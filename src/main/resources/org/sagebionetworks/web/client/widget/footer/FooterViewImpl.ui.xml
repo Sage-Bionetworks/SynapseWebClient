@@ -16,8 +16,8 @@
     	</div>
         <div class="clear"></div>
         <div class="footer-wrapper">
-            <div class="footer-container">
-	            <div class="footer container">
+            <div class="margin-left-15 margin-right-15">
+	            <div class="footer">
 					<div class="row">
 		                <div class="col-md-8">
 			                <h6>With Support From</h6>                            				                          				                    
@@ -50,8 +50,8 @@
             <div class="clear"></div>
 		</div>
         <div class="footer-line-wrapper">
-            <div class="footer-container">
-            	<div class="container footer-line">
+            <div class="margin-left-15 margin-right-15">
+            	<div class="footer-line">
             	    <div class="row">
 	                    <div class="col-md-4">
 	                        <p>Copyright <span ui:field="copyrightYear" /> <a href="http://www.sagebase.org">Sage Bionetworks</a><br/> 

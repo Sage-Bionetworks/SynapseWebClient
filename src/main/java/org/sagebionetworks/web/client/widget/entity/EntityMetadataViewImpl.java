@@ -46,12 +46,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	HTMLPanel entityNamePanel;
 	@UiField
 	HTMLPanel detailedMetadata;
-	
 	@UiField
 	HTMLPanel dataUseContainer;
-	@UiField
-	FlowPanel sharingContainer;
-
 	@UiField
 	Image entityIcon;
 	@UiField
@@ -60,10 +56,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SpanElement entityId;
 	@UiField
 	SimplePanel favoritePanel;
-
 	@UiField
 	SimplePanel doiPanel;
-
 	
 	private Presenter presenter;
 
@@ -104,21 +98,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		setEntityName(e.getName());
 		setEntityId(e.getId());
-		
-		sharingContainer.clear();
-		Label sharingLabel = new Label("Sharing:");
-		sharingLabel.addStyleName("boldText margin-right-5 inline-block");
-		sharingContainer.add(sharingLabel);
-		sharingContainer.add(publicPrivateBadge.asWidget());
-		publicPrivateBadge.configure(e);
-		if (canAdmin) {
-			Anchor shareSettings = new Anchor(DisplayConstants.MODIFY);
-			shareSettings.addStyleName("inline-block link");
-			
-			DisplayUtils.surroundWidgetWithParens(sharingContainer, shareSettings);
-			configureShareSettings(shareSettings, bundle.getEntity());
-		}
-			
+					
 		dataUseContainer.clear();
 		if(bundle.getPermissions().getCanPublicRead()) {
 			Widget dataUse = createRestrictionWidget();

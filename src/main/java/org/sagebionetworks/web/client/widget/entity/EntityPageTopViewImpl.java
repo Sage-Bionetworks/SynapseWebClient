@@ -355,8 +355,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		left.add(entityMetadata.asWidget());
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
-		// Programmatic Clients
-		right.add(createProgrammaticClientsWidget(bundle, versionNumber));
 				
 		// File History
 		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
@@ -381,6 +379,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
 		// Wiki
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true);
+
+		// LEFT/RIGHT Bottom
+		row = DisplayUtils.createRowContainer();
+		left = new LayoutContainer();
+		left.addStyleName("col-md-8");
+		right = new LayoutContainer();
+		right.addStyleName("col-md-4 push-right");
+		row.add(left);
+		row.add(right);
+		filesTabContainer.add(row);				
+		// Programmatic Clients
+		right.add(createProgrammaticClientsWidget(bundle, versionNumber));
+
 	}
 	
 	private Widget getFilePreview(EntityBundle bundle) {		
@@ -630,7 +641,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {		
-		LayoutContainer lc = new LayoutContainer();		
+		LayoutContainer lc = new LayoutContainer();
+		lc.addStyleName("panel");
 		lc.setAutoHeight(true);
 		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
 		pcc.addStyleName("right");
