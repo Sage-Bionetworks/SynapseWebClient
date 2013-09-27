@@ -1241,15 +1241,28 @@ ol.lowerroman {
   content: '\203a';
 }
 
-.projectNameTab {
-	color: #fff;
+.projectTitle {
+	color: #555;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: 200;
+    font-weight: 100;
+    font-size: 28px;
+    cursor: pointer;
+}
+a.projectTitle:hover {
+	text-decoration: none;
+	color: #555;
+} 
+
+.dropLargeIconText {
+	position: relative;
+	top: 4px;
 }
 
-.black-background {
-	background-color: #000;
+.liftLargeIcon {
+	position: relative;
+	top: -4px;
 }
+
 
 /*==================================*/
 /* GXT Overrides */

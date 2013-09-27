@@ -47,6 +47,7 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -54,6 +55,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -90,9 +92,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	LIElement adminListItem;
 	@UiField
-	LIElement projectNameTab;
-	@UiField
-	Anchor projectLink;
+	SimplePanel projectTitleContainer;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -246,13 +246,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	private void fillProjectLink(final EntityHeader projectHeader) {
-		projectLink.setHTML(SafeHtmlUtils.fromString(projectHeader.getName()));
-		projectLink.addClickHandler(new ClickHandler() {			
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(AbstractImagePrototype.create(iconsImageBundle.synapseProject24()).getHTML())
+		.appendHtmlConstant("<span class=\"dropLargeIconText\"> ")
+		.appendEscaped(projectHeader.getName())
+		.appendHtmlConstant("</span>");
+		Anchor a = new Anchor(shb.toSafeHtml());
+		a.addStyleName("projectTitle");
+		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, null, null));
 			}
 		});
+		projectTitleContainer.setWidget(a);
+		projectTitleContainer.setVisible(true);
 	}
 	
 	@Override
@@ -442,6 +450,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if(area == null) area = Synapse.EntityArea.WIKI; // select tab, set default if needed
 		setTabSelected(area, false);
 
+		projectTitleContainer.setVisible(false);
+		
 		// ** LEFT/RIGHT
 		LayoutContainer row;
 		row = DisplayUtils.createRowContainer();
