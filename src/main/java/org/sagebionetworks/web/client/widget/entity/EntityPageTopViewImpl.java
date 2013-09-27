@@ -6,19 +6,17 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.attachment.UploadResult;
-import org.sagebionetworks.repo.model.attachment.UploadStatus;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -43,20 +41,16 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.util.Padding;
-import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
-import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -80,10 +74,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	SimplePanel fullWidthPanel;
 	@UiField
 	SimplePanel topFullWidthPanel;
-	@UiField
-	SimplePanel breadcrumbsPanel;
-	@UiField
-	SimplePanel actionMenuPanel;
 
 	@UiField
 	Anchor wikiLink;
@@ -99,6 +89,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement filesListItem;
 	@UiField
 	LIElement adminListItem;
+	@UiField
+	LIElement projectNameTab;
+	@UiField
+	Anchor projectLink;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -125,6 +119,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
 	private CookieProvider cookies;
+	GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
@@ -144,7 +139,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			FilesBrowser filesBrowser, 
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget, 
-			PreviewWidget previewWidget, CookieProvider cookies) {
+			PreviewWidget previewWidget, CookieProvider cookies,
+			GlobalApplicationState globalApplicationState) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -164,7 +160,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.markdownWidget = markdownWidget;	//note that this will be unnecessary after description contents are moved to wiki markdown
 		this.wikiPageWidget = wikiPageWidget;
 		this.cookies = cookies;
-		
+		this.globalApplicationState = globalApplicationState;
 		initWidget(uiBinder.createAndBindUi(this));
 		initProjectLayout();
 	}
@@ -175,7 +171,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer = new LayoutContainer();
 		wikiTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
 		filesTabContainer = new LayoutContainer();
-		filesTabContainer.addStyleName("margin-left-15 margin-right-15");
+		filesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
 		adminTabContainer = new LayoutContainer();
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
 		wikiLink.setText(DisplayConstants.WIKI);
@@ -219,16 +215,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer.removeAll();
 		filesTabContainer.removeAll();
 		adminTabContainer.removeAll();
-		
-		// add breadcrumbs
-		breadcrumbsPanel.clear();
-		breadcrumbsPanel.add(breadcrumb.asWidget(bundle.getPath()));
-
-		// setup action menu
-		actionMenuPanel.clear();
-		actionMenuPanel.add(actionMenu.asWidget(bundle, isAdministrator,
-				canEdit, versionNumber));
-		
+				
+		// project header
+		fillProjectLink(projectHeader);
+	
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
 		isProject = bundle.getEntity() instanceof Project;
@@ -253,6 +243,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		colRightContainer.layout(true);
 		fullWidthContainer.layout(true);
 		topFullWidthContainer.layout(true);
+	}
+
+	private void fillProjectLink(final EntityHeader projectHeader) {
+		projectLink.setHTML(SafeHtmlUtils.fromString(projectHeader.getName()));
+		projectLink.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, null, null));
+			}
+		});
 	}
 	
 	@Override
@@ -323,8 +323,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tab container
 		fullWidthContainer.add(currentTabContainer);		
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
-		// project header
-		topFullWidthContainer.add(getProjectHeaderWidget(projectHeader)); 
 		
 		// ** LEFT/RIGHT
 		LayoutContainer row;
@@ -333,7 +331,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		left.addStyleName("col-md-8");
 		LayoutContainer right = new LayoutContainer();
 		right.addStyleName("col-md-4");
-		right.setStyleAttribute("float", "right !important");
+		row.add(left);
+		row.add(right);
+		filesTabContainer.add(row);		
+		// add breadcrumbs
+		left.add(breadcrumb.asWidget(bundle.getPath()));
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
 			left.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
@@ -342,12 +344,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		left.add(entityMetadata.asWidget());		
+		left.add(entityMetadata.asWidget());
+		// ActionMenu
+		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 		// Programmatic Clients
 		right.add(createProgrammaticClientsWidget(bundle, versionNumber));
-		row.add(left);
-		row.add(right);
-		filesTabContainer.add(row);		
 				
 		// File History
 		fileHistoryWidget.setEntityBundle(bundle, versionNumber);
@@ -391,12 +392,24 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tab container
 		fullWidthContainer.add(currentTabContainer);
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
+		
+		// ** LEFT/RIGHT
+		LayoutContainer row;
+		row = DisplayUtils.createRowContainer();
+		LayoutContainer left = new LayoutContainer();
+		left.addStyleName("col-md-8");
+		LayoutContainer right = new LayoutContainer();
+		right.addStyleName("col-md-4");
+		row.add(left);
+		row.add(right);
+		filesTabContainer.add(row);		
+		// add breadcrumbs
+		left.add(breadcrumb.asWidget(bundle.getPath()));
+		// ActionMenu
+		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 
-		// project header
-		topFullWidthContainer.add(getProjectHeaderWidget(projectHeader)); 
 
 		// File tab: everything
-		LayoutContainer row;
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		Widget ebW = entityMetadata.asWidget();
 		row = DisplayUtils.createRowContainer();
@@ -420,10 +433,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			
 	}
 
-	private HTML getProjectHeaderWidget(EntityHeader projectHeader) {
-		return new HTML(DisplayUtils.getIconHtml(iconsImageBundle.synapseProject16()) +" "+ projectHeader.getName());
-	}
-
 	// Render the Project entity
 	private void renderProjectEntity(final EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, final boolean canEdit,
@@ -433,13 +442,25 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		if(area == null) area = Synapse.EntityArea.WIKI; // select tab, set default if needed
 		setTabSelected(area, false);
 
+		// ** LEFT/RIGHT
+		LayoutContainer row;
+		row = DisplayUtils.createRowContainer();
+		LayoutContainer left = new LayoutContainer();
+		left.addStyleName("col-md-8");
+		LayoutContainer right = new LayoutContainer();
+		right.addStyleName("col-md-4");
+		row.add(left);
+		row.add(right);
+		topFullWidthContainer.add(row, new MarginData(5, 0, 0, 0));		
+
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
-		topFullWidthContainer.add(entityMetadata.asWidget());
-		topFullWidthContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
+		left.add(entityMetadata.asWidget());
+		left.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
+		// ActionMenu
+		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 
 		// Wiki Tab: Wiki
-		LayoutContainer row;
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false);
 		
 		// File Tab: Files, Annotations & old

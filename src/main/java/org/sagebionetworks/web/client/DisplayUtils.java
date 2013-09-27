@@ -1769,12 +1769,21 @@ public class DisplayUtils {
 		return createIconButton(title, type, null);
 	}
 		
-	public static com.google.gwt.user.client.ui.Button createIconButton(String title, ButtonType type, String iconClass) {
-		String style = iconClass == null ? "" : " class=\"glyphicon " + iconClass+ "\"" ;
-		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button(SafeHtmlUtils.fromSafeConstant("<span" + style +"></span> " + title));
+	public static com.google.gwt.user.client.ui.Button createIconButton(String title, ButtonType type, String iconClass) {		
+		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button();
+		relabelIconButton(btn, title, iconClass);
 		btn.removeStyleName("gwt-Button");
 		btn.addStyleName("btn btn-" + type.toString().toLowerCase());
 		return btn;
+	}
+	
+	public static void relabelIconButton(com.google.gwt.user.client.ui.Button btn, String title, String iconClass) {
+		String style = iconClass == null ? "" : " class=\"glyphicon " + iconClass+ "\"" ;
+		btn.setHTML(SafeHtmlUtils.fromSafeConstant("<span" + style +"></span> " + title));
+	}
+	
+	public static String getIcon(String iconClass) {
+		return "<span class=\"glyphicon " + iconClass + "\"></span>";
 	}
 
 	public static EntityHeader getProjectId(EntityPath entityPath) {

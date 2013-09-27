@@ -2,13 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.IconSize;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -21,28 +20,29 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,15 +57,14 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private EntityTypeProvider typeProvider;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
-	
-	private Long versionNumber;
-	private Button editButton;
-	private Button shareButton;
-	
-	private Button toolsButton;
-	private Button deleteButton;
-	private boolean isInTestMode;
 	private EntityBundle entityBundle;
+	private Long versionNumber;
+	private boolean isInTestMode;
+	
+	private Button shareButton;	
+	private DropdownButton toolsButton;
+	private PublicPrivateBadge publicPrivateBadge;
+	private String typeDisplay;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -76,7 +75,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
 			EntityFinder entityFinder,
-			EvaluationList evaluationList) {
+			EvaluationList evaluationList,
+			PublicPrivateBadge publicPrivateBadge) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
@@ -84,6 +84,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.typeProvider = typeProvider;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
+		this.publicPrivateBadge = publicPrivateBadge;
 	}
 
 	@Override
@@ -95,53 +96,27 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			boolean canEdit, 
 			Long versionNumber,
 			boolean isInTestMode) {
+		if(toolsButton != null) this.remove(toolsButton);
+		if(shareButton != null) this.remove(shareButton);
 		this.versionNumber = versionNumber;
 		this.entityBundle = entityBundle;
 		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
+		typeDisplay = typeProvider.getEntityDispalyName(entityType);
+				
+		// Share
+		shareButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_SHARE, ButtonType.DEFAULT, "glyphicon-lock");
+		shareButton.getElement().setId(DisplayConstants.ID_BTN_SHARE);
+		shareButton.addStyleName("pull-right margin-left-5");
+		configureShareButton(entity, isAdministrator);				
 		
-		if(deleteButton == null) {
-			deleteButton = getDeleteButton(entityType);
-			this.add(deleteButton);
-		}
-		
-		if(toolsButton == null) {
-			toolsButton = new Button(DisplayConstants.BUTTON_TOOLS_MENU, AbstractImagePrototype.create(iconsImageBundle.adminToolsGrey16()));
-			toolsButton.setHeight(25);
-			toolsButton.addStyleName("floatright margin-left-5");
-			this.add(toolsButton);	
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		}
-		
-		if(shareButton == null) { 
-			shareButton = new Button(DisplayConstants.BUTTON_SHARE, AbstractImagePrototype.create(iconsImageBundle.mailGrey16()));
-			shareButton.setId(DisplayConstants.ID_BTN_SHARE);
-			shareButton.setHeight(25);
-			shareButton.addStyleName("floatright margin-left-5");
-			this.add(shareButton);
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-		} 
-		
-		// edit button
-		if(editButton == null) {			
-			editButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
-			editButton.setId(DisplayConstants.ID_BTN_EDIT);
-			editButton.setHeight(25);
-			editButton.addStyleName("floatright margin-left-5");
-			this.add(editButton);
-			//this.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
-		}	
-		
-		editButton.setVisible(canEdit);
-		configureEditButton(entity, entityType);	
-		
-		shareButton.setVisible(isAdministrator);
-		configureShareButton(entity);
-		
-		deleteButton.setVisible(isAdministrator);
-		configureDeleteButton(entityType);
-		
+		// Tools
+		toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
+		toolsButton.addStyleName("pull-right margin-left-5");
 		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
+
+		this.add(toolsButton);	
+		this.add(shareButton);
 	}
 	
 	@Override
@@ -170,42 +145,31 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	@Override
 	public void clear() {
-		if(editButton != null) editButton.removeAllListeners();
-		if(shareButton != null) shareButton.removeAllListeners(); 
 	}
 	
 	/*
 	 * Private Methods
-	 */
-	private void configureEditButton(final Entity entity, EntityType entityType) {
-		editButton.removeAllListeners();
-		editButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
+	 */	
+	private void configureShareButton(Entity entity, boolean isAdministrator) { 
+		publicPrivateBadge.isEntityPublic(entity, new AsyncCallback<Boolean>() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// the presenter should handle this
-				presenter.onEdit();
+			public void onSuccess(Boolean isPublic) {
+				if(isPublic) {
+					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-globe");
+				} else {
+					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-lock");
+				}
 			}
-		});		
-	}
-
-	private void configureDeleteButton(EntityType entityType) {
-		final String typeDisplay = typeProvider.getEntityDispalyName(entityType);
-		deleteButton.removeAllListeners();
-		deleteButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				handleDeleteClick(typeDisplay);
+			public void onFailure(Throwable caught) {
+				DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, null);
 			}
 		});
-	}
-	
-	private void configureShareButton(Entity entity) { 
-		accessControlListEditor.setResource(entity);
-		shareButton.removeAllListeners();  
-		shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		shareButton.setVisible(isAdministrator);
+		accessControlListEditor.setResource(entity);  
+		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
 					@Override
 					public void invoke() {
@@ -216,63 +180,74 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		});
 	}
 	
-	private void configureToolsMenu(EntityBundle entityBundle, EntityType entityType, boolean isAdministrator, boolean canEdit) {
+	private void configureToolsMenu(EntityBundle entityBundle,
+			EntityType entityType, boolean isAdministrator, boolean canEdit) {
 		boolean authenticated = presenter.isUserLoggedIn();
-		// disable edit/admin items if in read-only mode
-		
-		// create drop down menu
-		Menu menu = new Menu();		
-		
 		Entity entity = entityBundle.getEntity();
 		
 		// upload
 		if(canEdit) {
-			addUploadItem(menu, entityBundle, entityType);
+			addEditItem(toolsButton);
+			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
 		if (canEdit && entity instanceof Versionable) {
-			addSubmitToEvaluationItem(menu, entity, entityType);
+			addSubmitToEvaluationItem(toolsButton, entity, entityType);
 		} 
 		
 		// create link
 		if(authenticated) {
-			addCreateShortcutItem(menu, entity, entityType);
+			addCreateShortcutItem(toolsButton, entity, entityType);
 		}
 		// move
 		if (canEdit) {
-			addMoveItem(menu, entity, entityType);
+			addMoveItem(toolsButton, entity, entityType);
 		}
 
 		if(entity instanceof Locationable || entity instanceof FileEntity) {
-			addUploadToGenomeSpace(menu, entityBundle);
+			addUploadToGenomeSpace(toolsButton, entityBundle);
 		}
 		
-		toolsButton.setMenu(menu);
-		toolsButton.setVisible(menu.getItemCount() > 0);
+		// put delete last
+		if(canEdit) {
+			addDeleteItem(toolsButton, typeDisplay);
+		}
+		
+		toolsButton.setVisible(toolsButton.getCount() > 0);
 	}
 
 	/**
 	 * 'Delete Entity' item
 	 * @param entityType 
-	 */
-	private Button getDeleteButton(EntityType entityType) {
-		Button deleteButton = new Button("", AbstractImagePrototype.create(iconsImageBundle.trash16()));
-		deleteButton.setHeight(25);
-		deleteButton.addStyleName("floatright margin-left-5");
-		DisplayUtils.addTooltip(synapseJSNIUtils, deleteButton, DisplayConstants.LABEL_DELETE, TOOLTIP_POSITION.BOTTOM);
-		return deleteButton;
-	}
-	
-	private void handleDeleteClick(final String typeDisplay) {
-		MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Listener<MessageBoxEvent>() {					
+	 */	
+	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
+		Anchor a = new Anchor(DisplayConstants.LABEL_DELETE);
+		a.addClickHandler(new ClickHandler() {			
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 					
-				Button btn = be.getButtonClicked();
-				if(Dialog.YES.equals(btn.getItemId())) {
-					presenter.deleteEntity();
-				}
+			public void onClick(ClickEvent event) {
+				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Listener<MessageBoxEvent>() {					
+					@Override
+					public void handleEvent(MessageBoxEvent be) { 					
+						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
+						if(Dialog.YES.equals(btn.getItemId())) {
+							presenter.deleteEntity();
+						}
+					}
+				});
 			}
 		});
+		menuBtn.addMenuItem(a);
+	}
+	
+	private void addEditItem(DropdownButton menuBtn) {
+		Anchor a = new Anchor(DisplayConstants.BUTTON_EDIT);
+		a.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEdit();
+			}
+		});
+		menuBtn.addMenuItem(a);
 	}
 	
 	/**
@@ -281,12 +256,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entity 
 	 * @param entityType 
 	 */
-	private void addUploadItem(Menu menu, final EntityBundle entityBundle, EntityType entityType) {
+	private void addUploadItem(DropdownButton menuBtn, final EntityBundle entityBundle, EntityType entityType) {
 		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
-			MenuItem item = new MenuItem(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-			item.setIcon(AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
 			final Window window = new Window();
 			uploader.clearHandlers();
 			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
@@ -302,9 +275,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 					window.hide();
 				}
 			});
-			item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
+			a.addClickHandler(new ClickHandler() {			
 				@Override
-				public void componentSelected(MenuEvent ce) {
+				public void onClick(ClickEvent event) {
 					window.removeAll();
 					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
@@ -314,8 +288,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
 					window.show();
 				}
-			});			
-			menu.add(item);
+			});
+			menuBtn.addMenuItem(a);
 		}
 	}
 		
@@ -325,13 +299,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entity 
 	 * @param entityType 
 	 */
-	private void addCreateShortcutItem(Menu menu, Entity entity,EntityType entityType) {	
+	private void addCreateShortcutItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {	
 		// Create shortcut
-		MenuItem item = new MenuItem(DisplayConstants.LABEL_CREATE_LINK);
-		item.setIcon(AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntityClassName(Link.class.getName(), IconSize.PX16, iconsImageBundle)));		
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+//		item.setIcon(AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntityClassName(Link.class.getName(), IconSize.PX16, iconsImageBundle)));		
+		Anchor a = new Anchor(DisplayConstants.LABEL_CREATE_LINK);
+		a.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(MenuEvent ce) {				
+			public void onClick(ClickEvent event) {
 				entityFinder.configure(false);				
 				final Window window = new Window();
 				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
@@ -347,20 +321,20 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 				});					
 			}
 		});
-		menu.add(item);
+		menuBtn.addMenuItem(a);		
 	}
 
-	private void addSubmitToEvaluationItem(Menu menu, Entity entity,EntityType entityType) {
-		MenuItem item = new MenuItem(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION);
-		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
+//		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
+		Anchor a = new Anchor(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION);
+		a.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(MenuEvent ce) {
+			public void onClick(ClickEvent event) {
 				//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
 				presenter.showAvailableEvaluations();
 			}
 		});
-		menu.add(item);
+		menuBtn.addMenuItem(a);
 	}
 	
 	/**
@@ -369,13 +343,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entity 
 	 * @param entityType 
 	 */
-	private void addMoveItem(Menu menu, final Entity entity, EntityType entityType) {
-		final String typeDisplay = typeProvider.getEntityDispalyName(entityType);
-		MenuItem itemMove = new MenuItem(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
-		itemMove.setIcon(AbstractImagePrototype.create(iconsImageBundle.moveButton16()));		
-		itemMove.addSelectionListener(new SelectionListener<MenuEvent>() {
+	private void addMoveItem(DropdownButton menuBtn, final Entity entity, EntityType entityType) {		
+//		itemMove.setIcon(AbstractImagePrototype.create(iconsImageBundle.moveButton16()));		
+		Anchor a = new Anchor(DisplayConstants.LABEL_MOVE + " " + typeDisplay);
+		a.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(MenuEvent ce) {				
+			public void onClick(ClickEvent event) {
 				entityFinder.configure(false);				
 				final Window window = new Window();
 				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
@@ -391,17 +364,20 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 				});				
 			}
 		});
-		menu.add(itemMove);
+		menuBtn.addMenuItem(a);
 	}
 
-	private void addUploadToGenomeSpace(final Menu menu, final EntityBundle bundle) {
-		MenuItem item = new MenuItem("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML());		
-		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+	private void addUploadToGenomeSpace(final DropdownButton menuBtn, final EntityBundle bundle) {
+		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML()));
+		a.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(MenuEvent ce) {
+			public void onClick(ClickEvent event) {
 				presenter.uploadToGenomespace();
 			}
 		});
-		menu.add(item);
-	}
+		menuBtn.addMenuItem(a);	}
 }
+
+
+
+

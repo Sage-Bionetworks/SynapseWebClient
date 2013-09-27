@@ -1140,6 +1140,10 @@ ol.lowerroman {
     position: absolute;
 }
 
+.fileTabTopPadding {
+	padding-top: 5px;
+}
+
 .hide {
 	display: none;
 }
@@ -1235,6 +1239,16 @@ ol.lowerroman {
 
 .carousel-control-clean .icon-next:before {
   content: '\203a';
+}
+
+.projectNameTab {
+	color: #fff;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 200;
+}
+
+.black-background {
+	background-color: #000;
 }
 
 /*==================================*/

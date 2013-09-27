@@ -4,30 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -53,7 +47,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget) {		
+			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
+			ActionMenu actionMenu) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -65,7 +60,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
-				
+		FileEntity fake = new FileEntity();
+		fake.setId("syn123");
+		fake.setName("fake");
+		EntityBundle bundle = new EntityBundle(fake, null, null, null, null, null, null, null);
+		entityView.setWidget(actionMenu.asWidget(bundle, true, true, new Long(1)));
 	}
 
 	@Override

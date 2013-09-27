@@ -9,9 +9,11 @@ import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,7 +59,11 @@ public class BreadcrumbViewImpl extends LayoutContainer implements BreadcrumbVie
 			final LinkData data = breadcrumbs.get(i);
 			String text = data.getText();
 			text = stubString(text);
-			Anchor anchor = new Anchor(text);
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			if(data.getIcon() != null) 
+				shb.appendHtmlConstant(AbstractImagePrototype.create(data.getIcon()).getHTML() + " ");
+			shb.appendEscaped(text);	
+			Anchor anchor = new Anchor(shb.toSafeHtml());
 			anchor.addClickHandler(new ClickHandler() {				
 				@Override
 				public void onClick(ClickEvent event) {
