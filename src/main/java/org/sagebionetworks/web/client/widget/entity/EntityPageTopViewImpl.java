@@ -174,7 +174,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
 		adminTabContainer = new LayoutContainer();
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
-		wikiLink.setText(DisplayConstants.WIKI);
+		wikiLink.setText(DisplayConstants.PROJECT_WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
 		fileLink.setText(DisplayConstants.FILES);
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));

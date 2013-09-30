@@ -27,8 +27,8 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void cancelClicked();
 	}
 	
-	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth);
-	public void showNoWikiAvailableUI();
+	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);
+	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();
 	public void updateWikiPage(WikiPage newPage);

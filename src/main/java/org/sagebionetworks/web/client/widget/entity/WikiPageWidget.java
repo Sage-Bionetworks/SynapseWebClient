@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -48,11 +49,11 @@ SynapseWidgetPresenter {
 	private WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
-	private String ownerObjectName; //used for linking back to the owner object
 	private int spanWidth;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
+	boolean isDescription = false;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -60,7 +61,7 @@ SynapseWidgetPresenter {
 	}
 	
 	public interface OwnerObjectNameCallback{
-		public void ownerObjectNameInitialized();
+		public void ownerObjectNameInitialized(String ownerObjectName, boolean isDescription);
 	}
 	
 	@Inject
@@ -107,7 +108,7 @@ SynapseWidgetPresenter {
 		
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
-			public void ownerObjectNameInitialized() {
+			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
 				//get the wiki page
 				synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
 					@Override
@@ -116,7 +117,7 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth, isDescription);
 						} catch (JSONObjectAdapterException e) {
 							onFailure(e);
 						}
@@ -127,7 +128,7 @@ SynapseWidgetPresenter {
 						if (caught instanceof NotFoundException) {
 							//show insert wiki button if user can edit and it's embedded in another entity page
 							if (canEdit && isEmbeddedInOwnerPage)
-								view.showNoWikiAvailableUI();
+								view.showNoWikiAvailableUI(isDescription);
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
 							
@@ -198,8 +199,9 @@ SynapseWidgetPresenter {
 							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
-								ownerObjectName = theHeader.getName();
-								callback.ownerObjectNameInitialized();
+								isDescription = !(Project.class.getName().equals(theHeader.getType()));
+								String ownerObjectName = theHeader.getName();
+								callback.ownerObjectNameInitialized(ownerObjectName, isDescription);
 							} else {
 								view.show404();
 							}
@@ -219,8 +221,8 @@ SynapseWidgetPresenter {
 			}
 		}
 		else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
-			ownerObjectName = "";
-			callback.ownerObjectNameInitialized();
+			isDescription = true;
+			callback.ownerObjectNameInitialized("", isDescription);
 		}
 	}
 	
@@ -297,10 +299,12 @@ SynapseWidgetPresenter {
 			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					if (isCreatingWiki)
-						view.showInfo("Wiki Created", "");
-					else
+					if (isCreatingWiki) {
+						String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
+						view.showInfo( type + " Created", "");
+					} else {
 						view.showInfo("Page '" + name + "' Added", "");
+					}
 					
 					refresh();
 				}

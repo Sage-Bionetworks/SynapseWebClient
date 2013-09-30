@@ -26,10 +26,8 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
@@ -38,7 +36,6 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -62,8 +59,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
-	private Button editButton, addPageButton;
-	HandlerRegistration editButtonHandlerRegistration, addButtonHandlerRegistration; 
+//	private Button editButton, addPageButton; 
 	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
@@ -76,6 +72,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WikiPageKey wikiKey;
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
+	private boolean isDescription = false;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -116,20 +113,24 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void showNoWikiAvailableUI() {
+	public void showNoWikiAvailableUI(boolean isDescription) {
 		removeAll(true);
+		this.isDescription = isDescription;
 		SimplePanel createWikiButtonWrapper = new SimplePanel();
 		createWikiButtonWrapper.addStyleName("margin-bottom-20");
-		createWikiButtonWrapper.add(getInsertPageButton(true));
+		Button insertBtn = createInsertOrAddPageButton(true);		
+		createWikiButtonWrapper.add(insertBtn);
 		add(createWikiButtonWrapper);
 		layout(true);
 	}
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int colWidth) {
+			String ownerObjectName, Boolean canEdit,
+			boolean isEmbeddedInOwnerPage, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
+		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
@@ -194,54 +195,30 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
 			commandBar = new LayoutContainer();
 			commandBarWrapper.add(commandBar);
+		} else {
+			commandBar.removeAll();
 		}
 			
-		if(editButton == null) {			
-			editButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_WIKI, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
-			editButton.addStyleName("left display-inline");			
-			editButton.getElement().setId(DisplayConstants.ID_BTN_EDIT);			
-			commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
-		}
+		Button editButton = createEditButton();			
+		commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
 		
-		if(addPageButton == null) {
-			addPageButton = getInsertPageButton(false);
-			addPageButton.addStyleName("display-inline");
+		if(!isDescription) {
+			Button addPageButton = createInsertOrAddPageButton(false);
 			commandBar.add(addPageButton);
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
-		configureEditButton();
-		
+		commandBar.layout(true);
 		return commandBarWrapper;
 	}
-	
-	private Button getInsertPageButton(final boolean isFirstPage) {
-		String buttonText = isFirstPage ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
-		Button insertButton = DisplayUtils.createIconButton(buttonText, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
-		if(addButtonHandlerRegistration != null) addButtonHandlerRegistration.removeHandler();
-		addButtonHandlerRegistration = insertButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (isFirstPage) {
-					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
-				}
-				else {
-					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-						@Override
-						public void onSave(String name, String description) {
-							presenter.createPage(name);
-						}
-					});
-				}
 
-			}
-		});
-		return insertButton;
-	}
-	
-	private void configureEditButton() {
-		if(editButtonHandlerRegistration != null) editButtonHandlerRegistration.removeHandler();
-		editButtonHandlerRegistration = editButton.addClickHandler(new ClickHandler() {			
+	private Button createEditButton() {
+		String editLabel = isDescription ? DisplayConstants.EDIT_DESCRIPTION : DisplayConstants.BUTTON_EDIT_WIKI;
+		Button btn = DisplayUtils.createIconButton(editLabel, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
+		btn.addStyleName("display-inline");			
+		btn.getElement().setId(DisplayConstants.ID_BTN_EDIT);
+		
+		btn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				//change to edit mode
@@ -275,8 +252,43 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				layout(true);
 			}
 		});
+
+		return btn;
 	}
 
+	private Button createInsertOrAddPageButton(final boolean isFirstPage) {
+		Button btn = DisplayUtils.createIconButton(getInsertBtnText(isFirstPage), DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+		btn.addStyleName("display-inline");
+		btn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (isFirstPage) {
+					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
+				}
+				else {
+					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
+						@Override
+						public void onSave(String name, String description) {
+							presenter.createPage(name);
+						}
+					});
+				}
+				
+			}
+		});
+		return btn;
+	}
+
+	private String getInsertBtnText(final boolean isFirstPage) {
+		String buttonText;
+		if(isFirstPage) {
+			buttonText = isDescription ? DisplayConstants.ADD_DESCRIPTION : DisplayConstants.CREATE_WIKI;
+		} else {
+			buttonText = DisplayConstants.ADD_PAGE;
+		}
+		return buttonText;
+	}
+	
 	private ManagementHandler getManagementHandler() {
 		return new ManagementHandler() {
 			@Override
@@ -377,5 +389,5 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	@Override
 	public void clear() {
 		removeAll(true);
-	}
+	}		
 }

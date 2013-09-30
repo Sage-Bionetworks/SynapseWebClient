@@ -192,6 +192,7 @@ public class DisplayConstants {
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
+	public static final String EDIT_DESCRIPTION = "Edit Description";	
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
@@ -264,7 +265,7 @@ public class DisplayConstants {
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
-	public static final String LABEL_NO_MARKDOWN = "Please add more information by clicking the \"Edit Wiki\" button.";
+	public static final String LABEL_NO_MARKDOWN = "There is no content. Please edit to add information.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
@@ -504,9 +505,11 @@ public class DisplayConstants {
 	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
-	public static final String CREATE_WIKI = "Insert Wiki";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String WIKI = "Wiki";
+	public static final String PROJECT_WIKI = "Project Wiki";
+	public static final String CREATE_WIKI = "Create Wiki";
+	public static final String ADD_DESCRIPTION = "Add Description";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
