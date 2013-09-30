@@ -569,12 +569,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 	}
 	
-	private LayoutContainer createSpacer() {
-		LayoutContainer onewide = new LayoutContainer();
-		onewide.setStyleName("span-1 notopmargin");		
-		return onewide;
-	}
-
 	// Render Snapshot Entity
 	// TODO: This rendering should be phased out in favor of a regular wiki page
 	private void renderSummaryEntity(EntityBundle bundle,
