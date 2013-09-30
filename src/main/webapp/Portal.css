@@ -974,6 +974,11 @@ ol.lowerroman {
 .padding-top-15 {
 	padding-top: 15px;
 }
+
+.padding-bottom-15 {
+	padding-bottom: 15px;
+}
+
 .howToUseLink {
 	font-size: 16px;
 	font-style: normal !important;

@@ -1325,7 +1325,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">404</p><h1>"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
@@ -1344,7 +1344,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">403</p><h1>"
 						+ DisplayConstants.UNAUTHORIZED
 						+ "</h1>"
 						+ "<p>"
