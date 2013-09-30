@@ -26,7 +26,7 @@ public class YouTubeWidgetViewImpl extends LayoutContainer implements YouTubeWid
 	public static String getYouTubeHTML(String videoId){
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("<iframe width=\"560\" height=\"315\" src=\"http://www.youtube.com/embed/");
+		sb.append("<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/");
 		sb.append(videoId);
 		sb.append("\" frameborder=\"0\" allowfullscreen></iframe>");
 	    return sb.toString();
