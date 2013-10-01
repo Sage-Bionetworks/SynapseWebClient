@@ -65,7 +65,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private Boolean canEdit;
 	private WikiPage currentPage;
 	private Breadcrumb breadcrumb;
-	private boolean isEmbeddedInOwnerPage;
+	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
 	private int colWidth;
@@ -126,14 +126,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit,
-			boolean isEmbeddedInOwnerPage, int colWidth, boolean isDescription) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
-		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
@@ -149,7 +148,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		removeAll(true);
 		SimplePanel topBarWrapper = new SimplePanel();
 		topBarWrapper.addStyleName("margin-top-5");
-		String titleString = isEmbeddedInOwnerPage ? "" : currentPage.getTitle();
+		String titleString = isRootWiki ? "" : currentPage.getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		add(topBarWrapper);
 		
@@ -171,7 +170,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	private Widget getBreadCrumbs(int colWidth) {
 		final SimplePanel breadcrumbsWrapper = new SimplePanel();		
-		if (!isEmbeddedInOwnerPage) {
+		if (!isRootWiki) {
 			List<LinkData> links = new ArrayList<LinkData>();
 			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
 				//point to Home
@@ -231,11 +230,10 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				
 				LayoutContainer form = new LayoutContainer();
 				final TextBox titleField = new TextBox();
-				if (!isEmbeddedInOwnerPage) {
+				if (!isRootWiki) {
 					titleField.setValue(currentPage.getTitle());
 					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
-					titleField.setHeight("35px");
-					
+					titleField.setHeight("35px");					
 					form.add(titleField);
 				}
 				//also add commands at the bottom

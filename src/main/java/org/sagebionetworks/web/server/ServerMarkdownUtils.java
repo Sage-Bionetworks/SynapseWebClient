@@ -1,37 +1,23 @@
 package org.sagebionetworks.web.server;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.widget.entity.SharedMarkdownUtils;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.server.markdownparser.MarkdownExtractor;
-import org.sagebionetworks.web.server.markdownparser.MarkdownRegExConstants;
 import org.sagebionetworks.web.server.markdownparser.TableParser;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import eu.henkelmann.actuarius.ActuariusTransformer;
-
 public class ServerMarkdownUtils {
-	
-	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by exactly 3 '`', then it's a match
-	public static final String FENCE_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{3}";
-	//At the beginning of the line, if there are >=0 whitespace characters, or '>', followed by ` exactly 4 times, then it's a match
-	//for starting code blocks, capture the language parameter by looking for word characters (or a hyphen) one or more times
-	public static final String START_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{4}\\s*([a-zA-Z_0-9-]+)\\s*$";
-	public static final String END_CODE_BLOCK_REGEX = "^[> \t\n\f\r]*[`]{4}\\s*$";
-	
 	public static final String START_PRE_CODE = "<pre><code";
 	public static final String END_PRE_CODE = "</code></pre>";
 	
@@ -52,81 +38,12 @@ public class ServerMarkdownUtils {
 	
 	
 	/**
-	 * This converts the given markdown to html using the given markdown processor.
-	 * It also post processes the output html, including:
-	 * *sending all links to a new window.
-	 * *applying the markdown css classname to entities supported by the markdown.
-	 * *auto detects Synapse IDs (and creates links out of them)
-	 * *auto detects generic urls (and creates links out of them)
-	 * *resolve Widgets!
-	 * @param panel
-	 * @throws IOException 
-	 */
-	public static String markdown2Html(String markdown, Boolean isPreview, ActuariusTransformer markdownProcessor) throws IOException {
-		String originalMarkdown = markdown;
-		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
-		//trick to maintain newlines when suppressing all html
-		if (markdown != null) {
-			markdown = preserveWhitespace(markdown);
-		}
-//		lastTime = System.currentTimeMillis();
-		//played with other forms of html stripping, 
-		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
-		markdown = Jsoup.parse(markdown).text();
-		markdown = restoreWhitespace(markdown);
-		markdown = markdown.replace(R_MESSED_UP_ASSIGNMENT, R_ASSIGNMENT);
-//		reportTime("suppress/escape html");
-		markdown = resolveHorizontalRules(markdown);
-		markdown = resolveTables(markdown);
-		markdown = resolveCodeWithLanguage(markdown);
-//		reportTime("resolved tables");
-		markdown = addSubpagesIfNotPresent(markdown);
-		markdown = fixNewLines(markdown);
-		markdown = markdownProcessor.apply(markdown);
-//		reportTime("markdownToHtml");
-		if (markdown == null) {
-			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
-			return originalMarkdown; 
-		}
-		//using jsoup, since it's already in this project!
-		Document doc = Jsoup.parse(markdown);
-//		reportTime("Jsoup parse");
-		ServerMarkdownUtils.assignIdsToHeadings(doc);
-//		reportTime("Assign IDs to Headings");
-		ServerMarkdownUtils.sendAllLinksToNewWindow(doc);
-//		reportTime("sendAllLinksToNewWindow");
-		Elements anchors = doc.getElementsByTag("a");
-		anchors.addClass("link");
-		
-		Elements tables = doc.getElementsByTag("table");
-		tables.addClass("markdowntable");
-		
-//		reportTime("add link class");
-		ServerMarkdownUtils.addWidgets(doc, isPreview);
-//		reportTime("addWidgets");
-		SynapseAutoLinkDetector.getInstance().createLinks(doc);
-		DoiAutoLinkDetector.getInstance().createLinks(doc);
-		UrlAutoLinkDetector.getInstance().createLinks(doc);
-//		reportTime("addSynapseLinks");
-		//URLs are automatically resolved from the markdown processor
-		String returnHtml = "<div class=\"markdown\">" + doc.html() + "</div>";
-		return returnHtml;
-	}
-	
-	public static String preserveWhitespace(String markdown){
-		return markdown.replace("\n", TEMP_NEWLINE_DELIMITER).replace(" ", TEMP_SPACE_DELIMITER);
-	}
-	
-	public static String restoreWhitespace(String markdown){
-		return markdown.replace(TEMP_NEWLINE_DELIMITER, "\n").replace(TEMP_SPACE_DELIMITER, " ");
-	}
-	
-	/**
 	 * Retrieves each container specified by saved ids and inserts the associated contents into the container
 	 * @param extractor
 	 * @param doc
 	 */
 	public static void insertExtractedContentToMarkdown(MarkdownExtractor extractor, Document doc, boolean hasHtml) {
+		Set<String> foundKeys = new HashSet<String>();
 		for(String key: extractor.getContainerIds()) {
 			Element el = doc.getElementById(key);
 			if(el != null) {
@@ -135,56 +52,14 @@ public class ServerMarkdownUtils {
 				} else {
 					el.appendText(extractor.getContent(key));
 				}
+				foundKeys.add(key);
 			}
 		}
+		//clean up the container Ids that we resolved
+		extractor.removeContainerIds(foundKeys);
 	}
 	
-	/**
-	 * adds a reference to the subpages wiki widget at the top of the page if it isn't already in the markdown
-	 * @param markdown
-	 * @return
-	 */
-	public static String addSubpagesIfNotPresent(String markdown) {
-		String subpagesMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
-		String newMarkdown = markdown;
-		if (!markdown.contains(subpagesMarkdown)) {
-			String noAutoWikiSubpages = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
-			if (markdown.contains(noAutoWikiSubpages)) {
-				//found.  delete this string, and do not include subpages markdown
-				newMarkdown = markdown.replace(noAutoWikiSubpages, "");
-			}
-			else {
-				newMarkdown = subpagesMarkdown + "\n"+ markdown;	
-			}
-		}
-		return newMarkdown;
-	}
 	
-	/**
-	 * adds html line breaks to every line, unless it suspects that the line will be in a preformatted code block
-	 * @param markdown
-	 * @return
-	 */
-	public static String fixNewLines(String markdown) {
-		if (markdown == null || markdown.length() == 0) return markdown;
-		String regEx = FENCE_CODE_BLOCK_REGEX;
-		Pattern p = Pattern.compile(regEx);
-		StringBuilder sb = new StringBuilder();
-		boolean isSuspectedCode = false;
-		for (String line : markdown.split("\n")) {
-			boolean currentLineHasFence = line.contains(START_PRE_CODE) || line.contains(END_PRE_CODE) || p.matcher(line).matches();
-			if (currentLineHasFence) {
-				//flip
-				isSuspectedCode = !isSuspectedCode;
-			}
-			sb.append(line);
-			//add a <br> if we're not in a code block (unless it's the current line that has the ```)
-			if (!isSuspectedCode && !currentLineHasFence)
-				sb.append(HTML_LINE_BREAK);
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
 	
 //	private static long lastTime;
 //	private static void reportTime(String description) {
@@ -235,11 +110,6 @@ public class ServerMarkdownUtils {
 		}
 	}
 	
-	public static void sendAllLinksToNewWindow(Document doc) {
-		Elements elements = doc.getElementsByTag("a");
-		elements.attr("target", "_blank");
-	}
-
 
 	public static void resolveAttachmentImages(Document doc, String attachmentUrl) {
 		Elements images = doc.select("img");
@@ -276,79 +146,8 @@ public class ServerMarkdownUtils {
 	        return builder.toString();
 	}
 	
-	public static String resolveHorizontalRules(String rawMarkdown) {
-		//find all horizontal rules
-		//match if we have 3 or more '-' or '*', and it's the only thing on the line
-		String regEx1 = MarkdownRegExConstants.HR_REGEX1;
-		String regEx2 = MarkdownRegExConstants.HR_REGEX2;
-		String[] lines = rawMarkdown.split("\n");
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < lines.length; i++) {
-			String testLine = lines[i].replaceAll(" ", "");
-			boolean isHr = testLine.matches(regEx1) || testLine.matches(regEx2);
-			if (isHr) {
-				//output hr
-				sb.append("<hr>\n");
-			} else {
-				//just add the line and move on
-				sb.append(lines[i] + "\n");
-			}
-		}
-		
-		return sb.toString();
-	}
 	
 	
-	public static String resolveTables(String rawMarkdown) {
-		//find all tables, and replace the raw text with html table
-		String regEx = MarkdownRegExConstants.TABLE_REGEX;
-		String[] lines = rawMarkdown.split("\n");
-		StringBuilder sb = new StringBuilder();
-		int tableCount = 0;
-		int i = 0;
-		while (i < lines.length) {
-			boolean looksLikeTable = lines[i].matches(regEx);
-			if (looksLikeTable) {
-				//create a table, and consume until the regEx stops
-				i = appendNewTableHtml(sb, regEx, lines, tableCount, i);
-				tableCount++;
-			} else {
-				//just add the line and move on
-				sb.append(lines[i] + "\n");
-				i++;
-			}
-		}
-		
-		return sb.toString();
-	}
-	
-	public static String resolveCodeWithLanguage(String markdown) {
-		if (markdown == null || markdown.length() == 0) return markdown;
-		String startCodeBlockRegex = START_CODE_BLOCK_REGEX;
-		String endCodeBlockRegex = END_CODE_BLOCK_REGEX;
-		Pattern p1 = Pattern.compile(startCodeBlockRegex);
-		Pattern p2 = Pattern.compile(endCodeBlockRegex);
-		StringBuilder sb = new StringBuilder();
-		for (String line : markdown.split("\n")) {
-			Matcher p1Matcher = p1.matcher(line);
-			Matcher p2Matcher = p2.matcher(line);
-			if (p1Matcher.matches() && p1Matcher.groupCount() == 1) {
-				//start pre code with the specified language
-				String language = p1Matcher.group(1);
-				sb.append(START_PRE_CODE + " class=\""+language.toLowerCase()+"\">");
-				
-			} else if (p2Matcher.matches()){
-				//end pre code
-				sb.append(END_PRE_CODE);
-			} else {
-				//else neither
-				sb.append(line);	
-			}
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
-
 	
 	public static int appendNewTableHtml(StringBuilder builder, String regEx, String[] lines, int tableCount, int i) {
 		builder.append(TableParser.TABLE_START_HTML+WidgetConstants.MARKDOWN_TABLE_ID_PREFIX+tableCount+"\" class=\"tablesorter\">");
@@ -381,57 +180,6 @@ public class ServerMarkdownUtils {
 		return i;
 	}
 	
-	public static void addWidgets(Document doc, Boolean isPreview) {
-		String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
-		// using a regular expression to find our special widget notation, replace with a div with the widget name
-		String regEx = "\\W*?("+WidgetConstants.WIDGET_START_MARKDOWN_ESCAPED+"([^\\}]*)\\})\\W*?"; //reluctant qualification so that it finds multiple per line
-		Elements elements = doc.select("*:matchesOwn(" + regEx + ")");  	// selector is case insensitive
-		Pattern pattern = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE);
-		int widgetsFound = 0;
-		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
-			Element element = (Element) iterator.next();
-			//only process the TextNode children (ignore others)
-			for (Iterator iterator2 = element.childNodes().iterator(); iterator2.hasNext();) {
-				Node childNode = (Node) iterator2.next();
-				if (childNode instanceof TextNode) {
-					String oldText = ((TextNode) childNode).text();
-					// find it in the text
-					Matcher matcher = pattern.matcher(oldText);
-					StringBuilder sb = new StringBuilder();
-					int previousFoundIndex = 0;
-					boolean childFound = false;
-					boolean inlineWidget = false;
-					while (matcher.find()) {
-						childFound = true;
-						if (matcher.groupCount() == 2) {
-							sb.append(oldText.substring(previousFoundIndex, matcher.start()));
-							sb.append(SharedMarkdownUtils.getWidgetHTML(widgetsFound + suffix, matcher.group(2)));
-							if(matcher.group(2).contains(WidgetConstants.INLINE_WIDGET_KEY)) {
-								inlineWidget = true;
-							}
-							widgetsFound++;
-							previousFoundIndex = matcher.end(1);
-						}
-					}
-					if (childFound) {
-						if (previousFoundIndex <= oldText.length() - 1)
-							// substring, go from the previously found index to the end
-							sb.append(oldText.substring(previousFoundIndex));
-						//wrap new html in an appropriate tag, since it needs a container!
-						Element newElement;
-						if(inlineWidget) {
-							newElement = doc.createElement("span");
-						} else {
-							newElement = doc.createElement("div"); 					
-						}
-						newElement.html(sb.toString());
-						childNode.replaceWith(newElement);
-					}
-				}
-			}
-		}
-	}
-
 	public static String getSynAnchorHtml(String synId){
 		return "<a class=\"link\" href=\"#!Synapse:" + synId +"\">" + synId + "</a>";
 	}

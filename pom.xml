@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2013-09-13-e70558e-662</synapse.version>
+		<synapse.version>2013-10-01-fdd5679-690</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -465,12 +465,6 @@
 			<version>20100527</version>
 		</dependency>
 
-		<!-- Markdown -->
-		<dependency>
-			<groupId>eu.henkelmann</groupId>
-			<artifactId>actuarius_2.9.2</artifactId>
-			<version>0.2.4</version>
-		</dependency>
 		<!-- Test only dependencies -->
 		<dependency>
 			<groupId>com.sun.grizzly</groupId>

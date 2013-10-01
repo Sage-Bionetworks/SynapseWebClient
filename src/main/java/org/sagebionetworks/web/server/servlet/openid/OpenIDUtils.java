@@ -19,13 +19,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.openid4java.consumer.ConsumerManager;
 import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.authutil.CrowdAuthUtil;
+import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.auth.User;
 import org.sagebionetworks.repo.web.NotFoundException;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
@@ -175,7 +174,7 @@ public class OpenIDUtils {
 			
 			if (email==null) throw new AuthenticationException(400, "Unable to authenticate", null);
 			
-			User credentials = new User();			
+			NewUser credentials = new NewUser();			
 			credentials.setEmail(email);
 
 			Map<String,Collection<String>> attrs = null;
