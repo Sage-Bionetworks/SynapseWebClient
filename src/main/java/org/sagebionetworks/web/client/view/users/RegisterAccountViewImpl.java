@@ -123,14 +123,14 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     formPanel = new FormPanel();  
 		     formPanel.setFrame(true);  
 		     formPanel.setHeaderVisible(false);
-		     formPanel.setWidth(380);  
+		     formPanel.setWidth(515);  
 		     formPanel.setLayout(new FlowLayout());		     
 		   
 		     FieldSet fieldSet = new FieldSet();  
 		     fieldSet.setHeading("User Information&nbsp;");  
 		   
 		     FormLayout layout = new FormLayout();  
-		     layout.setLabelWidth(85);  
+		     layout.setLabelWidth(100);  
 		     fieldSet.setLayout(layout);  
 		     
 		     final TextField<String> email = new TextField<String>();  

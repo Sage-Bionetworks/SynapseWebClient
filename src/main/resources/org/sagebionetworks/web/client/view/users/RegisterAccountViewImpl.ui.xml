@@ -4,36 +4,26 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
 	<ui:style>
-		
+
 	</ui:style>
 	<g:HTMLPanel>
-
-		<!-- start header -->
-		<!-- MAIN CONTAINER -->
-		<!-- HEADER -->
 		<div class="color-line"></div>
 		<div class="clear"></div>
-		<div class="container">
-			<g:SimplePanel ui:field="header" />
-			<div class="span-24 notopmargin">
-				<div class="span-24 separator margin-top-10-imp"></div>
-				<!-- end header -->
-				<div class="span-7"></div>
-				<div class="span-10 inner-6 view">
-					<h2>Register With Synapse </h2>
-					<g:SimplePanel ui:field="registerAccountPanel" />
-					<span ui:field="contentHtml"></span>
-
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp"></div>
+		<div class="container margin-top-15">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="well">
+						<h2>Register With Synapse </h2>
+						<g:SimplePanel ui:field="registerAccountPanel" />
+						<span ui:field="contentHtml"></span>
+					</div>
 				</div>
-				<div class="span-7"></div>
-
 			</div>
-
-			<!-- start footer -->
 			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+		</div>
 		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
 
 	</g:HTMLPanel>
 </ui:UiBinder> 
