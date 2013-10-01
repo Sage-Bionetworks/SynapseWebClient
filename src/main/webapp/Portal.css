@@ -1130,7 +1130,7 @@ ol.lowerroman {
 }
 
 .highlight-line {
-    padding: 3px;
+    padding: 18px;
 }
 
 .fixedWidthFont {
@@ -1268,6 +1268,9 @@ a.projectTitle:hover {
 	top: -4px;
 }
 
+.display-table {
+	display: table;
+}
 
 /*==================================*/
 /* GXT Overrides */

@@ -1,73 +1,66 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-		
+
 	<ui:style>
 		.important {
-			font-weight: bold;
+		font-weight: bold;
 		}
-		
+
 		.rowTop {
-			vertical-align: top;
+		vertical-align: top;
 		}
 	</ui:style>
-		
+
 	<g:HTMLPanel>
+		<div class="color-line"></div>
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp"></div>
+		<div class="container">
+			<div style="white-space: normal;">
+				<g:SimplePanel ui:field="breadcrumbsPanel" />
+			</div>
+			<h2>Settings</h2>
 
-	<!-- start header -->
-	<!-- MAIN CONTAINER -->
-		<!-- HEADER -->
-        <div class="color-line"></div>
-        <div class="clear"></div>
-    	<div class="container"> 		
-			<g:SimplePanel ui:field="header" />
-	        	<div class="span-24 notopmargin">	
-	<!-- end header -->
-					<div class="span-24 separator margin-top-10-imp"></div>
-					<div class="span-24 notopmargin" style="white-space: normal;">
-						<g:SimplePanel ui:field="breadcrumbsPanel"/>
-					</div>
-					<h2>Settings</h2>
-					
-					<div class="span-24 slider-area-inner notopmargin">
-						<div class="small-round-icon-white left">
-							<div class="icon-gray-small icon76-gray"></div>
-						</div>
-						<g:SimplePanel ui:field="storageUsagePanel" />
-					</div>					
-					
+			<div class="well">
+				<h4>
+					<span class="glyphicon glyphicon-info-sign" style="position: relative; top: 4px;"></span>
+					<span ui:field="storageUsageSpan" />
+				</h4>
+			</div>
 
-					<div class="span-24">
-						<h3>Synapse API Key</h3>
-						<p>Using an API key allows you to authenticate your scripts for an indefinite amount of time. It is important that you treat your API key with 
-						   the same security as your password.</p>
-						<div class="highlight-box highlight-line fixedWidthFont" title="API Key">
-						    <span class="strong" style="margin-left: 77px; font-size:13px;">
-						    	<span ui:field="apiKeyContainer"/>						    	
-						    </span>						    
-						</div>				
-					</div>						   
-					
-										
-					<div class="span-12">
-						<h3>Setup a Synapse Password</h3>
-						<p>To login to this website without using a Google account or to use the Synapse Programmatic Clients/REST API, 
-					you will need to either have a Synapse specific password or use your API key. To setup a Synapse password, click the button below. It will send you an email 
+			<h3>Synapse API Key</h3>
+			<p>Using an API key allows you to authenticate your scripts for an
+				indefinite amount of time. It is important that you treat your API
+				key with
+				the same security as your password.</p>
+			<div class="highlight-box highlight-line fixedWidthFont" title="API Key">
+				<span class="strong" style="margin-left: 77px; font-size:13px;">
+					<span ui:field="apiKeyContainer" />
+				</span>
+			</div>
+
+			<div class="row margin-top-15">
+				<div class="col-md-6">
+					<h3>Setup a Synapse Password</h3>
+					<p>To login to this website without using a Google account or to
+						use the Synapse Programmatic Clients/REST API,
+						you will need to either have a Synapse specific password or use your
+						API key. To setup a Synapse password, click the button below. It
+						will send you an email
 						with instructions on how to complete the process.</p>
-						<g:SimplePanel ui:field="setupPasswordButtonPanel" />					    
-					</div>
-					<div class="span-12 last">
-						<h3>Change Synapse Password</h3>
-						<g:SimplePanel ui:field="changePasswordPanel" />					    					    
-					</div>										
+					<g:SimplePanel ui:field="setupPasswordButtonPanel" />
 				</div>
-<!-- start footer -->
-            <div class="clear"></div>
-        </div> <!-- close class="container" -->
+				<div class="col-md-6">
+					<h3>Change Synapse Password</h3>
+					<g:SimplePanel ui:field="changePasswordPanel" />
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
-<!-- end footer -->
+		<!-- end footer -->
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

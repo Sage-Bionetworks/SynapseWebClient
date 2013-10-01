@@ -53,7 +53,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
-	SimplePanel storageUsagePanel;
+	SpanElement storageUsageSpan;
 	@UiField
 	SpanElement apiKeyContainer;
 	
@@ -67,8 +67,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private HTML changePasswordLabel;
 	private Breadcrumb breadcrumb;
 	private Footer footerWidget;
-
-	private Html storageUsageWidget;
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
@@ -126,9 +124,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		
 		setupPasswordButtonPanel.clear();
 		setupPasswordButtonPanel.add(createPasswordButton);
-
-		storageUsageWidget = new Html();
-		storageUsagePanel.add(storageUsageWidget);
 		
 	}
 
@@ -259,7 +254,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void clearStorageUsageUI() {
-		storageUsageWidget.setHtml(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
+		storageUsageSpan.setInnerText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
 	}
 	
 	@Override
@@ -268,7 +263,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			clearStorageUsageUI();
 		}
 		else {
-			storageUsageWidget.setHtml("<h4>You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false) + "</h4>");
+			storageUsageSpan.setInnerText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
 		}
 	}
 	
@@ -283,7 +278,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		changePasswordPanel.clear();
 		setupPasswordButtonPanel.clear();
-		storageUsagePanel.clear();
+		storageUsageSpan.setInnerText("");
 	}
 
 
