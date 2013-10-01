@@ -681,7 +681,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	 */
 	
 	private class AddEntityToGroupWidget extends LayoutContainer {
-//		private final String CONTAINER_STYLE = "span-19 notopmargin last";
 		
 		FormPanel form;
 		SimpleComboBox<EntityGroupDisplay> groupBox;
@@ -693,7 +692,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		Anchor hideBtn;
 
 		private AddEntityToGroupWidget(ClickHandler closeButtonHandler) {
-//			this.addStyleName(CONTAINER_STYLE);
 			hideBtn = new Anchor();
 			hideBtn.addStyleName("right");
 			hideBtn.setHTML(AbstractImagePrototype.create(iconsImageBundle.delete16()).getHTML());
@@ -701,7 +699,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			this.add(hideBtn, new MarginData(5));
 			
 			form = new FormPanel();
-//			form.setStyleName(CONTAINER_STYLE);
 			form.setFrame(false);
 			form.setHeaderVisible(false); 
 			form.setLabelAlign(LabelAlign.LEFT);
