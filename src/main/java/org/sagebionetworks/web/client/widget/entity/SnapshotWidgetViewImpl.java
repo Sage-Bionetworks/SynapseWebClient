@@ -123,7 +123,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			groupsTable.setWidget(i, 0, groupDisplays.get(i));
 		}
 		LayoutContainer groupsTableContainer = new LayoutContainer();
-		groupsTableContainer.setStyleName("span-24 notopmargin last");
 		groupsTableContainer.add(groupsTable);
 		this.add(groupsTableContainer);
 		
@@ -335,11 +334,11 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			addEditor.removeAll();
 		}
 		if(canEdit && !readOnly) {
-			addEditor.setStyleName("span-24 slider-area-inner");
+			addEditor.setStyleName("row slider-area-inner");
 			LayoutContainer left = new LayoutContainer();
-			left.setStyleName("span-4 notopmargin");			
+			left.setStyleName("col-md-2");			
 			final LayoutContainer right = new LayoutContainer();
-			right.setStyleName("span-19 notopmargin last");
+			right.setStyleName("col-md-10");
 			
 			SafeHtml editTitle = SafeHtmlUtils.fromSafeConstant("<h3 class=\"colored\">" + DisplayConstants.LABEL_ADD_TO_SNAPSHOT + "</h3>");
 			left.add(new HTML(editTitle));
@@ -498,11 +497,11 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 
 		private LayoutContainer initTopBar(IconsImageBundle iconsImageBundle, WidgetMenu editMenu, boolean canEdit) {
 			LayoutContainer topBar = new LayoutContainer();
-			topBar.setStyleName("span-24 last");
+			topBar.setStyleName("row");
 			LayoutContainer left = new LayoutContainer();
-			left.setStyleName("span-22 notopmargin");
+			left.setStyleName("col-md-11 notopmargin");
 			LayoutContainer right = new LayoutContainer();
-			right.setStyleName("span-2 notopmargin last");
+			right.setStyleName("col-md-1");
 			topBar.add(left);
 			topBar.add(right);
 			
@@ -558,7 +557,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			}
 
 			LayoutContainer tbl = new LayoutContainer();
-			tbl.setStyleName("span-24 last notopmargin");
 			tbl.add(table);
 			return tbl;
 		}
@@ -664,7 +662,6 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 				descriptionContainer.add(new HTML(new SafeHtmlBuilder()
 						.appendHtmlConstant("<p>").append(description)
 						.appendHtmlConstant("</p>").toSafeHtml()));
-				descriptionContainer.setStyleName("span-24 notopmargin");
 			} else {
 				descriptionContainer.setStyleName("");
 			}
@@ -684,7 +681,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	 */
 	
 	private class AddEntityToGroupWidget extends LayoutContainer {
-		private final String CONTAINER_STYLE = "span-19 notopmargin last";
+//		private final String CONTAINER_STYLE = "span-19 notopmargin last";
 		
 		FormPanel form;
 		SimpleComboBox<EntityGroupDisplay> groupBox;
@@ -696,7 +693,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		Anchor hideBtn;
 
 		private AddEntityToGroupWidget(ClickHandler closeButtonHandler) {
-			this.addStyleName(CONTAINER_STYLE);
+//			this.addStyleName(CONTAINER_STYLE);
 			hideBtn = new Anchor();
 			hideBtn.addStyleName("right");
 			hideBtn.setHTML(AbstractImagePrototype.create(iconsImageBundle.delete16()).getHTML());
@@ -704,7 +701,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 			this.add(hideBtn, new MarginData(5));
 			
 			form = new FormPanel();
-			form.setStyleName(CONTAINER_STYLE);
+//			form.setStyleName(CONTAINER_STYLE);
 			form.setFrame(false);
 			form.setHeaderVisible(false); 
 			form.setLabelAlign(LabelAlign.LEFT);

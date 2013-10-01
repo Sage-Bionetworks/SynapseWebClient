@@ -104,8 +104,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityTreeBrowser entityTreeBrowser;
 	private Breadcrumb breadcrumb;
 	private AnnotationsWidget annotationsWidget;
-	private LayoutContainer colLeftContainer;
-	private LayoutContainer colRightContainer;
 	private LayoutContainer fullWidthContainer;
 	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, adminTabContainer;
 	private Attachments attachmentsPanel;
@@ -201,13 +199,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean isAdministrator, boolean canEdit,
 			Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {
 		this.versionNumber = versionNumber;		
-		colLeftContainer = initContainerAndPanel(colLeftContainer, colLeftPanel);
-		colRightContainer = initContainerAndPanel(colRightContainer, colRightPanel);
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
 		topFullWidthContainer = initContainerAndPanel(topFullWidthContainer, topFullWidthPanel);
 
-		colLeftContainer.removeAll();
-		colRightContainer.removeAll();
 		fullWidthContainer.removeAll();
 		topFullWidthContainer.removeAll();
 		adminListItem.addClassName("hide");
@@ -239,8 +233,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
 
-		colLeftContainer.layout(true);
-		colRightContainer.layout(true);
 		fullWidthContainer.layout(true);
 		topFullWidthContainer.layout(true);
 	}
@@ -314,10 +306,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		actionMenu.clearState();
 		locationableTitleBar.clearState();
 		fileTitleBar.clearState();
-		if (colLeftContainer != null)
-			colLeftContainer.removeAll();
-		if (colRightContainer != null)
-			colRightContainer.removeAll();
 		if (fullWidthContainer != null)
 			fullWidthContainer.removeAll();
 	}
@@ -573,27 +561,35 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	// TODO: This rendering should be phased out in favor of a regular wiki page
 	private void renderSummaryEntity(EntityBundle bundle,
 			String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber) {
-		// ** LEFT **
-		// Entity Metadata
-		entityMetadata.setEntityBundle(bundle, versionNumber);
-		colLeftContainer.add(entityMetadata.asWidget());
-		//File History
-		colLeftContainer.add(fileHistoryWidget.asWidget(), new MarginData(0));
+		// tab container
+		fullWidthContainer.add(currentTabContainer);
+		setTabSelected(EntityArea.FILES, false); // select files tab for summary
 		
+		// File tab: everything
+		LayoutContainer row;
+		entityMetadata.setEntityBundle(bundle, versionNumber);
+		Widget ebW = entityMetadata.asWidget();
+		row = DisplayUtils.createRowContainer();
+		ebW.addStyleName("col-md-12");
+		row.add(ebW);
+		filesTabContainer.add(row);		
+		//File History
+		filesTabContainer.add(fileHistoryWidget.asWidget(), new MarginData(0));
 		// Description
-		colLeftContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
-				
-		// ** RIGHT **
-		// Annotation Editor widget
-		colRightContainer.add(createAnnotationsWidget(bundle, canEdit)); 
-		// Attachments
-		colRightContainer.add(createAttachmentsWidget(bundle, canEdit, false));
+		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 
-		// ** FULL WIDTH **
 		// Snapshot entity
 		boolean readOnly = versionNumber != null;
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
-		fullWidthContainer.add(snapshotWidget.asWidget());
+		Widget ssW = snapshotWidget.asWidget();
+		ssW.addStyleName("panel panel-body margin-top-15");
+		filesTabContainer.add(ssW);
+		
+		//Annotations
+		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
+		filesTabContainer.layout(true);
+		// Attachments
+		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));
 	}
 
 	private Widget createProvenanceWidget(EntityBundle bundle) {
