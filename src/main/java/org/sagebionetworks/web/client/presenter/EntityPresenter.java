@@ -18,7 +18,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -46,7 +45,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private GWTWrapper gwtWrapper;
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
@@ -58,14 +56,13 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,
-			AdapterFactory adapterFactory, GWTWrapper gwtWrapper) {
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-		this.gwtWrapper = gwtWrapper;
 		view.setPresenter(this);
 	}
 

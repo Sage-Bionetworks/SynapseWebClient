@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -52,6 +53,7 @@ public class BreadcrumbTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	EntityTypeProvider entityTypeProvider;
+	IconsImageBundle mockIconsImageBundle;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -61,10 +63,13 @@ public class BreadcrumbTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockIconsImageBundle = mock(IconsImageBundle.class);
 				
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 		
-		breadcrumb = new Breadcrumb(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, entityTypeProvider);
+		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
+				mockGlobalApplicationState, mockAuthenticationController,
+				mockNodeModelCreator, entityTypeProvider, mockIconsImageBundle);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);

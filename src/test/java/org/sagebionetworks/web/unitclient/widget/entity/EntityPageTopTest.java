@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Test;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -20,8 +23,10 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -43,6 +48,7 @@ public class EntityPageTopTest {
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
+	PlaceChanger mockPlaceChanger;
 	EntityPageTopView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -56,11 +62,14 @@ public class EntityPageTopTest {
 	AttachmentData attachment1;
 	WidgetRendererPresenter testWidgetRenderer;
 	String entityId = "syn123";
+	String projectId = "syn456";
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -96,7 +105,15 @@ public class EntityPageTopTest {
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
 
 		EntityBundle bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
-		pageTop.configure(bundle, 1l, EntityArea.FILES, null);
+		EntityHeader projectHeader = new EntityHeader();
+		projectHeader.setId(projectId);
+		
+		pageTop.configure(bundle, 1l, projectHeader, EntityArea.FILES, null);
 	}
 
+	@Test 
+	public void testGotoProjectArea() {
+		pageTop.gotoProjectArea(EntityArea.WIKI);		
+		verify(mockPlaceChanger).goTo(new Synapse(projectId, null, EntityArea.WIKI, null));
+	}
 }

@@ -94,14 +94,14 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure(){
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt());
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), false);
 	}
 	
 	@Test
 	public void testConfigureNoWikiPage(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).showNoWikiAvailableUI();
+		verify(mockView).showNoWikiAvailableUI(false);
 	}
 	
 	@Test
