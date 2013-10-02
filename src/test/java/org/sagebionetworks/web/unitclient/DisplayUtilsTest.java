@@ -207,7 +207,7 @@ public class DisplayUtilsTest {
 		project.setType(Project.class.getName());
 		EntityHeader file = new EntityHeader();
 		path.setPath(Arrays.asList(new EntityHeader[] { root, project, file }));
-		assertEquals(projectId, DisplayUtils.getProjectId(path));
+		assertEquals(project, DisplayUtils.getProjectHeader(path));
 	}
 }
 

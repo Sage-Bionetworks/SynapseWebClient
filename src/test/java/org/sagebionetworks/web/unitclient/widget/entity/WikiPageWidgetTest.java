@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -71,6 +73,7 @@ public class WikiPageWidgetTest {
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
 		EntityHeader testEntityHeader = new EntityHeader();
 		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
+		testEntityHeader.setType(Project.class.getName());
 		resultHeaderList.add(testEntityHeader);
 		headers.setResults(resultHeaderList);
 		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(headers);
@@ -94,7 +97,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure(){
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), false);
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false));
 	}
 	
 	@Test

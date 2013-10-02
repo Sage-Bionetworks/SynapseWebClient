@@ -117,14 +117,14 @@ public class BreadcrumbTest {
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityPath.class))).thenReturn(null); // null model return
 		breadcrumb.asWidget((EntityPath)null);
-		verify(mockView).setLinksList(any(List.class), (String)isNull());
+		verify(mockView).setLinksList(any(List.class));
 		
 		// success test
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(entityWrapper.getEntityJson(), EntityPath.class)).thenReturn(entityPath);
 		breadcrumb.asWidget(entityPath);
-		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
+		verify(mockView).setLinksList(any(List.class));				
 	}
 	
 

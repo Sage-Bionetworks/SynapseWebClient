@@ -1786,7 +1786,7 @@ public class DisplayUtils {
 		return "<span class=\"glyphicon " + iconClass + "\"></span>";
 	}
 
-	public static EntityHeader getProjectId(EntityPath entityPath) {
+	public static EntityHeader getProjectHeader(EntityPath entityPath) {
 		if(entityPath == null) return null;
 		for(EntityHeader eh : entityPath.getPath()) {
 			if(Project.class.getName().equals(eh.getType())) {
