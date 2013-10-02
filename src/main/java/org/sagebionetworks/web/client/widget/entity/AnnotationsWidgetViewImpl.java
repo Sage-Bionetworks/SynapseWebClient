@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -16,21 +17,18 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
@@ -136,21 +134,20 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		if (!rows.isEmpty() || canEdit) {
 			//include Add Annotation button if user can edit
 			if (canEdit) {
-				SelectionListener<ButtonEvent> listener = new SelectionListener<ButtonEvent>() {
+				Button addBtn = DisplayUtils.createIconButton(DisplayConstants.TEXT_ADD_ANNOTATION, ButtonType.DEFAULT, "glyphicon-plus");
+				addBtn.addClickHandler(new ClickHandler() {					
 					@Override
-					public void componentSelected(ButtonEvent ce) {
+					public void onClick(ClickEvent event) {
 						// Show a form for adding an Annotations
-						AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){
-
+						AddAnnotationDialog.showAddAnnotation(new AddAnnotationDialog.Callback(){							
 							@Override
 							public void addAnnotation(String name, ANNOTATION_TYPE type) {
 								presenter.addAnnotation(name, type);
 							}
 						});
 					}
-				}; 
-				
-				add(new Button(DisplayConstants.TEXT_ADD_ANNOTATION, AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()), listener));
+				});				
+				add(addBtn);
 			}
 			add(new HTML());
 		}
@@ -170,7 +167,7 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		MessageBox.confirm(DisplayConstants.LABEL_DELETE +" \"" + row.getLabel()+"\"", DisplayConstants.PROMPT_SURE_DELETE + " annotation?", new Listener<MessageBoxEvent>() {					
 			@Override
 			public void handleEvent(MessageBoxEvent be) { 					
-				Button btn = be.getButtonClicked();
+				com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
 				if(Dialog.YES.equals(btn.getItemId())) {
 					presenter.deleteAnnotation(row);
 				}
@@ -200,8 +197,8 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		form.add(field);
 		dialog.add(form);
 		dialog.show();
-		Button addButton = dialog.getButtonById(Dialog.OK);
-		Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
+		com.extjs.gxt.ui.client.widget.button.Button addButton = dialog.getButtonById(Dialog.OK);
+		com.extjs.gxt.ui.client.widget.button.Button cancelButton = dialog.getButtonById(Dialog.CANCEL);
 		
 		FormButtonBinding binding = new FormButtonBinding(form);  
 	    binding.addButton(addButton);

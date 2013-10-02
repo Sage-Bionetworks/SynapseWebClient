@@ -5,7 +5,7 @@ import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
-import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_HEIGHT;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
 import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_WIDTH;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
@@ -31,6 +31,8 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -99,6 +101,7 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -132,7 +135,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -145,7 +147,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
@@ -637,10 +638,10 @@ public class DisplayUtils {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
 	}
 	
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area) {
 		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
 	}
-	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
 		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
@@ -761,7 +762,7 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
 		return createFullWidthLoadingPanel(sageImageBundle, " Loading...");
 	}
 
@@ -773,15 +774,13 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		hp.setPixelSize(FULL_ENTITY_PAGE_WIDTH, FULL_ENTITY_PAGE_HEIGHT);
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
-		hp.add(w);
-		return hp;
+		LayoutContainer panel = new LayoutContainer();
+		panel.add(w, new MarginData(FULL_ENTITY_TOP_MARGIN_PX, 0, FULL_ENTITY_TOP_MARGIN_PX, 0));
+		panel.addStyleName("center");				
+		return panel;
 	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
@@ -1324,7 +1323,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">404</p><h1>"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
@@ -1343,7 +1342,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">403</p><h1>"
 						+ DisplayConstants.UNAUTHORIZED
 						+ "</h1>"
 						+ "<p>"
@@ -1754,5 +1753,45 @@ public class DisplayUtils {
 		
 		window.show();
 	}
+
+	public static LayoutContainer createRowContainer() {
+		LayoutContainer row;
+		row = new LayoutContainer();
+		row.setStyleName("row");
+		return row;
+	}
+
+	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
 	
+	public static com.google.gwt.user.client.ui.Button createButton(String title, ButtonType type) {
+		return createIconButton(title, type, null);
+	}
+		
+	public static com.google.gwt.user.client.ui.Button createIconButton(String title, ButtonType type, String iconClass) {		
+		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button();
+		relabelIconButton(btn, title, iconClass);
+		btn.removeStyleName("gwt-Button");
+		btn.addStyleName("btn btn-" + type.toString().toLowerCase());
+		return btn;
+	}
+	
+	public static void relabelIconButton(com.google.gwt.user.client.ui.Button btn, String title, String iconClass) {
+		String style = iconClass == null ? "" : " class=\"glyphicon " + iconClass+ "\"" ;
+		btn.setHTML(SafeHtmlUtils.fromSafeConstant("<span" + style +"></span> " + title));
+	}
+	
+	public static String getIcon(String iconClass) {
+		return "<span class=\"glyphicon " + iconClass + "\"></span>";
+	}
+
+	public static EntityHeader getProjectHeader(EntityPath entityPath) {
+		if(entityPath == null) return null;
+		for(EntityHeader eh : entityPath.getPath()) {
+			if(Project.class.getName().equals(eh.getType())) {
+				return eh;
+			}
+		}
+		return null;
+	}
+
 }

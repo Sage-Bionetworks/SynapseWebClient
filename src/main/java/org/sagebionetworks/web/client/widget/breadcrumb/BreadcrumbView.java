@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface BreadcrumbView extends IsWidget, SynapseView {

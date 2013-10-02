@@ -14,11 +14,23 @@ public class UnorderedListPanel extends ComplexPanel {
 	public UnorderedListPanel() {
 		setElement(ul);
 	}
-
+	
+	public void addStyleName(String style) {
+		ul.setClassName(ul.getClassName() + " " + style);
+	}
+	
+	public void setAttribute(String name, String value) {
+		ul.setAttribute(name, value);
+	}
+	
 	public void add(Widget w) {
 		addLi(w);
 	}
 
+	public void add(String styleName) {
+		add(null, styleName);
+	}
+	
 	public void add(Widget w, String styleName) {
 		LIElement li = addLi(w);
 		li.setClassName(styleName);
@@ -27,7 +39,8 @@ public class UnorderedListPanel extends ComplexPanel {
 	private LIElement addLi(Widget w) {
 		LIElement li = Document.get().createLIElement();		
 		ul.appendChild(li);
-		add(w, (Element) li.cast());	
+		if(w != null)
+			add(w, (Element) li.cast());	
 		return li;
 	}
 

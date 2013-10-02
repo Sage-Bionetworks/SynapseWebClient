@@ -333,6 +333,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 	
 	private void setLogo() {
+		showLargeLogo = false;
 		if(showLargeLogo) {
 			logoLarge.setVisible(true);
 			logoSmall.setVisible(false);

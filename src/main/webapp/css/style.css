@@ -8,7 +8,7 @@ Portfolio - http://themeforest.net/user/OrangeIdea/portfolio
 /*-------------------------------------------------------*/
 	/*BODY*/
 /*-------------------------------------------------------*/
-
+/* 
 body {
 	background-color:#f1f2f1;
 	background-image:url('../images/pattern/2w.png');
@@ -33,9 +33,11 @@ img::selection {
 img::-moz-selection {
 	background: transparent;
 }
+ */
 /*-------------------------------------------------------*/
 	/*Typography*/
 /*-------------------------------------------------------*/
+/*
 h1, h2, h3, h4, h5, h6 {
 	font-family:Yanone Kaffeesatz;
 	color:#000000; }
@@ -55,7 +57,7 @@ p.lead { font-size: 21px; line-height: 27px; color: #777;  }
 .strong { font-weight: bold; color: #333; }
 .small-italic {font-size:90%; font-style:italic;}
 hr { border: solid #ddd; border-width: 1px 0 0; clear: both; margin: 10px 0 30px; height: 0; }
-/*404error*/
+
 p.error{
 	font-size:172px;
 	font-family:Arial;
@@ -82,11 +84,11 @@ a:hover { text-decoration:underline;}
 .footer-line p { margin-bottom:0px;}
 .footer-line {  color:#fff; width:940px !important; margin-bottom:0px !important; padding-top:15px; padding-bottom:15px;}
 .footer-top-line {width:940px !important; margin-bottom:0px !important; padding-top:20px;}
-
+*/
 /*-------------------------------------------------------*/
 	/*GRID*/
 /*-------------------------------------------------------*/
-
+/* 
 .main-wrapper {
 	width: 1030px;
 	margin: 0 auto;
@@ -95,7 +97,7 @@ a:hover { text-decoration:underline;}
 	box-shadow: 0px 0px 10px #aaa;
 }
 
-/* A container should group all your columns. */
+A container should group all your columns.
 .container {
 	width: 940px;
 	margin: 0 auto;
@@ -107,21 +109,21 @@ a:hover { text-decoration:underline;}
 .footer-wrapper { background-color:#f1f2f1; background-image:url(../images/pattern/14w.png); width:1030px; padding-bottom:20px; padding-top:20px;  } 
 .footer-line-wrapper {background:#000; width:1030px; margin:0 auto; border-top:1px solid #ececec; margin-bottom:20px !important; } 
 .footer-line-top-wrapper {background:#f1f2f1; background-image:url(../images/pattern/14w.png); width:1030px; margin:0 auto; border-bottom:1px solid #dfdfdf; border-top:1px solid #dfdfdf; margin-top:40px;} 
-.color-line { width:1030px; height:10px; float:left; background:#04bfea}
+
 .nocolor-line { width:640px; height:10px; float:left; background:#04bfea}
 .logo { margin-top:27px !important;}
 .logo a { text-align:center !important;} 
-/* Columns
+Columns
 -------------------------------------------------------------- */
 
-/* Sets up basic grid floating and margin. */
+/* Sets up basic grid floating and margin.
 div.span-1, div.span-2, div.span-3, div.span-4, div.span-5, div.span-6, div.span-7, div.span-8, div.span-9, div.span-10, div.span-11, div.span-12, div.span-13, div.span-14, div.span-15, div.span-16, div.span-17, div.span-18, div.span-19, div.span-20, div.span-21, div.span-22, div.span-23, div.span-24 {float:left; margin-right: 20px; margin-top:30px;}
 .columns .span-1, .columns .span-2, .columns .span-3, .columns .span-4, .columns .span-5, .columns .span-6, .columns .span-7, .columns .span-8, .columns .span-9, .columns .span-10, .columns .span-11, .columns .span-12, .columns .span-13, .columns .span-14, .columns .span-15, .columns .span-16, .columns .span-17, .columns .span-18, .columns .span-19, .columns .span-20, .columns .span-21, .columns .span-22, .columns .span-23, .columns .span-24 { height:30px; background:#ededed; text-align:center; margin-top:10px !important; padding-top:10px;}
 p.span-1, p.span-2, p.span-3, p.span-4, p.span-5, p.span-6, p.span-7, p.span-8, p.span-9, p.span-10, p.span-11, p.span-12, p.span-13, p.span-14, p.span-15, p.span-16, p.span-17, p.span-18, p.span-19, p.span-20, p.span-21, p.span-22, p.span-23, p.span-24 {float:left; margin-right: 20px; margin-top:30px;}
-/* The last column in a row needs this class. */
+The last column in a row needs this class.
 div.last { margin-right: 0; }
 
-/* Use these classes to set the width of a column. */
+Use these classes to set the width of a column.
 .span-1  { width: 20px;}
 .span-2  { width: 60px;}
 .span-3  { width: 100px;}
@@ -152,7 +154,7 @@ div.last { margin-right: 0; }
 .span-24, div.span-24 { width: 940px; }
 
 .inner-block img { border:1px solid #fff;}
-/* Add these to a column to append empty cols. */
+Add these to a column to append empty cols.
 .append-1  { padding-right: 40px;}
 .append-2  { padding-right: 80px;}
 .append-3  { padding-right: 120px;}
@@ -178,7 +180,7 @@ div.last { margin-right: 0; }
 .append-23 { padding-right: 920px;}
 
 
-/* Add these to a column to prepend empty cols. */
+Add these to a column to prepend empty cols.
 .prepend-1  { padding-left: 40px;}
 .prepend-2  { padding-left: 80px;}
 .prepend-3  { padding-left: 120px;}
@@ -205,22 +207,22 @@ div.last { margin-right: 0; }
 
 
 
-/* Border on right hand side of a column. */
+Border on right hand side of a column.
 div.border {
   padding-right:9px;
   margin-right:10px;
   border-right: 1px solid #eee;
 }
 
-/* Border with more whitespace, spans one column. */
+Border with more whitespace, spans one column.
 div.colborder {
   padding-right:13px;
   margin-right:10px;
   border-right: 1px solid #eee;
 }
 
-/* Use these classes on an element to push it into the 
-   next column, or to pull it into the previous column.  */
+Use these classes on an element to push it into the 
+   next column, or to pull it into the previous column. 
 
 .pull-1 { margin-left: -40px;}
 .pull-2 { margin-left: -80px;}
@@ -282,7 +284,7 @@ div.colborder {
 .last { margin-right:0px !important;}
 .left {float:left}
 .right {float:right}
-
+ */
 
 /* Misc classes and elements
 -------------------------------------------------------------- */
@@ -294,12 +296,13 @@ div.colborder {
 	background: #E5ECF9; 
 }
 
-.separator {
+/* .separator {
 	clear:both;
 	margin-top:40px;
 	height:1px;
 	background:#ececec;
 }
+ */
 .inner-16 .separator {
 	clear:both;
 	margin-top:20px;
@@ -868,6 +871,7 @@ li.sfHover > a > .sf-sub-indicator {
 /*-------------------------------------------------------------------------------------------------*/
 	/*Features*/
 /*-------------------------------------------------------------------------------------------------*/
+/*
 .item a { 
 	display:block;
 	margin-bottom:15px;
@@ -879,6 +883,8 @@ li.sfHover > a > .sf-sub-indicator {
 	-webkit-box-shadow:1px 1px 2px #aaa;
 	box-shadow:1px 1px 2px #aaa;
 }
+*/
+
 .inner-12 .item a, .inner-8 .item a, .inner-6 .item a, .inner-16 .item a { padding:0px !important;}
 .home .item a{background-image:url('../images/bg-fade1.png');}
 .ca-content-wrapper .item a, .footer .item a {background-color:#fff;}
@@ -3258,7 +3264,7 @@ span.highlight,span.highlight-blue,span.highlight-red,span.highlight-green,span.
 
 
 /* Circular Content Carousel Style */
-.new-item { 
+/* .new-item { 
 	width:70px; 
 	height:20px;
 	background-color:#04bfea;
@@ -3383,7 +3389,7 @@ background:#000 url(../images/cross.png) no-repeat center center;
 	background:#f1f2f1;
 	background-image: url(../images/pattern/14w.png);
 	position:absolute;
-	width:0px; /* expands to width of the wrapper minus 1 element */
+	width:0px; expands to width of the wrapper minus 1 element
 	height:280px;
 	top:7px;
 	text-align:left;
@@ -3482,6 +3488,7 @@ background:#000 url(../images/cross.png) no-repeat center center;
 	opacity:1.0;
 }
 
+ */
 /* Vertical Accordion Style */
 .va-container{
 	position:relative;

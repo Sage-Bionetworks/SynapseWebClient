@@ -18,11 +18,12 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityTab;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -50,8 +51,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EventBus bus;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Long versionNumber;
-	private Synapse.EntityTab area;
+	private Synapse.EntityArea area;
 	private String areaToken;
+	private EntityHeader projectHeader;
+	private AreaChangeHandler areaChangedHandler;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -84,9 +87,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      *
      * @param bundle
      */
-    public void setBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+    public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
+    	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
 	}
@@ -101,26 +105,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public Widget asWidget() {
 		if(bundle != null) {
-			return asWidget(bundle);
+			view.setPresenter(this);
+			return view.asWidget();
 		}
 		return null;
 	}
 
-	public Widget asWidget(EntityBundle bundle) {
-		view.setPresenter(this);
-		return view.asWidget();
-	}
-
 	@Override
 	public void refresh() {
-		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken);
+		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken, projectHeader);
 	}
-	
-	@Override
-	public void refreshTab(Synapse.EntityTab area, String areaToken) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
-	}
-	
+		
 	@Override
 	public void fireEntityUpdatedEvent() {
 		EntityUpdatedEvent event = new EntityUpdatedEvent();
@@ -177,18 +172,41 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			});
 		}
 	}
+
+	public void setAreaChangeHandler(AreaChangeHandler handler) {
+		this.areaChangedHandler = handler;
+	}
+	
+	@Override
+	public void setArea(EntityArea area, String areaToken) {
+		this.area = area;
+		this.areaToken = areaToken;
+		if(areaChangedHandler != null) areaChangedHandler.areaChanged(area, areaToken);
+	}
+
+	@Override
+	public void refreshArea(Synapse.EntityArea area, String areaToken) {
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(bundle.getEntity().getId(), null, area, areaToken));
+	}
+
+	@Override
+	public void gotoProjectArea(EntityArea area) {
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, area, null));
+	}
+
 	
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityTab area, String areaToken) {
+	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken, projectHeader);
 	}
 	
 	private UserProfile getUserProfile() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		return (sessionData==null ? null : sessionData.getProfile());		
 	}
+
 }

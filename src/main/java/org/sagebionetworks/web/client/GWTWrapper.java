@@ -5,9 +5,15 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface GWTWrapper {
 	String getHostPageBaseURL();
+
 	String getModuleBaseURL();
+
 	void replaceThisWindowWith(String url);
+
 	String encodeQueryString(String queryString);
+
 	XMLHttpRequest createXMLHttpRequest();
+
 	NumberFormat getNumberFormat(String pattern);
+	
 }

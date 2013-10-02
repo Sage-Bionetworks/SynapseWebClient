@@ -2,37 +2,25 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style>
-		div.center {   
-			margin-left: auto;   
-			margin-right: auto;   
-			width: 8em;
-			padding:15px; 
+		div.center {
+		margin-left: auto;
+		margin-right: auto;
+		width: 8em;
+		padding:15px;
 		}
 	</ui:style>
 	<g:HTMLPanel>
-	<!-- start header -->
-	<!-- MAIN CONTAINER -->
-		<!-- HEADER -->
-        <div class="color-line"></div>
-        <div class="clear"></div>
-    	<div class="container"> 		
-			<g:SimplePanel ui:field="header" />
-	        	<div class="span-24 notopmargin">
-			<div class="span-24 separator margin-top-10-imp"></div>
+		<div class="color-line"></div>
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp"></div>
+		<!-- DownView -->
+		<div class="margin-top-15 margin-left-15" style="height: 12em">
+			<p class="error left colored">:-(</p>
+			<h1>Synapse is down for maintenance</h1>
+			<p>Sad but true. We will be back as soon as possible.</p>
+		</div>
 
-	<!-- end header -->
-				<!-- DownView -->				
-				<div class="span-24" style="height: 12em">
-					<p class="error left colored">:-(</p>
-					<h1>Synapse is down for maintenance</h1>
-					<p>Sad but true. We will be back as soon as possible.</p>
-				</div> 
-				
-				</div>
-<!-- start footer -->
-            <div class="clear"></div>
-        </div> <!-- close class="container" -->
+		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
-<!-- end footer -->
 	</g:HTMLPanel>
 </ui:UiBinder> 

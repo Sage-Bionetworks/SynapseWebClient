@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -21,6 +22,8 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -101,31 +104,27 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.refresh();
 		
 		ContentPanel cp = new ContentPanel();
-		cp.setWidth(385);
 		cp.setHeaderVisible(false);
 		cp.setBorders(true);						
 		cp.setBodyStyleName("lightGreyBackground");
-		cp.add(new HTML("<h2>"+ DisplayConstants.LABEL_LOGOUT_TEXT +"</h2>"), new MarginData(0, 0, 0, 10));
 		
 		HTML message = new HTML();
 		if(isSsoLogout) {
-			message.setHTML(DisplayUtils.getIconHtml(iconsImageBundle
-					.informationBalloon16())
-					+ " "
+			message.setHTML("<h4>"				
 					+ DisplayConstants.LOGOUT_TEXT
-					+ "<br/><br/>"
+					+ "</h4><br/><br/>"
 					+ DisplayUtils.getIconHtml(iconsImageBundle.warning16())
 					+ " " + DisplayConstants.LOGOUT_SSO_TEXT);
 		} else {
-			message.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " " + DisplayConstants.LOGOUT_TEXT);
+			message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
 		}
 		cp.add(message, new MarginData(0, 0, 0, 10));
 		
-		Button loginAgain = new Button(DisplayConstants.BUTTON_LOGIN_AGAIN);
-		loginAgain.setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
-		loginAgain.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);
+		loginAgain.getElement().setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
+		loginAgain.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				presenter.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			}
 		});

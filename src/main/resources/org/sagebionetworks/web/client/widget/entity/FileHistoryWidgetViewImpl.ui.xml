@@ -19,14 +19,14 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel>
-				<div class="span-24 notopmargin">
-				    <g:HTMLPanel ui:field="versions">
-						<span class="boldText">File History</span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
-						<g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />			
-					</g:HTMLPanel>
-				</div>
-				<div class="span-24 notopmargin">
+		    <g:HTMLPanel ui:field="versions">
+				<span class="boldText">File History</span> (<g:InlineLabel ui:field="allVersions" styleName="link" />)<br />
+				<g:Hyperlink ui:field="currentVersionLink" text="Go to the current version" styleName="link" visible="false" />			
+			</g:HTMLPanel>
+			<div class="row">
+				<div class="col-md-6">
 					<gxt:LayoutContainer ui:field="previousVersions" styleName="{style.limitedHeight}" visible="false" autoHeight="true" />
-				</div>					
+				</div>		
+			</div>			
 	</g:HTMLPanel>
 </ui:UiBinder>
