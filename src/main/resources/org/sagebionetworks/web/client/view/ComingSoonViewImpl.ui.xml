@@ -27,9 +27,8 @@
 			</ul>
 			<h2>Coming Soon</h2>
 			<g:SimplePanel ui:field="entityView" />
-				<g:FlexTable ui:field="flextTable1"></g:FlexTable>
-				This page is coming soon.
-			</div>
+			<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+			This page is coming soon.
 			<div class="clear"></div>
 		</div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
