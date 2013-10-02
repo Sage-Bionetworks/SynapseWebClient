@@ -10,6 +10,8 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -20,7 +22,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityTab;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -46,7 +48,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
-	private Synapse.EntityTab area;
+	private Synapse.EntityArea area;
 	private String areaToken;
 	
 	@Inject
@@ -61,7 +63,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-	
 		view.setPresenter(this);
 	}
 
@@ -76,12 +77,20 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.place = place;
 		this.view.setPresenter(this);		
 		
-		// token maps directly to entity id
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
-		this.area = place.getEntityArea();
+		this.area = place.getArea();
 		this.areaToken = place.getAreaToken();
 		refresh();
+	}
+	
+	public void updateArea(EntityArea area, String areaToken) {
+		this.area = area;
+		this.areaToken = areaToken;
+		place.setArea(area);
+		place.setAreaToken(areaToken);
+		place.setNoRestartActivity(true);
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	@Override
@@ -123,8 +132,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
 					} 					
-					
-					view.setEntityBundle(bundle, versionNumber, area, areaToken);					
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(new EntityPath(adapterFactory.createNew(transport.getEntityPathJson()))); 					
+					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				

@@ -113,7 +113,7 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				p.add(listPanel);
 				Button button = new Button("Submit To Challenge");
 				button.removeStyleName("gwt-Button");
-				button.addStyleName("btn btn-large");
+				button.addStyleName("btn btn-default btn-lg");
 				button.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {

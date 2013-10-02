@@ -4,7 +4,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityTab;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -20,7 +20,10 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile, String entityTypeDisplay, boolean isAdmin, boolean canEdit, Long versionNumber, Synapse.EntityTab area, String areaToken);
+	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
+			String entityTypeDisplay, boolean isAdmin, boolean canEdit,
+			Long versionNumber, Synapse.EntityArea area, String areaToken,
+			EntityHeader projectHeader);
 
 	/**
 	 * Presenter interface
@@ -29,8 +32,25 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		void refresh();
 
-		void refreshTab(Synapse.EntityTab area, String areaToken);
+		/**
+		 * Refreshes a given area
+		 * @param area
+		 * @param areaToken
+		 */
+		void refreshArea(Synapse.EntityArea area, String areaToken);
 		
+		/**
+		 * Changes places to the specified are of the Parent Project
+		 * @param area
+		 */
+		void gotoProjectArea(Synapse.EntityArea area);
+		
+		/**
+		 * Changes the current active area
+		 * @param area
+		 */
+		void setArea(EntityArea area, String areaToken);
+
 		void fireEntityUpdatedEvent();
 
 		boolean isLoggedIn();
@@ -40,6 +60,7 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
+
 				
 	}
 

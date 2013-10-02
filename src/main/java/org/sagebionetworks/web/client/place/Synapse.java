@@ -7,14 +7,15 @@ import com.google.gwt.place.shared.Prefix;
 public class Synapse extends Place{
 	public static final String VERSION_DELIMITER = "/version/";
 	
-	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityTab.ADMIN);
-	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityTab.WIKI);
-	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityTab.FILES);
+	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
+	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
+	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
 	
 	private String token;
 	private String entityId, areaToken;
 	private Long versionNumber;
-	private Synapse.EntityTab area;
+	private Synapse.EntityArea area;
+	private boolean noRestartActivity;
 	
 	public Synapse(String token) {
 		this.token = token;
@@ -47,16 +48,16 @@ public class Synapse extends Place{
 			
 			if(toProcess.contains(WIKI_DELIMITER)) {
 				String[] parts = toProcess.split(WIKI_DELIMITER);
-				area = Synapse.EntityTab.WIKI;
+				area = Synapse.EntityArea.WIKI;
 				if (parts.length == 2) {
 					areaToken = parts[1];
 				}
 				return;
 			} else if(toProcess.contains(ADMIN_DELIMITER)) {
-				area = Synapse.EntityTab.ADMIN;
+				area = Synapse.EntityArea.ADMIN;
 				return;
 			} else if(toProcess.contains(FILES_DELIMITER)) {
-				area = Synapse.EntityTab.FILES;
+				area = Synapse.EntityArea.FILES;
 				return;
 			}
 		} else {
@@ -65,25 +66,29 @@ public class Synapse extends Place{
 		}
 	}
 	
-	public static String getDelimiter(Synapse.EntityTab tab) {
-		return "/"+tab+"/";
+	public static String getDelimiter(Synapse.EntityArea tab) {
+		return "/"+tab.toString().toLowerCase()+"/";
 	}
 
-	public Synapse(String entityId, Long versionNumber, Synapse.EntityTab area, String areaToken) {		
-		this.token = entityId;
-		if(versionNumber != null) 
-			this.token += VERSION_DELIMITER + versionNumber;
-		if(area != null) {
-			this.token += "/" + area + "/";
-			if (areaToken != null) {
-				this.token += areaToken;
-			}
-		}
-		
+	public Synapse(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {				
 		this.entityId = entityId;
 		this.versionNumber = versionNumber;
 		this.area = area;
 		this.areaToken = areaToken;
+		calculateToken(entityId, versionNumber, area, areaToken);
+	}
+
+	private void calculateToken(String entityId, Long versionNumber,
+			Synapse.EntityArea area, String areaToken) {
+		this.token = entityId;
+		if(versionNumber != null) 
+			this.token += VERSION_DELIMITER + versionNumber;
+		if(area != null) {
+			this.token += getDelimiter(area);
+			if (areaToken != null) {
+				this.token += areaToken;
+			}
+		}
 	}
 
 	public String toToken() {
@@ -98,13 +103,25 @@ public class Synapse extends Place{
 		return versionNumber;
 	}
 	
-	public Synapse.EntityTab getEntityArea() {
+	public Synapse.EntityArea getArea() {
 		return area;
 	}
 	
 	public String getAreaToken() {
 		return areaToken;
 	}
+	
+	public void setArea(Synapse.EntityArea area) {
+		this.area = area;
+		calculateToken(entityId, versionNumber, area, areaToken);
+	}
+
+	public void setAreaToken(String areaToken) {
+		this.areaToken = areaToken;
+		calculateToken(entityId, versionNumber, area, areaToken);
+	}
+
+
 
 	@Prefix("!Synapse")
 	public static class Tokenizer implements PlaceTokenizer<Synapse> {
@@ -119,7 +136,7 @@ public class Synapse extends Place{
         }
     }
 
-	public static enum EntityTab { WIKI, FILES, ADMIN }
+	public static enum EntityArea { WIKI, FILES, ADMIN }
 
 	@Override
 	public int hashCode() {
@@ -146,5 +163,12 @@ public class Synapse extends Place{
 		return true;
 	}
 
+	public void setNoRestartActivity(boolean noRestart) {
+		this.noRestartActivity = noRestart;
+	}
+
+	public boolean isNoRestartActivity() {
+		return noRestartActivity;
+	}
 	
 }

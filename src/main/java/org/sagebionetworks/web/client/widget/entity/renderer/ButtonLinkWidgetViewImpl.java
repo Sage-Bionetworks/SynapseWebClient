@@ -23,7 +23,7 @@ public class ButtonLinkWidgetViewImpl extends LayoutContainer implements ButtonL
 		removeAll();
 		Button button = new Button(buttonText);
 		button.removeStyleName("gwt-Button");
-		button.addStyleName("btn btn-large");
+		button.addStyleName("btn btn-default btn-lg");
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

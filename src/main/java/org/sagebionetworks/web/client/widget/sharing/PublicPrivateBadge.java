@@ -38,9 +38,28 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 	}	
+
+	/**
+	 * Headless version of public/private answer
+	 * @param entity
+	 * @param callback
+	 */
+	public void isEntityPublic(Entity entity, final AsyncCallback<Boolean> callback) {		
+		configure(entity, new AsyncCallback<PublicPrincipalIds>() {
+			@Override
+			public void onSuccess(PublicPrincipalIds result) {
+				publicPrincipalIds = result;
+				callback.onSuccess(isPublic(acl, publicPrincipalIds));
+
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
+	}
 	
 	public void configure(Entity entity) {
-		this.entity = entity;
 		//set publicPrincipalIds, and acl
 		final AsyncCallback<PublicPrincipalIds> callback2 = new AsyncCallback<PublicPrincipalIds>() {
 			@Override
@@ -54,6 +73,12 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 					view.showErrorMessage(caught.getMessage());
 			}
 		};
+
+		configure(entity, callback2);
+	}
+	
+	public void configure(Entity entity, final AsyncCallback<PublicPrincipalIds> callback2) {
+		this.entity = entity;
 		AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
@@ -68,6 +93,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		};
 		
 		getAcl(callback1);
+		
 	}
 	
 	/**

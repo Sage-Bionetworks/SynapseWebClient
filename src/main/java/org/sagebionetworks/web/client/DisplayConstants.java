@@ -37,7 +37,7 @@ public class DisplayConstants {
 	public static final String EDIT_ANNOTATIONS_TEXT = "Edit Annotations for this object. You can add new annotations by using the form fields at the bottom.";
 	
 	public static final String LOGOUT_TEXT = "You have been logged out of Synapse.";
-	public static final String LOGOUT_SSO_TEXT = "To prevent others from accessing your account in this browser, you should log out of your Google account as well.<br/><a href=\"http://www.google.com/accounts/Logout?continue=http://www.google.com/\">Logout of your Google account by clicking here</a>"; // <br/><br/><a href=\"https://www.google.com/accounts/Logout\">Logout of your Google account by clicking here</a>
+	public static final String LOGOUT_SSO_TEXT = "To prevent others from accessing your account in this browser, you should log out of your Google account as well.<br/><a class=\"link\" href=\"http://www.google.com/accounts/Logout?continue=http://www.google.com/\">Logout of your Google account by clicking here</a>"; // <br/><br/><a href=\"https://www.google.com/accounts/Logout\">Logout of your Google account by clicking here</a>
 	public static final String PERMISSIONS_INHERITED_TEXT = "Sharing settings are being inherited from the parent resource and cannot be modified.";
 	public static final String PERMISSIONS_CREATE_NEW_ACL_TEXT = "Sharing settings from the parent resource will be overridden.";
 	public static final String PERMISSIONS_DELETE_ACL_TEXT = "Sharing settings will be inherited from the parent resource.";
@@ -192,6 +192,7 @@ public class DisplayConstants {
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
+	public static final String EDIT_DESCRIPTION = "Edit Description";	
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
@@ -264,7 +265,7 @@ public class DisplayConstants {
 	public static final String EMPTY = "Empty";
 	public static final String NONE_FOUND = "None Found";
 	public static final String LABEL_NO_DESCRIPTION = "Please add a description by clicking the \"Edit\" button.";
-	public static final String LABEL_NO_MARKDOWN = "Please add more information by clicking the \"Edit Wiki\" button.";
+	public static final String LABEL_NO_MARKDOWN = "There is no content. Please edit to add information.";
 	public static final String LABEL_NO_ACTIVITY = "Activity Feed is empty.";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_SAVE_LINK_HERE = "Sorry, you cannot save a Link to the requested spot.";
@@ -348,6 +349,7 @@ public class DisplayConstants {
 	public static final String ERROR_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_WIDGET_NAME_PATTERN_MISMATCH = "Names may only contain letters, numbers, spaces, hypens, periods, plus signs, and parentheses.";
 	public static final String ERROR_BOOKMARK_ID = "ID names may only contain letters, numbers, hypens, underscores, colons, and periods.";
+	public static final String PREVIEW = "Preview";
 	
 	/**
 	 * Widget editors
@@ -503,9 +505,11 @@ public class DisplayConstants {
 	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
-	public static final String CREATE_WIKI = "Insert Wiki";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String WIKI = "Wiki";
+	public static final String PROJECT_WIKI = "Project Wiki";
+	public static final String CREATE_WIKI = "Create Wiki";
+	public static final String ADD_DESCRIPTION = "Add Description";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
 	public static final String UNAUTHORIZED = "Unauthorized";
 	public static final String UNAUTHORIZED_DESC = "You are not authorized to access the page requested.";
@@ -598,6 +602,7 @@ public class DisplayConstants {
 	public static final String MORE_DETAILS_SYNAPSE = "Read more about Synapse";
 	public static final String REST_API_DOCUMENTATION = "REST API documentation";
 	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
+	public static final String SHOW_ALL_RESULTS = "Show Results for All Types";
 	
 }
 

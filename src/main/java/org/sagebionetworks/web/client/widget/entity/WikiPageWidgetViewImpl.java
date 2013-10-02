@@ -26,21 +26,17 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -50,6 +46,7 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -62,8 +59,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
-	private Button editButton, addPageButton;
-	private HorizontalPanel commandBar;
+//	private Button editButton, addPageButton; 
+	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private WikiPage currentPage;
@@ -71,10 +68,11 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
-	private int spanWidth;
+	private int colWidth;
 	private WikiPageKey wikiKey;
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
+	private boolean isDescription = false;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -115,24 +113,27 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void showNoWikiAvailableUI() {
+	public void showNoWikiAvailableUI(boolean isDescription) {
 		removeAll(true);
+		this.isDescription = isDescription;
 		SimplePanel createWikiButtonWrapper = new SimplePanel();
-		createWikiButtonWrapper.addStyleName("span-24 notopmargin margin-bottom-20");
-		createWikiButtonWrapper.add(getInsertPageButton(true));
+		createWikiButtonWrapper.addStyleName("margin-bottom-20");
+		Button insertBtn = createInsertOrAddPageButton(true);		
+		createWikiButtonWrapper.add(insertBtn);
 		add(createWikiButtonWrapper);
 		layout(true);
 	}
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int spanWidth) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
+		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
-		this.spanWidth = spanWidth;
+		this.colWidth = Math.round(colWidth/2);
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -145,11 +146,16 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
+		SimplePanel topBarWrapper = new SimplePanel();
+		topBarWrapper.addStyleName("margin-top-5");
+		String titleString = isRootWiki ? "" : currentPage.getTitle();
+		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
+		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
-		mainPanel.addStyleName("span-"+spanWidth + " notopmargin");
+		mainPanel.add(getBreadCrumbs(colWidth));
 		mainPanel.add(getCommands(canEdit));
-		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "span-"+spanWidth + " margin-top-5"));
+		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
 		
 		layout(true);
@@ -161,45 +167,99 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		widgetWrapper.add(widget);
 		return widgetWrapper;
 	}
+	
+	private Widget getBreadCrumbs(int colWidth) {
+		final SimplePanel breadcrumbsWrapper = new SimplePanel();		
+		if (!isRootWiki) {
+			List<LinkData> links = new ArrayList<LinkData>();
+			if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
+				//point to Home
+				links.add(new LinkData("Home", new Home(ClientProperties.DEFAULT_PLACE_TOKEN)));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, null));
+			} else {
+				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
+				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+			}
+			
+			layout(true);
+			//TODO: support other object types.  
+		}
+		return breadcrumbsWrapper;
+	}
 		
 	private SimplePanel getCommands(Boolean canEdit) {
 		if (commandBarWrapper == null) {
-			commandBarWrapper = new SimplePanel();
-			commandBarWrapper.addStyleName("margin-bottom-20 span-"+spanWidth + " margin-top-5");
-			commandBar = new HorizontalPanel();
-			commandBar.addStyleName("right");
-			commandBar.setVerticalAlign(VerticalAlignment.MIDDLE);
-			commandBar.setHorizontalAlign(HorizontalAlignment.LEFT);
+			commandBarWrapper = new SimplePanel();			
+			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
+			commandBar = new LayoutContainer();
 			commandBarWrapper.add(commandBar);
+		} else {
+			commandBar.removeAll();
 		}
 			
-		if(editButton == null) {			
-			editButton = new Button(DisplayConstants.BUTTON_EDIT_WIKI, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
-			editButton.setId(DisplayConstants.ID_BTN_EDIT);
-			editButton.setHeight(25);
-			commandBar.add(editButton);
-			commandBar.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));			
-		}
+		Button editButton = createEditButton();			
+		commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
 		
-		if(addPageButton == null) {
-			addPageButton = getInsertPageButton(false);
+		if(!isDescription) {
+			Button addPageButton = createInsertOrAddPageButton(false);
 			commandBar.add(addPageButton);
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
-		configureEditButton();
-		
+		commandBar.layout(true);
 		return commandBarWrapper;
 	}
-	
-	private Button getInsertPageButton(final boolean isFirstPage) {
-		String buttonText = isFirstPage ? DisplayConstants.CREATE_WIKI : DisplayConstants.ADD_PAGE;
-		Button insertButton = new Button(buttonText, AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
-		insertButton.setWidth(115);
-		insertButton.setHeight(25);
-		insertButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+	private Button createEditButton() {
+		String editLabel = isDescription ? DisplayConstants.EDIT_DESCRIPTION : DisplayConstants.BUTTON_EDIT_WIKI;
+		Button btn = DisplayUtils.createIconButton(editLabel, DisplayUtils.ButtonType.DEFAULT, "glyphicon-pencil");			
+		btn.addStyleName("display-inline");			
+		btn.getElement().setId(DisplayConstants.ID_BTN_EDIT);
+		
+		btn.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
+				//change to edit mode
+				removeAll(true);
+				//create the editor textarea, and configure the editor widget
+				final TextArea mdField = new TextArea();
+				mdField.setValue(currentPage.getMarkdown());
+				mdField.addStyleName("markdownEditor");
+				mdField.setHeight("400px");
+				
+				LayoutContainer form = new LayoutContainer();
+				final TextBox titleField = new TextBox();
+				if (!isRootWiki) {
+					titleField.setValue(currentPage.getTitle());
+					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
+					titleField.setHeight("35px");					
+					form.add(titleField);
+				}
+				//also add commands at the bottom
+				
+				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
+					@Override
+					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
+						//update wiki attachments
+						presenter.refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
+					}
+				}, getCloseHandler(titleField, mdField), getManagementHandler(), colWidth);
+				form.addStyleName("margin-bottom-40 margin-top-10");
+				add(form);
+				layout(true);
+			}
+		});
+
+		return btn;
+	}
+
+	private Button createInsertOrAddPageButton(final boolean isFirstPage) {
+		Button btn = DisplayUtils.createIconButton(getInsertBtnText(isFirstPage), DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+		btn.addStyleName("display-inline");
+		btn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
 				if (isFirstPage) {
 					presenter.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME);
 				}
@@ -211,52 +271,22 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						}
 					});
 				}
-
+				
 			}
 		});
-		return insertButton;
+		return btn;
+	}
+
+	private String getInsertBtnText(final boolean isFirstPage) {
+		String buttonText;
+		if(isFirstPage) {
+			buttonText = isDescription ? DisplayConstants.ADD_DESCRIPTION : DisplayConstants.CREATE_WIKI;
+		} else {
+			buttonText = DisplayConstants.ADD_PAGE;
+		}
+		return buttonText;
 	}
 	
-	private void configureEditButton() {
-		editButton.removeAllListeners();
-		editButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				//change to edit mode
-				removeAll(true);
-				//create the editor textarea, and configure the editor widget
-				final TextArea mdField = new TextArea();
-				mdField.setValue(currentPage.getMarkdown());
-				mdField.addStyleName("span-"+spanWidth);
-				mdField.addStyleName("markdownEditor");
-				mdField.setHeight("400px");
-				
-				LayoutContainer form = new LayoutContainer();
-				form.addStyleName("span-" + spanWidth);
-				final TextBox titleField = new TextBox();
-				if (!isRootWiki) {
-					titleField.setValue(currentPage.getTitle());
-					titleField.addStyleName("margin-left-10 margin-bottom-10 span-"+spanWidth);
-					
-					form.add(titleField);
-				}
-				//also add commands at the bottom
-				
-				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
-					@Override
-					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						//update wiki attachments
-						presenter.refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
-					}
-				}, getCloseHandler(titleField, mdField), getManagementHandler(), spanWidth);
-				form.addStyleName("margin-bottom-40");
-				add(form);
-				layout(true);
-			}
-		});		
-	}
-
 	private ManagementHandler getManagementHandler() {
 		return new ManagementHandler() {
 			@Override
@@ -300,7 +330,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						new Listener<MessageBoxEvent>() {
 					@Override
 					public void handleEvent(MessageBoxEvent be) {
-						Button btn = be.getButtonClicked();
+						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
 						if(Dialog.YES.equals(btn.getItemId())) {
 							presenter.deleteButtonClicked();
 						}
@@ -357,5 +387,5 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	@Override
 	public void clear() {
 		removeAll(true);
-	}
+	}		
 }

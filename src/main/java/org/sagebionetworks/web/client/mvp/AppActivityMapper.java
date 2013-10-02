@@ -42,6 +42,7 @@ public class AppActivityMapper implements ActivityMapper {
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
+	Activity lastActivity;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -116,13 +117,19 @@ public class AppActivityMapper implements ActivityMapper {
 			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
 			presenter.setGinInjector(ginjector);
+			lastActivity = presenter;
 			return presenter;
 		} else {
+			// check if this is a no-restart place change
+			if(place instanceof Synapse && ((Synapse)place).isNoRestartActivity() && lastActivity != null) {
+				return lastActivity;
+			}
 			if(loading != null) loading.showWidget();
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 			bulkPresenterProxy.setGinjector(ginjector);
 			bulkPresenterProxy.setloader(loading);
 			bulkPresenterProxy.setPlace(place);
+			lastActivity = bulkPresenterProxy;
 			return bulkPresenterProxy;
 		}
 	}

@@ -201,8 +201,7 @@ public class EntityListRenderer extends LayoutContainer {
 			table.getColumnFormatter().setWidth(7, "6%"); // edit column
 		}
 
-		LayoutContainer tbl = new LayoutContainer();
-		tbl.setStyleName("span-24 last notopmargin");
+		LayoutContainer tbl = new LayoutContainer();		
 		tbl.add(table);
 		return tbl;
 	}
