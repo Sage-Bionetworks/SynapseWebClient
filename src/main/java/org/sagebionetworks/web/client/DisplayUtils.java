@@ -5,7 +5,7 @@ import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
-import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_HEIGHT;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
 import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_WIDTH;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
@@ -762,7 +762,7 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
 		return createFullWidthLoadingPanel(sageImageBundle, " Loading...");
 	}
 
@@ -774,15 +774,13 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		hp.setPixelSize(FULL_ENTITY_PAGE_WIDTH, FULL_ENTITY_PAGE_HEIGHT);
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
-		hp.add(w);
-		return hp;
+		LayoutContainer panel = new LayoutContainer();
+		panel.add(w, new MarginData(FULL_ENTITY_TOP_MARGIN_PX, 0, FULL_ENTITY_TOP_MARGIN_PX, 0));
+		panel.addStyleName("center");				
+		return panel;
 	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {

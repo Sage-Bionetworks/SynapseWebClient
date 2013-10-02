@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 public class EntityViewImpl extends Composite implements EntityView {
 	
 	private SageImageBundle sageImageBundle;
-	private HorizontalPanel loadingPanel;
+	private Widget loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
