@@ -47,14 +47,13 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -117,8 +116,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private WikiPageWidget wikiPageWidget;
 	private PreviewWidget previewWidget;
 	private CookieProvider cookies;
-	GlobalApplicationState globalApplicationState;
+	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
+	private boolean newBadgesShown = false;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	
@@ -174,7 +174,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
 		wikiLink.setText(DisplayConstants.PROJECT_WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
-		fileLink.setText(DisplayConstants.FILES);
+		fileLink.setText(DisplayConstants.FILES);		
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
 		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
@@ -209,7 +209,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer.removeAll();
 		filesTabContainer.removeAll();
 		adminTabContainer.removeAll();
-				
+
+		// notify new tabs
+		notifyNewTabs();
+		
 		// project header
 		fillProjectLink(projectHeader);
 	
@@ -235,6 +238,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		fullWidthContainer.layout(true);
 		topFullWidthContainer.layout(true);
+	}
+
+	private void notifyNewTabs() {
+		if(!newBadgesShown) {
+			fileLink.setHTML(DisplayConstants.FILES + "<span class=\"label label-info margin-left-5 tabLabelPosition\">new</span>");
+			Timer t = new Timer() {
+			      @Override
+			      public void run() {
+						fileLink.setHTML(DisplayConstants.FILES);
+			      }
+			    };
+			    t.schedule(30000); // let it show once for 30 sec
+			    newBadgesShown = true;
+		}
 	}
 
 	private void fillProjectLink(final EntityHeader projectHeader) {
@@ -489,6 +506,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		}));
 		adminTabContainer.add(row);
+				
 	}
 
 	/**
@@ -687,12 +705,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Widget createAnnotationsWidget(EntityBundle bundle, boolean canEdit) {
 	    // Create the property body
 	    // the headers for properties.
-	    annotationsWidget.configure(bundle, canEdit);
+	    annotationsWidget.configure(bundle, canEdit);	    
 	    Widget widget;
 		if (canEdit || !annotationsWidget.isEmpty()) {
-			widget = annotationsWidget.asWidget();
+			widget = new LayoutContainer();
 			widget.addStyleName("highlight-box");
+			LayoutContainer row = DisplayUtils.createRowContainer();
+			Widget aW = annotationsWidget.asWidget();
+			aW.addStyleName("col-md-6");
 			widget.setTitle(DisplayConstants.ANNOTATIONS);
+			row.add(aW);
+			((LayoutContainer)widget).add(row);
 		} else {
 			widget = new HTML();
 		}

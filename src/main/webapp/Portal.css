@@ -1272,6 +1272,11 @@ a.projectTitle:hover {
 	display: table;
 }
 
+.tabLabelPosition {
+    position: absolute;
+    top: 4px;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
