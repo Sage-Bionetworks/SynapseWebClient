@@ -242,7 +242,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private void notifyNewTabs() {
 		if(!newBadgesShown) {
-			fileLink.setHTML(DisplayConstants.FILES + "<span class=\"label label-info margin-left-5 tabLabelPosition\">new</span>");
+			fileLink.setHTML(DisplayConstants.FILES + "<span class=\"label label-info margin-left-5 tabLabel\">new</span>");
 			Timer t = new Timer() {
 			      @Override
 			      public void run() {
