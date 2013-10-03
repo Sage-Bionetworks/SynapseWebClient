@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -121,6 +122,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private boolean newBadgesShown = false;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
+	private static final int MAX_DISPLAY_NAME_CHAR = 40;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder,
@@ -377,28 +379,37 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			row.add(createProvenanceWidget(bundle));
 		}
 		filesTabContainer.add(row);
-		
 		// Annotations			
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));		
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
 		// Wiki
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true);
-
-		// LEFT/RIGHT Bottom
-		row = DisplayUtils.createRowContainer();
-		left = new LayoutContainer();
-		left.addStyleName("col-md-8");
-		right = new LayoutContainer();
-		right.addStyleName("col-md-4 push-right");
-		row.add(left);
-		row.add(right);
-		filesTabContainer.add(row);				
 		// Programmatic Clients
-		right.add(createProgrammaticClientsWidget(bundle, versionNumber));
-
+		filesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
+		// Created By/Modified By
+		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+		// Padding Bottom
+		filesTabContainer.add(createBottomPadding());
 	}
 	
+	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin) {
+		// TODO : switch to using the badge	
+//		UserBadge badge;
+//		badge = ginInjector.getUserBadgeWidget();
+//		badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " <b>")
+		.appendEscaped(entity.getModifiedBy())
+		.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(entity.getModifiedOn()) + "<br>")
+		.appendHtmlConstant(DisplayConstants.CREATED_BY + " <b>")
+		.appendEscaped(entity.getCreatedBy())
+		.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(entity.getCreatedOn()));		
+		HTML html = new HTML(shb.toSafeHtml());
+		if(addTopMargin) html.addStyleName("margin-top-15");
+		return html;
+	}
+
 	private Widget getFilePreview(EntityBundle bundle) {		
 		previewWidget.configure(bundle);
 		Widget preview = previewWidget.asWidget();
@@ -442,19 +453,25 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(row);		
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
-
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
-		filesTabContainer.add(row);
-		
+		filesTabContainer.add(row);		
 		//Annotations
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
-		filesTabContainer.layout(true);
-		
-		// Wiki
+		filesTabContainer.layout(true);		
+		// Wiki		
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true);
-			
+		// Created By/Modified By
+		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
+		// Padding Bottom
+		filesTabContainer.add(createBottomPadding());
+	}
+
+	private Widget createBottomPadding() {
+		SimplePanel p = new SimplePanel();
+		p.addStyleName("padding-bottom-15");
+		return p;
 	}
 
 	// Render the Project entity
@@ -488,6 +505,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false);
+		// Created By/Modified By
+		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+		// Padding Bottom
+		wikiTabContainer.add(createBottomPadding());
 		
 		// File Tab: Files, Annotations & old
 		row = DisplayUtils.createRowContainer();		
@@ -495,7 +516,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(row);			
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));		
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false)); // Attachments (TODO : this should eventually be removed)
-		
+		// Created By/Modified By
+		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
+		// Padding Bottom
+		filesTabContainer.add(createBottomPadding());
+
 		// Admin Tab: evaluations
 		row = DisplayUtils.createRowContainer();
 		row.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
@@ -552,12 +577,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		currentTabContainer.layout(true);							
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, boolean canEdit, String wikiPageId, int spanWidth, boolean marginTop) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, int spanWidth, boolean marginTop) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
 			Widget wikiW = wikiPageWidget.asWidget();
-			SimplePanel wrapper = new SimplePanel(wikiW);
+			final SimplePanel wrapper = new SimplePanel(wikiW);
 			wrapper.addStyleName("panel panel-default panel-body");
 			if(marginTop) wrapper.addStyleName("margin-top-15");
 			container.add(wrapper);
@@ -568,8 +593,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				}
 				@Override
 				public void noWikiFound() {
-					//no wiki found, show Files tab instead for projects
-					if(isProject) setTabSelected(Synapse.EntityArea.FILES, false);					
+					if(isProject) {
+						//no wiki found, show Files tab instead for projects
+						setTabSelected(Synapse.EntityArea.FILES, false);
+					} else {
+						if(!canEdit) {
+							// hide description area for those who can't edit
+							wrapper.setVisible(false);
+						}
+					}
 				}
 			}, true, spanWidth);
 		}
@@ -601,13 +633,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
 		Widget ssW = snapshotWidget.asWidget();
 		ssW.addStyleName("panel panel-body margin-top-15");
-		filesTabContainer.add(ssW);
-		
+		filesTabContainer.add(ssW);		
 		//Annotations
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		filesTabContainer.layout(true);
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));
+		// Created By/Modified By
+		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
+		// Padding Bottom
+		filesTabContainer.add(createBottomPadding());
 	}
 
 	private Widget createProvenanceWidget(EntityBundle bundle) {
@@ -648,15 +683,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return list.asWidget();
 	}
 
-	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {		
-		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("panel");
-		lc.setAutoHeight(true);
-		LayoutContainer pcc = ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle);
-		pcc.addStyleName("right");
-		lc.add(pcc);
-		lc.layout();
-	    return lc;
+	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
+		LayoutContainer wrapper = new LayoutContainer();
+		wrapper.add(ProgrammaticClientCode.createLoadWidget(bundle.getEntity().getId(), versionNumber, synapseJSNIUtils, sageImageBundle));
+		wrapper.addStyleName("margin-top-15");
+		return wrapper;
 	}
 
 	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle, boolean canEdit) {

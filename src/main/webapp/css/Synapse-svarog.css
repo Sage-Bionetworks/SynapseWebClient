@@ -78,7 +78,7 @@ p.error{
 
 .footer-wrapper { background-color:#f1f2f1; background-image:url(../images/pattern/14w.png); padding-bottom:20px; padding-top:20px;  } 
 .footer-line-wrapper {background:#000; margin:0 auto; border-top:1px solid #ececec; margin-bottom:20px !important; } 
-.footer-line-top-wrapper {background:#f1f2f1; background-image:url(../images/pattern/14w.png); margin:0 auto; border-bottom:1px solid #dfdfdf; border-top:1px solid #dfdfdf; margin-top:40px;} 
+.footer-line-top-wrapper {background:#f1f2f1; background-image:url(../images/pattern/14w.png); margin:0 auto; border-bottom:1px solid #dfdfdf; border-top:1px solid #dfdfdf;} 
 .nocolor-line { height:10px; float:left; background:#04bfea}
 .logo { margin-top:27px !important;}
 .logo a { text-align:center !important;} 

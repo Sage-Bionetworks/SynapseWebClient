@@ -495,7 +495,10 @@ public class DisplayConstants {
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 	public static final String PROVENANCE = "Provenance";
 	public static final String CREATED = "Created";
+	public static final String CREATED_BY = "Created by";
 	public static final String MODIFIED = "Modified";
+	public static final String MODIFIED_BY = "Modified by";
+	public static final String ON = "on";
 	public static final String NO_VERSION_COMMENT = "No Version Comment";
 	public static final String ADD_FOLDER = "Add Folder";
 	public static final String ADD_FILE = "Add File";

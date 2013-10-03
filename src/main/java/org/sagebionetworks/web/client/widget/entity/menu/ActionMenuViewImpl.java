@@ -221,7 +221,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entityType 
 	 */	
 	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
-		Anchor a = new Anchor(DisplayConstants.LABEL_DELETE);
+		Anchor a = new Anchor(
+				SafeHtmlUtils.fromSafeConstant("<span class=\"text-danger\">"
+						+ DisplayUtils.getIcon("glyphicon-trash") + " "
+						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay
+						+ "</span>"));
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
