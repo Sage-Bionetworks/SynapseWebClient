@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -446,10 +445,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// File tab: everything
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		Widget ebW = entityMetadata.asWidget();
-		row = DisplayUtils.createRowContainer();
-		ebW.addStyleName("col-md-12");
-		row.add(ebW);
+		row = DisplayUtils.createRowContainer();		
+		row.add(wrap(entityMetadata.asWidget(), "col-md-12"));
 		filesTabContainer.add(row);		
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
@@ -466,6 +463,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
 		filesTabContainer.add(createBottomPadding());
+	}
+
+	private LayoutContainer wrap(Widget widget, String style) {
+		LayoutContainer wrap = new LayoutContainer();
+		wrap.addStyleName(style);
+		wrap.add(widget);
+		return wrap;
 	}
 
 	private Widget createBottomPadding() {
@@ -617,11 +621,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File tab: everything
 		LayoutContainer row;
-		entityMetadata.setEntityBundle(bundle, versionNumber);
-		Widget ebW = entityMetadata.asWidget();
-		row = DisplayUtils.createRowContainer();
-		ebW.addStyleName("col-md-12");
-		row.add(ebW);
+		entityMetadata.setEntityBundle(bundle, versionNumber);		
+		row = DisplayUtils.createRowContainer();		
+		row.add(wrap(entityMetadata.asWidget(), "col-md-12"));
 		filesTabContainer.add(row);		
 		//File History
 		filesTabContainer.add(fileHistoryWidget.asWidget(), new MarginData(0));
@@ -630,10 +632,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Snapshot entity
 		boolean readOnly = versionNumber != null;
-		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);
-		Widget ssW = snapshotWidget.asWidget();
-		ssW.addStyleName("panel panel-body margin-top-15");
-		filesTabContainer.add(ssW);		
+		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);		
+		filesTabContainer.add(wrap(snapshotWidget.asWidget(), "panel panel-body margin-top-15"));		
 		//Annotations
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		filesTabContainer.layout(true);

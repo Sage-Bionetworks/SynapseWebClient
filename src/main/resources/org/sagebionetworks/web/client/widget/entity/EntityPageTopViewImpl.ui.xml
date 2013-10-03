@@ -9,7 +9,7 @@
 				<g:SimplePanel styleName="margin-top-5" ui:field="projectTitleContainer"/>
 								
    				<div class="row">
-				    <g:SimplePanel ui:field="topFullWidthPanel" styleName="col-md-12"/>
+				    <g:SimplePanel ui:field="topFullWidthPanel"/>
 			    </div>
 				    
 				<div class="row margin-top-15" ui:field="navtabContainer">
