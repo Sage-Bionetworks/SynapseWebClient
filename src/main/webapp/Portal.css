@@ -1254,7 +1254,7 @@ ol.lowerroman {
     cursor: pointer;
 }
 a.projectTitle:hover {
-	text-decoration: none;
+	text-decoration: underline;
 	color: #555;
 } 
 
@@ -1270,6 +1270,17 @@ a.projectTitle:hover {
 
 .display-table {
 	display: table;
+}
+
+.tabLabel {
+    position: absolute;
+    top: 4px;
+    font-size: 10px;
+}
+
+.entity-tab {
+	width: 140px;
+	font-size: 16px;	
 }
 
 /*==================================*/

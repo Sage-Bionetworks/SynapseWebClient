@@ -55,7 +55,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 			sb.appendHtmlConstant("    <input name=\""+WebConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
 		sb.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_MODE+"\" type=\"hidden\" value=\""+  WebConstants.OPEN_ID_MODE_GWT +"\"/>");
-		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
+		sb.appendHtmlConstant("    <button class=\"btn btn-default btn-lg btn-block\" id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
 		.appendHtmlConstant("</form>")		
 		.appendHtmlConstant("<p>&nbsp;</p>");
 		return sb.toSafeHtml();

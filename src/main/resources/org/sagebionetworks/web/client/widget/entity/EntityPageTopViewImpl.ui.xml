@@ -9,14 +9,14 @@
 				<g:SimplePanel styleName="margin-top-5" ui:field="projectTitleContainer"/>
 								
    				<div class="row">
-				    <g:SimplePanel ui:field="topFullWidthPanel" styleName="col-md-12"/>
+				    <g:SimplePanel ui:field="topFullWidthPanel"/>
 			    </div>
 				    
 				<div class="row margin-top-15" ui:field="navtabContainer">
 				    <ul class="nav nav-tabs">				        
-					    <li class="span-4 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
-					    <li class="span-4" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
-					    <li class="span-4" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
+					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
+					    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
+					    <li class="entity-tab" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
 				    </ul>
 				</div>
 				
