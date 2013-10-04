@@ -180,7 +180,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void onAttach() {
 		super.onAttach();
-		carousel();
+		startCarousel();
 	}
 	
 	@Override
@@ -196,23 +196,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		newsFeed.clear();
 		newsFeed.add(panel);	
 	}
-		
-	private static native void carousel() /*-{
-		$wnd.jQuery("#slider").nivoSlider({
-	        effect:"sliceDown",
-	        slices:15,
-	        boxCols:8,
-	        boxRows:4,
-	        animSpeed:500,
-	        pauseTime:9000,
-	        startSlide:0,
-	        directionNav:true,
-	        controlNav:true,
-	        controlNavThumbs:false,
-	        pauseOnHover:true,
-	        manualAdvance:false
-	    });
-	}-*/;
 	
 	@Override
 	public void refresh() {
@@ -413,6 +396,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 		a.setHref(href);
 		a.setText(text);
 	}
+
+	private static native void startCarousel() /*-{
+		$wnd.jQuery('#myCarousel').carousel('cycle');
+	}-*/;
 
 	
 }

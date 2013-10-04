@@ -152,7 +152,7 @@
 			      <a class="left carousel-control-clean" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
 			      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
 			    </div><!-- /.carousel -->
-			</div> <!-- end row -->				
+			</div> <!-- end row -->		
 
 			<div class="row">
 				<div class="separator separator-margin"></div>						
@@ -172,44 +172,50 @@
 
 			<!-- PROGRAMMATIC CLIENTS -->
 			<div class="row">				
-				<h3>Programmatic Clients</h3>
-				<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
-				   interact with all of Synapse's functionality programmatically. Create projects, upload/download files, generate provenance, query, create wikis and more
-				   all from the comfort of your own code. Don't see your language of choice here? Check out our 
-				   full <g:Anchor ui:field="restApiLink"/>.</p>
-				<div class="col-md-4">
-			    	<span style="position:relative; top:8px; padding-right: 5px;">
-			    	    <g:Image resource='{sageImageBundle.logoR45}' />
-			    	</span>
-			    	<h4 style="display:inline; ">R Client</h4>
-			    	<g:SimplePanel ui:field="rClientInstallPanel" />
-			    	<h5 style="display:inline"><g:Anchor ui:field="rAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="rExampleCodeLink"/></h5>
-				</div>
-				<div class="col-md-3">
-			    	<span style="position:relative; top:8px; padding-right: 5px;">
-			    	    <g:Image resource='{sageImageBundle.logoPython45}' />
-			    	</span>
-			    	<h4 style="display:inline; ">Python Client</h4>
-			    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
-					<h5 style="display:inline"><g:Anchor ui:field="pythonAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="pythonExampleCodeLink"/></h5>
-				</div>
-				<div class="col-md-3">
-			    	<span style="position:relative; top:8px; padding-right: 5px;">
-			    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
-			    	</span>
-			    	<h4 style="display:inline; ">Command Line Client</h4>
-			    	<g:SimplePanel ui:field="clClientInstallPanel" />
-					<h5 style="display:inline"><g:Anchor ui:field="clAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="clExampleCodeLink"/></h5>
-				</div>												
-				<div class="col-md-2">
-			    	<span style="position:relative; top:8px; padding-right: 5px;">
-			    	    <g:Image resource='{sageImageBundle.logoJava45}' />
-			    	</span>
-			    	<h4 style="display:inline; ">Java Client</h4>
-			    	<g:SimplePanel ui:field="javaClientInstallPanel" />
-			    	<span class="padding-top-5">
-						<h5 style="display:inline"><g:Anchor ui:field="javaAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="javaExampleCodeLink"/></h5>								
-			    	</span>
+			    <div class="row">
+			        <div class="col-md-12">
+						<h3>Programmatic Clients</h3>
+						<p>Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
+						   all from the comfort of your own code. Don't see your language of choice here? Check out our 
+						   full <g:Anchor ui:field="restApiLink"/>.</p>
+					 </div>
+			   </div>
+				<div class="row">
+				    <div class="col-md-3">
+				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+				    	    <g:Image resource='{sageImageBundle.logoR45}' />
+				    	</span>
+				    	<h4 style="display:inline; ">R Client</h4>
+				    	<g:SimplePanel ui:field="rClientInstallPanel" />
+				    	<h5 style="display:inline"><g:Anchor ui:field="rAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="rExampleCodeLink"/></h5>
+					</div>
+					<div class="col-md-3">
+				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+				    	    <g:Image resource='{sageImageBundle.logoPython45}' />
+				    	</span>
+				    	<h4 style="display:inline; ">Python Client</h4>
+				    	<g:SimplePanel ui:field="pythonClientInstallPanel" />
+						<h5 style="display:inline"><g:Anchor ui:field="pythonAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="pythonExampleCodeLink"/></h5>
+					</div>
+					<div class="col-md-3">
+				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+				    	    <g:Image resource='{sageImageBundle.logoCommandLine45}' />
+				    	</span>
+				    	<h4 style="display:inline; ">Command Line Client</h4>
+				    	<g:SimplePanel ui:field="clClientInstallPanel" />
+						<h5 style="display:inline"><g:Anchor ui:field="clAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="clExampleCodeLink"/></h5>
+					</div>												
+					<div class="col-md-3">
+				    	<span style="position:relative; top:-5px; padding-right: 5px;">
+				    	    <g:Image resource='{sageImageBundle.logoJava45}' />
+				    	</span>
+				    	<h4 style="display:inline; ">Java Client</h4>
+				    	<g:SimplePanel ui:field="javaClientInstallPanel" />
+				    	<span class="padding-top-5">
+							<h5 style="display:inline"><g:Anchor ui:field="javaAPILink"/></h5> &amp; <h5 style="display:inline"><g:Anchor ui:field="javaExampleCodeLink"/></h5>								
+				    	</span>
+					</div>
 				</div>
 			</div> <!-- end row -->				
 
