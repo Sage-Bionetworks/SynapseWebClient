@@ -39,10 +39,11 @@ public class PortalLoggingIntegrationTest {
 	LogDAO logDAO;
 	
 	@Before
-	public void before(){
-		// clear all s3 log data before we start
+	public void before() throws InterruptedException{
+		// clear all s3 log data before we start		
 		logDAO.deleteAllStackInstanceLogs();
-
+		log.info("Sleeping after delete for 30 seconds");
+		Thread.sleep(30000);
 	}
 	
 	@Test
