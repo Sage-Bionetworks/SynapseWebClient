@@ -14,7 +14,7 @@ public interface EvaluationLinksListView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void configure(List<Evaluation> evaluations, String title);
+	public void configure(List<Evaluation> evaluations, String title, boolean showEvaluationIds);
 	/**
 	 * Presenter interface
 	 */

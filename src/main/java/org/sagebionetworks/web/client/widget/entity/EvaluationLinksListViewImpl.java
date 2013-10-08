@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -29,7 +30,7 @@ public class EvaluationLinksListViewImpl extends LayoutContainer implements Eval
 	}
 	
 	@Override
-	public void configure(List<Evaluation> evaluations, String title) {
+	public void configure(List<Evaluation> evaluations, String title, boolean showEvaluationIds) {
 		clear();
 		
 		if (evaluations.size() > 0) {
@@ -40,7 +41,12 @@ public class EvaluationLinksListViewImpl extends LayoutContainer implements Eval
 			for (Evaluation evaluation : evaluations) {
 				SimplePanel wrapper = new SimplePanel();
 				Anchor a = new Anchor();
-				a.setHTML(evaluation.getName());
+				SafeHtmlBuilder linkText=  new SafeHtmlBuilder();
+				linkText.appendEscaped(evaluation.getName());
+				if (showEvaluationIds) {
+					linkText.appendHtmlConstant(" (" + evaluation.getId() + ")");
+				}
+				a.setHTML(linkText.toSafeHtml());
 				a.addStyleName("link");
 				a.addClickHandler(getEvaluationClickHandler(evaluation));
 				wrapper.add(a);
