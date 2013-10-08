@@ -33,7 +33,7 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 	
 	@Override
 	public void configure(List<Evaluation> evaluations) {
-		evalList.configure(evaluations, getEvaluationClicked(), "Evaluations");
+		evalList.configure(evaluations, getEvaluationClicked(), "Evaluations", true);
 	}
 	
 	public CallbackP<Evaluation> getEvaluationClicked(){

@@ -25,9 +25,9 @@ public class EvaluationLinksList implements EvaluationLinksListView.Presenter, S
 	 * @param evaluations List of evaluations to display
 	 * @param evaluationCallback call back with the evaluation if it is selected
 	 */
-	public void configure(List<Evaluation> evaluations, CallbackP<Evaluation> evaluationCallback, String title) {
+	public void configure(List<Evaluation> evaluations, CallbackP<Evaluation> evaluationCallback, String title, boolean showEvaluationIds) {
 		this.evaluationCallback = evaluationCallback;
-		view.configure(evaluations, title);
+		view.configure(evaluations, title, showEvaluationIds);
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -991,7 +991,13 @@ public class DisplayUtils {
 		
 		return ordered;
 	}
-
+	
+	public static PopupPanel addToolTip(Widget widget, String message) {
+		PopupPanel popup = addToolTip(widget);
+		popup.setWidget(new HTML(message));
+		return popup;
+	}
+	
 	/**
 	 * Creates and attaches a simple tooltip to a GWT widget
 	 * 
