@@ -679,8 +679,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    // the headers for properties.
 		AdministerEvaluationsList list = ginInjector.getAdministerEvaluationsList();						
 		list.configure(bundle.getEntity().getId(), isChallengeCallback);
-		 
-		return list.asWidget();
+		
+		LayoutContainer lc = new LayoutContainer();
+		lc.addStyleName("col-md-12 margin-top-10");
+		lc.add(list.asWidget());
+		
+		return lc;
 	}
 
 	private Widget createProgrammaticClientsWidget(EntityBundle bundle, Long versionNumber) {
