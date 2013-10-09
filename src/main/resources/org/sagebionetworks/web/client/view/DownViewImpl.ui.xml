@@ -14,7 +14,7 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<!-- DownView -->
-		<div class="margin-top-15 margin-left-15" style="height: 12em">
+		<div class="margin-top-15 margin-left-15" style="height: 182px;">
 			<p class="error left colored">:-(</p>
 			<h1>Synapse is down for maintenance</h1>
 			<p>Sad but true. We will be back as soon as possible.</p>
