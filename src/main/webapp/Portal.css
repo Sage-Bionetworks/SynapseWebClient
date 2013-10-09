@@ -341,7 +341,7 @@
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 13px;
 	font-weight: normal;
-	height: 20px;
+	height: 26px;
 	letter-spacing: normal;
 	line-height: 20px;
 	padding-bottom: 4px;
@@ -1290,6 +1290,15 @@ a.projectTitle:hover {
 }
 
 /*
+ * Bootstrap Overrides 
+ */
+.entity-tabs > li.active > a,
+.entity-tabs > li.active > a:hover,
+.entity-tabs > li.active > a:focus {
+	background-color: #f9f9f9;
+}
+
+/*
  * Off Canvas
  * --------------------------------------------------
  */
@@ -1325,4 +1334,5 @@ a.projectTitle:hover {
     width: 50%; /* 6 columns */
   }
 }
+
 

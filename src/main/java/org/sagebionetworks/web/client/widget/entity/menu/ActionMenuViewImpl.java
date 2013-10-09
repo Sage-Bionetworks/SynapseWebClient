@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.menu;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -200,7 +201,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			addCreateShortcutItem(toolsButton, entity, entityType);
 		}
 		// move
-		if (canEdit) {
+		if (canEdit && !(entityBundle.getEntity() instanceof Project)) {
 			addMoveItem(toolsButton, entity, entityType);
 		}
 
@@ -221,11 +222,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entityType 
 	 */	
 	private void addDeleteItem(DropdownButton menuBtn, final String typeDisplay) {
-		Anchor a = new Anchor(
-				SafeHtmlUtils.fromSafeConstant("<span class=\"text-danger\">"
-						+ DisplayUtils.getIcon("glyphicon-trash") + " "
-						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay
-						+ "</span>"));
+		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-trash") + " "
+						+ DisplayConstants.LABEL_DELETE + " " + typeDisplay));
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
