@@ -5,14 +5,8 @@ import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_PROVIDER_GOOGL
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.net.URLEncoder;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -20,24 +14,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
 import org.openid4java.consumer.ConsumerManager;
 import org.sagebionetworks.authutil.AuthenticationException;
-import org.sagebionetworks.authutil.CrowdAuthUtil;
-import org.sagebionetworks.repo.model.auth.NewUser;
-import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.web.NotFoundException;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
 public class OpenIDUtils {
-	private static Random rand = new Random();
-	
-	
 	public static final String OPEN_ID_PROVIDER_GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
 
 	public static final String OPENID_CALLBACK_URI = "/Portal/openidcallback";
-	
-	private static final String OPEN_ID_ATTRIBUTE = "OPENID";
 	
 	private static final String RETURN_TO_URL_COOKIE_NAME = "org.sagebionetworks.auth.returnToUrl";
 	private static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "org.sagebionetworks.auth.acceptsTermsOfUse";
@@ -138,7 +127,8 @@ public class OpenIDUtils {
 
 	public static void openIDCallback(
 			HttpServletRequest request,
-			HttpServletResponse response) throws AuthenticationException, IOException, URISyntaxException {
+			HttpServletResponse response, 
+			SynapseClient synapse) throws AuthenticationException, IOException, URISyntaxException {
 		Boolean isGWTMode = null;
 		String returnToURL = null;
 		try {
@@ -174,43 +164,39 @@ public class OpenIDUtils {
 			
 			if (email==null) throw new AuthenticationException(400, "Unable to authenticate", null);
 			
-			NewUser credentials = new NewUser();			
-			credentials.setEmail(email);
+			JSONObject credentials = new JSONObject();
+			credentials.put("email", email);
 
-			Map<String,Collection<String>> attrs = null;
 			try {
-				attrs = new HashMap<String,Collection<String>>(CrowdAuthUtil.getUserAttributes(email));
-			} catch (NotFoundException nfe) {
-				// user doesn't exist yet, so create them
-				credentials.setPassword((new Long(rand.nextLong())).toString());
-				credentials.setFirstName(fname);
-				credentials.setLastName(lname);
-				if (fname!=null && lname!=null) credentials.setDisplayName(fname+" "+lname);
-				CrowdAuthUtil.createUser(credentials);
-				attrs = new HashMap<String,Collection<String>>(CrowdAuthUtil.getUserAttributes(email));
-			}
-			// save the OpenID in Crowd
-			Collection<String> openIDs = attrs.get(OPEN_ID_ATTRIBUTE);
-			if (openIDs==null) {
-				attrs.put(OPEN_ID_ATTRIBUTE, Arrays.asList(new String[]{openID}));
-			} else {
-				Set<String> modOpenIDs = new HashSet<String>(openIDs);
-				modOpenIDs.add(openID);
-				attrs.put(OPEN_ID_ATTRIBUTE, modOpenIDs);
+				credentials = synapse.getAuthEntity("/user?"
+						+ AuthorizationConstants.PORTAL_MASQUERADE_PARAM + "="
+						+ URLEncoder.encode(email, "UTF-8"));
+			} catch (SynapseNotFoundException e) {
+				// User doesn't exist yet
+				credentials.put("firstName", fname);
+				credentials.put("lastName", lname);
+				if (fname != null && lname != null) {
+					credentials.put("displayName", fname + " " + lname);
+				}
+				synapse.createAuthEntity("/user", credentials);
 			}
 
-			CrowdAuthUtil.setUserAttributes(email, attrs);
-			
-			Session crowdSession = CrowdAuthUtil.authenticate(credentials, false);
-			boolean crowdAcceptsTermsOfUse = CrowdAuthUtil.acceptsTermsOfUse(email, acceptsTermsOfUse);
-			String redirectUrl = createRedirectURL(returnToURL, crowdSession.getSessionToken(), crowdAcceptsTermsOfUse, isGWTMode);
+			JSONObject session = synapse.createAuthEntity("/session/portal?"
+					+ AuthorizationConstants.PORTAL_MASQUERADE_PARAM + "="
+					+ URLEncoder.encode(email, "UTF-8"), credentials);
+			String redirectUrl = createRedirectURL(returnToURL,
+					session.getString("sessionToken"),
+					new Boolean(credentials.getString("acceptsTermsOfUse")),
+					isGWTMode);
 			String location = response.encodeRedirectURL(redirectUrl);
 			response.sendRedirect(location);
 		} catch (Exception e) {
 			// we want to send the error as a 'redirect' but cannot do so unless we have the 
 			// returnToURL and know whether we are in 'GWT mode'
-			if (isGWTMode==null || returnToURL==null) {
-				if (e instanceof AuthenticationException) throw (AuthenticationException)e;
+			if (isGWTMode == null || returnToURL == null) {
+				if (e instanceof AuthenticationException) {
+					throw (AuthenticationException) e;
+				}
 				throw new AuthenticationException(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), e);
 			} else {
 				String redirectUrl = createErrorRedirectURL(returnToURL, isGWTMode);

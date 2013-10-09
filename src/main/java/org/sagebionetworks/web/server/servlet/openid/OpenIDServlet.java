@@ -9,15 +9,36 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.xpath.XPathExpressionException;
 
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.authutil.AuthenticationException;
-import org.sagebionetworks.repo.web.NotFoundException;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpStatus;
 
+import com.google.inject.Inject;
+
 public class OpenIDServlet extends HttpServlet {
 	private static final long serialVersionUID = 95256472471083244L;
+	private static final String PORTAL_USER_NAME = StackConfiguration.getPortalUsername();
+	private static final String PORTAL_API_KEY = StackConfiguration.getPortalAPIKey();
+	
+	/**
+	 * Injected with Gin
+	 */
+	private ServiceUrlProvider urlProvider;
+	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	
+	/**
+	 * Used to setup the Synapse client
+	 */
+	@Inject
+	public void setServiceUrlProvider(ServiceUrlProvider provider) {
+		this.urlProvider = provider;
+	}
 	
 	@Override
     public void doPost(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
@@ -78,7 +99,7 @@ public class OpenIDServlet extends HttpServlet {
 	
 	private void handleOpenIDCallbackRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException { 
 		try {
-			OpenIDUtils.openIDCallback(request, response);
+			OpenIDUtils.openIDCallback(request, response, createSynapseClient(PORTAL_USER_NAME, PORTAL_API_KEY));
 		} catch (AuthenticationException e) {
 			response.setStatus(e.getRespStatus());
 			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
@@ -89,5 +110,15 @@ public class OpenIDServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * Creates a Synapse client that authenticates via API key
+	 */
+	private SynapseClient createSynapseClient(String username, String apikey) {
+		SynapseClient synapseClient = synapseProvider.createNewClient();
+		synapseClient.setUserName(username);
+		synapseClient.setApiKey(apikey);
+		synapseClient.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
+		return synapseClient;
+	}
 
 }
