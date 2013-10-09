@@ -370,12 +370,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// Preview & Provenance Row
 		row = DisplayUtils.createRowContainer();
+		boolean provFullWidth = true;
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {			
 			row.add(getFilePreview(bundle));
+			provFullWidth = false;
 		}
 		if(!(bundle.getEntity() instanceof Project || bundle.getEntity() instanceof Folder)) { 
 			// Provenance Widget (for anything other than projects of folders)
-			row.add(createProvenanceWidget(bundle));
+			row.add(createProvenanceWidget(bundle, provFullWidth));
 		}
 		filesTabContainer.add(row);
 		// Annotations			
@@ -510,7 +512,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false);
 		// Created By/Modified By
-		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+		wikiTabContainer.add(createAnnotationsWidget(bundle, canEdit));
+		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
 		
@@ -645,7 +648,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 
-	private Widget createProvenanceWidget(EntityBundle bundle) {
+	private Widget createProvenanceWidget(EntityBundle bundle, boolean fullWidth) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
 		lc.addStyleName("highlight-box");
@@ -670,7 +673,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    lc.add(border);
 	    lc.layout();
 	    SimplePanel wrapper = new SimplePanel(lc);
-	    wrapper.addStyleName("col-md-6");
+	    String width = fullWidth ? "col-md-12" : "col-md-6";
+	    wrapper.addStyleName(width);
 		return wrapper;
 	}
 	

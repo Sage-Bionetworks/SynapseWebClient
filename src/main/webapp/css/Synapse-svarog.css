@@ -386,6 +386,41 @@ div.colborder {
 	background-position:0px 5px;
 }
 
+/*-------------------------------------------------------------------------------------------------*/
+	/*SOCIAL MEDIA ICONS */
+/*-------------------------------------------------------------------------------------------------*/
+.tweet-icon {
+	height:26px;
+	width:26px;
+	background-image:url('../images/social/t.png');
+	background-position: -0px -0px;
+	float:left;
+	margin-top:8px;
+	margin-right:10px;
+}
+	.tweet-icon:hover {
+		height:26px;
+		width:26px;
+		background-image:url('../images/social/t.png');
+		background-position: -0px -26px;
+	}
+
+.facebook-icon {
+	height:26px;
+	width:26px;
+	background-image:url('../images/social/f.png');
+	background-position: -0px -0px;
+	float:left;
+	margin-top:8px;
+	margin-right:10px;
+}
+	.facebook-icon:hover {
+		height:26px;
+		width:26px;
+		background-image:url('../images/social/f.png');
+		background-position: -0px -26px;
+	}
+
 /*-------------------------------------------------------*/
 /* ### Synapse Custom SVAROG ### */
 /*-------------------------------------------------------*/
