@@ -1329,7 +1329,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
@@ -1348,7 +1348,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
 						+ DisplayConstants.UNAUTHORIZED
 						+ "</h1>"
 						+ "<p>"
@@ -1710,7 +1710,7 @@ public class DisplayUtils {
 	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 465);
+		window.setSize(560, 522);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
@@ -1723,7 +1723,7 @@ public class DisplayUtils {
 	    window.setButtons(Dialog.OKCANCEL);
 	    window.setButtonAlign(HorizontalAlignment.RIGHT);
 	    window.setHideOnButtonClick(false);
-		window.setResizable(false);
+		window.setResizable(true);
 		
 		// "Apply" button
 		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
