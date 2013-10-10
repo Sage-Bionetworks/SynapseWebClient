@@ -359,7 +359,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    window.setSize(650, 500);
 	    window.setPlain(true);  
 	    window.setModal(true);  
-	    window.setHeading("Preview Description");
+	    window.setHeading("Preview");
 	    window.setLayout(new FitLayout());
 	    window.setButtons(Dialog.OK);
 	    window.setHideOnButtonClick(true);
