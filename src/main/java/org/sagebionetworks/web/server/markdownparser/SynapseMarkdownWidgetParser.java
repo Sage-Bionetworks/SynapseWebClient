@@ -14,7 +14,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	Pattern p= Pattern.compile(MarkdownRegExConstants.SYNAPSE_MARKDOWN_WIDGET_REGEX, Pattern.CASE_INSENSITIVE);
-	String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	MarkdownExtractor extractor;
 	
 	String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
@@ -28,7 +27,7 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	}
 	
 	private String getCurrentDivID() {
-		return WebConstants.DIV_ID_WIDGET_SYNTAX_PREFIX + extractor.getCurrentContainerId() + suffix;
+		return WebConstants.DIV_ID_WIDGET_SYNTAX_PREFIX + extractor.getCurrentContainerId() + SharedMarkdownUtils.getPreviewSuffix(isPreview);
 	}
 
 	@Override
