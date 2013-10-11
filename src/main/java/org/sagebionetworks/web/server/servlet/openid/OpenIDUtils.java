@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 import org.openid4java.consumer.ConsumerManager;
-import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.springframework.http.HttpStatus;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 public class OpenIDUtils {
 	public static final String OPEN_ID_PROVIDER_GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
@@ -128,7 +128,7 @@ public class OpenIDUtils {
 	public static void openIDCallback(
 			HttpServletRequest request,
 			HttpServletResponse response, 
-			SynapseClient synapse) throws AuthenticationException, IOException, URISyntaxException {
+			SynapseClient synapse) throws UnauthorizedException, IOException, URISyntaxException {
 		Boolean isGWTMode = null;
 		String returnToURL = null;
 		try {
@@ -144,7 +144,9 @@ public class OpenIDUtils {
 					redirectMode = c.getValue();
 				}
 			}
-			if (returnToURL==null) throw new RuntimeException("Missing required return-to URL.");
+			if (returnToURL == null) {
+				throw new RuntimeException("Missing required return-to URL.");
+			}
 			
 			isGWTMode = redirectMode!=null && WebConstants.OPEN_ID_MODE_GWT.equals(redirectMode);
 			
@@ -162,7 +164,9 @@ public class OpenIDUtils {
 			List<String> lnames = openIDInfo.getMap().get(SampleConsumer.AX_LAST_NAME);
 			String lname = (lnames==null || lnames.size()<1 ? null : lnames.get(0));
 			
-			if (email==null) throw new AuthenticationException(400, "Unable to authenticate", null);
+			if (email == null) {
+				throw new UnauthorizedException("Unable to authenticate");
+			}
 			
 			JSONObject credentials = new JSONObject();
 			credentials.put("email", email);
@@ -181,9 +185,7 @@ public class OpenIDUtils {
 				synapse.createAuthEntity("/user", credentials);
 			}
 
-			JSONObject session = synapse.createAuthEntity("/session/portal?"
-					+ AuthorizationConstants.PORTAL_MASQUERADE_PARAM + "="
-					+ URLEncoder.encode(email, "UTF-8"), credentials);
+			JSONObject session = synapse.createAuthEntity("/session/portal", credentials);
 			String redirectUrl = createRedirectURL(returnToURL,
 					session.getString("sessionToken"),
 					new Boolean(credentials.getString("acceptsTermsOfUse")),
@@ -194,10 +196,10 @@ public class OpenIDUtils {
 			// we want to send the error as a 'redirect' but cannot do so unless we have the 
 			// returnToURL and know whether we are in 'GWT mode'
 			if (isGWTMode == null || returnToURL == null) {
-				if (e instanceof AuthenticationException) {
-					throw (AuthenticationException) e;
+				if (e instanceof SynapseUnauthorizedException) {
+					throw (SynapseUnauthorizedException) e;
 				}
-				throw new AuthenticationException(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), e);
+				throw new RuntimeException(e);
 			} else {
 				String redirectUrl = createErrorRedirectURL(returnToURL, isGWTMode);
 				String location = response.encodeRedirectURL(redirectUrl);

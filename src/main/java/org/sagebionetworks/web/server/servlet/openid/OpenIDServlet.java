@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.authutil.AuthenticationException;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 
 import com.google.inject.Inject;
@@ -100,13 +100,13 @@ public class OpenIDServlet extends HttpServlet {
 	private void handleOpenIDCallbackRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException { 
 		try {
 			OpenIDUtils.openIDCallback(request, response, createSynapseClient(PORTAL_USER_NAME, PORTAL_API_KEY));
-		} catch (AuthenticationException e) {
-			response.setStatus(e.getRespStatus());
-			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
+		} catch (UnauthorizedException e) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
+			response.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		} catch (URISyntaxException e) {
 			// 400 error
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
+			response.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		}
 	}
 
