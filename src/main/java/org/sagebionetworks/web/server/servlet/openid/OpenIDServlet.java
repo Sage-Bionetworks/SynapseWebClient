@@ -10,21 +10,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 
 import com.google.inject.Inject;
 
 public class OpenIDServlet extends HttpServlet {
 	private static final long serialVersionUID = 95256472471083244L;
-	private static final String PORTAL_USER_NAME = StackConfiguration.getPortalUsername();
-	private static final String PORTAL_API_KEY = StackConfiguration.getPortalAPIKey();
 	
 	/**
 	 * Injected with Gin
@@ -99,8 +96,8 @@ public class OpenIDServlet extends HttpServlet {
 	
 	private void handleOpenIDCallbackRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException { 
 		try {
-			OpenIDUtils.openIDCallback(request, response, createSynapseClient(PORTAL_USER_NAME, PORTAL_API_KEY));
-		} catch (UnauthorizedException e) {
+			OpenIDUtils.openIDCallback(request, response, createSynapseClient());
+		} catch (SynapseUnauthorizedException e) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			response.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		} catch (URISyntaxException e) {
@@ -111,12 +108,10 @@ public class OpenIDServlet extends HttpServlet {
 	}
 
 	/**
-	 * Creates a Synapse client that authenticates via API key
+	 * Creates a Synapse client that can only make anonymous calls
 	 */
-	private SynapseClient createSynapseClient(String username, String apikey) {
+	private SynapseClient createSynapseClient() {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setUserName(username);
-		synapseClient.setApiKey(apikey);
 		synapseClient.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		return synapseClient;
 	}
