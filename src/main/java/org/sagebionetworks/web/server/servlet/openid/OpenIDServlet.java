@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openid4java.OpenIDException;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
@@ -49,14 +50,14 @@ public class OpenIDServlet extends HttpServlet {
 	private void handleOpenIDRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {        
 		String thisUrl = request.getRequestURL().toString();
 		int i = thisUrl.indexOf(WebConstants.OPEN_ID_URI);
-		if (i<0)  {
+		if (i < 0)  {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			response.getWriter().println("Request URL is missing suffix "+WebConstants.OPEN_ID_URI);
 			return;
 		}
 		String redirectEndpoint = thisUrl.substring(0, i);
 		String openIdProviderName = request.getParameter(WebConstants.OPEN_ID_PROVIDER);
-		if (openIdProviderName==null) {
+		if (openIdProviderName == null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			response.getWriter().println("Missing parameter "+WebConstants.OPEN_ID_PROVIDER);
 			return;
@@ -65,20 +66,19 @@ public class OpenIDServlet extends HttpServlet {
 		Boolean explicitlyAcceptsTermsOfUse = explicitlyAcceptsTermsOfUseString==null ? false : new Boolean(explicitlyAcceptsTermsOfUseString);
 		String redirectMode = request.getParameter(WebConstants.OPEN_ID_MODE);
 		String returnToURL = request.getParameter(WebConstants.RETURN_TO_URL_PARAM);
-		if (returnToURL==null) {
+		if (returnToURL == null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			response.getWriter().println("Missing parameter "+WebConstants.RETURN_TO_URL_PARAM);
 			return;
 		}
 
-		OpenIDUtils.openID(
-				openIdProviderName, 
-				explicitlyAcceptsTermsOfUse, 
-				redirectMode,
-				returnToURL, 
-				request, 
-				response, 
-				redirectEndpoint);
+		try {
+			OpenIDUtils.openID(openIdProviderName, explicitlyAcceptsTermsOfUse,
+					redirectMode, returnToURL, request, response,
+					redirectEndpoint);
+		} catch (OpenIDException e) {
+			throw new RuntimeException(e);
+		}
 		
 	}
 	
