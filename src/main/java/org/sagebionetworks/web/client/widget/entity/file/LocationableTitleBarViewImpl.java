@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.LocationTypeNames;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -27,14 +26,11 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -54,7 +50,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Anchor md5Link;
+	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;	
 	AuthenticationController authenticationController;
 	NodeModelCreator nodeModelCreator;
@@ -104,7 +100,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			SynapseJSNIUtils synapseJSNIUtils,
 			FavoriteWidget favoriteWidget,
 			AuthenticationController authenticationController,
-			NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
@@ -112,7 +108,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		this.favoriteWidget = favoriteWidget;
 		this.authenticationController = authenticationController;
 		this.nodeModelCreator = nodeModelCreator;
-		
+		this.md5Link = md5Link;
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
 		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
@@ -151,7 +147,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		downloadButtonContainer.clear();
 		downloadButtonContainer.add(downloadButton);
 		
-		md5Link = new Anchor("md5");
+		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
@@ -183,17 +179,11 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 					else {
 						fileSize.setInnerText("");
 					}
-					md5Link.setVisible(!isExternal);
+					
 					if (!isExternal) {
-						//also add md5 if not external
+						//set md5 if not external
 						final String md5 = locationable.getMd5();
-						md5Link.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								showMd5Dialog(md5);
-							}
-						});
-						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
+						md5Link.configure(md5);
 					}
 				}
 			}
@@ -269,24 +259,5 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 	@Override
 	public void clear() {
-	}
-	
-	private void showMd5Dialog(String md5) {
-		final Dialog window = new Dialog();
-		window.setSize(220, 85);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading("md5");
-		
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-left: 10px;\">"+md5+"</span>");
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		window.add(htmlPanel);
-		
-	    window.setButtons(Dialog.OK);
-	    window.setButtonAlign(HorizontalAlignment.CENTER);
-	    window.setHideOnButtonClick(true);
-		window.setResizable(false);
-		window.show();
 	}
 }

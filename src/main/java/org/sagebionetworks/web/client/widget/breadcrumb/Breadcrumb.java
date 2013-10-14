@@ -6,8 +6,11 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -16,6 +19,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,20 +32,22 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 	private EntityTypeProvider entityTypeProvider;
+	private IconsImageBundle iconsImageBundle;
 
 	@Inject
 	public Breadcrumb(BreadcrumbView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			NodeModelCreator nodeModelCreator,
-			EntityTypeProvider entityTypeProvider) {
+			EntityTypeProvider entityTypeProvider,
+			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.nodeModelCreator = nodeModelCreator;
 		this.entityTypeProvider = entityTypeProvider;
-
+		this.iconsImageBundle = iconsImageBundle;
 		view.setPresenter(this);
 	}
 
@@ -57,22 +63,19 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 		List<LinkData> links = new ArrayList<LinkData>();
 		links.add(new LinkData("Home", new Home(
 				ClientProperties.DEFAULT_PLACE_TOKEN)));
-		String current = null;
 		if (entityPath != null) {
 			List<EntityHeader> path = entityPath.getPath();
 			if (path != null) {
 				// create link data for each path element except for the first
 				// (root) and last (current)
-				for (int i = 1; i < path.size() - 1; i++) {
+				for (int i = 1; i < path.size(); i++) {
 					EntityHeader element = path.get(i);
-					links.add(new LinkData(element.getName(), new Synapse(
+					links.add(new LinkData(element.getName(), DisplayUtils.getSynapseIconForEntityClassName(element.getType(), IconSize.PX16, iconsImageBundle), new Synapse(
 							element.getId())));
 				}
-				// set current as name of last path element
-				current = path.get(path.size() - 1).getName();
 			}
 		}
-		view.setLinksList(links, current);
+		view.setLinksList(links);
 		return view.asWidget();
 	}
 	/**

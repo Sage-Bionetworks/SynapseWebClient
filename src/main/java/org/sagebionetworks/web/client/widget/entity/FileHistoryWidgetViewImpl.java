@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
+import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
@@ -90,6 +91,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	private static final String VERSION_KEY_COMMENT = "comment";
 	private static final String VERSION_KEY_MOD_ON = "modifiedOn";
 	private static final String VERSION_KEY_MOD_BY = "modifiedBy";
+	private static final String VERSION_KEY_CONTENT_MD5 = "contentMd5";
+	private static final String VERSION_KEY_CONTENT_SIZE = "contentSize";
 
 	private static final int VERSION_LIMIT = 100;
 
@@ -268,7 +271,13 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 									model.set(
 											FileHistoryWidgetViewImpl.VERSION_KEY_MOD_BY,
 											version.getModifiedByPrincipalId());
-
+									model.set(
+											FileHistoryWidgetViewImpl.VERSION_KEY_CONTENT_MD5,
+											version.getContentMd5());
+									model.set(
+											FileHistoryWidgetViewImpl.VERSION_KEY_CONTENT_SIZE,
+											version.getContentSize());
+									
 									if (entity.getVersionNumber().equals(version.getVersionNumber())) {
 										currentModel = model;
 									}
@@ -380,6 +389,24 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 					return badge.asWidget();
 				} else if (property.equals(VERSION_KEY_MOD_ON)) {
 					return FileHistoryWidgetViewImpl.shortDateFormat.format((Date)model.get(property));
+				} else if (property.equals(VERSION_KEY_CONTENT_MD5)){
+					//md5 link
+					String md5 = (String)model.get(property);
+					if (md5 != null) {
+						Md5Link link = ginInjector.getMd5Link();
+						link.configure(md5);
+						return link;
+					}
+					else return null;
+				} else if (property.equals(VERSION_KEY_CONTENT_SIZE)){
+					//content size
+					String size = (String)model.get(property);
+					try{
+						double sizeDouble = Double.parseDouble(size);
+						return DisplayUtils.getFriendlySize(sizeDouble, true);
+					} catch (Throwable t) {
+						return null;
+					}
 				} else if (model.get(property) != null) {
 					return model.get(property).toString();
 
@@ -441,9 +468,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 
 	private ColumnModel setupColumnModel(Versionable vb) {
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
-		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY, VERSION_KEY_MOD_ON , VERSION_KEY_COMMENT,  VERSION_KEY_NUMBER};
-		String[] names = {"Version"        , "Modified By"      , "Modified On"     , "Comment"          ,   ""                };
-		int[] widths =	 {100               , 250               , 70                , 250                ,   50                };
+		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY, VERSION_KEY_MOD_ON ,  VERSION_KEY_CONTENT_SIZE, VERSION_KEY_CONTENT_MD5, VERSION_KEY_COMMENT, VERSION_KEY_NUMBER };
+		String[] names = {"Version"        , "Modified By"      , "Modified On"     ,   "Size", "MD5", "Comment"          , ""                };
+		int[] widths =	 {100               , 250               , 70                ,   100, 50, 250                , 50                };
 		
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");

@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -40,7 +41,6 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Slider;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -56,6 +56,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -63,6 +64,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.autobean.vm.impl.BeanMethod;
 
 public class SearchViewImpl extends Composite implements SearchView {
 
@@ -188,9 +190,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private void createPagination(SearchResults searchResults) {
 		LayoutContainer lc = new LayoutContainer();
-		lc.setStyleName("span-16 last clear");
 		UnorderedListPanel ul = new UnorderedListPanel();
-		ul.setStyleName("pagination");
+		ul.setStyleName("pagination pagination-lg");
 				
 		List<PaginationEntry> entries = presenter.getPaginationEntries(MAX_RESULTS_PER_PAGE, MAX_PAGES_IN_PAGINATION);
 		String currentSearchJSON = presenter.getCurrentSearchJSON();
@@ -228,14 +229,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 			
 			// show project facet differently
 			if("project".equals(facet.getValue()) && "node_type".equals(facet.getKey())) {
-				Button btn = new Button("Show Results for All Types", AbstractImagePrototype.create(iconsImageBundle.magnify16()));
+				Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_ALL_RESULTS, ButtonType.DEFAULT, "glyphicon-search");
 				btn.addStyleName("floatleft");
-				btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				btn.addClickHandler(new ClickHandler() {
+					
 					@Override
-					public void componentSelected(ButtonEvent ce) {				
+					public void onClick(ClickEvent event) {
 						// disable all buttons to allow only one click
 						for(Button btn : facetButtons) {
-							btn.disable();
+							btn.setEnabled(false);
 						}
 						Window.scrollTo(0, 0);
 						presenter.removeFacet(facet.getKey(), facet.getValue());						
@@ -258,15 +260,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+			Button btn = DisplayUtils.createIconButton(text, ButtonType.DEFAULT, "glyphicon-remove");
 			btn.addStyleName("floatleft");
-			btn.setIconAlign(IconAlign.RIGHT);
-			btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			btn.addClickHandler(new ClickHandler() {				
 				@Override
-				public void componentSelected(ButtonEvent ce) {				
+				public void onClick(ClickEvent event) {
 					// disable all buttons to allow only one click
 					for(Button btn : facetButtons) {
-						btn.disable();
+						btn.setEnabled(false);
 					}
 					Window.scrollTo(0, 0);
 					presenter.removeFacet(facet.getKey(), facet.getValue());						
@@ -359,44 +360,42 @@ public class SearchViewImpl extends Composite implements SearchView {
 	 * Private Methods
 	 */	
 	private void configureSearchBox() {
-		if(horizontalTable == null) {
-			// setup search box
-			horizontalTable = new FlexTable();
-			horizontalTable.setCellPadding(2);
-			
-			// setup serachButton
-			searchButton = new Button(DisplayConstants.LABEL_SEARCH, AbstractImagePrototype.create(iconsImageBundle.magnify16()));
-			searchButton.setHeight(32);		
-			searchButton.setWidth(70);
-
-			// setup field
-			searchField = new TextBox();
-			searchField.setStyleName("homesearchbox resultssearchbox");
-			searchField.addKeyDownHandler(new KeyDownHandler() {				
-				@Override
-				public void onKeyDown(KeyDownEvent event) {
-					if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-		                searchButton.fireEvent(Events.Select);
-		            }					
-				}
-			});				
-
-			// add to table and page
-			horizontalTable.setWidget(0, 0, searchField);
-			horizontalTable.setHTML(0, 1, "&nbsp;");
-			horizontalTable.setWidget(0, 2, searchButton);					
-			searchBoxPanel.clear();
-			searchBoxPanel.add(horizontalTable);
-			
-		} else {
-			searchButton.removeAllListeners();	
-		}
-		searchButton.addSelectionListener(new SelectionListener<ButtonEvent>() {			
+		// setup search box
+		SimplePanel container;
+		LayoutContainer horizontalTable = new LayoutContainer();
+		horizontalTable.addStyleName("row");
+		
+		// setup serachButton
+		searchButton = DisplayUtils.createIconButton(DisplayConstants.LABEL_SEARCH, ButtonType.DEFAULT, "glyphicon-search");
+		searchButton.addStyleName("btn-lg btn-block");
+		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
-			public void componentSelected(ButtonEvent ce) {				
+			public void onClick(ClickEvent event) {					
 				presenter.setSearchTerm(searchField.getText());
 			}
 		});
+
+		// setup field
+		searchField = new TextBox();
+		searchField.setStyleName("form-control input-lg");
+		searchField.addKeyDownHandler(new KeyDownHandler() {				
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+	                searchButton.fireEvent(new ClickEvent() {});
+	            }					
+			}
+		});				
+
+		// add to table and page
+		container = new SimplePanel(searchField);
+		container.addStyleName("col-md-9");
+		horizontalTable.add(container);
+		container = new SimplePanel(searchButton);
+		container.addStyleName("col-md-3");
+		horizontalTable.add(container);
+		searchBoxPanel.clear();
+		searchBoxPanel.add(horizontalTable);
 
 	}
 
@@ -414,7 +413,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 		
 		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
-		resultBuilder.appendHtmlConstant("<div class=\"span-18 last serv notopmargin hit\">\n") 
+		resultBuilder.appendHtmlConstant("<div class=\"serv hit\">\n") 
 		.appendHtmlConstant("	   <h4>" + i + ". \n");
 		if(icon != null) 
 			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
@@ -554,7 +553,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		slider.addPlugin(plugin);
 		slider.setData("text", facet.getMin() + " to " + facet.getMax());
 
-		final Button apply = new Button("Apply Filter");
+		final com.extjs.gxt.ui.client.widget.button.Button apply = new com.extjs.gxt.ui.client.widget.button.Button("Apply Filter");
 		apply.hide();
 		apply.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override

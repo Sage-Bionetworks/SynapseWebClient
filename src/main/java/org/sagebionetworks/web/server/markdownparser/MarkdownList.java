@@ -21,7 +21,7 @@ public abstract class MarkdownList {
 	public int getDepth() {
 		return depth;
 	}
-
+	
 	public abstract String getStartListHtml();
 	public void addListItemHtml(MarkdownElements line, String item) {
 		//Close the previous list item if it exists

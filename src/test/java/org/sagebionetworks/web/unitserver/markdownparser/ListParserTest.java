@@ -49,8 +49,7 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		System.out.println("RESULT: " + result.toString());
-		assertEquals("<ol><li><p>First item</p></li><li><p>Second item</p></li></ol>", result.toString());
+		assertEquals("<ol start=\"1\"><li><p>First item</p></li><li><p>Second item</p></li></ol>", result.toString());
 		
 		String nestedExample = 
 			"1. List item one\n" +
@@ -68,8 +67,7 @@ public class ListParserTest {
 		MarkdownElements extraLine = new MarkdownElements("");
 		parser.processLine(extraLine);
 		result2.append(extraLine.getHtml());
-		System.out.println("RESULT: " + result2.toString());
-		assertEquals("<ol><li><p>List item one</p><ol><li><p>bunk</p></li><li><p>bupkis</p></li></ol></li><li><p>Second one</p></li></ol>", result2.toString());
+		assertEquals("<ol start=\"1\"><li><p>List item one</p><ol start=\"1\"><li><p>bunk</p></li><li><p>bupkis</p></li></ol></li><li><p>Second one</p></li></ol>", result2.toString());
 	}
 
 	@Test
@@ -94,8 +92,7 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		System.out.println("RESULT: " + result.toString());
-		assertEquals("<ul><li><p>Abacus</p><ul><li><p>answer</p></li></ul></li><li><p>Bubbles</p><ol><li><p>bunk</p></li><li><p>bupkis</p><ul><li><p>BELITTLER</p></li></ul></li><li><p>burper</p></li></ol></li><li><p>Cunning</p></li></ul>", result.toString());
+		assertEquals("<ul><li><p>Abacus</p><ul><li><p>answer</p></li></ul></li><li><p>Bubbles</p><ol start=\"1\"><li><p>bunk</p></li><li><p>bupkis</p><ul><li><p>BELITTLER</p></li></ul></li><li><p>burper</p></li></ol></li><li><p>Cunning</p></li></ul>", result.toString());
 	}
 	
 	@Test
@@ -116,7 +113,6 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		System.out.println("RESULT: " + result.toString());
 		assertEquals("<ul><li><p>First item</p><p>This is another paragraph</p><p>This is another paragraph</p></li></ul>", result.toString());
 	}
 	
@@ -143,7 +139,6 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		System.out.println("RESULT: " + result.toString());
 		assertTrue(result.toString().contains("<ul><li><p>First item</p><pre><code class=\""+ServerMarkdownUtils.DEFAULT_CODE_CSS_CLASS+"\">sudo apt-get install git"));
 		assertTrue(result.toString().contains("sudo apt-get install curl"));
 		assertTrue(result.toString().contains("sudo apt-get install python python-setuptools python-pip"));
@@ -167,8 +162,7 @@ public class ListParserTest {
 		MarkdownElements elements = new MarkdownElements("");
 		parser.processLine(elements);
 		result.append(elements.getHtml());
-		System.out.println("RESULT: " + result.toString());
-		assertEquals("<ol><li><p><h4>Heading1</h4></p><ol><li><p><h4>Heading2</h4></p></li></ol></li></ol>", result.toString());
+		assertEquals("<ol start=\"1\"><li><p><h4>Heading1</h4></p><ol start=\"1\"><li><p><h4>Heading2</h4></p></li></ol></li></ol>", result.toString());
 	}
 	
 }

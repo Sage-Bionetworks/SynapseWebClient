@@ -9,7 +9,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetEditorPresenter {
 	
 	private YouTubeConfigView view;
@@ -21,7 +21,7 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)

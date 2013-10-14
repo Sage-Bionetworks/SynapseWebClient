@@ -11,7 +11,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, WidgetEditorPresenter {
 	
 	private QueryTableConfigView view;
@@ -26,7 +26,7 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
 		String uri = tableConfig.getUri();

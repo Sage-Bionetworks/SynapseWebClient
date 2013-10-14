@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -164,4 +165,5 @@ public interface PortalGinInjector extends Ginjector {
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
 	public VersionTimer getVersionTimer();
+	public Md5Link getMd5Link();
 }

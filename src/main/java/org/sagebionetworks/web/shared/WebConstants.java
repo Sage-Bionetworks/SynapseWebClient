@@ -46,10 +46,34 @@ public class WebConstants {
 	
 	// OpenID related constants
 
+	/**
+	 * name of a web request parameter indicating that the user accepts the terms of use.
+	 * Passed at the initiation of OpenID authentication.
+	 * 
+	 */
+	public static final String ACCEPTS_TERMS_OF_USE_PARAM = "acceptsTermsOfUse";
+
+	/**
+	 * A token built into the redirect URL by the authentication controller at the end of OpenID
+	 * authentication to indicate that the Synapse Terms of Use have not been signed.
+	 * 
+	 */
+	public static final String ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN = "TermsOfUseAcceptanceRequired";
+
+	/**
+	 * A token built into the redirect URL by the authentication controller at the end of OpenID
+	 * authentication to indicate that an error has occurred.
+	 * 
+	 */
+	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+
+	
 	public static final String OPEN_ID_URI = "/Portal/openid";
 
 	public static final String OPEN_ID_PROVIDER = "OPEN_ID_PROVIDER";
 	// 		e.g. https://www.google.com/accounts/o8/id
+	
+	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "GOOGLE";
 	
 	// this is the parameter name for the value of the final redirect
 	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
@@ -77,7 +101,7 @@ public class WebConstants {
 	public static final String SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br>--strike out--<br></code></pre><br>" +
 			"<h3>Subscript/Superscript</h3><pre><code>~subscript~  ^superscript^<br></code></pre><br>" +
-			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><pre><code>Bookmarks within page<br>To create bookmark target: ${bookmarktarget?bookmarkID=myid}<br>To link to bookmark: [my text](#Bookmark:myid)</code></pre><br>" +
+			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><br>" +
 			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
 			"<h3>Inline LaTeX</h3><pre><code>$\\[x^2\\]$<br></code></pre><br>" +
@@ -108,6 +132,7 @@ public class WebConstants {
     public static final String DIV_ID_LINK_PREFIX = "link-";
 	public static final String DIV_ID_AUTOLINK_PREFIX = "autolink-";
 	public static final String DIV_ID_IMAGE_PREFIX = "image-";
+	public static final String DIV_ID_CODE_SPAN_PREFIX = "codespan-";
 	public static final String DIV_ID_WIDGET_SYNTAX_PREFIX = "widgetsyntax-";
 	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
 	

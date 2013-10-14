@@ -1,14 +1,16 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityTab;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,7 +26,7 @@ import com.google.inject.Inject;
 public class EntityViewImpl extends Composite implements EntityView {
 	
 	private SageImageBundle sageImageBundle;
-	private HorizontalPanel loadingPanel;
+	private Widget loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
@@ -64,13 +66,19 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {			
+		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.refresh();
 			}
-		};
-		entityPageTop.setEntityUpdatedHandler(handler);
+		});
+		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
+			@Override
+			public void areaChanged(EntityArea area, String areaToken) {
+				presenter.updateArea(area, areaToken);
+			}
+		});
+		
 		header.clear();
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -82,9 +90,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, Synapse.EntityTab area, String areaToken) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
 		entityPageTop.clearState();
-		entityPageTop.setBundle(bundle, versionNumber, area, areaToken);
+		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());
 		entityPageTop.refresh();
 	}

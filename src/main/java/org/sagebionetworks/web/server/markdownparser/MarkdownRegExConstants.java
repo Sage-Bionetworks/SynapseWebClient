@@ -176,7 +176,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * 1. First Item
 	 */
-	public static final String ORDERED_LIST_REGEX = PREFIX_GROUP + "(?:\\d+[.])(\\s+)(.+)";
+	public static final String ORDERED_LIST_REGEX = PREFIX_GROUP + "(\\d+)[.](\\s+)(.+)";
 	
 	/**
 	 * Recognized example input:
@@ -210,6 +210,12 @@ public class MarkdownRegExConstants {
 	
 	/**
 	 * Recognizes example input:
+	 * \~
+	 */
+	public static final String TILDE_ESCAPED_REGEX = "\\\\~";
+	
+	/**
+	 * Recognizes example input:
 	 * \_
 	 */
 	public static final String UNDERSCORE_ESCAPED_REGEX = "\\\\_";
@@ -218,7 +224,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * * First Item
 	 */
-	public static final String UNORDERED_LIST_REGEX = PREFIX_GROUP + "(?:[-+*])(\\s+)(.+)";
+	public static final String UNORDERED_LIST_REGEX = PREFIX_GROUP + "([-+*])(\\s+)(.+)";
 	
 	
 	public static final String NEWLINE_REGEX = "([\n])";

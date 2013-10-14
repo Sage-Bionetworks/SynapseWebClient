@@ -39,7 +39,7 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	public void configure(TocItem root) {
 		clear();
 		final SimplePanel treePanel = new SimplePanel();
-		treePanel.addStyleName("well well-small");
+		treePanel.addStyleName("well well-small display-table");
 		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);

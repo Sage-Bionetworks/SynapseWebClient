@@ -5,30 +5,27 @@
 	<ui:with field='icons'
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
-	<g:HTMLPanel>
-				<div class="span-24 notopmargin" style="margin-top: 5px !important">
-					<div class="span-14 notopmargin" style="white-space: normal;">
-						<g:SimplePanel ui:field="breadcrumbsPanel"/>
-					</div>
-					<div class="span-10 last right notopmargin">
-						<g:SimplePanel ui:field="actionMenuPanel" />
-					</div>
-				</div>
-
-				<div class="span-24 margin-top-5 left last"><g:SimplePanel ui:field="topFullWidthPanel" /></div>
-				<div class="span-24 margin-top-5" ui:field="navtabContainer">
-				    <ul class="nav nav-tabs">
-				        <!-- remove span-8 after upgrade to Bootstrap 3.0, use nav-justified on parent ul instead -->
-					    <li class="span-8 active" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
-					    <li class="span-8" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
-					    <li class="span-8" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
+	<g:HTMLPanel styleName="margin-left-15 margin-right-15">											
+				<g:SimplePanel styleName="margin-top-5" ui:field="projectTitleContainer"/>
+								
+   				<div class="row">
+				    <g:SimplePanel ui:field="topFullWidthPanel"/>
+			    </div>
+				    
+				<div class="row margin-top-15" ui:field="navtabContainer">
+				    <ul class="nav nav-tabs entity-tabs">				        
+					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
+					    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
+					    <li class="entity-tab" ui:field="adminListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
 				    </ul>
 				</div>
-				<div class="span-24 margin-top-5">
-					<div class="span-17 notopmargin left"><g:SimplePanel ui:field="colLeftPanel" /></div>
-					<div class="span-7 notopmargin right last" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
-					<div class="span-24 notopmargin left last"><g:SimplePanel ui:field="fullWidthPanel" /></div>
-				</div>								
+				
+				<div class="row">
+					<div class="col-md-8"><g:SimplePanel ui:field="colLeftPanel" /></div>
+					<div class="col-md-4" style="float:right; !important"><g:SimplePanel ui:field="colRightPanel" /></div>
+				</div>
+											
+				<g:SimplePanel ui:field="fullWidthPanel"/>
 	</g:HTMLPanel>
 </ui:UiBinder>
 

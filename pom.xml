@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2013-08-15-7ba0d44-611</synapse.version>
+		<synapse.version>2013-10-01-fdd5679-690</synapse.version>
 
 		<gwtVersion>2.4.0</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
@@ -25,6 +25,7 @@
 		<schema-to-pojo.version>0.2.0</schema-to-pojo.version>
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
+		<log4j.version>2.0-beta8</log4j.version>
 	</properties>
 
 	<repositories>
@@ -272,6 +273,12 @@
 			<artifactId>auth-util</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
+		<!-- Provides the S3 log sweeper -->
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>lib-logging</artifactId>
+			<version>${synapse.version}</version>
+		</dependency>		
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-communicationUtilities</artifactId>
@@ -314,7 +321,20 @@
 			<artifactId>org.springframework.web</artifactId>
 			<version>${org.springframework.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Used for timer triggers (cron-like) -->
+		<dependency>
+			<groupId>opensymphony</groupId>
+			<artifactId>quartz-all</artifactId>
+			<version>1.6.3</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>		
 			<!-- note: OpenID4Java seems to require version 4.1.1 and to break with 4.1.2 -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -328,10 +348,21 @@
 			<version>3.1.0</version>
 		</dependency>
 				
+		<!-- Logging -->
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-jcl</artifactId>
+			<version>${log4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -418,12 +449,6 @@
 			<version>1.0</version>
 		</dependency>
 
-		<!-- Get Satisfaction SSO support (Java FastPass Library) -->
-		<dependency>
-		    <groupId>com.getsatisfaction</groupId>
-		    <artifactId>fastpass</artifactId>
-		    <version>1.0</version>
-		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -440,12 +465,6 @@
 			<version>20100527</version>
 		</dependency>
 
-		<!-- Markdown -->
-		<dependency>
-			<groupId>eu.henkelmann</groupId>
-			<artifactId>actuarius_2.9.2</artifactId>
-			<version>0.2.4</version>
-		</dependency>
 		<!-- Test only dependencies -->
 		<dependency>
 			<groupId>com.sun.grizzly</groupId>

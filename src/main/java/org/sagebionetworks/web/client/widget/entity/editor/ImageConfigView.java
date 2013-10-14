@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public interface ImageConfigView extends IsWidget, WidgetEditorView {
 
 	/**
@@ -29,7 +30,12 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getSynapseId();
 	public void setExternalVisible(boolean visible);
 	
-	public void configure(WikiPageKey wikiKey);
+	public void configure(WikiPageKey wikiKey, Dialog window);
+	
+	public void setSynapseId(String synapseId);
+	public void setUploadedFileHandleName(String uploadedFileHandleName);
+	public void setAlignment(String alignment);
+	public void setScale(String scale);
 	
 	/**
 	 * Presenter interface

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
 import java.util.HashMap;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Dialog window) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -79,7 +80,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(wikiKey, model);
+			presenter.configure(wikiKey, model, window);
 		return presenter;
 	}
 

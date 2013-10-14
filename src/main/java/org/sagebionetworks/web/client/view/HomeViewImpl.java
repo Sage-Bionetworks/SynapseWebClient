@@ -137,7 +137,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button loginBtn = new Button(DisplayConstants.BUTTON_LOGIN);
 		loginBtn.removeStyleName("gwt-Button");
-		loginBtn.addStyleName("btn btn-large btn-block");
+		loginBtn.addStyleName("btn btn-default btn-lg btn-block");
 		loginBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -148,7 +148,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button registerBtn = new Button(DisplayConstants.REGISTER_BUTTON);
 		registerBtn.removeStyleName("gwt-Button");
-		registerBtn.addStyleName("btn btn-large btn-block");
+		registerBtn.addStyleName("btn btn-default btn-lg btn-block");
 		registerBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -159,7 +159,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
 		dream8Btn.removeStyleName("gwt-Button");
-		dream8Btn.addStyleName("btn btn-large btn-block");
+		dream8Btn.addStyleName("btn btn-default btn-lg btn-block");
 		dream8Btn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -180,7 +180,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void onAttach() {
 		super.onAttach();
-		carousel();
+		startCarousel();
 	}
 	
 	@Override
@@ -194,25 +194,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		HTMLPanel panel = new HTMLPanel(html);		
 		DisplayUtils.sendAllLinksToNewWindow(panel);
 		newsFeed.clear();
-		newsFeed.add(panel);
+		newsFeed.add(panel);	
 	}
-		
-	private static native void carousel() /*-{
-		$wnd.jQuery("#slider").nivoSlider({
-	        effect:"sliceDown",
-	        slices:15,
-	        boxCols:8,
-	        boxRows:4,
-	        animSpeed:500,
-	        pauseTime:9000,
-	        startSlide:0,
-	        directionNav:true,
-	        controlNav:true,
-	        controlNavThumbs:false,
-	        pauseOnHover:true,
-	        manualAdvance:false
-	    });
-	}-*/;
 	
 	@Override
 	public void refresh() {
@@ -261,30 +244,38 @@ public class HomeViewImpl extends Composite implements HomeView {
 	 */
 	private void injectProjectPanel() {
 		projectPanel.clear();
-		// Overall container
-		LayoutContainer container = new LayoutContainer();
-		container.setStyleName("span-16 notopmargin last");			
-		
+		LayoutContainer container = new LayoutContainer();		
+		// Evaluations and Projects
 		LayoutContainer evalsAndProjects = new LayoutContainer();
-		evalsAndProjects.setStyleName("span-8 notopmargin");
+		evalsAndProjects.setStyleName("col-md-4");
 		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
+		evalsAndProjects.add(createCreateProjectWidget()); 
 		container.add(evalsAndProjects);
+		// Favorites
 		container.add(getFavoritesContainer());
+
 		
-		// Create a project
+		projectPanel.add(container);		
+	}
+
+	private LayoutContainer createCreateProjectWidget() {
 		LayoutContainer createProjectContainer = new LayoutContainer();
-		createProjectContainer.addStyleName("span-16 last");		
+		createProjectContainer.setStyleName("row margin-top-15");
 		
+		LayoutContainer col1 = new LayoutContainer();
+		col1.addStyleName("col-md-7");
 		final TextBox input = new TextBox();
-		input.addStyleName("form-signinInput displayInline");
-		input.setWidth("200px");
+		input.addStyleName("form-control");
 		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
-		createProjectContainer.add(input, new MarginData(0, 10, 0, 0));		
+		col1.add(input);
+		createProjectContainer.add(col1);		
 		
-		Button createBtn = new Button(DisplayConstants.LABEL_CREATE);
+		LayoutContainer col2 = new LayoutContainer();
+		col2.addStyleName("col-md-5");
+		Button createBtn = new Button(DisplayConstants.CREATE_PROJECT);
 		createBtn.removeStyleName("gwt-Button");
-		createBtn.addStyleName("btn displayInline form-inputButton");
+		createBtn.addStyleName("btn btn-default btn-block");
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -296,8 +287,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 				presenter.createProject(input.getValue());
 			}
 		});
-		createProjectContainer.add(createBtn);		
+		col2.add(createBtn);
+		createProjectContainer.add(col2);		
 
+		LayoutContainer col3 = new LayoutContainer();
+		col3.addStyleName("col-md-12 right");		
 		Anchor whatProj = new Anchor(DisplayConstants.WHAT_IS_A_PROJECT);
 		whatProj.addClickHandler(new ClickHandler() {
 			@Override
@@ -305,16 +299,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new ProjectsHome(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		createProjectContainer.add(whatProj, new MarginData(0, 0, 0, 15));
-		
-		container.add(createProjectContainer);
-
-		projectPanel.add(container);		
+		col3.add(whatProj);
+		createProjectContainer.add(col3);
+		return createProjectContainer;
 	}
 	
 	private LayoutContainer getFavoritesContainer() {
 		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.setStyleName("span-8 notopmargin last");
+		favoritesContainer.setStyleName("col-md-4");
 		favoritesContainer.add(
 				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
@@ -324,14 +316,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer getMyEvaluationsContainer() {
 		//My Evaluations
 		LayoutContainer myEvaluations = new LayoutContainer();
-		myEvaluations.setStyleName("span-8 notopmargin");
 		myEvaluations.add(myEvaluationsList.asWidget());					
 		return myEvaluations;
 	}
 	
 	private LayoutContainer getMyProjectsContainer() {
 		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.setStyleName("span-8 notopmargin");
 		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
 		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
 		return myProjContainer;
@@ -390,7 +380,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 		Button showJava = new Button(DisplayConstants.SHOW);
 		showJava.removeStyleName("gwt-Button");
-		showJava.addStyleName("btn btn-large btn-block margin-top-5");
+		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
 		showJava.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -406,6 +396,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 		a.setHref(href);
 		a.setText(text);
 	}
+
+	private static native void startCarousel() /*-{
+		$wnd.jQuery('#myCarousel').carousel('cycle');
+	}-*/;
 
 	
 }

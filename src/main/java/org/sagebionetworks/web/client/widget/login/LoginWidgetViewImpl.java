@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.view.TermsOfUseHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -25,7 +23,6 @@ import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,13 +49,13 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		// federated login button
 		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
 		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
-		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
+		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
 		.appendHtmlConstant("    <input name=\""+WebConstants.RETURN_TO_URL_PARAM+"\" type=\"hidden\" value=\""+  presenter.getOpenIdReturnUrl() +"\"/>");
 		if (userHasExplictlyAcceptedTermsOfUse) {
-			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
+			sb.appendHtmlConstant("    <input name=\""+WebConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
 		}
 		sb.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_MODE+"\" type=\"hidden\" value=\""+  WebConstants.OPEN_ID_MODE_GWT +"\"/>");
-		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
+		sb.appendHtmlConstant("    <button class=\"btn btn-default btn-lg btn-block\" id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
 		.appendHtmlConstant("</form>")		
 		.appendHtmlConstant("<p>&nbsp;</p>");
 		return sb.toSafeHtml();
@@ -92,7 +89,7 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		final FormPanel formPanel = new FormPanel();
 		formPanel.setHeaderVisible(false);
 		formPanel.setFrame(true);
-		formPanel.setWidth(380);
+		formPanel.setWidth(526);
 		formPanel.setLabelWidth(85);
 		
 		// synapse login

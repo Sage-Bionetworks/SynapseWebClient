@@ -3,9 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,10 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.XML;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -27,7 +22,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.HttpUtils;
-import org.sagebionetworks.web.server.NcboUtils;
 
 import com.google.inject.Inject;
 
@@ -100,7 +94,7 @@ public class SimpleSearchService extends HttpServlet {
 			if(offset != null) searchQuery.setStart(offset);			
 			
 			// execute query
-			Synapse synapseClient = createSynapseClient(UserDataProvider.getThreadLocalUserToken(request));
+			SynapseClient synapseClient = createSynapseClient(UserDataProvider.getThreadLocalUserToken(request));
 			
 			try {
 				SearchResults searchResults = synapseClient.search(searchQuery);
@@ -117,9 +111,9 @@ public class SimpleSearchService extends HttpServlet {
 	 * The synapse client is stateful so we must create a new one for each
 	 * request
 	 */
-	private Synapse createSynapseClient(String sessionToken) {
+	private SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
-		Synapse synapseClient = synapseProvider.createNewClient();
+		SynapseClient synapseClient = synapseProvider.createNewClient();
 		synapseClient.setSessionToken(sessionToken);
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());

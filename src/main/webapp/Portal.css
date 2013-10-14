@@ -161,7 +161,7 @@
 
 .iconSpan img {
 	position: relative;
-	top: 3px;		
+	top: -2px;		
 }
 
 .gxtGreyBackground {
@@ -341,7 +341,7 @@
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 13px;
 	font-weight: normal;
-	height: 20px;
+	height: 26px;
 	letter-spacing: normal;
 	line-height: 20px;
 	padding-bottom: 4px;
@@ -431,6 +431,7 @@ a.shortBtn {
 	width: 100%;
 	top: 5px;
 	left: 0;
+	z-index: 100;
 }
 
 #alertContainer {
@@ -533,6 +534,13 @@ a.shortBtn {
 .margin-left-10 {
 	margin-left: 10px;
 }
+.margin-left-15 {
+	margin-left: 15px;
+}
+
+.margin-right-15 {
+	margin-right: 15px;
+}
 
 .margin-left-5 {
 	margin-left: 5px;
@@ -542,6 +550,9 @@ a.shortBtn {
 }
 .margin-top-10 {
 	margin-top: 10px;
+}
+.margin-top-15 {
+	margin-top: 15px;
 }
 
 .margin-left-180 {
@@ -562,15 +573,34 @@ a.shortBtn {
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
+.margin-bottom-15 {
+	margin-bottom: 15px;
+}
 
 .margin-left-725 {
 	margin-left: 725px;
 }
 
+.margin-left-0-important {
+	margin-left: 0px !important;
+}
+
+.margin-left-neg-15 {
+	margin-left: -15px;
+}
+
+.margin-right-neg-15 {
+	margin-right: -15px;
+}
+
+.tab-background {
+	background-color: #f9f9f9;
+}
+
 .file-preview {
     position: relative;
     margin: 15px 0;
-    padding: 39px 19px 14px;
+    padding: 30px 3px 3px 3px;
     background-color: white;
     border: 1px solid #DDD;
     -webkit-border-radius: 4px;
@@ -580,13 +610,12 @@ a.shortBtn {
 }
  
 .file-preview::after {
-    content: "Preview";
+    content: attr(title);
     position: absolute;
     top: -1px;
     left: -1px;
     padding: 3px 7px;
     font-size: 12px;
-    font-weight: bold;
     background-color: whiteSmoke;
     border: 1px solid #DDD;
     color: #9DA0A4;
@@ -945,6 +974,11 @@ ol.lowerroman {
 .padding-top-15 {
 	padding-top: 15px;
 }
+
+.padding-bottom-15 {
+	padding-bottom: 15px;
+}
+
 .howToUseLink {
 	font-size: 16px;
 	font-style: normal !important;
@@ -1012,7 +1046,7 @@ ol.lowerroman {
     display: inline-block;
     font: 11px arial,tahoma,helvetica,sans-serif;
     overflow: hidden;
-    padding: 0 0 5px 3px;
+    padding: 0 0 0px 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 270px;
@@ -1071,8 +1105,8 @@ ol.lowerroman {
 
 .highlight-box {
     position: relative;
-    margin: 15px 0;
-    padding: 39px 19px 14px;
+    margin-top: 15px;
+    padding: 47px 3px 6px 11px;
     background-color: white;
     border: 1px solid #DDD;
     -webkit-border-radius: 4px;
@@ -1084,21 +1118,19 @@ ol.lowerroman {
 .highlight-box::after {
     content: attr(title);
     position: absolute;
-    top: -1px;
-    left: -1px;
+    top: 6px;
+    left: 6px;
+	color: #333333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 21px;
+    font-weight: 200;
+    line-height: 1.4;
     padding: 3px 7px;
-    font-size: 12px;
-    font-weight: bold;
-    background-color: whiteSmoke;
-    border: 1px solid #DDD;
-    color: #9DA0A4;
-    -webkit-border-radius: 4px 0 4px 0;
-    -moz-border-radius: 4px 0 4px 0;
-    border-radius: 4px 0 4px 0;
+    position: absolute;    
 }
 
 .highlight-line {
-    padding: 3px;
+    padding: 18px;
 }
 
 .fixedWidthFont {
@@ -1111,6 +1143,10 @@ ol.lowerroman {
 .padding-top-5 {
 	margin-top: 5px;
     position: absolute;
+}
+
+.fileTabTopPadding {
+	padding-top: 5px;
 }
 
 .hide {
@@ -1145,9 +1181,158 @@ ol.lowerroman {
 	vertical-align: middle;
 }
 
+.separator-margin {	margin-top: 40px; margin-bottom: 40px; }
+.separator-margin-top {	margin-top: 40px; }
+.separator-header-home { margin-top: 20px; margin-bottom: 40px !important; }
+.separator-header-page { margin-top: 3px; }
 
+/*============================*/
+/* Custom Carousel Control */
+.carousel-control-clean {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 15%;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
 
+.carousel-control-clean.left {
+}
 
+.carousel-control-clean.right {
+  right: 0;
+  left: auto;
+}
 
+.carousel-control-clean:hover,
+.carousel-control-clean:focus {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+}
+
+.carousel-control-clean .icon-prev,
+.carousel-control-clean .icon-next,
+.carousel-control-clean .glyphicon-chevron-left,
+.carousel-control-clean .glyphicon-chevron-right {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  display: inline-block;
+}
+
+.carousel-control-clean .icon-prev,
+.carousel-control-clean .icon-next {
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  font-family: serif;
+}
+
+.carousel-control-clean .icon-prev:before {
+  content: '\2039';
+}
+
+.carousel-control-clean .icon-next:before {
+  content: '\203a';
+}
+
+.projectTitle {
+	color: #555;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 100;
+    font-size: 28px;
+    cursor: pointer;
+}
+a.projectTitle:hover {
+	text-decoration: underline;
+	color: #555;
+} 
+
+.dropLargeIconText {
+	position: relative;
+	top: 4px;
+}
+
+.liftLargeIcon {
+	position: relative;
+	top: -4px;
+}
+
+.display-table {
+	display: table;
+}
+
+.tabLabel {
+    position: absolute;
+    top: 4px;
+    font-size: 10px;
+}
+
+.entity-tab {
+	width: 140px;
+	font-size: 16px;	
+}
+
+/*==================================*/
+/* GXT Overrides */
+.x-tree3-node-text {
+	top: 1px !important;
+}
+
+/*
+ * Bootstrap Overrides 
+ */
+.entity-tabs > li.active > a,
+.entity-tabs > li.active > a:hover,
+.entity-tabs > li.active > a:focus {
+	background-color: #f9f9f9;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 768px) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
+  }
+
+  .row-offcanvas-right
+  .sidebar-offcanvas {
+    right: -50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left
+  .sidebar-offcanvas {
+    left: -50%; /* 6 columns */
+  }
+
+  .row-offcanvas-right.active {
+    right: 50%; /* 6 columns */
+  }
+
+  .row-offcanvas-left.active {
+    left: 50%; /* 6 columns */
+  }
+
+  .sidebar-offcanvas {
+    position: absolute;
+    top: 0;
+    width: 50%; /* 6 columns */
+  }
+}
 
 

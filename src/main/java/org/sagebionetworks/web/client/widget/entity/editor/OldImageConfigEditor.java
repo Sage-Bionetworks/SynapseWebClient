@@ -8,7 +8,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+import com.extjs.gxt.ui.client.widget.Dialog;
 public class OldImageConfigEditor implements OldImageConfigView.Presenter, WidgetEditorPresenter {
 	
 	private OldImageConfigView view;
@@ -22,7 +22,7 @@ public class OldImageConfigEditor implements OldImageConfigView.Presenter, Widge
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		//TODO: change file upload to support other owner object types

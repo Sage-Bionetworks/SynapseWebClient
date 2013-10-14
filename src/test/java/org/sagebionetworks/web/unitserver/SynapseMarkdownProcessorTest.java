@@ -75,7 +75,7 @@ public class SynapseMarkdownProcessorTest {
 			"> ```";
 		String actualResult = processor.markdown2Html(testString, false);
 		String expectedResult = "<blockquote><ul><li><p>Item 1</p></li>";
-		String expectedResult2 = "<li><p> Item 2</p><ol><li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p> SubItem 2b</p></li></ol></li></ul>";
+		String expectedResult2 = "<li><p> Item 2</p><ol start=\"1\"><li><p> </p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p> SubItem 2b</p></li></ol></li></ul>";
 		String expectedResult3 = "<pre><code class=\"r\"> Then a code block! </code></pre>";
 		String expectedResult4 = "</blockquote>"; 
 		assertTrue(actualResult.contains(expectedResult));
@@ -95,9 +95,9 @@ public class SynapseMarkdownProcessorTest {
 			"> Then a code block!\n" +
 			"> ```";
 
-		String expectedResult5 = "<ol><li><p>First</p></li><li><p>Second</p></li></ol><br />";
+		String expectedResult5 = "<ol start=\"1\"><li><p>First</p></li><li><p>Second</p></li></ol><br />";
 		String expectedResult6 = "<blockquote> <ul><li><p>Item 1</p></li>";
-		String expectedResult7 = "<li><p>Item 2</p><ol><li><p></p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p>SubItem 2b</p></li></ol></li></ul>";
+		String expectedResult7 = "<li><p>Item 2</p><ol start=\"1\"><li><p></p><h4 id=\"synapseheading0\" level=\"h4\" toc-style=\"toc-indent0\">SubItem 2a</h4></li><li><p>SubItem 2b</p></li></ol></li></ul>";
 		String expectedResult8 = "<pre><code class=\"r\"> Then a code block! </code></pre><br />";
 		String expectedResult9 = "</blockquote>";
 		

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.server.servlet.openid;
 
-import static org.sagebionetworks.repo.model.ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM;
+import static org.sagebionetworks.web.shared.WebConstants.ACCEPTS_TERMS_OF_USE_PARAM;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,8 +37,8 @@ public class OpenIDServlet extends HttpServlet {
 			return;
 		}
 		String redirectEndpoint = thisUrl.substring(0, i);
-		String openIdProvider = request.getParameter(WebConstants.OPEN_ID_PROVIDER);
-		if (openIdProvider==null) {
+		String openIdProviderName = request.getParameter(WebConstants.OPEN_ID_PROVIDER);
+		if (openIdProviderName==null) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			response.getWriter().println("Missing parameter "+WebConstants.OPEN_ID_PROVIDER);
 			return;
@@ -54,7 +54,7 @@ public class OpenIDServlet extends HttpServlet {
 		}
 
 		OpenIDUtils.openID(
-				openIdProvider, 
+				openIdProviderName, 
 				explicitlyAcceptsTermsOfUse, 
 				redirectMode,
 				returnToURL, 
@@ -79,15 +79,9 @@ public class OpenIDServlet extends HttpServlet {
 	private void handleOpenIDCallbackRequest(final HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException { 
 		try {
 			OpenIDUtils.openIDCallback(request, response);
-		} catch (NotFoundException e) {
-			// 404 error
-			response.setStatus(HttpStatus.NOT_FOUND.value());
 		} catch (AuthenticationException e) {
 			response.setStatus(e.getRespStatus());
 			response.getWriter().println("{\"reason\":\""+e.getMessage()+"\"}");
-		} catch (XPathExpressionException e) {
-			// 500 error
-			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		} catch (URISyntaxException e) {
 			// 400 error
 			response.setStatus(HttpStatus.BAD_REQUEST.value());

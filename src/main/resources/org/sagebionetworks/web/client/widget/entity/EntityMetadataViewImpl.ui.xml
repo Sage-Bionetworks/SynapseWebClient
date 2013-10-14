@@ -9,21 +9,13 @@
 	<g:HTMLPanel>
 		<h2 style="margin-bottom: 0px;">	
 			<g:HTMLPanel ui:field="entityNamePanel">			
-				 <g:Image ui:field="entityIcon" />&nbsp;<span ui:field="entityName"></span>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>			
+				 <span class="liftLargeIcon"><g:Image ui:field="entityIcon" styleName="liftLargeIcon"/></span>&nbsp;<span ui:field="entityName"/>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>			
 			</g:HTMLPanel>
 		</h2>
 		<g:HTMLPanel ui:field="detailedMetadata">
-		    <div><span class="boldText margin-right-5">Synapse ID:</span><span ui:field="entityId"></span></div>
-			<div class="span-17 notopmargin">
-				<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
-			</div>			
-			<div class="span-17 notopmargin">
-				<g:FlowPanel ui:field="sharingContainer" ></g:FlowPanel>
-			</div>
-			<div class="span-17 notopmargin">
-				<g:SimplePanel ui:field="doiPanel"/>
-			</div>
+		    <div><span class="boldText margin-right-5">Synapse ID: </span><span ui:field="entityId"></span></div>
+			<g:HTMLPanel ui:field="dataUseContainer" ></g:HTMLPanel>
+			<g:SimplePanel ui:field="doiPanel"/>
 	    </g:HTMLPanel>
-		<div style="padding-bottom: 30px;"></div>
 	</g:HTMLPanel>
 </ui:UiBinder>

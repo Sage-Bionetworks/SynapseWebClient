@@ -15,15 +15,15 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -65,29 +65,24 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	public void configure(String entityId, boolean canEdit, String title) {
 		this.removeAll(true);
 		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("span-24 notopmargin");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		LayoutContainer topbar = new LayoutContainer();		
-		LayoutContainer left = new LayoutContainer();
-		left.setStyleName("left span-17 notopmargin");
-		LayoutContainer right = new LayoutContainer();
-		right.setStyleName("right span-7 notopmargin");
-		topbar.add(left);
-		topbar.add(right);
 		boolean isTitle = (title!=null);
-		if(!isTitle) title = "&nbsp;"; 
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<h3>" + title + "</h3>");
-		left.add(new HTML(shb.toSafeHtml()));
+		if(isTitle) {
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			shb.appendHtmlConstant("<h3>" + title + "</h3>");
+			topbar.add(new HTML(shb.toSafeHtml()));
+		}
 		
 		if(canEdit) {
-			Button upload = getUploadButton(entityId); 
-			upload.addStyleName("right last");
-	
-			Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
+			Button upload = getUploadButton(entityId);
+			upload.addStyleName("margin-right-5");
+			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
+			Button addFolder = DisplayUtils.createIconButton(DisplayConstants.ADD_FOLDER, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+			addFolder.addClickHandler(new ClickHandler() {				
 				@Override
-				public void componentSelected(ButtonEvent ce) {
+				public void onClick(ClickEvent event) {
 					NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
 						@Override
 						public void onSave(String name, String description) {
@@ -96,20 +91,16 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 					});
 				}
 			});
-			addFolder.setHeight(25);
-			//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
-			addFolder.setWidth(90);
-			addFolder.addStyleName("right");
-
 		
-			right.add(upload);
-			right.add(addFolder, new MarginData(0, 3, 0, 0));
+			topbar.add(upload);
+			topbar.add(addFolder, new MarginData(0, 3, 0, 0));
 		}
 		
 		LayoutContainer files = new LayoutContainer();
-		files.setStyleName("span-24 notopmargin");
 		entityTreeBrowser.configure(entityId, true);
-		files.add(entityTreeBrowser.asWidget());
+		Widget etbW = entityTreeBrowser.asWidget();
+		etbW.addStyleName("margin-top-10");
+		files.add(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
 		if (canEdit || isTitle)
 			lc.add(topbar);
@@ -164,8 +155,9 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-		uploadButton.setHeight(25);
+		// AbstractImagePrototype.create(iconsImageBundle.NavigateUp16())
+		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
+		uploadButton.addStyleName("left display-inline");
 		final Window window = new Window();
 		uploader.clearHandlers();
 		// add user defined handler
@@ -185,18 +177,19 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			}
 		});
 		
-		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		uploadButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-					//let the uploader create the FileEntity
-					window.removeAll();
-					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-					window.setPlain(true);
-					window.setModal(true);		
-					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());
-					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
-					window.show();
+			public void onClick(ClickEvent event) {
+				//let the uploader create the FileEntity
+				window.removeAll();
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+				window.setPlain(true);
+				window.setModal(true);		
+				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+				window.setLayout(new FitLayout());
+				window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+				window.show();
 			}
 		});
 		return uploadButton;

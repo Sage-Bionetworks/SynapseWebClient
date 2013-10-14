@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
+import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -22,9 +23,22 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
-		view.configure(wikiKey);
+		view.configure(wikiKey, window);
+		//and try to prepopulate with values from the map.  if it fails, ignore
+		try {
+			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY) || descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+				if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)){
+					view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+				} else if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)){
+					view.setUploadedFileHandleName(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+					window.getButtonById(Dialog.OK).enable();
+				}
+				view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+				view.setScale(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY));
+			}
+		} catch (Exception e) {}
 	}
 	
 	@SuppressWarnings("unchecked")

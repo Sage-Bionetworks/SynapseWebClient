@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
@@ -69,7 +69,7 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		
 		presenter.editNew(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
 		verify(mockView).setWidgetDescriptor(any(WikiPageKey.class), eq(WidgetConstants.YOUTUBE_CONTENT_TYPE), eq(descriptor1), anyBoolean());
-		verify(mockView).show(eq(WidgetConstants.YOUTUBE_FRIENDLY_NAME));
+		verify(mockView).show();
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testEditNewFailedPreconditions1() {

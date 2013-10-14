@@ -6,13 +6,12 @@ import java.net.URLDecoder;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -23,7 +22,7 @@ import org.springframework.http.HttpHeaders;
  */
 public class UserDataProvider {
 	
-	static private Log logger = LogFactory.getLog(UserDataProvider.class);
+	static private Logger logger = LogManager.getLogger(UserDataProvider.class);
 	
 	/**
 	 * The key used to put the session token in a header.
