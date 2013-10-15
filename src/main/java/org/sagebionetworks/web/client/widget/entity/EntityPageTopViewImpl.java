@@ -385,7 +385,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
 		// Wiki
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
 		// Programmatic Clients
 		filesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 		// Created By/Modified By
@@ -460,7 +460,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		filesTabContainer.layout(true);		
 		// Wiki		
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
@@ -485,8 +485,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			String entityTypeDisplay, boolean isAdmin, final boolean canEdit,
 			Synapse.EntityArea area, String wikiPageId) {		
 		// tab container
-		fullWidthContainer.add(currentTabContainer);				
-		if(area == null) area = Synapse.EntityArea.WIKI; // select tab, set default if needed
+		fullWidthContainer.add(currentTabContainer);						
 		setTabSelected(area, false);
 
 		projectTitleContainer.setVisible(false);
@@ -510,7 +509,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 
 		// Wiki Tab: Wiki
-		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false);
+		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false, area);
 		// Created By/Modified By
 		wikiTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -550,6 +549,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// tell presenter what tab we're on only if the user clicked
 		// this keeps extra goTos that break navigation from occurring 
 		if(userSelected) presenter.setArea(targetTab, null);
+		if(targetTab == null) targetTab = Synapse.EntityArea.WIKI; // select tab, set default if needed
 		
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
@@ -584,7 +584,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		currentTabContainer.layout(true);							
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, int spanWidth, boolean marginTop) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, int spanWidth, boolean marginTop, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
@@ -601,8 +601,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				@Override
 				public void noWikiFound() {
 					if(isProject) {
-						//no wiki found, show Files tab instead for projects
-						setTabSelected(Synapse.EntityArea.FILES, false);
+						//if wiki area not specified and no wiki found, show Files tab instead for projects 
+						if(area != EntityArea.WIKI) {							
+							setTabSelected(Synapse.EntityArea.FILES, false);
+						}
 					} else {
 						if(!canEdit) {
 							// hide description area for those who can't edit
