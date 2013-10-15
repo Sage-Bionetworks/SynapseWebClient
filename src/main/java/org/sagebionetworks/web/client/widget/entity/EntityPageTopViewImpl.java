@@ -185,11 +185,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				// Change tabs for projects, change places for other entity types
-				if(isProject) {
+				// Change tabs locally (in view) for projects as long as requested tab does not requre a place change
+				if(isProject && !presenter.isPlaceChangeForArea(targetTab)) {
 					setTabSelected(targetTab, true);					
 				} else {					
-					presenter.gotoProjectArea(targetTab); // change place back to the project
+					// return to cached location
+					presenter.gotoProjectArea(targetTab); 
 				}
 			}
 		};

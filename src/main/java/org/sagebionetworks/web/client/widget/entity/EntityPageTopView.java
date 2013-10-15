@@ -61,6 +61,8 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		ImageResource getIconForType(String typeString);
 
+		boolean isPlaceChangeForArea(EntityArea targetTab);
+
 				
 	}
 

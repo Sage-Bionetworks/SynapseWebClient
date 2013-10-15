@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectAreaState;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.EventBus;
@@ -55,6 +56,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String areaToken;
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
+	private ProjectAreaState projectAreaState;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -77,7 +79,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.globalApplicationState = globalApplicationState;
+		this.globalApplicationState = globalApplicationState;	
+		
+		this.projectAreaState = new ProjectAreaState();
 		view.setPresenter(this);
 	}
 
@@ -93,8 +97,33 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
+    	
+    	// reset state for newly visited project
+    	if(projectHeader.getId() == null || !projectHeader.getId().equals(projectAreaState.getProjectId())) {
+    		projectAreaState = new ProjectAreaState();
+    		projectAreaState.setProjectId(projectHeader.getId());
+    	}
+    	
+    	// For non-project entities, record them as the last file area place 
+    	String entityId = bundle.getEntity().getId();
+    	if(!projectHeader.getId().equals(entityId)) {
+    		EntityHeader lastFileAreaEntity = new EntityHeader();
+    		lastFileAreaEntity.setId(entityId);
+    		lastFileAreaEntity.setVersionNumber(versionNumber);
+    		projectAreaState.setLastFileAreaEntity(lastFileAreaEntity);
+    	}
+    	
+    	// record last wiki state
+    	if(area == EntityArea.WIKI) {
+    		projectAreaState.setLastWikiSubToken(areaToken);
+    	}
+    	
+    	// default area is the base wiki page if we are navigating to the project
+    	if(area == null && entityId.equals(projectAreaState.getProjectId())) {
+    		projectAreaState.setLastWikiSubToken(null);
+    	}
 	}
-
+    
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
@@ -191,10 +220,31 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void gotoProjectArea(EntityArea area) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, area, null));
+		String entityId = projectHeader.getId();
+		String areaToken = null;
+		Long versionNumber = null;
+		if(area == EntityArea.WIKI) {
+			areaToken = projectAreaState.getLastWikiSubToken();
+		} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
+			entityId = projectAreaState.getLastFileAreaEntity().getId();
+			versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
+		} 
+		
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, area, areaToken));
 	}
 
-	
+	@Override
+	public boolean isPlaceChangeForArea(EntityArea targetTab) {
+		if(targetTab == EntityArea.ADMIN) {
+			return false;
+		} else if(targetTab == EntityArea.FILES) {
+			if(projectAreaState.getLastFileAreaEntity() != null) return true;
+		} else if(targetTab == EntityArea.WIKI) {
+			if(projectAreaState.getLastWikiSubToken() != null && !bundle.getEntity().getId().equals(projectAreaState.getProjectId())) return true;
+		}
+		return false;		
+	}
+
 	/*
 	 * Private Methods
 	 */
