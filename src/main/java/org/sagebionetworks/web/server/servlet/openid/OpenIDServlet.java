@@ -78,6 +78,8 @@ public class OpenIDServlet extends HttpServlet {
 					redirectEndpoint);
 		} catch (OpenIDException e) {
 			throw new RuntimeException(e);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 		
 	}
