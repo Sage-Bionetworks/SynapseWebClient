@@ -100,7 +100,7 @@ public class ClientProperties {
 	 * Client Documentation
 	 */
 	public static final String REST_API_URL = "http://rest.synapse.org";
-	public static final String CLIENT_R_API_URL = "https://www.synapse.org/#!Synapse:syn1834618";
+	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1834618";
 	public static final String CLIENT_PYTHON_API_URL = "https://www.synapse.org/#!Synapse:syn1768504";
 	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1768504";
