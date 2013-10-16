@@ -230,6 +230,7 @@ SynapseWidgetPresenter {
 	@Override
 	public void saveClicked(String title, String md) 
 	{
+		setIsEditing(false);
 		//before saving, we need to update the page first (widgets may have added/removed file handles from the list, like ImageConfigEditor)
 		refreshWikiAttachments(title, md, new Callback() {
 			@Override
@@ -284,8 +285,19 @@ SynapseWidgetPresenter {
 	
 	@Override
 	public void cancelClicked() {
+		setIsEditing(false);
 		refresh();
 	}
+	
+	private void setIsEditing(boolean isEditing) {
+		globalApplicationState.setIsEditing(isEditing);
+	}
+	
+	@Override
+	public void editClicked() {
+		setIsEditing(true);
+	}
+	 
 
 	@Override
 	public void createPage(final String name) {
