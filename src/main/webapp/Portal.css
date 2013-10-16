@@ -576,6 +576,10 @@ a.shortBtn {
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
+.margin-bottom-0-imp {
+	margin-bottom: 0px !important;
+}
+
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -1283,6 +1287,16 @@ a.projectTitle:hover {
 	font-size: 16px;	
 }
 
+.rowAdaptiveHeight{
+    overflow: hidden; 
+}
+
+.colAdaptiveHeight{ 
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;  
+}
+
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
@@ -1296,6 +1310,7 @@ a.projectTitle:hover {
 .entity-tabs > li.active > a:hover,
 .entity-tabs > li.active > a:focus {
 	background-color: #f9f9f9;
+	cursor: pointer;
 }
 
 /*
