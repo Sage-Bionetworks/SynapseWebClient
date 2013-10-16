@@ -71,5 +71,7 @@ public interface GlobalApplicationState {
 	public void setFavorites(List<EntityHeader> favorites);
 	
 	public void checkVersionCompatibility(SynapseClientAsync synapseClient, SynapseView view);
+	public boolean isEditing();
+	public void setIsEditing(boolean isEditing);
 	
 }
