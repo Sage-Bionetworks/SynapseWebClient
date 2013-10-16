@@ -99,7 +99,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.areaToken = areaToken;
     	
     	// reset state for newly visited project
-    	if(projectHeader.getId() == null || !projectHeader.getId().equals(projectAreaState.getProjectId())) {
+    	if(!projectHeader.getId().equals(projectAreaState.getProjectId())) {
     		projectAreaState = new ProjectAreaState();
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
@@ -238,12 +238,19 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
-		if(targetTab == EntityArea.ADMIN) {
-			return false;
+		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
+		if(targetTab == EntityArea.ADMIN && !isProject) {
+			// admin area clicked outside of project requires goto
+			return true;
 		} else if(targetTab == EntityArea.FILES) {
-			if(projectAreaState.getLastFileAreaEntity() != null) return true;
-		} else if(targetTab == EntityArea.WIKI) {
-			if(projectAreaState.getLastWikiSubToken() != null && !bundle.getEntity().getId().equals(projectAreaState.getProjectId())) return true;
+			// files area clicked in non-project entity requires goto root of files
+			// files area clicked with last-file-state requires goto
+			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
+				return true;			
+			}	
+		} else if(targetTab == EntityArea.WIKI && !isProject) {
+			// wiki area clicked in non-project entity requires goto
+			return true;			
 		}
 		return false;		
 	}

@@ -226,8 +226,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
-		isProject = bundle.getEntity() instanceof Project;
-		if (!isProject && currentArea == null) currentArea = EntityArea.FILES;
+		isProject = bundle.getEntity() instanceof Project;		
 		String wikiPageId = null;
 		if (Synapse.EntityArea.WIKI == area)
 			wikiPageId = areaToken;
@@ -236,11 +235,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		} else if (isFolderLike) {
 			//render Study like a Folder rather than a File (until all of the old types are migrated to the new world of Files and Folders)
 			renderFolderEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, wikiPageId, projectHeader);
+			if (currentArea == null) currentArea = EntityArea.FILES;
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber);
+		    if (currentArea == null) currentArea = EntityArea.FILES;
 		} else {
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId, projectHeader);
+			if (currentArea == null) currentArea = EntityArea.FILES;
 		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());

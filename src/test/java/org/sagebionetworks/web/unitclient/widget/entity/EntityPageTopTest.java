@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -70,9 +71,14 @@ public class EntityPageTopTest {
 	String entityId = "syn123";
 	Long entityVersion = 1L;
 	String projectId = "syn456";
+	String wikiSubpage = "987654";
 	EntityBundle entityBundle;
 	EntityHeader projectHeader;
-	
+	ArgumentCaptor<Synapse> capture;
+	Synapse gotoPlace;
+	EntityBundle projectBundle;
+	Project projectEntity = new Project();
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -117,93 +123,116 @@ public class EntityPageTopTest {
 		projectHeader = new EntityHeader();
 		projectHeader.setId(projectId);
 		
-		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.FILES, null);
-	}
-	
-	@Test 
-	public void testConfigureProjectAreaStateAndGotoProjectArea() {
-		ArgumentCaptor<Synapse> capture;
-		Synapse gotoPlace;
-		EntityBundle projectBundle;
-		
-		// fresh project, non project entity
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
-		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
-		// click files to test
-		pageTop.gotoProjectArea(EntityArea.FILES);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
-		assertEquals(EntityArea.FILES, gotoPlace.getArea());
-		assertEquals(entityId, gotoPlace.getEntityId());
-		assertEquals(entityVersion, gotoPlace.getVersionNumber());		
-			
-		// now visit a specific wiki sub page
-		reset(mockPlaceChanger);
-		String wikiSubpage = "987654";
-		Project projectEntity = new Project();
 		projectEntity.setId(projectId);
 		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
-		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, wikiSubpage);
+	}
+		
+	@Test 
+	public void testProjectInPageNoState() {		
+		// default project visit, no area, no area token
+		pageTop.configure(projectBundle, null, projectHeader, null, null);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+	}
+
+	@Test 
+	public void testProjectWithFilesState() {
+		// create some state for files tab
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// go back to project wiki
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, null);		
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// click files to test state
+		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		gotoPlace = captureGoTo();
+		assertNull(gotoPlace.getArea()); // should not specify area for sub entity
+		assertEquals(entityId, gotoPlace.getEntityId());
+		assertEquals(entityVersion, gotoPlace.getVersionNumber());				
+	}	
+	
+	@Test 
+	public void testWikiSubPageState() {
+		// create some state for the wiki tab on project
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
+		// go to files tab on project
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// now lets go to a child file
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click wiki to test
-		pageTop.gotoProjectArea(EntityArea.WIKI);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
+		pageTop.gotoProjectArea(EntityArea.WIKI, false);
+		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.WIKI, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());
 		assertEquals(wikiSubpage, gotoPlace.getAreaToken());
-		
-		// lets visit the default project wiki now
-		reset(mockPlaceChanger);
+	}	
+	
+	@Test 
+	public void testGoingBackToProjectWikiWithSubPageState() {
+		// create some state for the wiki tab on project
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
+		// now lets go to the project WIKI area with no subpage token
 		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
-		// click wiki to test
-		pageTop.gotoProjectArea(EntityArea.WIKI);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
+		// now lets go to a child file
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
+		// click wiki to test back to wiki root
+		pageTop.gotoProjectArea(EntityArea.WIKI, false);
+		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.WIKI, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());		
 		assertNull(gotoPlace.getAreaToken());
-		
-		// visit wiki subpage then visit project with null area
-		reset(mockPlaceChanger);
-		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, wikiSubpage);
-		pageTop.configure(projectBundle, entityVersion, projectHeader, null, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+	}	
+
+	// just like above but not going back to the project wiki, go to the project unparameterized
+	@Test 
+	public void testGoingBackToProjectWithSubPageState() {
+		// create some state for the wiki tab on project
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
-		// click wiki to test
-		pageTop.gotoProjectArea(null);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
+		// now lets go to the project WIKI area with no subpage 
+		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		pageTop.configure(projectBundle, entityVersion, projectHeader, null, null);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
+		// now lets go to a child file
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
+		// click wiki to test back to wiki root
+		pageTop.gotoProjectArea(null, false);
+		gotoPlace = captureGoTo();
 		assertNull(gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());		
 		assertNull(gotoPlace.getAreaToken());
-		
-		// with wiki subpage state and file entity state, on wiki tab, make sure wiki subpage still exists
-		reset(mockPlaceChanger);
-		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, wikiSubpage);
-		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.FILES, null);
+	}	
+
+	@Test 
+	public void testVisitNewProject() {
+		// create some state for the wiki tab on project
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
+		// create some state for the files tab on project
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
-		// click wiki to test
-		pageTop.gotoProjectArea(EntityArea.WIKI);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
-		assertEquals(EntityArea.WIKI, gotoPlace.getArea());
-		assertEquals(projectId, gotoPlace.getEntityId());		
-		assertEquals(wikiSubpage, gotoPlace.getAreaToken());
-		
-		
 		// visit a new project, make sure all area state is wiped out
-		reset(mockPlaceChanger);
 		String newProjectId = "syn789";
 		assertFalse(newProjectId.equals(projectId)); // assumption check
 		projectEntity = new Project();
@@ -215,19 +244,26 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// click files to test
-		pageTop.gotoProjectArea(EntityArea.FILES);
-		capture = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockPlaceChanger).goTo(capture.capture());
-		gotoPlace = capture.getValue();
+		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea());
 		assertEquals(newProjectId, gotoPlace.getEntityId());
-		assertNull(gotoPlace.getVersionNumber());			
-		
+		assertNull(gotoPlace.getVersionNumber());					
 		// visit wiki subpage and assure switch to default files view and back is not place change
 		pageTop.configure(projectBundle, entityVersion, newProjectHeader, EntityArea.WIKI, wikiSubpage);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
-		
 
+	}	
+
+	
+	/*
+	 * Private Methods
+	 */
+	private Synapse captureGoTo() {
+		capture = ArgumentCaptor.forClass(Synapse.class);
+		verify(mockPlaceChanger).goTo(capture.capture());
+		return capture.getValue();
 	}
+
 }
