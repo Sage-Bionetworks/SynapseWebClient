@@ -122,6 +122,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	@Override
 	public void redirectToViewProfile() {
+		globalApplicationState.setIsEditing(false);
 		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 	}
 
@@ -167,6 +168,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void updateProfileView(boolean editable) {
+		globalApplicationState.setIsEditing(editable);
 		updateProfileView(null, editable);
 	}
 	

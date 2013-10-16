@@ -27,12 +27,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
-	
+	private boolean isEditing;
 	
 	@Inject
 	public GlobalApplicationStateImpl(CookieProvider cookieProvider, EventBus eventBus) {
 		this.cookieProvider = cookieProvider;
 		this.eventBus = eventBus;
+		isEditing = false;
 	}
 
 	@Override
@@ -138,5 +139,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
-		
+
+	@Override
+	public boolean isEditing() {
+		return isEditing;
+	}
+	
+	@Override
+	public void setIsEditing(boolean isEditing) {
+		this.isEditing = isEditing;
+	}
 }
