@@ -222,6 +222,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			public void onClick(ClickEvent event) {
 				//change to edit mode
 				removeAll(true);
+				//inform presenter that edit was clicked
+				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
 				mdField.setValue(currentPage.getMarkdown());
@@ -237,7 +239,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 					form.add(titleField);
 				}
 				//also add commands at the bottom
-				
 				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
