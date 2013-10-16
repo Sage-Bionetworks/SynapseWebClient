@@ -100,7 +100,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					String content = "";
 					
 					if(result == null || SharedMarkdownUtils.getDefaultWikiMarkdown().equals(result)) {
-						content += SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;margin-bottom:30px\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>").asString();
+						content += SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%;\">" + DisplayConstants.LABEL_NO_MARKDOWN + "</div>").asString();
 					}
 					
 					if (result != null) {
