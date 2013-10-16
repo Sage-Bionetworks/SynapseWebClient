@@ -1296,6 +1296,9 @@ a.projectTitle:hover {
     padding-bottom: 99999px;  
 }
 
+.previewPreMaxHeight {
+	max-height: 206px;
+}
 
 /*==================================*/
 /* GXT Overrides */
