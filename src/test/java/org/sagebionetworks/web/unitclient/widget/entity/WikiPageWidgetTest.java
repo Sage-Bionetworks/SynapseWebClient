@@ -61,7 +61,7 @@ public class WikiPageWidgetTest {
 		mockView = mock(WikiPageWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockJsonObjectAdapter = mock(JSONObjectAdapter.class);
+		mockJsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient,
@@ -197,6 +197,26 @@ public class WikiPageWidgetTest {
 		verify(mockView).showErrorMessage(anyString());
 	}
 
+	@Test
+	public void testCancelClicked(){
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.cancelClicked();
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
+
+	@Test
+	public void testSaveClicked(){
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.saveClicked("", "");
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
 	
+	@Test
+	public void testEditClicked(){
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.editClicked();
+		verify(mockGlobalApplicationState).setIsEditing(eq(true));
+	}
+
 	
 }

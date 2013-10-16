@@ -5,7 +5,9 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -46,13 +48,16 @@ public class BulkPresenterProxy extends AbstractActivity {
 	Place place;
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
+	GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public BulkPresenterProxy(){
+	public BulkPresenterProxy(GlobalApplicationState globalApplicationState){
+		this.globalApplicationState = globalApplicationState;
 	}
 
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
+		globalApplicationState.setIsEditing(false);
 		GWT.runAsync(new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
@@ -161,6 +166,13 @@ public class BulkPresenterProxy extends AbstractActivity {
 
 	public void setloader(AppLoadingView loading) {
 		this.loading = loading;		
+	}
+	@Override
+	public String mayStop() {
+		if (globalApplicationState.isEditing())
+			return DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE;
+		else
+			return null;
 	}
 	
 	

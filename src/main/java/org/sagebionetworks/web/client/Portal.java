@@ -74,7 +74,10 @@ public class Portal implements EntryPoint {
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
-
+						
+						//listen for window close (or navigating away)
+						registerWindowClosingHandler(globalApplicationState);
+						
 						// start version timer
 						ginjector.getVersionTimer().start();
 						
@@ -88,5 +91,14 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
+		Window.addWindowClosingHandler(new Window.ClosingHandler() {
+		      public void onWindowClosing(Window.ClosingEvent closingEvent) {
+		    	  if (globalApplicationState.isEditing())
+		    		  closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
+		      }
+		    });
 	}
 }
