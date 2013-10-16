@@ -98,8 +98,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.area = area;
     	this.areaToken = areaToken;
     	
+    	boolean isProject = projectHeader.getId().equals(projectAreaState.getProjectId());
     	// reset state for newly visited project
-    	if(!projectHeader.getId().equals(projectAreaState.getProjectId())) {
+    	if(!isProject) {
     		projectAreaState = new ProjectAreaState();
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
@@ -121,6 +122,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	// default area is the base wiki page if we are navigating to the project
     	if(area == null && entityId.equals(projectAreaState.getProjectId())) {
     		projectAreaState.setLastWikiSubToken(null);
+    	}
+    	
+    	// clear out file state if we go back to root
+    	if(area == EntityArea.FILES && isProject) {
+    		projectAreaState.setLastFileAreaEntity(null);
     	}
 	}
     

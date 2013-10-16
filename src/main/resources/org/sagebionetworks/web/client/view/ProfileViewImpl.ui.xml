@@ -36,7 +36,7 @@
 					<g:SimplePanel ui:field="viewProfilePanel" />
 				</div>
 			</div>
-			<div class="user-profile-linkedin-bar span-13 push-11 last notopmargin">
+			<div class="user-profile-linkedin-bar">
 				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
 			</div>
 			<g:SimplePanel ui:field="updateUserInfoPanel" />
