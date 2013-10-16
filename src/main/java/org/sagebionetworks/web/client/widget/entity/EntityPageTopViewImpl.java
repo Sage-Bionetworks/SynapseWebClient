@@ -119,6 +119,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private boolean newBadgesShown = false;
+	private EntityArea currentArea;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	private static final int MAX_DISPLAY_NAME_CHAR = 40;
@@ -173,7 +174,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
 		adminTabContainer = new LayoutContainer();
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
-		wikiLink.setText(DisplayConstants.PROJECT_WIKI);
+		wikiLink.setText(DisplayConstants.WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
 		fileLink.setText(DisplayConstants.FILES);		
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
@@ -188,10 +189,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				// Change tabs locally (in view) for projects as long as requested tab does not requre a place change
 				if(isProject && !presenter.isPlaceChangeForArea(targetTab)) {
 					setTabSelected(targetTab, true);					
-				} else {					
+				} else {	
+					boolean overrideCache = false;
+					if(currentArea == EntityArea.FILES && targetTab == EntityArea.FILES) 
+						overrideCache = true;
 					// return to cached location
-					presenter.gotoProjectArea(targetTab); 
+					presenter.gotoProjectArea(targetTab, overrideCache); 
 				}
+				currentArea = targetTab;
 			}
 		};
 	}
@@ -200,7 +205,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public void setEntityBundle(EntityBundle bundle, UserProfile userProfile,
 			String entityTypeDisplay, boolean isAdministrator, boolean canEdit,
 			Long versionNumber, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {
-		this.versionNumber = versionNumber;		
+		this.versionNumber = versionNumber;
+		this.currentArea = area;
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
 		topFullWidthContainer = initContainerAndPanel(topFullWidthContainer, topFullWidthPanel);
 
@@ -221,6 +227,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Custom layouts for certain entities
 		boolean isFolderLike = bundle.getEntity() instanceof Folder || bundle.getEntity() instanceof Study || bundle.getEntity() instanceof Analysis;
 		isProject = bundle.getEntity() instanceof Project;
+		if (!isProject && currentArea == null) currentArea = EntityArea.FILES;
 		String wikiPageId = null;
 		if (Synapse.EntityArea.WIKI == area)
 			wikiPageId = areaToken;
@@ -350,7 +357,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row.add(right);
 		filesTabContainer.add(row);		
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath()));
+		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
 			left.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
@@ -441,7 +448,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row.add(right);
 		filesTabContainer.add(row);		
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath()));
+		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 

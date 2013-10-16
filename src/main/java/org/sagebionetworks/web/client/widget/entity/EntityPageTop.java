@@ -219,17 +219,19 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void gotoProjectArea(EntityArea area) {
+	public void gotoProjectArea(EntityArea area, boolean overrideCache) {
 		String entityId = projectHeader.getId();
 		String areaToken = null;
 		Long versionNumber = null;
-		if(area == EntityArea.WIKI) {
-			areaToken = projectAreaState.getLastWikiSubToken();
-		} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
-			entityId = projectAreaState.getLastFileAreaEntity().getId();
-			versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
-		} 
-		
+		if(!overrideCache) {
+			if(area == EntityArea.WIKI) {
+				areaToken = projectAreaState.getLastWikiSubToken();
+			} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
+				entityId = projectAreaState.getLastFileAreaEntity().getId();
+				versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
+			} 
+		}
+
 		if(!entityId.equals(projectHeader.getId())) area = null; // don't specify area in place for non-project entities
 		globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, area, areaToken));
 	}

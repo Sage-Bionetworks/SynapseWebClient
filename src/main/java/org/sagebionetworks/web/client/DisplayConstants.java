@@ -510,7 +510,6 @@ public class DisplayConstants {
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String WIKI = "Wiki";
-	public static final String PROJECT_WIKI = "Project Wiki";
 	public static final String CREATE_WIKI = "Create Wiki";
 	public static final String ADD_DESCRIPTION = "Add Description";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
