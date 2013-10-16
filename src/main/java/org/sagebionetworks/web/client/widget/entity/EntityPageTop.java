@@ -230,6 +230,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
 		} 
 		
+		if(!entityId.equals(projectHeader.getId())) area = null; // don't specify area in place for non-project entities
 		globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, area, areaToken));
 	}
 

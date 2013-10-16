@@ -576,6 +576,10 @@ a.shortBtn {
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
+.margin-bottom-0-imp {
+	margin-bottom: 0px !important;
+}
+
 
 .margin-left-725 {
 	margin-left: 725px;

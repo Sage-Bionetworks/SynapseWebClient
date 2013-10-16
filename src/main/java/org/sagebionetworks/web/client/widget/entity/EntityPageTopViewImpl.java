@@ -368,7 +368,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(fileHistoryWidget.asWidget());
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
-		
+		// Wiki
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
+
 		// Preview & Provenance Row
 		row = DisplayUtils.createRowContainer();
 		boolean provFullWidth = true;
@@ -385,8 +387,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));		
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
-		// Wiki
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
 		// Programmatic Clients
 		filesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
 		// Created By/Modified By
@@ -453,6 +453,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(row);		
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
+		// Wiki		
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
@@ -460,8 +462,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		//Annotations
 		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		filesTabContainer.layout(true);		
-		// Wiki		
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
@@ -591,7 +591,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			// Child Page Browser
 			Widget wikiW = wikiPageWidget.asWidget();
 			final SimplePanel wrapper = new SimplePanel(wikiW);
-			wrapper.addStyleName("panel panel-default panel-body");
+			wrapper.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
 			if(marginTop) wrapper.addStyleName("margin-top-15");
 			container.add(wrapper);
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
