@@ -56,7 +56,8 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 	
 	@Override
 	public void completeParse(StringBuilder html) {
-		html.append("<hr>");
+		if (footnotes.size() > 0)
+			html.append("<hr>");
 		StringBuilder footnoteMarkdown = new StringBuilder();
 		for(int i = 0; i < footnotes.size(); i++) {
 			String footnoteText = WidgetEncodingUtil.decodeValue(footnotes.get(i));
