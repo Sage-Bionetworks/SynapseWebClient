@@ -30,8 +30,6 @@ public class Portal implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		//listen for window close (or navigating away)
-		registerWindowClosingHandler();
 		//we might need to reload using the new token scheme (required for SEO)
 		String initToken = History.getToken();
 		if (initToken.length() > 0 && !initToken.startsWith("!")) {
@@ -76,7 +74,10 @@ public class Portal implements EntryPoint {
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
-
+						
+						//listen for window close (or navigating away)
+						registerWindowClosingHandler(globalApplicationState);
+						
 						// start version timer
 						ginjector.getVersionTimer().start();
 						
@@ -92,10 +93,11 @@ public class Portal implements EntryPoint {
 		}
 	}
 	
-	private void registerWindowClosingHandler() {
+	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
 		Window.addWindowClosingHandler(new Window.ClosingHandler() {
 		      public void onWindowClosing(Window.ClosingEvent closingEvent) {
-		        closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
+		    	  if (globalApplicationState.isEditing())
+		    		  closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
 		      }
 		    });
 	}
