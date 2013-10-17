@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -81,7 +82,7 @@ public class EntityEditor {
 	    if (isNew) {
 		title.append("Create ");
 	    } else {
-		title.append("Edit ");
+		title.append(DisplayConstants.LABEL_RENAME + " ");
 	    }
 	    title.append(DisplayUtils.getEntityTypeDisplay(schema));
 	    
