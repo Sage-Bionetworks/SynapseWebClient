@@ -99,7 +99,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 			}
 		});
 	    container = new SimplePanel(textField);
-	    container.addStyleName("col-md-7");
+	    container.addStyleName("col-md-7 col-sm-8 col-xs-8");
 	    horizontalTable.add(container);
 
 		
@@ -114,7 +114,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		});
 	    searchButtonContainer.add(createBtn);
 	    container = new SimplePanel(searchButtonContainer);
-	    container.addStyleName("col-md-2");
+	    container.addStyleName("col-md-2 col-sm-4 col-xs-4");
 	    horizontalTable.add(container);
 
 

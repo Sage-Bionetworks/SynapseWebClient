@@ -392,8 +392,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			row.add(createProvenanceWidget(bundle, provFullWidth));
 		}
 		filesTabContainer.add(row);
-		// Annotations			
-		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));		
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));		
 		// Programmatic Clients
@@ -439,6 +437,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.add(currentTabContainer);
 		setTabSelected(EntityArea.FILES, false); // select files tab for folder
 		
+		// File tab: everything
 		// ** LEFT/RIGHT
 		LayoutContainer row;
 		row = DisplayUtils.createRowContainer();
@@ -453,13 +452,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
-
-
-		// File tab: everything
+		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		row = DisplayUtils.createRowContainer();		
 		row.add(wrap(entityMetadata.asWidget(), "col-md-12"));
-		filesTabContainer.add(row);		
+		left.add(row);
+		
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki		
@@ -468,9 +466,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		filesTabContainer.add(row);		
-		//Annotations
-		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
-		filesTabContainer.layout(true);		
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
@@ -521,7 +516,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false, area);
 		// Created By/Modified By
-		wikiTabContainer.add(createAnnotationsWidget(bundle, canEdit));
 		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
@@ -530,7 +524,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row = DisplayUtils.createRowContainer();		
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		filesTabContainer.add(row);			
-		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));		
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -649,9 +642,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		boolean readOnly = versionNumber != null;
 		snapshotWidget.setSnapshot((Summary)bundle.getEntity(), canEdit, readOnly);		
 		filesTabContainer.add(wrap(snapshotWidget.asWidget(), "panel panel-body margin-top-15"));		
-		//Annotations
-		filesTabContainer.add(createAnnotationsWidget(bundle, canEdit));
-		filesTabContainer.layout(true);
 		// Attachments
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false));
 		// Created By/Modified By
@@ -753,26 +743,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
    		return lc;
 	}
 	
-	private Widget createAnnotationsWidget(EntityBundle bundle, boolean canEdit) {
-	    // Create the property body
-	    // the headers for properties.
-	    annotationsWidget.configure(bundle, canEdit);	    
-	    Widget widget;
-		if (canEdit || !annotationsWidget.isEmpty()) {
-			widget = new LayoutContainer();
-			widget.addStyleName("highlight-box");
-			LayoutContainer row = DisplayUtils.createRowContainer();
-			Widget aW = annotationsWidget.asWidget();
-			aW.addStyleName("col-md-6");
-			widget.setTitle(DisplayConstants.ANNOTATIONS);
-			row.add(aW);
-			((LayoutContainer)widget).add(row);
-		} else {
-			widget = new HTML();
-		}
-		return widget;
-	}
-
 	private Widget createAttachmentsWidget(final EntityBundle bundle, boolean canEdit, boolean showWhenEmpty) {	    
 		LayoutContainer lc = new LayoutContainer();
 	    lc.setTitle(DisplayConstants.BUTTON_WIKI_ATTACHMENTS);	    		

@@ -256,6 +256,27 @@ public class EntityPageTopTest {
 
 	}	
 
+	@Test
+	public void testRevisitFilesAfterFileStateAndFilesRootVisit() {
+		// create some state for files tab
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// go to files root
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
+		// go wiki tab
+		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, null);		
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// click files to test that there is no files tab state
+		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		gotoPlace = captureGoTo();
+		assertEquals(EntityArea.FILES, gotoPlace.getArea()); 
+		assertEquals(projectId, gotoPlace.getEntityId());
+		assertNull(gotoPlace.getVersionNumber());				
+	}
 	
 	/*
 	 * Private Methods

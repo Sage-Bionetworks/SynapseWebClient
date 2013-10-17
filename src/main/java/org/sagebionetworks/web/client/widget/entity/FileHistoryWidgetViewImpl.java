@@ -154,7 +154,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				allVersions.setText(DisplayConstants.SHOW_LC);
 			}
 		});
 		versionAnimation.setHideConfig(hideConfig);
@@ -164,14 +164,14 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				allVersions.setText(DisplayConstants.HIDE_LC);
 				if (scrollToElement != null)
 					scrollToElement.scrollIntoView();
 			}
 		});
 		versionAnimation.setShowConfig(showConfig);
 
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		allVersions.setText(DisplayConstants.SHOW_LC);
 
 		vToolbar = new PagingToolBar(VERSION_LIMIT);
 		vToolbar.setSpacing(2);
@@ -524,7 +524,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		//reset versions ui
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		allVersions.setText(DisplayConstants.SHOW_LC);
 	}
 	
 
