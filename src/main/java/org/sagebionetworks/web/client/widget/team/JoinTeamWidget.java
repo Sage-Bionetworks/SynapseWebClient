@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -28,11 +28,11 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter {
 		this.authenticationController = authenticationController;
 	}
 
-	public void configure(String teamId, TeamMembershipState membershipState, Callback teamUpdatedCallback) {
+	public void configure(String teamId, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback) {
 		//set team id
 		this.teamId = teamId;
 		this.teamUpdatedCallback = teamUpdatedCallback;
-		view.configure(authenticationController.isLoggedIn(), membershipState);
+		view.configure(authenticationController.isLoggedIn(), teamMembershipStatus);
 	};
 //	
 //	@Override

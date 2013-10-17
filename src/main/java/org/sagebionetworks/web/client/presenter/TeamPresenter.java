@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -33,6 +33,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Team team;
+	private TeamMembershipStatus teamMembershipStatus;
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -89,8 +90,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			public void onSuccess(TeamBundle result) {
 				try {
 					team = nodeModelCreator.createJSONEntity(result.getTeamJson(), Team.class);
+					teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
 					boolean isAdmin = result.isUserAdmin();
-					view.configure(team, isAdmin, TeamMembershipState.valueOf(result.getUserMembershipState()), result.getTotalMemberCount());
+					view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

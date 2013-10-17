@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 
@@ -37,25 +37,25 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, TeamMembershipState membershipState) {
+	public void configure(boolean isLoggedIn, TeamMembershipStatus teamMembershipStatus) {
 		clear();
 		initView();
 		//only shown if user is logged in
-		if (isLoggedIn) {
+		if (isLoggedIn && !teamMembershipStatus.getIsMember()) {
 			//add request UI, different based on membership state
-			if (TeamMembershipState.NONE.equals(membershipState)) {
+			if (teamMembershipStatus.getHasOpenInvitation()) {
+				//Team admin invited you!
+				add(acceptInviteButton);
+			} else if (teamMembershipStatus.getHasOpenRequest()) {
+				//already requested membership
+				add(requestedMessage);
+			} else {
 				//no affiliation, yet...
 				//full expandable UI.  ask for message
 				add(requestButton);
 				add(requestUIPanel);
 				requestUIPanel.setVisible(false);
-			} else if (TeamMembershipState.OPEN_INVITATION.equals(membershipState)) {
-				//Team admin invited you!
-				add(acceptInviteButton);
-			} else if (TeamMembershipState.OPEN_MEMBERSHIP_REQUEST.equals(membershipState)) {
-				//already requested membership
-				add(requestedMessage);
-			}
+			} 
 		}
 	}
 	

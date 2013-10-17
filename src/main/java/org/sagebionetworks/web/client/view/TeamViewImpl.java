@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
@@ -136,7 +136,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void configure(final Team team, boolean isAdmin, TeamMembershipState membershipState, Long totalMemberCount) {
+	public void configure(final Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount) {
 		clear();
 		this.team = team;
 		String pictureUrl;
@@ -174,9 +174,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 			commandsContainer.add(toolsButton);
 		}
 		
-		if (!TeamMembershipState.MEMBER.equals(membershipState)) {
+		if (!teamMembershipStatus.getIsMember()) {
 			//not a member, add Join widget
-			joinTeamWidget.configure(team.getId(), membershipState, getRefreshCallback(team.getId()));
+			joinTeamWidget.configure(team.getId(), teamMembershipStatus, getRefreshCallback(team.getId()));
 			Widget joinTeamView = joinTeamWidget.asWidget();
 			joinTeamView.addStyleName("margin-top-15");	
 			mainContainer.add(joinTeamView);

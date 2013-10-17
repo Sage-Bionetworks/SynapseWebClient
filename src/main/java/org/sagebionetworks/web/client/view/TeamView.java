@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -15,7 +15,7 @@ public interface TeamView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	void configure(Team team, boolean isAdmin, TeamMembershipState membershipState, Long totalMemberCount);
+	void configure(Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount);
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);

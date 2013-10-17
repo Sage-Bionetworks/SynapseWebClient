@@ -5,7 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class TeamBundle implements IsSerializable {
 
 	private String teamJson;
-	private String userMembershipState;
+	private String teamMembershipStatusJson;
 	private Long totalMemberCount;
 	private boolean isUserAdmin;
 	/**
@@ -16,10 +16,10 @@ public class TeamBundle implements IsSerializable {
 	}
 
 	public TeamBundle(String teamJson, Long totalMemberCount,
-			String userMembershipState, boolean isUserAdmin) {
+			String teamMembershipStatusJson, boolean isUserAdmin) {
 		super();
 		this.teamJson = teamJson;
-		this.userMembershipState = userMembershipState;
+		this.teamMembershipStatusJson = teamMembershipStatusJson;
 		this.totalMemberCount = totalMemberCount;
 		this.isUserAdmin = isUserAdmin;
 	}
@@ -31,12 +31,11 @@ public class TeamBundle implements IsSerializable {
 	public void setTeamJson(String teamJson) {
 		this.teamJson = teamJson;
 	}
-
-	public String getUserMembershipState() {
-		return userMembershipState;
+	public String getTeamMembershipStatusJson() {
+		return teamMembershipStatusJson;
 	}
-	public void setUserMembershipState(String userMembershipState) {
-		this.userMembershipState = userMembershipState;
+	public void setTeamMembershipStatusJson(String teamMembershipStatusJson) {
+		this.teamMembershipStatusJson = teamMembershipStatusJson;
 	}
 	public boolean isUserAdmin() {
 		return isUserAdmin;
@@ -60,11 +59,11 @@ public class TeamBundle implements IsSerializable {
 				+ ((teamJson == null) ? 0 : teamJson.hashCode());
 		result = prime
 				* result
-				+ ((totalMemberCount == null) ? 0 : totalMemberCount.hashCode());
+				+ ((teamMembershipStatusJson == null) ? 0
+						: teamMembershipStatusJson.hashCode());
 		result = prime
 				* result
-				+ ((userMembershipState == null) ? 0 : userMembershipState
-						.hashCode());
+				+ ((totalMemberCount == null) ? 0 : totalMemberCount.hashCode());
 		return result;
 	}
 
@@ -84,23 +83,26 @@ public class TeamBundle implements IsSerializable {
 				return false;
 		} else if (!teamJson.equals(other.teamJson))
 			return false;
+		if (teamMembershipStatusJson == null) {
+			if (other.teamMembershipStatusJson != null)
+				return false;
+		} else if (!teamMembershipStatusJson
+				.equals(other.teamMembershipStatusJson))
+			return false;
 		if (totalMemberCount == null) {
 			if (other.totalMemberCount != null)
 				return false;
 		} else if (!totalMemberCount.equals(other.totalMemberCount))
-			return false;
-		if (userMembershipState == null) {
-			if (other.userMembershipState != null)
-				return false;
-		} else if (!userMembershipState.equals(other.userMembershipState))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "TeamBundle [teamJson=" + teamJson + ", userMembershipState="
-				+ userMembershipState + ", totalMemberCount="
-				+ totalMemberCount + ", isUserAdmin=" + isUserAdmin + "]";
+		return "TeamBundle [teamJson=" + teamJson
+				+ ", teamMembershipStateJson=" + teamMembershipStatusJson
+				+ ", totalMemberCount=" + totalMemberCount + ", isUserAdmin="
+				+ isUserAdmin + "]";
 	}
+	
 }

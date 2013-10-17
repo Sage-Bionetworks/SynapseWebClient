@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -37,7 +37,12 @@ public class JoinTeamWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
 		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
-		joinWidget.configure(teamId, TeamMembershipState.NONE, mockTeamUpdatedCallback);
+		TeamMembershipStatus status = new TeamMembershipStatus();
+		status.setHasOpenInvitation(false);
+		status.setCanJoin(false);
+		status.setHasOpenRequest(false);
+		status.setIsMember(false);
+		joinWidget.configure(teamId, status, mockTeamUpdatedCallback);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));

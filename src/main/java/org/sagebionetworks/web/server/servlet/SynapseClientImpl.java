@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -49,15 +50,13 @@ import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
-import org.sagebionetworks.repo.model.TeamMembershipState;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserGroup;
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -109,16 +108,13 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.users.AclUtils;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
-
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appened to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
@@ -410,8 +406,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
-	private static final Long MAX_LIMIT = Long.MAX_VALUE;
-	private static final Long ZERO_OFFSET = 0l;
+	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
+	private static final Integer ZERO_OFFSET = 0;
 	
 	// before we hit this limit we will use another mechanism to find users
 	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
@@ -1302,112 +1298,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	private static PaginatedResults<TeamMember> getTestTeamMembers(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		UserGroupHeaderResponsePage page = null;
-		List<TeamMember> teamMembers = new ArrayList<TeamMember>();
-		try {
-			page = synapseClient.getUserGroupHeadersByPrefix("");
-			for (UserGroupHeader ugh : page.getChildren()) {
-				TeamMember tm = new TeamMember();
-				tm.setIsAdmin(false);
-				tm.setMember(ugh);
-				teamMembers.add(tm);
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		PaginatedResults<TeamMember> teams = new PaginatedResults<TeamMember>();
-		teams.setTotalNumberOfResults(teamMembers.size());
-		teams.setResults(teamMembers);
-		return teams;
-	}
-	
-	private static PaginatedResults<Team> getTestTeams() {
-		PaginatedResults<Team> teams = new PaginatedResults<Team>();
-		teams.setTotalNumberOfResults(2);
-		List<Team> teamList = new ArrayList<Team>();
-		Team team = new Team();
-		//is admin (is member)
-		team.setId("42");
-		team.setName("Springfield Isotopes");
-		team.setDescription("Springfield's only minor league baseball team.");
-		teamList.add(team);
-		team = new Team();
-		//is member
-		team.setId("43");
-		team.setName("Rogue Squadron");
-		team.setDescription("We need you.");
-		teamList.add(team);
-		team = new Team();
-		//has requested membership
-		team.setId("44");
-		team.setName("Yet Another Team");
-		team.setDescription("We do not need you, but you have requested to be a member of this team");
-		teamList.add(team);
-		teams.setResults(teamList);
-		team = new Team();
-		//no affiliation
-		team.setId("45");
-		team.setName("The Others");
-		team.setDescription("No description could possibly describe this team.");
-		teamList.add(team);
-		team = new Team();
-		//user invited to join by an admin
-		team.setId("46");
-		team.setName("A Party");
-		team.setDescription("And you're invited.");
-		teamList.add(team);
-		teams.setResults(teamList);
-
-		return teams;
-	}
-	private static PaginatedResults<Team> getTestTeams(int count, int offset) {
-		PaginatedResults<Team> teams = new PaginatedResults<Team>();
-		teams.setTotalNumberOfResults(count+200);
-		List<Team> teamList = new ArrayList<Team>();
-		for (int i = offset; i < offset + count; i++) {
-			Team team = new Team();
-			team.setId(Integer.toString(i));
-			team.setName("Team " + i);
-			team.setDescription(i + " is the best team.");
-			teamList.add(team);
-		}
-		
-		teams.setResults(teamList);
-		return teams;
-	}
-	
-	private static PaginatedResults<MembershipRequest> getTestMembershipRequests(String userId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		PaginatedResults<MembershipRequest> membershipRequests = new PaginatedResults<MembershipRequest>();
-		membershipRequests.setTotalNumberOfResults(2);
-		List<MembershipRequest> teamList = new ArrayList<MembershipRequest>();
-		if (teamId.equals("44") || teamId.equals("42")) {
-			MembershipRequest request = new MembershipRequest();
-			request.setTeamId(teamId);
-			request.setUserId(userId);
-			request.setMessage("I would love to join this team");
-			teamList.add(request);
-		}
-		membershipRequests.setResults(teamList);
-		return membershipRequests;
-	}
-	
-	private static PaginatedResults<MembershipInvitation> getTestInvitations(String userId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		PaginatedResults<MembershipInvitation> membershipRequests = new PaginatedResults<MembershipInvitation>();
-		membershipRequests.setTotalNumberOfResults(2);
-		List<MembershipInvitation> teamList = new ArrayList<MembershipInvitation>();
-		if (teamId.equals("46") || teamId.equals("42")) {
-			MembershipInvitation request = new MembershipInvitation();
-			request.setTeamId(teamId);
-			request.setUserId(userId);
-			request.setMessage("Please join our team!");
-			teamList.add(request);
-		}
-		membershipRequests.setResults(teamList);
-		return membershipRequests;
-	}
-
-	
 	public String createTeam(String teamName) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1434,13 +1324,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//TODO
-//			PaginatedResults<TeamMember> members = synapseClient.getTeamMembers(teamId, fragment, limit, offset);
-
-			//////////////TEST
-			PaginatedResults<TeamMember> members = getTestTeamMembers(synapseClient);
-			//////////////
-			
+			PaginatedResults<TeamMember> members = synapseClient.getTeamMembers(teamId, fragment, limit, offset);
 			return EntityFactory.createJSONStringForEntity(members);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1497,18 +1381,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
-			membershipRequest.setMessage(message);
-			membershipRequest.setTeamId(teamId);
-			membershipRequest.setUserId(currentUserId);
-
-			//make new Synapse call
-			synapseClient.createMembershipRequest(membershipRequest);
-			//and also attempt to complete the handshake (but do not report failure, since invitation may not have been sent)
-			try {
-				//Bruce indicated that for this to take place on the service side would make the call less RESTful.
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, currentUserId);
+			//if we can join the team without creating the request (like if we are a team admin, or there is an open invitation), then just do that!
+			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, currentUserId);
-			} catch (Throwable t) {
+			} else {
+				//otherwise, create the request
+				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
+				membershipRequest.setMessage(message);
+				membershipRequest.setTeamId(teamId);
+				membershipRequest.setUserId(currentUserId);
+
+				//make new Synapse call
+				synapseClient.createMembershipRequest(membershipRequest);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1519,20 +1404,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			
-			MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
-			membershipInvite.setMessage(message);
-			membershipInvite.setTeamId(teamId);
-			List<String> userIds = new ArrayList<String>();
-			userIds.add(userGroupId);
-			membershipInvite.setInvitees(userIds);
-			
-			//make new Synapse call
-			synapseClient.createMembershipInvitation(membershipInvite);
-			//and also attempt to complete the handshake (but do not report failure, since invitation may not have been sent)
-			try {
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, userGroupId);
+			//if we can join the team without creating the invite (like if we are a team admin, or there is an open membership request), then just do that!
+			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, userGroupId);
-			} catch (Throwable t) {
+			} else {
+				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
+				membershipInvite.setMessage(message);
+				membershipInvite.setTeamId(teamId);
+				List<String> userIds = new ArrayList<String>();
+				userIds.add(userGroupId);
+				membershipInvite.setInvitees(userIds);
+				
+				//make new Synapse call
+				synapseClient.createMembershipInvitation(membershipInvite);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1545,50 +1430,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isAdmin = false;
-			//TODO: fix to use TeamMember call when available
-//			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, Long.MAX_VALUE, 0);
-			//TODO: replace with a single web service call once it's available
+			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, MAX_LIMIT, ZERO_OFFSET);
 			Team team = synapseClient.getTeam(teamId);
-			//TODO TODO:  Bruce indicated that this "is member of team" question should be answered by the bundle request, and for now to iterate over all members
-			//also answer if the current user is an admin
+			//get membership state for the current user
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,userId);
 			
-			//////////////TEST
-			// admin for all teams
-			isAdmin = true;
-				
-			PaginatedResults<TeamMember> allMembers = getTestTeamMembers(synapseClient);
-			//////////////
-			
-			
-			boolean isMember = false;
-			if (userId != null) {
-				for (TeamMember ugh : allMembers.getResults()) {
-					if(userId.equals(ugh.getMember().getOwnerId())) {
-						isMember = true;
-						break;
-					}
-				}
-			}
-			TeamMembershipState state = TeamMembershipState.NONE;
-			if (isMember)
-				state = TeamMembershipState.MEMBER;
-			else if (userId != null) {
-				//if current user is not a member, find out if she requested to be a member, or if a Team admin extended an invitation
-				
-				PaginatedResults<MembershipRequest> openRequests = synapseClient.getOpenMembershipRequests(teamId, userId, 1, 0);
-				PaginatedResults<MembershipInvitation> openInvitations = synapseClient.getOpenMembershipInvitations(userId, teamId, 1, 0);
-
-				if (openRequests.getResults().size() > 0)
-					state = TeamMembershipState.OPEN_MEMBERSHIP_REQUEST;
-				else {
-					if (openInvitations.getResults().size() > 0)
-						state = TeamMembershipState.OPEN_INVITATION;	
+			//find the current user in the member list
+			for (Iterator iterator = allMembers.getResults().iterator(); iterator.hasNext();) {
+				TeamMember member = (TeamMember) iterator.next();
+				if (userId.equals(member.getMember().getOwnerId())){
+					//found it
+					isAdmin = member.getIsAdmin();
+					break;
 				}
 			}
 			
 			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew());
 			
-			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), state.name(), isAdmin);
+			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), membershipStatusJson.toJSONString(), isAdmin);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1600,7 +1460,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, Integer.MAX_VALUE, 0);
+			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, MAX_LIMIT, ZERO_OFFSET);
 			//and ask for the team info for each invite, and fill that in the bundle
 			
 			List<MembershipRequestBundle> returnList = new ArrayList<MembershipRequestBundle>();
@@ -1627,7 +1487,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(userId,null, Integer.MAX_VALUE, 0);
+			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(userId,null, MAX_LIMIT, ZERO_OFFSET);
 			//and ask for the team info for each invite, and fill that in the bundle
 			
 			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
@@ -1652,12 +1512,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		//TODO: fix once services isAdmin is available
-//		try {
-//			synapseClient.setIsTeamAdmin(currentUserId, targetUserId, teamId, isTeamAdmin);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
+		try {
+			synapseClient.setTeamMemberPermissions(teamId, targetUserId, isTeamAdmin);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -2053,12 +1912,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//query for all available evaluations.
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, 0, Integer.MAX_VALUE);
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, 0, MAX_LIMIT);
 			//gather all submissions
 			List<Submission> allSubmissions = new ArrayList<Submission>();
 			for (Evaluation evaluation : availableEvaluations.getResults()) {
 				//query for all submissions for each evaluation
-				PaginatedResults<Submission> submissions = synapseClient.getMySubmissions(evaluation.getId(), 0, Integer.MAX_VALUE);
+				PaginatedResults<Submission> submissions = synapseClient.getMySubmissions(evaluation.getId(), 0, MAX_LIMIT);
 				allSubmissions.addAll(submissions.getResults());
 			}
 			
