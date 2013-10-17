@@ -16,7 +16,7 @@
 		        <div class="separator margin-top-10-imp"></div>
 		    	<div class="container margin-top-15"> 		
 				<!-- LoginView -->				
-					<div class="well col-md-6 col-md-offset-3">
+					<div class="well col-md-offset-3 col-lg-6 col-md-8 col-sm-10 col-xs-10">
 						<h2>Login to Synapse </h2>
 						<g:SimplePanel ui:field="loginWidgetPanel" />
 						<div class="row margin-top-15">

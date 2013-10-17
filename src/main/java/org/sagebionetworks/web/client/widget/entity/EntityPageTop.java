@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectAreaState;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.event.shared.EventBus;
@@ -55,6 +56,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private String areaToken;
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
+	private ProjectAreaState projectAreaState;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -77,7 +79,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.widgetRegistrar = widgetRegistrar;
 		this.bus = bus;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.globalApplicationState = globalApplicationState;
+		this.globalApplicationState = globalApplicationState;	
+		
+		this.projectAreaState = new ProjectAreaState();
 		view.setPresenter(this);
 	}
 
@@ -93,8 +97,39 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.projectHeader = projectHeader;
     	this.area = area;
     	this.areaToken = areaToken;
+    	
+    	boolean isProject = projectHeader.getId().equals(projectAreaState.getProjectId());
+    	// reset state for newly visited project
+    	if(!isProject) {
+    		projectAreaState = new ProjectAreaState();
+    		projectAreaState.setProjectId(projectHeader.getId());
+    	}
+    	
+    	// For non-project entities, record them as the last file area place 
+    	String entityId = bundle.getEntity().getId();
+    	if(!projectHeader.getId().equals(entityId)) {
+    		EntityHeader lastFileAreaEntity = new EntityHeader();
+    		lastFileAreaEntity.setId(entityId);
+    		lastFileAreaEntity.setVersionNumber(versionNumber);
+    		projectAreaState.setLastFileAreaEntity(lastFileAreaEntity);
+    	}
+    	
+    	// record last wiki state
+    	if(area == EntityArea.WIKI) {
+    		projectAreaState.setLastWikiSubToken(areaToken);
+    	}
+    	
+    	// default area is the base wiki page if we are navigating to the project
+    	if(area == null && entityId.equals(projectAreaState.getProjectId())) {
+    		projectAreaState.setLastWikiSubToken(null);
+    	}
+    	
+    	// clear out file state if we go back to root
+    	if(area == EntityArea.FILES && isProject) {
+    		projectAreaState.setLastFileAreaEntity(null);
+    	}
 	}
-
+    
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
@@ -190,11 +225,42 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void gotoProjectArea(EntityArea area) {
-		globalApplicationState.getPlaceChanger().goTo(new Synapse(projectHeader.getId(), null, area, null));
+	public void gotoProjectArea(EntityArea area, boolean overrideCache) {
+		String entityId = projectHeader.getId();
+		String areaToken = null;
+		Long versionNumber = null;
+		if(!overrideCache) {
+			if(area == EntityArea.WIKI) {
+				areaToken = projectAreaState.getLastWikiSubToken();
+			} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
+				entityId = projectAreaState.getLastFileAreaEntity().getId();
+				versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
+			} 
+		}
+
+		if(!entityId.equals(projectHeader.getId())) area = null; // don't specify area in place for non-project entities
+		globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, versionNumber, area, areaToken));
 	}
 
-	
+	@Override
+	public boolean isPlaceChangeForArea(EntityArea targetTab) {
+		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
+		if(targetTab == EntityArea.ADMIN && !isProject) {
+			// admin area clicked outside of project requires goto
+			return true;
+		} else if(targetTab == EntityArea.FILES) {
+			// files area clicked in non-project entity requires goto root of files
+			// files area clicked with last-file-state requires goto
+			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
+				return true;			
+			}	
+		} else if(targetTab == EntityArea.WIKI && !isProject) {
+			// wiki area clicked in non-project entity requires goto
+			return true;			
+		}
+		return false;		
+	}
+
 	/*
 	 * Private Methods
 	 */

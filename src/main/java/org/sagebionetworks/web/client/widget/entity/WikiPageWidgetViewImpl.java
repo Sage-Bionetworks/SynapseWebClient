@@ -116,8 +116,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	public void showNoWikiAvailableUI(boolean isDescription) {
 		removeAll(true);
 		this.isDescription = isDescription;
-		SimplePanel createWikiButtonWrapper = new SimplePanel();
-		createWikiButtonWrapper.addStyleName("margin-bottom-20");
+		SimplePanel createWikiButtonWrapper = new SimplePanel();		
 		Button insertBtn = createInsertOrAddPageButton(true);		
 		createWikiButtonWrapper.add(insertBtn);
 		add(createWikiButtonWrapper);

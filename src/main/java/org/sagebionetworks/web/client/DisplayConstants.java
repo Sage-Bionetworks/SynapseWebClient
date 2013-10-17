@@ -327,8 +327,8 @@ public class DisplayConstants {
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
-	public static final String SHOW_VERSIONS = "show";
-	public static final String HIDE_VERSIONS = "hide";
+	public static final String SHOW_LC = "show";
+	public static final String HIDE_LC = "hide";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
@@ -472,7 +472,7 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
-	public static final String RESTRICTION_WARNING = "By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.";
+	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'Create' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
 	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
@@ -513,7 +513,6 @@ public class DisplayConstants {
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String WIKI = "Wiki";
-	public static final String PROJECT_WIKI = "Project Wiki";
 	public static final String CREATE_WIKI = "Create Wiki";
 	public static final String ADD_DESCRIPTION = "Add Description";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";

@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PreviewWidget implements PreviewWidgetView.Presenter{
-	public static final String APPLICATION_ZIP = "application/zip";
+	public static final String APPLICATION_ZIP = "application/zip";	
 	
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB

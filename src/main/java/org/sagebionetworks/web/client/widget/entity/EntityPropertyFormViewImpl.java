@@ -40,7 +40,6 @@ import com.google.inject.Inject;
 public class EntityPropertyFormViewImpl extends FormPanel implements EntityPropertyFormView {
 	Presenter presenter;
 	TextField<String> nameField;
-	TextField<String> descriptionField;
 	TextArea markdownDescriptionField;
 	List<Field<?>> propertyFields;
 	
@@ -151,10 +150,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		
 		//markdown widget to be removed from entity property form
 		//only reconfigure the md editor if the entity id is set
-		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
-			formPanel.add(descriptionField, basicFormData);
-		}
-		else {
+		if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
 			if (presenter.getEntity().getId() != null) {
 				markdownEditorWidget.configure(new WikiPageKey(presenter.getEntity().getId(),  ObjectType.ENTITY.toString(), null, DisplayUtils.getVersion(presenter.getEntity())), markdownDescriptionField, formPanel, true, false, new WidgetDescriptorUpdatedHandler() {
 					@Override
@@ -186,22 +182,10 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		nameField.setToolTip((ToolTipConfig)null);
 		
-		if (DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
-			descriptionField = (TextField<String>) formFactory.createField(model.getDescription());
-			//descriptionField.setToolTip(DisplayConstants.ENTITY_DESCRIPTION_TOOLTIP);
-			descriptionField.setToolTip((ToolTipConfig)null);
-			DisplayUtils.addToolTip(descriptionField, DisplayConstants.ENTITY_DESCRIPTION_TOOLTIP);
-		}
-		else {
-			markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
-			markdownDescriptionField.setWidth((DIALOG_WIDTH-90)+"px");
-			markdownDescriptionField.setHeight("300px");
-		}
-
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
 		
-		rebuild();
+		rebuild(); 
 	}
 	
 	@Override

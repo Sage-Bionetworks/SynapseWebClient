@@ -8,11 +8,17 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.AnimationProtector;
+import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
+import com.extjs.gxt.ui.client.event.FxEvent;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.fx.FxConfig;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,10 +29,9 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,6 +40,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
+	AnimationProtector annotationAnimation;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -58,8 +64,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	SimplePanel favoritePanel;
 	@UiField
 	SimplePanel doiPanel;
+	@UiField
+	HTMLPanel annotationsPanel;
+	@UiField
+	LayoutContainer annotationsContent;
+	@UiField
+	InlineLabel showAnnotations;
+
 	
 	private Presenter presenter;
+	private boolean annotationsFilled = false;
 
 	@UiField(provided = true)
 	final IconsImageBundle icons;
@@ -67,16 +81,22 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private AccessControlListEditor accessControlListEditor;
 	private PublicPrivateBadge publicPrivateBadge;
+	AnnotationsWidget annotationsWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget, DoiWidget doiWidget, AccessControlListEditor accessControlListEditor, PublicPrivateBadge publicPrivateBadge) {
+			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget,
+			DoiWidget doiWidget,
+			AccessControlListEditor accessControlListEditor,
+			PublicPrivateBadge publicPrivateBadge,
+			AnnotationsWidget annotationsWidget) {
 		this.icons = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
 		this.accessControlListEditor = accessControlListEditor;
 		this.publicPrivateBadge = publicPrivateBadge;
+		this.annotationsWidget = annotationsWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 				
@@ -121,6 +141,57 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		
 		//doi widget
 		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanEdit(), versionNumber);
+		
+		// annotations		
+		configureAnnotations(bundle, canEdit);
+	}
+
+	private void configureAnnotations(EntityBundle bundle, boolean canEdit) {
+		// configure widget
+		annotationsWidget.configure(bundle, canEdit);
+		// show widget?
+		if(canEdit || !annotationsWidget.isEmpty()) {
+			annotationsPanel.setVisible(true);
+		} else {
+			annotationsPanel.setVisible(false);
+		}
+		
+		// reset view
+		showAnnotations.setText(DisplayConstants.SHOW_LC);
+		annotationsContent.setVisible(false);
+				
+		if(!annotationsFilled) {
+			annotationAnimation = new AnimationProtector(new AnimationProtectorViewImpl(showAnnotations, annotationsContent));
+			FxConfig hideConfig = new FxConfig(400);
+			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+				@Override
+				public void handleEvent(FxEvent be) {
+					// This call to layout is necessary to force the scroll bar to appear on page-load
+					annotationsContent.layout(true);
+					showAnnotations.setText(DisplayConstants.SHOW_LC);
+				}
+			});
+			annotationAnimation.setHideConfig(hideConfig);
+			FxConfig showConfig = new FxConfig(400);
+			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+				@Override
+				public void handleEvent(FxEvent be) {
+					// This call to layout is necessary to force the scroll bar to appear on page-load
+					annotationsContent.layout(true);
+					showAnnotations.setText(DisplayConstants.HIDE_LC);
+				}
+			});
+			annotationAnimation.setShowConfig(showConfig);
+			showAnnotations.setText(DisplayConstants.SHOW_LC);
+			
+			LayoutContainer wrap = new LayoutContainer();
+			wrap.addStyleName("highlight-box margin-bottom-15");
+			wrap.setTitle(DisplayConstants.ANNOTATIONS);
+			wrap.add(annotationsWidget.asWidget());
+			annotationsContent.add(wrap);
+			
+			annotationsFilled = true;
+		}
 	}
 	
 	private void configureShareSettings(Anchor link, Entity entity){
