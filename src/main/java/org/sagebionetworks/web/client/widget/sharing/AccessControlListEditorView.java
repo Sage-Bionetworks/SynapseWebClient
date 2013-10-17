@@ -65,7 +65,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * @param permissionLevel
 		 */
 		void setAccess(Long principalId, PermissionLevel permissionLevel);
-
+		
 		/**
 		 * Remove the given principal from the ACL. Changes are NOT pushed to 
 		 * Synapse.

@@ -54,6 +54,10 @@ import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.view.SettingsViewImpl;
 import org.sagebionetworks.web.client.view.SynapseWikiView;
 import org.sagebionetworks.web.client.view.SynapseWikiViewImpl;
+import org.sagebionetworks.web.client.view.TeamSearchView;
+import org.sagebionetworks.web.client.view.TeamSearchViewImpl;
+import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.view.TeamViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -216,6 +220,24 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
+import org.sagebionetworks.web.client.widget.team.InviteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
+import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
+import org.sagebionetworks.web.client.widget.team.MemberListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetView;
+import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
+import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
+import org.sagebionetworks.web.client.widget.team.TeamBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
+import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
 
@@ -575,6 +597,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
+		bind(BigUserBadgeView.class).to(BigUserBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
 		
@@ -582,6 +605,40 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 
+		/*
+		 * Teams Places
+		 */
+		// Team Page
+		bind(TeamViewImpl.class).in(Singleton.class);
+		bind(TeamView.class).to(TeamViewImpl.class);
+
+		// Team Search Page
+		bind(TeamSearchViewImpl.class).in(Singleton.class);
+		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
+
+		/*
+		 * Teams Widgets
+		 */
+		// Open Team Invitations widget
+		bind(OpenTeamInvitationsWidgetView.class).to(OpenTeamInvitationsWidgetViewImpl.class);
+		
+		// Pending Team Join Requests widget
+		bind(OpenMembershipRequestsWidgetView.class).to(OpenMembershipRequestsWidgetViewImpl.class);
+				
+		// Team List widget (link to search teams page, optionally can create team)
+		bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
+
+		// Member List widget
+		bind(MemberListWidgetView.class).to(MemberListWidgetViewImpl.class);
+		
+		//Invite Team member widget
+		bind(InviteWidgetView.class).to(InviteWidgetViewImpl.class);
+		
+		//Request Team membership widget
+		bind(JoinTeamWidgetView.class).to(JoinTeamWidgetViewImpl.class);
+		//Team renderer
+		bind(TeamBadgeView.class).to(TeamBadgeViewImpl.class);
+		bind(BigTeamBadgeView.class).to(BigTeamBadgeViewImpl.class);
 	}
 
 }

@@ -8,7 +8,10 @@ import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -136,6 +139,26 @@ public interface SynapseClientAsync {
 
 	void getFavorites(Integer limit, Integer offset, AsyncCallback<String> callback);
 	
+	/**
+	 * TEAMS
+	 */
+	/////////////////
+	void createTeam(String teamName,AsyncCallback<String> callback);
+	void deleteTeam(String teamId,AsyncCallback<Void> callback);
+	void getTeams(String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getTeamBundle(String userId, String teamId, AsyncCallback<TeamBundle> callback);
+	void getOpenInvitations(String userId, AsyncCallback<List<MembershipInvitationBundle>> callback);
+	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
+	void updateTeam(String teamJson, AsyncCallback<String> callback);
+	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
+	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
+	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<String> callback);	
+	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
+	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
+	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
+	/////////////////
+	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
 	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
@@ -153,7 +176,7 @@ public interface SynapseClientAsync {
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
-	void completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
+	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
 	
 	
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);

@@ -42,13 +42,22 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipRequest;
+import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.TeamMembershipState;
 import org.sagebionetworks.repo.model.UserGroup;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -92,12 +101,17 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.users.AclUtils;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -396,10 +410,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return null;
 	}
 
+	private static final Long MAX_LIMIT = Long.MAX_VALUE;
+	private static final Long ZERO_OFFSET = 0l;
+	
 	// before we hit this limit we will use another mechanism to find users
 	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
 	private static final int EVALUATION_PAGINATION_OFFSET = 0;
-		
+	
 	private static final int USER_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find users
 	private static final int USER_PAGINATION_LIMIT = 1000; 
@@ -1285,6 +1302,391 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	private static PaginatedResults<TeamMember> getTestTeamMembers(org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		UserGroupHeaderResponsePage page = null;
+		List<TeamMember> teamMembers = new ArrayList<TeamMember>();
+		try {
+			page = synapseClient.getUserGroupHeadersByPrefix("");
+			for (UserGroupHeader ugh : page.getChildren()) {
+				TeamMember tm = new TeamMember();
+				tm.setIsAdmin(false);
+				tm.setMember(ugh);
+				teamMembers.add(tm);
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		PaginatedResults<TeamMember> teams = new PaginatedResults<TeamMember>();
+		teams.setTotalNumberOfResults(teamMembers.size());
+		teams.setResults(teamMembers);
+		return teams;
+	}
+	
+	private static PaginatedResults<Team> getTestTeams() {
+		PaginatedResults<Team> teams = new PaginatedResults<Team>();
+		teams.setTotalNumberOfResults(2);
+		List<Team> teamList = new ArrayList<Team>();
+		Team team = new Team();
+		//is admin (is member)
+		team.setId("42");
+		team.setName("Springfield Isotopes");
+		team.setDescription("Springfield's only minor league baseball team.");
+		teamList.add(team);
+		team = new Team();
+		//is member
+		team.setId("43");
+		team.setName("Rogue Squadron");
+		team.setDescription("We need you.");
+		teamList.add(team);
+		team = new Team();
+		//has requested membership
+		team.setId("44");
+		team.setName("Yet Another Team");
+		team.setDescription("We do not need you, but you have requested to be a member of this team");
+		teamList.add(team);
+		teams.setResults(teamList);
+		team = new Team();
+		//no affiliation
+		team.setId("45");
+		team.setName("The Others");
+		team.setDescription("No description could possibly describe this team.");
+		teamList.add(team);
+		team = new Team();
+		//user invited to join by an admin
+		team.setId("46");
+		team.setName("A Party");
+		team.setDescription("And you're invited.");
+		teamList.add(team);
+		teams.setResults(teamList);
+
+		return teams;
+	}
+	private static PaginatedResults<Team> getTestTeams(int count, int offset) {
+		PaginatedResults<Team> teams = new PaginatedResults<Team>();
+		teams.setTotalNumberOfResults(count+200);
+		List<Team> teamList = new ArrayList<Team>();
+		for (int i = offset; i < offset + count; i++) {
+			Team team = new Team();
+			team.setId(Integer.toString(i));
+			team.setName("Team " + i);
+			team.setDescription(i + " is the best team.");
+			teamList.add(team);
+		}
+		
+		teams.setResults(teamList);
+		return teams;
+	}
+	
+	private static PaginatedResults<MembershipRequest> getTestMembershipRequests(String userId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		PaginatedResults<MembershipRequest> membershipRequests = new PaginatedResults<MembershipRequest>();
+		membershipRequests.setTotalNumberOfResults(2);
+		List<MembershipRequest> teamList = new ArrayList<MembershipRequest>();
+		if (teamId.equals("44") || teamId.equals("42")) {
+			MembershipRequest request = new MembershipRequest();
+			request.setTeamId(teamId);
+			request.setUserId(userId);
+			request.setMessage("I would love to join this team");
+			teamList.add(request);
+		}
+		membershipRequests.setResults(teamList);
+		return membershipRequests;
+	}
+	
+	private static PaginatedResults<MembershipInvitation> getTestInvitations(String userId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		PaginatedResults<MembershipInvitation> membershipRequests = new PaginatedResults<MembershipInvitation>();
+		membershipRequests.setTotalNumberOfResults(2);
+		List<MembershipInvitation> teamList = new ArrayList<MembershipInvitation>();
+		if (teamId.equals("46") || teamId.equals("42")) {
+			MembershipInvitation request = new MembershipInvitation();
+			request.setTeamId(teamId);
+			request.setUserId(userId);
+			request.setMessage("Please join our team!");
+			teamList.add(request);
+		}
+		membershipRequests.setResults(teamList);
+		return membershipRequests;
+	}
+
+	
+	public String createTeam(String teamName) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Team t = new Team();
+			t.setName(teamName);
+			t = synapseClient.createTeam(t);
+			return t.getId();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	public void deleteTeam(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteTeam(teamId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	
+	@Override
+	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//TODO
+//			PaginatedResults<TeamMember> members = synapseClient.getTeamMembers(teamId, fragment, limit, offset);
+
+			//////////////TEST
+			PaginatedResults<TeamMember> members = getTestTeamMembers(synapseClient);
+			//////////////
+			
+			return EntityFactory.createJSONStringForEntity(members);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(userId, limit, offset);
+
+			return EntityFactory.createJSONStringForEntity(teams);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			if (searchTerm != null && searchTerm.trim().length() ==0)
+				searchTerm = null;
+			if (offset == null)
+				offset = ZERO_OFFSET.intValue();
+			PaginatedResults<Team> teams = synapseClient.getTeams(searchTerm, limit, offset);
+			return EntityFactory.createJSONStringForEntity(teams);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+//			get all open membership requests for this user
+			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, currentUserId, MAX_LIMIT, ZERO_OFFSET);
+			//and delete each one
+//			for (MembershipRequest request : requests.getResults()) {
+//				synapseClient.deleteMembershipRequest(request.getId());
+//			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
+			membershipRequest.setMessage(message);
+			membershipRequest.setTeamId(teamId);
+			membershipRequest.setUserId(currentUserId);
+
+			//make new Synapse call
+			synapseClient.createMembershipRequest(membershipRequest);
+			//and also attempt to complete the handshake (but do not report failure, since invitation may not have been sent)
+			try {
+				//Bruce indicated that for this to take place on the service side would make the call less RESTful.
+				synapseClient.addTeamMember(teamId, currentUserId);
+			} catch (Throwable t) {
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			
+			MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
+			membershipInvite.setMessage(message);
+			membershipInvite.setTeamId(teamId);
+			List<String> userIds = new ArrayList<String>();
+			userIds.add(userGroupId);
+			membershipInvite.setInvitees(userIds);
+			
+			//make new Synapse call
+			synapseClient.createMembershipInvitation(membershipInvite);
+			//and also attempt to complete the handshake (but do not report failure, since invitation may not have been sent)
+			try {
+				synapseClient.addTeamMember(teamId, userGroupId);
+			} catch (Throwable t) {
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	
+	@Override
+	public TeamBundle getTeamBundle(String userId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			boolean isAdmin = false;
+			//TODO: fix to use TeamMember call when available
+//			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, Long.MAX_VALUE, 0);
+			//TODO: replace with a single web service call once it's available
+			Team team = synapseClient.getTeam(teamId);
+			//TODO TODO:  Bruce indicated that this "is member of team" question should be answered by the bundle request, and for now to iterate over all members
+			//also answer if the current user is an admin
+			
+			//////////////TEST
+			// admin for all teams
+			isAdmin = true;
+				
+			PaginatedResults<TeamMember> allMembers = getTestTeamMembers(synapseClient);
+			//////////////
+			
+			
+			boolean isMember = false;
+			if (userId != null) {
+				for (TeamMember ugh : allMembers.getResults()) {
+					if(userId.equals(ugh.getMember().getOwnerId())) {
+						isMember = true;
+						break;
+					}
+				}
+			}
+			TeamMembershipState state = TeamMembershipState.NONE;
+			if (isMember)
+				state = TeamMembershipState.MEMBER;
+			else if (userId != null) {
+				//if current user is not a member, find out if she requested to be a member, or if a Team admin extended an invitation
+				
+				PaginatedResults<MembershipRequest> openRequests = synapseClient.getOpenMembershipRequests(teamId, userId, 1, 0);
+				PaginatedResults<MembershipInvitation> openInvitations = synapseClient.getOpenMembershipInvitations(userId, teamId, 1, 0);
+
+				if (openRequests.getResults().size() > 0)
+					state = TeamMembershipState.OPEN_MEMBERSHIP_REQUEST;
+				else {
+					if (openInvitations.getResults().size() > 0)
+						state = TeamMembershipState.OPEN_INVITATION;	
+				}
+			}
+			
+			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
+			
+			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), state.name(), isAdmin);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, Integer.MAX_VALUE, 0);
+			//and ask for the team info for each invite, and fill that in the bundle
+			
+			List<MembershipRequestBundle> returnList = new ArrayList<MembershipRequestBundle>();
+			//now go through and create a MembershipRequestBundle for each pair
+			
+			for (MembershipRequest request : requests.getResults()) {
+				UserProfile profile = synapseClient.getUserProfile(request.getUserId());
+				
+				JSONObjectAdapter profileJson = profile.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter requestJson = request.writeToJSONObject(adapterFactory.createNew());
+				MembershipRequestBundle b = new MembershipRequestBundle(profileJson.toJSONString(), requestJson.toJSONString());
+				returnList.add(b);
+			}
+			
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(userId,null, Integer.MAX_VALUE, 0);
+			//and ask for the team info for each invite, and fill that in the bundle
+			
+			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
+			//now go through and create a MembershipInvitationBundle for each pair
+			
+			for (MembershipInvitation invite : invitations.getResults()) {
+				Team team = synapseClient.getTeam(invite.getTeamId());
+				JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), inviteJson.toJSONString());
+				returnList.add(b);
+			}
+			
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		//TODO: fix once services isAdmin is available
+//		try {
+//			synapseClient.setIsTeamAdmin(currentUserId, targetUserId, teamId, isTeamAdmin);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+	}
+	
+	@Override
+	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.removeTeamMember(teamId, targetUserId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String updateTeam(String teamJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			Team team = jsonEntityFactory.createEntity(teamJson, Team.class);
+			Team updatedTeam = synapseClient.updateTeam(team);
+			JSONObjectAdapter updatedTeamJson = updatedTeam.writeToJSONObject(adapterFactory.createNew());
+			return updatedTeamJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
 	@Override
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1447,7 +1849,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);

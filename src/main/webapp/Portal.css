@@ -548,6 +548,15 @@ a.shortBtn {
 .margin-top-5 {
 	margin-top: 5px !important;
 }
+
+.margin-top-10-imp {
+	margin-top: 10px !important;
+}
+
+.margin-top-0 {
+	margin-top: 0px !important;
+}
+
 .margin-top-10 {
 	margin-top: 10px;
 }
@@ -573,6 +582,10 @@ a.shortBtn {
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
+.margin-bottom-5 {
+	margin-bottom: 5px;
+}
+
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
@@ -1133,6 +1146,11 @@ ol.lowerroman {
     padding: 18px;
 }
 
+.highlight-line-min {
+    padding: 5px;
+}
+
+
 .fixedWidthFont {
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
@@ -1179,6 +1197,11 @@ ol.lowerroman {
 
 .vertical-align-middle {
 	vertical-align: middle;
+}
+
+.member-search-button {
+	font-size: 12px !important;
+	width: 120px;
 }
 
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
@@ -1281,6 +1304,34 @@ a.projectTitle:hover {
 .entity-tab {
 	width: 140px;
 	font-size: 16px;	
+}
+
+.padding-right-5 {
+	padding-right: 5px;
+}
+.padding-left-5 {
+	padding-left: 5px;
+}
+.padding-left-10 {
+	padding-left: 10px;
+}
+
+.padding-left-74 {
+	padding-left:74px;
+}
+
+.updateTeamIconLink {
+	padding: 0px 0px 10px 0px;
+	font-size: 12px;
+}
+
+.dropText-10 {
+	position: relative;
+	top: 10px;
+}
+
+.width-150 {
+	width: 150px;
 }
 
 /*==================================*/

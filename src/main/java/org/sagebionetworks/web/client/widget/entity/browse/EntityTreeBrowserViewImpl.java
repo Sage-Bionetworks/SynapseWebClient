@@ -46,7 +46,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
-	private static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
+	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;

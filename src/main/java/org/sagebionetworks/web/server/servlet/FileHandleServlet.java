@@ -123,6 +123,8 @@ public class FileHandleServlet extends HttpServlet {
 		if (proxy != null)
 			isProxy = Boolean.parseBoolean(proxy);
 		
+		String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
+		
 		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
 		
@@ -158,6 +160,12 @@ public class FileHandleServlet extends HttpServlet {
 					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
 				else
 					resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			}
+		} else if (teamId != null) {
+			try {
+				resolvedUrl = client.getTeamIcon(teamId, false);
+			} catch (SynapseException e) {
+				throw new ServletException(e);
 			}
 		}
 		

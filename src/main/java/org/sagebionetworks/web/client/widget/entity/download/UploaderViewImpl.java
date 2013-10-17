@@ -61,6 +61,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
+	private boolean isEntity;
 	private Radio fileUploadOpenRadio;
 	private Radio fileUploadRestrictedRadio;
 	private Radio linkExternalOpenRadio;
@@ -131,28 +132,33 @@ public class UploaderViewImpl extends LayoutContainer implements
 	public void clear() {
 		uploadBtn.setEnabled(false);
 		fileUploadField.clear();
-		pathField.clear();
-		nameField.clear();
-		radioButtonPanel.clear();
+		if (pathField != null)
+			pathField.clear();
+		if (nameField != null)
+			nameField.clear();
+		if (radioButtonPanel != null)
+			radioButtonPanel.clear();
 	}
 	
 	@Override
-	public void createUploadForm(boolean isExternalSupported) {
+	public void createUploadForm(boolean isEntity) {
+		this.isEntity = isEntity;
 		initializeControls();
-		if(container == null) {
-			createUploadContents(isExternalSupported);
+		if(container == null) { 
+			createUploadContents();
 		}
-
+	
 		// reset
-		pathField.clear();
-		nameField.clear();
-
+		if (pathField != null)
+			pathField.clear();
+		if (nameField != null)
+			nameField.clear();
 	}
 
 	
 	@Override
 	public int getDisplayHeight() {
-		return 455;
+		return isEntity ? 455 : 200;
 	}
 
 	@Override
@@ -190,8 +196,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 	/*
 	 * Private Methods
 	 */	
-	private void createUploadContents(boolean isExternalSupported) {
-		this.container = new LayoutContainer();
+	private void createUploadContents() {
+		this.removeAll();
+		if (container == null)
+			this.container = new LayoutContainer();
+		else
+			container.removeAll();
+		
 		this.setLayout(new FitLayout());
 		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
@@ -199,54 +210,57 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.add(container);
 				
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
-		
-		TabPanel tabPanel = new TabPanel();		
-		tabPanel.setPlain(true);
-		tabPanel.setHeight(100);		
-		container.add(tabPanel, new MarginData(0, 10, 10, 10));
-		TabItem tab;
-		
-		// Upload File
-		tab = new TabItem(DisplayConstants.UPLOAD_FILE);
-		tab.addStyleName("pad-text");
-		tab.add(formPanel);
-		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-            public void handleEvent( TabPanelEvent be ) {
-            	configureUploadButton();
-            }
-        
-        });
-		tabPanel.add(tab);
+		if (isEntity) {
+			TabPanel tabPanel = new TabPanel();
+			tabPanel.setPlain(true);
+			tabPanel.setHeight(100);		
+			TabItem tab;
+			
+			// Upload File
+			tab = new TabItem(DisplayConstants.UPLOAD_FILE);
+			tab.addStyleName("pad-text");
+			formPanel.removeFromParent();
+			tab.add(formPanel);
+			
+			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+	            public void handleEvent( TabPanelEvent be ) {
+	            	configureUploadButton();
+	            }
+	        });
+			tabPanel.add(tab);
+	
+			// External URL
+			tab = new TabItem(DisplayConstants.LINK_TO_URL);
+			tab.addStyleName("pad-text");		
+			tab.add(createExternalPanel());		
+			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+	            public void handleEvent( TabPanelEvent be ) {
+	            	configureUploadButtonForExternal();
+	            }
+	        
+	        });
+			tabPanel.add(tab);
+			tabPanel.recalculate();
+			container.add(tabPanel, new MarginData(0, 10, 10, 10));
+		} else {
+			formPanel.removeFromParent();
+			container.add(formPanel);
+			configureUploadButton();
+		}
 
-		// External URL
-		tab = new TabItem(DisplayConstants.LINK_TO_URL);
-		if (!isExternalSupported)
-			tab.setEnabled(false);
-		tab.addStyleName("pad-text");		
-		tab.add(createExternalPanel());		
-		tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-            public void handleEvent( TabPanelEvent be ) {
-            	configureUploadButtonForExternal();
-            }
-        
-        });
-		tabPanel.add(tab);
-		
-		
-		
-		tabPanel.recalculate();
-
-		// Data Use message 
-		
-		container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
-		container.add(new HTML("<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
-				+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
-				+ DisplayUtils.getShareSettingsDisplay(true, synapseJSNIUtils) 				
-				+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
-				+"</div>"), new MarginData(0, 10, 0, 10));		
-		container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));
-		
-		addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
+		if (isEntity) {
+			// Data Use message 
+			
+			container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
+			container.add(new HTML("<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
+					+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
+					+ DisplayUtils.getShareSettingsDisplay(true, synapseJSNIUtils) 				
+					+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
+					+"</div>"), new MarginData(0, 10, 0, 10));		
+			container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));
+			
+			addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
+		}
 		
 		ButtonBar bar = new ButtonBar();
 		bar.setAlignment(HorizontalAlignment.RIGHT);
@@ -264,8 +278,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 			bar.add(cancelButton);
 		}
 		container.add(bar);
-		
 		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
+		formPanel.layout(true);
 		container.layout(true);
 		this.layout(true);
 	}
@@ -480,7 +494,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setHeight(PANEL_HEIGHT);
 		formPanel.setBorders(false);
 		formPanel.setAutoWidth(true);
-		formPanel.setFieldWidth(PANEL_WIDTH);
+		formPanel.setFieldWidth(PANEL_WIDTH-100);
 
 		fileUploadField.setWidth(PANEL_WIDTH-100);
 		fileUploadField.setAllowBlank(false);
@@ -497,10 +511,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				uploadBtn.setEnabled(true);
 			}
 		});
-		MultiField fileUploadMF = new MultiField();
-		fileUploadMF.add(fileUploadField);
-		fileUploadMF.setFieldLabel("File");
-		formPanel.add(fileUploadMF);
+		formPanel.add(fileUploadField);
 		formPanel.layout(true);		
 		
 		configureUploadButton(); // upload tab first by default
@@ -550,7 +561,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if (!formPanel.isValid()) {
 					return;
 				}
-				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
+				if(isEntity && restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}
@@ -571,7 +582,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					return;
 				}
 
-				if(restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
+				if(isEntity && restrictedModeChosen() == RADIO_SELECTED.NO_RADIO_SELECTED) {
 					showErrorMessage(DisplayConstants.SELECT_DATA_USE);
 					return;
 				}

@@ -173,7 +173,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void updateProfileView(String userId, final boolean editable) {
-		
+		view.clear();
 		final boolean isOwner = userId == null;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override

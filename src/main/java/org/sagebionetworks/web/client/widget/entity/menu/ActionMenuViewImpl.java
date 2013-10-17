@@ -282,12 +282,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 				@Override
 				public void onClick(ClickEvent event) {
 					window.removeAll();
-					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.setPlain(true);
 					window.setModal(true);		
 					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 					window.setLayout(new FitLayout());			
 					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 					window.show();
 				}
 			});

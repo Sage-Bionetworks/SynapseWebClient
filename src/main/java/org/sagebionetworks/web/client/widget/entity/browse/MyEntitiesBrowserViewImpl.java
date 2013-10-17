@@ -64,7 +64,7 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		myTab.setScrollMode(Scroll.AUTO);	
 		panel.add(myTab);
 			
-		TabItem favoritesTab = new TabItem(DisplayConstants.FAVORITES);
+		TabItem favoritesTab = new TabItem(DisplayConstants.MY_FAVORITES);
 		favoritesTab.add(favoritesTreeBrowser.asWidget());
 		favoritesTab.setScrollMode(Scroll.AUTO);
 		favoritesTab.setIcon(AbstractImagePrototype.create(iconsImageBundle.star16()));
