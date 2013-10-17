@@ -188,7 +188,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		
 		// upload
 		if(canEdit) {
-			addEditItem(toolsButton);
+			addRenameItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
@@ -241,8 +241,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		menuBtn.addMenuItem(a);
 	}
 	
-	private void addEditItem(DropdownButton menuBtn) {
-		Anchor a = new Anchor(DisplayConstants.BUTTON_EDIT);
+	private void addRenameItem(DropdownButton menuBtn) {
+		Anchor a = new Anchor(DisplayConstants.LABEL_RENAME);
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

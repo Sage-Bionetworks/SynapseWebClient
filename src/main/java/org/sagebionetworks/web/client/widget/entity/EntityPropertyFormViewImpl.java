@@ -201,7 +201,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
 		
-		rebuild();
+		rebuild(); 
 	}
 	
 	@Override
