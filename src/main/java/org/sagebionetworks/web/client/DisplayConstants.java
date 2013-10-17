@@ -469,7 +469,7 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
-	public static final String RESTRICTION_WARNING = "By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.";
+	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'Create' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
 	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";

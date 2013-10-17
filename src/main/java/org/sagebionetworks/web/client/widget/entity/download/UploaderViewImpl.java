@@ -412,6 +412,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				createRestrictionLabel(RESTRICTION_LEVEL.RESTRICTED, iconsImageBundle),
 				createRestrictionLabel(RESTRICTION_LEVEL.CONTROLLED, iconsImageBundle)}));
 
+		
 		layoutContainer.add(radioButtonPanel, MARGIN);
 	}
 	
