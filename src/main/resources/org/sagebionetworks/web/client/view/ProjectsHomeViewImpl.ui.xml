@@ -45,7 +45,7 @@
 								code, etc) into a hierarchy like a file system.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Organize.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Organize.png"
 								alt=" " />
 						</div>
 					</div>
@@ -60,7 +60,7 @@
 								system.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_StoreData.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_StoreData.png"
 								alt=" " />
 						</div>
 					</div>
@@ -79,7 +79,7 @@
 								and everything in between.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Acl.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Acl.png"
 								alt=" " />
 						</div>
 					</div>
@@ -92,7 +92,7 @@
 								searchable and available to those granted access to see.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Annotations.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Annotations.png"
 								alt=" " />
 						</div>
 					</div>
@@ -111,7 +111,7 @@
 								clients for R and Java.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_R.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_R.png"
 								alt=" " />
 						</div>
 					</div>
@@ -124,7 +124,7 @@
 								programmatically.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Attachments.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Attachments.png"
 								alt=" " />
 						</div>
 					</div>
@@ -144,7 +144,7 @@
 								data.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Describe.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Describe.png"
 								alt=" " />
 						</div>
 					</div>
@@ -159,7 +159,7 @@
 								They are displayed automatically.</p>
 						</div>
 						<div class="col-md-6 col-md-pull-6">
-							<img class="img-preview spec-border" src="images/ProjectOverView_Links.png"
+							<img class="img-preview spec-border img-responsive" src="images/ProjectOverView_Links.png"
 								alt=" " />
 						</div>
 					</div>
