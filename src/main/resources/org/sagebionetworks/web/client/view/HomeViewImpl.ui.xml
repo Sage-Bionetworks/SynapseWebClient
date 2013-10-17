@@ -72,7 +72,7 @@
 				<g:HTMLPanel ui:field="getStartedContainer">
 					<div class="col-md-4 ">
 						<h3>Get Started</h3>
-						Synapse is free to use as a Beta service.<br/><br/> 
+						Synapse is free to use as a service.<br/><br/> 
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
