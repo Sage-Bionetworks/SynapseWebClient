@@ -223,7 +223,7 @@ public interface SynapseClient extends RemoteService {
 	public void deleteTeam(String teamId) throws RestServiceException;
 	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
 	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
-	public TeamBundle getTeamBundle(String userId, String teamId) throws RestServiceException;
+	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;

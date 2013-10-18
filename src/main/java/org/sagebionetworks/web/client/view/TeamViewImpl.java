@@ -173,34 +173,35 @@ public class TeamViewImpl extends Composite implements TeamView {
 			addDeleteItem(toolsButton);
 			commandsContainer.add(toolsButton);
 		}
-		
-		if (!teamMembershipStatus.getIsMember()) {
-			//not a member, add Join widget
-			joinTeamWidget.configure(team.getId(), teamMembershipStatus, getRefreshCallback(team.getId()));
-			Widget joinTeamView = joinTeamWidget.asWidget();
-			joinTeamView.addStyleName("margin-top-15");	
-			mainContainer.add(joinTeamView);
-		}
-		else {
-			//add Leave Team button
-			leaveButton = DisplayUtils.createButton(DisplayConstants.BUTTON_LEAVE);
-			leaveButton.addStyleName("pull-right margin-left-5");
-			leaveButton.addClickHandler(new ClickHandler() {			
-				@Override
-				public void onClick(ClickEvent event) {
-					MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
-						@Override
-						public void handleEvent(MessageBoxEvent be) { 					
-							com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-							if(Dialog.YES.equals(btn.getItemId())) {
-								presenter.leaveTeam();
+		if (teamMembershipStatus != null) {
+			if (!teamMembershipStatus.getIsMember()) {
+				//not a member, add Join widget
+				joinTeamWidget.configure(team.getId(), teamMembershipStatus, getRefreshCallback(team.getId()));
+				Widget joinTeamView = joinTeamWidget.asWidget();
+				joinTeamView.addStyleName("margin-top-15");	
+				mainContainer.add(joinTeamView);
+			}
+			else {
+				//add Leave Team button
+				leaveButton = DisplayUtils.createButton(DisplayConstants.BUTTON_LEAVE);
+				leaveButton.addStyleName("pull-right margin-left-5");
+				leaveButton.addClickHandler(new ClickHandler() {			
+					@Override
+					public void onClick(ClickEvent event) {
+						MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
+							@Override
+							public void handleEvent(MessageBoxEvent be) { 					
+								com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
+								if(Dialog.YES.equals(btn.getItemId())) {
+									presenter.leaveTeam();
+								}
 							}
-						}
-					});
-
-				}
-			});
-			commandsContainer.add(leaveButton);
+						});
+	
+					}
+				});
+				commandsContainer.add(leaveButton);
+			}
 		}
 		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));
 		Widget memberListView = memberListWidget.asWidget();

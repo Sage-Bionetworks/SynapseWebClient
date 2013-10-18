@@ -85,12 +85,15 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	
 	@Override
 	public void refresh(final String teamId) {
-		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<TeamBundle>() {
+		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
 				try {
 					team = nodeModelCreator.createJSONEntity(result.getTeamJson(), Team.class);
-					teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
+					if (result.getTeamMembershipStatusJson() != null)
+						teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
+					else
+						teamMembershipStatus = null; 
 					boolean isAdmin = result.isUserAdmin();
 					view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
 				} catch (JSONObjectAdapterException e) {

@@ -147,7 +147,7 @@ public interface SynapseClientAsync {
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeams(String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset, AsyncCallback<String> callback);
-	void getTeamBundle(String userId, String teamId, AsyncCallback<TeamBundle> callback);
+	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
 	void getOpenInvitations(String userId, AsyncCallback<List<MembershipInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(String teamJson, AsyncCallback<String> callback);

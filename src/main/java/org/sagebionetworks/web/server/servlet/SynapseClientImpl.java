@@ -1426,29 +1426,31 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	
 	@Override
-	public TeamBundle getTeamBundle(String userId, String teamId) throws RestServiceException {
+	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isAdmin = false;
 			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, MAX_LIMIT, ZERO_OFFSET);
 			Team team = synapseClient.getTeam(teamId);
+			String membershipStatusJsonString = null;
 			//get membership state for the current user
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,userId);
-			
-			//find the current user in the member list
-			for (Iterator iterator = allMembers.getResults().iterator(); iterator.hasNext();) {
-				TeamMember member = (TeamMember) iterator.next();
-				if (userId.equals(member.getMember().getOwnerId())){
-					//found it
-					isAdmin = member.getIsAdmin();
-					break;
+			if (isLoggedIn){
+				TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,userId);
+				JSONObjectAdapter membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew());
+				membershipStatusJsonString = membershipStatusJson.toJSONString();
+				//find the current user in the member list
+				for (Iterator iterator = allMembers.getResults().iterator(); iterator.hasNext();) {
+					TeamMember member = (TeamMember) iterator.next();
+					if (userId.equals(member.getMember().getOwnerId())){
+						//found it
+						isAdmin = member.getIsAdmin();
+						break;
+					}
 				}
 			}
 			
 			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
-			JSONObjectAdapter membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew());
-			
-			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), membershipStatusJson.toJSONString(), isAdmin);
+			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), membershipStatusJsonString, isAdmin);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
