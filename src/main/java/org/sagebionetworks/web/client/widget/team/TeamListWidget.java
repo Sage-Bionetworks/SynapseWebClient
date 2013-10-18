@@ -1,16 +1,15 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,21 +21,20 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	private TeamListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	
+	private AdapterFactory adapterFactory;
 	@Inject
 	public TeamListWidget(TeamListWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController,
-			NodeModelCreator nodeModelCreator) {
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
+		this.adapterFactory = adapterFactory;
 	}
 	
 	@Override
@@ -65,12 +63,15 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	}
 	
 	private void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
-		synapseClient.getTeams(userId, Integer.MAX_VALUE, 0, new AsyncCallback<String>() {
+		synapseClient.getTeamsForUser(userId, new AsyncCallback<ArrayList<String>>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(ArrayList<String> results) {
 				try {
-					PaginatedResults<Team> teams = nodeModelCreator.createPaginatedResults(result, Team.class);
-					callback.onSuccess(teams.getResults());
+					List<Team> teams = new ArrayList<Team>();
+					for (String teamString : results) {
+						teams.add(new Team(adapterFactory.createNew(teamString)));
+					}
+					callback.onSuccess(teams);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

@@ -1334,6 +1334,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public ArrayList<String> getTeamsForUser(String userId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(userId, MAX_LIMIT, ZERO_OFFSET);
+			List<Team> teamList = teams.getResults();
+			ArrayList<String> teamListStrings = new ArrayList<String>();
+			for (Team t : teamList) {
+				teamListStrings.add(EntityFactory.createJSONStringForEntity(t));
+			}
+			return teamListStrings;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
 	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1430,6 +1448,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isAdmin = false;
+			//TODO: once PLFM-2248 is resolved (to figure out isAdmin), set the limit to 1 (to determine the total member count)
+//			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
 			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, MAX_LIMIT, ZERO_OFFSET);
 			Team team = synapseClient.getTeam(teamId);
 			String membershipStatusJsonString = null;
