@@ -199,7 +199,7 @@ public class DisplayConstants {
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
-	public static final String BUTTON_LEAVE = "Leave";
+	public static final String BUTTON_LEAVE_TEAM = "Leave Team";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
 	public static final String LABEL_RENAME = "Rename";
