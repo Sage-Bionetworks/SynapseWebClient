@@ -16,10 +16,10 @@ import com.extjs.gxt.ui.client.widget.form.ListModelPropertyEditor;
 
 public class TeamSearchBox {
 	
-	public static final String TEAM_URL = "/team";
+	public static final String TEAM_URL = "/teams";
 
 	public static final String KEY_QUERY = "query";
-	public static final String KEY_PREFIX = "fragment";
+	public static final String KEY_FRAGMENT = "fragment";
 	public static final String KEY_OFFSET = "offset";
 	public static final String KEY_START = "start";
 	public static final String KEY_LIMIT = "limit";
@@ -27,8 +27,7 @@ public class TeamSearchBox {
 	// This is the value to get and set.
 	public static final String KEY_DISPLAY_NAME = "name";
 	public static final String KEY_TOTAL_NUMBER_OF_RESULTS = "totalNumberOfResults";
-	public static final String KEY_CHILDREN = "children";
-	public static final String KEY_TEAM_PICTURE = "icon";
+	public static final String KEY_RESULTS = "results";
 	public static final String KEY_TEAM_ID = "id";
 	
 	/**
@@ -44,10 +43,9 @@ public class TeamSearchBox {
 		
 		// Maps the model to our Team JSON format.
 		ModelType type = new ModelType();
-		type.setRoot(KEY_CHILDREN);
+		type.setRoot(KEY_RESULTS);
 		type.setTotalName(KEY_TOTAL_NUMBER_OF_RESULTS);
 		type.addField(KEY_DISPLAY_NAME, KEY_DISPLAY_NAME);
-		type.addField(KEY_TEAM_PICTURE, KEY_TEAM_PICTURE);
 		type.addField(KEY_TEAM_ID, KEY_TEAM_ID);
 		
 		// The paginated reader
@@ -62,9 +60,9 @@ public class TeamSearchBox {
 		loader.addListener(Loader.BeforeLoad, new Listener<LoadEvent>() {
 			@Override
 			public void handleEvent(LoadEvent be) {
-				be.<ModelData> getConfig().set(KEY_START,	be.<ModelData> getConfig().get(KEY_OFFSET));
+				be.<ModelData> getConfig().set(KEY_OFFSET,	be.<ModelData> getConfig().get(KEY_OFFSET));
 				be.<ModelData> getConfig().set(KEY_LIMIT,	be.<ModelData> getConfig().get(KEY_LIMIT));
-				be.<ModelData> getConfig().set(KEY_PREFIX,	be.<ModelData> getConfig().get(KEY_QUERY));
+				be.<ModelData> getConfig().set(KEY_FRAGMENT,	be.<ModelData> getConfig().get(KEY_QUERY));
 			}
 		});
 		

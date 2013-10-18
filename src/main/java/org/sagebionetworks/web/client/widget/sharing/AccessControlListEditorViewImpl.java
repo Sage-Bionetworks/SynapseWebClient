@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -85,6 +86,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private CookieProvider cookies;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
@@ -95,11 +97,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private SimpleComboBox<String> sourceCombo;
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookies = cookies;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -238,7 +241,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			sourceCombo.add(SOURCE_TEAMS);
 			sourceCombo.setSimpleValue(SOURCE_USERS);
 			
-			fieldSet.add(sourceCombo);
+			if (DisplayUtils.isInTestWebsite(cookies))
+				fieldSet.add(sourceCombo);
 			
 			// user/group combobox
 			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
@@ -531,7 +535,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				} else if (!principal.getIsIndividual()) {
 					//if a group, then try to fill in the icon from the team
 					String url = DisplayUtils.createTeamIconUrl(
-							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
+							synapseJSNIUtils.getBaseFileHandleUrl(), 
 							principal.getOwnerId()
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
