@@ -32,5 +32,6 @@
 			<div class="clear"></div>
 		
 		<g:SimplePanel ui:field="footer" />
+		</div>
 	</g:HTMLPanel>
 </ui:UiBinder> 
