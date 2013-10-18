@@ -20,6 +20,8 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -131,6 +133,16 @@ public class BulkPresenterProxy extends AbstractActivity {
 				} else if(place instanceof Down) {
 					DownPresenter presenter = ginjector.getDownPresenter();
 					presenter.setPlace((Down) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Team) {
+					// Team page
+					TeamPresenter presenter = ginjector.getTeamPresenter();
+					presenter.setPlace((Team)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof TeamSearch) {
+					// Team Search page
+					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
+					presenter.setPlace((TeamSearch)place);
 					presenter.start(panel, eventBus);
 				} else {
 					// Log that we have an unknown place but send the user to the default

@@ -8,11 +8,15 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -53,6 +57,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel viewProfilePanel;
 	@UiField
+	SimplePanel myTeamsPanel;
+	@UiField
+	SimplePanel myTeamInvitesPanel;
+
+	@UiField
 	SimplePanel editProfileButtonPanel;
 	@UiField
 	SimplePanel breadcrumbsPanel;
@@ -82,12 +91,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private HandlerRegistration editPhotoHandler = null;
 
 	private Footer footerWidget;
+	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private OpenTeamInvitationsWidget openInvitesWidget;
+	private TeamListWidget myTeamsWidget;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb, SynapseJSNIUtils synapseJSNIUtils) {		
+			Header headerWidget, 
+			Footer footerWidget, 
+			IconsImageBundle icons,
+			SageImageBundle imageBundle, 
+			SageImageBundle sageImageBundle,
+			Breadcrumb breadcrumb, 
+			SynapseJSNIUtils synapseJSNIUtils, 
+			OpenTeamInvitationsWidget openInvitesWidget, 
+			TeamListWidget myTeamsWidget,
+			CookieProvider cookies) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
@@ -96,6 +116,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.breadcrumb = breadcrumb;
+		this.openInvitesWidget = openInvitesWidget;
+		this.myTeamsWidget = myTeamsWidget;
+		this.cookies = cookies;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -140,7 +163,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
 		//when editable, show profile form and linkedin import ui
-		clear();
 		if (isEditing)
 		{
 			updateUserInfoPanel.add(profileFormWidget);
@@ -149,6 +171,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
+			if (DisplayUtils.isInTestWebsite(cookies)) {
+				myTeamsWidget.configure(profile.getOwnerId(), false);
+				myTeamsPanel.add(myTeamsWidget.asWidget());
+				myTeamsPanel.setVisible(true);
+			}
+
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
 			updateViewProfile(profile);
 			viewProfilePanel.add(profileWidget);
@@ -156,6 +184,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				editPhotoButtonContainer.add(editPhotoLink);
 				editPhotoButtonContainer.layout();
 				editProfileButtonPanel.add(editProfileCommandPanel);
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					openInvitesWidget.configure(new Callback() {
+						@Override
+						public void invoke() {
+							//refresh the view after accepting/ignoring
+							presenter.redirectToViewProfile();
+						}
+					});
+					
+					myTeamInvitesPanel.add(openInvitesWidget.asWidget());
+				}
 			}
 				
 		}
@@ -353,6 +392,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		editProfileButtonPanel.clear();
+		myTeamInvitesPanel.clear();
+		myTeamsPanel.clear();
+		myTeamsPanel.setVisible(false);
 		editPhotoButtonContainer.removeAll();
 		profilePictureContainer.removeAll();
 		pictureCanvasContainer.setVisible(false);

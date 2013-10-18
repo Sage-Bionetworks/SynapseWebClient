@@ -24,6 +24,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
@@ -46,6 +47,7 @@ public class HomePresenterTest {
 	HomeView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
+	PlaceChanger mockPlaceChanger;
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
 	SearchServiceAsync mockSearchService; 
@@ -55,13 +57,14 @@ public class HomePresenterTest {
 
 	List<EntityHeader> testEvaluationResults;
 	RSSFeed testFeed = null;
-	
+	String testTeamId = "42";
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
 		cookieProvider = mock(CookieProvider.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
 		mockRssService = mock(RssServiceAsync.class);
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -80,7 +83,9 @@ public class HomePresenterTest {
 			testBatchResultsList.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
 		}
 		
+		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
+		
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
 		entry.setTitle("A Title");
@@ -91,7 +96,8 @@ public class HomePresenterTest {
 		testFeed.setEntries(entries);
 		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
-		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
@@ -106,6 +112,7 @@ public class HomePresenterTest {
 	public void testSetPlace() {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
+		verify(mockView).refreshMyTeams(anyString());
 	}
 	
 	@Test
@@ -135,4 +142,19 @@ public class HomePresenterTest {
 		verify(mockCallback).onFailure(simulatedException);
 	}
 
+	@Test
+	public void testCreateTeam() {
+		//happy case
+		homePresenter.createTeam("New Team");
+		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testCreateTeamFailure() throws RestServiceException {
+		Exception simulatedException = new Exception("Simulated Error");
+		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		homePresenter.createTeam("New Team");
+		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
 }

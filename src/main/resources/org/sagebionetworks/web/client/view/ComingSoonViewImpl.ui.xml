@@ -30,7 +30,8 @@
 			<g:FlexTable ui:field="flextTable1"></g:FlexTable>
 			This page is coming soon.
 			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+		
 		<g:SimplePanel ui:field="footer" />
+		</div>
 	</g:HTMLPanel>
 </ui:UiBinder> 

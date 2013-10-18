@@ -145,7 +145,9 @@ public class WebConstants {
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 
 	public static final String ENTITY_PARAM_KEY = "entityId";
-
+	
+	public static final String TEAM_PARAM_KEY = "teamId";
+	
 	public static final String ENTITY_VERSION_PARAM_KEY = "version";
 
 	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";

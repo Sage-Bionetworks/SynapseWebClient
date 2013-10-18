@@ -103,7 +103,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
-	private FlexTable horizontalTable;
 	private TextBox searchField;
 	private Button searchButton;
 	private ContentPanel loadingPanel;
@@ -389,10 +388,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 		// add to table and page
 		container = new SimplePanel(searchField);
-		container.addStyleName("col-md-9");
+		container.addStyleName("col-md-9 padding-right-5");
 		horizontalTable.add(container);
 		container = new SimplePanel(searchButton);
-		container.addStyleName("col-md-3");
+		container.addStyleName("col-md-3 padding-left-5");
 		horizontalTable.add(container);
 		searchBoxPanel.clear();
 		searchBoxPanel.add(horizontalTable);

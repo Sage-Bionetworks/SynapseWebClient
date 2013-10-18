@@ -154,7 +154,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return authenticationController.isLoggedIn();
 	}
 	
-	private void loadProjectsAndFavorites() {
+	public void loadProjectsAndFavorites() {
 		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
@@ -166,7 +166,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 		
-		
+		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
 		
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
@@ -240,4 +240,21 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
+	@Override
+	public void createTeam(final String teamName) {
+		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newTeamId) {
+				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
+			}
+		});
+	}
 }

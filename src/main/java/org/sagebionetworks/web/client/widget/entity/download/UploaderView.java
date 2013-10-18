@@ -12,7 +12,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean isExternalSupported);
+	public void createUploadForm(boolean isEntity);
 	
 	public int getDisplayHeight();
 

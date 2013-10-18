@@ -8,11 +8,13 @@ import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -217,6 +219,21 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getFavorites(Integer limit, Integer offset) throws RestServiceException;
 	
+	public String createTeam(String teamName) throws RestServiceException;
+	public void deleteTeam(String teamId) throws RestServiceException;
+	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
+	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
+	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
+	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
+	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
+	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
+	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
+	public String updateTeam(String teamJson) throws RestServiceException;
+	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
+	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
+	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
+	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
+	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	
 	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
@@ -229,7 +246,7 @@ public interface SynapseClient extends RemoteService {
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
 	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
 	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
-	public String completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
 	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;

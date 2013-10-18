@@ -767,7 +767,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
-		synapseClient.completeUpload(null, null, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
@@ -785,7 +785,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = false;
-		synapseClient.completeUpload(null, entityId, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId", isRestricted);
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());

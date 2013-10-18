@@ -183,12 +183,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			public void onClick(ClickEvent event) {
 				//let the uploader create the FileEntity
 				window.removeAll();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 				window.setLayout(new FitLayout());
 				window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.show();
 			}
 		});

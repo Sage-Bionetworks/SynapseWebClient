@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -262,7 +263,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		});
 	}
-
+	
 	@Override
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
