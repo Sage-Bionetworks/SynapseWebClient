@@ -56,7 +56,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	FlowPanel commandsContainer;
 	private Team team;
 	private DropdownButton toolsButton;
-	private Button leaveButton;
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private MemberListWidget memberListWidget;
@@ -149,7 +148,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, 2);
 		mediaObjectContainer.add(mediaObjectPanel);
 		mainContainer.add(new HTML("<div><span class=\"padding-left-74 boldText margin-right-5\">Total members: </span><span>"+totalMemberCount+"</span></div>"));
-		
+		//initialize the tools menu button
+		toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
+		toolsButton.addStyleName("pull-right margin-left-5");
+				
 		if (isAdmin) {
 			CallbackP<String> fileHandleIdCallback = new CallbackP<String>(){
 				@Override
@@ -167,12 +169,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
 			
 			//fill in the tools menu button
-			toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
-			toolsButton.addStyleName("pull-right margin-left-5");
 			addEditItem(toolsButton);
 			addDeleteItem(toolsButton);
-			commandsContainer.add(toolsButton);
 		}
+		
 		if (teamMembershipStatus != null) {
 			if (!teamMembershipStatus.getIsMember()) {
 				//not a member, add Join widget
@@ -182,25 +182,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 				mainContainer.add(joinTeamView);
 			}
 			else {
-				//add Leave Team button
-				leaveButton = DisplayUtils.createButton(DisplayConstants.BUTTON_LEAVE);
-				leaveButton.addStyleName("pull-right margin-left-5");
-				leaveButton.addClickHandler(new ClickHandler() {			
-					@Override
-					public void onClick(ClickEvent event) {
-						MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 					
-								com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.leaveTeam();
-								}
-							}
-						});
-	
-					}
-				});
-				commandsContainer.add(leaveButton);
+				//add Leave Team menu item, and show tools menu
+				addLeaveItem(toolsButton);
+				commandsContainer.add(toolsButton);
 			}
 		}
 		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));
@@ -264,6 +248,25 @@ public class TeamViewImpl extends Composite implements TeamView {
 		menuBtn.addMenuItem(a);
 	}
 
+	private void addLeaveItem(DropdownButton menuBtn) {
+		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_LEAVE_TEAM));
+		a.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
+					@Override
+					public void handleEvent(MessageBoxEvent be) { 					
+						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
+						if(Dialog.YES.equals(btn.getItemId())) {
+							presenter.leaveTeam();
+						}
+					}
+				});
+			}
+		});
+		menuBtn.addMenuItem(a);
+	}
+	
 	private void addDeleteItem(DropdownButton menuBtn) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-remove") + " "
 				+ DisplayConstants.LABEL_DELETE + " Team"));

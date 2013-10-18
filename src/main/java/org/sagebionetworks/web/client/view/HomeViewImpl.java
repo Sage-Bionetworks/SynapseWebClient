@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
@@ -37,6 +39,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -364,7 +367,23 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer getTeamsContainer() {
 		LayoutContainer myTeamsContainer = new LayoutContainer();
 		myTeamsContainer.addStyleName("margin-top-15");
-		myTeamsContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"row\"><h3 class=\"col-md-6\">" + DisplayConstants.MY_TEAMS + "</h3>"+"<div class=\"col-md-6\"><a class=\"dropText-10 right link\" href=\""+DisplayUtils.getTeamSearchHistoryToken("")+"\">Search for Team</a></div></div>")));
+		Button searchButton = DisplayUtils.createIconButton("Search for Teams", ButtonType.DEFAULT, "glyphicon-search");
+		searchButton.addStyleName("right btn-xs");
+		searchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new TeamSearch(""));
+			}
+		});
+		LayoutContainer headerRow = DisplayUtils.createRowContainer();
+		HTML myTeamsHeader = new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_TEAMS + "</h3>"));
+		myTeamsHeader.addStyleName("col-md-6");
+		headerRow.add(myTeamsHeader);
+		FlowPanel wrapButton = new FlowPanel();
+		wrapButton.addStyleName("col-md-6");
+		wrapButton.add(searchButton);
+		headerRow.add(wrapButton);
+		myTeamsContainer.add(headerRow);
 		Widget teamListWidget = teamsListWidget.asWidget();
 		teamListWidget.addStyleName("margin-top-0 padding-left-10 highlight-box highlight-line-min");
 		myTeamsContainer.add(teamListWidget);
