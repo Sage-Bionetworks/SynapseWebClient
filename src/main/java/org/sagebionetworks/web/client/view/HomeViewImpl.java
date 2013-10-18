@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ProjectsHome;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -106,6 +108,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
 	private MyEvaluationEntitiesList myEvaluationsList;
+	private TeamListWidget teamsListWidget;
+	private CookieProvider cookies;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -117,7 +121,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 			HomeSearchBox homeSearchBox, 
 			EntityTreeBrowser myProjectsTreeBrowser,
 			EntityTreeBrowser favoritesTreeBrowser,
-			MyEvaluationEntitiesList myEvaluationsList) {
+			MyEvaluationEntitiesList myEvaluationsList,
+			CookieProvider cookies,
+			TeamListWidget teamsListWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -127,6 +133,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
 		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
+		this.teamsListWidget = teamsListWidget;
+		this.cookies = cookies;
 		
 		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
@@ -174,7 +182,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		// Other links
 		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
-		
 	}	
 
 	@Override
@@ -194,7 +201,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		HTMLPanel panel = new HTMLPanel(html);		
 		DisplayUtils.sendAllLinksToNewWindow(panel);
 		newsFeed.clear();
-		newsFeed.add(panel);	
+		newsFeed.add(panel);
 	}
 	
 	@Override
@@ -244,27 +251,64 @@ public class HomeViewImpl extends Composite implements HomeView {
 	 */
 	private void injectProjectPanel() {
 		projectPanel.clear();
-		LayoutContainer container = new LayoutContainer();		
-		// Evaluations and Projects
+		LayoutContainer projectPanelContainer = new LayoutContainer();
+		
 		LayoutContainer evalsAndProjects = new LayoutContainer();
 		evalsAndProjects.setStyleName("col-md-4");
 		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
 		evalsAndProjects.add(createCreateProjectWidget()); 
-		container.add(evalsAndProjects);
-		// Favorites
-		container.add(getFavoritesContainer());
-
+		projectPanelContainer.add(evalsAndProjects);
 		
-		projectPanel.add(container);		
+		LayoutContainer favsAndTeams = new LayoutContainer();
+		favsAndTeams.setStyleName("col-md-4");
+		favsAndTeams.add(getFavoritesContainer());
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			favsAndTeams.add(getTeamsContainer());
+			favsAndTeams.add(createCreateTeamsContainer());
+		}
+		projectPanelContainer.add(favsAndTeams);
+		projectPanel.add(projectPanelContainer);
 	}
 
-	private LayoutContainer createCreateProjectWidget() {
+	private LayoutContainer createCreateTeamsContainer() {
+		// Create a project
 		LayoutContainer createProjectContainer = new LayoutContainer();
 		createProjectContainer.setStyleName("row margin-top-15");
 		
 		LayoutContainer col1 = new LayoutContainer();
-		col1.addStyleName("col-md-7");
+		col1.addStyleName("col-md-7 padding-right-5");
+		final TextBox input = new TextBox();
+		input.addStyleName("form-control");
+		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		col1.add(input);
+		createProjectContainer.add(col1);		
+		
+		LayoutContainer col2 = new LayoutContainer();
+		col2.addStyleName("col-md-5 padding-left-5");
+		Button createBtn = DisplayUtils.createButton(DisplayConstants.CREATE_TEAM);
+		createBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				String name = input.getValue();
+				if(name == null || name.isEmpty()) {
+					showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+					return;
+				}
+				presenter.createTeam(input.getValue());
+			}
+		});
+		col2.add(createBtn);
+		createProjectContainer.add(col2);		
+		return createProjectContainer;
+	}
+	private LayoutContainer createCreateProjectWidget() {
+		// Create a project
+		LayoutContainer createProjectContainer = new LayoutContainer();
+		createProjectContainer.setStyleName("row margin-top-15");
+		
+		LayoutContainer col1 = new LayoutContainer();
+		col1.addStyleName("col-md-7 padding-right-5");
 		final TextBox input = new TextBox();
 		input.addStyleName("form-control");
 		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
@@ -272,10 +316,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		createProjectContainer.add(col1);		
 		
 		LayoutContainer col2 = new LayoutContainer();
-		col2.addStyleName("col-md-5");
-		Button createBtn = new Button(DisplayConstants.CREATE_PROJECT);
-		createBtn.removeStyleName("gwt-Button");
-		createBtn.addStyleName("btn btn-default btn-block");
+		col2.addStyleName("col-md-5 padding-left-5");
+		Button createBtn = DisplayUtils.createButton(DisplayConstants.CREATE_PROJECT);
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -306,11 +348,27 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	private LayoutContainer getFavoritesContainer() {
 		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.setStyleName("col-md-4");
 		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
 		return favoritesContainer;
+	}
+	
+	@Override
+	public void refreshMyTeams(String userId) {
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			teamsListWidget.configure(userId, false);
+		}
+	}
+	
+	private LayoutContainer getTeamsContainer() {
+		LayoutContainer myTeamsContainer = new LayoutContainer();
+		myTeamsContainer.addStyleName("margin-top-15");
+		myTeamsContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"row\"><h3 class=\"col-md-6\">" + DisplayConstants.MY_TEAMS + "</h3>"+"<div class=\"col-md-6\"><a class=\"dropText-10 right link\" href=\""+DisplayUtils.getTeamSearchHistoryToken("")+"\">Search for Team</a></div></div>")));
+		Widget teamListWidget = teamsListWidget.asWidget();
+		teamListWidget.addStyleName("margin-top-0 padding-left-10 highlight-box highlight-line-min");
+		myTeamsContainer.add(teamListWidget);
+		return myTeamsContainer;
 	}
 	
 	private LayoutContainer getMyEvaluationsContainer() {

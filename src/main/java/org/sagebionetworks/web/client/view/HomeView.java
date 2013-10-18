@@ -23,7 +23,8 @@ public interface HomeView extends IsWidget, SynapseView {
 	public interface Presenter extends SynapsePresenter {
 
 		boolean showLoggedInDetails();	
-		void createProject(String name);			
+		void createProject(String name);
+		void createTeam(String teamName);
 	}
 
 	public void setMyProjects(List<EntityHeader> result);
@@ -36,4 +37,6 @@ public interface HomeView extends IsWidget, SynapseView {
 	
 	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities);
 	public void setMyEvaluationsError(String string);
+	
+	public void refreshMyTeams(String userId);
 }

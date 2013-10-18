@@ -13,7 +13,7 @@ public class AclUtils {
 	private static Map<PermissionLevel, Set<ACCESS_TYPE>> permToACCESS_TYPE;
 
 	private static Map<ACCESS_TYPE, Set<PermissionLevel>> accessTypeToPerm;
-
+	
 	// Build up a list of increasing permissions, starting with VIEW
 	// It's acceptable to use the shallow copy of the ArrayList(arrList) constructor
 	// because the elements are all ENUMS.
@@ -78,7 +78,7 @@ public class AclUtils {
 		}
 		return null;
 	}
-
+	
 	public static Set<ACCESS_TYPE> getACCESS_TYPEs(PermissionLevel permissionLevel) {
 		return permToACCESS_TYPE.get(permissionLevel);
 	}

@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,7 +24,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	public void render();
 	
 	public void updateView(UserProfile profile, boolean editable, boolean isOwner, Widget profileFormView);
-	
 	public void refreshHeader();
 	
 	public interface Presenter extends SynapsePresenter {

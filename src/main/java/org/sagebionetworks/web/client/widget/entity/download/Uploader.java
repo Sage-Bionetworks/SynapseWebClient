@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
@@ -79,7 +80,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
 	private boolean isDirectUploading;
-
+	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
 	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
@@ -119,17 +120,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}		
 		
 	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {
+		return asWidget(entity, null, accessRequirements, null, true);
+	}
+	
+	public Widget asWidget(String parentEntityId, List<AccessRequirement> accessRequirements) {
+		return asWidget((Entity)null, parentEntityId, accessRequirements, null, true);
+	}
+	
+	public Widget asWidget(Entity entity, String parentEntityId, List<AccessRequirement> accessRequirements, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
 		this.view.setPresenter(this);
 		this.entity = entity;
+		this.parentEntityId = parentEntityId;
+		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm(true);
+		this.view.createUploadForm(isEntity);
 		return this.view.asWidget();
 	}
 
-	public Widget asWidget(String parentEntityId, List<AccessRequirement> accessRequirements) {
-		this.parentEntityId = parentEntityId;
-		return asWidget((Entity)null, accessRequirements);
-	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
@@ -401,7 +408,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			view.updateProgress(.99d, "99%");
-			completeUpload(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			if (entityId != null || parentEntityId != null)
+				setFileEntityFileHandle(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			if (fileHandleIdCallback != null) {
+				fileHandleIdCallback.invoke(status.getFileHandleId());
+				uploadSuccess(false);
+			}
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
@@ -454,9 +466,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 	}
 	
-	public void completeUpload(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
+	public void setFileEntityFileHandle(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
 		try {
-			synapseClient.completeUpload(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					//to new file handle id, or create new file entity with this file handle id
@@ -619,7 +631,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public boolean isRestricted() {
 		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
 	}
-		public int getDisplayHeight() {
+
+	public int getDisplayHeight() {
 		return view.getDisplayHeight();
 	}
 	

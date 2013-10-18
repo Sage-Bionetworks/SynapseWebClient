@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,6 +67,7 @@ public class FileHandleServletTest {
 		when(mockSynapse.getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
 		when(mockSynapse.getFileEntityTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
 
+		when(mockSynapse.getTeamIcon(anyString(), anyBoolean())).thenReturn(resolvedUrl);
 
 		mockUrlProvider = mock(ServiceUrlProvider.class);
 		mockTokenProvider = mock(TokenProvider.class);
@@ -97,6 +96,12 @@ public class FileHandleServletTest {
 		when(mockRequest.getParameter(WebConstants.ENTITY_PARAM_KEY)).thenReturn("syn296531");
 		when(mockRequest.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY)).thenReturn("20");
 	}
+	
+	private void setupTeam() {
+		when(mockRequest.getParameter(WebConstants.TEAM_PARAM_KEY)).thenReturn("36");
+	}
+	
+	
 
 	@Test
 	public void testDoGetLoggedInWikiAttachmentPreview() throws Exception {
@@ -164,6 +169,16 @@ public class FileHandleServletTest {
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getFileEntityTemporaryUrlForCurrentVersion(anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	}
+
+	@Test
+	public void testDoGetLoggedInTeamIcon() throws Exception {
+		setupTeam();
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getTeamIcon(anyString(), anyBoolean());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 

@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKE
 import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
 import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
 import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
-import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_PAGE_WIDTH;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
@@ -65,8 +65,11 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
@@ -135,11 +138,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -147,7 +150,7 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-	
+
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -579,7 +582,11 @@ public class DisplayUtils {
 	}
 	
 	public static String getWarningHtml(String title, String warningText) {
-		return "<div class=\"alert alert-block\"><strong>"+ title + "</strong><br/> " + warningText + "</div>";
+		return getAlertHtml(title, warningText, BootstrapAlertType.WARNING);
+	}
+	
+	public static String getAlertHtml(String title, String text, BootstrapAlertType type) {
+		return "<div class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</div>";
 	}
 	
 	public static String uppercaseFirstLetter(String display) {
@@ -611,6 +618,22 @@ public class DisplayUtils {
 		Wiki place = new Wiki(ownerId, objectType, wikiPageId);
 		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
 	}
+	
+	public static String getTeamHistoryToken(String teamId) {
+		Team place = new Team(teamId);
+		return "#!" + getTeamPlaceString(Team.class) + ":" + place.toToken();
+	}
+	
+	public static String getTeamSearchHistoryToken(String searchTerm) {
+		TeamSearch place = new TeamSearch(searchTerm);
+		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
+	}
+	
+	public static String getTeamSearchHistoryToken(String searchTerm, Integer start) {
+		TeamSearch place = new TeamSearch(searchTerm, start);
+		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -694,6 +717,24 @@ public class DisplayUtils {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}
+	
+	public static LayoutContainer wrap(Widget widget) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.addStyleName("col-md-12");
+		lc.add(widget);
+		return lc;
+	}
+	private static String getTeamPlaceString(Class<Team> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		String fullPlaceName = place.getName();		
+		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
+		return fullPlaceName;
+	}
+	
 	
 	private static String getSearchPlaceString(Class<Search> place) {
 		String fullPlaceName = place.getName();		
@@ -1356,25 +1397,38 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * 'Upload File' button
+	 * 'Upload File' button for an entity
 	 * @param entity 
 	 * @param entityType 
 	 */
 	public static Widget getUploadButton(final EntityBundle entityBundle,
 			EntityType entityType, final Uploader uploader,
 			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-		uploadButton.setHeight(25);
+		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, ButtonType.DEFAULT, "glyphicon-arrow-up");
+		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, null, entityBundle, handler, entityType, DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+	}
+
+	/**
+	 * 'Upload File' button something other than an entity (for example the team icon)
+	 */
+	public static Widget getUploadButton(final CallbackP<String> fileHandleIdCallback, final Uploader uploader,	IconsImageBundle iconsImageBundle, String buttonText, ButtonType buttonType) {
+		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(buttonText, buttonType, null);
+		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, fileHandleIdCallback, null, null, null, buttonText);
+	}
+	
+	/**
+	 * 'Upload File' button
+	 * @param entity 
+	 * @param entityType 
+	 */
+	private static Widget configureUploadWidget(final FocusWidget uploadButton, final Uploader uploader,
+			IconsImageBundle iconsImageBundle, final CallbackP<String> fileHandleIdCallback, final EntityBundle entityBundle, EntityUpdatedHandler handler, EntityType entityType, final String buttonText) {
 		final Window window = new Window();  
-		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		}));
+		
 		uploader.clearHandlers();
 		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
+		if (handler != null)
+			uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
 		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
@@ -1389,20 +1443,34 @@ public class DisplayUtils {
 				window.hide();
 			}
 		});
-		
-		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		uploadButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				window.removeAll();
 				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-				window.setLayout(new FitLayout());			
-				window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.setHeading(buttonText);
+				window.setLayout(new FitLayout());
+				List<AccessRequirement> ars = null;
+				Entity entity = null;
+				boolean isEntity = true;
+				
+				if (entityBundle != null) {
+					//is entity
+					ars = entityBundle.getAccessRequirements();
+					entity = entityBundle.getEntity();
+				} else {
+					//is something else that just wants a file handle id
+					isEntity = false;
+				}
+					
+				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
 				window.show();
 			}
 		});
+		
 		return uploadButton;
 	}
 
@@ -1490,6 +1558,18 @@ public class DisplayUtils {
 				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
+	
+	/**
+	 * Create the url to a Team icon filehandle.
+	 * @param baseURl
+	 * @param teamId
+	 * @return
+	 */
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
+		return baseFileHandleUrl + "?" +
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
+	}
+
 
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
@@ -1710,7 +1790,7 @@ public class DisplayUtils {
 	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 522);
+		window.setSize(560, 552);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
@@ -1765,9 +1845,14 @@ public class DisplayUtils {
 		row = new LayoutContainer();
 		row.setStyleName("row");
 		return row;
-	}
+}
 
 	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
+	public static enum BootstrapAlertType { SUCCESS, INFO, WARNING, DANGER }
+	
+	public static com.google.gwt.user.client.ui.Button createButton(String title) {
+		return createIconButton(title, ButtonType.DEFAULT, null);
+	}
 	
 	public static com.google.gwt.user.client.ui.Button createButton(String title, ButtonType type) {
 		return createIconButton(title, type, null);
@@ -1799,5 +1884,32 @@ public class DisplayUtils {
 		}
 		return null;
 	}
-
+	
+	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, int headingLevel) {
+		FlowPanel panel = new FlowPanel();
+		panel.addStyleName("media");
+		String linkStyle = "";
+		if (clickHandler != null)
+			linkStyle = "link";
+		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
+		if (clickHandler != null)
+			headingHtml.addClickHandler(clickHandler);
+		
+		Image profilePicture = new Image(pictureUri);
+		profilePicture.addStyleName("pull-left media-object");
+		profilePicture.setPixelSize(64,64);
+		profilePicture.setWidth("64px");
+		profilePicture.setHeight("64px");
+		profilePicture.addStyleName("imageButton");
+		if (clickHandler != null)
+			profilePicture.addClickHandler(clickHandler);
+		panel.add(profilePicture);
+		FlowPanel mediaBodyPanel = new FlowPanel();
+		mediaBodyPanel.addStyleName("media-body");
+		mediaBodyPanel.add(headingHtml);
+		if (description != null)
+			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+		panel.add(mediaBodyPanel);
+		return panel;
+	}
 }
