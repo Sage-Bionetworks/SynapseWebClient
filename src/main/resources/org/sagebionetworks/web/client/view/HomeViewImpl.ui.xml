@@ -86,7 +86,7 @@
 			</div> <!-- end row -->				
 
 			<!-- SEARCH BOX -->
-			<div class="row">
+			<div class="row margin-top-15">
 				<h3>Search Synapse</h3>
 				<div class="well" style="margin-bottom: 0px !important;">
 					<g:SimplePanel ui:field="bigSearchBox" />
