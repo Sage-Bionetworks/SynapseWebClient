@@ -149,7 +149,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				wrap.add(combo);
 				left.add(wrap);
 				//add delete member button
-				Button leaveButton = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "glyphicon-remove");
+				Button leaveButton = DisplayUtils.createButton("Remove", ButtonType.DANGER);
 				leaveButton.addStyleName("pull-right margin-left-5");
 				leaveButton.addClickHandler(new ClickHandler() {			
 					@Override
