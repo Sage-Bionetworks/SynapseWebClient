@@ -63,7 +63,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		FileEntity fake = new FileEntity();
 		fake.setId("syn123");
 		fake.setName("fake");
-		EntityBundle bundle = new EntityBundle(fake, null, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(fake, null, null, null, null, null, null);
 		entityView.setWidget(actionMenu.asWidget(bundle, true, true, new Long(1)));
 	}
 

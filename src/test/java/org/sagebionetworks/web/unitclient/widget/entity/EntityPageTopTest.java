@@ -119,12 +119,12 @@ public class EntityPageTopTest {
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
 
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
 		projectHeader = new EntityHeader();
 		projectHeader.setId(projectId);
 		
 		projectEntity.setId(projectId);
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 	}
 		
 	@Test 
@@ -182,7 +182,7 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage token
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, null);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
@@ -206,7 +206,7 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage 
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, null, null);
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
@@ -237,7 +237,7 @@ public class EntityPageTopTest {
 		assertFalse(newProjectId.equals(projectId)); // assumption check
 		projectEntity = new Project();
 		projectEntity.setId(newProjectId);
-		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 		EntityHeader newProjectHeader = new EntityHeader();
 		newProjectHeader.setId(newProjectId);
 		pageTop.configure(projectBundle, entityVersion, newProjectHeader, EntityArea.WIKI, null);

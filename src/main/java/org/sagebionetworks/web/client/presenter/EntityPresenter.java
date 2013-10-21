@@ -107,9 +107,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | 
-		ENTITY_PATH | ENTITY_REFERENCEDBY | HAS_CHILDREN |
-			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {				

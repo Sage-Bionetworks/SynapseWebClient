@@ -184,30 +184,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		return DisplayUtils.getSynapseIconForEntityType(type, IconSize.PX16, iconsImageBundle);
 	}
 
-	@Override
-	public void loadShortcuts(int offset, int limit, final AsyncCallback<PaginatedResults<EntityHeader>> callback) {
-		if(offset == 0) {
-			 callback.onSuccess(bundle.getReferencedBy());
-		} else {
-			synapseClient.getEntityReferencedBy(bundle.getEntity().getId(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					PaginatedResults<EntityHeader> paginatedResults;
-					try {
-						paginatedResults = nodeModelCreator.createPaginatedResults(result, EntityHeader.class);
-						callback.onSuccess(paginatedResults);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));						
-					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		}
-	}
-
 	public void setAreaChangeHandler(AreaChangeHandler handler) {
 		this.areaChangedHandler = handler;
 	}
