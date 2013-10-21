@@ -96,7 +96,6 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		Annotations annotations = null;
 		UserEntityPermissions permissions = null;
 		EntityPath path = null;
-		PaginatedResults<EntityHeader> referencedBy = null;
 		List<AccessRequirement> accessRequirements = null;
 		List<AccessRequirement> unmetAccessRequirements = null;
 		List<FileHandle> fileHandles = null;
@@ -117,11 +116,6 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		if(transport.getEntityPathJson() != null){
 			path =  factory.createEntity(transport.getEntityPathJson() , EntityPath.class);
 		}
-		// referencedBy?
-		if(transport.getEntityReferencedByJson() != null){
-			referencedBy =  new PaginatedResults<EntityHeader>(EntityHeader.class, factory);
-			referencedBy.initializeFromJSONObject(jsonObjectAdapter.createNew(transport.getEntityReferencedByJson()));
-		}			
 		// accessRequirements?
 		if(transport.getAccessRequirementsJson() != null){
 			accessRequirements =  new ArrayList<AccessRequirement>();
@@ -152,9 +146,8 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		}
 		
 		// put it all together.
-		EntityBundle eb =  new EntityBundle(entity, annotations, 
-				permissions, path, referencedBy,
-				accessRequirements, unmetAccessRequirements, fileHandles);
+		EntityBundle eb = new EntityBundle(entity, annotations, permissions,
+				path, accessRequirements, unmetAccessRequirements, fileHandles);
 		// Set the child count when there.
 		if(transport.getHasChildren() != null){
 			eb.setChildCount(transport.getHasChildren());
