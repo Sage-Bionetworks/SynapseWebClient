@@ -629,10 +629,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			String targetUserId = userId == null ? "" : "/"+userId;
-			JSONObject userProfile = synapseClient.getSynapseEntity(urlProvider.getRepositoryServiceUrl(), "/userProfile"+targetUserId);
-			return userProfile.toString();
+			UserProfile profile = synapseClient.getUserProfile(targetUserId);
+			return EntityFactory.createJSONStringForEntity(profile);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
 	
@@ -691,9 +693,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					}
 				}
 			    profile.setPic(pic);
-				userProfileJSONObject = EntityFactory.createJSONObjectForEntity(profile);
 			}
-			synapseClient.putJSONObject("/userProfile", userProfileJSONObject, null);				
+			synapseClient.updateMyProfile(profile);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONException e) {
