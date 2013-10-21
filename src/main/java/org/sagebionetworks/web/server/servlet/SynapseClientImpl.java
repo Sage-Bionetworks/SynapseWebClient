@@ -628,8 +628,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getUserProfile(String userId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			String targetUserId = userId == null ? "" : "/"+userId;
-			UserProfile profile = synapseClient.getUserProfile(targetUserId);
+			UserProfile profile;
+			if (userId == null) {
+				profile = synapseClient.getMyProfile();
+			} else {
+				profile = synapseClient.getUserProfile(userId);
+			}
 			return EntityFactory.createJSONStringForEntity(profile);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
