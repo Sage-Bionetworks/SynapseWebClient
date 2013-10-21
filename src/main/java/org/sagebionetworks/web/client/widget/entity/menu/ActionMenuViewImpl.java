@@ -242,7 +242,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	}
 	
 	private void addRenameItem(DropdownButton menuBtn) {
-		Anchor a = new Anchor(DisplayConstants.LABEL_RENAME);
+		Anchor a = new Anchor(DisplayConstants.BUTTON_EDIT);
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
