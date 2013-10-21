@@ -491,13 +491,14 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetUserProfile() throws Exception {
 		//verify call is directly calling the synapse client provider
-		JSONObject testUserJSONObject = new JSONObject("{ username: \"Test User\"}");
+		UserProfile testUserProfile = new UserProfile();
+		testUserProfile.setUserName("Test User");
 		String testRepoUrl = "http://mytestrepourl";
 		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
-		when(mockSynapse.getSynapseEntity(testRepoUrl, "/userProfile/" + testUserId)).thenReturn(testUserJSONObject);
+		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
 		String userProfile = synapseClient.getUserProfile(testUserId);
-		assertEquals(userProfile, testUserJSONObject.toString());
+		assertEquals(userProfile, EntityFactory.createJSONStringForEntity(testUserProfile));
 	}
 	
 	@Test
