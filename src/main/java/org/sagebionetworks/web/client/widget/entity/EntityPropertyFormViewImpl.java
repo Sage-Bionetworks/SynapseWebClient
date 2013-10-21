@@ -182,6 +182,12 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		nameField.setToolTip((ToolTipConfig)null);
 		
+		 if (!DisplayUtils.isWikiSupportedType(presenter.getEntity())) {
+             markdownDescriptionField = formFactory.createTextAreaField(model.getDescription());
+             markdownDescriptionField.setWidth((DIALOG_WIDTH-90)+"px");
+             markdownDescriptionField.setHeight("300px");
+	     }
+		
 		// Create the list of fields
 		propertyFields = formFactory.createFormFields(model.getProperties());
 		
