@@ -112,7 +112,7 @@ public class OpenIDUtils {
 		
 		try {
 			// Send all the Open ID info to the repository services
-			JSONObject session = synapse.passOpenIDParameters(request.getQueryString());
+			JSONObject session = synapse.passThroughOpenIDParameters(request.getQueryString());
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
