@@ -9,12 +9,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
 import org.openid4java.OpenIDException;
 import org.sagebionetworks.authutil.OpenIDConsumerUtils;
 import org.sagebionetworks.authutil.OpenIDInfo;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OpenIDUtils {
@@ -112,11 +112,11 @@ public class OpenIDUtils {
 		
 		try {
 			// Send all the Open ID info to the repository services
-			JSONObject session = synapse.passThroughOpenIDParameters(request.getQueryString());
+			Session session = synapse.passThroughOpenIDParameters(request.getQueryString());
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
-					session.getString("sessionToken"), new Boolean(acceptsTermsOfUse), isGWTMode);
+					session.getSessionToken(), new Boolean(acceptsTermsOfUse), isGWTMode);
 			String location = response.encodeRedirectURL(redirectUrl);
 			response.sendRedirect(location);
 			
