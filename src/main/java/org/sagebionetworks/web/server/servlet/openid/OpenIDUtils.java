@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openid4java.OpenIDException;
 import org.sagebionetworks.authutil.OpenIDConsumerUtils;
-import org.sagebionetworks.authutil.OpenIDInfo;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -20,6 +20,11 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class OpenIDUtils {
 	public static final String OPEN_ID_PROVIDER_GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
 	public static final String OPENID_CALLBACK_URI = "/Portal/openidcallback";
+	
+	public static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "sagebionetworks.acceptsTermsOfUse";
+	public static final String RETURN_TO_URL_COOKIE_NAME = "sagebionetworks.returnToUrl";
+	public static final String REDIRECT_MODE_COOKIE_NAME = "sagebionetworks.redirectMode";
+	public static final int COOKIE_MAX_AGE_SECONDS = 60;
 	
 	/**
 	 * This maps allowed provider names to their OpenID endpoints
@@ -41,18 +46,27 @@ public class OpenIDUtils {
 			OpenIDException, URISyntaxException {
 		
 		String openIdProvider = getOpenIdProviderURLforName(openIdProviderName);
+
+		// Stash info that the portal needs in cookies
+		Cookie cookie = new Cookie(RETURN_TO_URL_COOKIE_NAME, returnToURL);
+		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
+		response.addCookie(cookie);
 		
-		// Build up a return URL 
-		String openIDCallbackURL = redirectEndpoint + OPENID_CALLBACK_URI;
-		openIDCallbackURL = OpenIDConsumerUtils.addRequestParameter(returnToURL, OpenIDInfo.ACCEPTS_TERMS_OF_USE_PARAM_NAME + "=" + acceptsTermsOfUse);
-		if (redirectMode != null) {
-			openIDCallbackURL = OpenIDConsumerUtils.addRequestParameter(returnToURL, OpenIDInfo.REDIRECT_MODE_PARAM_NAME + "=" + redirectMode);
+		cookie = new Cookie(ACCEPTS_TERMS_OF_USE_COOKIE_NAME, ""+acceptsTermsOfUse);
+		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
+		response.addCookie(cookie);
+		
+		if (redirectMode!=null) {
+			cookie = new Cookie(REDIRECT_MODE_COOKIE_NAME, redirectMode);
+			cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
+			response.addCookie(cookie);
 		}
 		
-		// Note: this must be the last parameter to be added
-		openIDCallbackURL = OpenIDConsumerUtils.addRequestParameter(returnToURL, OpenIDInfo.RETURN_TO_URL_PARAM_NAME + "=" + openIDCallbackURL);
-		
+		// Get the redirect
+		String openIDCallbackURL = redirectEndpoint + OPENID_CALLBACK_URI;
 		String redirectURL = OpenIDConsumerUtils.authRequest(openIdProvider, openIDCallbackURL);
+		
+		// Send the user off to the next part of the handshake
 		response.sendRedirect(redirectURL);
 	}
 	
@@ -100,9 +114,19 @@ public class OpenIDUtils {
 			SynapseUnauthorizedException {
 		Boolean isGWTMode = null;
 		
-		String returnToURL = request.getParameter(OpenIDInfo.RETURN_TO_URL_PARAM_NAME);
-		String redirectMode = request.getParameter(OpenIDInfo.REDIRECT_MODE_PARAM_NAME);
-		String acceptsTermsOfUse = request.getParameter(OpenIDInfo.ACCEPTS_TERMS_OF_USE_PARAM_NAME);
+		String returnToURL = null;
+		Boolean acceptsTermsOfUse = null;
+		String redirectMode = null;
+		Cookie[] cookies = request.getCookies();
+		for (Cookie c : cookies) {
+			if (RETURN_TO_URL_COOKIE_NAME.equals(c.getName())) {
+				returnToURL = c.getValue();
+			} else if (ACCEPTS_TERMS_OF_USE_COOKIE_NAME.equals(c.getName())) {
+				acceptsTermsOfUse = Boolean.parseBoolean(c.getValue());
+			} else if (REDIRECT_MODE_COOKIE_NAME.equals(c.getName())) {
+				redirectMode = c.getValue();
+			}
+		}
 		
 		if (returnToURL == null) {
 			throw new RuntimeException("Missing required return-to URL.");
@@ -112,11 +136,11 @@ public class OpenIDUtils {
 		
 		try {
 			// Send all the Open ID info to the repository services
-			Session session = synapse.passThroughOpenIDParameters(request.getQueryString());
+			Session session = synapse.passThroughOpenIDParameters(request.getQueryString(), acceptsTermsOfUse);
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
-					session.getSessionToken(), new Boolean(acceptsTermsOfUse), isGWTMode);
+					session.getSessionToken(), acceptsTermsOfUse, isGWTMode);
 			String location = response.encodeRedirectURL(redirectUrl);
 			response.sendRedirect(location);
 			
