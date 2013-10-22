@@ -4,6 +4,7 @@ import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -51,22 +52,17 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 		if (!UserEvaluationState.EVAL_REGISTRATION_UNAVAILABLE.equals(state)) {
 			//show a register/unregister button
 			if (UserEvaluationState.EVAL_OPEN_USER_NOT_REGISTERED.equals(state)) {
-				LayoutContainer megaButton = new LayoutContainer();
-				megaButton.setStyleName("mega-button");
-				megaButton.setStyleAttribute("margin-top", "10px;");
-				megaButton.setStyleAttribute("float", "none;");
 				
-				Anchor applyForChallengeLink = new Anchor();
-				applyForChallengeLink.setText("Join!");
-				applyForChallengeLink.addClickHandler(new ClickHandler() {
+				Button applyForChallengeBtn = DisplayUtils.createButton(DisplayConstants.JOIN_CHALLENGE, ButtonType.PRIMARY);
+				applyForChallengeBtn.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
 						presenter.register();
 					}
 				});
-				megaButton.add(applyForChallengeLink);
+				applyForChallengeBtn.addStyleName("btn-lg margin-top-10");
 				SimplePanel wrapper = new SimplePanel();
-				wrapper.add(megaButton);
+				wrapper.add(applyForChallengeBtn);
 				add(wrapper);
 			}
 			else if (UserEvaluationState.EVAL_OPEN_USER_REGISTERED.equals(state)) {
@@ -113,13 +109,13 @@ public class JoinWidgetViewImpl extends LayoutContainer implements JoinWidgetVie
 				p.add(listPanel);
 				Button button = new Button("Submit To Challenge");
 				button.removeStyleName("gwt-Button");
-				button.addStyleName("btn btn-default btn-lg");
+				button.addStyleName("btn btn-primary btn-lg margin-top-10");
 				button.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {
 						presenter.submitToChallengeClicked();
 					}
-				});
+				});				
 				p.add(button);
 				add(p);
 			}

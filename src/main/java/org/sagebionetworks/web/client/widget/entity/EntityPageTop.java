@@ -98,15 +98,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.area = area;
     	this.areaToken = areaToken;
     	
-    	boolean isProject = projectHeader.getId().equals(projectAreaState.getProjectId());
+    	String entityId = bundle.getEntity().getId();
+    	boolean isNewProject = projectHeader.getId().equals(projectAreaState.getProjectId());
+    	boolean isProject = entityId.equals(projectAreaState.getProjectId());
     	// reset state for newly visited project
-    	if(!isProject) {
+    	if(!isNewProject) {
     		projectAreaState = new ProjectAreaState();
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
     	
     	// For non-project entities, record them as the last file area place 
-    	String entityId = bundle.getEntity().getId();
     	if(!projectHeader.getId().equals(entityId)) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
     		lastFileAreaEntity.setId(entityId);
@@ -120,7 +121,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
     	
     	// default area is the base wiki page if we are navigating to the project
-    	if(area == null && entityId.equals(projectAreaState.getProjectId())) {
+    	if(area == null && isProject) {
     		projectAreaState.setLastWikiSubToken(null);
     	}
     	
@@ -230,9 +231,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
 				return true;			
 			}	
-		} else if(targetTab == EntityArea.WIKI && !isProject) {
-			// wiki area clicked in non-project entity requires goto
-			return true;			
+		} else if(targetTab == EntityArea.WIKI) {
+			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
+				// wiki area clicked in non-project entity requires goto
+				// wiki area with defined subtoken requires goto (can not guarantee that subpage is loaded loaded)
+				return true;							
+			}
 		}
 		return false;		
 	}
