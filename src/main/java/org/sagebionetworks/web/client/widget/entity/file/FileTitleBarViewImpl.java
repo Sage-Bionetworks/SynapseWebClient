@@ -158,7 +158,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			if (isFilenamePanelVisible) {
 				//don't ask for the size if it's external, just display that this is external data
 				if (fileHandle instanceof ExternalFileHandle) {
-					fileName.setInnerText(DisplayUtils.getFileNameFromExternalUrl(((ExternalFileHandle) fileHandle).getExternalURL()));
+					fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
 					md5Link.setVisible(false);
 					fileSize.setInnerText("(External Storage)");
 				}
