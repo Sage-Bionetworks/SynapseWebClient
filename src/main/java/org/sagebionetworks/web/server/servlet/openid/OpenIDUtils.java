@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server.servlet.openid;
 
-import static org.sagebionetworks.web.shared.WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -19,22 +17,12 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class OpenIDUtils {
-	public static final String OPEN_ID_PROVIDER_GOOGLE_ENDPOINT = "https://www.google.com/accounts/o8/id";
 	public static final String OPENID_CALLBACK_URI = "/Portal/openidcallback";
 	
 	public static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "sagebionetworks.acceptsTermsOfUse";
 	public static final String RETURN_TO_URL_COOKIE_NAME = "sagebionetworks.returnToUrl";
 	public static final String REDIRECT_MODE_COOKIE_NAME = "sagebionetworks.redirectMode";
 	public static final int COOKIE_MAX_AGE_SECONDS = 60;
-	
-	/**
-	 * This maps allowed provider names to their OpenID endpoints
-	 * At this time only Google is supported
-	 */
-	private static String getOpenIdProviderURLforName(String name) {
-		if (name.equals(OPEN_ID_PROVIDER_GOOGLE_VALUE)) return OPEN_ID_PROVIDER_GOOGLE_ENDPOINT;
-		throw new IllegalArgumentException(name);
-	}
 	
 	/**
 	 * @param redirectEndpoint  this is the end point to which the OpenID provider should redirect
@@ -45,8 +33,6 @@ public class OpenIDUtils {
 			HttpServletRequest request, HttpServletResponse response,
 			String redirectEndpoint) throws IOException, ServletException,
 			OpenIDException, URISyntaxException {
-		
-		String openIdProvider = getOpenIdProviderURLforName(openIdProviderName);
 
 		// Stash info that the portal needs in cookies
 		Cookie cookie = new Cookie(RETURN_TO_URL_COOKIE_NAME, returnToURL);
@@ -65,7 +51,7 @@ public class OpenIDUtils {
 		
 		// Get the redirect
 		String openIDCallbackURL = redirectEndpoint + OPENID_CALLBACK_URI;
-		String redirectURL = OpenIDConsumerUtils.authRequest(openIdProvider, openIDCallbackURL);
+		String redirectURL = OpenIDConsumerUtils.authRequest(WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE, openIDCallbackURL);
 		
 		// Send the user off to the next part of the handshake
 		response.sendRedirect(redirectURL);
@@ -137,6 +123,7 @@ public class OpenIDUtils {
 		
 		try {
 			// Send all the Open ID info to the repository services
+			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
 					URLDecoder.decode(request.getQueryString(), "UTF-8"), 
 					acceptsTermsOfUse);
