@@ -43,7 +43,7 @@ public class OpenIDUtils {
 		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
 		response.addCookie(cookie);
 		
-		if (redirectMode!=null) {
+		if (redirectMode != null) {
 			cookie = new Cookie(REDIRECT_MODE_COOKIE_NAME, redirectMode);
 			cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
 			response.addCookie(cookie);
@@ -58,34 +58,29 @@ public class OpenIDUtils {
 	}
 	
 	public static String createRedirectURL(String returnToURL,
-			String sessionToken, boolean crowdAcceptsTermsOfUse,
+			String sessionToken, boolean acceptsTermsOfUse,
 			boolean isGWTMode) throws URISyntaxException {
-		String redirectUrl = null;
-		if (isGWTMode) {
-			redirectUrl = returnToURL+":";
-			if (crowdAcceptsTermsOfUse) {
-				redirectUrl += sessionToken;
-			} else {
-				redirectUrl += WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
-			}
-		} else {
-			if (crowdAcceptsTermsOfUse) {
+		String redirectUrl = returnToURL + ":" + sessionToken;
+		
+		if (!isGWTMode) {
+			if (acceptsTermsOfUse) {
 				redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=OK&sessionToken="+sessionToken);
 			} else {
 				redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN);
 			}
 		}
+		
 		return redirectUrl;
 	}
 
 	public static String createErrorRedirectURL(String returnToURL,
 			boolean isGWTMode) throws URISyntaxException {
-		String redirectUrl = null;
-		if (isGWTMode) {
-			redirectUrl = returnToURL + ":" + WebConstants.OPEN_ID_ERROR_TOKEN;
-		} else {
+		String redirectUrl = returnToURL + ":" + WebConstants.OPEN_ID_ERROR_TOKEN;;
+
+		if (!isGWTMode) {
 			redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + WebConstants.OPEN_ID_ERROR_TOKEN);
 		}
+		
 		return redirectUrl;
 	}
 
@@ -123,7 +118,6 @@ public class OpenIDUtils {
 		
 		try {
 			// Send all the Open ID info to the repository services
-			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
 					URLDecoder.decode(request.getQueryString(), "UTF-8"), 
 					acceptsTermsOfUse);

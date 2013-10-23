@@ -122,7 +122,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							view.showLogin(openIdActionUrl, openIdReturnUrl);
 							return;
 						}
-						if (caught instanceof TermsOfUseException) {
+						if (caught.getMessage().contains("Terms of use have not been signed")) {
 							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 								public void onSuccess(String termsOfUseContents) {
 									view.showTermsOfUse(termsOfUseContents, 

@@ -121,7 +121,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+				callback.onFailure(caught);
 			}
 		});		
 	}
