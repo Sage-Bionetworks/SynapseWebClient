@@ -39,4 +39,6 @@ public interface UserAccountService extends RemoteService {
 	public void changeEmailAddress(String changeEmailToken, String newPassword);
 	
 	public String getStorageUsage();
+	
+	public String acceptTermsOfUse(String sessionToken);
 }

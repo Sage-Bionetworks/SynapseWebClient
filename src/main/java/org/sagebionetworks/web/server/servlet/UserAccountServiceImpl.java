@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.server.RestTemplateProvider;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -577,6 +579,19 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			}
 		}
 		return publicPrincipalIds;
+	}
+
+	@Override
+	public String acceptTermsOfUse(String sessionToken) {
+		SynapseClient anonymousClient = createAnonymousSynapseClient();
+		Session session = new Session();
+		session.setSessionToken(sessionToken);
+		try {
+			anonymousClient.acceptTermsOfUse(session);
+		} catch (SynapseException e) {
+			ExceptionUtil.convertSynapseException(e);
+		}
+		return null;
 	}
 	
 	public static void initPublicAndAuthenticatedPrincipalIds(SynapseClient synapseClient, String anonymousPrincipalId) {

@@ -57,4 +57,9 @@ public interface UserAccountServiceAsync {
 	 * return the StorageUsageSummaryList json for the current user
 	 */
 	void getStorageUsage(AsyncCallback<String> callback);
+	
+	/**
+	 * Accepts the terms of use for a user, as identified by the session token
+	 */
+	void acceptTermsOfUse(String sessionToken, AsyncCallback<String> callback);
 }

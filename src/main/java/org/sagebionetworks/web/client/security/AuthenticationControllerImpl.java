@@ -125,6 +125,35 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});		
 	}
+	
+	@Override
+	public void acceptTermsOfUse(String token, final AsyncCallback<String> callback, final boolean isSSO) {
+		if (token == null) {
+			callback.onFailure(new IllegalArgumentException("Session token must be provided"));
+		}
+		
+		userAccountService.acceptTermsOfUse(token, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String nothing) {
+				try {
+					UserSessionData userSessionData = new UserSessionData();
+					userSessionData.setIsSSO(isSSO);
+					JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
+					Date tomorrow = getDayFromNow();
+					cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
+					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
+					currentUser = userSessionData;
+				} catch (JSONObjectAdapterException e){
+					callback.onFailure(e);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
+	}
 
 	@Override
 	public void getTermsOfUse(AsyncCallback<String> callback) {

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -9,22 +8,16 @@ public interface AuthenticationController {
 		
 	/**
 	 * Login the user
-	 * @param username
-	 * @param password
-	 * @return
 	 */
 	public void loginUser(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
 	
 	/**
 	 * Logs in the user represented by the token
-	 * @param token
 	 */
 	public void loginUser(String token, AsyncCallback<String> callback);
 	
 	/**
 	 * Sets the current user 
-	 * @param displayName
-	 * @param token
 	 */
 	public void loginUserSSO(String token, AsyncCallback<String> callback);
 	
@@ -33,34 +26,34 @@ public interface AuthenticationController {
 	 */
 	public void logoutUser();
 	
+	/**
+	 * Uses the session token to accept the terms of use
+	 */
+	public void acceptTermsOfUse(String token, AsyncCallback<String> callback,  boolean isSSO);
+	
 
 	/**
 	 * Is the user logged in?
-	 * @return
 	 */
 	public boolean isLoggedIn();
 	
 	/**
 	 * Get the OwnerId/Principal id out of the UserProfile / UserSessionData in a lightweight fashion
-	 * @return
 	 */
 	public String getCurrentUserPrincipalId();
 
 	/**
 	 * Get the current session token, if there is one
-	 * @return
 	 */
 	public String getCurrentUserSessionToken();
 	
 	/**
 	 * Get the current SSO status
-	 * @return
 	 */
 	public boolean getCurrentUserIsSSO();		
 	
 	/**
 	 * Get the UserSessionData object 
-	 * @return
 	 */
 	public UserSessionData getCurrentUserSessionData();
 
