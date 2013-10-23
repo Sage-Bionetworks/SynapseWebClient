@@ -197,6 +197,27 @@ public class JoinWidgetTest {
 		verify(mockView).showError(anyString());
 	}
 	@Test
+	public void testOptionalRegisterStep5() throws Exception {
+		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, "my team id");
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		widget.configure(wikiKey, descriptor);
+		widget.registerOptionalStep5();
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+	}
+	
+	@Test
+	public void testOptionalRegisterStep5Failure() throws Exception {
+		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, "my team id");
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		widget.configure(wikiKey, descriptor);
+		widget.registerOptionalStep5();
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		verify(mockView).showError(anyString());
+	}
+
+	
+	@Test
 	public void testShowEvaluationSubmitter() throws Exception {
 		widget.configure(wikiKey, descriptor);
 		widget.showSubmissionDialog();
