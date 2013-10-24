@@ -395,8 +395,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		try {
 			response = templateProvider.getTemplate().exchange(url, method, entity, String.class);
 		} catch(HttpClientErrorException ex) {
-			if (ex.getStatusCode() == HttpStatus.BAD_REQUEST)
-				throw new BadRequestException(ex.getResponseBodyAsString());
+			if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED)
+				throw new UnauthorizedException(ex.getResponseBodyAsString());
 			else if (ex.getMessage().toLowerCase().contains("no content-type found"))
 				return;
 			else throw ex;

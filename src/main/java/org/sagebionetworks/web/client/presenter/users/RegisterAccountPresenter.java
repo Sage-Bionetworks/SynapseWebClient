@@ -7,7 +7,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -69,7 +69,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(caught instanceof BadRequestException) {					
+				if(caught instanceof UnauthorizedException) {					
 					view.showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
 				} else {
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
