@@ -180,7 +180,7 @@ public class UserAccountServiceImplTest {
 		Assert.assertNotNull(userData.getSessionToken());
 	}
 	
-	@Test(expected=BadRequestException.class)
+	@Test(expected=UnauthorizedException.class)
 	public void testCreateDuplicateUser() throws Exception {
 		UserAccountServiceImpl testService = new UserAccountServiceImpl();
 		ServiceUrlProvider mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
@@ -189,7 +189,7 @@ public class UserAccountServiceImplTest {
 		testService.setRestTemplate(mockTemplateProvider);
 		RestTemplate mockRestTemplate = Mockito.mock(RestTemplate.class);
 		when(mockTemplateProvider.getTemplate()).thenReturn(mockRestTemplate);
-		when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class),anyVararg())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+		when(mockRestTemplate.exchange(anyString(), any(HttpMethod.class),any(HttpEntity.class),any(Class.class),anyVararg())).thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
 		testService.createUser(user1);
 	}
 	
