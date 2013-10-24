@@ -272,7 +272,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 //			}
 //		});
 		
-		if(userData != null) {
+		if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 			UserProfile profile = userData.getProfile();
 			String displayName = profile.getDisplayName();
