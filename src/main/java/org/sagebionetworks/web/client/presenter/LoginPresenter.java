@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -17,7 +15,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -111,7 +108,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			// parse token
 			view.showLoggingInLoader();
 			if(token != null) {
-				String sessionToken = token;	
+				final String sessionToken = token;	
 				authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 					@Override
 					public void onSuccess(String result) {
@@ -125,12 +122,26 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							view.showLogin(openIdActionUrl, openIdReturnUrl);
 							return;
 						}
-						if (caught instanceof TermsOfUseException) {
+						if (caught.getMessage().contains("Terms of use have not been signed")) {
 							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 								public void onSuccess(String termsOfUseContents) {
 									view.showTermsOfUse(termsOfUseContents, 
 											new AcceptTermsOfUseCallback() {
-												public void accepted() {showView(place);}
+												public void accepted() {
+													// Since this is an SSO request, to tell Repo that the terms have been accepted,
+													// the user can either redo the SSO-process or perform this call with the session token
+													authenticationController.acceptTermsOfUse(sessionToken, new AsyncCallback<String>() {
+														@Override
+														public void onSuccess(String result) {}
+														
+														@Override
+														public void onFailure(Throwable caught) {
+															if(!DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) 
+																view.showErrorMessage("An error occurred. Please try logging in again.");
+														}
+													}, true);
+													showView(place);
+												}
 											});		
 								}
 								public void onFailure(Throwable t) {
