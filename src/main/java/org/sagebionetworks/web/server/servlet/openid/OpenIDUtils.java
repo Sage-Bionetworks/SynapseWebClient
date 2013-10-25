@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.openid4java.OpenIDException;
 import org.sagebionetworks.authutil.OpenIDConsumerUtils;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
+import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -127,6 +129,19 @@ public class OpenIDUtils {
 			Session session = synapse.passThroughOpenIDParameters(
 					URLDecoder.decode(request.getQueryString(), "UTF-8"), 
 					acceptsTermsOfUse);
+			
+			// Check to see if the user has accepted the terms of use
+			synapse.setSessionToken(session.getSessionToken());
+			try {
+				NewUser user = synapse.getAuthUserInfo();
+				
+				// The user has accepted the terms, otherwise the previous operation would have failed
+				acceptsTermsOfUse = user.getAcceptsTermsOfUse();
+			} catch (SynapseForbiddenException e) {
+				// The user has not accepted the terms
+				// If something else broke, the error would be a SynapseUnauthorizedException
+				acceptsTermsOfUse = false;
+			}
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
