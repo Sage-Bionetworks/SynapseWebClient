@@ -122,9 +122,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			SynapseMarkdownProcessor.getInstance();
 		}
 	
-	@SuppressWarnings("unused")
-	private static Logger logger = Logger.getLogger(SynapseClientImpl.class
-			.getName());
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
