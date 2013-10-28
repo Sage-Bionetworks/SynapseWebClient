@@ -117,7 +117,12 @@ public class UserGroupSearchBox {
 				// dev usr  |  dev....1@sagebase.org  |  syn114085
 				
 				StringBuilder sb = new StringBuilder();
+				Boolean isIndividual = value.get(KEY_IS_INDIVIDUAL);
+				if (isIndividual != null && !isIndividual)
+					sb.append("(Team) ");
+				
 				sb.append(value.get(KEY_DISPLAY_NAME).toString());
+				
 				String email = value.get(KEY_EMAIL);
 				if (email != null)
 					sb.append("  |  " + email);
@@ -142,7 +147,7 @@ public class UserGroupSearchBox {
 			}
 		});
 		combo.setDisplayField(KEY_PRINCIPAL_ID);
-		combo.setItemSelector("div.search-item");
+		combo.setItemSelector("span.search-item");
 		combo.setTemplate(getTemplate());
 		combo.setStore(store);
 		combo.setHideTrigger(false);
@@ -154,8 +159,15 @@ public class UserGroupSearchBox {
 
 	private static native String getTemplate() /*-{
 		return [ '<tpl for=".">',
-				'<div class="search-item" qtitle="{displayName}" qtip="{email}">',
-				'{displayName}</div></tpl>' ].join("");
+				'<div>',
+				'<tpl if="!isIndividual">',
+			        '(Team) ',
+			    '</tpl>',
+				'<span class="search-item" qtitle="{displayName}" qtip="{email}">',
+				'{displayName}</span>',
+				'</div>',
+				'</tpl>' ].join("");
+				
 	}-*/;
 
 }
