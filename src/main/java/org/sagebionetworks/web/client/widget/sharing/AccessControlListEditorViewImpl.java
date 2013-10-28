@@ -69,8 +69,6 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends LayoutContainer implements AccessControlListEditorView {
  
-	public static final String SOURCE_TEAMS = "Teams";
-	public static final String SOURCE_USERS = "Users";
 	private static final int FIELD_WIDTH = 500;
 	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
@@ -93,8 +91,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Boolean isPubliclyVisible;
 	private Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private ComboBox<ModelData> peopleCombo, teamCombo;
-	private SimpleComboBox<String> sourceCombo;
+	private ComboBox<ModelData> peopleCombo;
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
@@ -230,23 +227,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setLayout(layout);
 			fieldSet.setWidth(FIELD_WIDTH);
 			
-			//source combobox
-			sourceCombo = new SimpleComboBox<String>();
-			sourceCombo.setTypeAhead(false);
-			sourceCombo.setEditable(false);
-			sourceCombo.setForceSelection(true);
-			sourceCombo.setTriggerAction(TriggerAction.ALL);
-			sourceCombo.setFieldLabel("Source");
-			sourceCombo.add(SOURCE_USERS);
-			sourceCombo.add(SOURCE_TEAMS);
-			sourceCombo.setSimpleValue(SOURCE_USERS);
-			
-			if (DisplayUtils.isInTestWebsite(cookies))
-				fieldSet.add(sourceCombo);
 			
 			// user/group combobox
 			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
-			peopleCombo.setEmptyText("Enter user name...");
+			peopleCombo.setEmptyText("Enter name...");
 			peopleCombo.setFieldLabel("Name");
 			peopleCombo.setForceSelection(true);
 			peopleCombo.setTriggerAction(TriggerAction.ALL);
@@ -257,29 +241,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				}
 			});
 			fieldSet.add(peopleCombo);
-			
-			teamCombo = TeamSearchBox.createTeamSearchSuggestBox(urlCache.getRepositoryServiceUrl());
-			teamCombo.setVisible(false);
-			teamCombo.setEmptyText("Enter team name...");
-			teamCombo.setFieldLabel("Name");
-			teamCombo.setForceSelection(true);
-			teamCombo.setTriggerAction(TriggerAction.ALL);
-			teamCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-					presenter.setUnsavedViewChanges(true);
-				}
-			});
-			fieldSet.add(teamCombo);
-			
-			sourceCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<String>>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<SimpleComboValue<String>> se) {
-					boolean isUsers = SOURCE_USERS.equals(sourceCombo.getSimpleValue());
-					peopleCombo.setVisible(isUsers);
-					teamCombo.setVisible(!isUsers);
-				}
-			});
 			
 			// permission level combobox
 			permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
@@ -306,10 +267,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 				@Override
 				public void componentSelected(ButtonEvent ce) {
-					if (SOURCE_USERS.equals(sourceCombo.getSimpleValue()))
-						addPersonToAcl();
-					else
-						addPeopleToAcl();
+					addPersonToAcl();
 				}
 			});
 
@@ -652,30 +610,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				showAddMessage("Please select a permission level to grant.");
 			}
 		} else {
-			showAddMessage("Please select a user or group to grant permission to.");
+			showAddMessage("Please select a user or team to grant permission to.");
 		}
 	}
-	
-	private void addPeopleToAcl() {
-		if(teamCombo.getValue() != null) {
-			ModelData selectedModel = teamCombo.getValue();
-			String idStr = (String) selectedModel.get(TeamSearchBox.KEY_TEAM_ID);
-			Long teamId = (Long.parseLong(idStr));
-			
-			if(permissionLevelCombo.getValue() != null) {
-				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
-				presenter.setAccess(teamId, level);
-				
-				// clear selections
-				teamCombo.clearSelections();
-				permissionLevelCombo.clearSelections();
-				presenter.setUnsavedViewChanges(false);
-			} else {
-				showAddMessage("Please select a permission level to grant.");
-			}
-		} else {
-			showAddMessage("Please select a team to grant permission to.");
-		}
-	}
-
 }
