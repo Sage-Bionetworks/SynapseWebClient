@@ -53,7 +53,7 @@ public class OpenIDUtils {
 		
 		// Get the redirect
 		String openIDCallbackURL = redirectEndpoint + OPENID_CALLBACK_URI;
-		String redirectURL = OpenIDConsumerUtils.authRequest(WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE, openIDCallbackURL);
+		String redirectURL = OpenIDConsumerUtils.authRequest(openIdProviderName, openIDCallbackURL);
 		
 		// Send the user off to the next part of the handshake
 		response.sendRedirect(redirectURL);
