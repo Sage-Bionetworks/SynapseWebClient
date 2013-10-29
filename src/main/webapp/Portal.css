@@ -1351,6 +1351,30 @@ a.projectTitle:hover {
 	width: 150px;
 }
 
+.signin-panel input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.signin-panel input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.signin-panel .form-control {
+  position: relative;
+  font-size: 16px;
+  height: auto;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.signin-panel .form-control:focus {
+  z-index: 2;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {

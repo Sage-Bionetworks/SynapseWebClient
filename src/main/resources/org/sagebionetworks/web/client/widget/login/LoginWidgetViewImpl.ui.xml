@@ -9,7 +9,7 @@
 		<div class="container">
 
 			<g:SimplePanel ui:field="googleSSOContainer" />
-			<div class="panel panel-body margin-top-15">
+			<div class="signin-panel panel panel-body margin-top-15">
    				<h4 class="form-signin-heading">Sign in with a Synapse Account</h4>
 				<g:TextBox ui:field="username" styleName="form-control"/>
 				<g:PasswordTextBox ui:field="password" styleName="form-control"/>				
