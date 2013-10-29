@@ -66,7 +66,8 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 			extractor.putContainerIdToContent(getCurrentDivID(), content.toString());
 			
 			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
-			html.insert(0, containerElement);
+			//html.insert(0, containerElement);
+			html.append(containerElement);
 		}
 	}
 	
