@@ -93,7 +93,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
-		uploadBtn.setEnabled(false);
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
 		this.fileUploadField = new FileUploadField();
@@ -130,7 +129,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void clear() {
-		uploadBtn.setEnabled(false);
 		fileUploadField.clear();
 		if (pathField != null)
 			pathField.clear();
