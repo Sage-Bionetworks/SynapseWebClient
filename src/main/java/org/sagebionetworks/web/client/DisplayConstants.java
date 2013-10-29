@@ -627,6 +627,9 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
 	public static final String SHOW_ALL_RESULTS = "Show Results for All Types";
 	public static final String JOIN_CHALLENGE = "Join Challenge";
+	public static final String FORGOT_PASSWORD = "forgot password?";
+	public static final String SIGNING_IN = "Signing in...";
+	
 	
 }
 

@@ -6,12 +6,14 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -24,13 +26,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private NodeModelCreator nodeModelCreator;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.nodeModelCreator = nodeModelCreator;
+		this.globalApplicationState = globalApplicationState;
 	}
 
 	public Widget asWidget() {
@@ -47,6 +51,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
+				view.clear();
 				UserSessionData userSessionData = null;
 				if (result != null){
 					try {
@@ -55,11 +60,12 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
-				fireUserChage(userSessionData);
+				fireUserChage(userSessionData);				
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.clear();
 				if (caught instanceof TermsOfUseException) {
 					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 						public void onSuccess(String termsOfUseContent) {	
@@ -113,6 +119,10 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public void acceptTermsOfUse() {
 		view.acceptTermsOfUse();
 	}
-	
+
+	@Override
+	public void goTo(Place place) {
+		globalApplicationState.getPlaceChanger().goTo(place);
+	}
 	
 }

@@ -42,10 +42,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	SimplePanel loginWidgetPanel;
 	@UiField
-	SimplePanel passwordResetButtonPanel;
-	@UiField 
-	SimplePanel registerButtonPanel;
-	@UiField
 	SimplePanel logoutPanel;
 
 	private Presenter presenter;
@@ -143,33 +139,12 @@ public class LoginViewImpl extends Composite implements LoginView {
 		// Add the widget to the panel
 		loginWidgetPanel.clear();
 		loginWidgetPanel.add(loginWidget.asWidget());
-		loginWidget.addUserListener(new UserListener() {
-			
+		loginWidget.addUserListener(new UserListener() {			
 			@Override
 			public void userChanged(UserSessionData newUser) {
 				presenter.setNewUser(newUser);
 			}
-		});
-				
-		Button forgotPasswordButton = new Button("Forgot Password?", AbstractImagePrototype.create(iconsImageBundle.help16()), new SelectionListener<ButtonEvent>() {			
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));								
-			}
-		});
-		forgotPasswordButton.setId(DisplayConstants.ID_BTN_FORGOT_PWD);
-		passwordResetButtonPanel.clear();
-		passwordResetButtonPanel.add(forgotPasswordButton);
-		
-
-		Button registerButton = new Button(DisplayConstants.REGISTER_BUTTON, AbstractImagePrototype.create(iconsImageBundle.userBusiness16()), new SelectionListener<ButtonEvent>() {			
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				presenter.goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
-			}
-		});
-		registerButton.setId(DisplayConstants.ID_BTN_REGISTER2);
-		registerButtonPanel.add(registerButton);
+		});				
 	}
 	
 	@Override
@@ -193,8 +168,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		if(logginInWindow != null) logginInWindow.hide();
 		loginWidget.clear();
 		loginWidgetPanel.clear();
-		passwordResetButtonPanel.clear();
-		registerButtonPanel.clear();
 		logoutPanel.clear();
 	}
 	
