@@ -12,8 +12,9 @@ import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
-import com.extjs.gxt.ui.client.widget.treepanel.TreePanel.TreeNode;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,8 +39,9 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	@Override
 	public void configure(TocItem root) {
 		clear();
-		final SimplePanel treePanel = new SimplePanel();
+		final FlowPanel treePanel = new FlowPanel();
 		treePanel.addStyleName("well well-small display-table");
+		treePanel.add(new HTML("<h3>Wiki Subpages</h3>"));
 		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
@@ -61,7 +63,7 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			tree.setLabelProvider(new ModelStringProvider<ModelData>() {
 				@Override
 				public String getStringValue(ModelData model, String property) {
-					return model.toString();
+					return "<span class=\"link\">" + model.toString() + "</span>";
 				}	
 			});
 			
