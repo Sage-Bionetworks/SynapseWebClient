@@ -122,6 +122,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	@Override
 	public void redirectToViewProfile() {
+		globalApplicationState.setIsEditing(false);
 		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 	}
 
@@ -167,11 +168,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void updateProfileView(boolean editable) {
+		globalApplicationState.setIsEditing(editable);
 		updateProfileView(null, editable);
 	}
 	
 	private void updateProfileView(String userId, final boolean editable) {
-		
+		view.clear();
 		final boolean isOwner = userId == null;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override

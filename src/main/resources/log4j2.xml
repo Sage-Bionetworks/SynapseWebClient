@@ -36,7 +36,7 @@
 		<logger name="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager" level="debug" additivity="false">
 			<appender-ref ref="portal-http-out" />
 		</logger>	
-		<logger name="org.sagebionetworks" level="all" additivity="true">
+		<logger name="org.sagebionetworks" level="info" additivity="true">
 			<appender-ref ref="portal" />
 		</logger>
 		<root level="error">

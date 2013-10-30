@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -83,6 +84,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private CookieProvider cookies;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
@@ -90,14 +92,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ComboBox<ModelData> peopleCombo;
-	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.cookies = cookies;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -225,10 +227,11 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			fieldSet.setLayout(layout);
 			fieldSet.setWidth(FIELD_WIDTH);
 			
+			
 			// user/group combobox
 			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
-			peopleCombo.setEmptyText("Enter a user or group name...");
-			peopleCombo.setFieldLabel("User/Group");
+			peopleCombo.setEmptyText("Enter name...");
+			peopleCombo.setFieldLabel("Name");
 			peopleCombo.setForceSelection(true);
 			peopleCombo.setTriggerAction(TriggerAction.ALL);
 			peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
@@ -237,8 +240,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					presenter.setUnsavedViewChanges(true);
 				}
 			});
-			fieldSet.add(peopleCombo);			
-
+			fieldSet.add(peopleCombo);
+			
 			// permission level combobox
 			permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
 			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
@@ -487,6 +490,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				} else if (publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString())){
 					ImageResource icon = iconsImageBundle.globe32();
 					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
+				} else if (!principal.getIsIndividual()) {
+					//if a group, then try to fill in the icon from the team
+					String url = DisplayUtils.createTeamIconUrl(
+							synapseJSNIUtils.getBaseFileHandleUrl(), 
+							principal.getOwnerId()
+					);
+					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
+				
 				} else {
 					// Default to generic user or group avatar
 					ImageResource icon = principal.getIsIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
@@ -599,8 +610,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				showAddMessage("Please select a permission level to grant.");
 			}
 		} else {
-			showAddMessage("Please select a user or group to grant permission to.");
+			showAddMessage("Please select a user or team to grant permission to.");
 		}
 	}
-
 }

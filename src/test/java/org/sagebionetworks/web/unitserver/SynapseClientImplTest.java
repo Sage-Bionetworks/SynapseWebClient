@@ -491,13 +491,14 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetUserProfile() throws Exception {
 		//verify call is directly calling the synapse client provider
-		JSONObject testUserJSONObject = new JSONObject("{ username: \"Test User\"}");
+		UserProfile testUserProfile = new UserProfile();
+		testUserProfile.setUserName("Test User");
 		String testRepoUrl = "http://mytestrepourl";
 		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
-		when(mockSynapse.getSynapseEntity(testRepoUrl, "/userProfile/" + testUserId)).thenReturn(testUserJSONObject);
+		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
 		String userProfile = synapseClient.getUserProfile(testUserId);
-		assertEquals(userProfile, testUserJSONObject.toString());
+		assertEquals(userProfile, EntityFactory.createJSONStringForEntity(testUserProfile));
 	}
 	
 	@Test
@@ -767,7 +768,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
-		synapseClient.completeUpload(null, null, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
@@ -785,7 +786,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = false;
-		synapseClient.completeUpload(null, entityId, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId", isRestricted);
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());

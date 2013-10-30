@@ -100,12 +100,12 @@ public class ClientProperties {
 	 * Client Documentation
 	 */
 	public static final String REST_API_URL = "http://rest.synapse.org";
-	public static final String CLIENT_R_API_URL = "https://www.synapse.org/#!Synapse:syn1834618";
+	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
 	public static final String CLIENT_R_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1834618";
 	public static final String CLIENT_PYTHON_API_URL = "https://www.synapse.org/#!Synapse:syn1768504";
 	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1768504";
-	public static final String CLIENT_CL_API_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient";
-	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance";
+	public static final String CLIENT_CL_API_URL = "https://www.synapse.org/#!Synapse:syn1768504";
+	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://www.synapse.org/#!Synapse:syn1768504";
 	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
 	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";	
 

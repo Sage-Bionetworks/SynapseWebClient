@@ -72,7 +72,8 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				profilePicture = new Image();
 				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
 			} else {
-				profilePicture = new Image(sageImageBundle.defaultProfilePicture());
+				profilePicture = new Image(sageImageBundle.defaultProfilePicture20().getSafeUri());
+				profilePicture.setPixelSize(16,16);
 			}
 			
 			profilePicture.setWidth("16px");

@@ -42,8 +42,9 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		/**
 		 * Changes places to the specified are of the Parent Project
 		 * @param area
+		 * @param overrideCache 
 		 */
-		void gotoProjectArea(Synapse.EntityArea area);
+		void gotoProjectArea(Synapse.EntityArea area, boolean overrideCache);
 		
 		/**
 		 * Changes the current active area
@@ -55,11 +56,11 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		boolean isLoggedIn();
 
-		void loadShortcuts(int offset, int limit, AsyncCallback<PaginatedResults<EntityHeader>> asyncCallback);
-
 		String createEntityLink(String id, String version, String display);
 
 		ImageResource getIconForType(String typeString);
+
+		boolean isPlaceChangeForArea(EntityArea targetTab);
 
 				
 	}

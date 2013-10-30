@@ -154,7 +154,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+				allVersions.setText(DisplayConstants.SHOW_LC);
 			}
 		});
 		versionAnimation.setHideConfig(hideConfig);
@@ -164,14 +164,14 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 			public void handleEvent(FxEvent be) {
 				// This call to layout is necessary to force the scroll bar to appear on page-load
 				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.HIDE_VERSIONS);
+				allVersions.setText(DisplayConstants.HIDE_LC);
 				if (scrollToElement != null)
 					scrollToElement.scrollIntoView();
 			}
 		});
 		versionAnimation.setShowConfig(showConfig);
 
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		allVersions.setText(DisplayConstants.SHOW_LC);
 
 		vToolbar = new PagingToolBar(VERSION_LIMIT);
 		vToolbar.setSpacing(2);
@@ -470,7 +470,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 		String[] keys =  {VERSION_KEY_LABEL, VERSION_KEY_MOD_BY, VERSION_KEY_MOD_ON ,  VERSION_KEY_CONTENT_SIZE, VERSION_KEY_CONTENT_MD5, VERSION_KEY_COMMENT, VERSION_KEY_NUMBER };
 		String[] names = {"Version"        , "Modified By"      , "Modified On"     ,   "Size", "MD5", "Comment"          , ""                };
-		int[] widths =	 {100               , 250               , 70                ,   100, 50, 250                , 50                };
+		int[] widths =	 {100               , 250               , 130                ,   100, 50, 250                , 50                };
 		
 		if (keys.length != names.length || names.length != widths.length)
 			throw new IllegalArgumentException("All configuration arrays must be the same length.");
@@ -524,7 +524,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		//reset versions ui
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
-		allVersions.setText(DisplayConstants.SHOW_VERSIONS);
+		allVersions.setText(DisplayConstants.SHOW_LC);
 	}
 	
 

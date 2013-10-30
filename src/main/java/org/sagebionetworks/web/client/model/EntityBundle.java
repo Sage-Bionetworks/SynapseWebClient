@@ -24,7 +24,6 @@ public class EntityBundle {
 	private Annotations annotations;
 	private UserEntityPermissions permissions;
 	private EntityPath path;
-	private PaginatedResults<EntityHeader> referencedBy;
 	private List<AccessRequirement> accessRequirements;
 	private List<AccessRequirement> unmetAccessRequirements;
 	private Boolean hasChildren;
@@ -32,7 +31,6 @@ public class EntityBundle {
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
-			PaginatedResults<EntityHeader> referencedBy,
 			List<AccessRequirement> accessRequirements,
 		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles
 	) {
@@ -41,7 +39,6 @@ public class EntityBundle {
 		this.annotations = annotations;
 		this.permissions = permissions;
 		this.path = path;
-		this.referencedBy = referencedBy;
 		this.accessRequirements=accessRequirements;
 		this.unmetAccessRequirements=unmetAccessRequirements;
 		this.fileHandles = fileHandles;
@@ -58,9 +55,6 @@ public class EntityBundle {
 	public EntityPath getPath() {
 		return path;
 	}	
-	public PaginatedResults<EntityHeader> getReferencedBy() {
-		return referencedBy;
-	}
 	
 	public Boolean getHasChildren() {
 		return hasChildren;
@@ -79,9 +73,6 @@ public class EntityBundle {
 	}
 	public void setPath(EntityPath path) {
 		this.path = path;
-	}
-	public void setReferencedBy(PaginatedResults<EntityHeader> referencedBy) {
-		this.referencedBy = referencedBy;
 	}
 	public List<AccessRequirement> getAccessRequirements() {
 		return accessRequirements;
@@ -123,8 +114,6 @@ public class EntityBundle {
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
 		result = prime * result
 				+ ((permissions == null) ? 0 : permissions.hashCode());
-		result = prime * result
-				+ ((referencedBy == null) ? 0 : referencedBy.hashCode());
 		result = prime
 				* result
 				+ ((unmetAccessRequirements == null) ? 0
@@ -175,11 +164,6 @@ public class EntityBundle {
 				return false;
 		} else if (!permissions.equals(other.permissions))
 			return false;
-		if (referencedBy == null) {
-			if (other.referencedBy != null)
-				return false;
-		} else if (!referencedBy.equals(other.referencedBy))
-			return false;
 		if (unmetAccessRequirements == null) {
 			if (other.unmetAccessRequirements != null)
 				return false;
@@ -192,13 +176,10 @@ public class EntityBundle {
 	public String toString() {
 		return "EntityBundle [entity=" + entity + ", annotations="
 				+ annotations + ", permissions=" + permissions + ", path="
-				+ path + ", referencedBy=" + referencedBy
-				+ ", accessRequirements=" + accessRequirements
+				+ path + ", accessRequirements=" + accessRequirements
 				+ ", unmetAccessRequirements=" + unmetAccessRequirements
 				+ ", hasChildren=" + hasChildren + ", fileHandles=" + fileHandles
 				+ "]";
 	}
 	
-	
-
 }

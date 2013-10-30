@@ -25,6 +25,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback);
 		public void saveClicked(String title, String md);
 		public void cancelClicked();
+		public void editClicked();
 	}
 	
 	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);

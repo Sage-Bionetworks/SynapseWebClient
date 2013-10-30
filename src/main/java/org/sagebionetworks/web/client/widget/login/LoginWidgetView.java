@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface LoginWidgetView extends IsWidget {
@@ -24,6 +24,8 @@ public interface LoginWidgetView extends IsWidget {
 		public String getOpenIdReturnUrl();
 		
 		public void acceptTermsOfUse();
+
+		public void goTo(Place place);
 	}
 
 	public void showAuthenticationFailed();

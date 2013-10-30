@@ -15,6 +15,8 @@ import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
+import org.sagebionetworks.web.client.presenter.TeamPresenter;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
@@ -59,6 +61,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWid
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.TeamBadge;
+import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.shared.EventBus;
@@ -109,6 +114,10 @@ public interface PortalGinInjector extends Ginjector {
 	public WikiPresenter getWikiPresenter();
 	
 	public DownPresenter getDownPresenter();
+	
+	public TeamPresenter getTeamPresenter();
+	
+	public TeamSearchPresenter getTeamSearchPresenter();
 	
 	public EventBus getEventBus();
 	
@@ -164,6 +173,10 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	public UserBadge getUserBadgeWidget();
+	public BigUserBadge getBigUserBadgeWidget();
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
+	
+	public TeamBadge getTeamBadgeWidget();
+	public BigTeamBadge getBigTeamBadgeWidget();
 }

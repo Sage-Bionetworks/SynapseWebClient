@@ -72,7 +72,7 @@
 				<g:HTMLPanel ui:field="getStartedContainer">
 					<div class="col-md-4 ">
 						<h3>Get Started</h3>
-						Synapse is free to use as a Beta service.<br/><br/> 
+						Synapse is free to use as a service.<br/><br/> 
 						<g:SimplePanel ui:field="loginBtnPanel"/>
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
@@ -85,8 +85,16 @@
 				<g:SimplePanel ui:field="projectPanel" />
 			</div> <!-- end row -->				
 
+			<!-- SEARCH BOX -->
+			<div class="row margin-top-15">
+				<h3>Search Synapse</h3>
+				<div class="well" style="margin-bottom: 0px !important;">
+					<g:SimplePanel ui:field="bigSearchBox" />
+				</div>
+			</div> <!-- end row -->				
+
             <!-- SLIDER -->
-			<div class="row separator-margin-top">
+			<div class="row margin-top-15">
 			    <!-- Carousel
 			    ================================================== -->
 			    <div id="myCarousel" class="carousel slide">
@@ -153,18 +161,6 @@
 			      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
 			    </div><!-- /.carousel -->
 			</div> <!-- end row -->		
-
-			<div class="row">
-				<div class="separator separator-margin"></div>						
-			</div> <!-- end row -->				
-
-			<!-- SEARCH BOX -->
-			<div class="row">
-				<h3>Search Synapse</h3>
-				<div class="well" style="margin-bottom: 0px !important;">
-					<g:SimplePanel ui:field="bigSearchBox" />
-				</div>
-			</div> <!-- end row -->				
 
 			<div class="row">
 				<div class="separator separator-margin"></div>						

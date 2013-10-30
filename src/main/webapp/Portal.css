@@ -548,6 +548,15 @@ a.shortBtn {
 .margin-top-5 {
 	margin-top: 5px !important;
 }
+
+.margin-top-10-imp {
+	margin-top: 10px !important;
+}
+
+.margin-top-0 {
+	margin-top: 0px !important;
+}
+
 .margin-top-10 {
 	margin-top: 10px;
 }
@@ -573,9 +582,17 @@ a.shortBtn {
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
+.margin-bottom-5 {
+	margin-bottom: 5px;
+}
+
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
+.margin-bottom-0-imp {
+	margin-bottom: 0px !important;
+}
+
 
 .margin-left-725 {
 	margin-left: 725px;
@@ -1133,6 +1150,11 @@ ol.lowerroman {
     padding: 18px;
 }
 
+.highlight-line-min {
+    padding: 5px;
+}
+
+
 .fixedWidthFont {
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
@@ -1179,6 +1201,11 @@ ol.lowerroman {
 
 .vertical-align-middle {
 	vertical-align: middle;
+}
+
+.member-search-button {
+	font-size: 12px !important;
+	width: 120px;
 }
 
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
@@ -1283,6 +1310,71 @@ a.projectTitle:hover {
 	font-size: 16px;	
 }
 
+.rowAdaptiveHeight{
+    overflow: hidden; 
+}
+
+.colAdaptiveHeight{ 
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;  
+}
+
+.previewPreMaxHeight {
+	max-height: 206px;
+}
+
+.padding-right-5 {
+	padding-right: 5px;
+}
+.padding-left-5 {
+	padding-left: 5px;
+}
+.padding-left-10 {
+	padding-left: 10px;
+}
+
+.padding-left-74 {
+	padding-left:74px;
+}
+
+.updateTeamIconLink {
+	padding: 0px 0px 10px 0px;
+	font-size: 12px;
+}
+
+.dropText-10 {
+	position: relative;
+	top: 10px;
+}
+
+.width-150 {
+	width: 150px;
+}
+
+.signin-panel input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.signin-panel input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.signin-panel .form-control {
+  position: relative;
+  font-size: 16px;
+  height: auto;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+.signin-panel .form-control:focus {
+  z-index: 2;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
@@ -1296,6 +1388,7 @@ a.projectTitle:hover {
 .entity-tabs > li.active > a:hover,
 .entity-tabs > li.active > a:focus {
 	background-color: #f9f9f9;
+	cursor: pointer;
 }
 
 /*

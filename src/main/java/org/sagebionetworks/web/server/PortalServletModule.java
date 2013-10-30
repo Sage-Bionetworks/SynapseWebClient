@@ -24,6 +24,7 @@ import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
+import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDServlet;
@@ -58,6 +59,9 @@ public class PortalServletModule extends ServletModule {
 		filter("/Portal/*").through(RPCValidationFilter.class);
 		bind(RPCValidationFilter.class).in(Singleton.class);
 
+		bind(DreamFilter.class).in(Singleton.class);
+		filter("/dream").through(DreamFilter.class);
+		
 		// Setup the Search service
 		bind(SynapseClientImpl.class).in(Singleton.class);
 		serve("/Portal/synapse").with(SynapseClientImpl.class);

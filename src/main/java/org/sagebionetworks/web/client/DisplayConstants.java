@@ -36,6 +36,9 @@ public class DisplayConstants {
 	public static final String EDIT_CODE_TEXT = "Edit the step's details by altering the fields below and then clicking the Save button. To cancel, click the Close button.";;
 	public static final String EDIT_ANNOTATIONS_TEXT = "Edit Annotations for this object. You can add new annotations by using the form fields at the bottom.";
 	
+	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
+	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
+	
 	public static final String LOGOUT_TEXT = "You have been logged out of Synapse.";
 	public static final String LOGOUT_SSO_TEXT = "To prevent others from accessing your account in this browser, you should log out of your Google account as well.<br/><a class=\"link\" href=\"http://www.google.com/accounts/Logout?continue=http://www.google.com/\">Logout of your Google account by clicking here</a>"; // <br/><br/><a href=\"https://www.google.com/accounts/Logout\">Logout of your Google account by clicking here</a>
 	public static final String PERMISSIONS_INHERITED_TEXT = "Sharing settings are being inherited from the parent resource and cannot be modified.";
@@ -196,6 +199,7 @@ public class DisplayConstants {
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
+	public static final String BUTTON_LEAVE_TEAM = "Leave Team";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
 	public static final String LABEL_RENAME = "Rename";
@@ -207,6 +211,8 @@ public class DisplayConstants {
 	public static final String ERROR_ENTITY_DELETE_FAILURE = "Deletion failed. Please try again.";
 	public static final String ERROR_ENTITY_MOVE_FAILURE = "Move failed. Please try again.";
 	public static final String PROMPT_SURE_DELETE = "Are you sure you want to delete this";
+	public static final String PROMPT_SURE_LEAVE_TEAM = "You will lose access to resources shared with the team.  Are you sure?";
+	public static final String PROMPT_SURE_REMOVE_MEMBER = " will lose access to resources shared with the team.  Are you sure?";
 	public static final String PROMPT_SURE_PROMOTE = "Are you sure you want to promote this version to the top?";
 	public static final String LABEL_NO_PREVIEW_DATA = "A Preview has not been created.";
 	public static final String LABEL_CONTAINS_NO_CHILDREN = "This object contains no children.";
@@ -222,6 +228,7 @@ public class DisplayConstants {
 	public static final String LABEL_SEARCH = "Search";
 	public static final String LABEL_PROJECT_NAME = "Project Name";
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
+	public static final String LABEL_TEAM_CREATED = "Team Created";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
@@ -324,8 +331,8 @@ public class DisplayConstants {
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
-	public static final String SHOW_VERSIONS = "show";
-	public static final String HIDE_VERSIONS = "hide";
+	public static final String SHOW_LC = "show";
+	public static final String HIDE_LC = "hide";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
@@ -469,7 +476,7 @@ public class DisplayConstants {
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
 	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
-	public static final String RESTRICTION_WARNING = "By clicking 'OK' below, I request that the Synapse ACT contact me to assign the appropriate access restrictions for this dataset.";
+	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'OK' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
 	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
@@ -494,6 +501,15 @@ public class DisplayConstants {
 	public static final String TO_LOAD_AN_ENTITY = "To load an entity";
 	public static final String PROGRAMMATIC_ACCESS = "Programmatic Access";
 	public static final String PROVENANCE = "Provenance";
+	public static final String MEMBERS = "Members";
+	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
+	public static final String PENDING_JOIN_REQUESTS = "Pending Join Requests";
+	public static final String DELETE_TEAM_SUCCESS = "Team successfully deleted";
+	public static final String UPDATE_TEAM_SUCCESS = "Team successfully updated";
+	public static final String LEAVE_TEAM_SUCCESS = "Successfully left team";
+	public static final String JOIN_TEAM_SUCCESS = "Successfully joined team";
+	public static final String JOIN = "Join";
+	public static final String ACCEPT = "Accept";
 	public static final String CREATED = "Created";
 	public static final String CREATED_BY = "Created by";
 	public static final String MODIFIED = "Modified";
@@ -510,7 +526,6 @@ public class DisplayConstants {
 	public static final String ADD_PAGE = "Add a new Page";
 	public static final String DEFAULT_ROOT_WIKI_NAME = "Root";
 	public static final String WIKI = "Wiki";
-	public static final String PROJECT_WIKI = "Project Wiki";
 	public static final String CREATE_WIKI = "Create Wiki";
 	public static final String ADD_DESCRIPTION = "Add Description";
 	public static final String ERROR_PAGE_CREATION_FAILED = "Page creation failed. Please try again";
@@ -552,7 +567,8 @@ public class DisplayConstants {
 	public static final String MY_PROJECTS = "My Projects";
 	public static final String MY_EVALUATIONS = "My Challenges";
 	public static final String SUBMITTER_ALIAS = "your alias (or team name)";
-	public static final String FAVORITES = "Favorites";
+	public static final String MY_FAVORITES = "My Favorites";
+	public static final String MY_TEAMS = "My Teams";
 	public static final String ERROR_LOADING_FAVORITES = "Error loading Favorites.";
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
@@ -572,7 +588,10 @@ public class DisplayConstants {
 	public static final String SIGN_IN = "Sign in";
 	public static final String REGISTER_BUTTON = "Register for a Synapse Account";
 	public static final String CREATE_PROJECT = "Create Project";
+	public static final String CREATE_TEAM = "Create Team";
 	public static final String NEW_PROJECT_NAME = "New Project Name";
+	public static final String NEW_TEAM_NAME = "New Team Name";
+	public static final String SHORT_TEAM_DESCRIPTION = "Short Team Description";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
 	public static final String USER_GUIDE = "User Guide";
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
@@ -596,6 +615,7 @@ public class DisplayConstants {
 	public static final String SUCCESS = "Success";
 	public static final String REQUEST_SENT = "Request Sent";
 	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
+	public static final String PLEASE_ENTER_TEAM_NAME = "Please enter a team name";
 	public static final String OLD_VERSION = "old version";
 	public static final String THERE_IS_A_NEWER_VERSION = "A more recent version of this entity exists.";
 	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
@@ -606,6 +626,10 @@ public class DisplayConstants {
 	public static final String REST_API_DOCUMENTATION = "REST API documentation";
 	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
 	public static final String SHOW_ALL_RESULTS = "Show Results for All Types";
+	public static final String JOIN_CHALLENGE = "Join Challenge";
+	public static final String FORGOT_PASSWORD = "forgot password?";
+	public static final String SIGNING_IN = "Signing in...";
+	
 	
 }
 
