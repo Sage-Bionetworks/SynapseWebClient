@@ -118,7 +118,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private CookieProvider cookies;
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
-	private boolean newBadgesShown = false;
 	private EntityArea currentArea;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
@@ -218,9 +217,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.removeAll();
 		adminTabContainer.removeAll();
 
-		// notify new tabs
-		notifyNewTabs();
-		
 		// project header
 		fillProjectLink(projectHeader);
 	
@@ -249,20 +245,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		fullWidthContainer.layout(true);
 		topFullWidthContainer.layout(true);
-	}
-
-	private void notifyNewTabs() {
-		if(!newBadgesShown) {
-			fileLink.setHTML(DisplayConstants.FILES + "<span class=\"label label-info margin-left-5 tabLabel\">new</span>");
-			Timer t = new Timer() {
-			      @Override
-			      public void run() {
-						fileLink.setHTML(DisplayConstants.FILES);
-			      }
-			    };
-			    t.schedule(30000); // let it show once for 30 sec
-			    newBadgesShown = true;
-		}
 	}
 
 	private void fillProjectLink(final EntityHeader projectHeader) {
