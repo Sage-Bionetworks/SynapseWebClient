@@ -39,4 +39,5 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void setMyEvaluationsError(String string);
 	
 	public void refreshMyTeams(String userId);
+	public void showOpenTeamInvitesMessage(Boolean visible);
 }

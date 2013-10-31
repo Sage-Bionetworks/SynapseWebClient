@@ -1038,6 +1038,11 @@ ol.lowerroman {
 	font-size: 0.8em;
 }
 
+.biggerText {
+	font-size: 1.2em;
+}
+
+
 .widgetContainer {
 	overflow-x: auto;
 	display: inline;

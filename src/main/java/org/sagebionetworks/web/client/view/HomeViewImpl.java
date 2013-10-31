@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -112,6 +114,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private MyEvaluationEntitiesList myEvaluationsList;
 	private TeamListWidget teamsListWidget;
 	private CookieProvider cookies;
+	private FlowPanel openTeamInvitesPanel;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -184,6 +187,19 @@ public class HomeViewImpl extends Composite implements HomeView {
 		// Other links
 		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
+		
+		openTeamInvitesPanel = new FlowPanel();
+		openTeamInvitesPanel.addStyleName("highlight-line-min alert alert-"+BootstrapAlertType.INFO.toString().toLowerCase());
+		openTeamInvitesPanel.add(new HTML("<span class=\"biggerText\">You have pending Team invitations!</span>"));
+		Button userProfileButton = DisplayUtils.createButton("See Invitations");
+		userProfileButton.addStyleName("margin-top-5");
+		openTeamInvitesPanel.add(userProfileButton);
+		userProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+			}
+		});
 	}	
 
 	@Override
@@ -276,7 +292,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer createCreateTeamsContainer() {
 		// Create a project
 		LayoutContainer createProjectContainer = new LayoutContainer();
-		createProjectContainer.setStyleName("row margin-top-15");
+		createProjectContainer.setStyleName("row");
 		
 		LayoutContainer col1 = new LayoutContainer();
 		col1.addStyleName("col-md-7 padding-right-5");
@@ -384,11 +400,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		headerRow.add(wrapButton);
 		myTeamsContainer.add(headerRow);
 		Widget teamListWidget = teamsListWidget.asWidget();
-		teamListWidget.addStyleName("margin-top-0 padding-left-10 highlight-box highlight-line-min");
+		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min");
 		myTeamsContainer.add(teamListWidget);
+		myTeamsContainer.add(openTeamInvitesPanel);
 		return myTeamsContainer;
 	}
-	
+	@Override
+	public void showOpenTeamInvitesMessage(Boolean visible) {
+		openTeamInvitesPanel.setVisible(visible);
+	}
 	private LayoutContainer getMyEvaluationsContainer() {
 		//My Evaluations
 		LayoutContainer myEvaluations = new LayoutContainer();

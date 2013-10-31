@@ -34,7 +34,9 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -56,6 +58,8 @@ public class HomePresenterTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
 	List<EntityHeader> testEvaluationResults;
+	List<MembershipInvitationBundle> openInvitations;
+	
 	RSSFeed testFeed = null;
 	String testTeamId = "42";
 	@Before
@@ -85,6 +89,9 @@ public class HomePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
+		
+		openInvitations = new ArrayList<MembershipInvitationBundle>();
+		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
@@ -156,5 +163,20 @@ public class HomePresenterTest {
 		homePresenter.createTeam("New Team");
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testIsNoOpenInvites() {
+		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		homePresenter.isOpenTeamInvites(mockCallback);
+		verify(mockCallback).invoke(eq(false));
+	}
+	
+	@Test
+	public void testIsOpenInvites() {
+		openInvitations.add(new MembershipInvitationBundle());
+		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		homePresenter.isOpenTeamInvites(mockCallback);
+		verify(mockCallback).invoke(eq(true));
 	}
 }

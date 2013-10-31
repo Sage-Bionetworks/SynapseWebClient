@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -18,8 +20,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -168,6 +173,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		
 		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
 		
+		view.showOpenTeamInvitesMessage(false);
+		isOpenTeamInvites(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean b) {
+				view.showOpenTeamInvitesMessage(b);
+			}
+		});
+		
+		
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
@@ -189,6 +203,20 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				view.setFavoritesError("Could not load Favorites");
 			}
 		});
+	}
+	
+	public void isOpenTeamInvites(final CallbackP<Boolean> callback) {
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+			@Override
+			public void onSuccess(List<MembershipInvitationBundle> result) {
+				callback.invoke(result.size() > 0);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//do nothing
+			}
+		});		
 	}
 
 	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
