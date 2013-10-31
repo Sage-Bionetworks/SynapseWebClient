@@ -134,6 +134,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -1912,4 +1913,19 @@ public class DisplayUtils {
 		panel.add(mediaBodyPanel);
 		return panel;
 	}
+	
+	public static HTML getNewLabel(boolean superScript) {		
+		final HTML label = new HTML(DisplayConstants.NEW);
+		label.addStyleName("label label-info margin-left-5");
+		if(superScript) label.addStyleName("tabLabel");
+		Timer t = new Timer() {
+		      @Override
+		      public void run() {
+					label.setVisible(false);
+		      }
+		    };
+		t.schedule(30000); // hide after 30 seconds
+	    return label;
+	}
+	
 }
