@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
-import org.apache.logging.log4j.core.pattern.MDCPatternConverter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,6 +12,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -72,7 +72,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private Image editWidgetButton;
 	private WidgetDescriptorUpdatedHandler callback;
 	private WidgetSelectionState widgetSelectionState;
-	
+	private ResourceLoader resourceLoader;
 	public interface CloseHandler{
 		public void saveClicked();
 		public void cancelClicked();
@@ -89,7 +89,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
 			IconsImageBundle iconsImageBundle,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			ResourceLoader resourceLoader) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -97,6 +98,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.cookies = cookies;
+		this.resourceLoader = resourceLoader;
 		widgetSelectionState = new WidgetSelectionState();
 	}
 	
@@ -372,7 +374,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			panel = new HTMLPanel(result);
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
-		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true);
+		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
 		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");

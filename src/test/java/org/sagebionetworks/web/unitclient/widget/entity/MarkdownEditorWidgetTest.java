@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -29,6 +30,7 @@ public class MarkdownEditorWidgetTest {
 	IconsImageBundle mockIcons;
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
+	ResourceLoader mockResourceLoader;
 	
 	@Before
 	@Ignore
@@ -38,8 +40,9 @@ public class MarkdownEditorWidgetTest {
 		mockIcons = mock(IconsImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		mockBaseEditWidgetPresenter = mock(BaseEditWidgetDescriptorPresenter.class);
+		mockResourceLoader = mock(ResourceLoader.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies);
+		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader);
 	}
 	
 	@Test
