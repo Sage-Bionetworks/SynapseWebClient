@@ -4,7 +4,9 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -146,6 +149,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep3();
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
+		//verify that team updated callback is invoked
 		verify(mockTeamUpdatedCallback).invoke();
 	}
 
@@ -158,4 +162,20 @@ public class JoinTeamWidgetTest {
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testJoinRequestStep3WikiRefresh() throws Exception {
+		//configure using wiki widget renderer version
+		Map<String, String> descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
+		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
+		Callback mockWidgetRefreshRequired = mock(Callback.class);
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired);
+		joinWidget.sendJoinRequestStep3();
+		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		//verify that wiki page refresh is invoked
+		verify(mockWidgetRefreshRequired).invoke();
+	}
+
 }
