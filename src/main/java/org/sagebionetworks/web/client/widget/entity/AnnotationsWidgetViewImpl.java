@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -184,7 +185,7 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		final Object originalValue = row.getValue();
 		Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(345, 125);
+		dialog.setSize(450, 140);
 		dialog.setPlain(true);  
 		dialog.setModal(true);  
 		dialog.setHeading("Edit Annotation");  
@@ -193,6 +194,8 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		dialog.setButtons(Dialog.OKCANCEL);
 		dialog.setHideOnButtonClick(true);
 		FormPanel form = DialogUtils.createNewFormPanel();
+		form.setLabelWidth(200);
+		if(row.getLabel().length() > 35) form.setLabelAlign(LabelAlign.TOP);
 		// Add them to the form
 		form.add(field);
 		dialog.add(form);
