@@ -281,10 +281,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		LayoutContainer favsAndTeams = new LayoutContainer();
 		favsAndTeams.setStyleName("col-md-4");
 		favsAndTeams.add(getFavoritesContainer());
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			favsAndTeams.add(getTeamsContainer());
-			favsAndTeams.add(createCreateTeamsContainer());
-		}
+		favsAndTeams.add(getTeamsContainer());
+		favsAndTeams.add(createCreateTeamsContainer());
 		projectPanelContainer.add(favsAndTeams);
 		projectPanel.add(projectPanelContainer);
 	}
@@ -374,9 +372,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refreshMyTeams(String userId) {
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			teamsListWidget.configure(userId, false);
-		}
+		teamsListWidget.configure(userId, false);
 	}
 	
 	private LayoutContainer getTeamsContainer() {
