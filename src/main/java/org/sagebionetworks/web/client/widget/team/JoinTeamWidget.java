@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -173,10 +174,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			public void onSuccess(String result) {
 				//are there unmet access restrictions?
 				try{
-					PaginatedResults<AccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, AccessRequirement.class);
+					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
 					if (ar.getTotalNumberOfResults() > 0) {
 						//there are unmet access requirements.  user must accept all before joining the challenge
-						List<AccessRequirement> unmetRequirements = ar.getResults();
+						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
 						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
 						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
 						Callback termsOfUseCallback = new Callback() {
