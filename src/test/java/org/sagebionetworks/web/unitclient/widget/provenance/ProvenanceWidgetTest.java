@@ -174,7 +174,7 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildGraphSuccess() throws Exception {				
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null);	
 		ProvGraph graph = verifyBuildGraphCalls();					
 		verifySuccessGraphStructure(graph);
 	}
@@ -208,7 +208,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailGetActivity() throws Exception {
 		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));		
 		ProvGraph graph = captureGraph();
 		
@@ -235,7 +235,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailGetActivity404() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
@@ -263,7 +263,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailHeaderBatch() throws Exception {
 		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
@@ -274,7 +274,7 @@ public class ProvenanceWidgetTest {
 	@Test
 	public void testFindOldVersions() throws Exception {
 		// create graph
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null);	
 		ProvGraph graph = verifyBuildGraphCalls();					
 		
 		reset(mockSynapseClient);

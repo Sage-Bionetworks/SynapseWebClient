@@ -38,7 +38,7 @@ public class YouTubeWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(eq(videoId));
 	}
 }

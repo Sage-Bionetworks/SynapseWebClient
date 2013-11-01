@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -174,6 +176,8 @@ public interface SynapseClient extends RemoteService {
 	String getUnmetEvaluationAccessRequirements(String evalId)
 			throws RestServiceException;
 
+	String getUnmetTeamAccessRequirements(String teamId) throws RestServiceException;
+	
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
 	
@@ -237,10 +241,6 @@ public interface SynapseClient extends RemoteService {
 	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	
-	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
-	
-	public void createParticipants(String[] evaluationIds) throws RestServiceException;
-	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
 	public String getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException;
@@ -257,6 +257,8 @@ public interface SynapseClient extends RemoteService {
 	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
 	public String getAvailableEvaluations() throws RestServiceException;
+	public String getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
+	
 	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
 	public String getAvailableEvaluationEntities() throws RestServiceException;
 	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException;

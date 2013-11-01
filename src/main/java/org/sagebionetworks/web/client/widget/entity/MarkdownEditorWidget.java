@@ -375,7 +375,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
+		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true, null);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
@@ -481,13 +481,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
-
 	    	menu.add(getNewCommand(WidgetConstants.BOOKMARK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    		public void componentSelected(ComponentEvent ce) {
 	    			handleInsertWidgetCommand(WidgetConstants.BOOKMARK_CONTENT_TYPE, callback);
 	    		}
 	    	}));
-
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
@@ -503,9 +501,14 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
-	    	menu.add(getNewCommand("Join Evaluation Button", new SelectionListener<ComponentEvent>() {
+	    	menu.add(getNewCommand("Join Team Button", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY + "=true" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+	    	menu.add(getNewCommand("Submit To Evaluation Button", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the challenge" + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
 	    	menu.add(getNewCommand(WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
@@ -513,8 +516,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
-
-	    	
 	    }
 
 	    return menu;

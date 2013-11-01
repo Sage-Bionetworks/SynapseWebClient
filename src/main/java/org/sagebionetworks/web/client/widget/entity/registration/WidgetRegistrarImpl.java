@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
 import java.util.HashMap;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -10,10 +9,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.inject.Inject;
 
 
@@ -95,7 +96,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Callback widgetRefreshRequired) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -127,8 +128,10 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.USERBADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserBadgeWidget();
-		} else if (contentTypeKey.equals(WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE)) {
-			presenter = ginInjector.getJoinWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.JOIN_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getJoinTeamWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
+			presenter = ginInjector.getEvaluationSubmissionWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE)) {
@@ -136,7 +139,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(wikiKey, model);
+			presenter.configure(wikiKey, model, widgetRefreshRequired);
 		return presenter;
 	}
 	@Override
