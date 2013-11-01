@@ -47,7 +47,7 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void showError(String error) {
+	public void showErrorMessage(String error) {
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
 		layout(true);
 	}
@@ -87,11 +87,6 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showLoading() {
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override

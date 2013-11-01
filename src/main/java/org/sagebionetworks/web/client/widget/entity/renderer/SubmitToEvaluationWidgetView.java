@@ -15,8 +15,6 @@ public interface SubmitToEvaluationWidgetView extends IsWidget, SynapseView {
 	
 	void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage);
 	
-	void showError(String message);
-	
 	void showAnonymousRegistrationMessage();
 	
 	void showInfo(String title, String message);

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -36,7 +35,6 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private EvaluationSubmitter evaluationSubmitter;
 	private String[] evaluationIds;
 	
@@ -45,14 +43,13 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter, EvaluationSubmitter evaluationSubmitter) {
+			EvaluationSubmitter evaluationSubmitter) {
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.evaluationSubmitter = evaluationSubmitter;
 	}
 	
@@ -93,12 +90,12 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				public void onFailure(Throwable caught) {
 					//if the user can't read the evaluation, then don't show the join button.  if there was some other error, then report it...
 					if (!(caught instanceof ForbiddenException)) {
-						view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
+						view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + caught.getMessage());
 					}
 				}
 			});
 		} catch (RestServiceException e) {
-			view.showError(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
+			view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		}
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
