@@ -70,20 +70,20 @@ public class OldImageWidgetTest {
 		attachments.add(testImage);
 		testPage.setAttachments(attachments);
 		
-		widget.configure(wikiKey,descriptor);
+		widget.configure(wikiKey,descriptor, null);
 		verify(mockView).configure(anyString(), eq(testImage), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasNullAttachments() {
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasZeroAttachments() {
 		testPage.setAttachments(new ArrayList());
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
@@ -97,7 +97,7 @@ public class OldImageWidgetTest {
 		attachments.add(testImage);
 		testPage.setAttachments(attachments);
 
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 

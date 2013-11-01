@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -25,7 +26,7 @@ public class BookmarkWidget implements BookmarkWidgetView.Presenter, WidgetRende
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		descriptor = widgetDescriptor;
 		view.configure(descriptor.get(WidgetConstants.BOOKMARK_KEY), descriptor.get(WidgetConstants.TEXT_KEY));
 	}

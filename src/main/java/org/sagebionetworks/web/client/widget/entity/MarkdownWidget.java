@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -45,6 +46,10 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	AuthenticationController authenticationController;
 	NodeModelCreator nodeModelCreator;
 	private ResourceLoader resourceLoader;
+	private String md;
+	private WikiPageKey wikiKey;
+	private boolean isWiki;
+	private boolean isPreview;
 	
 	@Inject
 	public MarkdownWidget(SynapseClientAsync synapseClient,
@@ -87,7 +92,10 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			}
 		});				
 	}
-	
+
+	public void refresh() {
+		setMarkdown(md, wikiKey, isWiki, isPreview);
+	}
 	
 	/**
 	 * @param md
@@ -95,6 +103,10 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 */
 	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
 		final SynapseView view = this;
+		this.md = md;
+		this.wikiKey = wikiKey;
+		this.isWiki = isWiki;
+		this.isPreview= isPreview;
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -115,8 +127,14 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					synapseJSNIUtils.highlightCodeBlocks();
 					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 					MarkdownWidget.loadMath(panel, synapseJSNIUtils, isPreview, resourceLoader);
+					Callback widgetRefreshRequired = new Callback() {
+						@Override
+						public void invoke() {
+							refresh();
+						}
+					};
 					//asynchronously load the widgets
-					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview);
+					loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -141,7 +159,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	 * @param view
 	 * @throws JSONObjectAdapterException 
 	 */
-	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview) throws JSONObjectAdapterException {
+	public static void loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired) throws JSONObjectAdapterException {
 		final String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
 		int i = 0;
@@ -155,7 +173,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki, widgetRefreshRequired);
 						if (presenter == null)
 							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
 						panel.add(presenter.asWidget(), currentWidgetDiv);

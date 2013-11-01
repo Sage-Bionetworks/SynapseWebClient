@@ -247,6 +247,7 @@ public class DisplayConstants {
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
+	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
@@ -597,6 +598,8 @@ public class DisplayConstants {
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
+	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";

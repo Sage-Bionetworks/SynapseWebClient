@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -21,7 +22,7 @@ public class AttachmentPreviewWidget implements AttachmentPreviewWidgetView.Pres
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		this.descriptor = widgetDescriptor;
 		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
 		//set up view based on descriptor parameters

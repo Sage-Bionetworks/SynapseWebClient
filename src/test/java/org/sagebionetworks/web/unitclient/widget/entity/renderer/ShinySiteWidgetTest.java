@@ -51,11 +51,11 @@ public class ShinySiteWidgetTest {
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(eq(validSiteUrl), anyInt());
 		
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl2);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(eq(validSiteUrl2), anyInt());
 	}
 	
@@ -63,7 +63,7 @@ public class ShinySiteWidgetTest {
 	public void testConfigureInvalid() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).showInvalidSiteUrl(invalidSiteUrl);
 	}
 	

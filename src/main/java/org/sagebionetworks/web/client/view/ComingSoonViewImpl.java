@@ -111,7 +111,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		configMap.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(false));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
-	    provenanceWidget.configure(null, configMap);
+	    provenanceWidget.configure(null, configMap, null);
 	    provenanceWidget.setHeight(800);	
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}

@@ -134,7 +134,7 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     teamName = new TextField<String>();  
 	     teamName.setFieldLabel("DREAM 8 Team Name");  
 	     teamName.setAllowBlank(true);
-	     left.add(teamName, formData);
+//	     left.add(teamName, formData);
 	     
 	     url = new TextField<String>();  
 	     url.setFieldLabel("Link To More Info");  

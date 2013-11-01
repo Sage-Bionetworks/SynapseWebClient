@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -26,7 +26,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);

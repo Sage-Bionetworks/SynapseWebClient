@@ -112,7 +112,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
@@ -129,7 +129,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 	}
 	
@@ -146,7 +146,7 @@ public class APITableWidgetTest {
 		};
 		//return our renderer that always fails to initialize when asked for the Synapse ID column renderer
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
@@ -157,7 +157,7 @@ public class APITableWidgetTest {
 	@Test
 	public void testMissingServiceURI() throws JSONObjectAdapterException {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockView).showError(anyString());
 	}
 	
@@ -166,14 +166,14 @@ public class APITableWidgetTest {
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockView).showError(eq(errorMessage));
 	}
 	
 	@Test
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -181,14 +181,14 @@ public class APITableWidgetTest {
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagingURI() throws JSONObjectAdapterException {
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		String pagedURI = widget.getPagedURI();
 		assertEquals(TESTSERVICE_PATH + "?limit=10&offset=0", pagedURI.toLowerCase());
 	}
@@ -197,7 +197,7 @@ public class APITableWidgetTest {
 	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
-		widget.configure(testWikiKey, descriptor);
+		widget.configure(testWikiKey, descriptor, null);
 		String pagedURI = widget.getPagedURI();
 		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
 	}

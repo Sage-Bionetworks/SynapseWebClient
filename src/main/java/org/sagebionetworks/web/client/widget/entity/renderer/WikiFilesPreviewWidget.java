@@ -7,6 +7,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -31,7 +32,7 @@ public class WikiFilesPreviewWidget implements WikiFilesPreviewWidgetView.Presen
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		//get all of the file attachments for this wiki page

@@ -13,11 +13,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -56,7 +56,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	
 	@Override
 	public void configure(WikiPageKey wikiKey,
-			Map<String, String> widgetDescriptor) {
+			Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		tableConfig = new APITableConfig(descriptor);
