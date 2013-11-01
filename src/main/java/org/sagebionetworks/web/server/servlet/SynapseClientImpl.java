@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1817,10 +1816,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<Evaluation> returnResults = new PaginatedResults<Evaluation>();
 			List<Evaluation> returnList = new ArrayList<Evaluation>();
 			if (targetEvaluationIds.size() > 0) {
+				Set<String> targetEvalIdsCopy = new HashSet<String>();
+				targetEvalIdsCopy.addAll(targetEvaluationIds);
 				PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 				//filter down to the target evaluation ids
 				for (Evaluation evaluation : results.getResults()) {
-					if (targetEvaluationIds.contains(evaluation.getId())) {
+					if (targetEvalIdsCopy.contains(evaluation.getId())) {
+						targetEvalIdsCopy.remove(evaluation.getId());
 						returnList.add(evaluation);
 					}
 				}
