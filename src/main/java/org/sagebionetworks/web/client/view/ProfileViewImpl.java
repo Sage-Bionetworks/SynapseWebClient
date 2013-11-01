@@ -171,12 +171,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				myTeamsWidget.configure(profile.getOwnerId(), false);
-				myTeamsPanel.add(myTeamsWidget.asWidget());
-				myTeamsPanel.setVisible(true);
-			}
-
+			myTeamsWidget.configure(profile.getOwnerId(), false);
+			myTeamsPanel.add(myTeamsWidget.asWidget());
+			myTeamsPanel.setVisible(true);
+		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
 			updateViewProfile(profile);
 			viewProfilePanel.add(profileWidget);
@@ -184,19 +182,16 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				editPhotoButtonContainer.add(editPhotoLink);
 				editPhotoButtonContainer.layout();
 				editProfileButtonPanel.add(editProfileCommandPanel);
-				if (DisplayUtils.isInTestWebsite(cookies)) {
-					openInvitesWidget.configure(new Callback() {
-						@Override
-						public void invoke() {
-							//refresh the view after accepting/ignoring
-							presenter.redirectToViewProfile();
-						}
-					});
-					
-					myTeamInvitesPanel.add(openInvitesWidget.asWidget());
-				}
-			}
+				openInvitesWidget.configure(new Callback() {
+					@Override
+					public void invoke() {
+						//refresh the view after accepting/ignoring
+						presenter.redirectToViewProfile();
+					}
+				});
 				
+				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
+			}
 		}
 	}
 	
