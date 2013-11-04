@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -54,6 +58,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
@@ -80,7 +85,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -104,8 +108,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Test for the SynapseClientImpl
@@ -828,9 +830,9 @@ public class SynapseClientImplTest {
 		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
 		Evaluation e = new Evaluation();
 		e.setId("A test ID");
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 		String evaluationsJson = synapseClient.getAvailableEvaluations();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
 		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
 		assertEquals(expectedJson, evaluationsJson);
 	}
@@ -907,7 +909,7 @@ public class SynapseClientImplTest {
 	
 	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
 		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
 	@Test
@@ -925,7 +927,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getEntityHeaderBatch(any(List.class))).thenReturn(batchResults);
 		
 		String entityHeadersJson = synapseClient.getAvailableEvaluationEntities();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
 		
 		//capture argument to verify that the reference passed to getEntityHeaderBatch points to a single entity (the sharedEntityId)
 		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
@@ -960,7 +962,7 @@ public class SynapseClientImplTest {
 		e.setId(eval2Id);
 		evalResults.add(e);
 		availableEvaluations.setResults(evalResults);
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(availableEvaluations);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(availableEvaluations);
 		
 		//test sorting, uniqueness, and empty/null values
 		Submission[] submissions = new Submission[6];

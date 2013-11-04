@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +23,6 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
@@ -1793,7 +1791,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
@@ -1805,7 +1803,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//look up the available evaluations
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			//collect contentSource entity IDs
 			Set<String> uniqueEntityIds = new HashSet<String>();
 			for (Evaluation eval : availableEvaluations.getResults()) {
@@ -1859,7 +1857,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//look up the available evaluations
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			//collect contentSource entity IDs
 			Set<String> uniqueEntityIds = new HashSet<String>();
 			for (Evaluation eval : availableEvaluations.getResults()) {
@@ -1936,7 +1934,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//query for all available evaluations.
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, 0, MAX_LIMIT);
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(0, MAX_LIMIT);
 			//gather all submissions
 			List<Submission> allSubmissions = new ArrayList<Submission>();
 			for (Evaluation evaluation : availableEvaluations.getResults()) {
@@ -1981,7 +1979,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//get all evaluations for which the user has joined as a participant
-			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			for (Evaluation evaluation : evaluations.getResults()) {
 				//return true if any of these have a submission
 				PaginatedResults<Submission> res = synapseClient.getMySubmissions(evaluation.getId(), 0, 0);
