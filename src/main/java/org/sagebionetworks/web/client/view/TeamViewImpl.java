@@ -272,8 +272,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 					}
 				});
 			}
-		});
-		menuBtn.addMenuItem(a);
+		});		
+		// TODO : restore this for SWC-1025
+		//menuBtn.addMenuItem(a);
 	}
 	
 	private void addDeleteItem(DropdownButton menuBtn) {
