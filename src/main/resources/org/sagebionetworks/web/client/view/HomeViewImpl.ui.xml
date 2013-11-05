@@ -109,7 +109,7 @@
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
-			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream8Banner.jpg" alt="First slide"/></a>
+			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream85_Banner.jpg" alt="DREAM 8.5 Challenges"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM8">Learn More</a></p>
@@ -117,31 +117,31 @@
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn1720047"><img src="images/spotlight/HPN_Challenge.jpg" alt="First slide"/></a>
+			          <a href="#!Synapse:syn312572"><img src="images/spotlight/Dream85_SM.jpg" alt="ICGC-TCGA DREAM Somatic Mutation Calling Challenge"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">			              
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1720047">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn312572">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn1761567"><img src="images/spotlight/Toxicogenetics_Challenge.jpg" alt="First slide"/></a>
+			          <a href="#!Synapse:syn1734172"><img src="images/spotlight/Dream85_RA.jpg" alt="The Rheumatoid Arthritis Responder DREAM Challenge"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1761567">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1734172">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn1876068"><img src="images/spotlight/WholeCell_Challenge.jpg" alt="First slide"/></a>
+			          <a href="#!Synapse:syn2290704"><img src="images/spotlight/Dream85_AD.jpg" alt="The Big Data Alzheimer's Disease DREAM Challenge"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1876068">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="First slide"/></a>
+			          <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="BCC Gateway Project"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1710250">BCC Gateway Project</a></p>
@@ -149,7 +149,7 @@
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="First slide"/></a>
+			          <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="TCGA Pancancer Project"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn300013">TCGA Pancancer Project</a></p>
