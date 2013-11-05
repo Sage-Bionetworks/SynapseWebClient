@@ -174,6 +174,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			//fill in the tools menu button
 			addEditItem(toolsButton);
 			addDeleteItem(toolsButton);
+			commandsContainer.add(toolsButton);
 		}
 		
 		if (teamMembershipStatus != null) {
@@ -186,8 +187,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 			}
 			else {
 				//add Leave Team menu item, and show tools menu
-				addLeaveItem(toolsButton);
-				commandsContainer.add(toolsButton);
+				// TODO : restore this for SWC-1025
+				//addLeaveItem(toolsButton); 
+				//commandsContainer.add(toolsButton);
 			}
 		}
 		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));
@@ -272,9 +274,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 					}
 				});
 			}
-		});		
-		// TODO : restore this for SWC-1025
-		//menuBtn.addMenuItem(a);
+		});				
+		menuBtn.addMenuItem(a);
 	}
 	
 	private void addDeleteItem(DropdownButton menuBtn) {
