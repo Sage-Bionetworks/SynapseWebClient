@@ -166,7 +166,8 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 
 					}
 				});
-				right.add(leaveButton);
+				// TODO : restore this for SWC-1025
+				//right.add(leaveButton);
 			} else if (teamMember.getIsAdmin()) {
 				//otherwise, indicate that this row user is an admin (via label)
 				left.add(new HTML("<span class=\"margin-left-15\">Admin</span>"));
