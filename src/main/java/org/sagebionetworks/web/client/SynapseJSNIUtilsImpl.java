@@ -170,10 +170,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private final static native boolean _isDirectUploadSupported() /*-{ 
-		//if Safari, direct upload is not supported
 		var userAgentString = navigator.userAgent.toLowerCase();
-		if ((userAgentString.indexOf('safari') != -1 && userAgentString.indexOf('chrome') == -1) ||	//Safari or
-			(userAgentString.indexOf('msie') != -1))												//IE
+		if (userAgentString.indexOf('msie') != -1) //IE
 			return false;
 		var xhr = new XMLHttpRequest();
 		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
@@ -204,7 +202,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-		xhr.send(fileSliceToUpload);
+  		xhr.setRequestHeader('Content-type', contentType);
+  		xhr.send(fileSliceToUpload);
 	}-*/;
 	
 	
