@@ -164,7 +164,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 			};
 			Widget uploadLink = DisplayUtils.getUploadButton(fileHandleIdCallback, uploader, iconsImageBundle, "Update Icon", ButtonType.LINK); 
 			uploadLink.addStyleName("updateTeamIconLink");
-			mainContainer.add(uploadLink);
+			//only show upload link if direct upload is supported
+			if (synapseJSNIUtils.isDirectUploadSupported())
+				mainContainer.add(uploadLink);
 			//show invite UI
 			inviteWidget.configure(team.getId());
 			mainContainer.add(inviteWidget.asWidget());
