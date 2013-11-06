@@ -219,7 +219,7 @@ public class DisplayConstants {
 	public static final String BUTTON_REGISTER = "Register";
 	public static final String LINK_COMMUNITY_FORUM = "Forum";
 	public static final String BUTTON_LOGIN = "Login";
-	public static final String BUTTON_DREAM_8 = "DREAM8 Challenges";
+	public static final String BUTTON_DREAM = "DREAM Challenges";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
 	public static final String BUTTON_MY_PROFILE = "My Profile";
