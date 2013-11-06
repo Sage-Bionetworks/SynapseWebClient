@@ -77,6 +77,7 @@ public class WidgetConstants {
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
+	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";
 	public static final String JOIN_WIDGET_SHOW_PROFILE_FORM_KEY = "showProfileForm";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY = "subchallengeIdList";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER = ",";
