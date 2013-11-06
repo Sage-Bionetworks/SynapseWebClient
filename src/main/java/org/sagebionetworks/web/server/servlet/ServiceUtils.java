@@ -32,21 +32,7 @@ public class ServiceUtils {
 	public static final String REPOSVC_SUFFIX_PATH_ACL = "acl"; 	
 	public static final String REPOSVC_SUFFIX_PATH_TYPE = "type";
 	public static final String REPOSVC_SUFFIX_PATH_BENEFACTOR = "benefactor"; 
-	public static final String REPOSVC_STORAGE_SUMMARY = "storageSummary";
 	
-	public static final String AUTHSVC_SET_REGISTRATION_USER_PASSWORD_PATH = "registeringUserPassword";
-	public static final String AUTHSVC_CHANGE_USER_EMAIL_PATH = "changeEmail";
-	public static final String AUTHSVC_SEND_PASSWORD_CHANGE_PATH = "userPasswordEmail";
-	public static final String AUTHSVC_SEND_API_PASSWORD_PATH = "apiPasswordEmail";
-	public static final String AUTHSVC_SET_PASSWORD_PATH = "userPassword";
-	public static final String AUTHSVC_INITIATE_SESSION_PATH = "session";
-	public static final String AUTHSVC_CREATE_USER_PATH = "user";
-	public static final String AUTHSVC_GET_USER_PATH = "user";
-	
-	@Deprecated
-	public static final String AUTHSVC_UPDATE_USER_PATH = "user";
-	public static final String AUTHSVC_TERMINATE_SESSION_PATH = "session";
-	public static final String AUTHSVC_REFRESH_SESSION_PATH = "session";
 	public static final String AUTHSVC_GET_GROUPS_PATH = "userGroup";
 	
 	public static final String AUTHSVC_ACL_PRINCIPAL_NAME = "name";

@@ -28,12 +28,6 @@ public interface UserAccountServiceAsync {
 
 	void createUser(UserRegistration userInfo, AsyncCallback<Void> callback);
 	
-	/**
-	 * This needs to be replaced with a Synapse Java Client call
-	 */
-	@Deprecated
-	void updateUser(String firstName, String lastName, String displayName, AsyncCallback<Void> callback) throws RestServiceException;
-	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 
 	void getPrivateAuthServiceUrl(AsyncCallback<String> callback);
