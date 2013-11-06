@@ -43,7 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
-	private String message;
+	private String message, isMemberMessage;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
 	
@@ -64,13 +64,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 
-	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback) {
+	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage) {
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
 		this.showUserProfileForm = showUserProfileForm;
 		this.teamUpdatedCallback = teamUpdatedCallback;
-		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus);
+		this.isMemberMessage = isMemberMessage;
+		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage);
 	};
 //	
 //	@Override
@@ -100,6 +101,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.showUserProfileForm = descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY) ? 
 				Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY)) : 
 				false;
+		this.isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
 		refresh();
 	}
 	
@@ -114,7 +116,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null, isMemberMessage);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -125,7 +127,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, showUserProfileForm, null, null);
+			configure(teamId, canPublicJoin, showUserProfileForm, null, null, isMemberMessage);
 		}
 	}
 	

@@ -78,7 +78,7 @@ public class JoinTeamWidgetTest {
 		status.setCanJoin(false);
 		status.setHasOpenRequest(false);
 		status.setIsMember(false);
-		joinWidget.configure(teamId, false, false, status, mockTeamUpdatedCallback);
+		joinWidget.configure(teamId, false, false, status, mockTeamUpdatedCallback, null);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));

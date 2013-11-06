@@ -26,6 +26,7 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -53,7 +54,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus) {
+	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage) {
 		clear();
 		initView();
 		
@@ -61,6 +62,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			//(note:  in all cases, clicking UI will check for unmet ToU)
 			if (teamMembershipStatus.getIsMember()) {
 				// don't show anything?
+				if(isMemberMessage != null && isMemberMessage.length() > 0){
+					add(new HTML(DisplayUtils.getAlertHtmlSpan(SafeHtmlUtils.htmlEscape(isMemberMessage), "", BootstrapAlertType.INFO)));
+				}
 			} else if (teamMembershipStatus.getCanJoin()) { // not in team but can join with a single request
 				// show join button; clicking Join joins the team
 				add(acceptInviteButton);
