@@ -279,9 +279,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
+//				if(caught instanceof ConflictException) {
+//					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+//				} else {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
-				} 
+				}
+//				}
 			}
 		});
 	}

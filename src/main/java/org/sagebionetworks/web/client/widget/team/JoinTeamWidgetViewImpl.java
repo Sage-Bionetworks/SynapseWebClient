@@ -225,7 +225,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         dialog.setAutoHeight(true);
         dialog.setResizable(false);
         dialog.add(profileForm.asWidget());
- 		dialog.setHeading("About You");
+        profileForm.setUpdateButtonText("Continue");
+ 		dialog.setHeading("Please Update Your Public Profile");
  		
 		dialog.show();
 	}
