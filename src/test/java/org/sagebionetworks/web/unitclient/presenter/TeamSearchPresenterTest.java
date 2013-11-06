@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +94,19 @@ public class TeamSearchPresenterTest {
 				anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		presenter.search("test", null);
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCanPublicJoin() throws RestServiceException {
+		//can public join is interpretted as false if null
+		Team team = new Team();
+		team.setCanPublicJoin(null);
+		assertFalse(TeamSearchPresenter.getCanPublicJoin(team));
+		team.setCanPublicJoin(false);
+		assertFalse(TeamSearchPresenter.getCanPublicJoin(team));
+
+		team.setCanPublicJoin(true);
+		assertTrue(TeamSearchPresenter.getCanPublicJoin(team));
 	}
 
 }

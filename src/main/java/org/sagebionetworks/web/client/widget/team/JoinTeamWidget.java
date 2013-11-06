@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -113,7 +114,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), team.getCanPublicJoin(), showUserProfileForm, teamMembershipStatus, null);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
