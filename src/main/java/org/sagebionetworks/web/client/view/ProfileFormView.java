@@ -29,6 +29,8 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	 */
 	void userUpdateFailed();
 	
+	void setUpdateButtonText(String text);
+	
 	public interface Presenter extends SynapsePresenter {
 
 		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, AttachmentData pic, String teamName, String url);

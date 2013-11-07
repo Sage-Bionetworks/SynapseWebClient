@@ -124,5 +124,9 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 		search(searchTerm, offset);
 	}
 
+	public static boolean getCanPublicJoin(Team team) {
+		return team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
+	}
+
 }
 

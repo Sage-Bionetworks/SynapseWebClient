@@ -124,6 +124,10 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		profileUpdatedCallback.profileUpdateCancelled();
 	}
 	
+	public void setUpdateButtonText(String text){
+		view.setUpdateButtonText(text);
+	}
+	
 	private void updateLoginInfo(UserSessionData currentUser) {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override

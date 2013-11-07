@@ -67,7 +67,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel registerBtnPanel;		
 	@UiField
-	SimplePanel dream8BtnPanel;
+	SimplePanel dreamBtnPanel;
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -170,16 +170,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 		registerBtnPanel.setWidget(registerBtn);
 		
-		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
-		dream8Btn.removeStyleName("gwt-Button");
-		dream8Btn.addStyleName("btn btn-default btn-lg btn-block");
-		dream8Btn.addClickHandler(new ClickHandler() {			
+		Button dreamBtn = new Button(DisplayConstants.BUTTON_DREAM);
+		dreamBtn.removeStyleName("gwt-Button");
+		dreamBtn.addStyleName("btn btn-default btn-lg btn-block");
+		dreamBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM8"));
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
 			}
 		});
-		dream8BtnPanel.setWidget(dream8Btn);
+		dreamBtnPanel.setWidget(dreamBtn);
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
