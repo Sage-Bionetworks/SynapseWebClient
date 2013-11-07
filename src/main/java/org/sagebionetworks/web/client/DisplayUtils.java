@@ -128,6 +128,8 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -368,7 +370,12 @@ public class DisplayUtils {
 			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
 			if(reason.matches(".*entity with the name: .+ already exites.*")) {
 				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			}			
+			} else {
+				RegExp regEx = RegExp.compile(".*Name.+is already used.*", "gm");
+				MatchResult matchResult = regEx.exec(reason);
+				if (matchResult != null)
+					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
+			}
 			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {

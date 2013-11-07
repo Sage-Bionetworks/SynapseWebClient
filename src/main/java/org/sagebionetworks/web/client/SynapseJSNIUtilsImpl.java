@@ -202,7 +202,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-  		xhr.setRequestHeader('Content-type', contentType);
+  		if(contentType) {
+  			xhr.setRequestHeader('Content-type', contentType);
+  		}
   		xhr.send(fileSliceToUpload);
 	}-*/;
 	

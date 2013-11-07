@@ -77,7 +77,7 @@
 						<br/>
 						<g:SimplePanel ui:field="registerBtnPanel"/>
 						<br/>
-						<g:SimplePanel ui:field="dream8BtnPanel"/>
+						<g:SimplePanel ui:field="dreamBtnPanel"/>
 					</div>
 				</g:HTMLPanel>
 	
@@ -105,14 +105,13 @@
 			        <li data-target="#myCarousel" data-slide-to="2"></li>
 			        <li data-target="#myCarousel" data-slide-to="3"></li>
    			        <li data-target="#myCarousel" data-slide-to="4"></li>
-   			        <li data-target="#myCarousel" data-slide-to="5"></li>			        			        
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
-			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream85_Banner.jpg" alt="DREAM 8.5 Challenges"/></a>
+			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream85_Banner.jpg" alt="DREAM Challenges"/></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM8">Learn More</a></p>
+			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM">Learn More</a></p>
 			            </div>
 			          </div>
 			        </div>
@@ -137,14 +136,6 @@
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
-			            </div>
-			          </div>
-			        </div>
-			        <div class="item">
-			          <a href="#!Synapse:syn1710250"><img src="images/spotlight/attractorMetagene.jpg" alt="BCC Gateway Project"/></a>
-			          <div class="container">
-			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1710250">BCC Gateway Project</a></p>
 			            </div>
 			          </div>
 			        </div>

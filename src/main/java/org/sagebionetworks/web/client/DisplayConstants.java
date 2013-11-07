@@ -163,6 +163,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_MESSAGE = "An error occuring attempting to save. Please try again.";
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
+	public static final String ERROR_DUPLICATE_NAME_MESSAGE = "This name already exists. Please enter a different name.";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
 	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
@@ -219,7 +220,7 @@ public class DisplayConstants {
 	public static final String BUTTON_REGISTER = "Register";
 	public static final String LINK_COMMUNITY_FORUM = "Forum";
 	public static final String BUTTON_LOGIN = "Login";
-	public static final String BUTTON_DREAM_8 = "DREAM8 Challenges";
+	public static final String BUTTON_DREAM = "DREAM Challenges";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
 	public static final String BUTTON_MY_PROFILE = "My Profile";
@@ -293,6 +294,7 @@ public class DisplayConstants {
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
+	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
 	public static final String ATTACHMENT_DIALOG_BUTTON_TEXT = "Attach";

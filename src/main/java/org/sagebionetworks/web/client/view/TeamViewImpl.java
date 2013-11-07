@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
@@ -36,8 +37,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -159,7 +158,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			CallbackP<String> fileHandleIdCallback = new CallbackP<String>(){
 				@Override
 				public void invoke(String fileHandleId) {
-					presenter.updateTeamInfo(team.getName(), team.getDescription(), team.getCanPublicJoin(), fileHandleId);
+					presenter.updateTeamInfo(team.getName(), team.getDescription(), TeamSearchPresenter.getCanPublicJoin(team), fileHandleId);
 				}
 			};
 			Widget uploadLink = DisplayUtils.getUploadButton(fileHandleIdCallback, uploader, iconsImageBundle, "Update Icon", ButtonType.LINK); 
@@ -182,7 +181,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (teamMembershipStatus != null) {
 			if (!teamMembershipStatus.getIsMember()) {
 				//not a member, add Join widget
-				joinTeamWidget.configure(team.getId(), team.getCanPublicJoin(), false, teamMembershipStatus, getRefreshCallback(team.getId()));
+				joinTeamWidget.configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), false, teamMembershipStatus, getRefreshCallback(team.getId()), null);
 				Widget joinTeamView = joinTeamWidget.asWidget();
 				joinTeamView.addStyleName("margin-top-15");	
 				mainContainer.add(joinTeamView);
@@ -218,7 +217,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		descriptionField.addStyleName("col-md-12 margin-left-10 margin-bottom-10");
 		form.add(DisplayUtils.wrap(descriptionField));
 		final CheckBox publicJoinCb = new CheckBox("People can join this team without team administrator authorization");
-		boolean isPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
+		boolean isPublicJoin = TeamSearchPresenter.getCanPublicJoin(team);
 		publicJoinCb.setValue(isPublicJoin);
 		FlowPanel cbPanel = new FlowPanel();
 		cbPanel.addStyleName("checkbox margin-left-10");
