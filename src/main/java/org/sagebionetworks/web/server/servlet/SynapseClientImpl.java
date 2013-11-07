@@ -1436,14 +1436,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, currentUserId);
 			} else {
-				//otherwise, create the request
-				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
-				membershipRequest.setMessage(message);
-				membershipRequest.setTeamId(teamId);
-				membershipRequest.setUserId(currentUserId);
-
-				//make new Synapse call
-				synapseClient.createMembershipRequest(membershipRequest);
+				PaginatedResults<MembershipRequest> openRequests = synapseClient.getOpenMembershipRequests(teamId,  currentUserId, 1,  ZERO_OFFSET);
+				if (openRequests.getTotalNumberOfResults() == 0) {
+					//otherwise, create the request
+					MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
+					membershipRequest.setMessage(message);
+					membershipRequest.setTeamId(teamId);
+					membershipRequest.setUserId(currentUserId);
+	
+					//make new Synapse call
+					synapseClient.createMembershipRequest(membershipRequest);
+				}
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1459,15 +1462,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, userGroupId);
 			} else {
-				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
-				membershipInvite.setMessage(message);
-				membershipInvite.setTeamId(teamId);
-				List<String> userIds = new ArrayList<String>();
-				userIds.add(userGroupId);
-				membershipInvite.setInvitees(userIds);
-				
-				//make new Synapse call
-				synapseClient.createMembershipInvitation(membershipInvite);
+				//check to see if there is already an open invite
+				PaginatedResults<MembershipInvitation> openInvitations = synapseClient.getOpenMembershipInvitations(userGroupId,teamId, 1, ZERO_OFFSET);
+				if (openInvitations.getTotalNumberOfResults() == 0) {
+					MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
+					membershipInvite.setMessage(message);
+					membershipInvite.setTeamId(teamId);
+					List<String> userIds = new ArrayList<String>();
+					userIds.add(userGroupId);
+					membershipInvite.setInvitees(userIds);
+					
+					//make new Synapse call
+					synapseClient.createMembershipInvitation(membershipInvite);
+				}
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
