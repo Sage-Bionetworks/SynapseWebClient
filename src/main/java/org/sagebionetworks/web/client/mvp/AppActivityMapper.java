@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -76,6 +77,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(Team.class);
 		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(Down.class);
+		openAccessPlaces.add(Profile.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);

@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -73,7 +76,6 @@ public class ProfilePresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		profilePresenter.setPlace(place);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
@@ -86,25 +88,9 @@ public class ProfilePresenterTest {
 		testUserJson = adapter.toJSONString(); 
 	}
 	
-	private void resetMocks() {
-		reset(mockView);
-		reset(mockAuthenticationController);
-		reset(mockUserService);
-		reset(mockPlaceChanger);
-		reset(mockSynapseClient);
-		reset(mockNodeModelCreator);
-		reset(mockGWTWrapper);
-		
-		reset(mockGlobalApplicationState);
-		reset(mockCookieProvider);
-	}
-	
 	@Test
 	public void testStart() {
-		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
-
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
@@ -113,30 +99,68 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testSetPlace() {
-		Profile newPlace = Mockito.mock(Profile.class);
-		profilePresenter.setPlace(newPlace);
-	}
-		
-	@Test
 	public void testRedirectToLinkedIn() {
-		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
-	
 		profilePresenter.redirectToLinkedIn();
 	}
 	
 	@Test
 	public void testUpdateProfileWithLinkedIn() {
-		resetMocks();
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator,mockCookieProvider, mockGWTWrapper,adapter, mockProfileForm);	
 		profilePresenter.setPlace(place);
-
 		when(mockCookieProvider.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
 	}
+	
+	@Test
+	public void testPublicView() {
+		//view another user profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn("12345");
+		profilePresenter.setPlace(place);
+		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testPublicViewMyProfileRedirect() {
+		//view another user profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(Profile.VIEW_PROFILE_PLACE_TOKEN);
+		profilePresenter.setPlace(place);
+		verify(mockView).showErrorMessage(anyString());
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+
+	@Test
+	public void testPublicEditMyProfileRedirect() {
+		//view another user profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		when(place.toToken()).thenReturn(Profile.EDIT_PROFILE_PLACE_TOKEN);
+		profilePresenter.setPlace(place);
+		verify(mockView).showErrorMessage(anyString());
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testViewMyProfileNoRedirect() {
+		//view another user profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(place.toToken()).thenReturn(Profile.VIEW_PROFILE_PLACE_TOKEN);
+		profilePresenter.setPlace(place);
+		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
+	
+
+	@Test
+	public void testEditMyProfileNoRedirect() {
+		//view another user profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(place.toToken()).thenReturn(Profile.EDIT_PROFILE_PLACE_TOKEN);
+		profilePresenter.setPlace(place);
+		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
+
 	
 }
