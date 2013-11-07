@@ -913,32 +913,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
-		String sharedEntityId = "syn123455";
-		setupGetAvailableEvaluations(sharedEntityId);
-		
-		//when asking for entity headers, return a single entity header
-		BatchResults<EntityHeader> batchResults = new BatchResults<EntityHeader>();
-		List<EntityHeader> entityHeaders = new ArrayList<EntityHeader>();
-		entityHeaders.add(new EntityHeader());
-		batchResults.setResults(entityHeaders);
-		batchResults.setTotalNumberOfResults(1);
-		when(mockSynapse.getEntityHeaderBatch(any(List.class))).thenReturn(batchResults);
-		
-		String entityHeadersJson = synapseClient.getAvailableEvaluationEntities();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
-		
-		//capture argument to verify that the reference passed to getEntityHeaderBatch points to a single entity (the sharedEntityId)
-		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		verify(mockSynapse).getEntityHeaderBatch(captor.capture());
-		assertTrue(captor.getValue().size() == 1);
-		assertEquals(sharedEntityId, ((Reference)captor.getValue().get(0)).getTargetId());
-		String expectedJson = EntityFactory.createJSONStringForEntity(batchResults);
-		assertEquals(expectedJson, entityHeadersJson);
-	}
-
-	@Test
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();
 		inputSubmission.setId("my submission id");

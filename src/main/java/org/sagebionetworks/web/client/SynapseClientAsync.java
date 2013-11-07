@@ -182,8 +182,6 @@ public interface SynapseClientAsync {
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
-	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object

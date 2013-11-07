@@ -111,7 +111,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
-	private MyEvaluationEntitiesList myEvaluationsList;
 	private TeamListWidget teamsListWidget;
 	private CookieProvider cookies;
 	private FlowPanel openTeamInvitesPanel;
@@ -136,7 +135,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
 		this.teamsListWidget = teamsListWidget;
 		this.cookies = cookies;
@@ -273,7 +271,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		LayoutContainer evalsAndProjects = new LayoutContainer();
 		evalsAndProjects.setStyleName("col-md-4");
-		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
 		evalsAndProjects.add(createCreateProjectWidget()); 
 		projectPanelContainer.add(evalsAndProjects);
@@ -405,12 +402,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showOpenTeamInvitesMessage(Boolean visible) {
 		openTeamInvitesPanel.setVisible(visible);
 	}
-	private LayoutContainer getMyEvaluationsContainer() {
-		//My Evaluations
-		LayoutContainer myEvaluations = new LayoutContainer();
-		myEvaluations.add(myEvaluationsList.asWidget());					
-		return myEvaluations;
-	}
 	
 	private LayoutContainer getMyProjectsContainer() {
 		LayoutContainer myProjContainer = new LayoutContainer();
@@ -435,15 +426,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void setFavoritesError(String string) {
-	}
-	
-	@Override
-	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities) {
-		myEvaluationsList.configure(myEvaluationEntities);
-	}
-	
-	@Override
-	public void setMyEvaluationsError(String string) {
 	}
 	
 	private void fillProgrammaticClientInstallCode() {
