@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
 
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -15,7 +14,9 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -226,15 +227,26 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		};
 	}
 	
+	private void loggedInCheck() {
+		if (!authenticationController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}
+	}
+	
 	private void showView(Profile place) {
 		setupProfileFormCallback();
 		String token = place.toToken();
 		if (Profile.VIEW_PROFILE_PLACE_TOKEN.equals(token)) {
 			//View (my) profile
+			//must be logged in
+			loggedInCheck();
 			updateProfileView(false);
 		}
 		else if (Profile.EDIT_PROFILE_PLACE_TOKEN.equals(token)) {
 			//Edit my profile (current user must equal the profile being displayed)
+			//must be logged in
+			loggedInCheck();
 			updateProfileView(true);
 		}
 		else if(!"".equals(token) && token != null) {
@@ -243,7 +255,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			{
 				// User just logged in to LinkedIn. Get the request token and their info to update
 				// their profile with.
-				
+
+				//must be logged in
+				loggedInCheck();
+
 				String requestToken = "";
 				String verifier = "";
 				if (token.startsWith("?"))
