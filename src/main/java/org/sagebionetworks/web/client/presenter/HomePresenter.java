@@ -160,17 +160,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadProjectsAndFavorites() {
-		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setMyEvaluationList(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setMyEvaluationsError("Could not load My Evaluations");
-			}
-		});
-		
 		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
 		
 		view.showOpenTeamInvitesMessage(false);
@@ -217,33 +206,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				//do nothing
 			}
 		});		
-	}
-
-	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
-		try {
-			synapseClient.getAvailableEvaluationEntitiesList(new AsyncCallback<ArrayList<String>>() {
-				@Override
-				public void onSuccess(ArrayList<String> results) {					
-					try {	
-						List<EntityHeader> evals = new ArrayList<EntityHeader>();
-						for(String eh : results) {
-							evals.add(new EntityHeader(adapterFactory.createNew(eh)));
-						}
-						callback.onSuccess(evals);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (RestServiceException e) {
-			callback.onFailure(e);
-		}
-
 	}
 	
 	@Override
