@@ -7,6 +7,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -45,6 +46,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	NodeModelCreator nodeModelCreator;
+	GWTWrapper gwt;
 	private ResourceLoader resourceLoader;
 	private String md;
 	private WikiPageKey wikiKey;
@@ -59,7 +61,8 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			NodeModelCreator nodeModelCreator,
-			ResourceLoader resourceLoader) {
+			ResourceLoader resourceLoader, 
+			GWTWrapper gwt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -70,6 +73,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 		this.authenticationController = authenticationController;
 		this.nodeModelCreator = nodeModelCreator;
 		this.resourceLoader = resourceLoader;
+		this.gwt = gwt;
 	}
 	
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview) {
@@ -107,7 +111,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 		this.wikiKey = wikiKey;
 		this.isWiki = isWiki;
 		this.isPreview= isPreview;
-		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), DisplayUtils.getHostPrefix(), new AsyncCallback<String>() {
+		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

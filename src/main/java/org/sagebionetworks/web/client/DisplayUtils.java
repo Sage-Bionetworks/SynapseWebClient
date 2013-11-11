@@ -1938,9 +1938,4 @@ public class DisplayUtils {
 		t.schedule(30000); // hide after 30 seconds
 	    return label;
 	}
-	
-	public static String getHostPrefix() {
-		return com.google.gwt.user.client.Window.Location.getProtocol()+"//"+com.google.gwt.user.client.Window.Location.getHost();
-	}
-	
 }

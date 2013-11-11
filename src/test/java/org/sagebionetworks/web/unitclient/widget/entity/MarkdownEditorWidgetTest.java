@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -31,6 +32,7 @@ public class MarkdownEditorWidgetTest {
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
+	GWTWrapper mockGwt;
 	
 	@Before
 	@Ignore
@@ -42,7 +44,8 @@ public class MarkdownEditorWidgetTest {
 		mockBaseEditWidgetPresenter = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockResourceLoader = mock(ResourceLoader.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader);
+		mockGwt = mock(GWTWrapper.class);
+		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader, mockGwt);
 	}
 	
 	@Test

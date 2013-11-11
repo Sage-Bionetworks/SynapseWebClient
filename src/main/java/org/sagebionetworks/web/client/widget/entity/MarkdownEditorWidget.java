@@ -5,6 +5,7 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -73,6 +74,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private WidgetDescriptorUpdatedHandler callback;
 	private WidgetSelectionState widgetSelectionState;
 	private ResourceLoader resourceLoader;
+	private GWTWrapper gwt;
+	
 	public interface CloseHandler{
 		public void saveClicked();
 		public void cancelClicked();
@@ -90,7 +93,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			IconsImageBundle iconsImageBundle,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			CookieProvider cookies,
-			ResourceLoader resourceLoader) {
+			ResourceLoader resourceLoader, 
+			GWTWrapper gwt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -99,6 +103,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
+		this.gwt = gwt;
 		widgetSelectionState = new WidgetSelectionState();
 	}
 	
@@ -338,7 +343,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), DisplayUtils.getHostPrefix(), new AsyncCallback<String>() {
+	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {

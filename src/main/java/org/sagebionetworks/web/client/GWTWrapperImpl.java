@@ -38,4 +38,9 @@ public class GWTWrapperImpl implements GWTWrapper {
 		return NumberFormat.getFormat(pattern);
 	}
 
+	@Override
+	public String getHostPrefix() {
+		return com.google.gwt.user.client.Window.Location.getProtocol()+"//"+com.google.gwt.user.client.Window.Location.getHost();
+	}
+
 }
