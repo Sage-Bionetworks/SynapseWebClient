@@ -53,10 +53,10 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callFailureWith(new Exception())
 				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(), 
+				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
 						any(AsyncCallback.class));
 		
 		presenter.showPreview(testMarkdown, true);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
 	}
 }

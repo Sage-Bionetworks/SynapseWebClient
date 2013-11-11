@@ -107,7 +107,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 		this.wikiKey = wikiKey;
 		this.isWiki = isWiki;
 		this.isPreview= isPreview;
-		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
+		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), DisplayUtils.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {

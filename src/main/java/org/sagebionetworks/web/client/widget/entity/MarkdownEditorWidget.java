@@ -338,7 +338,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
+	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), DisplayUtils.getHostPrefix(), new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {

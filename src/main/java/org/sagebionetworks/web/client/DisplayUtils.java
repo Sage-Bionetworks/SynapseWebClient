@@ -1939,4 +1939,8 @@ public class DisplayUtils {
 	    return label;
 	}
 	
+	public static String getHostPrefix() {
+		return com.google.gwt.user.client.Window.Location.getProtocol()+"//"+com.google.gwt.user.client.Window.Location.getHost();
+	}
+	
 }
