@@ -14,7 +14,6 @@ import org.sagebionetworks.authutil.OpenIDConsumerUtils;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
-import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -133,10 +132,10 @@ public class OpenIDUtils {
 			// Check to see if the user has accepted the terms of use
 			synapse.setSessionToken(session.getSessionToken());
 			try {
-				NewUser user = synapse.getAuthUserInfo();
+				synapse.getAuthUserInfo();
 				
 				// The user has accepted the terms, otherwise the previous operation would have failed
-				acceptsTermsOfUse = user.getAcceptsTermsOfUse();
+				acceptsTermsOfUse = true;
 			} catch (SynapseForbiddenException e) {
 				// The user has not accepted the terms
 				// If something else broke, the error would be a SynapseUnauthorizedException
