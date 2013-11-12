@@ -601,6 +601,11 @@ public class DisplayUtils {
 		return "<span class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</span>";
 	}
 	
+	public static String getBadgeHtml(String i) {
+		return "<span class=\"badge\">"+i+"</span>";
+	}
+
+	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
 	}

@@ -171,7 +171,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(profile.getOwnerId(), false);
+			myTeamsWidget.configure(profile.getOwnerId(), false, true);
 			myTeamsPanel.add(myTeamsWidget.asWidget());
 			myTeamsPanel.setVisible(true);
 		

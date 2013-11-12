@@ -42,16 +42,22 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	public void configure(List<Team> teams, boolean isBig) {
+	public void configure(List<Team> teams, boolean isBig, boolean showRequestCounts) {
 		view.configure(teams, isBig);
 	}
 	
-	public void configure(String userId, final boolean isBig) {
+	public void configure(String userId, final boolean isBig, final boolean showRequestCounts) {
 		//get the teams associated to the given user
 		getTeams(userId, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> teams) {
-				configure(teams, isBig);
+				configure(teams, isBig, showRequestCounts);
+				//then asynchronously load the request counts
+				if (showRequestCounts) {
+					for (Team team : teams) {
+						queryForRequestCount(team.getId());
+					}
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -82,6 +88,20 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 			}
 		});
 	}
+	
+	private void queryForRequestCount(final String teamId) {
+		synapseClient.getOpenRequestCount(teamId, new AsyncCallback<Long>() {
+			@Override
+			public void onSuccess(Long result) {
+				view.setRequestCount(teamId, result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//ignore any failures
+			}
+		});
+	}
+	
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();
