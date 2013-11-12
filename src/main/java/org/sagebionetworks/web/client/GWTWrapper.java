@@ -16,4 +16,5 @@ public interface GWTWrapper {
 
 	NumberFormat getNumberFormat(String pattern);
 	
+	String getHostPrefix(); 
 }
