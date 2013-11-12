@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,6 +14,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,7 +23,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	private SageImageBundle sageImageBundle;
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
-	
+	private Map<String, SimplePanel> team2NotificationPanel;
 	@Inject
 	public TeamListWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
@@ -49,22 +52,36 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	}
 	
 	@Override
+	public void setRequestCount(String teamId, Long count) {
+		if (team2NotificationPanel.containsKey(teamId)) {
+			team2NotificationPanel.get(teamId).setWidget(new HTML(DisplayUtils.getBadgeHtml(count.toString())));
+		}
+	}
+	
+	@Override
 	public void configure(List<Team> teams, boolean isBig) {
 		clear();
+		team2NotificationPanel = new HashMap<String, SimplePanel>();
 		for (Team team : teams) {
+			FlowPanel teamPanel = new FlowPanel();
+			SimplePanel notificationContainer = new SimplePanel();
+			notificationContainer.addStyleName("inline-block");
+			team2NotificationPanel.put(team.getId(), notificationContainer);
+			teamPanel.add(notificationContainer);
 			if (isBig) {
 				BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 				teamRenderer.configure(team, team.getDescription());
 				Widget teamRendererWidget = teamRenderer.asWidget();
 				teamRendererWidget.addStyleName("margin-top-15 margin-bottom-40");
-				add(teamRendererWidget);
+				teamPanel.add(teamRendererWidget);
 			} else {
 				TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
 				teamRenderer.configure(team);
 				Widget teamRendererWidget = teamRenderer.asWidget();
 				teamRendererWidget.addStyleName("margin-top-5");
-				add(teamRendererWidget);
+				teamPanel.add(teamRendererWidget);
 			}
+			add(teamPanel);
 		}
 		if (teams.isEmpty())
 			add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
