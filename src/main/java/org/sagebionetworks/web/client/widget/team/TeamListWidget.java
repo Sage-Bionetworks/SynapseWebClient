@@ -90,14 +90,17 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	}
 	
 	private void queryForRequestCount(final String teamId) {
-		synapseClient.getOpenRequestCount(teamId, new AsyncCallback<Long>() {
+		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
 			@Override
 			public void onSuccess(Long result) {
-				view.setRequestCount(teamId, result);
+				if (result != null && result > 0)
+					view.setRequestCount(teamId, result);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				//ignore any failures
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
 			}
 		});
 	}

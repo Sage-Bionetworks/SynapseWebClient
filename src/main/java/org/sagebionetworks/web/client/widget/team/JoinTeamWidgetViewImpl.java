@@ -163,6 +163,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			});
 			requestUIPanel.add(sendRequestButton);
 		}
+		messageArea.setValue("");
 	}	
 	@Override
 	public void showLoading() {

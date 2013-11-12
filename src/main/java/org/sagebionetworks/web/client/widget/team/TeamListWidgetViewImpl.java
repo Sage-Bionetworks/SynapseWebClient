@@ -54,7 +54,9 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void setRequestCount(String teamId, Long count) {
 		if (team2NotificationPanel.containsKey(teamId)) {
-			team2NotificationPanel.get(teamId).setWidget(new HTML(DisplayUtils.getBadgeHtml(count.toString())));
+			HTML widget = new HTML(DisplayUtils.getBadgeHtml(count.toString()));
+			DisplayUtils.addToolTip(widget, "This team has Pending Join Requests to review");
+			team2NotificationPanel.get(teamId).setWidget(widget);
 		}
 	}
 	
@@ -64,10 +66,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 		team2NotificationPanel = new HashMap<String, SimplePanel>();
 		for (Team team : teams) {
 			FlowPanel teamPanel = new FlowPanel();
-			SimplePanel notificationContainer = new SimplePanel();
-			notificationContainer.addStyleName("inline-block");
-			team2NotificationPanel.put(team.getId(), notificationContainer);
-			teamPanel.add(notificationContainer);
+			add(teamPanel);
 			if (isBig) {
 				BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 				teamRenderer.configure(team, team.getDescription());
@@ -78,10 +77,15 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 				TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
 				teamRenderer.configure(team);
 				Widget teamRendererWidget = teamRenderer.asWidget();
-				teamRendererWidget.addStyleName("margin-top-5");
+				teamRendererWidget.addStyleName("margin-top-5 inline-block");
 				teamPanel.add(teamRendererWidget);
+				SimplePanel notificationContainer = new SimplePanel();
+				notificationContainer.addStyleName("inline-block moveup-5 margin-left-5");
+				team2NotificationPanel.put(team.getId(), notificationContainer);
+				teamPanel.add(notificationContainer);
 			}
-			add(teamPanel);
+			
+			
 		}
 		if (teams.isEmpty())
 			add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
