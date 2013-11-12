@@ -68,7 +68,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		});
 	}
 	
-	private void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
+	public void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
 		synapseClient.getTeamsForUser(userId, new AsyncCallback<ArrayList<String>>() {
 			@Override
 			public void onSuccess(ArrayList<String> results) {
@@ -89,7 +89,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		});
 	}
 	
-	private void queryForRequestCount(final String teamId) {
+	public void queryForRequestCount(final String teamId) {
 		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
 			@Override
 			public void onSuccess(Long result) {
