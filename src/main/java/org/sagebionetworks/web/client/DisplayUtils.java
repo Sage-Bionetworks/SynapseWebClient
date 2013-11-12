@@ -1938,5 +1938,4 @@ public class DisplayUtils {
 		t.schedule(30000); // hide after 30 seconds
 	    return label;
 	}
-	
 }

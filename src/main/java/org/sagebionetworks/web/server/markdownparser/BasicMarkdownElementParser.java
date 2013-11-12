@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 
 public abstract class BasicMarkdownElementParser implements MarkdownElementParser {
 	protected boolean isPreview;
+	protected String clientHostString="";
 	
 	/**
 	 * Can leave alone if element parser has no state 
@@ -57,6 +58,15 @@ public abstract class BasicMarkdownElementParser implements MarkdownElementParse
 	@Override
 	public void setIsPreview(boolean isPreview) {
 		this.isPreview= isPreview;
+	}
+	
+	public String getClientHostString() {
+		return clientHostString;
+	}
+	
+	@Override
+	public void setClientHostString(String clientHostString) {
+		this.clientHostString = clientHostString;
 	}
 	
 	public String runSimpleParsers(String line, List<MarkdownElementParser> simpleParsers) {

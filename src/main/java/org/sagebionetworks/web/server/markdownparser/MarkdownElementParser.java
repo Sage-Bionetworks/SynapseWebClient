@@ -56,4 +56,6 @@ public interface MarkdownElementParser {
 	boolean isInputSingleLine();
 	
 	void setIsPreview(boolean isPreview);
+	
+	void setClientHostString(String clientHostString);
 }

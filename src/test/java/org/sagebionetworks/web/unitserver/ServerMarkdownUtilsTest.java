@@ -58,4 +58,32 @@ public class ServerMarkdownUtilsTest {
 		assertEquals(beforeHtml, htmlDoc.html());
 		assertEquals(beforeSet, extractor.getContainerIds());
 	}
+	
+	@Test
+	public void testGetStartLink(){
+		String startLink;
+		//verify it's the current window if either the client host string or the href is null or blank
+		startLink = ServerMarkdownUtils.getStartLink(null, "http://www.jayhodgson.com");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		startLink = ServerMarkdownUtils.getStartLink("", "http://www.jayhodgson.com");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", null);
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		
+		//verify current window if href starts with the client host string
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "https://www.synapse.org/#!Challenges:DREAM");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		//ignore the case they supply for the link
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "https://WWW.SYNAPSE.ORG/#!Challenges:DREAM");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		
+		
+		//new window if different
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "https://www.jayhodgson.com/#!Challenges:DREAM");
+		assertEquals(ServerMarkdownUtils.START_LINK_NEW_WINDOW, startLink);
+	}
+	
+	
 }
