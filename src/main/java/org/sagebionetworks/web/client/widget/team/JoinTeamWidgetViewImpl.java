@@ -108,7 +108,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private void initView() {
 		if (requestUIPanel == null) {
 			
-			anonymousUserButton = DisplayUtils.createButton("Join", ButtonType.SUCCESS);
+			anonymousUserButton = DisplayUtils.createButton("Join", ButtonType.PRIMARY);
+			anonymousUserButton.addStyleName("btn-lg");
 			anonymousUserButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -117,7 +118,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				}
 			});
 			
-			acceptInviteButton = DisplayUtils.createButton("Join", ButtonType.SUCCESS);
+			acceptInviteButton = DisplayUtils.createButton("Join", ButtonType.PRIMARY);
+			acceptInviteButton.addStyleName("btn-lg");
 			acceptInviteButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

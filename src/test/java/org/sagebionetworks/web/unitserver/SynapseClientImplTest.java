@@ -1031,10 +1031,8 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testInviteMemberOpenInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
-		openInvites.setTotalNumberOfResults(1);
-		when(mockSynapse.getOpenMembershipInvitations(anyString(), anyString(), anyLong(), anyLong())).thenReturn(openInvites);
-		//and verify that no evaluations are returned for a different entity id
+		membershipStatus.setHasOpenInvitation(true);
+		//verify it does not create a new invitation since one is already open
 		synapseClient.inviteMember("123", "a team", "");
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(), anyString());
 		verify(mockSynapse, Mockito.times(0)).createMembershipInvitation(any(MembershipInvtnSubmission.class));
@@ -1043,10 +1041,8 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testRequestMemberOpenRequests() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		PaginatedResults<MembershipRequest> openRequests = new PaginatedResults<MembershipRequest>();
-		openRequests.setTotalNumberOfResults(1);
-		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(openRequests);
-		//and verify that no evaluations are returned for a different entity id
+		membershipStatus.setHasOpenRequest(true);
+		//verify it does not create a new request since one is already open
 		synapseClient.requestMembership("123", "a team", "");
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(), anyString());
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(any(MembershipRqstSubmission.class));
