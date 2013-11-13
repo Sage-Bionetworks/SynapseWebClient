@@ -9,9 +9,6 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
 import com.extjs.gxt.ui.client.store.TreeStore;
-import com.extjs.gxt.ui.client.widget.Layout;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -19,35 +16,23 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpagesView {
+public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
 
 	private Presenter presenter;
 	private GlobalApplicationState globalAppState;
 	
 	@Inject
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
-		this.setLayout(new FitLayout());
 		this.globalAppState = globalAppState;
 	}
 	
 	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-		
-	};
-
-	@Override
 	public void configure(TocItem root, final ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer) {
 		clear();
-		setLayout(new FitLayout());
-		//addStyleName("well well-small display-table");
-		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
@@ -86,10 +71,9 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 					String newHeight = child.getClientHeight() + "px";
 					tree.setHeight(newHeight);
 					setHeight(newHeight);
-					String expandedHeight = child.getClientHeight()+20 + "px";
+					String expandedHeight = child.getClientHeight()+50 + "px";
 					if (parentContainer != null)
 						parentContainer.setHeight(expandedHeight);
-					layout(true);
 				}
 			};
 			
@@ -104,17 +88,18 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	            		globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
 	            };
 	        });
+			
+			add(new HTML("<h3>Pages</h3>"));
 			add(tree);
 
 			parentContainer.addResizeHandler(new ResizeHandler() {
 				@Override
 				public void onResize(ResizeEvent event) {
 					//when container is resized, also resize the tree
-					tree.setWidth(WikiSubpagesViewImpl.this.getWidth());
+					tree.setWidth(WikiSubpagesViewImpl.this.getOffsetWidth());
 				}
 			});
 		}
-		layout(true);
 	}	
 	
 	@Override
@@ -139,10 +124,5 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void clear() {
-		this.removeAll(true);
 	}
 }
