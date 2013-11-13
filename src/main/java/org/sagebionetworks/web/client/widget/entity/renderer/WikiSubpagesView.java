@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
 
@@ -17,7 +20,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(TocItem root);
+	public void configure(TocItem root, ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer);
 	
 	/**
 	 * Presenter interface

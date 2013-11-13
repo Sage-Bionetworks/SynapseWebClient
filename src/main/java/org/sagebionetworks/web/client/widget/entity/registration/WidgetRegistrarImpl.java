@@ -116,8 +116,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getSynapseAPICallRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.TOC_CONTENT_TYPE)) {
 			presenter = ginInjector.getTableOfContentsRenderer();
-		} else if (contentTypeKey.equals(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE)) {
-			presenter = ginInjector.getWikiSubpagesRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getWikiFilesPreviewRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
@@ -136,6 +134,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getButtonLinkWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE)) {
 			presenter = ginInjector.getTutorialWidgetRenderer();
+		} else if (contentTypeKey.equals(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.NO_AUTO_WIKI_SUBPAGES)) {
+			presenter = ginInjector.getEmptyWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)

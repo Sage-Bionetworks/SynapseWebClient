@@ -9,12 +9,18 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.TreePanelEvent;
 import com.extjs.gxt.ui.client.store.TreeStore;
+import com.extjs.gxt.ui.client.widget.Layout;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,16 +43,20 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	};
 
 	@Override
-	public void configure(TocItem root) {
+	public void configure(TocItem root, ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer) {
 		clear();
-		final FlowPanel treePanel = new FlowPanel();
-		treePanel.addStyleName("well well-small display-table");
-		treePanel.add(new HTML("<h3>Wiki Subpages</h3>"));
+		setLayout(new FitLayout());
+		//addStyleName("well well-small display-table");
 		
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
 			return;
+		
+		if (parentContainer != null)
+			parentContainer.addStyleName("col-md-3 col-md-push-9");	
+		if (markdownContainer != null)
+			markdownContainer.addStyleName("col-md-9 col-md-pull-3");	
 		
 		//only show the tree if the root has children
 		if (mainPage.getChildCount() > 0) {
@@ -55,6 +65,8 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
 			
 			tree.setAutoExpand(true);
+			tree.setAutoHeight(true);
+			tree.setTrackMouseOver(false);
 			tree.addStyleName("pagesTree");
 			//Remove folder icons
 			tree.getStyle().setNodeCloseIcon(null);
@@ -73,7 +85,8 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 					Element child = tree.getElement().getFirstChildElement();
 					String newHeight = child.getClientHeight() + "px";
 					tree.setHeight(newHeight);
-					treePanel.setHeight(newHeight);
+					setHeight(newHeight);
+					layout(true);
 				}			
 			};
 			
@@ -88,10 +101,17 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	            		globalAppState.getPlaceChanger().goTo(event.getItem().getTargetPlace());
 	            };
 	        });
-			treePanel.add(tree);
+			add(tree);
+
+			parentContainer.addResizeHandler(new ResizeHandler() {
+				@Override
+				public void onResize(ResizeEvent event) {
+					//when container is resized, also resize the tree
+					tree.setWidth(WikiSubpagesViewImpl.this.getWidth());
+				}
+			});
 		}
-		this.add(treePanel);
-		this.layout(true);
+		layout(true);
 	}	
 	
 	@Override

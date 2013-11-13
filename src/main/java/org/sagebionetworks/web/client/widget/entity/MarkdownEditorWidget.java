@@ -474,13 +474,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
 		}));
-    	menu.add(getNewCommand("Wiki Pages", new SelectionListener<ComponentEvent>() {
-	    	public void componentSelected(ComponentEvent ce) {
-	    		insertMarkdown(SharedMarkdownUtils.getWikiSubpagesMarkdown());
-	    	};
-		}));
-	    
-	    
+    	
 	    /**
 	     * load alpha test site widgets
 	     */

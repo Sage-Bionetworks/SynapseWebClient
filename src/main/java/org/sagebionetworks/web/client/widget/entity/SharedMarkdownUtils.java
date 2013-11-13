@@ -5,14 +5,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class SharedMarkdownUtils {
 
-	public static String getWikiSubpagesMarkdown() {
-		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN;
-	}
-	
-	public static String getNoAutoWikiSubpagesMarkdown() {
-		return WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.NO_AUTO_WIKI_SUBPAGES + WidgetConstants.WIDGET_END_MARKDOWN;
-	}
-
 	public static String getWidgetHTML(String id, String widgetProperties){
 		boolean inlineWidget = false;
 		StringBuilder sb = new StringBuilder();
@@ -35,10 +27,6 @@ public class SharedMarkdownUtils {
 		sb.append("\">");
 		sb.append("</span>");
 	    return sb.toString();
-	}
-
-	public static String getDefaultWikiMarkdown() {
-		return getWidgetHTML(0 + "", WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
 	}
 
 	public static String getPreviewSuffix(Boolean isPreview) {
