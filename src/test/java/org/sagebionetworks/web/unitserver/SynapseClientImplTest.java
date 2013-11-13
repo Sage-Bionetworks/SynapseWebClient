@@ -676,6 +676,21 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
+	public void testGetV2WikiPage() throws Exception {
+		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
+		synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+	    verify(mockSynapse).getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+	}
+	
+	@Test
+	public void testUpdateV2WikiPage() throws Exception {
+		String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
+		Mockito.when(mockSynapse.updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class))).thenReturn(v2Page);
+		synapseClient.updateV2WikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		verify(mockSynapse).updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class));
+	}
+	
+	@Test
 	public void testRestoreV2WikiPage() throws Exception {
 		String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
 		Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong())).thenReturn(v2Page);
@@ -697,21 +712,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getV2WikiHistory(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class), any(Long.class))).thenReturn(historyResults);
 		synapseClient.getV2WikiHistory(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(10), new Long(0));
 	    verify(mockSynapse).getV2WikiHistory(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class), any(Long.class));
-	}
-	
-	@Test
-	public void testGetV2WikiPage() throws Exception {
-		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
-		synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-	    verify(mockSynapse).getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
-	public void testUpdateV2WikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
-		Mockito.when(mockSynapse.updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class))).thenReturn(v2Page);
-		synapseClient.updateV2WikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-		verify(mockSynapse).updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class));
 	}
 
 	@Test
