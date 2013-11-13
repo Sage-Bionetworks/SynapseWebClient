@@ -43,7 +43,7 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 	};
 
 	@Override
-	public void configure(TocItem root, ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer) {
+	public void configure(TocItem root, final ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer) {
 		clear();
 		setLayout(new FitLayout());
 		//addStyleName("well well-small display-table");
@@ -52,9 +52,9 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
 			return;
-		
+		addStyleName("margin-10");
 		if (parentContainer != null)
-			parentContainer.addStyleName("col-md-3 col-md-push-9");	
+			parentContainer.addStyleName("col-xs-12 col-md-3 col-md-push-9 well well-small display-table");	
 		if (markdownContainer != null)
 			markdownContainer.addStyleName("col-md-9 col-md-pull-3");	
 		
@@ -63,7 +63,6 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			TreeStore<ModelData> store = new TreeStore<ModelData>();
 			store.add(root.getChildren(), true);
 			final TreePanel<ModelData> tree = new TreePanel<ModelData>(store);
-			
 			tree.setAutoExpand(true);
 			tree.setAutoHeight(true);
 			tree.setTrackMouseOver(false);
@@ -75,7 +74,8 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 			tree.setLabelProvider(new ModelStringProvider<ModelData>() {
 				@Override
 				public String getStringValue(ModelData model, String property) {
-					return "<span class=\"link\">" + model.toString() + "</span>";
+					String style = ((TocItem)model).isCurrentPage() ? "" : "link";
+					return "<span class=\""+style+"\">" + model.toString() + "</span>";
 				}	
 			});
 			
@@ -86,8 +86,11 @@ public class WikiSubpagesViewImpl extends LayoutContainer implements WikiSubpage
 					String newHeight = child.getClientHeight() + "px";
 					tree.setHeight(newHeight);
 					setHeight(newHeight);
+					String expandedHeight = child.getClientHeight()+20 + "px";
+					if (parentContainer != null)
+						parentContainer.setHeight(expandedHeight);
 					layout(true);
-				}			
+				}
 			};
 			
 			tree.addListener(Events.Expand, expandCollapseListener);

@@ -136,9 +136,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							title = header.getTitle();
 						}
 						
-						if (isCurrentPage)
-							title += " (Current Page)";
-						TocItem item = new TocItem(title, targetPlace);
+						TocItem item = new TocItem(title, targetPlace, isCurrentPage);
 						wikiId2TreeItem.put(header.getId(), item);
 					}
 					//now set up the relationships
@@ -182,24 +180,26 @@ class TocItem extends BaseTreeModel implements Serializable {
 	private static int ID = 0;
 	private String text;
 	private Synapse targetPlace;
+	private boolean isCurrentPage;
 	
 	public TocItem() {
 		set("id", ID++);
 	}
 	
-	public TocItem(String text, Synapse targetPlace) {
+	public TocItem(String text, Synapse targetPlace, boolean isCurrentPage) {
 		super();
 		set("id", ID++);
 		this.text = text;
 		this.targetPlace = targetPlace;
+		this.isCurrentPage = isCurrentPage;
 	}
 	
 	public Integer getId() {
 		return (Integer) get("id");
 	}
 	
-	public TocItem(String text, Synapse targetPlace, BaseTreeModel[] children) {
-		this(text, targetPlace);
+	public TocItem(String text, Synapse targetPlace, boolean isCurrentPage, BaseTreeModel[] children) {
+		this(text, targetPlace, isCurrentPage);
 		for(int i = 0; i < children.length; i++) {
 			add(children[i]);
 		}
@@ -211,6 +211,10 @@ class TocItem extends BaseTreeModel implements Serializable {
 	
 	public String getText() {
 		return text;
+	}
+	
+	public boolean isCurrentPage() {
+		return isCurrentPage;
 	}
 	
 	@Override
