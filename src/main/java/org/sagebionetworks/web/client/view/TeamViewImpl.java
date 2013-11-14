@@ -188,9 +188,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 			}
 			else {
 				//add Leave Team menu item, and show tools menu
-				// TODO : restore this for SWC-1025
-				//addLeaveItem(toolsButton); 
-				//commandsContainer.add(toolsButton);
+				addLeaveItem(toolsButton); 
+				commandsContainer.add(toolsButton);
 			}
 		}
 		memberListWidget.configure(team.getId(), isAdmin, getRefreshCallback(team.getId()));
