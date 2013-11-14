@@ -35,7 +35,7 @@ public class ServerMarkdownUtils {
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
 	public static final String TEMP_LESS_THAN_DELIMITER = "2%lt%9";
 	public static final String TEMP_GREATER_THAN_DELIMITER = "2%gt%9";
-	public static final String R_ASSIGNMENT = "<-";
+	public static final String R_ASSIGNMENT = "&lt;-";
 	public static final String R_MESSED_UP_ASSIGNMENT = "< -";
 	
 	public static String getStartLink(String clientHostString, String href) {
