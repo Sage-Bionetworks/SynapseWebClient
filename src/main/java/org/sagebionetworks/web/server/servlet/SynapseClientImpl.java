@@ -1552,7 +1552,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				Team team = synapseClient.getTeam(invite.getTeamId());
 				JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
 				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), inviteJson.toJSONString());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), null, inviteJson.toJSONString());
+				returnList.add(b);
+			}
+			
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//TODO: change to point to the new service call
+//			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipTeamInvitations(teamId,null, MAX_LIMIT, ZERO_OFFSET);
+			String fakeUserId = "273954";
+			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(fakeUserId, teamId, MAX_LIMIT, ZERO_OFFSET);
+			//and ask for the team info for each invite, and fill that in the bundle
+			
+			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
+			//now go through and create a MembershipInvitationBundle for each pair
+			
+			for (MembershipInvitation invite : invitations.getResults()) {
+				UserProfile profile = synapseClient.getUserProfile(invite.getUserId());
+				JSONObjectAdapter profileJson = profile.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(null, profileJson.toJSONString(), inviteJson.toJSONString());
 				returnList.add(b);
 			}
 			

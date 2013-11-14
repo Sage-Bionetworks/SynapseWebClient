@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidget;
+import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -62,6 +63,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private SageImageBundle sageImageBundle;
 	private MemberListWidget memberListWidget;
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
+	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	private InviteWidget inviteWidget;
 	private JoinTeamWidget joinTeamWidget;
 	private Header headerWidget;
@@ -74,7 +76,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
 			SageImageBundle sageImageBundle, 
 			MemberListWidget memberListWidget, 
-			OpenMembershipRequestsWidget openMembershipRequestsWidget, 
+			OpenMembershipRequestsWidget openMembershipRequestsWidget,
+			OpenUserInvitationsWidget openUserInvitationsWidget,
 			InviteWidget inviteWidget, 
 			JoinTeamWidget joinTeamWidget, 
 			Header headerWidget, 
@@ -87,6 +90,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.sageImageBundle = sageImageBundle;
 		this.memberListWidget = memberListWidget;
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
+		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.inviteWidget = inviteWidget;
 		this.joinTeamWidget = joinTeamWidget;
 		this.headerWidget = headerWidget;
@@ -171,6 +175,9 @@ public class TeamViewImpl extends Composite implements TeamView {
 			mainContainer.add(inviteWidget.asWidget());
 			openMembershipRequestsWidget.configure(team.getId(), getRefreshCallback(team.getId()));
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
+			
+			openUserInvitationsWidget.configure(team.getId());
+			mainContainer.add(openUserInvitationsWidget.asWidget());
 			
 			//fill in the tools menu button
 			addEditItem(toolsButton);

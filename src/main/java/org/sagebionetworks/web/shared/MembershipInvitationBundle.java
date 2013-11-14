@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MembershipInvitationBundle implements IsSerializable {
 
-	private String teamJson, membershipInvitationJson;
+	private String teamJson, membershipInvitationJson, userProfileJson;
 	
 	/**
 	 * Default constructor
@@ -13,10 +13,11 @@ public class MembershipInvitationBundle implements IsSerializable {
 		
 	}
 
-	public MembershipInvitationBundle(String teamJson, String membershipInvitationJson) {
+	public MembershipInvitationBundle(String teamJson, String userProfileJson, String membershipInvitationJson) {
 		super();
 		this.teamJson = teamJson;
 		this.membershipInvitationJson = membershipInvitationJson;
+		this.userProfileJson = userProfileJson;
 	}
 
 	public String getTeamJson() {
@@ -26,6 +27,15 @@ public class MembershipInvitationBundle implements IsSerializable {
 	public void setTeamJson(String teamJson) {
 		this.teamJson = teamJson;
 	}
+	
+	public String getUserProfileJson() {
+		return userProfileJson;
+	}
+	
+	public void setUserProfileJson(String userProfileJson) {
+		this.userProfileJson = userProfileJson;
+	}
+	
 	public String getMembershipInvitationJson() {
 		return membershipInvitationJson;
 	}
