@@ -1464,9 +1464,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
 				membershipInvite.setMessage(message);
 				membershipInvite.setTeamId(teamId);
-				List<String> userIds = new ArrayList<String>();
-				userIds.add(userGroupId);
-				membershipInvite.setInvitees(userIds);
+				membershipInvite.setInviteeId(userGroupId);
 				
 				//make new Synapse call
 				synapseClient.createMembershipInvitation(membershipInvite);
