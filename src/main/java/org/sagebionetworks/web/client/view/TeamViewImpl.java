@@ -175,7 +175,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 			//fill in the tools menu button
 			addEditItem(toolsButton);
 			addDeleteItem(toolsButton);
-			commandsContainer.add(toolsButton);
 		}
 		
 		if (teamMembershipStatus != null) {
