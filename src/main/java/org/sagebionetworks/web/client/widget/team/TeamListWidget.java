@@ -52,6 +52,12 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 			@Override
 			public void onSuccess(List<Team> teams) {
 				configure(teams, isBig);
+				//then asynchronously load the request counts
+				if (!isBig) {
+					for (Team team : teams) {
+						queryForRequestCount(team.getId());
+					}
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -62,7 +68,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		});
 	}
 	
-	private void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
+	public void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
 		synapseClient.getTeamsForUser(userId, new AsyncCallback<ArrayList<String>>() {
 			@Override
 			public void onSuccess(ArrayList<String> results) {
@@ -82,6 +88,23 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 			}
 		});
 	}
+	
+	public void queryForRequestCount(final String teamId) {
+		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
+			@Override
+			public void onSuccess(Long result) {
+				if (result != null && result > 0)
+					view.setRequestCount(teamId, result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
+			}
+		});
+	}
+	
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();

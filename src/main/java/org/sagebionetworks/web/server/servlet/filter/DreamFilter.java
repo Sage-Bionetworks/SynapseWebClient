@@ -33,7 +33,7 @@ public class DreamFilter implements Filter {
 		HttpServletRequest httpRqst = (HttpServletRequest)rqst;
 			//redirect to challenge page
 		URL requestURL = new URL(httpRqst.getRequestURL().toString());
-		URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), requestURL.getPath().substring(0, requestURL.getPath().length()-"dream".length()) + "#!Challenge:DREAM");
+		URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), requestURL.getPath().substring(0, requestURL.getPath().length()-"dream".length()) + "#!Challenges:DREAM");
 		HttpServletResponse httpRsp = (HttpServletResponse)rspn;
 		httpRsp.sendRedirect(httpRsp.encodeRedirectURL(redirectURL.toString()));
 	}

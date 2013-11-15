@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.evaluation.model.UserEvaluationState;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -174,6 +176,8 @@ public interface SynapseClient extends RemoteService {
 	String getUnmetEvaluationAccessRequirements(String evalId)
 			throws RestServiceException;
 
+	String getUnmetTeamAccessRequirements(String teamId) throws RestServiceException;
+	
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
 	
@@ -188,7 +192,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param markdown
 	 * @return
 	 */
-	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha) throws RestServiceException;
+	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString) throws RestServiceException;
 	
 	public String getActivityForEntity(String entityId) throws RestServiceException;
 	
@@ -225,6 +229,7 @@ public interface SynapseClient extends RemoteService {
 	public ArrayList<String> getTeamsForUser(String userId) throws RestServiceException;
 	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
+	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
 	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
@@ -236,10 +241,6 @@ public interface SynapseClient extends RemoteService {
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
 	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
-	
-	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException;
-	
-	public void createParticipants(String[] evaluationIds) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
@@ -257,10 +258,9 @@ public interface SynapseClient extends RemoteService {
 	public String getEvaluations(List<String> evaluationIds) throws RestServiceException;
 	
 	public String getAvailableEvaluations() throws RestServiceException;
+	public String getAvailableEvaluations(Set<String> targetEvaluationIds) throws RestServiceException;
+	
 	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
-	public String getAvailableEvaluationEntities() throws RestServiceException;
-	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException;
-
 	
 	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
 	

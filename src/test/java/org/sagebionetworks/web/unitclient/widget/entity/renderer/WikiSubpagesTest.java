@@ -93,7 +93,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureEntityHeaderBatchFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
 		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -102,7 +102,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -110,7 +110,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
 		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView, times(2)).clear();
 	}

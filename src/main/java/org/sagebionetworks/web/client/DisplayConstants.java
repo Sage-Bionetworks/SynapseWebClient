@@ -163,6 +163,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_MESSAGE = "An error occuring attempting to save. Please try again.";
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
+	public static final String ERROR_DUPLICATE_NAME_MESSAGE = "This name already exists. Please enter a different name.";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
 	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
@@ -219,7 +220,7 @@ public class DisplayConstants {
 	public static final String BUTTON_REGISTER = "Register";
 	public static final String LINK_COMMUNITY_FORUM = "Forum";
 	public static final String BUTTON_LOGIN = "Login";
-	public static final String BUTTON_DREAM_8 = "DREAM8 Challenges";
+	public static final String BUTTON_DREAM = "DREAM Challenges";
 	public static final String LABEL_WELCOME = "Welcome";
 	public static final String BUTTON_LOGOUT = "Logout";
 	public static final String BUTTON_MY_PROFILE = "My Profile";
@@ -247,6 +248,7 @@ public class DisplayConstants {
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
 	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
+	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
 	
 	public static final String SUBMITTED_TITLE = "Submitted";
@@ -292,6 +294,7 @@ public class DisplayConstants {
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
+	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
 	public static final String ATTACHMENT_DIALOG_BUTTON_TEXT = "Attach";
@@ -597,6 +600,8 @@ public class DisplayConstants {
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
+	public static final String EVALUATION_JOIN_TEAM_ERROR = "Unable to join team associated with the evaluation: ";
+	public static final String JOIN_TEAM_ERROR = "Unable to request membership to the team: ";
 	public static final String EVALUATION_SUBMISSION_ERROR = "Unable to submit to the evaluation: ";
 	public static final String EVALUATION_USER_STATE_ERROR = "Unable to determine if you are registered for the evaluation: ";
 	public static final String EVALUATION_USER_ACCESS_ERROR = "Unable to determine if you have administration access to the evaluation: ";
@@ -629,6 +634,7 @@ public class DisplayConstants {
 	public static final String JOIN_CHALLENGE = "Join Challenge";
 	public static final String FORGOT_PASSWORD = "forgot password?";
 	public static final String SIGNING_IN = "Signing in...";
+	public static final String NEW = "new";
 	
 	
 }

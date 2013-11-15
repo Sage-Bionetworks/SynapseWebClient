@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -18,8 +20,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -155,18 +160,16 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadProjectsAndFavorites() {
-		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
+		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
+		
+		view.showOpenTeamInvitesMessage(false);
+		isOpenTeamInvites(new CallbackP<Boolean>() {
 			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setMyEvaluationList(result);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setMyEvaluationsError("Could not load My Evaluations");
+			public void invoke(Boolean b) {
+				view.showOpenTeamInvitesMessage(b);
 			}
 		});
 		
-		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
 		
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
@@ -190,32 +193,19 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 	}
-
-	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
-		try {
-			synapseClient.getAvailableEvaluationEntitiesList(new AsyncCallback<ArrayList<String>>() {
-				@Override
-				public void onSuccess(ArrayList<String> results) {					
-					try {	
-						List<EntityHeader> evals = new ArrayList<EntityHeader>();
-						for(String eh : results) {
-							evals.add(new EntityHeader(adapterFactory.createNew(eh)));
-						}
-						callback.onSuccess(evals);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (RestServiceException e) {
-			callback.onFailure(e);
-		}
-
+	
+	public void isOpenTeamInvites(final CallbackP<Boolean> callback) {
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+			@Override
+			public void onSuccess(List<MembershipInvitationBundle> result) {
+				callback.invoke(result.size() > 0);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//do nothing
+			}
+		});		
 	}
 	
 	@Override
@@ -251,9 +241,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
+//				if(caught instanceof ConflictException) {
+//					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+//				} else {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
-				} 
+				}
+//				}
 			}
 		});
 	}

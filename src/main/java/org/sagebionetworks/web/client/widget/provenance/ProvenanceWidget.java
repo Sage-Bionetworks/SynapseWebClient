@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -104,7 +105,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}	
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		view.setPresenter(this);
 		view.showLoading();
 		//set up view based on descriptor parameters

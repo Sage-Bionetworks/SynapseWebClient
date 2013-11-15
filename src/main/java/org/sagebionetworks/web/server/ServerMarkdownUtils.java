@@ -24,7 +24,9 @@ public class ServerMarkdownUtils {
 	public static final String START_CONTAINER = "<span id=\"";
 	public static final String END_CONTAINER = "</span>";
 	
-	public static final String START_LINK = "<a class=\"link\" target=\"_blank\" href=\"";
+	public static final String START_LINK_NEW_WINDOW = "<a class=\"link\" target=\"_blank\" href=\"";
+	public static final String START_LINK_CURRENT_WINDOW = "<a class=\"link\" href=\"";
+	
 	public static final String END_LINK = "</a>";
 	
 	public static final String START_BLOCKQUOTE_TAG = "<blockquote>";
@@ -33,9 +35,17 @@ public class ServerMarkdownUtils {
 	public static final String TEMP_SPACE_DELIMITER = "%^&2_9d";
 	public static final String TEMP_LESS_THAN_DELIMITER = "2%lt%9";
 	public static final String TEMP_GREATER_THAN_DELIMITER = "2%gt%9";
-	public static final String R_ASSIGNMENT = "<-";
+	public static final String R_ASSIGNMENT = "&lt;-";
 	public static final String R_MESSED_UP_ASSIGNMENT = "< -";
 	
+	public static String getStartLink(String clientHostString, String href) {
+		//default is to stay in the current window
+		if (clientHostString == null || clientHostString.length() == 0 || href == null || href.length() == 0)
+			return START_LINK_CURRENT_WINDOW;
+		return href.toLowerCase().startsWith(clientHostString) ?
+				START_LINK_CURRENT_WINDOW : 
+				START_LINK_NEW_WINDOW;
+	}
 	
 	/**
 	 * Retrieves each container specified by saved ids and inserts the associated contents into the container

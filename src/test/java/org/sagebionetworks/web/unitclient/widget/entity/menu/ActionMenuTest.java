@@ -1,29 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.entity.menu;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.Assert;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LocationData;
-import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -37,16 +26,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ActionMenuTest {
 		
@@ -100,6 +82,6 @@ public class ActionMenuTest {
 	@Test
 	public void testShowAvailableEvaluations() throws RestServiceException {
 		actionMenu.showAvailableEvaluations();
-		verify(mockEvaluationSubmitter).configure(any(Entity.class), any(List.class));
+		verify(mockEvaluationSubmitter).configure(any(Entity.class), anySet());
 	}
 }

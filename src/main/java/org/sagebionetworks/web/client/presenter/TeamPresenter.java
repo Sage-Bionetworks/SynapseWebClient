@@ -152,13 +152,14 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 
 	@Override
-	public void updateTeamInfo(String name, String description, String fileHandleId) {
+	public void updateTeamInfo(String name, String description, boolean canPublicJoin, String fileHandleId) {
 		if (name == null || name.trim().length() == 0) {
 			view.showErrorMessage(DisplayConstants.ERROR_NAME_MUST_BE_DEFINED);
 		}
 		else {
 			team.setName(name);
 			team.setDescription(description);
+			team.setCanPublicJoin(canPublicJoin);
 			team.setIcon(fileHandleId);
 			try {
 				JSONObjectAdapter adapter = team.writeToJSONObject(jsonObjectAdapter.createNew());

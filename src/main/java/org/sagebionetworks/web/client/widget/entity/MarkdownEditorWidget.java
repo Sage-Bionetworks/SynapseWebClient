@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
-import org.apache.logging.log4j.core.pattern.MDCPatternConverter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -72,6 +73,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private Image editWidgetButton;
 	private WidgetDescriptorUpdatedHandler callback;
 	private WidgetSelectionState widgetSelectionState;
+	private ResourceLoader resourceLoader;
+	private GWTWrapper gwt;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -89,7 +92,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
 			IconsImageBundle iconsImageBundle,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			ResourceLoader resourceLoader, 
+			GWTWrapper gwt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -97,6 +102,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.cookies = cookies;
+		this.resourceLoader = resourceLoader;
+		this.gwt = gwt;
 		widgetSelectionState = new WidgetSelectionState();
 	}
 	
@@ -336,7 +343,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public void showPreview(String descriptionMarkdown, final boolean isWiki) {
 	    //get the html for the markdown
-	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), new AsyncCallback<String>() {
+	    synapseClient.markdown2Html(descriptionMarkdown, true, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 	    	@Override
 			public void onSuccess(String result) {
 	    		try {
@@ -372,8 +379,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			panel = new HTMLPanel(result);
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
-		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true);
-		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true);
+		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
+		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true, null);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
@@ -467,25 +474,17 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	
 	    	};
 		}));
-    	menu.add(getNewCommand("Wiki Pages", new SelectionListener<ComponentEvent>() {
-	    	public void componentSelected(ComponentEvent ce) {
-	    		insertMarkdown(SharedMarkdownUtils.getWikiSubpagesMarkdown());
-	    	};
-		}));
-	    
-	    
+    	
 	    /**
 	     * load alpha test site widgets
 	     */
 	    if (DisplayUtils.isInTestWebsite(cookies)) {
 	    	menu.add(new SeparatorMenuItem());
-
 	    	menu.add(getNewCommand(WidgetConstants.BOOKMARK_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 	    		public void componentSelected(ComponentEvent ce) {
 	    			handleInsertWidgetCommand(WidgetConstants.BOOKMARK_CONTENT_TYPE, callback);
 	    		}
 	    	}));
-
 	    	menu.add(getNewCommand(WidgetConstants.SHINYSITE_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
 		    		handleInsertWidgetCommand(WidgetConstants.SHINYSITE_CONTENT_TYPE, callback);
@@ -501,9 +500,14 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
-	    	menu.add(getNewCommand("Join Evaluation Button", new SelectionListener<ComponentEvent>() {
+	    	menu.add(getNewCommand("Join Team Button", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY + "=true&" +WidgetConstants.IS_MEMBER_MESSAGE + "=You have successfully joined the challenge" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    	};
+			}));
+	    	menu.add(getNewCommand("Submit To Evaluation Button", new SelectionListener<ComponentEvent>() {
+		    	public void componentSelected(ComponentEvent ce) {
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY+"=evalId1,evalId2&" +WidgetConstants.UNAVAILABLE_MESSAGE + "=Join the team to submit to the challenge" + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
 	    	menu.add(getNewCommand(WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
@@ -511,8 +515,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE + "?"+WidgetConstants.WIDGET_ENTITY_ID_KEY+"=syn123&" +WidgetConstants.TEXT_KEY + "=Tutorial"+ WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
-
-	    	
 	    }
 
 	    return menu;

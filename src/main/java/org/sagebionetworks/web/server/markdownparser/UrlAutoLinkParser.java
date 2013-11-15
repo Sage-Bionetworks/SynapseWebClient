@@ -29,7 +29,7 @@ public class UrlAutoLinkParser extends BasicMarkdownElementParser {
 		while(m.find()) {
 			String url = m.group(1).trim();
 			StringBuilder html = new StringBuilder();
-			html.append(ServerMarkdownUtils.START_LINK);
+			html.append(ServerMarkdownUtils.getStartLink(getClientHostString(), url));
 			html.append(url + "\">");
 			html.append(url + ServerMarkdownUtils.END_LINK);
 			extractor.putContainerIdToContent(getCurrentDivID(), html.toString());

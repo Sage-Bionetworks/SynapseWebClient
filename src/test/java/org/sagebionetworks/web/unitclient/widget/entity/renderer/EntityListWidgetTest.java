@@ -90,7 +90,7 @@ public class EntityListWidgetTest {
 		String encoded = EntityListUtil.recordsToString(records);
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
 				
-		widget.configure(null, descriptor);
+		widget.configure(null, descriptor, null);
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));

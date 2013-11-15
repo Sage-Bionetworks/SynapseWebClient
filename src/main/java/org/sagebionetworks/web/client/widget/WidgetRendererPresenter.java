@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public interface WidgetRendererPresenter extends SynapseWidgetPresenter {
@@ -10,5 +11,5 @@ public interface WidgetRendererPresenter extends SynapseWidgetPresenter {
 	 * @param wikiKey
 	 * @param widgetDescriptor
 	 */
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor);
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired);
 }

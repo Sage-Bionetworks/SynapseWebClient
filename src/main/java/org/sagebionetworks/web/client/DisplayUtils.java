@@ -128,12 +128,15 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
@@ -367,7 +370,12 @@ public class DisplayUtils {
 			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
 			if(reason.matches(".*entity with the name: .+ already exites.*")) {
 				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			}			
+			} else {
+				RegExp regEx = RegExp.compile(".*Name.+is already used.*", "gm");
+				MatchResult matchResult = regEx.exec(reason);
+				if (matchResult != null)
+					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
+			}
 			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {
@@ -588,6 +596,15 @@ public class DisplayUtils {
 	public static String getAlertHtml(String title, String text, BootstrapAlertType type) {
 		return "<div class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</div>";
 	}
+	
+	public static String getAlertHtmlSpan(String title, String text, BootstrapAlertType type) {
+		return "<span class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</span>";
+	}
+	
+	public static String getBadgeHtml(String i) {
+		return "<span class=\"badge\">"+i+"</span>";
+	}
+
 	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
@@ -1911,5 +1928,19 @@ public class DisplayUtils {
 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
 		panel.add(mediaBodyPanel);
 		return panel;
+	}
+	
+	public static HTML getNewLabel(boolean superScript) {		
+		final HTML label = new HTML(DisplayConstants.NEW);
+		label.addStyleName("label label-info margin-left-5");
+		if(superScript) label.addStyleName("tabLabel");
+		Timer t = new Timer() {
+		      @Override
+		      public void run() {
+					label.setVisible(false);
+		      }
+		    };
+		t.schedule(30000); // hide after 30 seconds
+	    return label;
 	}
 }

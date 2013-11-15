@@ -61,7 +61,7 @@ public class LinkParser extends BasicMarkdownElementParser  {
 				}
 				
 				StringBuilder html = new StringBuilder();
-				html.append(ServerMarkdownUtils.START_LINK);
+				html.append(ServerMarkdownUtils.getStartLink(getClientHostString(), url));
 				html.append(url + "\">");
 				String processedText = runSimpleParsers(text, simpleParsers);
 				html.append(processedText + ServerMarkdownUtils.END_LINK);

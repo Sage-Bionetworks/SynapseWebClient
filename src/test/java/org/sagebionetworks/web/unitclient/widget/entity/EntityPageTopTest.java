@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -117,7 +118,7 @@ public class EntityPageTopTest {
 		entityAttachments.add(attachment1);
 		entity.setAttachments(entityAttachments);
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean())).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean(), any(Callback.class))).thenReturn(testWidgetRenderer);
 
 		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
 		projectHeader = new EntityHeader();

@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitterView.Presenter;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -66,14 +65,14 @@ public class EvaluationSubmitter implements Presenter {
 	 * @param submissionEntity set to null if an entity finder should be shown
 	 * @param evaluationIds set to null if we should query for all available evaluations
 	 */
-	public void configure(Entity submissionEntity, List<String> evaluationIds) {
+	public void configure(Entity submissionEntity, Set<String> evaluationIds) {
 		view.showLoading();
 		this.submissionEntity = submissionEntity;
 		try {
 			if (evaluationIds == null)
 				synapseClient.getAvailableEvaluations(getEvalCallback());
 			else
-				synapseClient.getEvaluations(evaluationIds, getEvalCallback());
+				synapseClient.getAvailableEvaluations(evaluationIds, getEvalCallback());
 		} catch (RestServiceException e) {
 			view.showErrorMessage(e.getMessage());
 		}
@@ -270,6 +269,17 @@ public class EvaluationSubmitter implements Presenter {
 			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
 		}
 		try {
+//			//TODO: add the content source as a fav instead of My Challenges area
+//			synapseClient.addFavorite(evaluation.getContentSource(), new AsyncCallback<String>() {			
+//				@Override
+//				public void onSuccess(String result) {
+//				}
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+//						view.showErrorMessage(caught.getMessage());
+//				}
+//			});
 			synapseClient.createSubmission(adapter.toJSONString(), etag, new AsyncCallback<String>() {			
 				@Override
 				public void onSuccess(String result) {

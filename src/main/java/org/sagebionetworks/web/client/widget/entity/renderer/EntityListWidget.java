@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -40,7 +41,7 @@ public class EntityListWidget implements EntityListWidgetView.Presenter, WidgetR
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey,  Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey,  Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		if (widgetDescriptor == null) throw new IllegalArgumentException("Descriptor can not be null");
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;

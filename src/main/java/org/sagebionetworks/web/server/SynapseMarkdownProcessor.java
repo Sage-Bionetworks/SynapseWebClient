@@ -131,9 +131,9 @@ public class SynapseMarkdownProcessor {
 	 * @param panel
 	 * @throws IOException 
 	 */
-	public String markdown2Html(String markdown, Boolean isPreview) throws IOException {
+	public String markdown2Html(String markdown, Boolean isPreview, String clientHostString) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return SharedMarkdownUtils.getDefaultWikiMarkdown();
+		if (markdown == null) return "";
 		
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {
@@ -143,19 +143,22 @@ public class SynapseMarkdownProcessor {
 		//and this method has been the least destructive (compared to clean() with various WhiteLists, or using java HTMLEditorKit to do it).
 		markdown = Jsoup.parse(markdown).text();
 		markdown = applyPatternReplacements(markdown, restorers);
+
 		//now make the main single pass to identify markdown elements and create the output
 		markdown = StringUtils.replace(markdown, ServerMarkdownUtils.R_MESSED_UP_ASSIGNMENT, ServerMarkdownUtils.R_ASSIGNMENT);
-		String html = processMarkdown(markdown, allElementParsers, isPreview);
+
+		String html = processMarkdown(markdown, allElementParsers, isPreview, clientHostString);
 		if (html == null) {
 			//if the markdown processor fails to convert the md to html (will return null in this case), return the raw markdown instead. (as ugly as it might be, it's better than no information).
 			return originalMarkdown; 
 		}
 		//URLs are automatically resolved from the markdown processor
 		html = "<div class=\"markdown\">" + postProcessHtml(html, isPreview) + "</div>";
+		
 		return html;
 	}
 	
-	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers, boolean isPreview) {
+	public String processMarkdown(String markdown, List<MarkdownElementParser> parsers, boolean isPreview, String clientHostString) {
 		//go through the document once, and apply all markdown parsers to it
 		StringBuilder output = new StringBuilder();
 		
@@ -176,9 +179,11 @@ public class SynapseMarkdownProcessor {
 		}
 		
 		//reset all of the parsers
+		String lowerClientHostString = clientHostString == null ? "" : clientHostString.toLowerCase();
 		for (MarkdownElementParser parser : parsers) {
 			parser.reset(simpleParsers);
 			parser.setIsPreview(isPreview);
+			parser.setClientHostString(lowerClientHostString);
 		}
 		
 		List<String> allLines = new ArrayList<String>();

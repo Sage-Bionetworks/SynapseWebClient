@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -39,7 +40,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
 		//get the user id from the descriptor, and pass to the other configure
 		configure(widgetDescriptor.get(WidgetConstants.USERBADGE_WIDGET_ID_KEY));
 	}
@@ -62,7 +63,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 				view.showLoadError(principalId);
 			}
 		});
-
 	}
 	
 	@SuppressWarnings("unchecked")

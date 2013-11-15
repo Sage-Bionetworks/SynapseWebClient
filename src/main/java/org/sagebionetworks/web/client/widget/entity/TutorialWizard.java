@@ -53,7 +53,7 @@ public class TutorialWizard implements TutorialWizardView.Presenter, WidgetRende
 	 * Synapse Widget configuration entry point
 	 */
 	@Override
-	public void configure(WikiPageKey wikiKey,Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey,Map<String, String> widgetDescriptor, org.sagebionetworks.web.client.utils.Callback widgetRefreshRequired) {
 		entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		tutorialButtonText = widgetDescriptor.get(WidgetConstants.TEXT_KEY);
 	}

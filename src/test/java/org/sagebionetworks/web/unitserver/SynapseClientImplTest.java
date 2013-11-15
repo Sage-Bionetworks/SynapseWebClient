@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -54,12 +58,18 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
+import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipRequest;
+import org.sagebionetworks.repo.model.MembershipRqstSubmission;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -80,7 +90,6 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -100,12 +109,11 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Test for the SynapseClientImpl
@@ -143,7 +151,7 @@ public class SynapseClientImplTest {
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
-
+	private TeamMembershipStatus membershipStatus;
 	@Before
 	public void before() throws SynapseException, JSONObjectAdapterException{
 		mockSynapse = Mockito.mock(SynapseClient.class);
@@ -295,6 +303,22 @@ public class SynapseClientImplTest {
 		status.setState(State.PROCESSING);
 		status.setPercentComplete(.05d);
 		when(mockSynapse.startUploadDeamon(any(CompleteAllChunksRequest.class))).thenReturn(status);
+		
+		PaginatedResults<MembershipInvitation> openInvites = new PaginatedResults<MembershipInvitation>();
+		openInvites.setTotalNumberOfResults(0);
+		when(mockSynapse.getOpenMembershipInvitations(anyString(), anyString(), anyLong(), anyLong())).thenReturn(openInvites);
+		
+		PaginatedResults<MembershipRequest> openRequests = new PaginatedResults<MembershipRequest>();
+		openRequests.setTotalNumberOfResults(0);
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(openRequests);
+		membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setCanJoin(false);
+		membershipStatus.setHasOpenInvitation(false);
+		membershipStatus.setHasOpenRequest(false);
+		membershipStatus.setHasUnmetAccessRequirement(false);
+		membershipStatus.setIsMember(false);
+		membershipStatus.setMembershipApprovalRequired(false);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
 	}
 	
 	@Test
@@ -828,9 +852,9 @@ public class SynapseClientImplTest {
 		PaginatedResults<Evaluation> testResults = new PaginatedResults<Evaluation>();
 		Evaluation e = new Evaluation();
 		e.setId("A test ID");
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 		String evaluationsJson = synapseClient.getAvailableEvaluations();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
+		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
 		String expectedJson = EntityFactory.createJSONStringForEntity(testResults);
 		assertEquals(expectedJson, evaluationsJson);
 	}
@@ -907,35 +931,9 @@ public class SynapseClientImplTest {
 	
 	public void setupGetAvailableEvaluations(String sharedEntityId) throws SynapseException {
 		PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(testResults);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(testResults);
 	}
 	
-	@Test
-	public void testGetAvailableEvaluationEntities() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		//when asking for available evaluations, return two (subchallenges) that share the same contentSource (sharedEntityId)
-		String sharedEntityId = "syn123455";
-		setupGetAvailableEvaluations(sharedEntityId);
-		
-		//when asking for entity headers, return a single entity header
-		BatchResults<EntityHeader> batchResults = new BatchResults<EntityHeader>();
-		List<EntityHeader> entityHeaders = new ArrayList<EntityHeader>();
-		entityHeaders.add(new EntityHeader());
-		batchResults.setResults(entityHeaders);
-		batchResults.setTotalNumberOfResults(1);
-		when(mockSynapse.getEntityHeaderBatch(any(List.class))).thenReturn(batchResults);
-		
-		String entityHeadersJson = synapseClient.getAvailableEvaluationEntities();
-		verify(mockSynapse).getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt());
-		
-		//capture argument to verify that the reference passed to getEntityHeaderBatch points to a single entity (the sharedEntityId)
-		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		verify(mockSynapse).getEntityHeaderBatch(captor.capture());
-		assertTrue(captor.getValue().size() == 1);
-		assertEquals(sharedEntityId, ((Reference)captor.getValue().get(0)).getTargetId());
-		String expectedJson = EntityFactory.createJSONStringForEntity(batchResults);
-		assertEquals(expectedJson, entityHeadersJson);
-	}
-
 	@Test
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();
@@ -960,7 +958,7 @@ public class SynapseClientImplTest {
 		e.setId(eval2Id);
 		evalResults.add(e);
 		availableEvaluations.setResults(evalResults);
-		when(mockSynapse.getAvailableEvaluationsPaginated(any(EvaluationStatus.class), anyInt(),anyInt())).thenReturn(availableEvaluations);
+		when(mockSynapse.getAvailableEvaluationsPaginated(anyInt(),anyInt())).thenReturn(availableEvaluations);
 		
 		//test sorting, uniqueness, and empty/null values
 		Submission[] submissions = new Submission[6];
@@ -1031,4 +1029,51 @@ public class SynapseClientImplTest {
 		assertEquals(0, sharableEvaluations.size());
 	}
 	
+	@Test
+	public void testInviteMemberOpenInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		membershipStatus.setHasOpenInvitation(true);
+		//verify it does not create a new invitation since one is already open
+		synapseClient.inviteMember("123", "a team", "");
+		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(0)).createMembershipInvitation(any(MembershipInvtnSubmission.class));
+		
+	}
+	
+	@Test
+	public void testRequestMemberOpenRequests() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		membershipStatus.setHasOpenRequest(true);
+		//verify it does not create a new request since one is already open
+		synapseClient.requestMembership("123", "a team", "");
+		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(any(MembershipRqstSubmission.class));
+	}
+	
+	@Test
+	public void testInviteMemberCanJoin() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		membershipStatus.setCanJoin(true);
+		synapseClient.inviteMember("123", "a team", "");
+		verify(mockSynapse).addTeamMember(anyString(), anyString());
+	}
+	
+
+	@Test
+	public void testRequestMembershipCanJoin() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		membershipStatus.setCanJoin(true);
+		synapseClient.requestMembership("123", "a team", "");
+		verify(mockSynapse).addTeamMember(anyString(), anyString());
+	}
+
+	@Test
+	public void testInviteMember() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		synapseClient.inviteMember("123", "a team", "");
+		verify(mockSynapse).createMembershipInvitation(any(MembershipInvtnSubmission.class));
+	}
+	
+
+	@Test
+	public void testRequestMembership() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		synapseClient.requestMembership("123", "a team", "");
+		verify(mockSynapse).createMembershipRequest(any(MembershipRqstSubmission.class));
+	}
+
 }

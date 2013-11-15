@@ -47,7 +47,7 @@ import com.google.inject.Inject;
 
 public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigView {
 
-	private static final int DISPLAY_HEIGHT = 220;
+	private static final int DISPLAY_HEIGHT = 250;
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	EntityFinder entityFinder;

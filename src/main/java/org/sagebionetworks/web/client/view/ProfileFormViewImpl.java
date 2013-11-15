@@ -77,6 +77,11 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 		updateUserInfoButton.setText(DisplayConstants.BUTTON_CHANGE_USER_INFO);
 	}
 
+	@Override
+	public void setUpdateButtonText(String text){
+		updateUserInfoButton.setText(text);
+	}
+	
 	 private void createProfileForm() {
 		 userFormPanel = new FormPanel();
 		 FormData formData = new FormData("-20");
@@ -134,7 +139,6 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     teamName = new TextField<String>();  
 	     teamName.setFieldLabel("DREAM 8 Team Name");  
 	     teamName.setAllowBlank(true);
-	     left.add(teamName, formData);
 	     
 	     url = new TextField<String>();  
 	     url.setFieldLabel("Link To More Info");  
@@ -147,7 +151,7 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     main.add(right, new ColumnData(.5));
 	     
 	     summary = new TextArea();  
-	     summary.setFieldLabel("Summary");  
+	     summary.setFieldLabel("Bio");  
 	     summary.setAllowBlank(true);
 	     summary.setHeight(200);
 	   

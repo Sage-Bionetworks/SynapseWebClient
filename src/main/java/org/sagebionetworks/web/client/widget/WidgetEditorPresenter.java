@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget;
 
 import java.util.Map;
-import com.extjs.gxt.ui.client.widget.Dialog;
 
 import org.sagebionetworks.web.shared.WikiPageKey;
+
+import com.extjs.gxt.ui.client.widget.Dialog;
 
 /**
  * To support, add your editor to the PortalGinModule, and add it to the know widgets in the widget registrar.

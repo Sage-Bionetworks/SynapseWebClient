@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -100,6 +100,8 @@ public interface SynapseClientAsync {
 	 * @param callback returns VariableContentPaginatedResults<AccessRequirement> json
 	 */
 	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
+	
+	public void getUnmetTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
@@ -109,7 +111,7 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 
@@ -149,29 +151,23 @@ public interface SynapseClientAsync {
 	void getTeamsForUser(String userId, AsyncCallback<ArrayList<String>> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset, AsyncCallback<String> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
+	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
+
 	void getOpenInvitations(String userId, AsyncCallback<List<MembershipInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(String teamJson, AsyncCallback<String> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<String> callback);	
+//	void getTeamMembershipState(String currentUserId, String teamId, AsyncCallback<String> callback);
 	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
+	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
 	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
 	/////////////////
 	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
-	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
-
-	/**
-	 * Returns json string representation of created Participant
-	 * @param evaluationId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	void createParticipants(String[] evaluationIds, AsyncCallback<Void> callback) throws RestServiceException;
-	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
@@ -186,9 +182,8 @@ public interface SynapseClientAsync {
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
+	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
-	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object

@@ -53,7 +53,7 @@ public class WikiFilesPreviewWidgetTest {
 	@Test
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
@@ -61,7 +61,7 @@ public class WikiFilesPreviewWidgetTest {
 	public void testConfigureFailure() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 

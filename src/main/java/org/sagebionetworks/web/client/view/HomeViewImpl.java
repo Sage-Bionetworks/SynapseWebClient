@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -65,7 +67,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel registerBtnPanel;		
 	@UiField
-	SimplePanel dream8BtnPanel;
+	SimplePanel dreamBtnPanel;
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -109,9 +111,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
-	private MyEvaluationEntitiesList myEvaluationsList;
 	private TeamListWidget teamsListWidget;
 	private CookieProvider cookies;
+	private FlowPanel openTeamInvitesPanel;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -133,7 +135,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
 		this.teamsListWidget = teamsListWidget;
 		this.cookies = cookies;
@@ -167,16 +168,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 		registerBtnPanel.setWidget(registerBtn);
 		
-		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
-		dream8Btn.removeStyleName("gwt-Button");
-		dream8Btn.addStyleName("btn btn-default btn-lg btn-block");
-		dream8Btn.addClickHandler(new ClickHandler() {			
+		Button dreamBtn = new Button(DisplayConstants.BUTTON_DREAM);
+		dreamBtn.removeStyleName("gwt-Button");
+		dreamBtn.addStyleName("btn btn-default btn-lg btn-block");
+		dreamBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM8"));
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
 			}
 		});
-		dream8BtnPanel.setWidget(dream8Btn);
+		dreamBtnPanel.setWidget(dreamBtn);
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
@@ -184,6 +185,19 @@ public class HomeViewImpl extends Composite implements HomeView {
 		// Other links
 		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
 		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
+		
+		openTeamInvitesPanel = new FlowPanel();
+		openTeamInvitesPanel.addStyleName("highlight-line-min alert alert-"+BootstrapAlertType.INFO.toString().toLowerCase());
+		openTeamInvitesPanel.add(new HTML("<span class=\"biggerText\">You have pending Team invitations!</span>"));
+		Button userProfileButton = DisplayUtils.createButton("See Invitations");
+		userProfileButton.addStyleName("margin-top-5");
+		openTeamInvitesPanel.add(userProfileButton);
+		userProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+			}
+		});
 	}	
 
 	@Override
@@ -257,7 +271,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		LayoutContainer evalsAndProjects = new LayoutContainer();
 		evalsAndProjects.setStyleName("col-md-4");
-		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
 		evalsAndProjects.add(createCreateProjectWidget()); 
 		projectPanelContainer.add(evalsAndProjects);
@@ -265,10 +278,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		LayoutContainer favsAndTeams = new LayoutContainer();
 		favsAndTeams.setStyleName("col-md-4");
 		favsAndTeams.add(getFavoritesContainer());
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			favsAndTeams.add(getTeamsContainer());
-			favsAndTeams.add(createCreateTeamsContainer());
-		}
+		favsAndTeams.add(getTeamsContainer());
+		favsAndTeams.add(createCreateTeamsContainer());
 		projectPanelContainer.add(favsAndTeams);
 		projectPanel.add(projectPanelContainer);
 	}
@@ -276,7 +287,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer createCreateTeamsContainer() {
 		// Create a project
 		LayoutContainer createProjectContainer = new LayoutContainer();
-		createProjectContainer.setStyleName("row margin-top-15");
+		createProjectContainer.setStyleName("row");
 		
 		LayoutContainer col1 = new LayoutContainer();
 		col1.addStyleName("col-md-7 padding-right-5");
@@ -358,9 +369,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refreshMyTeams(String userId) {
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			teamsListWidget.configure(userId, false);
-		}
+		teamsListWidget.configure(userId, false);
 	}
 	
 	private LayoutContainer getTeamsContainer() {
@@ -384,16 +393,14 @@ public class HomeViewImpl extends Composite implements HomeView {
 		headerRow.add(wrapButton);
 		myTeamsContainer.add(headerRow);
 		Widget teamListWidget = teamsListWidget.asWidget();
-		teamListWidget.addStyleName("margin-top-0 padding-left-10 highlight-box highlight-line-min");
+		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min");
 		myTeamsContainer.add(teamListWidget);
+		myTeamsContainer.add(openTeamInvitesPanel);
 		return myTeamsContainer;
 	}
-	
-	private LayoutContainer getMyEvaluationsContainer() {
-		//My Evaluations
-		LayoutContainer myEvaluations = new LayoutContainer();
-		myEvaluations.add(myEvaluationsList.asWidget());					
-		return myEvaluations;
+	@Override
+	public void showOpenTeamInvitesMessage(Boolean visible) {
+		openTeamInvitesPanel.setVisible(visible);
 	}
 	
 	private LayoutContainer getMyProjectsContainer() {
@@ -419,15 +426,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void setFavoritesError(String string) {
-	}
-	
-	@Override
-	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities) {
-		myEvaluationsList.configure(myEvaluationEntities);
-	}
-	
-	@Override
-	public void setMyEvaluationsError(String string) {
 	}
 	
 	private void fillProgrammaticClientInstallCode() {

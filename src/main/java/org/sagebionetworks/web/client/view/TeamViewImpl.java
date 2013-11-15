@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
@@ -32,6 +33,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -156,12 +158,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 			CallbackP<String> fileHandleIdCallback = new CallbackP<String>(){
 				@Override
 				public void invoke(String fileHandleId) {
-					presenter.updateTeamInfo(team.getName(), team.getDescription(), fileHandleId);
+					presenter.updateTeamInfo(team.getName(), team.getDescription(), TeamSearchPresenter.getCanPublicJoin(team), fileHandleId);
 				}
 			};
 			Widget uploadLink = DisplayUtils.getUploadButton(fileHandleIdCallback, uploader, iconsImageBundle, "Update Icon", ButtonType.LINK); 
 			uploadLink.addStyleName("updateTeamIconLink");
-			mainContainer.add(uploadLink);
+			//only show upload link if direct upload is supported
+			if (synapseJSNIUtils.isDirectUploadSupported())
+				mainContainer.add(uploadLink);
 			//show invite UI
 			inviteWidget.configure(team.getId());
 			mainContainer.add(inviteWidget.asWidget());
@@ -176,14 +180,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 		if (teamMembershipStatus != null) {
 			if (!teamMembershipStatus.getIsMember()) {
 				//not a member, add Join widget
-				joinTeamWidget.configure(team.getId(), teamMembershipStatus, getRefreshCallback(team.getId()));
+				joinTeamWidget.configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), false, teamMembershipStatus, getRefreshCallback(team.getId()), null);
 				Widget joinTeamView = joinTeamWidget.asWidget();
 				joinTeamView.addStyleName("margin-top-15");	
 				mainContainer.add(joinTeamView);
 			}
 			else {
 				//add Leave Team menu item, and show tools menu
-				addLeaveItem(toolsButton);
+				addLeaveItem(toolsButton); 
 				commandsContainer.add(toolsButton);
 			}
 		}
@@ -210,12 +214,18 @@ public class TeamViewImpl extends Composite implements TeamView {
 		descriptionField.getElement().setAttribute("placeholder", DisplayConstants.SHORT_TEAM_DESCRIPTION);
 		descriptionField.addStyleName("col-md-12 margin-left-10 margin-bottom-10");
 		form.add(DisplayUtils.wrap(descriptionField));
-		
+		final CheckBox publicJoinCb = new CheckBox("People can join this team without team administrator authorization");
+		boolean isPublicJoin = TeamSearchPresenter.getCanPublicJoin(team);
+		publicJoinCb.setValue(isPublicJoin);
+		FlowPanel cbPanel = new FlowPanel();
+		cbPanel.addStyleName("checkbox margin-left-10");
+		cbPanel.add(publicJoinCb);
+		form.add(DisplayUtils.wrap(cbPanel));
 		Button saveButton = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.updateTeamInfo(nameField.getValue(), descriptionField.getValue(), team.getIcon());
+				presenter.updateTeamInfo(nameField.getValue(), descriptionField.getValue(), publicJoinCb.getValue(), team.getIcon());
 			}
 		});
 		saveButton.addStyleName("right margin-right-5");
@@ -263,7 +273,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 					}
 				});
 			}
-		});
+		});				
 		menuBtn.addMenuItem(a);
 	}
 	

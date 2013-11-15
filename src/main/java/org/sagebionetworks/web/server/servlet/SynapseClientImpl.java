@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,13 +21,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.EvaluationStatus;
-import org.sagebionetworks.evaluation.model.Participant;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
-import org.sagebionetworks.evaluation.model.UserEvaluationState;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -929,6 +926,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String getUnmetTeamAccessRequirements(String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(teamId);
+			subjectId.setType(RestrictableObjectType.TEAM);
+			
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
+				synapseClient.getUnmetAccessRequirements(subjectId);
+			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+			return arJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
+
+	
+	@Override
 	public EntityWrapper createAccessApproval(EntityWrapper aaEW) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1040,10 +1057,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode) throws RestServiceException{
+	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode, String clientHostString) throws RestServiceException{
 		try {
 			long startTime = System.currentTimeMillis();
-			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview);
+			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview, clientHostString);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime-startTime;
 			
@@ -1305,6 +1322,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			Team t = new Team();
 			t.setName(teamName);
+			t.setCanPublicJoin(false);
 			t = synapseClient.createTeam(t);
 			return t.getId();
 		} catch (SynapseException e) {
@@ -1397,6 +1415,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+
+	public String getTeamMembershipState(String currentUserId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, currentUserId);
+			return EntityFactory.createJSONStringForEntity(membershipStatus);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 	@Override
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1405,7 +1436,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			//if we can join the team without creating the request (like if we are a team admin, or there is an open invitation), then just do that!
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, currentUserId);
-			} else {
+			} else if (!membershipStatus.getHasOpenRequest()){
 				//otherwise, create the request
 				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
 				membershipRequest.setMessage(message);
@@ -1428,13 +1459,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			//if we can join the team without creating the invite (like if we are a team admin, or there is an open membership request), then just do that!
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, userGroupId);
-			} else {
+			} else if (!membershipStatus.getHasOpenInvitation()){
+				//check to see if there is already an open invite
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
 				membershipInvite.setMessage(message);
 				membershipInvite.setTeamId(teamId);
-				List<String> userIds = new ArrayList<String>();
-				userIds.add(userGroupId);
-				membershipInvite.setInvitees(userIds);
+				membershipInvite.setInviteeId(userGroupId);
 				
 				//make new Synapse call
 				synapseClient.createMembershipInvitation(membershipInvite);
@@ -1504,6 +1534,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//must be an admin to the team
+			//TODO: After PLFM-2248 is complete, enable this admin check (remove the try catch method)
+//			TeamBundle teamBundle = getTeamBundle(currentUserId, teamId, true);
+//			if (teamBundle.isUserAdmin()) {
+			try {
+				PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				return requests.getTotalNumberOfResults();
+			} catch (SynapseForbiddenException forbiddenEx) {
+				return null;
+			}
+//			} else {
+//				return null;
+//			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
@@ -1620,29 +1672,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.createEntityDoi(entityId, versionNumber);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public UserEvaluationState getUserEvaluationState(String evaluationId) throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getUserEvaluationState(evaluationId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public void createParticipants(String[] evaluationIds)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			for (int i = 0; i < evaluationIds.length; i++) {
-				Participant participant = synapseClient.createParticipant(evaluationIds[i]);	
-			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1793,7 +1822,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
@@ -1801,27 +1830,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-	public String getAvailableEvaluationEntities() throws RestServiceException {
+	@Override
+	public String getAvailableEvaluations(Set<String> targetEvaluationIds)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//look up the available evaluations
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
-			//collect contentSource entity IDs
-			Set<String> uniqueEntityIds = new HashSet<String>();
-			for (Evaluation eval : availableEvaluations.getResults()) {
-				uniqueEntityIds.add(eval.getContentSource());
+			PaginatedResults<Evaluation> returnResults = new PaginatedResults<Evaluation>();
+			List<Evaluation> returnList = new ArrayList<Evaluation>();
+			if (targetEvaluationIds.size() > 0) {
+				Set<String> targetEvalIdsCopy = new HashSet<String>();
+				targetEvalIdsCopy.addAll(targetEvaluationIds);
+				PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+				//filter down to the target evaluation ids
+				for (Evaluation evaluation : results.getResults()) {
+					if (targetEvalIdsCopy.contains(evaluation.getId())) {
+						targetEvalIdsCopy.remove(evaluation.getId());
+						returnList.add(evaluation);
+					}
+				}
 			}
-			//create reference for each contentSource entity ID
-			List<Reference> references = new ArrayList<Reference>();
-			for (String entityId : uniqueEntityIds) {
-				Reference ref = new Reference();
-				ref.setTargetId(entityId);
-				references.add(ref);
-			}
-			//query for the associated entities
-			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(references);
-			//and return them
-			return EntityFactory.createJSONStringForEntity(results);
+			returnResults.setResults(returnList);
+			returnResults.setTotalNumberOfResults(returnList.size());
+			//filter results down to the targetEvaluationIds
+			JSONObjectAdapter evaluationsJson = returnResults.writeToJSONObject(adapterFactory.createNew());
+			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -1849,37 +1881,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 			}
 			return mySharableEvalauations;
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	@Override
-	public ArrayList<String> getAvailableEvaluationEntitiesList() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			//look up the available evaluations
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
-			//collect contentSource entity IDs
-			Set<String> uniqueEntityIds = new HashSet<String>();
-			for (Evaluation eval : availableEvaluations.getResults()) {
-				uniqueEntityIds.add(eval.getContentSource());
-			}
-			//create reference for each contentSource entity ID
-			List<Reference> references = new ArrayList<Reference>();
-			for (String entityId : uniqueEntityIds) {
-				Reference ref = new Reference();
-				ref.setTargetId(entityId);
-				references.add(ref);
-			}
-			//query for the associated entities
-			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(references);
-			//and return them
-			ArrayList<String> evaluations = new ArrayList<String>();
-			for(EntityHeader eh : results.getResults()) {
-				evaluations.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-			}
-			return evaluations;
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -1936,7 +1937,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//query for all available evaluations.
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, 0, MAX_LIMIT);
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(0, MAX_LIMIT);
 			//gather all submissions
 			List<Submission> allSubmissions = new ArrayList<Submission>();
 			for (Evaluation evaluation : availableEvaluations.getResults()) {
@@ -1981,7 +1982,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//get all evaluations for which the user has joined as a participant
-			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EvaluationStatus.OPEN, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
 			for (Evaluation evaluation : evaluations.getResults()) {
 				//return true if any of these have a submission
 				PaginatedResults<Submission> res = synapseClient.getMySubmissions(evaluation.getId(), 0, 0);

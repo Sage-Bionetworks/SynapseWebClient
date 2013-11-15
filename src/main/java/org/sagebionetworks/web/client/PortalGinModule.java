@@ -168,18 +168,20 @@ import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.JoinWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
@@ -228,14 +230,14 @@ import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
-import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetView;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
-import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
+import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -576,9 +578,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);
 		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
 		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
-		bind(JoinWidgetView.class).to(JoinWidgetViewImpl.class);
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
+		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
@@ -636,6 +638,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//Request Team membership widget
 		bind(JoinTeamWidgetView.class).to(JoinTeamWidgetViewImpl.class);
+		//Submit to evaluation widget
+		bind(SubmitToEvaluationWidgetView.class).to(SubmitToEvaluationWidgetViewImpl.class);
 		//Team renderer
 		bind(TeamBadgeView.class).to(TeamBadgeViewImpl.class);
 		bind(BigTeamBadgeView.class).to(BigTeamBadgeViewImpl.class);

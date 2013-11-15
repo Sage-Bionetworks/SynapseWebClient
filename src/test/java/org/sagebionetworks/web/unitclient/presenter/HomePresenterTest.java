@@ -19,10 +19,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.RssServiceAsync;
@@ -33,8 +31,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -56,6 +55,8 @@ public class HomePresenterTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 
 	List<EntityHeader> testEvaluationResults;
+	List<MembershipInvitationBundle> openInvitations;
+	
 	RSSFeed testFeed = null;
 	String testTeamId = "42";
 	@Before
@@ -84,7 +85,9 @@ public class HomePresenterTest {
 		}
 		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
+		
+		openInvitations = new ArrayList<MembershipInvitationBundle>();
+		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
 		testFeed = new RSSFeed();
 		RSSEntry entry = new RSSEntry();
@@ -125,24 +128,6 @@ public class HomePresenterTest {
 	}	
 	
 	@Test
-	public void testLoadEvaluations() {
-		//happy case
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		homePresenter.loadEvaluations(mockCallback);
-		verify(mockCallback).onSuccess(testEvaluationResults);
-	}
-	
-	
-	@Test
-	public void testLoadEvaluationsFailure() throws RestServiceException {
-		Exception simulatedException = new Exception("Simulated Error");
-		AsyncMockStubber.callFailureWith(simulatedException).when(mockSynapseClient).getAvailableEvaluationEntitiesList(any(AsyncCallback.class));
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		homePresenter.loadEvaluations(mockCallback);
-		verify(mockCallback).onFailure(simulatedException);
-	}
-
-	@Test
 	public void testCreateTeam() {
 		//happy case
 		homePresenter.createTeam("New Team");
@@ -156,5 +141,20 @@ public class HomePresenterTest {
 		homePresenter.createTeam("New Team");
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testIsNoOpenInvites() {
+		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		homePresenter.isOpenTeamInvites(mockCallback);
+		verify(mockCallback).invoke(eq(false));
+	}
+	
+	@Test
+	public void testIsOpenInvites() {
+		openInvitations.add(new MembershipInvitationBundle());
+		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		homePresenter.isOpenTeamInvites(mockCallback);
+		verify(mockCallback).invoke(eq(true));
 	}
 }
