@@ -127,7 +127,7 @@ public class OpenIDUtils {
 			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
 					URLDecoder.decode(request.getQueryString(), "UTF-8"), 
-					acceptsTermsOfUse);
+					acceptsTermsOfUse, true);
 			
 			// Check to see if the user has accepted the terms of use
 			synapse.setSessionToken(session.getSessionToken());
