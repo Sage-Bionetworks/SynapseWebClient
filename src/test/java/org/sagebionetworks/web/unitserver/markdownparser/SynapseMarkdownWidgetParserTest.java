@@ -39,7 +39,7 @@ public class SynapseMarkdownWidgetParserTest {
 		Document doc = Jsoup.parse(sb.toString());
 		parser.completeParse(doc);
 		assertTrue(doc.html().contains("provenance?entityList=syn1234567&amp;depth=1&amp;showExpand=true"));
-		assertTrue(doc.html().contains("wikipages"));
+		assertFalse(doc.html().contains("wikipages"));
 	}
 	
 	@Test

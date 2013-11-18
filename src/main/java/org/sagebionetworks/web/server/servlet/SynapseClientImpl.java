@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -1636,9 +1637,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
 				membershipInvite.setMessage(message);
 				membershipInvite.setTeamId(teamId);
-				List<String> userIds = new ArrayList<String>();
-				userIds.add(userGroupId);
-				membershipInvite.setInvitees(userIds);
+				membershipInvite.setInviteeId(userGroupId);
 				
 				//make new Synapse call
 				synapseClient.createMembershipInvitation(membershipInvite);
@@ -1708,6 +1707,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//must be an admin to the team
+			//TODO: After PLFM-2248 is complete, enable this admin check (remove the try catch method)
+//			TeamBundle teamBundle = getTeamBundle(currentUserId, teamId, true);
+//			if (teamBundle.isUserAdmin()) {
+			try {
+				PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				return requests.getTotalNumberOfResults();
+			} catch (SynapseForbiddenException forbiddenEx) {
+				return null;
+			}
+//			} else {
+//				return null;
+//			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	

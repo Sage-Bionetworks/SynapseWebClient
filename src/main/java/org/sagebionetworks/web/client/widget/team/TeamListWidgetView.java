@@ -16,7 +16,7 @@ public interface TeamListWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
+	public void setRequestCount(String teamId, Long count);
 	public void configure(List<Team> teams, boolean isBig);
 	
 	public interface Presenter extends SynapsePresenter {

@@ -15,8 +15,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -91,7 +91,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		AsyncMockStubber.callFailureWith(new UnauthorizedException("user exists")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
 		
 		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState);	
 		registerAccountPresenter.setPlace(place);

@@ -16,14 +16,9 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	Pattern p= Pattern.compile(MarkdownRegExConstants.SYNAPSE_MARKDOWN_WIDGET_REGEX, Pattern.CASE_INSENSITIVE);
 	MarkdownExtractor extractor;
 	
-	String subpagesWidgetMarkdown = SharedMarkdownUtils.getWikiSubpagesMarkdown();
-	String noSubpagesMarkdown = SharedMarkdownUtils.getNoAutoWikiSubpagesMarkdown();
-	boolean seenWikiSubpagesWidget;
-	
 	@Override
 	public void reset(List<MarkdownElementParser> simpleParsers) {
 		extractor = new MarkdownExtractor();
-		seenWikiSubpagesWidget = false;
 	}
 	
 	private String getCurrentDivID() {
@@ -33,15 +28,6 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 	@Override
 	public void processLine(MarkdownElements line) {
 		String markdown = line.getMarkdown();
-		if (!seenWikiSubpagesWidget) {
-			if (markdown.contains(subpagesWidgetMarkdown))
-				seenWikiSubpagesWidget = true;
-			if (markdown.contains(noSubpagesMarkdown)) {
-				seenWikiSubpagesWidget = true;
-				markdown.replace(noSubpagesMarkdown, "");
-			}
-		}
-		
 		Matcher m = p.matcher(markdown);
 		StringBuffer sb = new StringBuffer();
 		while(m.find()) {				
@@ -54,20 +40,6 @@ public class SynapseMarkdownWidgetParser extends BasicMarkdownElementParser {
 		}
 		m.appendTail(sb);
 		line.updateMarkdown(sb.toString());
-	}
-	
-	@Override
-	public void completeParse(StringBuilder html) {
-		if (!seenWikiSubpagesWidget) {	
-			//If wikipages/nowikipages widget is not seen, automatically insert it at the top of the markdown
-			//First add this widget to the map of widgets
-			StringBuilder content = new StringBuilder();
-			content.append(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE);
-			extractor.putContainerIdToContent(getCurrentDivID(), content.toString());
-			
-			String containerElement = extractor.getNewElementStart(getCurrentDivID()) + extractor.getContainerElementEnd();
-			html.insert(0, containerElement);			
-		}
 	}
 	
 	@Override
