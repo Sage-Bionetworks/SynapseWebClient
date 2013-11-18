@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,12 +66,13 @@ public class SettingsPresenterTest {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		
 		
 //		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
-		profile.setOwnerId("testuser@test.com");
+		profile.setEmail("testuser@test.com");
 		testUser.setProfile(profile);
 		testUser.setSessionToken("token");
 		testUser.setIsSSO(false);

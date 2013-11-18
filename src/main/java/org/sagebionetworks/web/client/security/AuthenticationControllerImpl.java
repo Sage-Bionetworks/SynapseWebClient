@@ -39,7 +39,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.adapterFactory = adapterFactory;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<String> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
@@ -91,13 +90,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		}
 	}	
 
-	/*
-	 * Private Methods
-	 */
-	@SuppressWarnings("deprecation")
 	private void setUser(String token, final AsyncCallback<String> callback, final boolean isSSO) {
 		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
-		userAccountService.getUser(token, new AsyncCallback<String>() {
+		userAccountService.getUserSessionData(token, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String userSessionJson) {
 				if (userSessionJson != null) {					
