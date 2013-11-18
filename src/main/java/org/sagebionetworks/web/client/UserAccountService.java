@@ -22,8 +22,6 @@ public interface UserAccountService extends RemoteService {
 	public String getUser(String sessionToken) throws AuthenticationException, RestServiceException;
 
 	public void createUser(UserRegistration userInfo) throws RestServiceException;
-			
-	public void updateUser(String firstName, String lastName, String displayName) throws RestServiceException;
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
 	
