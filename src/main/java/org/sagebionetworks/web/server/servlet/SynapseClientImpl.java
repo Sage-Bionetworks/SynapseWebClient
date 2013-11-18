@@ -1386,18 +1386,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<V2WikiHeader> results = getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
+			PaginatedResults<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
 			return EntityFactory.createJSONStringForEntity(results);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	private PaginatedResults<V2WikiHeader> getV2WikiHeaderTree(String ownerId, ObjectType ownerType)  throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PaginatedResults<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree(ownerId, ownerType);
-			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1432,20 +1422,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Long offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<V2WikiHistorySnapshot> results = getPaginatedHistory(key, limit, offset);
-			return EntityFactory.createJSONStringForEntity(results);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	private PaginatedResults<V2WikiHistorySnapshot> getPaginatedHistory(org.sagebionetworks.web.shared.WikiPageKey key, Long limit,
-			Long offset)  throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
 			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 			PaginatedResults<V2WikiHistorySnapshot> results = synapseClient.getV2WikiHistory(properKey, limit, offset);
-			return results;
+			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
