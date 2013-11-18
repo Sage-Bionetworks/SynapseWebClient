@@ -70,6 +70,7 @@ import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -2062,7 +2063,39 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}		
 	}
 	
-	
+	/**
+	 * Upload a file to Synapse
+	 * 
+	 * @param file
+	 * @param contentType
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public FileHandle uploadFile(File file, String contentType) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			// Upload the file and create S3 handle
+			return synapseClient.createFileHandle(file, contentType);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (IOException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 
-	
+	/**
+	 * Get the file handle
+	 * 
+	 * @param fileHandleId
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getRawFileHandle(fileHandleId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 }
