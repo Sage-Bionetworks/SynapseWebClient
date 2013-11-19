@@ -22,7 +22,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 
 	private Presenter presenter;
 	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField;
-	private CheckBox isPagingField, isRowVisibleField;
+	private CheckBox isPagingField, isRowVisibleField, isQueryTableResults;
 	private APITableColumnManager columnsManager;
 	
 	@Inject
@@ -41,7 +41,9 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		isRowVisibleField.addStyleName("apitable");
 		rowNumbersColumnNameField = new TextField<String>();
 		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
+		isQueryTableResults = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_QUERY_TABLE_RESULTS);
 		isPagingField.addStyleName("apitable");
+		isQueryTableResults.addStyleName("apitable");
 		pageSizeField = new TextField<String>();
 		jsonResultsKeyNameField = new TextField<String>();
 		cssStyleNameField = new TextField<String>();
@@ -53,6 +55,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
 
 		flowpanel.add(isPagingField);
+		flowpanel.add(isQueryTableResults);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_PAGE_SIZE, pageSizeField, flowpanel);
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, flowpanel);
@@ -87,6 +90,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		columnsManager.configure(tableConfig.getColumnConfigs());
 		urlField.setValue(tableConfig.getUri());
 		isPagingField.setValue(tableConfig.isPaging());
+		isQueryTableResults.setValue(tableConfig.isQueryTableResults());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
 		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
@@ -137,7 +141,10 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	public Boolean isPaging() {
 		return isPagingField.getValue();
 	}
-	
+	@Override
+	public Boolean isQueryTableResults() {
+		return isQueryTableResults.getValue();
+	}
 	@Override
 	public Boolean isShowRowNumbers() {
 		return isRowVisibleField.getValue();

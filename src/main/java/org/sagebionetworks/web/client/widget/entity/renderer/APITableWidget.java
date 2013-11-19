@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.query.QueryTableResults;
+import org.sagebionetworks.repo.model.query.Row;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -102,18 +104,37 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					if (adapter.has("totalNumberOfResults")) {
 						total = adapter.getInt("totalNumberOfResults");
 					}
-					if (adapter.has(tableConfig.getJsonResultsArrayKeyName())) {
+					
+					if (tableConfig.isQueryTableResults()) {
+						//initialize
+						QueryTableResults results = new QueryTableResults();
+						results.initializeFromJSONObject(adapter);
+						//initialize column data
+						Map<String, List<String>> columnData = createColumnDataMap(results.getHeaders().iterator());
+						//quick lookup for column index
+						Map<Integer, String> columnIndexMap = new HashMap<Integer, String>();
+						for (int i = 0; i < results.getHeaders().size(); i++) {
+							columnIndexMap.put(i, results.getHeaders().get(i));
+						}
+						//transform results into column data
+						for (Row row : results.getRows()) {
+							//add values to the appropriate column lists
+							for (int i = 0; i < row.getValues().size(); i++) {
+								List<String> col = columnData.get(columnIndexMap.get(i));
+								col.add(row.getValues().get(i));
+							}
+						}
+						initFromColumnData(columnData);
+					}
+					else if (adapter.has(tableConfig.getJsonResultsArrayKeyName())) {
 						JSONArrayAdapter resultsList = adapter.getJSONArray(tableConfig.getJsonResultsArrayKeyName());
 						rowCount = resultsList.length();
 						if (rowCount > 0) {
 							JSONObjectAdapter firstItem = resultsList.getJSONObject(0);
 							//initialize column data
-							Map<String, List<String>> columnData = new HashMap<String, List<String>>();
-							//initialize the column data lists
-							for (Iterator<String> iterator = firstItem.keys(); iterator.hasNext();) {
-								columnData.put(iterator.next(), new ArrayList<String>());
-							}
-
+							Map<String, List<String>> columnData = createColumnDataMap(firstItem.keys());
+							
+							//transform results into column data
 							for (int i = 0; i < resultsList.length(); i++) {
 								JSONObjectAdapter row = resultsList.getJSONObject(i);
 								for (String key : columnData.keySet()) {
@@ -123,30 +144,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 								}
 							}
 							
-							//define the column names
-							String[] columnNamesArray = new String[]{};
-							columnNamesArray = new String[columnData.keySet().size()];
-							int colNamesIndex = 0;
-							for (Iterator<String> iterator = columnData.keySet().iterator(); iterator.hasNext();) {
-								String columnName = iterator.next();
-								columnNamesArray[colNamesIndex] = columnName;
-								colNamesIndex++;
-							}
-							
-							//if column configs were not passed in, then use default
-							if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
-								tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray));
-							}
-							
-							APITableColumnRenderer[] renderers = new APITableColumnRenderer[tableConfig.getColumnConfigs().size()];
-							int i = 0;
-							for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
-								renderers[i] = createColumnRendererInstance(ginInjector, config.getRendererFriendlyName());
-								i++;
-							}
-							
-							APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
-							tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
+							initFromColumnData(columnData);
 						}
 					}
 				} catch (Exception e1) {
@@ -154,12 +152,48 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				}
 			}
 			
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showError(caught.getMessage());
 			}
 		});
+	}
+	
+	private Map<String, List<String>> createColumnDataMap(Iterator<String> iterator) {
+		//initialize column data
+		Map<String, List<String>> columnData = new HashMap<String, List<String>>();
+		//initialize the column data lists
+		for (; iterator.hasNext();) {
+			columnData.put(iterator.next(), new ArrayList<String>());
+		}
+		return columnData;
+	}
+	
+	private void initFromColumnData(Map<String, List<String>> columnData) {
+		//define the column names
+		String[] columnNamesArray = new String[]{};
+		columnNamesArray = new String[columnData.keySet().size()];
+		int colNamesIndex = 0;
+		for (Iterator<String> iterator = columnData.keySet().iterator(); iterator.hasNext();) {
+			String columnName = iterator.next();
+			columnNamesArray[colNamesIndex] = columnName;
+			colNamesIndex++;
+		}
+		
+		//if column configs were not passed in, then use default
+		if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
+			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray));
+		}
+		
+		APITableColumnRenderer[] renderers = new APITableColumnRenderer[tableConfig.getColumnConfigs().size()];
+		int i = 0;
+		for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
+			renderers[i] = createColumnRendererInstance(ginInjector, config.getRendererFriendlyName());
+			i++;
+		}
+		
+		APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
+		tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
 	}
 	
 	private String getColumnValue(JSONObjectAdapter row, String key) throws JSONObjectAdapterException {

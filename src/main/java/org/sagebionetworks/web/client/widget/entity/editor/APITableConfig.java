@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingU
  */
 public class APITableConfig {
 	private String uri, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
-	private boolean isPaging, isShowRowNumber;
+	private boolean isPaging, isShowRowNumber,isQueryTableResults;
 	private int offset, pageSize;
 	private List<APITableColumnConfig> columnConfigs;
 	public final static String COLUMN_NAMES_DELIMITER = ";";	
@@ -38,6 +38,11 @@ public class APITableConfig {
 						pageSize = 10;
 				}	
 			}
+			isQueryTableResults = false;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS)){
+				isQueryTableResults = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS));
+			}
+			
 			isShowRowNumber = false;
 			rowNumberColName = "";
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY)){
@@ -122,6 +127,14 @@ public class APITableConfig {
 
 	public boolean isPaging() {
 		return isPaging;
+	}
+	
+	public boolean isQueryTableResults() {
+		return isQueryTableResults;
+	}
+	
+	public void setQueryTableResults(boolean isQueryTableResults) {
+		this.isQueryTableResults = isQueryTableResults;
 	}
 
 	public void setPaging(boolean isPaging) {

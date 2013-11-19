@@ -388,6 +388,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL = "Show Row Numbers?";
 	public static final String SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME = "Row Numbers Col Name:";
 	public static final String SYNAPSE_API_CALL_IS_PAGING = "Support Pagination?";
+	public static final String SYNAPSE_API_CALL_IS_QUERY_TABLE_RESULTS = "Returns QueryTableResults?";
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";

@@ -98,6 +98,7 @@ public class WidgetConstants {
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
+	public static final String API_TABLE_WIDGET_QUERY_TABLE_RESULTS = "queryTableResults";
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
