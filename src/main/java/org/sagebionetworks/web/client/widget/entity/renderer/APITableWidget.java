@@ -60,9 +60,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	@Override
 	public void configure(WikiPageKey wikiKey,
 			Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+		view.clear();
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		tableConfig = new APITableConfig(descriptor);
+		
+		//if the table is configured to only show if the user is logged in, and we are not logged in, then just return.
+		if (!authenticationController.isLoggedIn() && tableConfig.isShowOnlyIfLoggedIn())
+			return;
 		
 		if (tableConfig.getUri() != null) {
 			refreshData();
@@ -111,22 +116,25 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						//initialize
 						QueryTableResults results = new QueryTableResults();
 						results.initializeFromJSONObject(adapter);
-						//initialize column data
-						Map<String, List<String>> columnData = createColumnDataMap(results.getHeaders().iterator());
-						//quick lookup for column index
-						Map<Integer, String> columnIndexMap = new HashMap<Integer, String>();
-						for (int i = 0; i < results.getHeaders().size(); i++) {
-							columnIndexMap.put(i, results.getHeaders().get(i));
-						}
-						//transform results into column data
-						for (Row row : results.getRows()) {
-							//add values to the appropriate column lists
-							for (int i = 0; i < row.getValues().size(); i++) {
-								List<String> col = columnData.get(columnIndexMap.get(i));
-								col.add(row.getValues().get(i));
+						rowCount = results.getRows().size();
+						if (rowCount > 0) {
+							//initialize column data
+							Map<String, List<String>> columnData = createColumnDataMap(results.getHeaders().iterator());
+							//quick lookup for column index
+							Map<Integer, String> columnIndexMap = new HashMap<Integer, String>();
+							for (int i = 0; i < results.getHeaders().size(); i++) {
+								columnIndexMap.put(i, results.getHeaders().get(i));
 							}
+							//transform results into column data
+							for (Row row : results.getRows()) {
+								//add values to the appropriate column lists
+								for (int i = 0; i < row.getValues().size(); i++) {
+									List<String> col = columnData.get(columnIndexMap.get(i));
+									col.add(row.getValues().get(i));
+								}
+							}
+							initFromColumnData(columnData);
 						}
-						initFromColumnData(columnData);
 					}
 					else if (adapter.has(tableConfig.getJsonResultsArrayKeyName())) {
 						JSONArrayAdapter resultsList = adapter.getJSONArray(tableConfig.getJsonResultsArrayKeyName());
