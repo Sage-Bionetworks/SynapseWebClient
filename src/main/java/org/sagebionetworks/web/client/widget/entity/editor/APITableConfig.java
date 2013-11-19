@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingU
  */
 public class APITableConfig {
 	private String uri, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
-	private boolean isPaging, isShowRowNumber,isQueryTableResults;
+	private boolean isPaging, isShowRowNumber,isQueryTableResults,isShowOnlyIfLoggedIn;
 	private int offset, pageSize;
 	private List<APITableColumnConfig> columnConfigs;
 	public final static String COLUMN_NAMES_DELIMITER = ";";	
@@ -42,6 +42,12 @@ public class APITableConfig {
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS)){
 				isQueryTableResults = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS));
 			}
+			
+			isShowOnlyIfLoggedIn = false;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN)){
+				isShowOnlyIfLoggedIn = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN));
+			}
+
 			
 			isShowRowNumber = false;
 			rowNumberColName = "";
@@ -136,6 +142,15 @@ public class APITableConfig {
 	public void setQueryTableResults(boolean isQueryTableResults) {
 		this.isQueryTableResults = isQueryTableResults;
 	}
+	
+	public boolean isShowOnlyIfLoggedIn() {
+		return isShowOnlyIfLoggedIn;
+	}
+	
+	public void setShowOnlyIfLoggedIn(boolean isShowOnlyIfLoggedIn) {
+		this.isShowOnlyIfLoggedIn = isShowOnlyIfLoggedIn;
+	}
+
 
 	public void setPaging(boolean isPaging) {
 		this.isPaging = isPaging;

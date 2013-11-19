@@ -52,7 +52,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			builder.append("<table id=\""+elementId+"\"");
 			
 			//apply tablesorter style
-			builder.append(" class=\"inline-block scroll-x tablesorter\"");
+			builder.append(" class=\"noBackground inline-block scroll-x tablesorter\"");
 			builder.append(">");
 				
 			//headers

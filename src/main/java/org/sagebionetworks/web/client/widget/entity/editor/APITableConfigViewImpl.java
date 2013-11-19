@@ -22,7 +22,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 
 	private Presenter presenter;
 	private TextField<String> urlField, rowNumbersColumnNameField, pageSizeField, jsonResultsKeyNameField, cssStyleNameField;
-	private CheckBox isPagingField, isRowVisibleField, isQueryTableResults;
+	private CheckBox isPagingField, isRowVisibleField, isQueryTableResults, isShowIfLoggedInOnly;
 	private APITableColumnManager columnsManager;
 	
 	@Inject
@@ -41,9 +41,12 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		isRowVisibleField.addStyleName("apitable");
 		rowNumbersColumnNameField = new TextField<String>();
 		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
-		isQueryTableResults = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_QUERY_TABLE_RESULTS);
 		isPagingField.addStyleName("apitable");
+		isQueryTableResults = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_QUERY_TABLE_RESULTS);
 		isQueryTableResults.addStyleName("apitable");
+		isShowIfLoggedInOnly = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_SHOW_IF_LOGGED_IN_ONLY);
+		isShowIfLoggedInOnly.addStyleName("apitable");
+		
 		pageSizeField = new TextField<String>();
 		jsonResultsKeyNameField = new TextField<String>();
 		cssStyleNameField = new TextField<String>();
@@ -51,21 +54,24 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_URL_LABEL, urlField, flowpanel);
 		urlField.setAllowBlank(false);
 
-		flowpanel.add(isRowVisibleField);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
 
-		flowpanel.add(isPagingField);
-		flowpanel.add(isQueryTableResults);
+		flowpanel.add(DisplayUtils.wrapInDiv(isPagingField));
+		flowpanel.add(DisplayUtils.wrapInDiv(isRowVisibleField));
+		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_PAGE_SIZE, pageSizeField, flowpanel);
 		
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME, jsonResultsKeyNameField, flowpanel);
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_CSS_STYLE_NAME, cssStyleNameField, flowpanel);
 		
+		flowpanel.add(DisplayUtils.wrapInDiv(isQueryTableResults));
+		flowpanel.add(DisplayUtils.wrapInDiv(isShowIfLoggedInOnly));
 		
 		flowpanel.add(columnsManager.asWidget());
 		
 		add(flowpanel);
 	}
+	
 	
 	public static void showDialog(APITableColumnManager columnManager) {
         final Dialog window = new Dialog();
@@ -145,6 +151,12 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 	public Boolean isQueryTableResults() {
 		return isQueryTableResults.getValue();
 	}
+	
+	@Override
+	public Boolean isShowIfLoggedInOnly() {
+		return isShowIfLoggedInOnly.getValue();
+	}
+	
 	@Override
 	public Boolean isShowRowNumbers() {
 		return isRowVisibleField.getValue();
