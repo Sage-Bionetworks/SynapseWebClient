@@ -97,6 +97,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 		urlField.setValue(tableConfig.getUri());
 		isPagingField.setValue(tableConfig.isPaging());
 		isQueryTableResults.setValue(tableConfig.isQueryTableResults());
+		isShowIfLoggedInOnly.setValue(tableConfig.isShowOnlyIfLoggedIn());
 		isRowVisibleField.setValue(tableConfig.isShowRowNumber());
 		rowNumbersColumnNameField.setValue(tableConfig.getRowNumberColName());
 		pageSizeField.setValue(Integer.toString(tableConfig.getPageSize()));
