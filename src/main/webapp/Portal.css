@@ -1334,6 +1334,10 @@ a.projectTitle:hover {
 .padding-right-5 {
 	padding-right: 5px;
 }
+.padding-right-15 {
+	padding-right: 15px !important;
+}
+
 .padding-left-5 {
 	padding-left: 5px;
 }

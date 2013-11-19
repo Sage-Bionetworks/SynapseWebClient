@@ -27,6 +27,7 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 		if (colValues == null) {
 			//user defined an input column that doesn't exist in the service output
 			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
+			return;
 		}
 		outputColumnData.put(outputColumnName, colValues);
 		
