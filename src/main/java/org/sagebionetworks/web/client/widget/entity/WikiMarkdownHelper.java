@@ -31,5 +31,5 @@ public interface WikiMarkdownHelper {
 	 * @throws IOException
 	 * @throws RestServiceException
 	 */
-	public String getMarkdown(String fileHandleId, String wikiPageId) throws IOException, RestServiceException ;
+	public String getMarkdownAsString(String fileHandleId, String wikiPageId) throws IOException, RestServiceException ;
 }
