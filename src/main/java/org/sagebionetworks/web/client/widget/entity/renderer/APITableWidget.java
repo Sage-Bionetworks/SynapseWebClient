@@ -112,7 +112,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					if (adapter.has("totalNumberOfResults")) {
 						total = adapter.getInt("totalNumberOfResults");
 					}
-					
+					Map<String, List<String>> columnData = null;
 					if (tableConfig.isQueryTableResults()) {
 						//initialize
 						QueryTableResults results = new QueryTableResults();
@@ -120,7 +120,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						rowCount = results.getRows().size();
 						if (rowCount > 0) {
 							//initialize column data
-							Map<String, List<String>> columnData = createColumnDataMap(results.getHeaders().iterator());
+							columnData = createColumnDataMap(results.getHeaders().iterator());
 							//quick lookup for column index
 							Map<Integer, String> columnIndexMap = new HashMap<Integer, String>();
 							for (int i = 0; i < results.getHeaders().size(); i++) {
@@ -134,7 +134,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 									col.add(row.getValues().get(i));
 								}
 							}
-							initFromColumnData(columnData);
 						}
 					}
 					else if (adapter.has(tableConfig.getJsonResultsArrayKeyName())) {
@@ -143,7 +142,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						if (rowCount > 0) {
 							JSONObjectAdapter firstItem = resultsList.getJSONObject(0);
 							//initialize column data
-							Map<String, List<String>> columnData = createColumnDataMap(firstItem.keys());
+							columnData = createColumnDataMap(firstItem.keys());
 							
 							//transform results into column data
 							for (int i = 0; i < resultsList.length(); i++) {
@@ -154,10 +153,18 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 									col.add(value);
 								}
 							}
-							
-							initFromColumnData(columnData);
 						}
 					}
+					
+					if (columnData != null) {
+						//define the column names
+						String[] columnNamesArray = getColumnNamesArray(columnData.keySet());
+						//create renderers
+						APITableColumnRenderer[] renderers = createRenderers(columnNamesArray, tableConfig, ginInjector);
+						APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
+						tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
+					}
+					
 				} catch (Exception e1) {
 					onFailure(e1);
 				}
@@ -170,27 +177,19 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		});
 	}
 	
-	private Map<String, List<String>> createColumnDataMap(Iterator<String> iterator) {
+	public Map<String, List<String>> createColumnDataMap(Iterator<String> iterator) {
 		//initialize column data
 		Map<String, List<String>> columnData = new HashMap<String, List<String>>();
-		//initialize the column data lists
-		for (; iterator.hasNext();) {
-			columnData.put(iterator.next(), new ArrayList<String>());
+		if (iterator != null) {
+			//initialize the column data lists
+			for (; iterator.hasNext();) {
+				columnData.put(iterator.next(), new ArrayList<String>());
+			}
 		}
 		return columnData;
 	}
 	
-	private void initFromColumnData(Map<String, List<String>> columnData) {
-		//define the column names
-		String[] columnNamesArray = new String[]{};
-		columnNamesArray = new String[columnData.keySet().size()];
-		int colNamesIndex = 0;
-		for (Iterator<String> iterator = columnData.keySet().iterator(); iterator.hasNext();) {
-			String columnName = iterator.next();
-			columnNamesArray[colNamesIndex] = columnName;
-			colNamesIndex++;
-		}
-		
+	public APITableColumnRenderer[] createRenderers(String[] columnNamesArray, APITableConfig tableConfig, PortalGinInjector ginInjector) {
 		//if column configs were not passed in, then use default
 		if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
 			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray));
@@ -203,8 +202,20 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			i++;
 		}
 		
-		APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
-		tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
+		return renderers;
+	}
+	
+	public String[] getColumnNamesArray(Set<String> columnNames){
+		String[] columnNamesArray = new String[]{};
+		if (columnNames != null) {
+			columnNamesArray = new String[columnNames.size()];
+			int colNamesIndex = 0;
+			for (String colName : columnNames) {
+				columnNamesArray[colNamesIndex] = colName;
+				colNamesIndex++;
+			}
+		}
+		return columnNamesArray;
 	}
 	
 	private String getColumnValue(JSONObjectAdapter row, String key) throws JSONObjectAdapterException {

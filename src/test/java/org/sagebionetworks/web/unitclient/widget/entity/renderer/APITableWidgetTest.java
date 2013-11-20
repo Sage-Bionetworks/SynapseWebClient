@@ -3,9 +3,12 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.Assert.*;
 
@@ -54,6 +57,8 @@ public class APITableWidgetTest {
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
+	String col1Name ="column 1";
+	String col2Name ="column 2";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -224,8 +229,70 @@ public class APITableWidgetTest {
 		
 		verify(mockView).clear();
 		verify(mockView, times(0)).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
-		
+	}
+	
+	private Set<String> getTestColumnNameSet() {
+		Set<String> testSet = new HashSet<String>();
+		testSet.add(col1Name);
+		testSet.add(col2Name);
+		return testSet;
+	}
+	
+	@Test
+	public void testCreateColumnDataMap() throws JSONObjectAdapterException {
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		assertEquals(2, dataMap.keySet().size());
+		assertEquals(new ArrayList<String>(), dataMap.get(col1Name));
+	}
+	
+	@Test
+	public void testCreateColumnDataMapEmptyOrNull() throws JSONObjectAdapterException {
+		Map emptyMap = new HashMap<String, String>();
+		Set<String> emptyTestSet = new HashSet<String>();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(emptyTestSet.iterator());
+		assertEquals(emptyMap, dataMap);
+		dataMap = widget.createColumnDataMap(null);
+		assertEquals(emptyMap, dataMap);
+	}
+	
+	
+	@Test
+	public void testCreateRenderersNull() throws JSONObjectAdapterException {
+		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		APITableConfig newConfig = new APITableConfig(descriptor);
+		newConfig.setColumnConfigs(null);
+		widget.createRenderers(columnNames, newConfig, mockGinInjector);
+		//should have tried to create two default renderers (NONE)
+		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
 	}
 
+	@Test
+	public void testCreateRenderersEmpty() throws JSONObjectAdapterException {
+		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		APITableConfig newConfig = new APITableConfig(descriptor);
+		newConfig.setColumnConfigs(new ArrayList());
+		widget.createRenderers(columnNames, newConfig, mockGinInjector);
+		//should have tried to create two default renderers (NONE)
+		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
+	}
+
+	@Test
+	public void testCreateRenderer() throws JSONObjectAdapterException {
+		String[] columnNames = new String[]{col1Name};
+		APITableConfig tableConfig = new APITableConfig(descriptor);
+		List<APITableColumnConfig> configList = new ArrayList<APITableColumnConfig>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		Set<String> inputColName = new HashSet<String>();
+		inputColName.add(col1Name);
+		columnConfig.setInputColumnNames(inputColName);
+		columnConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
+		
+		configList.add(columnConfig);
+		tableConfig.setColumnConfigs(configList);
+		widget.createRenderers(columnNames, tableConfig, mockGinInjector);
+		//should have tried to create a single user id renderer (based on the table configuration)
+		verify(mockGinInjector).getAPITableColumnRendererUserId();
+	}
 	
 }
