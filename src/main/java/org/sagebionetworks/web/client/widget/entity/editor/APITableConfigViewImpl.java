@@ -199,7 +199,7 @@ public class APITableConfigViewImpl extends LayoutContainer implements APITableC
 
 	@Override
 	public int getDisplayHeight() {
-		return 250;
+		return 280;
 	}
 	@Override
 	public int getAdditionalWidth() {

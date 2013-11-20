@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +11,7 @@ import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -114,6 +110,7 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor, null);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -200,6 +197,34 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null);
 		String pagedURI = widget.getPagedURI();
 		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+	}
+	
+	@Test
+	public void testCurrentUserVariable() throws JSONObjectAdapterException {
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project+where+userId==" + APITableWidget.CURRENT_USER_SQL_VARIABLE;
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String testUserId = "12345test";
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		widget.configure(testWikiKey, descriptor, null);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		
+		assertTrue(arg.getValue().endsWith(testUserId));
+	}
+	
+	@Test
+	public void testLoggedInOnly() throws JSONObjectAdapterException {
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, "true");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		widget.configure(testWikiKey, descriptor, null);
+		
+		verify(mockView).clear();
+		verify(mockView, times(0)).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+		
 	}
 
 	

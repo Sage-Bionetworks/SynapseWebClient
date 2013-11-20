@@ -101,7 +101,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (tableConfig.isPaging()) {
 			fullUri = getPagedURI();
 		}
-		fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, authenticationController.getCurrentUserPrincipalId());
+		if (authenticationController.isLoggedIn())
+			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, authenticationController.getCurrentUserPrincipalId());
 		synapseClient.getJSONEntity(fullUri, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
