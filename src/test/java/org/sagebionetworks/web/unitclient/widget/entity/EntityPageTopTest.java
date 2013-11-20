@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -305,6 +306,20 @@ public class EntityPageTopTest {
 		assertEquals(wikiSubpage, gotoPlace.getAreaToken());				
 	}
 
+	@Test
+	public void testDeletedEntityIdInTabState_SWC_1046() {
+		// create some state for files tab
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// now delete entity 
+		pageTop.entityDeleted(new EntityDeletedEvent(entityId));
+		// goto files tab and check that entity is gone from the state and we are at project root
+		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		gotoPlace = captureGoTo();
+		assertEquals(EntityArea.FILES, gotoPlace.getArea());
+		assertEquals(projectId, gotoPlace.getEntityId());
+	}
 	
 	/*
 	 * Private Methods

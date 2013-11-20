@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -61,6 +62,8 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		ImageResource getIconForType(String typeString);
 
 		boolean isPlaceChangeForArea(EntityArea targetTab);
+
+		void entityDeleted(EntityDeletedEvent event);
 
 				
 	}
