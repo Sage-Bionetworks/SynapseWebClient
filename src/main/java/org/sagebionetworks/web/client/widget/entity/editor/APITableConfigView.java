@@ -16,6 +16,8 @@ public interface APITableConfigView extends IsWidget, WidgetEditorView {
 	public String getApiUrl();
 	
 	public Boolean isPaging();
+	public Boolean isQueryTableResults();
+	public Boolean isShowIfLoggedInOnly();
 	public String getPageSize();
 	public Boolean isShowRowNumbers();
 	public String getRowNumberColumnName();

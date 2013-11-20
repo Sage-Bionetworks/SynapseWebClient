@@ -741,6 +741,12 @@ public class DisplayUtils {
 		lc.add(widget);
 		return lc;
 	}
+	
+	public static SimplePanel wrapInDiv(Widget widget) {
+		SimplePanel lc = new SimplePanel();
+		lc.setWidget(widget);
+		return lc;
+	}
 	private static String getTeamPlaceString(Class<Team> place) {
 		String fullPlaceName = place.getName();		
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
