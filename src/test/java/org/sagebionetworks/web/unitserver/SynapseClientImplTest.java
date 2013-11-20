@@ -90,6 +90,9 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -141,6 +144,7 @@ public class SynapseClientImplTest {
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
 	AccessControlList acl;
 	WikiPage page;
+	V2WikiPage v2Page;
 	Evaluation mockEvaluation;
 	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
@@ -272,6 +276,8 @@ public class SynapseClientImplTest {
 		page.setMarkdown("my markdown");
 		page.setParentWikiId(null);
 		page.setTitle("A Title");
+		v2Page = new V2WikiPage();
+		v2Page.setId("v2TestId");
 		S3FileHandle handle = new S3FileHandle();
 		handle.setId("4422");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
@@ -655,6 +661,67 @@ public class SynapseClientImplTest {
 	    verify(mockSynapse).getWikiAttachmenthHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
 	}
 
+	 @Test
+	 public void testCreateV2WikiPage() throws Exception {
+	         String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
+	         Mockito.when(mockSynapse.createV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class))).thenReturn(v2Page);
+	         synapseClient.createV2WikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+	     verify(mockSynapse).createV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class));
+	 }
+     
+     @Test
+     public void testDeleteV2WikiPage() throws Exception {
+             synapseClient.deleteV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+             verify(mockSynapse).deleteV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+     }
+     
+     @Test
+     public void testGetV2WikiPage() throws Exception {
+             Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
+             synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+         verify(mockSynapse).getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+     }
+     
+     @Test
+     public void testUpdateV2WikiPage() throws Exception {
+             String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
+             Mockito.when(mockSynapse.updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class))).thenReturn(v2Page);
+             synapseClient.updateV2WikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+             verify(mockSynapse).updateV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class));
+     }
+     
+     @Test
+     public void testRestoreV2WikiPage() throws Exception {
+             String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
+             Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong())).thenReturn(v2Page);
+             synapseClient.restoreV2WikiPage("ownerId", ObjectType.ENTITY.toString(), wikiPageJson, new Long(2));
+             verify(mockSynapse).restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong());
+     }
+     
+     @Test
+     public void testGetV2WikiHeaderTree() throws Exception {
+             PaginatedResults<V2WikiHeader> headerTreeResults = new PaginatedResults<V2WikiHeader>();
+             when(mockSynapse.getV2WikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
+             synapseClient.getV2WikiHeaderTree("testId", ObjectType.ENTITY.toString());
+         verify(mockSynapse).getV2WikiHeaderTree(anyString(), any(ObjectType.class));
+     }
+     
+     @Test
+     public void testGetV2WikiHistory() throws Exception {
+             PaginatedResults<V2WikiHistorySnapshot> historyResults = new PaginatedResults<V2WikiHistorySnapshot>();
+             when(mockSynapse.getV2WikiHistory(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class), any(Long.class))).thenReturn(historyResults);
+             synapseClient.getV2WikiHistory(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(10), new Long(0));
+         verify(mockSynapse).getV2WikiHistory(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class), any(Long.class));
+     }
+
+     @Test
+     public void testGetV2WikiAttachmentHandles() throws Exception {
+             FileHandleResults testResults = new FileHandleResults();
+             Mockito.when(mockSynapse.getV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(testResults);
+             synapseClient.getV2WikiAttachmentHandles(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+         verify(mockSynapse).getV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+     }
+     
 	private void resetUpdateExternalFileHandleMocks(String testId, FileEntity file, ExternalFileHandle handle) throws SynapseException, JSONObjectAdapterException {
 		reset(mockSynapse);
 		when(mockSynapse.getEntityById(testId)).thenReturn(file);
