@@ -24,6 +24,8 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
+import org.sagebionetworks.web.client.events.EntityDeletedEvent;
+import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -296,6 +298,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityUpdatedHandler(handler);
 		annotationsWidget.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
+		actionMenu.setEntityDeletedHandler(new EntityDeletedHandler() {			
+			@Override
+			public void onDeleteSuccess(EntityDeletedEvent event) {
+				presenter.entityDeleted(event);
+			}
+		});
 	}
 
 	@Override
