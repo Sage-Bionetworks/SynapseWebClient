@@ -14,7 +14,7 @@ public interface UserAccountService extends RemoteService {
 	
 	public void changePassword(String sessionToken, String newPassword);
 
-	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException;
+	public String initiateSession(String username, String password) throws RestServiceException;
 	
 	public String getUserSessionData(String sessionToken) throws RestServiceException;
 	

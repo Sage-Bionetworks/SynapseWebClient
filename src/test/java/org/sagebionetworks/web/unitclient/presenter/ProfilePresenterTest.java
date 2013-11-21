@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -80,7 +81,8 @@ public class ProfilePresenterTest {
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
 		testUser.setProfile(userProfile);
-		testUser.setSessionToken("token");
+		testUser.setSession(new Session());
+		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 		
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();

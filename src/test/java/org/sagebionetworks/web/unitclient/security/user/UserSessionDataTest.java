@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 
@@ -18,7 +19,8 @@ public class UserSessionDataTest {
 		profile.setDisplayName("Display Name");
 		profile.setOwnerId("1");
 		user.setProfile(profile);
-		user.setSessionToken("token");
+		user.setSession(new Session());
+		user.getSession().setSessionToken("token");
 		user.setIsSSO(false);
 		try {
 			String cookieString = EntityFactory.createJSONStringForEntity(user);

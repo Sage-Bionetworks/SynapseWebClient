@@ -12,7 +12,7 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
+	public void loginUser(String username, String password, AsyncCallback<String> callback);
 	
 	/**
 	 * Logs in the user represented by the token
@@ -69,5 +69,10 @@ public interface AuthenticationController {
 	void reloadUserSessionData();
 
 	public void getTermsOfUse(AsyncCallback<String> callback);
+	
+	/**
+	 * Signs the terms of use for a user
+	 */
+	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
 	
 }

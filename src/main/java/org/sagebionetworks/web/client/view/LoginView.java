@@ -21,9 +21,6 @@ public interface LoginView extends IsWidget, SynapseView {
 	void showLogin(String openIdActionUrl, String openIdReturnUrl);	
 	
 	void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
-
-
-	void acceptTermsOfUse();
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);

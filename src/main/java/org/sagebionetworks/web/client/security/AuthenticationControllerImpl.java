@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -40,25 +41,20 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public void loginUser(final String username, String password, boolean explicitlyAcceptsTermsOfUse, final AsyncCallback<String> callback) {
+	public void loginUser(final String username, String password, final AsyncCallback<String> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
-		userAccountService.initiateSession(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {		
+		userAccountService.initiateSession(username, password, new AsyncCallback<String>() {		
 			@Override
-			public void onSuccess(String userSessionJson) {
-				UserSessionData userSessionData = null;
+			public void onSuccess(String sessionJson) {
+				Session session = null;
 				try {
-					//automatically expire after a day
-					Date tomorrow = getDayFromNow();
-					setUserSessionDataCookie(userSessionJson, tomorrow);
-					userSessionData = new UserSessionData(adapterFactory.createNew(userSessionJson)); 
-					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
+					session = new Session(adapterFactory.createNew(sessionJson));
 				} catch (JSONObjectAdapterException e) {
 					//can't save the cookie
 					e.printStackTrace();
 				}
 				
-				currentUser = userSessionData;
-				callback.onSuccess(userSessionJson);
+				loginUser(session.getSessionToken(), callback);
 			}
 
 			
@@ -88,7 +84,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 			currentUser = null;
 		}
-	}	
+	}
 
 	private void setUser(String token, final AsyncCallback<String> callback, final boolean isSSO) {
 		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
@@ -103,7 +99,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						userSessionData.setIsSSO(isSSO);
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
-						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSessionToken(), tomorrow);
+						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
 						callback.onSuccess(usdAdapter.toJSONString());
 					} catch (JSONObjectAdapterException e){
@@ -175,7 +171,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public String getCurrentUserSessionToken() {
-		if(currentUser != null) return currentUser.getSessionToken();
+		if(currentUser != null) return currentUser.getSession().getSessionToken();
 		else return null;
 	}
 	
@@ -185,13 +181,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		else return false;
 	}
 
-	
-	/*
-	 * Private Methods
-	 */
-	private void setUserSessionDataCookie(String userSessionJson,
-			Date tomorrow) {
-		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, userSessionJson, tomorrow);
+	@Override
+	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
+		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
 	}
 
 	private Date getDayFromNow() {
@@ -199,6 +191,4 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		CalendarUtil.addDaysToDate(date, 1);
 		return date;  
 	}
-
-	
 }

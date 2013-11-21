@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -74,7 +75,8 @@ public class SettingsPresenterTest {
 		profile.setDisplayName("tester");
 		profile.setEmail("testuser@test.com");
 		testUser.setProfile(profile);
-		testUser.setSessionToken("token");
+		testUser.setSession(new Session());
+		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 	}
 	

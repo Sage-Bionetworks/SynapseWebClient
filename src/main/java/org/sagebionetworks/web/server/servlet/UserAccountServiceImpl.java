@@ -2,20 +2,19 @@ package org.sagebionetworks.web.server.servlet;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.users.UserRegistration;
 import org.springframework.web.client.RestClientException;
@@ -91,18 +90,15 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public String initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse) throws RestServiceException {
+	public String initiateSession(String username, String password) throws RestServiceException {
 		validateService();
 		
 		SynapseClient synapseClient = createSynapseClient();
 		try {
-			UserSessionData userData = synapseClient.login(username, password, explicitlyAcceptsTermsOfUse);
-			return EntityFactory.createJSONStringForEntity(userData);
+			Session session = synapseClient.login(username, password);
+			return EntityFactory.createJSONStringForEntity(session);
 		} catch (JSONObjectAdapterException e) {
-			e.printStackTrace();
 			throw new UnauthorizedException(e.getMessage());
-		} catch (SynapseTermsOfUseException e) {
-			throw new TermsOfUseException(e.getMessage());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -117,7 +113,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			UserSessionData userData = synapseClient.getUserSessionData();
 			return EntityFactory.createJSONStringForEntity(userData);
 		} catch (JSONObjectAdapterException e) {
-			e.printStackTrace();
 			throw new UnauthorizedException(e.getMessage());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

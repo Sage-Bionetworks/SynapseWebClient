@@ -11,7 +11,7 @@ public interface UserAccountServiceAsync {
 
 	void changePassword(String sessionToken, String newPassword, AsyncCallback<Void> callback);
 
-	void initiateSession(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
+	void initiateSession(String username, String password, AsyncCallback<String> callback);
 	
 	void getUserSessionData(String sessionToken, AsyncCallback<String> callback);
 	

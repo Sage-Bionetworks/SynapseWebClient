@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.openid4java.OpenIDException;
 import org.sagebionetworks.authutil.OpenIDConsumerUtils;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -20,7 +19,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class OpenIDUtils {
 	public static final String OPENID_CALLBACK_URI = "/Portal/openidcallback";
 	
-	public static final String ACCEPTS_TERMS_OF_USE_COOKIE_NAME = "sagebionetworks.acceptsTermsOfUse";
 	public static final String RETURN_TO_URL_COOKIE_NAME = "sagebionetworks.returnToUrl";
 	public static final String REDIRECT_MODE_COOKIE_NAME = "sagebionetworks.redirectMode";
 	public static final int COOKIE_MAX_AGE_SECONDS = 60;
@@ -29,18 +27,13 @@ public class OpenIDUtils {
 	 * @param redirectEndpoint  this is the end point to which the OpenID provider should redirect
 	 * to complete the first part of the OpenID handshake
 	 */
-	public static void openID(String openIdProviderName,
-			Boolean acceptsTermsOfUse, String redirectMode, String returnToURL,
+	public static void openID(String openIdProviderName, String redirectMode, String returnToURL,
 			HttpServletRequest request, HttpServletResponse response,
 			String redirectEndpoint) throws IOException, ServletException,
 			OpenIDException, URISyntaxException {
 
 		// Stash info that the portal needs in cookies
 		Cookie cookie = new Cookie(RETURN_TO_URL_COOKIE_NAME, returnToURL);
-		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
-		response.addCookie(cookie);
-		
-		cookie = new Cookie(ACCEPTS_TERMS_OF_USE_COOKIE_NAME, ""+acceptsTermsOfUse);
 		cookie.setMaxAge(COOKIE_MAX_AGE_SECONDS);
 		response.addCookie(cookie);
 		
@@ -59,22 +52,13 @@ public class OpenIDUtils {
 	}
 	
 	public static String createRedirectURL(String returnToURL,
-			String sessionToken, boolean crowdAcceptsTermsOfUse,
+			String sessionToken,
 			boolean isGWTMode) throws URISyntaxException {
 		String redirectUrl = null;
 		if (isGWTMode) {
-			redirectUrl = returnToURL+":";
-			if (crowdAcceptsTermsOfUse) {
-				redirectUrl += sessionToken;
-			} else {
-				redirectUrl += WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN;
-			}
+			redirectUrl = returnToURL+":" + sessionToken;
 		} else {
-			if (crowdAcceptsTermsOfUse) {
-				redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=OK&sessionToken="+sessionToken);
-			} else {
-				redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN);
-			}
+			redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=OK&sessionToken="+sessionToken);
 		}
 		return redirectUrl;
 	}
@@ -103,14 +87,11 @@ public class OpenIDUtils {
 		Boolean isGWTMode = null;
 		
 		String returnToURL = null;
-		Boolean acceptsTermsOfUse = null;
 		String redirectMode = null;
 		Cookie[] cookies = request.getCookies();
 		for (Cookie c : cookies) {
 			if (RETURN_TO_URL_COOKIE_NAME.equals(c.getName())) {
 				returnToURL = c.getValue();
-			} else if (ACCEPTS_TERMS_OF_USE_COOKIE_NAME.equals(c.getName())) {
-				acceptsTermsOfUse = Boolean.parseBoolean(c.getValue());
 			} else if (REDIRECT_MODE_COOKIE_NAME.equals(c.getName())) {
 				redirectMode = c.getValue();
 			}
@@ -126,24 +107,12 @@ public class OpenIDUtils {
 			// Send all the Open ID info to the repository services
 			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
-					URLDecoder.decode(request.getQueryString(), "UTF-8"), 
-					acceptsTermsOfUse, true);
-			
-			// Check to see if the user has accepted the terms of use
-			synapse.setSessionToken(session.getSessionToken());
-			try {
-				synapse.getMyProfile();
-				
-				// The user has accepted the terms, otherwise the previous operation would have failed
-				acceptsTermsOfUse = true;
-			} catch (SynapseForbiddenException e) {
-				// The user has not accepted the terms
-				acceptsTermsOfUse = false;
-			}
+					URLDecoder.decode(request.getQueryString(), "UTF-8"), true);
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
-					session.getSessionToken(), acceptsTermsOfUse, isGWTMode);
+					session.getSessionToken(), isGWTMode);
+			
 			String location = response.encodeRedirectURL(redirectUrl);
 			response.sendRedirect(location);
 			

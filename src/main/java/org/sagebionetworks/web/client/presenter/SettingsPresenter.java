@@ -93,7 +93,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	@Override
 	public void resetPassword(final String username, final String existingPassword, final String newPassword) {		
 		if(authenticationController.isLoggedIn()) {
-			authenticationController.loginUser(username, existingPassword, false, new AsyncCallback<String>() {				
+			authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
 				@Override
 				public void onSuccess(String userSessionJson) {
 					userService.changePassword(authenticationController.getCurrentUserSessionToken(), newPassword, new AsyncCallback<Void>() {
