@@ -31,12 +31,14 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.widget.entity.FileHandleZipHelperImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -58,7 +60,7 @@ public class CrawlFilter implements Filter {
 	 * Injected with Gin
 	 */
 	private SynapseClientImpl synapseClient;
-
+	private FileHandleZipHelperImpl zipHelper;
 	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Override
@@ -161,9 +163,10 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = escapeHtml(entity.getCreatedBy());
 		try{
-			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
-			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
-			markdown = escapeHtml(rootPage.getMarkdown());
+			String wikiPageJson = synapseClient.getV2WikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
+			V2WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, V2WikiPage.class);
+			String unzippedMarkdown = zipHelper.getMarkdownAsString(rootPage.getMarkdownFileHandleId(), rootPage.getId());
+			markdown = escapeHtml(unzippedMarkdown);
 		} catch (Exception e) {}
 		
 		StringBuilder html = new StringBuilder();

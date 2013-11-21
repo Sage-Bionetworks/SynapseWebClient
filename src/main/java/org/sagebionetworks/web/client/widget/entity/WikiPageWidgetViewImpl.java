@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -25,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -63,7 +66,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
-	private WikiPage currentPage;
+	private V2WikiPage currentPage;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
@@ -73,6 +76,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
+	private FileHandleZipHelperImpl zipHelper;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -124,7 +128,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(WikiPage newPage, WikiPageKey wikiKey,
+	public void configure(V2WikiPage newPage, WikiPageKey wikiKey,
 			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
@@ -134,12 +138,18 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
+		String unzippedMarkdown;
+		try {
+			unzippedMarkdown = zipHelper.getMarkdownAsString(newPage.getMarkdownFileHandleId(), newPage.getId());
+			markdownWidget.setMarkdown(unzippedMarkdown, wikiKey, true, false);
+		} catch (IOException e) {
+		} catch (RestServiceException e) {
+		}
 		showDefaultViewWithWiki();
 	}
 	
 	@Override
-	public void updateWikiPage(WikiPage newPage){
+	public void updateWikiPage(V2WikiPage newPage){
 		currentPage = newPage;
 	}
 	
@@ -225,7 +235,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
-				mdField.setValue(currentPage.getMarkdown());
+				String unzippedMarkdown;
+				try {
+					unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
+					mdField.setValue(unzippedMarkdown);
+				} catch (IOException e) {
+				} catch (RestServiceException e) {
+				}
 				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
 				

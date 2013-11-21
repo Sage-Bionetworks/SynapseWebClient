@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.inject.Inject;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,41 +17,43 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.google.inject.Inject;
 
-public class WikiMarkdownHelperImpl implements WikiMarkdownHelper {
+public class FileHandleZipHelperImpl implements FileHandleZipHelper {
 	private AmazonS3Client s3Client;
 	private SynapseClientImpl synapseClient;
 	
 	public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 	
 	@Inject
-	public WikiMarkdownHelperImpl(AmazonS3Client s3Client, SynapseClientImpl synapseClient) {
+	public FileHandleZipHelperImpl(AmazonS3Client s3Client, SynapseClientImpl synapseClient) {
 		this.s3Client = s3Client;
 		this.synapseClient = synapseClient;
 	}
 	
+	/**
+	 * Uploads the given markdown to S3.
+	 * 
+	 * @param markdown
+	 * @param wikiPageId
+	 * @return
+	 * @throws IOException
+	 * @throws RestServiceException
+	 */
 	@Override
 	public FileHandle uploadMarkdown(String markdown, String wikiPageId) throws IOException, RestServiceException {
 		// Zip up markdown into a file
-		File tempFile = zipUp(markdown, wikiPageId);
+		File tempFile = zipUp(markdown, wikiPageId + "_markdown");
 		// Get the type of content
 		String contentType = guessContentTypeFromStream(tempFile);
 		// Upload file to Synapse
 		return synapseClient.uploadFile(tempFile, contentType);
 	}
 	
-	/**
-	 * Zips up content into a file.
-	 * @param markdown
-	 * @param id
-	 * @return
-	 * @throws IOException
-	 */
-	public File zipUp(String content, String id) throws IOException {
+	
+	@Override
+	public File zipUp(String content, String fileName) throws IOException {
 		// Create a temporary file to write content to
-		File tempFile = File.createTempFile(id + "_markdown", ".tmp");
+		File tempFile = File.createTempFile(fileName, ".tmp");
 		if(content != null) {
 			FileUtils.writeByteArrayToFile(tempFile, content.getBytes());
 		} else {
@@ -69,7 +72,7 @@ public class WikiMarkdownHelperImpl implements WikiMarkdownHelper {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static String guessContentTypeFromStream(File file)	throws FileNotFoundException, IOException {
+	private static String guessContentTypeFromStream(File file)	throws FileNotFoundException, IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 		try{
 			// Let java guess from the stream.
@@ -84,16 +87,25 @@ public class WikiMarkdownHelperImpl implements WikiMarkdownHelper {
 		}
 	}
 	
+	/**
+	 * Retrieves the markdown content from the file handle. Reads and returns it as a string.
+	 * @param fileHandleId
+	 * @param wikiPageId
+	 * @return
+	 * @throws IOException
+	 * @throws RestServiceException
+	 */
 	@Override
 	public String getMarkdownAsString(String fileHandleId, String wikiPageId) throws IOException, RestServiceException {
 		// Get the file handle for the specific id
 		S3FileHandle markdownHandle = (S3FileHandle) synapseClient.getFileHandle(fileHandleId);
 		// Get the associated S3 object and unzip into a string
-		return getAndReadContent(markdownHandle, wikiPageId);
+		return getAndReadContent(markdownHandle, wikiPageId + "_markdown");
 	}
 	
-	public String getAndReadContent(S3FileHandle handle, String wikiPageId) throws IOException {
-		File tempFile = File.createTempFile(wikiPageId + "_markdown", ".tmp");
+	@Override
+	public String getAndReadContent(S3FileHandle handle, String fileName) throws IOException {
+		File tempFile = File.createTempFile(fileName, ".tmp");
 		// Retrieve uploaded markdown
 		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
 				handle.getKey()), tempFile);

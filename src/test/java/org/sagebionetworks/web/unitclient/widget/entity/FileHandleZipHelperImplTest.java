@@ -13,13 +13,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.web.client.widget.entity.WikiMarkdownHelperImpl;
+import org.sagebionetworks.web.client.widget.entity.FileHandleZipHelperImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 
-public class WikiMarkdownHelperImplTest {
-	WikiMarkdownHelperImpl helperImpl;
+public class FileHandleZipHelperImplTest {
+	FileHandleZipHelperImpl helperImpl;
 	AmazonS3Client mockS3Client;
 	SynapseClientImpl synapseClient;
 	
@@ -29,7 +29,7 @@ public class WikiMarkdownHelperImplTest {
 	public void before() {
 		mockS3Client = Mockito.mock(AmazonS3Client.class);
 		synapseClient = new SynapseClientImpl();
-		helperImpl = new WikiMarkdownHelperImpl(mockS3Client, synapseClient);
+		helperImpl = new FileHandleZipHelperImpl(mockS3Client, synapseClient);
 		
 		handle = new org.sagebionetworks.repo.model.file.S3FileHandle();
 	}

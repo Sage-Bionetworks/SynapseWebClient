@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -32,7 +33,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private WikiPage wikiPage;
+	private V2WikiPage wikiPage;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
 	private Callback callback;
@@ -57,7 +58,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
+	public void configure(final WikiPageKey wikiKey, V2WikiPage wikiPage, Callback callback) {
 		this.wikiPage = wikiPage;
 		this.wikiKey = wikiKey;
 		if (callback == null) {
@@ -73,7 +74,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		}
 		else
 			this.callback = callback;	
-		synapseClient.getWikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
 				try {
@@ -123,12 +124,12 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			}
 
 			// update wiki page minus attachment
-			synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
+			synapseClient.updateV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
 					try{
-						WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+						V2WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 						configure(wikiKey, updatedPage, callback);
 						callback.attachmentDeleted(fileName);
 					} catch (JSONObjectAdapterException e) {

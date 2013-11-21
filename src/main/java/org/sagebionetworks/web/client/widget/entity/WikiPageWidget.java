@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -24,6 +27,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -46,11 +50,12 @@ SynapseWidgetPresenter {
 	private JSONObjectAdapter jsonObjectAdapter;
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
-	private WikiPage currentPage;
+	private V2WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
 	private int spanWidth;
 	private WikiPageWidgetView view; 
+	private FileHandleZipHelper zipHelper;
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
@@ -70,7 +75,8 @@ SynapseWidgetPresenter {
 			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter, AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			FileHandleZipHelperImpl zipHelper) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -79,6 +85,7 @@ SynapseWidgetPresenter {
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.zipHelper = zipHelper;
 		view.setPresenter(this);
 	}
 	
@@ -110,16 +117,17 @@ SynapseWidgetPresenter {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
 				//get the wiki page
-				synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+				synapseClient.getV2WikiPage(wikiKey, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
 						try {
-							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							originalMarkdown = currentPage.getMarkdown();
+							String unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
+							originalMarkdown = unzippedMarkdown;
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
-						} catch (JSONObjectAdapterException e) {
+						} catch (Exception e) {
 							onFailure(e);
 						}
 					}
@@ -153,24 +161,26 @@ SynapseWidgetPresenter {
 	@Override
 	public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback) {
 		//get the wiki page
-		synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiPage(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-					if (originalMarkdown != null && !originalMarkdown.equals(currentPage.getMarkdown())) {
+					currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
+					String unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
+					if (originalMarkdown != null && !originalMarkdown.equals(unzippedMarkdown)) {
 						//markdown changed by another process.  please refresh to see the most current version of the wiki
 						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
 						return;
 					}
 					//update with the most current markdown and title
-					currentPage.setMarkdown(updatedMarkdown);
+					FileHandle updatedMarkdownFileHandle = zipHelper.uploadMarkdown(updatedMarkdown, currentPage.getId());
+					currentPage.setMarkdownFileHandleId(updatedMarkdownFileHandle.getId());
 					if (updatedTitle != null && updatedTitle.length() > 0)
 						currentPage.setTitle(updatedTitle);
 					view.updateWikiPage(currentPage);
 					if (pageUpdatedCallback != null)
 						pageUpdatedCallback.pageUpdated();
-				} catch (JSONObjectAdapterException e) {
+				} catch (Exception e) {
 					onFailure(e);
 				}
 			}
@@ -239,7 +249,7 @@ SynapseWidgetPresenter {
 				JSONObjectAdapter json = jsonObjectAdapter.createNew();
 				try {
 					currentPage.writeToJSONObject(json);
-					synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
+					synapseClient.updateV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
 						@Override
 						public void onSuccess(String result) {
 							//showDefaultViewWithWiki();
@@ -263,7 +273,7 @@ SynapseWidgetPresenter {
 	
 	@Override
 	public void deleteButtonClicked() {
-		synapseClient.deleteWikiPage(wikiKey, new AsyncCallback<Void>() {
+		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
 			
 			@Override
 			public void onSuccess(Void result) {
@@ -301,7 +311,7 @@ SynapseWidgetPresenter {
 
 	@Override
 	public void createPage(final String name) {
-		WikiPage page = new WikiPage();
+		V2WikiPage page = new V2WikiPage();
 		//if this is creating the root wiki, then refresh the full page
 		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
 		page.setParentWikiId(wikiKey.getWikiPageId());
@@ -309,7 +319,7 @@ SynapseWidgetPresenter {
 		String wikiPageJson;
 		try {
 			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
+			synapseClient.createV2WikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					if (isCreatingWiki) {
