@@ -172,6 +172,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	/**
+	 * To allow for test to pass in a mock.
+	 * @param client
+	 */
+	public void setS3Client(AmazonS3Client client) {
+		this.s3Client = client;
+	}
+	
+	/**
 	 * Validate that the service is ready to go. If any of the injected data is
 	 * missing then it cannot run. Public for tests.
 	 */
@@ -2227,9 +2235,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException {
 		// Get the file handle for the specific id
-		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);
+		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);;
 		// Get the associated S3 object and unzip into a string
-
 		File tempFile = File.createTempFile(fileName, ".tmp");
 		// Retrieve uploaded markdown
 		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
