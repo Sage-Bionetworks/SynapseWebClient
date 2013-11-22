@@ -10,9 +10,12 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -120,17 +123,14 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-
-								}
-
 								@Override
 								public void onSuccess(String result) {
 									originalMarkdown = result;
-								}
-								
+								}	
+								@Override
+								public void onFailure(Throwable caught) {
+									view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+								}		
 							});
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, originalMarkdown);
@@ -173,55 +173,55 @@ SynapseWidgetPresenter {
 			public void onSuccess(String result) {
 				try {
 					currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
-					synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-
-						}
-
-						@Override
-						public void onSuccess(String result) {
-							if (originalMarkdown != null && !originalMarkdown.equals(result)) {
-								//markdown changed by another process.  please refresh to see the most current version of the wiki
-								view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
-								return;
-							}
-						}
-						
-					});
-					
-					synapseClient.zipUpAndUpload(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<FileHandle>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-
-						}
-
-						@Override
-						public void onSuccess(FileHandle result) {
-							currentPage.setMarkdownFileHandleId(result.getId());	
-						}
-						
-					});
-					
-					if (updatedTitle != null && updatedTitle.length() > 0)
-						currentPage.setTitle(updatedTitle);
-					view.updateWikiPage(currentPage, updatedMarkdown);
-					if (pageUpdatedCallback != null)
-						pageUpdatedCallback.pageUpdated();
 				} catch (Exception e) {
 					onFailure(e);
 				}
+				synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String markdownResult) {
+						if (originalMarkdown != null && !originalMarkdown.equals(markdownResult)) {
+							//markdown changed by another process.  please refresh to see the most current version of the wiki
+							view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
+							return;
+						}
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+					}		
+				});
+				
+				synapseClient.zipAndUploadFile(updatedMarkdown, currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String fileHandleResult) {
+						FileHandle markdownHandle;
+						try {
+							markdownHandle = nodeModelCreator.createJSONEntity(fileHandleResult, FileHandle.class);
+							currentPage.setMarkdownFileHandleId(markdownHandle.getId());
+						} catch (JSONObjectAdapterException e) {
+							onFailure(e);
+						}
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+					}
+				});
+				
+				if (updatedTitle != null && updatedTitle.length() > 0)
+					currentPage.setTitle(updatedTitle);
+				view.updateWikiPage(currentPage, updatedMarkdown);
+				if (pageUpdatedCallback != null)
+					pageUpdatedCallback.pageUpdated();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
-		});				
+		});	
 	}
-	
+
 	public void setOwnerObjectName(final OwnerObjectNameCallback callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id

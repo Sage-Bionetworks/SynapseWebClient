@@ -100,17 +100,14 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					wikiKey.setWikiPageId(page.getId());
 					try {
 						synapseClient.getAndReadS3Object(page.getMarkdownFileHandleId(), page.getId() + "_markdown", new AsyncCallback<String>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-
-							}
-
 							@Override
 							public void onSuccess(String result) {
 								setMarkdown(result, wikiKey, true, isPreview);
 							}
-							
+							@Override
+							public void onFailure(Throwable caught) {
+								MarkdownWidget.this.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+							}	
 						});
 						
 					} catch (Exception e) {

@@ -2225,13 +2225,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public FileHandle zipUpAndUpload(String content, String fileName) throws RestServiceException, FileNotFoundException, IOException {
+	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException {
+		// Get the file handle for the specific id
+		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);
+		// Get the associated S3 object and unzip into a string
+
+		File tempFile = File.createTempFile(fileName, ".tmp");
+		// Retrieve uploaded markdown
+		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
+				handle.getKey()), tempFile);
+		// Read the file as a string
+		return FileUtils.readFileToString(tempFile, "UTF-8");
+	}
+
+	@Override
+	public String zipAndUploadFile(String content, String fileName) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		File file = zipUp(content, fileName);
 		String contentType = guessContentTypeFromStream(file);
 		try {
 			// Upload the file and create S3 handle
-			return synapseClient.createFileHandle(file, contentType);
+			FileHandle handle = synapseClient.createFileHandle(file, contentType);
+			 try {
+				return EntityFactory.createJSONStringForEntity(handle);
+			} catch (JSONObjectAdapterException e) {
+				throw new UnknownErrorException(e.getMessage());
+			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (IOException e) {
@@ -2239,7 +2258,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
+	private FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getRawFileHandle(fileHandleId);
@@ -2247,8 +2266,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	public File zipUp(String content, String fileName) throws IOException {
+	
+	private File zipUp(String content, String fileName) throws IOException {
 		// Create a temporary file to write content to
 		File tempFile = File.createTempFile(fileName, ".tmp");
 		if(content != null) {
@@ -2275,20 +2294,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}finally{
 			is.close();
 		}
-	}
-
-	@Override
-	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException {
-		// Get the file handle for the specific id
-		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);
-		// Get the associated S3 object and unzip into a string
-
-		File tempFile = File.createTempFile(fileName, ".tmp");
-		// Retrieve uploaded markdown
-		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
-				handle.getKey()), tempFile);
-		// Read the file as a string
-		return FileUtils.readFileToString(tempFile, "UTF-8");
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -237,5 +236,5 @@ public interface SynapseClientAsync {
 	void getAPIKey(AsyncCallback<String> callback);
 
 	public void getAndReadS3Object(String fileHandleId, String fileName, AsyncCallback<String> callback);
-	public void zipUpAndUpload(String content, String fileName, AsyncCallback<FileHandle> callback);
+	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
 }
