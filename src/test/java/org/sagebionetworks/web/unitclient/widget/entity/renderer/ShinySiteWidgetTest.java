@@ -30,7 +30,7 @@ public class ShinySiteWidgetTest {
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 	String validSiteUrl2 = "https://shiny.synapse.org/rstudio/faithful/";
 
-	String invalidSiteUrl = "http://google.com";
+	String invalidSiteUrl = "http://glimmer.rstudio.com.hackers.com/problem.html";
 	
 	@Before
 	public void setup(){
