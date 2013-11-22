@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.server.servlet.openid;
 
-import static org.sagebionetworks.web.shared.WebConstants.ACCEPTS_TERMS_OF_USE_PARAM;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -62,8 +60,6 @@ public class OpenIDServlet extends HttpServlet {
 			response.getWriter().println("Missing parameter "+WebConstants.OPEN_ID_PROVIDER);
 			return;
 		}
-		String explicitlyAcceptsTermsOfUseString = request.getParameter(ACCEPTS_TERMS_OF_USE_PARAM);
-		Boolean explicitlyAcceptsTermsOfUse = explicitlyAcceptsTermsOfUseString==null ? false : new Boolean(explicitlyAcceptsTermsOfUseString);
 		String redirectMode = request.getParameter(WebConstants.OPEN_ID_MODE);
 		String returnToURL = request.getParameter(WebConstants.RETURN_TO_URL_PARAM);
 		if (returnToURL == null) {
@@ -73,8 +69,7 @@ public class OpenIDServlet extends HttpServlet {
 		}
 
 		try {
-			OpenIDUtils.openID(openIdProviderName, explicitlyAcceptsTermsOfUse,
-					redirectMode, returnToURL, request, response,
+			OpenIDUtils.openID(openIdProviderName, redirectMode, returnToURL, request, response,
 					redirectEndpoint);
 		} catch (OpenIDException e) {
 			throw new RuntimeException(e);

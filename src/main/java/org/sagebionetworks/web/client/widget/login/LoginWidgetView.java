@@ -17,13 +17,11 @@ public interface LoginWidgetView extends IsWidget {
 	 */
 	public interface Presenter {
 		
-		public void setUsernameAndPassword(String username, String password, boolean explicitlyAcceptsTermsOfUse);
+		public void setUsernameAndPassword(String username, String password);
 		
 		public String getOpenIdActionUrl();
 		
 		public String getOpenIdReturnUrl();
-		
-		public void acceptTermsOfUse();
 
 		public void goTo(Place place);
 	}
@@ -37,7 +35,5 @@ public interface LoginWidgetView extends IsWidget {
 	public void showError(String message);
 	
 	public void clear();
-
-	public void acceptTermsOfUse();
 
 }

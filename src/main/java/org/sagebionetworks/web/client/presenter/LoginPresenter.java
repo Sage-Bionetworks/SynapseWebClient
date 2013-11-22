@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -15,7 +14,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -31,7 +29,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private LoginView view;
 	private EventBus bus;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
@@ -41,10 +38,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, UserAccountServiceAsync userService, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.nodeModelCreator = nodeModelCreator;
 		this.cookies = cookies;
@@ -77,7 +73,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		return openIdReturnUrl;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {			
@@ -86,48 +81,79 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				isSso = authenticationController.getCurrentUserIsSSO();
 			authenticationController.logoutUser();
 			view.showLogout(isSso);
-		} else if (token!=null && WebConstants.ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN.equals(token)) {
-			userService.getTermsOfUse(new AsyncCallback<String>() {
-				public void onSuccess(String content) {
-					view.showTermsOfUse(content, 
-						new AcceptTermsOfUseCallback() {
-							public void accepted() {
-								view.acceptTermsOfUse();
-								globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
-							} 
-						});			
-				}
-				public void onFailure(Throwable throwable) {
-					if(!DisplayUtils.checkForRepoDown(throwable, globalApplicationState.getPlaceChanger(), view))
-						view.showErrorMessage("An error occurred. Please try logging in again.");
-					view.showLogin(openIdActionUrl, openIdReturnUrl);				}
-			});
-		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token)				
-				&& !"".equals(token) && token != null) {			
+		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && !"".equals(token) && token != null) {			
 			// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 			// parse token
 			view.showLoggingInLoader();
 			if(token != null) {
-				String sessionToken = token;	
+				final String sessionToken = token;	
 				authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 					@Override
 					public void onSuccess(String result) {
-						view.hideLoggingInLoader();
-						// user is logged in. forward to destination						
-						forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
-							view.showLogin(openIdActionUrl, openIdReturnUrl);
-							return;
-						}
-						if (caught instanceof TermsOfUseException) {
+						
+						// Show the ToU dialog if necessary
+						if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
+							
 							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 								public void onSuccess(String termsOfUseContents) {
+									view.hideLoggingInLoader();
 									view.showTermsOfUse(termsOfUseContents, 
 											new AcceptTermsOfUseCallback() {
-												public void accepted() {showView(place);}
+												public void accepted() {
+													view.showLoggingInLoader();
+													authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															view.showErrorMessage("An error occurred. Please try logging in again.");
+															view.showLogin(openIdActionUrl, openIdReturnUrl);
+														}
+
+														@Override
+														public void onSuccess(Void result) {
+															// Have to get the UserSessionData again, 
+															// since it won't contain the UserProfile if the terms haven't been signed
+															authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+
+																@Override
+																public void onFailure(
+																		Throwable caught) {
+																	view.showErrorMessage("An error occurred. Please try logging in again.");
+																	view.showLogin(openIdActionUrl, openIdReturnUrl);
+																}
+
+																@Override
+																public void onSuccess(
+																		String result) {
+																	view.hideLoggingInLoader();
+																	// All setup complete, so forward the user
+																	forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+																}	
+																
+															});
+														}
+														
+													});
+												}
+
+												@Override
+												public void rejected() {
+													authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															view.showErrorMessage("An error occurred. Please try logging in again.");
+															view.showLogin(openIdActionUrl, openIdReturnUrl);
+														}
+
+														@Override
+														public void onSuccess(Void result) {
+															authenticationController.logoutUser();
+															forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+														}
+														
+													});
+												}
 											});		
 								}
 								public void onFailure(Throwable t) {
@@ -137,9 +163,19 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 								}
 							});
 						} else {
-							view.showErrorMessage("An error occurred. Please try logging in again.");
-							view.showLogin(openIdActionUrl, openIdReturnUrl);
+							view.hideLoggingInLoader();
+							// user is logged in. forward to destination
+							forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 						}
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
+							view.showLogin(openIdActionUrl, openIdReturnUrl);
+							return;
+						}
+						view.showErrorMessage("An error occurred. Please try logging in again.");
+						view.showLogin(openIdActionUrl, openIdReturnUrl);
 					}
 				});
 			} 
