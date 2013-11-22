@@ -22,7 +22,7 @@ public class ShinySiteConfigEditorTest {
 	ShinySiteConfigEditor editor;
 	ShinySiteConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+	String validSiteUrl = "http://static.synapse.com/rstudio/faithful/";
 	
 	@Before
 	public void setup(){

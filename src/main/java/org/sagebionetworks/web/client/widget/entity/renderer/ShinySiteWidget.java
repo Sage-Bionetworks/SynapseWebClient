@@ -18,7 +18,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		"http://shiny.synapse.org/", 
 		"https://shiny.synapse.org/", 
 		"http://spark.rstudio.com/",
-		"http://static.prod.sagebase.org/" };
+		"http://static.synapse.org/" };
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
