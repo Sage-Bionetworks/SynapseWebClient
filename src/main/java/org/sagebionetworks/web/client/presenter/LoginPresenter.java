@@ -157,6 +157,15 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void setNewUser(UserSessionData newUser) {	
 		// Allow the user to proceed.		
+		
+		//TODO: check for default gamertag
+		String ownerId = newUser.getProfile().getOwnerId();
+		String screenName = newUser.getProfile().getScreenname();
+		if (ownerId != null && ownerId.equals(screenName)) {
+			//set your screenname!
+			
+		}
+		
 		forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());		
 	}
 
