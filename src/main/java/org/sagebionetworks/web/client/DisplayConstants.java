@@ -391,7 +391,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_PAGE_SIZE = "Page Size:";
 	public static final String SYNAPSE_API_CALL_JSON_REUSLTS_KEY_NAME = "JSON \"results\" Key Name:";
 	public static final String SYNAPSE_API_CALL_CSS_STYLE_NAME = "CSS Table Style Name:";
-	public static final String SHINYSITE_SITE_LABEL = "Shiny Site URL";
+	public static final String SHINYSITE_SITE_LABEL = "Site URL";
 	public static final String WIDTH = "Width";
 	public static final String HEIGHT = "Height";
 	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
@@ -576,7 +576,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String EXTERNAL_URL = "External URL";
 	public static final String ADD_ENTITY = "Add Entity";
-	public static final String INVALID_SHINY_SITE = " is not a valid Shiny Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Shiny Server added to our white list.";
+	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please " + ClientProperties.HELP_EMAIL_ADDRESS_LINK + " if you would like your Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
