@@ -28,7 +28,7 @@ public class ShinySiteWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
-	String validSiteUrl2 = "http://static.synapse.org/rstudio/faithful/";
+	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
 	String invalidSiteUrl = "http://glimmer.rstudio.com.hackers.com/problem.html";
 	
