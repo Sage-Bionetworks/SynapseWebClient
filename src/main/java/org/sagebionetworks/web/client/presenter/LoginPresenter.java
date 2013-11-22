@@ -86,38 +86,73 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			// parse token
 			view.showLoggingInLoader();
 			if(token != null) {
-				String sessionToken = token;	
+				final String sessionToken = token;	
 				authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 					@Override
 					public void onSuccess(String result) {
-						view.hideLoggingInLoader();
 						
 						// Show the ToU dialog if necessary
 						if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-							final AsyncCallback<Void> toUCallback = new AsyncCallback<Void> () {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									view.showErrorMessage("An error occurred. Please try logging in again.");
-									view.showLogin(openIdActionUrl, openIdReturnUrl);
-								}
-
-								@Override
-								public void onSuccess(Void result) {}
-								
-							};
 							
 							authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 								public void onSuccess(String termsOfUseContents) {
+									view.hideLoggingInLoader();
 									view.showTermsOfUse(termsOfUseContents, 
 											new AcceptTermsOfUseCallback() {
 												public void accepted() {
-													authenticationController.signTermsOfUse(true, toUCallback);
+													view.showLoggingInLoader();
+													authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															view.showErrorMessage("An error occurred. Please try logging in again.");
+															view.showLogin(openIdActionUrl, openIdReturnUrl);
+														}
+
+														@Override
+														public void onSuccess(Void result) {
+															// Have to get the UserSessionData again, 
+															// since it won't contain the UserProfile if the terms haven't been signed
+															authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+
+																@Override
+																public void onFailure(
+																		Throwable caught) {
+																	view.showErrorMessage("An error occurred. Please try logging in again.");
+																	view.showLogin(openIdActionUrl, openIdReturnUrl);
+																}
+
+																@Override
+																public void onSuccess(
+																		String result) {
+																	view.hideLoggingInLoader();
+																	// All setup complete, so forward the user
+																	forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+																}	
+																
+															});
+														}
+														
+													});
 												}
 
 												@Override
 												public void rejected() {
-													authenticationController.signTermsOfUse(false, toUCallback);
+													authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															view.showErrorMessage("An error occurred. Please try logging in again.");
+															view.showLogin(openIdActionUrl, openIdReturnUrl);
+														}
+
+														@Override
+														public void onSuccess(Void result) {
+															authenticationController.logoutUser();
+															forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+														}
+														
+													});
 												}
 											});		
 								}
@@ -127,10 +162,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 									view.showLogin(openIdActionUrl, openIdReturnUrl);									
 								}
 							});
+						} else {
+							view.hideLoggingInLoader();
+							// user is logged in. forward to destination
+							forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 						}
-						
-						// user is logged in. forward to destination						
-						forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 					}
 					@Override
 					public void onFailure(Throwable caught) {

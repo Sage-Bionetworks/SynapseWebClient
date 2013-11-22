@@ -97,6 +97,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
 						userSessionData.setIsSSO(isSSO);
+						usdAdapter = userSessionData.writeToJSONObject(usdAdapter);
+						
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);

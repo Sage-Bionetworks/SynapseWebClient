@@ -71,8 +71,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Assume all tokens other than the default are session tokens
 		if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
 			sessionToken = place.toToken();
+			view.showResetForm();
+		} else {
+			view.showRequestForm();
 		}
-		view.showResetForm();
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void resetPassword(final String newPassword) {
-		if (authenticationController.isLoggedIn()) {
+		if (sessionToken == null && authenticationController.isLoggedIn()) {
 			sessionToken = authenticationController.getCurrentUserSessionToken();
 		}
 		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
