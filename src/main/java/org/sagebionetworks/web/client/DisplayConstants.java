@@ -617,7 +617,7 @@ public class DisplayConstants {
 	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
 	public static final String SHOW = "Show";
 	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
-	public static final String EMAIL_ADDRESS = "Email Address";
+	public static final String EMAIL_ADDRESS = "Username or Email Address";
 	public static final String SET_PASSWORD = "Set Password";
 	public static final String SUCCESS = "Success";
 	public static final String REQUEST_SENT = "Request Sent";
