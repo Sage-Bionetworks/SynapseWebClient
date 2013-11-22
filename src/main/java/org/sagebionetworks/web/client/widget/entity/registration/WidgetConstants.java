@@ -41,7 +41,7 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
 	
 	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
-	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
+	public static final String SHINYSITE_FRIENDLY_NAME ="External Website";
 
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
