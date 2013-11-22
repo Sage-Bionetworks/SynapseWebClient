@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.login;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,9 +42,9 @@ public class LoginWidgetTest {
 	public void testSetUsernameAndPassword() {
 		String u = "user";
 		String p = "pass";
-		loginWidget.setUsernameAndPassword(u, p, true);
+		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), anyBoolean(), (AsyncCallback<String>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
 	}
 
 }

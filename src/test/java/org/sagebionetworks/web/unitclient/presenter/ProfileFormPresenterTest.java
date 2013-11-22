@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,21 +12,17 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,7 +62,8 @@ public class ProfileFormPresenterTest {
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
 		testUser.setProfile(userProfile);
-		testUser.setSessionToken("token");
+		testUser.setSession(new Session());
+		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 		
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
