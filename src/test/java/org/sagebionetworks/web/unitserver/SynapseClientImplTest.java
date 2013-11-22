@@ -1145,17 +1145,6 @@ public class SynapseClientImplTest {
 		synapseClient.requestMembership("123", "a team", "");
 		verify(mockSynapse).createMembershipRequest(any(MembershipRqstSubmission.class));
 	}
-	
-	@Test
-	public void testUploadFile() throws RestServiceException, IOException, SynapseException {
-		synapseClient.uploadFile(File.createTempFile("pre", "suf"), "");
-		verify(mockSynapse).createFileHandle(any(File.class), any(String.class));
-	}
-	
-	@Test
-	public void testGetFileHandle() throws RestServiceException, SynapseException {
-		synapseClient.getFileHandle("");
-		verify(mockSynapse).getRawFileHandle(any(String.class));
-	}
+
 
 }

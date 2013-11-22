@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.evaluation.model.UserEvaluationState;
+
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -16,7 +20,6 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -287,4 +290,7 @@ public interface SynapseClient extends RemoteService {
 	public String getSynapseProperty(String key);
 	
 	public String getAPIKey() throws RestServiceException;
+
+	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException;
+	public FileHandle zipUpAndUpload(String content, String fileName) throws RestServiceException, FileNotFoundException, IOException;
 }

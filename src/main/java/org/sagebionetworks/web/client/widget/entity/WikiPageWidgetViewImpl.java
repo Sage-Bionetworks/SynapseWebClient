@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -49,7 +48,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -67,6 +65,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private V2WikiPage currentPage;
+	private String currentMarkdown;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
@@ -76,7 +75,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
-	private FileHandleZipHelperImpl zipHelper;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -92,7 +90,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
+			WidgetRegistrar widgetRegistrar) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -129,7 +129,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(V2WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, String markdown) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -137,20 +137,17 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
+		this.currentMarkdown = markdown;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		String unzippedMarkdown;
-		try {
-			unzippedMarkdown = zipHelper.getMarkdownAsString(newPage.getMarkdownFileHandleId(), newPage.getId());
-			markdownWidget.setMarkdown(unzippedMarkdown, wikiKey, true, false);
-		} catch (IOException e) {
-		} catch (RestServiceException e) {
-		}
+		final WikiPageKey finalKey = wikiKey;
+		markdownWidget.setMarkdown(currentMarkdown, finalKey, true, false);
 		showDefaultViewWithWiki();
 	}
 	
 	@Override
-	public void updateWikiPage(V2WikiPage newPage){
+	public void updateWikiPage(V2WikiPage newPage, String markdown){
 		currentPage = newPage;
+		currentMarkdown = markdown;
 	}
 	
 	private void showDefaultViewWithWiki() {
@@ -235,13 +232,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
-				String unzippedMarkdown;
-				try {
-					unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
-					mdField.setValue(unzippedMarkdown);
-				} catch (IOException e) {
-				} catch (RestServiceException e) {
-				}
+				mdField.setValue(currentMarkdown);
 				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
 				

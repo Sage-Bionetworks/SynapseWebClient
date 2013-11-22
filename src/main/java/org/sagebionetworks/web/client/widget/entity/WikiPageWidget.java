@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -55,7 +54,6 @@ SynapseWidgetPresenter {
 	private AdapterFactory adapterFactory;
 	private int spanWidth;
 	private WikiPageWidgetView view; 
-	private FileHandleZipHelper zipHelper;
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
@@ -75,8 +73,7 @@ SynapseWidgetPresenter {
 			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter, AdapterFactory adapterFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			FileHandleZipHelperImpl zipHelper) {
+			AuthenticationController authenticationController) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -85,7 +82,6 @@ SynapseWidgetPresenter {
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.zipHelper = zipHelper;
 		view.setPresenter(this);
 	}
 	
@@ -123,10 +119,21 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							String unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
-							originalMarkdown = unzippedMarkdown;
+							synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+
+								}
+
+								@Override
+								public void onSuccess(String result) {
+									originalMarkdown = result;
+								}
+								
+							});
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, originalMarkdown);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -166,18 +173,41 @@ SynapseWidgetPresenter {
 			public void onSuccess(String result) {
 				try {
 					currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
-					String unzippedMarkdown = zipHelper.getMarkdownAsString(currentPage.getMarkdownFileHandleId(), currentPage.getId());
-					if (originalMarkdown != null && !originalMarkdown.equals(unzippedMarkdown)) {
-						//markdown changed by another process.  please refresh to see the most current version of the wiki
-						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
-						return;
-					}
-					//update with the most current markdown and title
-					FileHandle updatedMarkdownFileHandle = zipHelper.uploadMarkdown(updatedMarkdown, currentPage.getId());
-					currentPage.setMarkdownFileHandleId(updatedMarkdownFileHandle.getId());
+					synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+
+						}
+
+						@Override
+						public void onSuccess(String result) {
+							if (originalMarkdown != null && !originalMarkdown.equals(result)) {
+								//markdown changed by another process.  please refresh to see the most current version of the wiki
+								view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
+								return;
+							}
+						}
+						
+					});
+					
+					synapseClient.zipUpAndUpload(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<FileHandle>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+
+						}
+
+						@Override
+						public void onSuccess(FileHandle result) {
+							currentPage.setMarkdownFileHandleId(result.getId());	
+						}
+						
+					});
+					
 					if (updatedTitle != null && updatedTitle.length() > 0)
 						currentPage.setTitle(updatedTitle);
-					view.updateWikiPage(currentPage);
+					view.updateWikiPage(currentPage, updatedMarkdown);
 					if (pageUpdatedCallback != null)
 						pageUpdatedCallback.pageUpdated();
 				} catch (Exception e) {
@@ -349,4 +379,5 @@ SynapseWidgetPresenter {
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
+
 }

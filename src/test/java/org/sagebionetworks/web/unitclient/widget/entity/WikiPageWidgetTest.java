@@ -20,8 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
-import org.sagebionetworks.client.SynapseClient;
+
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -37,21 +36,14 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.FileHandleZipHelper;
-import org.sagebionetworks.web.client.widget.entity.FileHandleZipHelperImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
-import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
-import org.sagebionetworks.web.server.servlet.SynapseProvider;
-import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -68,14 +60,7 @@ public class WikiPageWidgetTest {
 	WikiPageWidget presenter;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
-	
-	SynapseProvider mockSynapseProvider;
-	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
-	SynapseClient mockSynapse;
-	SynapseClientImpl synapseClient;
-	AmazonS3Client s3Client;
-	FileHandleZipHelperImpl zipHelper;
+
 	V2WikiPage testPage;
 	FileHandle markdownFileHandle;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
@@ -88,25 +73,9 @@ public class WikiPageWidgetTest {
 		mockJsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		
-		mockSynapse = Mockito.mock(SynapseClient.class);
-		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
-		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
-		mockTokenProvider = Mockito.mock(TokenProvider.class);
-		synapseClient = mock(SynapseClientImpl.class);
-		synapseClient.setSynapseProvider(mockSynapseProvider);
-		synapseClient.setTokenProvider(mockTokenProvider);
-
-		s3Client = mock(AmazonS3Client.class);
-		//zipHelper = new FileHandleZipHelperImpl(s3Client, synapseClient);
-		zipHelper = mock(FileHandleZipHelperImpl.class);
-		
 		presenter = new WikiPageWidget(mockView, mockSynapseClient,
 				mockNodeModelCreator, mockJsonObjectAdapter, adapterFactory,
-				mockGlobalApplicationState, mockAuthenticationController,
-				zipHelper);
-		
+				mockGlobalApplicationState, mockAuthenticationController);
 		BatchResults<EntityHeader> headers = new BatchResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -120,11 +89,9 @@ public class WikiPageWidgetTest {
 		
 		markdownFileHandle = new org.sagebionetworks.repo.model.file.S3FileHandle();
 		markdownFileHandle.setId("1");
-		when(synapseClient.getFileHandle(any(String.class))).thenReturn(markdownFileHandle);
-		when(synapseClient.uploadFile(any(File.class), any(String.class))).thenReturn(markdownFileHandle);
-		
-		when(zipHelper.uploadMarkdown(any(String.class), any(String.class))).thenReturn(markdownFileHandle);
-		
+
+		AsyncMockStubber.callSuccessWith(markdownFileHandle).when(mockSynapseClient).zipUpAndUpload(any(String.class), any(String.class), any(AsyncCallback.class));
+
 		testPage = new V2WikiPage();
 		testPage.setId("wikiPageId");
 		testPage.setMarkdownFileHandleId(markdownFileHandle.getId());
@@ -144,7 +111,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure(){
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(V2WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false));
+		verify(mockView).configure(any(V2WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), any(String.class));
 	}
 	
 	@Test
@@ -196,7 +163,11 @@ public class WikiPageWidgetTest {
 	public void testRefreshWikiAttachments() throws IOException, RestServiceException{		
 		String newTitle = "new wiki page title";
 		String newMarkdown = "new wiki page markdown";
-		when(zipHelper.getMarkdownAsString(markdownFileHandle.getId(), testPage.getId())).thenReturn(newMarkdown);
+		
+		FileHandle newMarkdownFileHandle = new org.sagebionetworks.repo.model.file.S3FileHandle();
+		newMarkdownFileHandle.setId("2");
+		//when(mockSynapseClientImpl.zipUpAndUpload(any(String.class), any(String.class))).thenReturn(newMarkdownFileHandle);
+		AsyncMockStubber.callSuccessWith(newMarkdownFileHandle).when(mockSynapseClient).zipUpAndUpload(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.refreshWikiAttachments(newTitle, newMarkdown, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -205,12 +176,9 @@ public class WikiPageWidgetTest {
 			public void noWikiFound() {
 			}
 		});
-		verify(zipHelper).getMarkdownAsString(testPage.getMarkdownFileHandleId(), testPage.getId());
-		verify(zipHelper).uploadMarkdown(newMarkdown, testPage.getId());
-		verify(mockView).updateWikiPage(testPage);
+		assertEquals(newMarkdownFileHandle.getId(), testPage.getMarkdownFileHandleId());
+		verify(mockView).updateWikiPage(testPage, newMarkdown);
 		assertEquals(newTitle, testPage.getTitle());
-		String unzippedMarkdown = zipHelper.getMarkdownAsString(testPage.getMarkdownFileHandleId(), testPage.getId());
-		assertEquals(newMarkdown, unzippedMarkdown);
 	}
 
 	@Test
@@ -228,14 +196,10 @@ public class WikiPageWidgetTest {
 		});
 
 		verify(mockView).showErrorMessage(anyString());
-		verify(zipHelper, times(0)).getMarkdownAsString(testPage.getMarkdownFileHandleId(), testPage.getId());
-		verify(zipHelper, times(0)).uploadMarkdown(newMarkdown, testPage.getId());
-		verify(mockView, times(0)).updateWikiPage(testPage);
+		assertEquals(markdownFileHandle.getId(), testPage.getMarkdownFileHandleId());
 
 		//verify testpage was not updated
 		assertFalse(newTitle.equals(testPage.getTitle()));
-		String unzippedMarkdown = zipHelper.getMarkdownAsString(testPage.getMarkdownFileHandleId(), testPage.getId());
-		assertFalse(newMarkdown.equals(unzippedMarkdown));
 	}
 	
 	@Test

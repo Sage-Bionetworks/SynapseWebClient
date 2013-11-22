@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -110,6 +114,8 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -176,6 +182,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new IllegalStateException("The token provider was not set");
 		}
 	}
+	
+	private AmazonS3Client s3Client = new AmazonS3Client();
+	
 
 	@Override
 	public String getSessionToken() {
@@ -2215,16 +2224,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}		
 	}
 	
-	/**
-	 * Upload a file to Synapse
-	 * 
-	 * @param file
-	 * @param contentType
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public FileHandle uploadFile(File file, String contentType) throws RestServiceException {
+	@Override
+	public FileHandle zipUpAndUpload(String content, String fileName) throws RestServiceException, FileNotFoundException, IOException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		File file = zipUp(content, fileName);
+		String contentType = guessContentTypeFromStream(file);
 		try {
 			// Upload the file and create S3 handle
 			return synapseClient.createFileHandle(file, contentType);
@@ -2235,13 +2239,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	/**
-	 * Get the file handle
-	 * 
-	 * @param fileHandleId
-	 * @return
-	 * @throws RestServiceException
-	 */
 	public FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2250,4 +2247,48 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+
+	public File zipUp(String content, String fileName) throws IOException {
+		// Create a temporary file to write content to
+		File tempFile = File.createTempFile(fileName, ".tmp");
+		if(content != null) {
+			FileUtils.writeByteArrayToFile(tempFile, content.getBytes());
+		} else {
+			// When creating a wiki for the first time, markdown content doesn't exist
+			// Uploaded file should be empty
+			byte[] emptyByteArray = new byte[0];
+			FileUtils.writeByteArrayToFile(tempFile, emptyByteArray);
+		}
+		return tempFile;
+	}
+
+	private static String guessContentTypeFromStream(File file)	throws FileNotFoundException, IOException {
+		InputStream is = new BufferedInputStream(new FileInputStream(file));
+		try{
+			// Let java guess from the stream.
+			String contentType = URLConnection.guessContentTypeFromStream(is);
+			// If Java fails then set the content type to be octet-stream
+			if(contentType == null){
+				contentType = "application/octet-stream";
+			}
+			return contentType;
+		}finally{
+			is.close();
+		}
+	}
+
+	@Override
+	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException {
+		// Get the file handle for the specific id
+		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);
+		// Get the associated S3 object and unzip into a string
+
+		File tempFile = File.createTempFile(fileName, ".tmp");
+		// Retrieve uploaded markdown
+		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
+				handle.getKey()), tempFile);
+		// Read the file as a string
+		return FileUtils.readFileToString(tempFile, "UTF-8");
+	}
+
 }

@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -54,7 +54,6 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
 	private CookieProvider cookies;
-	private FileHandleZipHelperImpl zipHelper;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	NodeModelCreator nodeModelCreator;
@@ -99,10 +98,21 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 				try {
 					V2WikiPage page = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 					wikiKey.setWikiPageId(page.getId());
-					String unzippedMarkdown;
 					try {
-						unzippedMarkdown = zipHelper.getMarkdownAsString(page.getMarkdownFileHandleId(), page.getId());
-						setMarkdown(unzippedMarkdown, wikiKey, true, isPreview);
+						synapseClient.getAndReadS3Object(page.getMarkdownFileHandleId(), page.getId() + "_markdown", new AsyncCallback<String>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+
+							}
+
+							@Override
+							public void onSuccess(String result) {
+								setMarkdown(result, wikiKey, true, isPreview);
+							}
+							
+						});
+						
 					} catch (Exception e) {
 						onFailure(e);
 					}

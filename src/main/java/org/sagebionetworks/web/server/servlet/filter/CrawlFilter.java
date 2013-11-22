@@ -38,7 +38,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.widget.entity.FileHandleZipHelperImpl;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -60,7 +59,6 @@ public class CrawlFilter implements Filter {
 	 * Injected with Gin
 	 */
 	private SynapseClientImpl synapseClient;
-	private FileHandleZipHelperImpl zipHelper;
 	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Override
@@ -165,7 +163,7 @@ public class CrawlFilter implements Filter {
 		try{
 			String wikiPageJson = synapseClient.getV2WikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			V2WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, V2WikiPage.class);
-			String unzippedMarkdown = zipHelper.getMarkdownAsString(rootPage.getMarkdownFileHandleId(), rootPage.getId());
+			String unzippedMarkdown = synapseClient.getAndReadS3Object(rootPage.getMarkdownFileHandleId(), rootPage.getId() + "_markdown");
 			markdown = escapeHtml(unzippedMarkdown);
 		} catch (Exception e) {}
 		
