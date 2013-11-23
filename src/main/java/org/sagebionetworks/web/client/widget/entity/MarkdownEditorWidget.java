@@ -5,6 +5,7 @@ import java.util.Map;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -191,54 +192,34 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		previewFormData.setMargins(new Margins(10,0,0,0));
 		
 		LayoutContainer overallRow = DisplayUtils.createRowContainer();
-		LayoutContainer row = DisplayUtils.createRowContainer();		
-		HorizontalPanel mdCommandsLowerLeft = new HorizontalPanel();
-		mdCommandsLowerLeft.addStyleName("col-md-6");
-		mdCommandsLowerLeft.setVerticalAlign(VerticalAlignment.MIDDLE);
-		LayoutContainer mdCommandsLowerRight = new LayoutContainer();
-		mdCommandsLowerRight.addStyleName("col-md-6");		
-		row.add(mdCommandsLowerLeft);
-		row.add(mdCommandsLowerRight);
+		LayoutContainer row = DisplayUtils.createRowContainer();
+		FlowPanel commands = new FlowPanel();
+		commands.addStyleName("col-md-12");
+		row.add(commands);
 		overallRow.add(row);
-		formPanel.add(overallRow, previewFormData);		
-		if (managementHandler != null) {
-			final com.google.gwt.user.client.ui.Button deleteButton =  new com.google.gwt.user.client.ui.Button();
-			deleteButton.removeStyleName("gwt-Button");
-			deleteButton.setHTML(DisplayConstants.BUTTON_DELETE_WIKI);
-			deleteButton.addStyleName("btn btn-danger");
+		formPanel.add(overallRow, previewFormData);
+		final com.google.gwt.user.client.ui.Button deleteButton =  DisplayUtils.createButton(DisplayConstants.BUTTON_DELETE_WIKI, ButtonType.DANGER);
+		final com.google.gwt.user.client.ui.Button attachmentsButton =  DisplayUtils.createButton(DisplayConstants.BUTTON_WIKI_ATTACHMENTS, ButtonType.DEFAULT);
+		boolean canManage = managementHandler != null;
+		if (canManage) {
 			deleteButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					managementHandler.deleteClicked();
 				}
 			});
-			mdCommandsLowerLeft.add(deleteButton);
-			mdCommandsLowerLeft.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
-			final com.google.gwt.user.client.ui.Button attachmentsButton =  new com.google.gwt.user.client.ui.Button();
-			attachmentsButton.removeStyleName("gwt-Button");
-			attachmentsButton.setText(DisplayConstants.BUTTON_WIKI_ATTACHMENTS);
-			attachmentsButton.addStyleName("btn btn-default");
+			
 			attachmentsButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					managementHandler.attachmentsClicked();
 				}
 			});
-			mdCommandsLowerLeft.add(attachmentsButton);
-			mdCommandsLowerLeft.add(new HTML(SafeHtmlUtils.fromSafeConstant("&nbsp;")));
 		}
-		mdCommandsLowerLeft.add(previewButton);
-
-		if (saveHandler != null) {
-			SimplePanel space = new SimplePanel();
-			space.addStyleName("margin-left-35");
-			mdCommandsLowerLeft.add(space);
-			
-			//also add a save button to the lower command bar
-			final com.google.gwt.user.client.ui.Button saveButton =  new com.google.gwt.user.client.ui.Button();
-			saveButton.removeStyleName("gwt-Button");
-			saveButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
-			saveButton.addStyleName("btn btn-primary right margin-right-5");
+		final com.google.gwt.user.client.ui.Button saveButton =  DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
+		final com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL, ButtonType.DEFAULT);
+		boolean canSave = saveHandler != null;
+		if (canSave) {
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -246,19 +227,36 @@ public class MarkdownEditorWidget extends LayoutContainer {
 				}
 			});
 						
-			final com.google.gwt.user.client.ui.Button cancelButton =  new com.google.gwt.user.client.ui.Button();
-			cancelButton.removeStyleName("gwt-Button");
-			cancelButton.setText(DisplayConstants.BUTTON_CANCEL);
-			cancelButton.addStyleName("btn btn-default right");
 			cancelButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					saveHandler.cancelClicked();
 				}
 			});
-
-			mdCommandsLowerRight.add(cancelButton);
-			mdCommandsLowerRight.add(saveButton);
+		}
+		
+		//add to container
+		//save, attachments, preview
+		if (canSave) {
+			saveButton.addStyleName("margin-right-5");
+			commands.add(saveButton);
+		}
+			
+		if (canManage) {
+			attachmentsButton.addStyleName("margin-right-5");
+			commands.add(attachmentsButton);
+		}
+		previewButton.addStyleName("margin-right-5");
+		commands.add(previewButton);
+		
+		//then cancel, delete
+		if (canManage) {
+			deleteButton.addStyleName("pull-right");
+			commands.add(deleteButton);
+		}
+		if (canSave) {
+			cancelButton.addStyleName("pull-right margin-right-5");
+			commands.add(cancelButton);
 		}
 		
 		

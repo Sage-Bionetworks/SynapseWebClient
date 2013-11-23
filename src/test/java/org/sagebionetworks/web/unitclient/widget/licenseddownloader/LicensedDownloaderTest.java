@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -160,7 +161,8 @@ public class LicensedDownloaderTest {
 		profile.setDisplayName("Display Name");
 		profile.setOwnerId("1");
 		user1.setProfile(profile);
-		user1.setSessionToken("token");
+		user1.setSession(new Session());
+		user1.getSession().setSessionToken("token");
 		user1.setIsSSO(false);
 
 		licensedDownloader.setUserProfile(profile);

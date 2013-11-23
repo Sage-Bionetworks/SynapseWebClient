@@ -52,7 +52,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			builder.append("<table id=\""+elementId+"\"");
 			
 			//apply tablesorter style
-			builder.append(" class=\"inline-block scroll-x tablesorter\"");
+			builder.append(" class=\"noBackground inline-block scroll-x tablesorter\"");
 			builder.append(">");
 				
 			//headers
@@ -78,7 +78,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 					for (int i = 0; i < rowCount; i++) {
 						builder.append("<tr>");
 						if (tableConfig.isShowRowNumber())
-							builder.append("<td>"+(i+tableConfig.getOffset()+1)+"</td>"); //row number
+							builder.append("<td class=\"padding-right-15\">"+(i+tableConfig.getOffset()+1)+"</td>"); //row number
 						
 						//column data (each renderer has a list of columns that it will output.  ask for each value
 						for (int j = 0; j < renderers.length; j++) {
@@ -94,7 +94,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 								} else {
 									value = outputColumnData.get(columnName).get(i);
 								}
-								builder.append("<td>"+value+"</td>");
+								builder.append("<td class=\"padding-right-15\">"+value+"</td>");
 							}
 						}
 						

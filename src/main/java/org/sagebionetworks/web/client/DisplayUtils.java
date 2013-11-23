@@ -73,6 +73,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -145,7 +146,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -739,6 +739,12 @@ public class DisplayUtils {
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("col-md-12");
 		lc.add(widget);
+		return lc;
+	}
+	
+	public static SimplePanel wrapInDiv(Widget widget) {
+		SimplePanel lc = new SimplePanel();
+		lc.setWidget(widget);
 		return lc;
 	}
 	private static String getTeamPlaceString(Class<Team> place) {
@@ -1912,11 +1918,8 @@ public class DisplayUtils {
 		if (clickHandler != null)
 			headingHtml.addClickHandler(clickHandler);
 		
-		Image profilePicture = new Image(pictureUri);
+		FitImage profilePicture = new FitImage(pictureUri, 64, 64);
 		profilePicture.addStyleName("pull-left media-object");
-		profilePicture.setPixelSize(64,64);
-		profilePicture.setWidth("64px");
-		profilePicture.setHeight("64px");
 		profilePicture.addStyleName("imageButton");
 		if (clickHandler != null)
 			profilePicture.addClickHandler(clickHandler);

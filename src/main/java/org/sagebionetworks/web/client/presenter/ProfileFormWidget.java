@@ -146,9 +146,9 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		};
 
 		if(currentUser.getIsSSO()) {
-			authenticationController.loginUserSSO(currentUser.getSessionToken(), callback);
+			authenticationController.loginUserSSO(currentUser.getSession().getSessionToken(), callback);
 		} else {
-			authenticationController.loginUser(currentUser.getSessionToken(), callback);
+			authenticationController.loginUser(currentUser.getSession().getSessionToken(), callback);
 		}
 
 	}

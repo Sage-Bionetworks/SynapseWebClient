@@ -16,17 +16,15 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class APITableColumnRendererDate implements APITableColumnRenderer {
+public class APITableColumnRendererEpochDate implements APITableColumnRenderer {
 
-	private DateTimeFormat formatter;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
 	
 	@Inject
-	public APITableColumnRendererDate(SynapseJSNIUtils synapseJSNIUtils) {
+	public APITableColumnRendererEpochDate(SynapseJSNIUtils synapseJSNIUtils) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		formatter = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	}
 	
 	@Override
@@ -49,7 +47,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 		for (Iterator iterator2 = colValues.iterator(); iterator2
 				.hasNext();) {
 			String colValue = (String) iterator2.next();
-			Date date = formatter.parse(colValue);
+			Date date = new Date(Long.parseLong(colValue));
 			outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
 		}
 		outputColumnData.put(outputColumnName, outputValues);

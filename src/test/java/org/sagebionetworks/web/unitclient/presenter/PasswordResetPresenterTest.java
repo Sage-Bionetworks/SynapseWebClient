@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -97,62 +96,14 @@ public class PasswordResetPresenterTest {
 		presenter.start(panel, eventBus);		
 		verify(panel).setWidget(mockView);
 	}
-	
-	@Test
-	public void testChangeEmail() {
-		resetAll();
-		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		presenter.setPlace(place);
-		
-		verify(mockView).showResetForm();
-	}
 
-	
-	@Test
-	public void testChangeEmailNotLoggedIn() {
-		resetAll();
-		when(place.toToken()).thenReturn(PasswordResetPresenter.CHANGE_EMAIL_TOKEN_PREFIX + "a20session20token");
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		presenter.setPlace(place);
-		
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-
-	
-	@Test
-	public void testResetPasswordDuringRegistration() {
-		//set the registration token, and mock a successful user service call
-		resetAll();
-		when(place.toToken()).thenReturn(PasswordResetPresenter.REGISTRATION_TOKEN_PREFIX + "myEncryptedSessionToken");
-		
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).setRegistrationUserPassword(any(String.class), any(String.class), any(AsyncCallback.class));
-		presenter.setPlace(place);
-		presenter.resetPassword("myPassword");
-		//verify password set text is shown in the view
-		verify(mockView).showInfo(DisplayConstants.PASSWORD_SET_TEXT);
-		//verify that place is changed to LoginPlace
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-	
-	@Test
-	public void testServiceFailureDuringRegistration() {
-		//set the registration token, and mock a failed user service call
-		resetAll();
-		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).setRegistrationUserPassword(any(String.class), any(String.class), any(AsyncCallback.class));
-		when(place.toToken()).thenReturn(PasswordResetPresenter.REGISTRATION_TOKEN_PREFIX + "myEncryptedSessionToken");
-		presenter.setPlace(place);
-		presenter.resetPassword("myPassword");
-		//verify password set failed text is shown in the view
-		verify(mockView).showErrorMessage(DisplayConstants.PASSWORD_SET_FAILED_TEXT);
-	}
-
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testResetPassword() {
 		//without the registration token set, mock a successful user service call
 		resetAll();
 		presenter.setPlace(place);
-		AsyncMockStubber.callSuccessWith(null).when(mockUserService).setPassword(any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
@@ -160,11 +111,12 @@ public class PasswordResetPresenterTest {
 		verify(mockPlaceChanger).goTo(any(Home.class));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testServiceFailure() {
 		//without the registration token set, mock a failed user service call
 		resetAll();
-		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).setPassword(any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.setPlace(place);
 		presenter.resetPassword("myPassword");
 		//verify password reset failed text is shown in the view

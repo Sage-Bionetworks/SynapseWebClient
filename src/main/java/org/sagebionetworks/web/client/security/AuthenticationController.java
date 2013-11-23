@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.security;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -13,7 +12,7 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, boolean explicitlyAcceptsTermsOfUse, AsyncCallback<String> callback);
+	public void loginUser(String username, String password, AsyncCallback<String> callback);
 	
 	/**
 	 * Logs in the user represented by the token
@@ -64,13 +63,16 @@ public interface AuthenticationController {
 	 */
 	public UserSessionData getCurrentUserSessionData();
 
-	
-	
 	/**
 	 * Redownload the user's session data 
 	 */
 	void reloadUserSessionData();
 
 	public void getTermsOfUse(AsyncCallback<String> callback);
+	
+	/**
+	 * Signs the terms of use for a user
+	 */
+	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback);
 	
 }
