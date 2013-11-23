@@ -4,12 +4,15 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -23,6 +26,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.EntityDeletedEvent;
+import org.sagebionetworks.web.client.events.EntityDeletedHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -55,6 +60,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityEditor entityEditor;
 	private AutoGenFactory entityFactory;
 	private EntityUpdatedHandler entityUpdatedHandler;
+	private EntityDeletedHandler entityDeletedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
 	private  NodeModelCreator nodeModelCreator;
@@ -140,6 +146,10 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		entityEditor.setEntityUpdatedHandler(handler);
 	}
 	
+	public void setEntityDeletedHandler(EntityDeletedHandler handler) {
+		this.entityDeletedHandler = handler;
+	}
+	
 	@Override
 	public void moveEntity(String newParentId) {
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
@@ -187,9 +197,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
+		final String deletedId = entityBundle.getEntity().getId();
 		synapseClient.deleteEntityById(entityBundle.getEntity().getId(), new AsyncCallback<Void>() {
 			@Override
-			public void onSuccess(Void result) {				
+			public void onSuccess(Void result) {
+				entityDeletedHandler.onDeleteSuccess(new EntityDeletedEvent(deletedId));
 				view.showInfo(entityTypeDisplay + " Deleted", "The " + entityTypeDisplay + " was successfully deleted."); 
 				// Go to entity's parent
 				Place gotoPlace = null;
@@ -209,7 +221,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 				}
 			}
 		});
-	}	
+	}
 	
 	@Override
 	public boolean isUserLoggedIn() {
