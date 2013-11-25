@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -54,8 +55,8 @@ public class WikiAttachmentsTest {
 		mockView = Mockito.mock(WikiAttachmentsView.class);
 		when(mockJSONObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).updateWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		FileHandleResults testResults = new FileHandleResults();
 		FileHandle testHandle = new S3FileHandle();
@@ -66,29 +67,29 @@ public class WikiAttachmentsTest {
 		testResults.setList(handles);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(FileHandleResults.class))).thenReturn(testResults);
 		
-		WikiPage testPage = new WikiPage();
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(WikiPage.class))).thenReturn(testPage);
+		V2WikiPage testPage = new V2WikiPage();
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(V2WikiPage.class))).thenReturn(testPage);
 		// setup the entity editor with 
 		presenter = new WikiAttachments(mockView, mockSynapseClient, mockGlobalAppState, mockAuthenticationController, mockJSONObjectAdapter, mockNodeModelCreator);
 	}
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
 	@Test
 	public void testConfigureFail() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
 		presenter.deleteAttachment("a file");
-		verify(mockSynapseClient).updateWikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 }

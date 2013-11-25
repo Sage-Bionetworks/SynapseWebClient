@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
@@ -142,9 +143,9 @@ public class FileHandleServlet extends HttpServlet {
 			// Redirect the user to the temp preview url
 			
 			if (isPreview)
-				resolvedUrl = client.getWikiAttachmentPreviewTemporaryUrl(properKey, fileName);
+				resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
 			else
-				resolvedUrl = client.getWikiAttachmentTemporaryUrl(properKey, fileName);
+				resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
 			//Done
 		}
 		else if (entityId != null) {
@@ -247,11 +248,11 @@ public class FileHandleServlet extends HttpServlet {
 					ObjectType type = ObjectType.valueOf(ownerType);
 					String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-					WikiPage page = client.getWikiPage(properKey);
+					V2WikiPage page = client.getV2WikiPage(properKey);
 					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
 					if (!fileHandleIds.contains(newFileHandle.getId()))
 						fileHandleIds.add(newFileHandle.getId());
-					client.updateWikiPage(ownerId, type, page);
+					client.updateV2WikiPage(ownerId, type, page);
 				}
 				else if (isCreateEntity) {
 					//create the file entity

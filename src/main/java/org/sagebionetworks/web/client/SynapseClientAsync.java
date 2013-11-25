@@ -133,6 +133,16 @@ public interface SynapseClientAsync {
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
+	 // V2 Wiki crud
+    public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
+    public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate, AsyncCallback<String> callback);
+    public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+    public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+    public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+    public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);
+    
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 
 	void addFavorite(String entityId, AsyncCallback<String> callback);
@@ -224,4 +234,7 @@ public interface SynapseClientAsync {
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
+
+	public void getAndReadS3Object(String fileHandleId, String fileName, AsyncCallback<String> callback);
+	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
 }

@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -46,7 +48,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -63,7 +64,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
-	private WikiPage currentPage;
+	private V2WikiPage currentPage;
+	private String currentMarkdown;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
@@ -88,7 +90,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
+			WidgetRegistrar widgetRegistrar) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -124,8 +128,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
+	public void configure(V2WikiPage newPage, WikiPageKey wikiKey,
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, String markdown) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -133,14 +137,17 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
+		this.currentMarkdown = markdown;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
+		final WikiPageKey finalKey = wikiKey;
+		markdownWidget.setMarkdown(currentMarkdown, finalKey, true, false);
 		showDefaultViewWithWiki();
 	}
 	
 	@Override
-	public void updateWikiPage(WikiPage newPage){
+	public void updateWikiPage(V2WikiPage newPage, String markdown){
 		currentPage = newPage;
+		currentMarkdown = markdown;
 	}
 	
 	private void showDefaultViewWithWiki() {
@@ -225,7 +232,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
-				mdField.setValue(currentPage.getMarkdown());
+				mdField.setValue(currentMarkdown);
 				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
 				

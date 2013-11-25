@@ -23,6 +23,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -54,13 +55,13 @@ public class FileHandleServletTest {
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 
 		FileHandleResults testResults = new FileHandleResults();
-		WikiPage testPage = new WikiPage();
+		V2WikiPage testPage = new V2WikiPage();
 		testPage.setAttachmentFileHandleIds(new ArrayList<String>());
 		when(mockSynapse.createFileHandles(any(List.class))).thenReturn(testResults);
-		when(mockSynapse.getWikiPage(any(WikiPageKey.class))).thenReturn(testPage);
+		when(mockSynapse.getV2WikiPage(any(WikiPageKey.class))).thenReturn(testPage);
 		URL resolvedUrl = new URL("http://localhost/file.png");
-		when(mockSynapse.getWikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
-		when(mockSynapse.getWikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
+		when(mockSynapse.getV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString())).thenReturn(resolvedUrl);
 
 		when(mockSynapse.getFileEntityPreviewTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
 		when(mockSynapse.getFileEntityTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
@@ -110,7 +111,7 @@ public class FileHandleServletTest {
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockSynapse).getWikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString());
+		verify(mockSynapse).getV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 	
@@ -121,7 +122,7 @@ public class FileHandleServletTest {
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockSynapse).getWikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString());
+		verify(mockSynapse).getV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 

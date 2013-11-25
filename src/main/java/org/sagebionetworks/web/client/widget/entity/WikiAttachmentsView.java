@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -22,7 +22,7 @@ public interface WikiAttachmentsView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void configure(WikiPageKey wikiKey, WikiPage wikiPage, Callback callback);
+		void configure(WikiPageKey wikiKey, V2WikiPage wikiPage, Callback callback);
 		/**
 		 * Delete attachment
 		 */
