@@ -31,6 +31,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -111,6 +112,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testPage);
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getAndReadS3Object(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		verify(mockView).configure(any(V2WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), any(String.class));
 	}
@@ -169,7 +171,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith("file handle json").when(mockSynapseClient).zipAndUploadFile(any(String.class), any(String.class), any(AsyncCallback.class));
 		// Make sure node creator creates correct object
 		when(mockNodeModelCreator.createJSONEntity("wiki json", V2WikiPage.class)).thenReturn(testPage);
-		when(mockNodeModelCreator.createJSONEntity("file handle json", FileHandle.class)).thenReturn(markdownHandle);
+		when(mockNodeModelCreator.createJSONEntity("file handle json", S3FileHandle.class)).thenReturn(markdownHandle);
 		presenter.refreshWikiAttachments(newTitle, newMarkdown, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -207,7 +209,10 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
-	public void testCreatePage(){
+	public void testCreatePage() throws JSONObjectAdapterException{
+		S3FileHandle markdownHandle = new S3FileHandle();
+		AsyncMockStubber.callSuccessWith("file handle json").when(mockSynapseClient).zipAndUploadFile(any(String.class), any(String.class), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createJSONEntity("file handle json", S3FileHandle.class)).thenReturn(markdownHandle);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		presenter.createPage("a new wiki page with this title");
 		verify(mockSynapseClient).createV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -215,12 +220,14 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
-	public void testCreatePageFailure() throws JSONObjectAdapterException{
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testPage);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+	public void testCreatePageFailure() throws JSONObjectAdapterException{		
+		S3FileHandle markdownHandle = new S3FileHandle();
+		AsyncMockStubber.callSuccessWith("file handle json").when(mockSynapseClient).zipAndUploadFile(any(String.class), any(String.class), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createJSONEntity("file handle json", S3FileHandle.class)).thenReturn(markdownHandle);
 		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		presenter.createPage("a new wiki page with this title");
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
 	}
 
 	@Test
@@ -236,7 +243,7 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith("wiki json").when(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("file handle json").when(mockSynapseClient).zipAndUploadFile(any(String.class), any(String.class), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity("wiki json", V2WikiPage.class)).thenReturn(testPage);
-		when(mockNodeModelCreator.createJSONEntity("file handle json", FileHandle.class)).thenReturn(markdownHandle);
+		when(mockNodeModelCreator.createJSONEntity("file handle json", S3FileHandle.class)).thenReturn(markdownHandle);
 		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		presenter.saveClicked("", "");

@@ -50,7 +50,6 @@ SynapseWidgetPresenter {
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private V2WikiPage currentPage;
-	private String currentMarkdownHandleId;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
 	private int spanWidth;
@@ -196,8 +195,7 @@ SynapseWidgetPresenter {
 						S3FileHandle markdownHandle;
 						try {
 							markdownHandle = nodeModelCreator.createJSONEntity(fileHandleResult, S3FileHandle.class);
-							currentMarkdownHandleId = markdownHandle.getId();
-							currentPage.setMarkdownFileHandleId(currentMarkdownHandleId);
+							currentPage.setMarkdownFileHandleId(markdownHandle.getId());
 							if (updatedTitle != null && updatedTitle.length() > 0)
 								currentPage.setTitle(updatedTitle);
 							view.updateWikiPage(currentPage, updatedMarkdown);
@@ -209,7 +207,7 @@ SynapseWidgetPresenter {
 					}
 					@Override
 					public void onFailure(Throwable caught) {
-						view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+						view.showErrorMessage(DisplayConstants.ERROR_WIKI_SAVE_MARKDOWN+caught.getMessage());
 					}
 				});
 				
@@ -355,44 +353,51 @@ SynapseWidgetPresenter {
 				S3FileHandle markdownHandle;
 				try {
 					markdownHandle = nodeModelCreator.createJSONEntity(fileHandleResult, S3FileHandle.class);
-					currentMarkdownHandleId = markdownHandle.getId();
-					page.setMarkdownFileHandleId(currentMarkdownHandleId);
+					page.setMarkdownFileHandleId(markdownHandle.getId());
 					
-					String wikiPageJson;
-					try {			
-						wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-						synapseClient.createV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
-							@Override
-							public void onSuccess(String result) {
-								if (isCreatingWiki) {
-									String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
-									view.showInfo( type + " Created", "");
-								} else {
-									view.showInfo("Page '" + name + "' Added", "");
-								}
-								
-								refresh();
-							}
-							
-							@Override
-							public void onFailure(Throwable caught) {
-								if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-									view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-							}
-						});
-					} catch (JSONObjectAdapterException e) {			
-						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-					}
+					createPage(page, isCreatingWiki, name);
+					
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
 			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				}
 			}
 		});
 		
+	}
+	
+	private void createPage(final V2WikiPage page, final boolean isCreatingWiki, final String name) {
+		String wikiPageJson;
+		try {			
+			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.createV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					if (isCreatingWiki) {
+						String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
+						view.showInfo( type + " Created", "");
+					} else {
+						view.showInfo("Page '" + name + "' Added", "");
+					}
+					
+					refresh();
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {	
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		}
 	}
 	
 	public void clear(){
