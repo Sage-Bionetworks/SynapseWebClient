@@ -36,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -142,7 +143,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					if (result != null) {
 						content += result;
 					}
-					ResizeLayoutPanel wikiSubpagesPanel = new ResizeLayoutPanel();
+					FlowPanel wikiSubpagesPanel = new FlowPanel();
 					add(wikiSubpagesPanel);
 
 					HTMLPanel panel = new HTMLPanel(content);
