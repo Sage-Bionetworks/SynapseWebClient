@@ -52,7 +52,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			builder.append("<table id=\""+elementId+"\"");
 			
 			//apply tablesorter style
-			builder.append(" class=\"noBackground inline-block scroll-x tablesorter\"");
+			builder.append(" class=\"margin-bottom-0-imp noBackground inline-block scroll-x tablesorter\"");
 			builder.append(">");
 				
 			//headers
@@ -118,8 +118,9 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	@Override
 	public void configurePager(int start, int end, int total) {
 		UnorderedListPanel panel = new UnorderedListPanel();
-		panel.setStyleName("pager");
+		panel.setStyleName("pager padding-left-5-imp inline-block margin-top-5");
 		Label label = new Label(start + "-" + end + " of " + total);
+		label.addStyleName("inline-block margin-left-5 margin-right-5");
 		
 		Anchor prev = new Anchor();
 		prev.setHTML("Previous");
@@ -152,7 +153,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			panel.add(next, "disabled");
 		} else {
 			panel.add(next);
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_NEXT, TOOLTIP_POSITION.BOTTOM);
 		}
 		add(panel);
 		layout(true);

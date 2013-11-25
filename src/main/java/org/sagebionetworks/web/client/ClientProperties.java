@@ -117,6 +117,7 @@ public class ClientProperties {
 	public static final WebResource MATHJAX_JS = new WebResource("https://c328740.ssl.cf1.rackcdn.com/mathjax/2.2-latest/MathJax.js?config=default", ResourceType.JAVASCRIPT);
 	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
+	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
 	
 }
 
