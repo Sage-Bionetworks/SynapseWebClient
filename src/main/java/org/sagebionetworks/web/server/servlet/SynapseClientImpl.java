@@ -114,6 +114,7 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -189,9 +190,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		if (tokenProvider == null) {
 			throw new IllegalStateException("The token provider was not set");
 		}
+		if (s3Client == null) {
+			throw new IllegalStateException("The S3Client was not set");
+		}
 	}
-	
-	private AmazonS3Client s3Client = new AmazonS3Client();
+
+	private AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(StackConfiguration.getIAMUserId(), StackConfiguration.getIAMUserKey()));
 	
 
 	@Override
@@ -2235,12 +2239,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public String getAndReadS3Object(String fileHandleId, String fileName) throws IOException, RestServiceException {
 		// Get the file handle for the specific id
-		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);;
+		S3FileHandle handle = (S3FileHandle) getFileHandle(fileHandleId);
 		// Get the associated S3 object and unzip into a string
 		File tempFile = File.createTempFile(fileName, ".tmp");
-		// Retrieve uploaded markdown
+		// Retrieve uploaded markdown	
 		s3Client.getObject(new GetObjectRequest(handle.getBucketName(), 
 				handle.getKey()), tempFile);
+
 		// Read the file as a string
 		return FileUtils.readFileToString(tempFile, "UTF-8");
 	}
@@ -2252,8 +2257,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String contentType = guessContentTypeFromStream(file);
 		try {
 			// Upload the file and create S3 handle
-			FileHandle handle = synapseClient.createFileHandle(file, contentType);
-			 try {
+			S3FileHandle handle = synapseClient.createFileHandle(file, contentType);
+			try {
 				return EntityFactory.createJSONStringForEntity(handle);
 			} catch (JSONObjectAdapterException e) {
 				throw new UnknownErrorException(e.getMessage());
