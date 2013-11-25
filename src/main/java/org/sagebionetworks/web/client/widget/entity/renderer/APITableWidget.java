@@ -246,7 +246,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public String getPagedURI() {
 		String uri = tableConfig.getUri();
 		//special case for query service
-		if (uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX)) {
+		if (uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX) || uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX)) {
 			return tableConfig.getUri() + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
 		} else {
 			String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
