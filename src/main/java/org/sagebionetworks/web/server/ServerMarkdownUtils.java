@@ -42,7 +42,7 @@ public class ServerMarkdownUtils {
 		//default is to stay in the current window
 		if (clientHostString == null || clientHostString.length() == 0 || href == null || href.length() == 0)
 			return START_LINK_CURRENT_WINDOW;
-		return href.toLowerCase().startsWith(clientHostString) ?
+		return href.toLowerCase().startsWith(clientHostString) || href.charAt(0) == '#' ?
 				START_LINK_CURRENT_WINDOW : 
 				START_LINK_NEW_WINDOW;
 	}

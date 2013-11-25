@@ -80,6 +80,9 @@ public class ServerMarkdownUtilsTest {
 		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
 		
 		
+		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "#!Challenges:DREAM");
+		assertEquals(ServerMarkdownUtils.START_LINK_CURRENT_WINDOW, startLink);
+		
 		//new window if different
 		startLink = ServerMarkdownUtils.getStartLink("https://www.synapse.org", "https://www.jayhodgson.com/#!Challenges:DREAM");
 		assertEquals(ServerMarkdownUtils.START_LINK_NEW_WINDOW, startLink);
