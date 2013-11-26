@@ -182,6 +182,10 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
 		//combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
 		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+		combo.setTypeAhead(false);
+		combo.setEditable(false);
+		combo.setForceSelection(true);
+
 		combo.setTriggerAction(TriggerAction.ALL);
 		
 		final SimpleComboBox<String> sortCb = new SimpleComboBox<String>();
@@ -189,6 +193,9 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		sortCb.add(COLUMN_SORT_TYPE.DESC.toString());
 		sortCb.add(COLUMN_SORT_TYPE.ASC.toString());
 		sortCb.setSimpleValue(COLUMN_SORT_TYPE.NONE.toString());
+		sortCb.setTypeAhead(false);
+		sortCb.setEditable(false);
+		sortCb.setForceSelection(true);
 		sortCb.setTriggerAction(TriggerAction.ALL);
 		
 		initNewField("Renderer", combo, panel);
