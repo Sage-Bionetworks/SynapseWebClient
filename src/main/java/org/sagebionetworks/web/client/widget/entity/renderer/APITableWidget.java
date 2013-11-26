@@ -99,7 +99,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private void refreshData() {
 		String fullUri = tableConfig.getUri();
 		
-		fullUri = getOrderedByURI(fullUri);
+		fullUri = getOrderedByURI(fullUri, tableConfig);
 		
 		if (tableConfig.isPaging()) {
 			fullUri = getPagedURI(fullUri);
@@ -258,14 +258,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 	}
 	
-	public String getOrderedByURI(String uri) {
+	public String getOrderedByURI(String uri, APITableConfig tableConfig) {
 		String newUri = uri;
 		if (isQueryService(uri)) {
 			//find the order by column
 			COLUMN_SORT_TYPE sort = COLUMN_SORT_TYPE.NONE;
 			String columnName = null;
 			for (APITableColumnConfig columnConfig : tableConfig.getColumnConfigs()) {
-				if (COLUMN_SORT_TYPE.NONE != columnConfig.getSort()) {
+				if (columnConfig.getSort() != null && COLUMN_SORT_TYPE.NONE != columnConfig.getSort()) {
 					//found
 					Set<String> inputColumnNames = columnConfig.getInputColumnNames();
 					if (inputColumnNames.size() > 0) {
