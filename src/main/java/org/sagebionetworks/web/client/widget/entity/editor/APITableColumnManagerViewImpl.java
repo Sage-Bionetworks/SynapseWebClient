@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -45,6 +46,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -182,13 +184,22 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
 		combo.setTriggerAction(TriggerAction.ALL);
 		
+		final SimpleComboBox<String> sortCb = new SimpleComboBox<String>();
+		sortCb.add(COLUMN_SORT_TYPE.NONE.toString());
+		sortCb.add(COLUMN_SORT_TYPE.DESC.toString());
+		sortCb.add(COLUMN_SORT_TYPE.ASC.toString());
+		sortCb.setSimpleValue(COLUMN_SORT_TYPE.NONE.toString());
+		sortCb.setTriggerAction(TriggerAction.ALL);
+		
 		initNewField("Renderer", combo, panel);
 		initNewField("Input Column Names", columnNames, panel);
 		initNewField("Display Column Name (optional)", displayColumnName, panel);
+		initNewField("Sort", sortCb, panel);
+		
 		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				presenter.addColumnConfig(combo.getValue().getValue(), columnNames.getValue(), displayColumnName.getValue());
+				presenter.addColumnConfig(combo.getValue().getValue(), columnNames.getValue(), displayColumnName.getValue(), COLUMN_SORT_TYPE.valueOf(sortCb.getValue().getValue()));
 			}
 	    });
 
