@@ -25,7 +25,6 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -46,7 +45,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -174,29 +172,20 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		panel.addStyleName("margin-top-left-10");
 		final TextField<String> columnNames = new TextField<String>();
 		final TextField<String> displayColumnName = new TextField<String>();
-		final SimpleComboBox<String> combo = new SimpleComboBox<String>();
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
-		//combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
-		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
-		combo.setTypeAhead(false);
-		combo.setEditable(false);
-		combo.setForceSelection(true);
+		List<String> rendererValues = new ArrayList<String>();
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
+		//rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
+		final SimpleComboBox<String> combo = DisplayUtils.createSimpleComboBox(rendererValues, WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
 
-		combo.setTriggerAction(TriggerAction.ALL);
-		
-		final SimpleComboBox<String> sortCb = new SimpleComboBox<String>();
-		sortCb.add(COLUMN_SORT_TYPE.NONE.toString());
-		sortCb.add(COLUMN_SORT_TYPE.DESC.toString());
-		sortCb.add(COLUMN_SORT_TYPE.ASC.toString());
-		sortCb.setSimpleValue(COLUMN_SORT_TYPE.NONE.toString());
-		sortCb.setTypeAhead(false);
-		sortCb.setEditable(false);
-		sortCb.setForceSelection(true);
-		sortCb.setTriggerAction(TriggerAction.ALL);
+		List<String> sortValues = new ArrayList<String>();
+		sortValues.add(COLUMN_SORT_TYPE.NONE.toString());
+		sortValues.add(COLUMN_SORT_TYPE.DESC.toString());
+		sortValues.add(COLUMN_SORT_TYPE.ASC.toString());
+		final SimpleComboBox<String> sortCb = DisplayUtils.createSimpleComboBox(sortValues, COLUMN_SORT_TYPE.NONE.toString());
 		
 		initNewField("Renderer", combo, panel);
 		initNewField("Input Column Names", columnNames, panel);

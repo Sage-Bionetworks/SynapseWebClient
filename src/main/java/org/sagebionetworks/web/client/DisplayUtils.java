@@ -110,6 +110,8 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -1931,6 +1933,17 @@ public class DisplayUtils {
 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
 		panel.add(mediaBodyPanel);
 		return panel;
+	}
+	
+	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
+		final SimpleComboBox<String> cb = new SimpleComboBox<String>();
+		cb.add(values);
+		cb.setSimpleValue(defaultValue);
+		cb.setTypeAhead(false);
+		cb.setEditable(false);
+		cb.setForceSelection(true);
+		cb.setTriggerAction(TriggerAction.ALL);
+		return cb;
 	}
 	
 	public static HTML getNewLabel(boolean superScript) {		
