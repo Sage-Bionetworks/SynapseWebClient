@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.provenance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -42,11 +43,11 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
-import com.extjs.gxt.ui.client.widget.ProgressBar;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -94,7 +95,7 @@ public class ProvUtilsTest {
 		ref2.setTargetId(entity2.getId());
 		ref2.setTargetVersionNumber(entity2.getVersionNumber());
 		EntityHeader header2 = new EntityHeader();
-		header2.setId(ref2.getTargetId());
+		header2.setId(ref2.getTargetId());		
 		header2.setVersionNumber(ref2.getTargetVersionNumber());
 		
 		UsedEntity ue = new UsedEntity();
@@ -121,15 +122,14 @@ public class ProvUtilsTest {
 		
 		Set<Reference> noExpandNodes = new HashSet<Reference>();
 		
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, startRefs, noExpandNodes);		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, true, startRefs, noExpandNodes);		
 		
 		assertNotNull(graph.getNodes());
 		assertNotNull(graph.getEdges());		
 		Set<ProvGraphNode> nodes = graph.getNodes();
 		Set<ProvGraphEdge> edges = graph.getEdges();
 		
-		// verify all nodes created
-		
+		// verify all nodes created		
 		EntityGraphNode entity1Node = null;
 		EntityGraphNode entity2Node = null;
 		ActivityGraphNode actNode = null;
@@ -150,6 +150,17 @@ public class ProvUtilsTest {
 		assertTrue(edges.contains(generatedByEdge));
 		ProvGraphEdge usedEdge = new ProvGraphEdge(actNode, entity2Node);
 		assertTrue(edges.contains(usedEdge));
+		
+		// SWC-1070 regression test
+		// find and verify expand nodes are not created for entities with no name (forbidden or not found entities) 
+		assertNull(header2.getName()); // precondition
+		boolean foundExpand2 = false;
+		for(ProvGraphEdge edge : edges) {
+			if(edge.getSource().equals(entity2Node) && edge.getSink() instanceof ExpandGraphNode) {
+				foundExpand2 = true;
+			}
+		}
+		assertFalse(foundExpand2);
 	}
 
 	public void testCreateUniqueNodeId() throws Exception {

@@ -101,7 +101,13 @@ public class ProvUtils {
 						graph.addEdge(new ProvGraphEdge(activityNode, entityNode));				
 						
 						// create expand nodes for those that don't have generatedBy activities defined
-						if(showExpand && !generatedByActivityId.containsKey(ref) && !noExpandNode.contains(ref) && !nodeHasExpandNode.contains(entityNode)) {
+						// also, if entity header name is null, do not create expand
+						EntityHeader refHeader = refToHeader.containsKey(ref) ? refToHeader.get(ref) : new EntityHeader();
+						if (showExpand
+								&& !generatedByActivityId.containsKey(ref)
+								&& !noExpandNode.contains(ref)
+								&& !nodeHasExpandNode.contains(entityNode)
+								&& refHeader.getName() != null) {							
 							ProvGraphNode expandNode = new ExpandGraphNode(createUniqueNodeId(), ref.getTargetId(), ref.getTargetVersionNumber());
 							idToNode.put(expandNode.getId(), expandNode);
 							graph.addEdge(new ProvGraphEdge(entityNode, expandNode));

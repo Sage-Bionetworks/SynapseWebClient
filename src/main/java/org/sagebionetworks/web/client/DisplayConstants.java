@@ -637,7 +637,7 @@ public class DisplayConstants {
 	public static final String FORGOT_PASSWORD = "forgot password?";
 	public static final String SIGNING_IN = "Signing in...";
 	public static final String NEW = "new";
-	
+	public static final String DETAILS_UNAVAILABLE = "Details unavailable";	 	
 	
 }
 
