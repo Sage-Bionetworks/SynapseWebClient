@@ -99,7 +99,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					V2WikiPage page = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 					wikiKey.setWikiPageId(page.getId());
 					try {
-						synapseClient.getAndReadS3Object(page.getMarkdownFileHandleId(), page.getId() + "_markdown", new AsyncCallback<String>() {
+						synapseClient.getMarkdown(wikiKey, new AsyncCallback<String>() {
 							@Override
 							public void onSuccess(String result) {
 								setMarkdown(result, wikiKey, true, isPreview);

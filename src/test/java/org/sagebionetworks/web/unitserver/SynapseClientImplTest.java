@@ -139,7 +139,6 @@ public class SynapseClientImplTest {
 	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
-	AmazonS3Client mockS3Client;
 	String entityId = "123";
 	ExampleEntity entity;
 	AttachmentData attachment1, attachment2;
@@ -176,8 +175,6 @@ public class SynapseClientImplTest {
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
 		synapseClient.setServiceUrlProvider(mockUrlProvider);
-		mockS3Client = Mockito.mock(AmazonS3Client.class);
-		synapseClient.setS3Client(mockS3Client);
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
@@ -692,6 +689,10 @@ public class SynapseClientImplTest {
          Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
          synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
          verify(mockSynapse).getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+         
+         Mockito.when(mockSynapse.getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(v2Page);
+         synapseClient.getVersionOfV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
+         verify(mockSynapse).getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
      }
      
      @Test
@@ -732,7 +733,30 @@ public class SynapseClientImplTest {
          Mockito.when(mockSynapse.getV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(testResults);
          synapseClient.getV2WikiAttachmentHandles(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
          verify(mockSynapse).getV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+         
+         Mockito.when(mockSynapse.getVersionOfV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(testResults);
+         synapseClient.getVersionOfV2WikiAttachmentHandles(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
+         verify(mockSynapse).getVersionOfV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
      }
+     
+ 	@Test
+ 	public void testZipAndUpload() throws IOException, RestServiceException, JSONObjectAdapterException, SynapseException {
+         Mockito.when(mockSynapse.createFileHandle(any(File.class), any(String.class))).thenReturn(handle);
+         synapseClient.zipAndUploadFile("markdown", "fileName");
+         verify(mockSynapse).createFileHandle(any(File.class), any(String.class));
+ 	}
+ 	
+ 	@Test
+ 	public void testGetMarkdown() throws IOException, RestServiceException, SynapseException {
+ 		File file = File.createTempFile("pre", "txt");
+ 		Mockito.when(mockSynapse.downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(file);
+        synapseClient.getMarkdown(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+        verify(mockSynapse).downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+        
+        Mockito.when(mockSynapse.downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(file);
+        synapseClient.getVersionOfMarkdown(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
+        verify(mockSynapse).downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
+ 	}
      
 	private void resetUpdateExternalFileHandleMocks(String testId, FileEntity file, ExternalFileHandle handle) throws SynapseException, JSONObjectAdapterException {
 		reset(mockSynapse);
@@ -1153,24 +1177,5 @@ public class SynapseClientImplTest {
 	public void testRequestMembership() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		synapseClient.requestMembership("123", "a team", "");
 		verify(mockSynapse).createMembershipRequest(any(MembershipRqstSubmission.class));
-	}
-
-	@Test
-	public void testZipAndUpload() throws IOException, RestServiceException, JSONObjectAdapterException, SynapseException {
-        Mockito.when(mockSynapse.createFileHandle(any(File.class), any(String.class))).thenReturn(handle);
-        synapseClient.zipAndUploadFile("markdown", "fileName");
-        verify(mockSynapse).createFileHandle(any(File.class), any(String.class));
-	}
-	
-	@Test
-	public void testGetAndRead() throws IOException, RestServiceException, SynapseException {
-		FileHandle fileHandle = new org.sagebionetworks.repo.model.file.S3FileHandle();
-		S3FileHandle s3FileHandle = (S3FileHandle) fileHandle;
-		s3FileHandle.setId("123");
-		s3FileHandle.setBucketName("bucket");
-		s3FileHandle.setKey("key");
-		Mockito.when(mockSynapse.getRawFileHandle(any(String.class))).thenReturn(fileHandle);
-		synapseClient.getAndReadS3Object(handle.getId(), "fileName");
-		verify(mockS3Client).getObject(any(GetObjectRequest.class), any(File.class));
 	}
 }

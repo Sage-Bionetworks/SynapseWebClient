@@ -112,7 +112,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testPage);
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getAndReadS3Object(any(String.class), any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getMarkdown(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		verify(mockView).configure(any(V2WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), any(String.class));
 	}
@@ -180,7 +180,7 @@ public class WikiPageWidgetTest {
 			public void noWikiFound() {
 			}
 		});
-		verify(mockSynapseClient).getAndReadS3Object(any(String.class), any(String.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).getMarkdown(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseClient).zipAndUploadFile(any(String.class), any(String.class), any(AsyncCallback.class));
 		verify(mockView).updateWikiPage(testPage, newMarkdown);
         assertEquals(newTitle, testPage.getTitle());

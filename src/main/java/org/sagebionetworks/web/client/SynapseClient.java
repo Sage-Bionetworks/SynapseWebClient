@@ -218,13 +218,19 @@ public interface SynapseClient extends RemoteService {
 	 // V2 Wiki crud
     public String createV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
     public String getV2WikiPage(WikiPageKey key) throws RestServiceException;
+    public String getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
     public String updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
     public String restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public String getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
     public String getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
+    public String getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
     public String getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
     
+	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
+	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
+	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
+	
 	public String getFileEndpoint() throws RestServiceException;
 	
 	public String addFavorite(String entityId) throws RestServiceException;
@@ -287,8 +293,5 @@ public interface SynapseClient extends RemoteService {
 	public String getSynapseProperty(String key);
 	
 	public String getAPIKey() throws RestServiceException;
-
-	public String getAndReadS3Object(String fileHandleId, String fileName)throws IOException, RestServiceException;
-	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
 }

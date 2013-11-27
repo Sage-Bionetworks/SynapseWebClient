@@ -119,7 +119,7 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+							synapseClient.getMarkdown(wikiKey, new AsyncCallback<String>() {
 								@Override
 								public void onSuccess(String result) {
 									originalMarkdown = result;
@@ -174,7 +174,7 @@ SynapseWidgetPresenter {
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
-				synapseClient.getAndReadS3Object(currentPage.getMarkdownFileHandleId(), currentPage.getId() + "_markdown", new AsyncCallback<String>() {
+				synapseClient.getMarkdown(wikiKey, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String markdownResult) {
 						if (originalMarkdown != null && !originalMarkdown.equals(markdownResult)) {
@@ -306,6 +306,7 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onSuccess(Void result) {
+				setIsEditing(false);
 				//clear the now invalid page id from the wiki key
 				wikiKey.setWikiPageId(null);
 				if (isEmbeddedInOwnerPage)
