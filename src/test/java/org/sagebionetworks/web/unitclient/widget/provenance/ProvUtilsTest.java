@@ -71,7 +71,19 @@ public class ProvUtilsTest {
 		mockLayoutService = mock(LayoutServiceAsync.class);		
 		adapterFactory = new AdapterFactoryImpl();				
 	}
-		
+
+	
+	/*
+	 * Test Graph:
+	 * 
+	 *          expand
+	 *           |
+	 *    ent2  ent3
+	 *     \   /
+	 *    Activity
+	 *       |
+	 *      ent1
+	 */
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildProvGraph() throws Exception {
@@ -81,6 +93,9 @@ public class ProvUtilsTest {
 		Data entity2 = new Data();
 		entity2.setId("syn456");
 		entity2.setVersionNumber(1L);
+		Data entity3 = new Data();
+		entity3.setId("syn456654");
+		entity3.setVersionNumber(1L);
 		Activity act = new Activity();
 		act.setId("789");
 
@@ -98,9 +113,21 @@ public class ProvUtilsTest {
 		header2.setId(ref2.getTargetId());		
 		header2.setVersionNumber(ref2.getTargetVersionNumber());
 		
-		UsedEntity ue = new UsedEntity();
-		ue.setReference(ref2);
+		Reference ref3 = new Reference();
+		ref3.setTargetId(entity3.getId());
+		ref3.setTargetVersionNumber(entity3.getVersionNumber());
+		EntityHeader header3 = new EntityHeader();
+		header3.setId(ref3.getTargetId());
+		header3.setName("Some Name");
+		header3.setType(Data.class.getName());
+		header3.setVersionNumber(ref3.getTargetVersionNumber());
+		
 		Set<Used> used = new HashSet<Used>();
+		UsedEntity ue = new UsedEntity();
+		ue.setReference(ref2);		
+		used.add(ue);
+		ue = new UsedEntity();
+		ue.setReference(ref3);
 		used.add(ue);
 		act.setUsed(used);
 
@@ -110,6 +137,7 @@ public class ProvUtilsTest {
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 		refToHeader.put(ref1, header1);
 		refToHeader.put(ref2, header2);
+		refToHeader.put(ref3, header3);
 		
 		Map<Reference, String> generatedByActivityId = new HashMap<Reference, String>();
 		generatedByActivityId.put(ref1, act.getId());
@@ -132,18 +160,25 @@ public class ProvUtilsTest {
 		// verify all nodes created		
 		EntityGraphNode entity1Node = null;
 		EntityGraphNode entity2Node = null;
+		EntityGraphNode entity3Node = null;
+		ExpandGraphNode entity3ExpandNode = null;
 		ActivityGraphNode actNode = null;
 		for(ProvGraphNode node : nodes) {			
 			if(node instanceof EntityGraphNode) {
 				if(((EntityGraphNode)node).getEntityId().equals(entity1.getId())) entity1Node = (EntityGraphNode) node;
 				if(((EntityGraphNode)node).getEntityId().equals(entity2.getId())) entity2Node = (EntityGraphNode) node;
+				if(((EntityGraphNode)node).getEntityId().equals(entity3.getId())) entity3Node = (EntityGraphNode) node;
 			} else if(node instanceof ActivityGraphNode) {
 				if(((ActivityGraphNode)node).getActivityId().equals(act.getId())) actNode = (ActivityGraphNode) node;
+			} else if(node instanceof ExpandGraphNode) {
+				if(((ExpandGraphNode)node).getEntityId().equals(entity3.getId())) entity3ExpandNode = (ExpandGraphNode) node;
 			}
 		}
 		assertNotNull(entity1Node);
 		assertNotNull(entity2Node);
+		assertNotNull(entity3Node);		
 		assertNotNull(actNode);
+		assertNotNull(entity3ExpandNode);
 		
 		// verify all edges created
 		ProvGraphEdge generatedByEdge = new ProvGraphEdge(entity1Node, actNode);
