@@ -118,6 +118,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 							view.showTermsOfUseDownloadFailed();							
 						}
 					});
+				} else {
+					fireUserChange(userSessionData);
 				}
 			}
 
