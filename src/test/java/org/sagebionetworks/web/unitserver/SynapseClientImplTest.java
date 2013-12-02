@@ -38,6 +38,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
@@ -1080,55 +1081,22 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetOpenRequestCountNotAMember() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
-		membershipStatus.setIsMember(false);
-		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+	public void testGetOpenRequestCountUnauthorized() throws SynapseException, RestServiceException {
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenThrow(new SynapseForbiddenException());
 		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		
-		//should not even try to ask for membership requests from the service, since we are not a member
-		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
-		verify(mockSynapse, Mockito.times(0)).getTeamMember(anyString(), anyString());
-		verify(mockSynapse, Mockito.times(0)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
-		assertNull(count);
-	}
-	
-	@Test
-	public void testGetOpenRequestCountNotAnAdmin() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
-		membershipStatus.setIsMember(true);
-		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(false);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
-		
-		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		
-		//should not even try to ask for membership requests from the service, since we are not a member
-		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
-		verify(mockSynapse, Mockito.times(1)).getTeamMember(anyString(), anyString());
-		verify(mockSynapse, Mockito.times(0)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
 		assertNull(count);
 	}
 
 	@Test
-	public void testGetOpenRequestCountIsAdmin() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
-		membershipStatus.setIsMember(true);
-		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(true);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
-		Long testCount = 42l;
+	public void testGetOpenRequestCount() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		Long testCount = 42L;
 		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
 		testOpenRequests.setTotalNumberOfResults(testCount);
 		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(testOpenRequests);
 		
 		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
 		
-		//should not even try to ask for membership requests from the service, since we are not a member
-		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
-		verify(mockSynapse, Mockito.times(1)).getTeamMember(anyString(), anyString());
 		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
 		assertEquals(testCount, count);
 	}
@@ -1136,7 +1104,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testGetTeamBundle() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		//set team member count
-		Long testMemberCount = 111l;
+		Long testMemberCount = 111L;
 		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
 		allMembers.setTotalNumberOfResults(testMemberCount);
 		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(), anyLong())).thenReturn(allMembers);

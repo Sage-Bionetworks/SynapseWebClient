@@ -1536,16 +1536,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//must be an admin to the team open requests.  To get admin status, must be a member
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,currentUserId);
-			if (membershipStatus.getIsMember()) {
-				TeamMember teamMember = synapseClient.getTeamMember(teamId, currentUserId);
-				if (teamMember.getIsAdmin()) {
-					PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
-					return requests.getTotalNumberOfResults();
-				}
+			try {
+				PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				return requests.getTotalNumberOfResults();
+			} catch (SynapseForbiddenException forbiddenEx) {
+				return null;
 			}
-
-			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
