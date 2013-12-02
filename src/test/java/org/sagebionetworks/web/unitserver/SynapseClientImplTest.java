@@ -69,6 +69,8 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -108,6 +110,7 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -1076,4 +1079,95 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createMembershipRequest(any(MembershipRqstSubmission.class));
 	}
 
+	@Test
+	public void testGetOpenRequestCountNotAMember() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setIsMember(false);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
+		
+		//should not even try to ask for membership requests from the service, since we are not a member
+		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(0)).getTeamMember(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(0)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		assertNull(count);
+	}
+	
+	@Test
+	public void testGetOpenRequestCountNotAnAdmin() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setIsMember(true);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(false);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
+		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
+		
+		//should not even try to ask for membership requests from the service, since we are not a member
+		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(1)).getTeamMember(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(0)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		assertNull(count);
+	}
+
+	@Test
+	public void testGetOpenRequestCountIsAdmin() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setIsMember(true);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(true);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		Long testCount = 42l;
+		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
+		testOpenRequests.setTotalNumberOfResults(testCount);
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(testOpenRequests);
+		
+		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
+		
+		//should not even try to ask for membership requests from the service, since we are not a member
+		verify(mockSynapse, Mockito.times(1)).getTeamMembershipStatus(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(1)).getTeamMember(anyString(), anyString());
+		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		assertEquals(testCount, count);
+	}
+	
+	@Test
+	public void testGetTeamBundle() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//set team member count
+		Long testMemberCount = 111l;
+		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
+		allMembers.setTotalNumberOfResults(testMemberCount);
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(), anyLong())).thenReturn(allMembers);
+		
+		//set team
+		Team team = new Team();
+		team.setId("test team id");
+		when(mockSynapse.getTeam(anyString())).thenReturn(team);
+		
+		//is member
+		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setIsMember(true);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		//is admin
+		TeamMember testTeamMember = new TeamMember();
+		boolean isAdmin = true;
+		testTeamMember.setIsAdmin(isAdmin);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
+		//make the call
+		TeamBundle bundle = synapseClient.getTeamBundle("myUserId", "myTeamId", true);
+		
+		//now verify round all values were returned in the bundle (based on the mocked service calls)
+		String membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		String teamJson = team.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		assertEquals(teamJson, bundle.getTeamJson());
+		assertEquals(membershipStatusJson, bundle.getTeamMembershipStatusJson());
+		assertEquals(isAdmin, bundle.isUserAdmin());
+		assertEquals(testMemberCount, bundle.getTotalMemberCount());
+	}
+	
+
+	
 }
