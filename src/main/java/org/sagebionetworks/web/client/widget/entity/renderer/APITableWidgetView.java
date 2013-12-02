@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -34,5 +35,6 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void pageBack();
 		void pageForward();
+		void columnConfigClicked(APITableColumnConfig columnConfig);
 	}
 }

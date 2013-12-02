@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 
 import static junit.framework.Assert.*;
 
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManager;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
@@ -52,13 +53,14 @@ public class APITableColumnManagerTest {
 		//before assert it's empty
 		assertTrue(manager.getColumnConfigs().isEmpty());  //sanity test
 		//if we only have a single input column, the display column name should be called that by default
-		manager.addColumnConfig(defaultRendererName, defaultInputColumnName, null);
+		manager.addColumnConfig(defaultRendererName, defaultInputColumnName, null, null);
 		assertTrue(manager.getColumnConfigs().size() == 1);  //sanity test
 		APITableColumnConfig newConfig = manager.getColumnConfigs().get(0);
 		verify(mockView).configure(anyList());
 		assertEquals(defaultInputColumnNamesSet, newConfig.getInputColumnNames());
 		assertEquals(defaultRendererName, newConfig.getRendererFriendlyName());
 		assertEquals(defaultInputColumnName, newConfig.getDisplayColumnName());
+		assertEquals(COLUMN_SORT_TYPE.NONE, newConfig.getSort());
 		
 		//now try deleting the thing
 		manager.deleteColumnConfig(newConfig);
@@ -71,9 +73,19 @@ public class APITableColumnManagerTest {
 		String myDisplayColumnName = "My Test";
 		assertTrue(manager.getColumnConfigs().isEmpty());  //sanity test
 		//if we only have a single input column, the display column name should be called that by default
-		manager.addColumnConfig(defaultRendererName, defaultInputColumnName, myDisplayColumnName);
+		manager.addColumnConfig(defaultRendererName, defaultInputColumnName, myDisplayColumnName, COLUMN_SORT_TYPE.ASC);
 		assertTrue(manager.getColumnConfigs().size() == 1);  //sanity test
 		APITableColumnConfig newConfig = manager.getColumnConfigs().get(0);
 		assertEquals(myDisplayColumnName, newConfig.getDisplayColumnName());
+		assertEquals(COLUMN_SORT_TYPE.ASC, newConfig.getSort());
 	}
+	
+	@Test
+	public void testSortTypeDesc() {
+		String myDisplayColumnName = "My Test";
+		manager.addColumnConfig(defaultRendererName, defaultInputColumnName, myDisplayColumnName, COLUMN_SORT_TYPE.DESC);
+		APITableColumnConfig newConfig = manager.getColumnConfigs().get(0);
+		assertEquals(COLUMN_SORT_TYPE.DESC, newConfig.getSort());
+	}
+
 }

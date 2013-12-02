@@ -95,6 +95,9 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 					sb.append(columnName);
 					sb.append(APITableConfig.COLUMN_NAMES_DELIMITER);
 				}
+				sb.append(APITableConfig.FIELD_DELIMITER);
+				sb.append(config.getSort().toString());
+
 				String columnConfigString = sb.toString();
 				if (columnConfigString != null && columnConfigString.trim().length() > 0)
 					descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, columnConfigString);
