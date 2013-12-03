@@ -758,6 +758,33 @@ public class SynapseClientImplTest {
         verify(mockSynapse).downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
  	}
      
+ 	@Test
+ 	public void testCreateV2WikiPageWithV1() throws Exception {
+ 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
+		Mockito.when(mockSynapse.createV2WikiPageWithV1(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
+		synapseClient.createV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+	    verify(mockSynapse).createV2WikiPageWithV1(anyString(), any(ObjectType.class), any(WikiPage.class));
+ 	}
+ 	
+ 	@Test
+ 	public void testUpdateV2WikiPageWithV1() throws Exception {
+ 		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
+		Mockito.when(mockSynapse.updateV2WikiPageWithV1(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
+		synapseClient.updateV2WikiPageWithV1("testId", ObjectType.ENTITY.toString(), wikiPageJson);
+		verify(mockSynapse).updateV2WikiPageWithV1(anyString(), any(ObjectType.class), any(WikiPage.class));
+ 	}
+ 	
+ 	@Test
+ 	public void getV2WikiPageAsV1() throws Exception {
+ 		Mockito.when(mockSynapse.getV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
+        synapseClient.getV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+        verify(mockSynapse).getV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+        
+        Mockito.when(mockSynapse.getVersionOfV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(page);
+        synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
+        verify(mockSynapse).getVersionOfV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
+ 	}
+ 	
 	private void resetUpdateExternalFileHandleMocks(String testId, FileEntity file, ExternalFileHandle handle) throws SynapseException, JSONObjectAdapterException {
 		reset(mockSynapse);
 		when(mockSynapse.getEntityById(testId)).thenReturn(file);

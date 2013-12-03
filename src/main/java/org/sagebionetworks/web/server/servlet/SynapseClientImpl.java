@@ -1547,6 +1547,80 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public String createV2WikiPageWithV1(String ownerId, String ownerType,
+             String wikiPageJson) throws IOException, RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+        try {
+	        JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+	        @SuppressWarnings("unchecked")
+	        WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
+	        WikiPage returnPage = synapseClient.createV2WikiPageWithV1(ownerId, ObjectType.valueOf(ownerType), page);
+	        return EntityFactory.createJSONStringForEntity(returnPage);
+        } catch (SynapseException e) {
+            throw ExceptionUtil.convertSynapseException(e);
+        } catch (JSONObjectAdapterException e) {
+            throw new UnknownErrorException(e.getMessage());
+        }
+	}
+	
+	@Override
+    public String updateV2WikiPageWithV1(String ownerId, String ownerType,
+            String wikiPageJson) throws IOException, RestServiceException {
+    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+	    try {
+	        JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+	        @SuppressWarnings("unchecked")
+	        WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
+	        WikiPage returnPage = synapseClient.updateV2WikiPageWithV1(ownerId, ObjectType.valueOf(ownerType), page);
+	        return EntityFactory.createJSONStringForEntity(returnPage);
+	    } catch (SynapseException e) {
+	        throw ExceptionUtil.convertSynapseException(e);
+	    } catch (JSONObjectAdapterException e) {
+	        throw new UnknownErrorException(e.getMessage());
+	    }
+    }
+
+	@Override
+    public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key)
+                    throws RestServiceException, IOException {
+        org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+        try {
+            if (key.getWikiPageId() == null) {
+                //asking for the root.  find the root id first
+                String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+                key.setWikiPageId(rootWikiPage);
+            }
+            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+            WikiPage returnPage = synapseClient.getV2WikiPageAsV1(properKey);
+            return EntityFactory.createJSONStringForEntity(returnPage);
+        } catch (SynapseException e) {
+            throw ExceptionUtil.convertSynapseException(e);
+        } catch (JSONObjectAdapterException e) {
+            throw new UnknownErrorException(e.getMessage());
+        }
+    }
+
+	@Override
+    public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
+    	throws RestServiceException, IOException {
+    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+    	try {
+            if (key.getWikiPageId() == null) {
+	            //asking for the root.  find the root id first
+	            String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+	            key.setWikiPageId(rootWikiPage);
+            }
+            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+            WikiPage returnPage = synapseClient.getVersionOfV2WikiPageAsV1(properKey, version);
+            return EntityFactory.createJSONStringForEntity(returnPage);
+	    } catch (SynapseException e) {
+	        throw ExceptionUtil.convertSynapseException(e);
+	    } catch (JSONObjectAdapterException e) {
+	        throw new UnknownErrorException(e.getMessage());
+	    }
+    }
+	
+	@Override
 	public String addFavorite(String entityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

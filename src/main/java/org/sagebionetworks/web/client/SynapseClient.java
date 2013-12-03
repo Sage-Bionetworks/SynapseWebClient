@@ -231,6 +231,11 @@ public interface SynapseClient extends RemoteService {
 	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
 	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
+	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public String updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
+	public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
+	
 	public String getFileEndpoint() throws RestServiceException;
 	
 	public String addFavorite(String entityId) throws RestServiceException;
