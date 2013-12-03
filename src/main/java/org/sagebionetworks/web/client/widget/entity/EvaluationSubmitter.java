@@ -43,6 +43,8 @@ public class EvaluationSubmitter implements Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
+	private String submissionEntityId, submitterAlias;
+	private Long submissionEntityVersion;
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
@@ -107,50 +109,41 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-				view.showErrorMessage(caught.getMessage());
+					view.showErrorMessage(caught.getMessage());
 			}
 		};
 	}
 	
 		
 	@Override
-	public void submitToEvaluations(final Reference selectedReference, final List<Evaluation> evaluations, final String submitterAlias) {
+	public void submitToEvaluations(Reference selectedReference, List<Evaluation> evaluations, String submitterAlias) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
-		String entityId;
-		Long version = null;
+		this.submitterAlias = submitterAlias; 
+		submissionEntityVersion = null;
 		if (submissionEntity != null) {
-			entityId = submissionEntity.getId();
+			submissionEntityId = submissionEntity.getId();
 			if (submissionEntity instanceof Versionable)
-				version = ((Versionable)submissionEntity).getVersionNumber();
+				submissionEntityVersion = ((Versionable)submissionEntity).getVersionNumber();
 		}
 		else {
-			entityId = selectedReference.getTargetId();
-			version = selectedReference.getTargetVersionNumber();
-		}
-		
-		final String id = entityId;
-		final Long ver = version;
-		final String[] evaluationIds = new String[evaluations.size()];
-		for(int i = 0; i < evaluationIds.length; i++) {
-			evaluationIds[i] = evaluations.get(i).getId();
+			submissionEntityId = selectedReference.getTargetId();
+			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
 		
 		 //Check access requirements for evaluations before moving on with submission
 		 try {
-			 checkForUnmetRequirements(0, evaluationIds);
+			 checkForUnmetRequirements(0, evaluations);
 		 } catch(RestServiceException e) {
 			 view.showErrorMessage(DisplayConstants.EVALUATION_SUBMISSION_ERROR + e.getMessage());
 		 }
-		
-		lookupEtag(id, ver, evaluations, submitterAlias); 
 	}
 	
 	/**
 	* Check for unmet access restrictions. As long as more exist, it will not move onto submissions.
 	* @throws RestServiceException
 	*/
-	public void checkForUnmetRequirements(final int evalIndex, final String[] evaluationIds) throws RestServiceException {
-		synapseClient.getUnmetEvaluationAccessRequirements(evaluationIds[evalIndex], new AsyncCallback<String>() {
+	public void checkForUnmetRequirements(final int evalIndex, final List<Evaluation> evaluations) throws RestServiceException {
+		synapseClient.getUnmetEvaluationAccessRequirements(evaluations.get(evalIndex).getId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
@@ -164,14 +157,17 @@ public class EvaluationSubmitter implements Presenter {
 							@Override
 							public void invoke() {
 								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement.getId(), evalIndex, evaluationIds);
+								setLicenseAccepted(firstUnmetAccessRequirement.getId(), evalIndex, evaluations);
 							}
 						};
 						//pop up the requirement
 						view.showAccessRequirement(text, termsOfUseCallback);
 					} else {
-						if (evalIndex != evaluationIds.length - 1) {
-							checkForUnmetRequirements(evalIndex+1, evaluationIds);
+						if (evalIndex != evaluations.size() - 1) {
+							checkForUnmetRequirements(evalIndex+1, evaluations);
+						} else {
+							//we have gone through all unmet access requirements for all evaluations.
+							lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations, submitterAlias);
 						}
 					}
 				} catch(Throwable e) {
@@ -186,7 +182,7 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void setLicenseAccepted(Long	arId, final int evalIndex, final String[] evaluationIds) {	
+	public void setLicenseAccepted(Long	arId, final int evalIndex, final List<Evaluation> evaluations) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -199,7 +195,7 @@ public class EvaluationSubmitter implements Presenter {
 			public void invoke() {
 				//ToU signed, now try to submit evaluations (checks for other unmet access restrictions before submission)
 				try {
-					checkForUnmetRequirements(evalIndex, evaluationIds);
+					checkForUnmetRequirements(evalIndex, evaluations);
 				} catch (RestServiceException e) {
 					onFailure.invoke(e);
 				}
@@ -215,7 +211,7 @@ public class EvaluationSubmitter implements Presenter {
 				jsonObjectAdapter);
 	}
 	
-	public void lookupEtag(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
