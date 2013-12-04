@@ -500,7 +500,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			}));
 	    	menu.add(getNewCommand("Join Team Button", new SelectionListener<ComponentEvent>() {
 		    	public void componentSelected(ComponentEvent ce) {
-		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY + "=true&" +WidgetConstants.IS_MEMBER_MESSAGE + "=You have successfully joined the challenge" + WidgetConstants.WIDGET_END_MARKDOWN);
+		    		insertMarkdown(WidgetConstants.WIDGET_START_MARKDOWN + WidgetConstants.JOIN_TEAM_CONTENT_TYPE + "?"+WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY + "=42&" + WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY + "=true&" +WidgetConstants.IS_MEMBER_MESSAGE + "=You have successfully joined the challenge&" + WidgetConstants.JOIN_TEAM_BUTTON_TEXT + "="+WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT+"&" +WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE + "="+WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE + WidgetConstants.WIDGET_END_MARKDOWN);
 		    	};
 			}));
 	    	menu.add(getNewCommand("Submit To Evaluation Button", new SelectionListener<ComponentEvent>() {
