@@ -33,7 +33,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private V2WikiPage wikiPage;
+	private WikiPage wikiPage;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
 	private Callback callback;
@@ -58,7 +58,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, V2WikiPage wikiPage, Callback callback) {
+	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
 		this.wikiPage = wikiPage;
 		this.wikiKey = wikiKey;
 		if (callback == null) {
@@ -124,12 +124,12 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			}
 
 			// update wiki page minus attachment
-			synapseClient.updateV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
+			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
 					try{
-						V2WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
+						WikiPage updatedPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 						configure(wikiKey, updatedPage, callback);
 						callback.attachmentDeleted(fileName);
 					} catch (JSONObjectAdapterException e) {

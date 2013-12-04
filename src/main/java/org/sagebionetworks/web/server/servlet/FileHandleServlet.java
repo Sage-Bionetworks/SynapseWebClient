@@ -248,11 +248,11 @@ public class FileHandleServlet extends HttpServlet {
 					ObjectType type = ObjectType.valueOf(ownerType);
 					String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-					V2WikiPage page = client.getV2WikiPage(properKey);
+					WikiPage page = client.getV2WikiPageAsV1(properKey);
 					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
 					if (!fileHandleIds.contains(newFileHandle.getId()))
 						fileHandleIds.add(newFileHandle.getId());
-					client.updateV2WikiPage(ownerId, type, page);
+					client.updateV2WikiPageWithV1(ownerId, type, page);
 				}
 				else if (isCreateEntity) {
 					//create the file entity

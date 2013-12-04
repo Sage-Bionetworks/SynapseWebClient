@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -28,9 +28,9 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void editClicked();
 	}
 	
-	public void configure(V2WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription, String markdown);
+	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);
 	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();
-	public void updateWikiPage(V2WikiPage newPage, String markdown);
+	public void updateWikiPage(WikiPage newPage);
 }

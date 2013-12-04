@@ -67,29 +67,29 @@ public class WikiAttachmentsTest {
 		testResults.setList(handles);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(FileHandleResults.class))).thenReturn(testResults);
 		
-		V2WikiPage testPage = new V2WikiPage();
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(V2WikiPage.class))).thenReturn(testPage);
+		WikiPage testPage = new WikiPage();
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(WikiPage.class))).thenReturn(testPage);
 		// setup the entity editor with 
 		presenter = new WikiAttachments(mockView, mockSynapseClient, mockGlobalAppState, mockAuthenticationController, mockJSONObjectAdapter, mockNodeModelCreator);
 	}
 
 	@Test
 	public void testConfigure() {
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
 	@Test
 	public void testConfigureFail() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new V2WikiPage(), null);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
 		presenter.deleteAttachment("a file");
-		verify(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 }

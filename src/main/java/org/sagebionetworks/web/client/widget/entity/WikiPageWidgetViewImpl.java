@@ -64,8 +64,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
-	private V2WikiPage currentPage;
-	private String currentMarkdown;
+	private WikiPage currentPage;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
@@ -128,8 +127,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(V2WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, String markdown) {
+	public void configure(WikiPage newPage, WikiPageKey wikiKey,
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -137,17 +136,14 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
-		this.currentMarkdown = markdown;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		final WikiPageKey finalKey = wikiKey;
-		markdownWidget.setMarkdown(currentMarkdown, finalKey, true, false);
+		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
 	}
 	
 	@Override
-	public void updateWikiPage(V2WikiPage newPage, String markdown){
+	public void updateWikiPage(WikiPage newPage){
 		currentPage = newPage;
-		currentMarkdown = markdown;
 	}
 	
 	private void showDefaultViewWithWiki() {
@@ -232,7 +228,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
-				mdField.setValue(currentMarkdown);
+				mdField.setValue(currentPage.getMarkdown());
 				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
 				

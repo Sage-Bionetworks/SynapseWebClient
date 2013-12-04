@@ -92,27 +92,13 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview) {
 		//get the wiki page
-		synapseClient.getV2WikiPage(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					V2WikiPage page = nodeModelCreator.createJSONEntity(result, V2WikiPage.class);
+					WikiPage page = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 					wikiKey.setWikiPageId(page.getId());
-					try {
-						synapseClient.getMarkdown(wikiKey, new AsyncCallback<String>() {
-							@Override
-							public void onSuccess(String result) {
-								setMarkdown(result, wikiKey, true, isPreview);
-							}
-							@Override
-							public void onFailure(Throwable caught) {
-								MarkdownWidget.this.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
-							}	
-						});
-						
-					} catch (Exception e) {
-						onFailure(e);
-					}
+					setMarkdown(page.getMarkdown(), wikiKey, true, isPreview);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
