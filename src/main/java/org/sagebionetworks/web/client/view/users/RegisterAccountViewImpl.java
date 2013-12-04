@@ -53,20 +53,22 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	private Header headerWidget;
 	private Footer footerWidget;
 	private SageImageBundle sageImageBundle;
-
+	private UsernameTextField usernameTextField; 
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter, SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter, SageImageBundle imageBundle, SageImageBundle sageImageBundle, UsernameTextField usernameTextField) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = iconsImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
+		this.usernameTextField = usernameTextField;
 		
 		// header setup
 		header.clear();
 		footer.clear();
 		headerWidget.configure(false);
+		usernameTextField.configure(null);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 	}
@@ -77,6 +79,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		this.presenter = presenter;
 		headerWidget.configure(false);
 		headerWidget.refresh();
+		usernameTextField.configure(null);
 	}
 
 	@Override
@@ -133,6 +136,8 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     layout.setLabelWidth(100);  
 		     fieldSet.setLayout(layout);  
 		     
+		     fieldSet.add(usernameTextField.asWidget(), formData);
+		     
 		     final TextField<String> email = new TextField<String>();  
 		     email.setFieldLabel("Email Address");
 		     email.setAllowBlank(false);
@@ -188,7 +193,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	private boolean validateForm(TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
 		if (email.getValue() != null && email.getValue().length() > 0
 				&& firstName.getValue() != null && firstName.getValue().length() > 0
-				&& lastName.getValue() != null && lastName.getValue().length() > 0) {
+				&& lastName.getValue() != null && lastName.getValue().length() > 0 && usernameTextField.validate()) {
 			return true;
 		}
 		return false;

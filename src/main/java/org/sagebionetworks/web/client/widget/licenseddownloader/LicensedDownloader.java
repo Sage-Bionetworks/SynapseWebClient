@@ -281,7 +281,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	public Callback getRequestAccessCallback() {
 		final String jiraLink = jiraUrlHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
-				userProfile.getDisplayName(), 
+				DisplayUtils.getDisplayName(userProfile), 
 				userProfile.getUserName(), 
 				entityId, 
 				accessRequirementToDisplay.getId().toString());

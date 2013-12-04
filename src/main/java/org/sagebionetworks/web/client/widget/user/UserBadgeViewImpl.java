@@ -47,9 +47,10 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		
 		if(profile != null) {
-			String name = maxNameLength == null ? profile.getDisplayName() : DisplayUtils.stubStrPartialWord(profile.getDisplayName(), maxNameLength); 
+			String displayName = DisplayUtils.getDisplayName(profile);
+			String name = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
 			
-			Widget nameWidget;	
+			Widget nameWidget;
 			final Anchor userAnchor = new Anchor();
 			if(profile.getOwnerId() != null) {				
 				userAnchor.setText(name);

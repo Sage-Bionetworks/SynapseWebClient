@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -545,6 +546,18 @@ public class DisplayUtils {
 	    box.setMinWidth(minWidth);
 	    box.show();
 
+	}
+	
+	public static String getDisplayName(UserProfile profile) {
+		StringBuilder sb = new StringBuilder();
+		if (profile.getFirstName() != null) {
+			sb.append(profile.getFirstName());
+		}
+		if (profile.getLastName() != null) {
+			sb.append(" ");
+			sb.append(profile.getLastName());
+		}
+		return sb.toString();
 	}
 	
 	/**
