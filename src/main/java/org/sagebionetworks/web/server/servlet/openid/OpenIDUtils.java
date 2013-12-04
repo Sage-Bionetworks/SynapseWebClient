@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.openid4java.OpenIDException;
 import org.sagebionetworks.authutil.OpenIDConsumerUtils;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -64,12 +65,13 @@ public class OpenIDUtils {
 	}
 
 	public static String createErrorRedirectURL(String returnToURL,
-			boolean isGWTMode) throws URISyntaxException {
+			boolean isGWTMode, Exception e) throws URISyntaxException {
 		String redirectUrl = null;
+		String errorToken = e instanceof SynapseNotFoundException ? WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN : WebConstants.OPEN_ID_ERROR_TOKEN; 
 		if (isGWTMode) {
-			redirectUrl = returnToURL + ":" + WebConstants.OPEN_ID_ERROR_TOKEN;
+			redirectUrl = returnToURL + ":" + errorToken;
 		} else {
-			redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + WebConstants.OPEN_ID_ERROR_TOKEN);
+			redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + errorToken);
 		}
 		return redirectUrl;
 	}
@@ -107,7 +109,7 @@ public class OpenIDUtils {
 			// Send all the Open ID info to the repository services
 			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
-					URLDecoder.decode(request.getQueryString(), "UTF-8"), true);
+					URLDecoder.decode(request.getQueryString(), "UTF-8"), false);
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
@@ -125,7 +127,7 @@ public class OpenIDUtils {
 				}
 				throw new RuntimeException(e);
 			} else {
-				String redirectUrl = createErrorRedirectURL(returnToURL, isGWTMode);
+				String redirectUrl = createErrorRedirectURL(returnToURL, isGWTMode, e);
 				String location = response.encodeRedirectURL(redirectUrl);
 				response.sendRedirect(location);
 			}
