@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdated
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -54,9 +55,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	@Override
-	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage) {
+	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText) {
 		clear();
-		initView();
+		String joinButtonText = buttonText == null ? WidgetConstants.JOIN_TEAM_DEFAULT_BUTTON_TEXT : buttonText;
+		initView(joinButtonText);
 		
 		if (isLoggedIn) {
 			//(note:  in all cases, clicking UI will check for unmet ToU)
@@ -105,10 +107,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	    box.show();
 	}
 	
-	private void initView() {
+	private void initView(String joinButtonText) {
 		if (requestUIPanel == null) {
 			
-			anonymousUserButton = DisplayUtils.createButton("Join", ButtonType.PRIMARY);
+			anonymousUserButton = DisplayUtils.createButton(joinButtonText, ButtonType.PRIMARY);
 			anonymousUserButton.addStyleName("btn-lg");
 			anonymousUserButton.addClickHandler(new ClickHandler() {
 				@Override
@@ -118,7 +120,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				}
 			});
 			
-			acceptInviteButton = DisplayUtils.createButton("Join", ButtonType.PRIMARY);
+			acceptInviteButton = DisplayUtils.createButton(joinButtonText, ButtonType.PRIMARY);
 			acceptInviteButton.addStyleName("btn-lg");
 			acceptInviteButton.addClickHandler(new ClickHandler() {
 				@Override
