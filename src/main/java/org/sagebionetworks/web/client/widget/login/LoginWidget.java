@@ -50,36 +50,67 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onSuccess(String result) {
 				view.clear();
-				UserSessionData userSessionData = null;
+				UserSessionData toBeParsed = null;
 				if (result != null){
 					try {
-						userSessionData = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
+						toBeParsed = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
+				final UserSessionData userSessionData = toBeParsed;
 				
 				if (!userSessionData.getSession().getAcceptsTermsOfUse()) {
 					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 						public void onSuccess(String termsOfUseContent) {
-							final AsyncCallback<Void> toUCallback = new AsyncCallback<Void> () {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									view.showError("An error occurred. Please try logging in again.");
-								}
-
-								@Override
-								public void onSuccess(Void result) {}
-								
-							};
 							view.showTermsOfUse(termsOfUseContent, 
 									new AcceptTermsOfUseCallback() {
 										public void accepted() {
-											authenticationController.signTermsOfUse(true, toUCallback);
+											authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													view.showError("An error occurred. Please try logging in again.");
+												}
+
+												@Override
+												public void onSuccess(Void result) {
+													// Have to get the UserSessionData again, 
+													// since it won't contain the UserProfile if the terms haven't been signed
+													authenticationController.loginUserSSO(userSessionData.getSession().getSessionToken(), new AsyncCallback<String>() {
+
+														@Override
+														public void onFailure(
+																Throwable caught) {
+															view.showError("An error occurred. Please try logging in again.");
+														}
+
+														@Override
+														public void onSuccess(
+																String result) {
+															// All setup complete
+															fireUserChange(userSessionData);
+														}	
+														
+													});
+												}
+												
+											});
 										}
 										public void rejected() {
-											authenticationController.signTermsOfUse(false, toUCallback);
+											authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													view.showError("An error occurred. Please try logging in again.");
+												}
+
+												@Override
+												public void onSuccess(Void result) {
+													authenticationController.logoutUser();
+												}
+												
+											});
 										}
 									});							
 						}
@@ -87,8 +118,9 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 							view.showTermsOfUseDownloadFailed();							
 						}
 					});
+				} else {
+					fireUserChange(userSessionData);
 				}
-				fireUserChage(userSessionData);				
 			}
 
 			@Override
@@ -104,7 +136,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	// needed?
-	private void fireUserChage(UserSessionData user) {
+	private void fireUserChange(UserSessionData user) {
 		for(UserListener listener: listeners){
 			listener.userChanged(user);
 		}

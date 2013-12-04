@@ -638,6 +638,8 @@ public class DisplayConstants {
 	public static final String SIGNING_IN = "Signing in...";
 	public static final String NEW = "new";
 	public static final String DETAILS_UNAVAILABLE = "Details unavailable";	 	
+	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
+	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
 	
 }
 

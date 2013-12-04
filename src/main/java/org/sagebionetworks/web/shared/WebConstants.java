@@ -51,6 +51,7 @@ public class WebConstants {
 	 * 
 	 */
 	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
 
 	
 	public static final String OPEN_ID_URI = "/Portal/openid";
