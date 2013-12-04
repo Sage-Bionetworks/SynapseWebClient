@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -16,6 +17,8 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
+import org.sagebionetworks.web.shared.TableObject;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -48,7 +51,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
-			ActionMenu actionMenu) {		
+			ActionMenu actionMenu, PortalGinInjector ginInjector) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -60,11 +63,14 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
-		FileEntity fake = new FileEntity();
-		fake.setId("syn123");
-		fake.setName("fake");
-		EntityBundle bundle = new EntityBundle(fake, null, null, null, null, null, null);
-		entityView.setWidget(actionMenu.asWidget(bundle, true, true, new Long(1)));
+		
+		SynapseTableWidget tableWidget = ginInjector.getSynapseTableWidget();
+		TableObject table = new TableObject();
+		table.setId("12345");
+		table.setName("Example Table");
+		table.setCreatedByPrincipalId("2337773");
+		tableWidget.configure(table);
+		entityView.setWidget(tableWidget.asWidget());
 	}
 
 	@Override
