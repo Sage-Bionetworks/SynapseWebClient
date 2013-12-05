@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +14,8 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -100,6 +94,8 @@ public class HomePresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
 		
+		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
+		
 		openInvitations = new ArrayList<MembershipInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		
@@ -177,4 +173,18 @@ public class HomePresenterTest {
 		homePresenter.isOpenTeamInvites(mockCallback);
 		verify(mockCallback).invoke(eq(true));
 	}
+	
+	@Test
+	public void testGetChallengeProjectHeaders() {
+		homePresenter.getChallengeProjectHeaders(new ArrayList<String>());
+		verify(mockView).setMyChallenges(anyList());
+	}
+	
+	@Test
+	public void testGetChallengeProjectHeadersFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
+		homePresenter.getChallengeProjectHeaders(new ArrayList<String>());
+		verify(mockView).setMyChallengesError(anyString());
+	}
+
 }
