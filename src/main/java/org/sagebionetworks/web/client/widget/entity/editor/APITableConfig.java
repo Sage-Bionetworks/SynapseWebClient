@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 
@@ -15,7 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingU
  */
 public class APITableConfig {
 	private String uri, jsonResultsArrayKeyName, cssStyleName, rowNumberColName;
-	private boolean isPaging, isShowRowNumber;
+	private boolean isPaging, isShowRowNumber,isQueryTableResults,isShowOnlyIfLoggedIn;
 	private int offset, pageSize;
 	private List<APITableColumnConfig> columnConfigs;
 	public final static String COLUMN_NAMES_DELIMITER = ";";	
@@ -38,6 +39,17 @@ public class APITableConfig {
 						pageSize = 10;
 				}	
 			}
+			isQueryTableResults = false;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS)){
+				isQueryTableResults = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS));
+			}
+			
+			isShowOnlyIfLoggedIn = false;
+			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN)){
+				isShowOnlyIfLoggedIn = Boolean.parseBoolean(descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN));
+			}
+
+			
 			isShowRowNumber = false;
 			rowNumberColName = "";
 			if (descriptor.containsKey(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY)){
@@ -78,7 +90,9 @@ public class APITableConfig {
 					inputColumnNames.add(inputColumns[j]);
 				}
 				config.setInputColumnNames(inputColumnNames);
-				
+				if (parts.length > 3) {
+					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3]));
+				} else config.setSort(COLUMN_SORT_TYPE.NONE);
 				columnConfigs.add(config);
 			} catch (Throwable t) {
 				throw new RuntimeException(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i+":"+t.getMessage(), t);
@@ -123,6 +137,23 @@ public class APITableConfig {
 	public boolean isPaging() {
 		return isPaging;
 	}
+	
+	public boolean isQueryTableResults() {
+		return isQueryTableResults;
+	}
+	
+	public void setQueryTableResults(boolean isQueryTableResults) {
+		this.isQueryTableResults = isQueryTableResults;
+	}
+	
+	public boolean isShowOnlyIfLoggedIn() {
+		return isShowOnlyIfLoggedIn;
+	}
+	
+	public void setShowOnlyIfLoggedIn(boolean isShowOnlyIfLoggedIn) {
+		this.isShowOnlyIfLoggedIn = isShowOnlyIfLoggedIn;
+	}
+
 
 	public void setPaging(boolean isPaging) {
 		this.isPaging = isPaging;

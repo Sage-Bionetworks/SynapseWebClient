@@ -1,21 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -28,6 +27,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -58,6 +58,8 @@ public class APITableWidgetTest {
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
+	String col1Name ="column 1";
+	String col2Name ="column 2";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -114,6 +116,7 @@ public class APITableWidgetTest {
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor, null);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -189,18 +192,151 @@ public class APITableWidgetTest {
 	@Test
 	public void testPagingURI() throws JSONObjectAdapterException {
 		widget.configure(testWikiKey, descriptor, null);
-		String pagedURI = widget.getPagedURI();
+		String pagedURI = widget.getPagedURI(TESTSERVICE_PATH);
 		assertEquals(TESTSERVICE_PATH + "?limit=10&offset=0", pagedURI.toLowerCase());
 	}
 	
 	@Test
 	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
-		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
 		widget.configure(testWikiKey, descriptor, null);
-		String pagedURI = widget.getPagedURI();
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
+		String pagedURI = widget.getPagedURI(testServiceCall);
 		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
 	}
+	
+	@Test
+	public void testCurrentUserVariable() throws JSONObjectAdapterException {
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project+where+userId==" + APITableWidget.CURRENT_USER_SQL_VARIABLE;
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String testUserId = "12345test";
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		widget.configure(testWikiKey, descriptor, null);
+		
+		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		
+		assertTrue(arg.getValue().endsWith(testUserId));
+	}
+	
+	@Test
+	public void testLoggedInOnly() throws JSONObjectAdapterException {
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, "true");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		widget.configure(testWikiKey, descriptor, null);
+		
+		verify(mockView).clear();
+		verify(mockView, times(0)).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
+	}
+	
+	private Set<String> getTestColumnNameSet() {
+		Set<String> testSet = new HashSet<String>();
+		testSet.add(col1Name);
+		testSet.add(col2Name);
+		return testSet;
+	}
+	
+	@Test
+	public void testCreateColumnDataMap() throws JSONObjectAdapterException {
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		assertEquals(2, dataMap.keySet().size());
+		assertEquals(new ArrayList<String>(), dataMap.get(col1Name));
+	}
+	
+	@Test
+	public void testCreateColumnDataMapEmptyOrNull() throws JSONObjectAdapterException {
+		Map emptyMap = new HashMap<String, String>();
+		Set<String> emptyTestSet = new HashSet<String>();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(emptyTestSet.iterator());
+		assertEquals(emptyMap, dataMap);
+		dataMap = widget.createColumnDataMap(null);
+		assertEquals(emptyMap, dataMap);
+	}
+	
+	
+	@Test
+	public void testCreateRenderersNull() throws JSONObjectAdapterException {
+		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		APITableConfig newConfig = new APITableConfig(descriptor);
+		newConfig.setColumnConfigs(null);
+		widget.createRenderers(columnNames, newConfig, mockGinInjector);
+		//should have tried to create two default renderers (NONE)
+		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
+	}
 
+	@Test
+	public void testCreateRenderersEmpty() throws JSONObjectAdapterException {
+		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		APITableConfig newConfig = new APITableConfig(descriptor);
+		newConfig.setColumnConfigs(new ArrayList());
+		widget.createRenderers(columnNames, newConfig, mockGinInjector);
+		//should have tried to create two default renderers (NONE)
+		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
+	}
+
+	private APITableConfig getTableConfig() {
+		APITableConfig tableConfig = new APITableConfig(descriptor);
+		List<APITableColumnConfig> configList = new ArrayList<APITableColumnConfig>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		Set<String> inputColName = new HashSet<String>();
+		inputColName.add(col1Name);
+		columnConfig.setInputColumnNames(inputColName);
+		columnConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
+		configList.add(columnConfig);
+		
+		columnConfig = new APITableColumnConfig();
+		inputColName = new HashSet<String>();
+		inputColName.add(col2Name);
+		columnConfig.setInputColumnNames(inputColName);
+		columnConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
+		configList.add(columnConfig);
+		
+		tableConfig.setColumnConfigs(configList);
+		return tableConfig;
+	}
+	@Test
+	public void testCreateRenderer() throws JSONObjectAdapterException {
+		String[] columnNames = new String[]{col1Name, col2Name};
+		
+		widget.createRenderers(columnNames, getTableConfig(), mockGinInjector);
+		//should have tried to create a user id renderer (based on the table configuration)
+		verify(mockGinInjector).getAPITableColumnRendererUserId();
+		verify(mockGinInjector).getAPITableColumnRendererSynapseID();
+	}
+	
+	@Test
+	public void testOrderByURINotQueryService() throws JSONObjectAdapterException {
+		APITableConfig tableConfig = getTableConfig();
+		String inputUri = "/evaluation";
+		assertEquals(inputUri, widget.getOrderedByURI(inputUri, tableConfig));
+		inputUri = "";
+		assertEquals(inputUri, widget.getOrderedByURI(inputUri, tableConfig));
+	}
+	
+	@Test
+	public void testOrderByURIWithQueryService() throws JSONObjectAdapterException {
+		APITableConfig tableConfig = getTableConfig();
+		//and set a sort column
+		APITableColumnConfig sortColumnConfig = tableConfig.getColumnConfigs().get(1);
+		sortColumnConfig.setSort(COLUMN_SORT_TYPE.DESC);
+		String inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project";
+		String outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(outputUri.contains("order+by+"));
+		assertTrue(outputUri.contains("desc"));
+		
+		inputUri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_123";
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(outputUri.contains("order+by+"));
+		assertTrue(outputUri.contains("desc"));
+		
+		sortColumnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertFalse(outputUri.contains("order+by+"));
+		assertFalse(outputUri.contains("desc"));
+	}
+	
 	
 }

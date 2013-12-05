@@ -38,6 +38,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
@@ -69,6 +70,8 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserGroup;
@@ -108,6 +111,7 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -1076,4 +1080,62 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createMembershipRequest(any(MembershipRqstSubmission.class));
 	}
 
+	@Test
+	public void testGetOpenRequestCountUnauthorized() throws SynapseException, RestServiceException {
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenThrow(new SynapseForbiddenException());
+		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
+		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		assertNull(count);
+	}
+
+	@Test
+	public void testGetOpenRequestCount() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		Long testCount = 42L;
+		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
+		testOpenRequests.setTotalNumberOfResults(testCount);
+		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(testOpenRequests);
+		
+		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
+		
+		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		assertEquals(testCount, count);
+	}
+	
+	@Test
+	public void testGetTeamBundle() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//set team member count
+		Long testMemberCount = 111L;
+		PaginatedResults<TeamMember> allMembers = new PaginatedResults<TeamMember>();
+		allMembers.setTotalNumberOfResults(testMemberCount);
+		when(mockSynapse.getTeamMembers(anyString(), anyString(), anyLong(), anyLong())).thenReturn(allMembers);
+		
+		//set team
+		Team team = new Team();
+		team.setId("test team id");
+		when(mockSynapse.getTeam(anyString())).thenReturn(team);
+		
+		//is member
+		TeamMembershipStatus membershipStatus = new TeamMembershipStatus();
+		membershipStatus.setIsMember(true);
+		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		//is admin
+		TeamMember testTeamMember = new TeamMember();
+		boolean isAdmin = true;
+		testTeamMember.setIsAdmin(isAdmin);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
+		//make the call
+		TeamBundle bundle = synapseClient.getTeamBundle("myUserId", "myTeamId", true);
+		
+		//now verify round all values were returned in the bundle (based on the mocked service calls)
+		String membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		String teamJson = team.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		assertEquals(teamJson, bundle.getTeamJson());
+		assertEquals(membershipStatusJson, bundle.getTeamMembershipStatusJson());
+		assertEquals(isAdmin, bundle.isUserAdmin());
+		assertEquals(testMemberCount, bundle.getTotalMemberCount());
+	}
+	
+
+	
 }

@@ -45,27 +45,13 @@ public class WebConstants {
 	public static final String URL_PROTOCOL = "http://";
 	
 	// OpenID related constants
-
-	/**
-	 * name of a web request parameter indicating that the user accepts the terms of use.
-	 * Passed at the initiation of OpenID authentication.
-	 * 
-	 */
-	public static final String ACCEPTS_TERMS_OF_USE_PARAM = "acceptsTermsOfUse";
-
-	/**
-	 * A token built into the redirect URL by the authentication controller at the end of OpenID
-	 * authentication to indicate that the Synapse Terms of Use have not been signed.
-	 * 
-	 */
-	public static final String ACCEPTS_TERMS_OF_USE_REQUIRED_TOKEN = "TermsOfUseAcceptanceRequired";
-
 	/**
 	 * A token built into the redirect URL by the authentication controller at the end of OpenID
 	 * authentication to indicate that an error has occurred.
 	 * 
 	 */
 	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
 
 	
 	public static final String OPEN_ID_URI = "/Portal/openid";

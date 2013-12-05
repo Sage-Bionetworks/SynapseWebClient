@@ -41,7 +41,7 @@ public class WidgetConstants {
 	public static final String ENTITYLIST_FRIENDLY_NAME ="Entity List";
 	
 	public static final String SHINYSITE_CONTENT_TYPE = "iframe";
-	public static final String SHINYSITE_FRIENDLY_NAME ="Shiny Site";
+	public static final String SHINYSITE_FRIENDLY_NAME ="External Website";
 
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
@@ -78,6 +78,10 @@ public class WidgetConstants {
 	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";
 	public static final String IS_MEMBER_MESSAGE = "isMemberMessage";
+	public static final String JOIN_TEAM_BUTTON_TEXT = "text";
+	public static final String JOIN_TEAM_DEFAULT_BUTTON_TEXT = "Join";
+	public static final String JOIN_TEAM_SUCCESS_MESSAGE = "successMessage";
+	public static final String JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE = "Invitation Accepted";
 	public static final String JOIN_WIDGET_SHOW_PROFILE_FORM_KEY = "showProfileForm";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_KEY = "subchallengeIdList";
 	public static final String JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER = ",";
@@ -98,6 +102,8 @@ public class WidgetConstants {
 	public static final String YOUTUBE_WIDGET_VIDEO_ID_KEY = "videoId";
 	public static final String API_TABLE_WIDGET_PATH_KEY = "path";
 	public static final String API_TABLE_WIDGET_PAGING_KEY = "paging";
+	public static final String API_TABLE_WIDGET_QUERY_TABLE_RESULTS = "queryTableResults";
+	public static final String API_TABLE_WIDGET_SHOW_IF_LOGGED_IN = "showIfLoggedInOnly";
 	public static final String API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY = "showRowNumber";
 	public static final String API_TABLE_WIDGET_RESULTS_KEY = "jsonResultsKeyName";
 	public static final String API_TABLE_WIDGET_CSS_STYLE = "cssStyle";
@@ -124,6 +130,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_NONE = "none";
 	public static final String API_TABLE_COLUMN_RENDERER_USER_ID = "userid";
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
+	public static final String API_TABLE_COLUMN_RENDERER_EPOCH_DATE = "epochdate";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
 	

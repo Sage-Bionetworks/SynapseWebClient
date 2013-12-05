@@ -48,6 +48,8 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		view.checkParams();
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, view.getApiUrl());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS, view.isQueryTableResults().toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, view.isShowIfLoggedInOnly().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, view.getPageSize());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
@@ -93,6 +95,9 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 					sb.append(columnName);
 					sb.append(APITableConfig.COLUMN_NAMES_DELIMITER);
 				}
+				sb.append(APITableConfig.FIELD_DELIMITER);
+				sb.append(config.getSort().toString());
+
 				String columnConfigString = sb.toString();
 				if (columnConfigString != null && columnConfigString.trim().length() > 0)
 					descriptor.put(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i, columnConfigString);

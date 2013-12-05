@@ -9,8 +9,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
@@ -47,41 +45,88 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 	
 	@Override
-	public void setUsernameAndPassword(final String username, final String password, final boolean explicitlyAcceptsTermsOfUse) {		
-		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {
+	public void setUsernameAndPassword(final String username, final String password) {		
+		authenticationController.loginUser(username, password, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				view.clear();
-				UserSessionData userSessionData = null;
+				UserSessionData toBeParsed = null;
 				if (result != null){
 					try {
-						userSessionData = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
+						toBeParsed = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
-				fireUserChage(userSessionData);				
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.clear();
-				if (caught instanceof TermsOfUseException) {
+				final UserSessionData userSessionData = toBeParsed;
+				
+				if (!userSessionData.getSession().getAcceptsTermsOfUse()) {
 					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-						public void onSuccess(String termsOfUseContent) {	
+						public void onSuccess(String termsOfUseContent) {
 							view.showTermsOfUse(termsOfUseContent, 
 									new AcceptTermsOfUseCallback() {
-										public void accepted() {setUsernameAndPassword(username, password, true);}
+										public void accepted() {
+											authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													view.showError("An error occurred. Please try logging in again.");
+												}
+
+												@Override
+												public void onSuccess(Void result) {
+													// Have to get the UserSessionData again, 
+													// since it won't contain the UserProfile if the terms haven't been signed
+													authenticationController.loginUserSSO(userSessionData.getSession().getSessionToken(), new AsyncCallback<String>() {
+
+														@Override
+														public void onFailure(
+																Throwable caught) {
+															view.showError("An error occurred. Please try logging in again.");
+														}
+
+														@Override
+														public void onSuccess(
+																String result) {
+															// All setup complete
+															fireUserChange(userSessionData);
+														}	
+														
+													});
+												}
+												
+											});
+										}
+										public void rejected() {
+											authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													view.showError("An error occurred. Please try logging in again.");
+												}
+
+												@Override
+												public void onSuccess(Void result) {
+													authenticationController.logoutUser();
+												}
+												
+											});
+										}
 									});							
 						}
 						public void onFailure(Throwable t) {
 							view.showTermsOfUseDownloadFailed();							
 						}
 					});
-
 				} else {
-					view.showAuthenticationFailed();
+					fireUserChange(userSessionData);
 				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.clear();
+				view.showAuthenticationFailed();
 			}
 		});
 	}
@@ -91,7 +136,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	// needed?
-	private void fireUserChage(UserSessionData user) {
+	private void fireUserChange(UserSessionData user) {
 		for(UserListener listener: listeners){
 			listener.userChanged(user);
 		}
@@ -113,11 +158,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	@Override
 	public String getOpenIdReturnUrl() {
 		return openIdReturnUrl;
-	}
-
-	@Override
-	public void acceptTermsOfUse() {
-		view.acceptTermsOfUse();
 	}
 
 	@Override

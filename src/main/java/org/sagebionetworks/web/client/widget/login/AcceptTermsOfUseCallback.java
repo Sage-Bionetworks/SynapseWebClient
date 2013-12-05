@@ -10,4 +10,5 @@ package org.sagebionetworks.web.client.widget.login;
  */
 public interface AcceptTermsOfUseCallback {
 	void accepted();
+	void rejected();
 }
