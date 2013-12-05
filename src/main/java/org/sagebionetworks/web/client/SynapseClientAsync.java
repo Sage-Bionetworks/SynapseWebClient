@@ -1,6 +1,7 @@
 
 package org.sagebionetworks.web.client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -133,6 +134,27 @@ public interface SynapseClientAsync {
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
+	 // V2 Wiki crud
+    public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
+    public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
+    public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate, AsyncCallback<String> callback);
+    public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+    public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+    public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+    public void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version, AsyncCallback<String> callback);
+    public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);
+
+	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
+	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
+	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
+	
+	public void createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<String> callback);
+	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<String> callback);
+	
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 
 	void addFavorite(String entityId, AsyncCallback<String> callback);

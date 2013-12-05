@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -114,16 +115,16 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	}
 	
 	public void refreshTableOfContents() {
-		synapseClient.getWikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
+		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
 				try {
-					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, WikiHeader.class);
+					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
 					Map<String, TocItem> wikiId2TreeItem = new HashMap<String, TocItem>();
 					
 					//now grab all of the headers associated with this level
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-						WikiHeader header = (WikiHeader) headerEntity;
+						V2WikiHeader header = (V2WikiHeader) headerEntity;
 						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
 						Synapse targetPlace;
 						String title;
@@ -143,7 +144,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 					TocItem root = new TocItem();
 					
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
-						WikiHeader header = (WikiHeader) headerEntity;
+						V2WikiHeader header = (V2WikiHeader) headerEntity;
 						if (header.getParentId() != null){
 							//add this as a child							
 							TocItem parent = wikiId2TreeItem.get(header.getParentId());

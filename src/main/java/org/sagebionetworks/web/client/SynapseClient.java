@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.evaluation.model.UserEvaluationState;
+
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -16,7 +17,6 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -215,6 +215,27 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
+	 // V2 Wiki crud
+    public String createV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
+    public String getV2WikiPage(WikiPageKey key) throws RestServiceException;
+    public String getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
+    public String updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
+    public String restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate) throws RestServiceException;
+    public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
+    public String getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
+    public String getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
+    public String getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
+    public String getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
+    
+	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
+	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
+	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
+	
+	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public String updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
+	public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
+	public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
+	
 	public String getFileEndpoint() throws RestServiceException;
 	
 	public String addFavorite(String entityId) throws RestServiceException;
@@ -277,4 +298,5 @@ public interface SynapseClient extends RemoteService {
 	public String getSynapseProperty(String key);
 	
 	public String getAPIKey() throws RestServiceException;
+	
 }

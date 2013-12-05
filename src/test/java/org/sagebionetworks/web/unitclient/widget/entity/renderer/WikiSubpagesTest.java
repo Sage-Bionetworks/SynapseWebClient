@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -51,7 +52,7 @@ public class WikiSubpagesTest {
 	
 	WikiSubpagesWidget widget;
 	List<JSONEntity> wikiHeadersList;
-	WikiHeader testRootHeader;
+	V2WikiHeader testRootHeader;
 	String entityId = "syn123";
 	Map<String, String> descriptor = new HashMap<String, String>();
 	
@@ -79,7 +80,7 @@ public class WikiSubpagesTest {
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		PaginatedResults<JSONEntity> wikiHeaders = new PaginatedResults<JSONEntity>();
 		wikiHeadersList = new ArrayList<JSONEntity>();
-		testRootHeader = new WikiHeader();
+		testRootHeader = new V2WikiHeader();
 		testRootHeader.setId("123");
 		testRootHeader.setParentId(null);
 		testRootHeader.setTitle("my test root wiki header (page)");
@@ -101,17 +102,17 @@ public class WikiSubpagesTest {
 	
 	@Test
 	public void testConfigureFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
-		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
-		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView, times(2)).clear();
 	}
 
