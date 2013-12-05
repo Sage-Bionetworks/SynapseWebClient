@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -114,6 +115,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private TeamListWidget teamsListWidget;
 	private CookieProvider cookies;
 	private FlowPanel openTeamInvitesPanel;
+	private MyEvaluationEntitiesList myEvaluationsList;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -138,6 +140,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.iconsImageBundle = icons;
 		this.teamsListWidget = teamsListWidget;
 		this.cookies = cookies;
+		this.myEvaluationsList = myEvaluationsList;
 		
 		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
@@ -198,7 +201,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 			}
 		});
-	}	
+	}
 
 	@Override
 	public void onAttach() {
@@ -271,6 +274,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		LayoutContainer evalsAndProjects = new LayoutContainer();
 		evalsAndProjects.setStyleName("col-md-4");
+		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
 		evalsAndProjects.add(createCreateProjectWidget()); 
 		projectPanelContainer.add(evalsAndProjects);
@@ -282,6 +286,26 @@ public class HomeViewImpl extends Composite implements HomeView {
 		favsAndTeams.add(createCreateTeamsContainer());
 		projectPanelContainer.add(favsAndTeams);
 		projectPanel.add(projectPanelContainer);
+	}
+
+	private LayoutContainer getMyEvaluationsContainer() {
+		//My Evaluations
+		LayoutContainer myEvaluations = new LayoutContainer();
+		myEvaluations.add(myEvaluationsList.asWidget());          
+		return myEvaluations;
+	}
+	
+	@Override
+	public void setMyChallenges(List<EntityHeader> myEvaluationEntities) {
+		myEvaluationsList.configure(myEvaluationEntities);
+	}
+
+	@Override
+	public void setMyChallengesError(String string) {
+	}
+
+	@Override
+	public void setMyTeamsError(String string) {
 	}
 
 	private LayoutContainer createCreateTeamsContainer() {
@@ -368,8 +392,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	@Override
-	public void refreshMyTeams(String userId) {
-		teamsListWidget.configure(userId, false);
+	public void refreshMyTeams(List<Team> teams) {
+		teamsListWidget.configure(teams, false);
 	}
 	
 	private LayoutContainer getTeamsContainer() {

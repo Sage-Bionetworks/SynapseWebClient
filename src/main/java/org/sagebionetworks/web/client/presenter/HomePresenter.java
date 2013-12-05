@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.MembershipInvitation;
@@ -17,6 +20,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -24,6 +28,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -31,6 +36,14 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Header;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -49,6 +62,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SearchServiceAsync searchService;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -57,7 +71,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RssServiceAsync rssService,
 			SearchServiceAsync searchService, 
 			SynapseClientAsync synapseClient, 			
-			AdapterFactory adapterFactory){
+			AdapterFactory adapterFactory,
+			SynapseJSNIUtils synapseJSNIUtils){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -67,6 +82,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.view.setPresenter(this);
 	}
 
@@ -160,7 +176,18 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void loadProjectsAndFavorites() {
-		view.refreshMyTeams(authenticationController.getCurrentUserPrincipalId());
+		//ask for my teams
+		TeamListWidget.getTeams(authenticationController.getCurrentUserPrincipalId(), synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setMyTeamsError("Could not load My Teams");
+			}
+			@Override
+			public void onSuccess(List<Team> myTeams) {
+				view.refreshMyTeams(myTeams);
+				getChallengeProjectIds(myTeams);
+			}
+		});
 		
 		view.showOpenTeamInvitesMessage(false);
 		isOpenTeamInvites(new CallbackP<Boolean>() {
@@ -194,6 +221,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
+	
 	public void isOpenTeamInvites(final CallbackP<Boolean> callback) {
 		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
 			@Override
@@ -206,6 +234,73 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				//do nothing
 			}
 		});		
+	}
+	
+	public void getChallengeProjectIds(final List<Team> myTeams) {
+		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObject>() {
+			@Override
+			public void invoke(JSONObject mapping) {
+				List<String> challengeEntities = new ArrayList<String>();
+				for (Team team : myTeams) {
+					if (mapping.containsKey(team.getId())) {
+						challengeEntities.add(mapping.get(team.getId()).toString());
+					}
+				}
+				getChallengeProjectHeaders(challengeEntities);
+			}
+		});
+	}
+	
+	public void getChallengeProjectHeaders(final List<String> challengeProjectIds) {
+		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
+			
+			@Override
+			public void onSuccess(List<String> entityHeaderStrings) {
+				try {
+					//finally, we can tell the view to update the user challenges based on these entity headers
+					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					for (String headerString : entityHeaderStrings) {
+						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
+						headers.add(header);
+					}
+					view.setMyChallenges(headers);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}	
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setMyChallengesError("Could not load My Challenges:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObject> callback) {
+	     RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), ClientProperties.TEAM2CHALLENGE_WHITELIST_URL));
+	     try
+	     {
+	         rb.sendRequest(null, new RequestCallback() {
+	            @Override
+	            public void onError(Request request, Throwable exception) 
+	            {
+	            	view.setMyChallengesError("Could not load My Challenges: " + exception.getMessage());
+	            }
+
+	            @Override
+	            public void onResponseReceived(Request request,Response response) 
+	            {
+	            	String responseText = response.getText();
+	                JSONValue parsed = JSONParser.parseStrict(responseText);
+	                callback.invoke(parsed.isObject());
+	            }
+
+	         });
+	     }
+	     catch (Exception e){
+         	//failed to load my challenges
+	    	 view.setMyChallengesError("Could not load My Challenges: " + e.getMessage());
+	     }
 	}
 	
 	@Override

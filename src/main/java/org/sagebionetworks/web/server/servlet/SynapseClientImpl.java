@@ -579,6 +579,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public List<String> getEntityHeaderBatch(List<String> entityIds)
+			throws RestServiceException {
+		try {
+			List<Reference> list = new ArrayList<Reference>();
+			for (String entityId : entityIds) {
+				Reference ref = new Reference();
+				ref.setTargetId(entityId);
+			}
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list);
+			List<String> returnList = new ArrayList<String>();
+			for (EntityHeader header : results.getResults()) {
+				returnList.add(EntityFactory.createJSONStringForEntity(header));
+			}
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 
 
 	@Override

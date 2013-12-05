@@ -125,6 +125,8 @@ public class WebConstants {
 	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
+	
+	public static final String REDIRECT_URL_KEY = "redirect";
 
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 

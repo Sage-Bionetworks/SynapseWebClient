@@ -127,6 +127,7 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -1566,7 +1567,18 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
-
+	
+	/**
+	 * Create the url to a FileEntity filehandle.
+	 * @param baseURl
+	 * @param entityid
+	 * @return
+	 */
+	public static String createRedirectUrl(String baseFileHandleUrl, String redirectUrl){
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
+				WebConstants.REDIRECT_URL_KEY + "=" + URL.encode(redirectUrl);
+	}
+	
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
