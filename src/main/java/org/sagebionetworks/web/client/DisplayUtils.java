@@ -1574,9 +1574,9 @@ public class DisplayUtils {
 	 * @param entityid
 	 * @return
 	 */
-	public static String createRedirectUrl(String baseFileHandleUrl, String redirectUrl){
+	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
 		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
-				WebConstants.REDIRECT_URL_KEY + "=" + URL.encode(redirectUrl);
+				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
 	}
 	
 	/**

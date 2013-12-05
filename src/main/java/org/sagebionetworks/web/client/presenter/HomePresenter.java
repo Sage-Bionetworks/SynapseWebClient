@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
@@ -16,7 +12,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -24,19 +22,16 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.Header;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -63,6 +58,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private GWTWrapper gwt;
+	private RequestBuilderWrapper requestBuilder;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -72,7 +69,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			SearchServiceAsync searchService, 
 			SynapseClientAsync synapseClient, 			
 			AdapterFactory adapterFactory,
-			SynapseJSNIUtils synapseJSNIUtils){
+			SynapseJSNIUtils synapseJSNIUtils,
+			GWTWrapper gwt,
+			RequestBuilderWrapper requestBuilder){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -83,6 +82,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.gwt = gwt;
+		this.requestBuilder = requestBuilder;
 		this.view.setPresenter(this);
 	}
 
@@ -277,10 +278,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObject> callback) {
-	     RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), ClientProperties.TEAM2CHALLENGE_WHITELIST_URL));
+		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), gwt.encodeQueryString(ClientProperties.TEAM2CHALLENGE_WHITELIST_URL)));
 	     try
 	     {
-	         rb.sendRequest(null, new RequestCallback() {
+	    	 requestBuilder.sendRequest(null, new RequestCallback() {
 	            @Override
 	            public void onError(Request request, Throwable exception) 
 	            {

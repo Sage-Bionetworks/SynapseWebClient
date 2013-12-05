@@ -19,14 +19,19 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
@@ -36,6 +41,7 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -49,11 +55,14 @@ public class HomePresenterTest {
 	PlaceChanger mockPlaceChanger;
 	StackConfigServiceAsync mockStackConfigService;
 	RssServiceAsync mockRssService;
+	RequestBuilderWrapper mockRequestBuilder;
 	SearchServiceAsync mockSearchService; 
 	SynapseClientAsync mockSynapseClient; 
 	AutoGenFactory autoGenFactory;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	GWTWrapper mockGwtWrapper;
+	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
+	
 	List<EntityHeader> testEvaluationResults;
 	List<MembershipInvitationBundle> openInvitations;
 	
@@ -69,6 +78,11 @@ public class HomePresenterTest {
 		mockRssService = mock(RssServiceAsync.class);
 		mockSearchService = mock(SearchServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		mockGwtWrapper = mock(GWTWrapper.class);
+		mockRequestBuilder = mock(RequestBuilderWrapper.class);
+		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
+		
 		autoGenFactory = new AutoGenFactory();
 		BatchResults<EntityHeader> testBatchResults = new BatchResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
@@ -81,7 +95,7 @@ public class HomePresenterTest {
 		
 		ArrayList<String> testBatchResultsList = new ArrayList<String>();
 		for(EntityHeader eh : testBatchResults.getResults()) {
-			testBatchResultsList.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			testBatchResultsList.add(eh.writeToJSONObject(adapter.createNew()).toJSONString());
 		}
 		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
@@ -101,21 +115,27 @@ public class HomePresenterTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockRssService,
 				mockSearchService,
 				mockSynapseClient,
-				adapterFactory);
+				adapter, 
+				mockSynapseJSNIUtils,
+				mockGwtWrapper,
+				mockRequestBuilder);
 		verify(mockView).setPresenter(homePresenter);
+		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 	}	
 	
 	@Test
 	public void testSetPlace() {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
-		verify(mockView).refreshMyTeams(anyString());
+		verify(mockView).refresh();
+		verify(mockView).refreshMyTeams(any(List.class));
 	}
 	
 	@Test
