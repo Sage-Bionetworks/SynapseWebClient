@@ -253,7 +253,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void getChallengeProjectHeaders(final List<String> challengeProjectIds) {
-		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
+		List<String> uniqueChallengeProjectIds = new ArrayList<String>();
+		for (String projectId : challengeProjectIds) {
+			if (!uniqueChallengeProjectIds.contains(projectId)) {
+				uniqueChallengeProjectIds.add(projectId);
+			}
+		}
+		synapseClient.getEntityHeaderBatch(uniqueChallengeProjectIds, new AsyncCallback<List<String>>() {
 			
 			@Override
 			public void onSuccess(List<String> entityHeaderStrings) {
