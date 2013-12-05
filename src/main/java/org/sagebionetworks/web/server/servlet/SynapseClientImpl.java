@@ -588,6 +588,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			for (String entityId : entityIds) {
 				Reference ref = new Reference();
 				ref.setTargetId(entityId);
+				list.add(ref);
 			}
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list);

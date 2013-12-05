@@ -243,7 +243,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				List<String> challengeEntities = new ArrayList<String>();
 				for (Team team : myTeams) {
 					if (mapping.containsKey(team.getId())) {
-						challengeEntities.add(mapping.get(team.getId()).toString());
+						challengeEntities.add(mapping.get(team.getId()).isString().stringValue());
 					}
 				}
 				getChallengeProjectHeaders(challengeEntities);
