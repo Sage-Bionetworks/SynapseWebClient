@@ -5,14 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -139,6 +133,7 @@ public class SynapseClientImplTest {
 	Annotations annos;
 	UserEntityPermissions eup;
 	UserEvaluationPermissions userEvaluationPermissions;
+	List<EntityHeader> batchHeaderResults;
 	
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
@@ -149,6 +144,7 @@ public class SynapseClientImplTest {
 	Participant mockParticipant;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
+	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
@@ -243,6 +239,16 @@ public class SynapseClientImplTest {
 		EntityHeader bene = new EntityHeader();
 		bene.setId("syn999");
 		when(mockSynapse.getEntityBenefactor(anyString())).thenReturn(bene);
+		
+		BatchResults<EntityHeader> batchHeaders = new BatchResults<EntityHeader>();
+		batchHeaderResults = new ArrayList<EntityHeader>();
+		for (int i = 0; i < 10; i++) {
+			EntityHeader h = new EntityHeader();
+			h.setId("syn"+i);
+			batchHeaderResults.add(h);	
+		}
+		batchHeaders.setResults(batchHeaderResults);
+		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(batchHeaders);
 		
 		List<AccessRequirement> accessRequirements= new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
@@ -1134,6 +1140,16 @@ public class SynapseClientImplTest {
 		assertEquals(membershipStatusJson, bundle.getTeamMembershipStatusJson());
 		assertEquals(isAdmin, bundle.isUserAdmin());
 		assertEquals(testMemberCount, bundle.getTotalMemberCount());
+	}
+	
+	@Test
+	public void testGetEntityHeaderBatch() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		List<String> headers = synapseClient.getEntityHeaderBatch(new ArrayList());
+		//in the setup, we told the mockSynapse.getEntityHeaderBatch to return batchHeaderResults, so verify that this is batchHeaderResults (json string versions)
+		for (int i = 0; i < batchHeaderResults.size(); i++) {
+			EntityHeader returnedHeader = new EntityHeader(adapterFactory.createNew(headers.get(i)));
+			assertEquals(batchHeaderResults.get(i), returnedHeader);
+		}
 	}
 	
 

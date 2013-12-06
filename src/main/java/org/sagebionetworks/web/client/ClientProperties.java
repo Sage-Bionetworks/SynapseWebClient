@@ -15,6 +15,7 @@ public class ClientProperties {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	public static final String ABOUT_SYNAPSE_URL = "https://s3.amazonaws.com/static.synapse.org/About_Synapse.pdf";
+	public static final String TEAM2CHALLENGE_WHITELIST_URL = "https://s3.amazonaws.com/static.synapse.org/teamId2challengeEntityId.json";
 	
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
