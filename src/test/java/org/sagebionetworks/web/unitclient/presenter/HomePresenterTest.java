@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -202,7 +203,9 @@ public class HomePresenterTest {
 	public void testTeam2ChallengeEndToEnd() throws RequestException {
 		Team t1 = new Team();
 		t1.setId("2");
-		homePresenter.getChallengeProjectIds(new ArrayList<Team>());
+		List<Team> myTeams = new ArrayList<Team>();
+		myTeams.add(t1);
+		homePresenter.getChallengeProjectIds(myTeams);
 		//grab the request callback and invoke
 		ArgumentCaptor<RequestCallback> arg = ArgumentCaptor.forClass(RequestCallback.class);
 		verify(mockRequestBuilder).sendRequest(anyString(), arg.capture());
@@ -239,7 +242,11 @@ public class HomePresenterTest {
 			}
 		};
 		callback.onResponseReceived(null, testResponse);
-		verify(mockView).setMyChallenges(anyList());
+		ArgumentCaptor<List> entityList = ArgumentCaptor.forClass(List.class);
+		verify(mockRequestBuilder).sendRequest(anyString(), arg.capture());
+		verify(mockView).setMyChallenges(entityList.capture());
+		List<EntityHeader> capturedEntityList = entityList.getValue();
+		assertEquals(1, capturedEntityList.size());
 	}
 	
 	@Test
