@@ -4,16 +4,19 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -37,6 +40,11 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
+import com.google.gwt.http.client.Header;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HomePresenterTest {
@@ -51,7 +59,8 @@ public class HomePresenterTest {
 	RssServiceAsync mockRssService;
 	RequestBuilderWrapper mockRequestBuilder;
 	SearchServiceAsync mockSearchService; 
-	SynapseClientAsync mockSynapseClient; 
+	SynapseClientAsync mockSynapseClient;
+	CookieProvider mockCookies;
 	AutoGenFactory autoGenFactory;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	GWTWrapper mockGwtWrapper;
@@ -75,6 +84,7 @@ public class HomePresenterTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockGwtWrapper = mock(GWTWrapper.class);
 		mockRequestBuilder = mock(RequestBuilderWrapper.class);
+		mockCookies = mock(CookieProvider.class);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://synapse.org/filehandle/");
 		
 		autoGenFactory = new AutoGenFactory();
@@ -121,7 +131,8 @@ public class HomePresenterTest {
 				adapter, 
 				mockSynapseJSNIUtils,
 				mockGwtWrapper,
-				mockRequestBuilder);
+				mockRequestBuilder, 
+				mockCookies);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 	}	
@@ -176,15 +187,77 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testGetChallengeProjectHeaders() {
-		homePresenter.getChallengeProjectHeaders(new ArrayList<String>());
+		homePresenter.getChallengeProjectHeaders(new HashSet<String>());
 		verify(mockView).setMyChallenges(anyList());
 	}
 	
 	@Test
 	public void testGetChallengeProjectHeadersFailure() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
-		homePresenter.getChallengeProjectHeaders(new ArrayList<String>());
+		homePresenter.getChallengeProjectHeaders(new HashSet<String>());
 		verify(mockView).setMyChallengesError(anyString());
 	}
+	
+	@Test
+	public void testTeam2ChallengeEndToEnd() throws RequestException {
+		Team t1 = new Team();
+		t1.setId("2");
+		homePresenter.getChallengeProjectIds(new ArrayList<Team>());
+		//grab the request callback and invoke
+		ArgumentCaptor<RequestCallback> arg = ArgumentCaptor.forClass(RequestCallback.class);
+		verify(mockRequestBuilder).sendRequest(anyString(), arg.capture());
+		RequestCallback callback = arg.getValue();
+		Response testResponse = new Response() {
+			@Override
+			public String getText() {
+				return "{\"1\":\"syn1\", \"2\" : \"syn2\"}";
+			}
+			
+			@Override
+			public String getStatusText() {
+				return null;
+			}
+			
+			@Override
+			public int getStatusCode() {
+				return 0;
+			}
+			
+			@Override
+			public String getHeadersAsString() {
+				return null;
+			}
+			
+			@Override
+			public Header[] getHeaders() {
+				return null;
+			}
+			
+			@Override
+			public String getHeader(String header) {
+				return null;
+			}
+		};
+		callback.onResponseReceived(null, testResponse);
+		verify(mockView).setMyChallenges(anyList());
+	}
+	
+	@Test
+	public void testTeam2ChallengeProjectFileCache() {
+		CallbackP callback = new CallbackP() {
+			@Override
+			public void invoke(Object param) {
+			}
+		};
+		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn("{\"1\":\"syn1\", \"2\" : \"syn2\"}");
+		homePresenter.getTeamId2ChallengeIdWhitelist(callback);
+		verify(mockRequestBuilder, times(0)).configure(any(RequestBuilder.Method.class), anyString());
+		
+		//but without the cookie, it should be called
+		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn(null);
+		homePresenter.getTeamId2ChallengeIdWhitelist(callback);
+		verify(mockRequestBuilder, times(1)).configure(any(RequestBuilder.Method.class), anyString());
+	}
+	
 
 }

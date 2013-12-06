@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -248,13 +249,17 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void getChallengeProjectIds(final List<Team> myTeams) {
-		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObject>() {
+		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
 			@Override
-			public void invoke(JSONObject mapping) {
+			public void invoke(JSONObjectAdapter mapping) {
 				Set<String> challengeEntities = new HashSet<String>();
 				for (Team team : myTeams) {
-					if (mapping.containsKey(team.getId())) {
-						challengeEntities.add(mapping.get(team.getId()).isString().stringValue());
+					if (mapping.has(team.getId())) {
+						try {
+							challengeEntities.add(mapping.getString(team.getId()));
+						} catch (JSONObjectAdapterException e) {
+							//problem with one of the mapping entries
+						}
 					}
 				}
 				getChallengeProjectHeaders(challengeEntities);
@@ -298,7 +303,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
-	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObject> callback) {
+	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObjectAdapter> callback) {
 		String responseText = cookies.getCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
 		
 		if (responseText != null) {
@@ -332,10 +337,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	     }
 	}
 	
-	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObject> callback){
+	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObjectAdapter> callback){
 		try {
-			JSONValue parsed = JSONParser.parseStrict(responseText);
-			callback.invoke(parsed.isObject());
+			callback.invoke(adapterFactory.createNew(responseText));
 		} catch (Throwable e) {
 			//just in case there is a parsing exception
 		}
