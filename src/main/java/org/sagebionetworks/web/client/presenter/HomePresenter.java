@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
@@ -19,6 +24,7 @@ import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -46,7 +52,8 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {
 	public static final String KEY_DATASETS_SELECTED_COLUMNS_COOKIE = "org.sagebionetworks.selected.dataset.columns";
-
+	public static final String TEAMS_2_CHALLENGE_ENTITIES_COOKIE = "org.sagebionetworks.team.2.challenge.project";
+	
 	private static final int MAX_NEWS_ITEMS = 3;
 	
 	private Home place;
@@ -60,6 +67,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
 	private RequestBuilderWrapper requestBuilder;
+	private CookieProvider cookies;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -71,7 +79,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
 			GWTWrapper gwt,
-			RequestBuilderWrapper requestBuilder){
+			RequestBuilderWrapper requestBuilder,
+			CookieProvider cookies){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -84,6 +93,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
 		this.requestBuilder = requestBuilder;
+		this.cookies = cookies;
 		this.view.setPresenter(this);
 	}
 
@@ -241,7 +251,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObject>() {
 			@Override
 			public void invoke(JSONObject mapping) {
-				List<String> challengeEntities = new ArrayList<String>();
+				Set<String> challengeEntities = new HashSet<String>();
 				for (Team team : myTeams) {
 					if (mapping.containsKey(team.getId())) {
 						challengeEntities.add(mapping.get(team.getId()).isString().stringValue());
@@ -252,14 +262,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
-	public void getChallengeProjectHeaders(final List<String> challengeProjectIds) {
-		List<String> uniqueChallengeProjectIds = new ArrayList<String>();
-		for (String projectId : challengeProjectIds) {
-			if (!uniqueChallengeProjectIds.contains(projectId)) {
-				uniqueChallengeProjectIds.add(projectId);
-			}
-		}
-		synapseClient.getEntityHeaderBatch(uniqueChallengeProjectIds, new AsyncCallback<List<String>>() {
+	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
+		List<String> challengeProjectIds = new ArrayList<String>();
+		challengeProjectIds.addAll(challengeProjectIdsSet);
+		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
 			
 			@Override
 			public void onSuccess(List<String> entityHeaderStrings) {
@@ -270,6 +276,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
 						headers.add(header);
 					}
+					
+					//sort by name
+					Collections.sort(headers, new Comparator<EntityHeader>() {
+				        @Override
+				        public int compare(EntityHeader o1, EntityHeader o2) {
+				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+				        }
+					});
+					
 					view.setMyChallenges(headers);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -284,6 +299,12 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 	
 	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObject> callback) {
+		String responseText = cookies.getCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
+		
+		if (responseText != null) {
+			parseTeam2ChallengeWhitelist(responseText, callback);
+			return;
+		}
 		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), gwt.encodeQueryString(ClientProperties.TEAM2CHALLENGE_WHITELIST_URL)));
 	     try
 	     {
@@ -291,15 +312,16 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	            @Override
 	            public void onError(Request request, Throwable exception) 
 	            {
-	            	view.setMyChallengesError("Could not load My Challenges: " + exception.getMessage());
+	            	//do nothing, may or may not have any challenges
 	            }
 
 	            @Override
 	            public void onResponseReceived(Request request,Response response) 
 	            {
 	            	String responseText = response.getText();
-	                JSONValue parsed = JSONParser.parseStrict(responseText);
-	                callback.invoke(parsed.isObject());
+	            	Date expires = new Date(System.currentTimeMillis() + 1000*60*60*24); // store for a day
+	            	cookies.setCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
+	            	parseTeam2ChallengeWhitelist(responseText, callback);
 	            }
 
 	         });
@@ -308,6 +330,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
          	//failed to load my challenges
 	    	 view.setMyChallengesError("Could not load My Challenges: " + e.getMessage());
 	     }
+	}
+	
+	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObject> callback){
+		try {
+			JSONValue parsed = JSONParser.parseStrict(responseText);
+			callback.invoke(parsed.isObject());
+		} catch (Throwable e) {
+			//just in case there is a parsing exception
+		}
 	}
 	
 	@Override

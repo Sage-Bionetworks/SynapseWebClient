@@ -1569,9 +1569,11 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Create the url to a FileEntity filehandle.
+	 * Create a url that points to the FileHandleServlet.
+	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
+	 * USE TO REQUEST SMALL FILES ONLY and CACHE THE RESULTS
 	 * @param baseURl
-	 * @param entityid
+	 * @param encodedRedirectUrl
 	 * @return
 	 */
 	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
