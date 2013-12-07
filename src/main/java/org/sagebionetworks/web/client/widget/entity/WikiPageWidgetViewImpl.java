@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -46,7 +48,6 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -88,7 +89,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
+			WidgetRegistrar widgetRegistrar) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
