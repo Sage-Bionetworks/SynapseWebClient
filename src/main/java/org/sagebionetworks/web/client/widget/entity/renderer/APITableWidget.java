@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
@@ -98,9 +99,13 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private void refreshData() {
 		String fullUri = tableConfig.getUri();
 		
+		fullUri = getOrderedByURI(fullUri, tableConfig);
+		
 		if (tableConfig.isPaging()) {
-			fullUri = getPagedURI();
+			fullUri = getPagedURI(fullUri);
 		}
+		
+		
 		if (authenticationController.isLoggedIn())
 			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, authenticationController.getCurrentUserPrincipalId());
 		synapseClient.getJSONEntity(fullUri, new AsyncCallback<String>() {
@@ -243,15 +248,44 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return value;
 	}
 	
-	public String getPagedURI() {
-		String uri = tableConfig.getUri();
+	public String getPagedURI(String uri) {
 		//special case for query service
-		if (uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX) || uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX)) {
-			return tableConfig.getUri() + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
+		if (isQueryService(uri)) {
+			return uri + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
 		} else {
-			String firstCharacter = tableConfig.getUri().contains("?") ? "&" : "?";
-			return tableConfig.getUri() + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();	
+			String firstCharacter = uri.contains("?") ? "&" : "?";
+			return uri + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();	
 		}
+	}
+	
+	public String getOrderedByURI(String uri, APITableConfig tableConfig) {
+		String newUri = uri;
+		if (isQueryService(uri)) {
+			//find the order by column
+			COLUMN_SORT_TYPE sort = COLUMN_SORT_TYPE.NONE;
+			String columnName = null;
+			for (APITableColumnConfig columnConfig : tableConfig.getColumnConfigs()) {
+				if (columnConfig.getSort() != null && COLUMN_SORT_TYPE.NONE != columnConfig.getSort()) {
+					//found
+					Set<String> inputColumnNames = columnConfig.getInputColumnNames();
+					if (inputColumnNames.size() > 0) {
+						//take one
+						columnName = inputColumnNames.iterator().next();
+						sort = columnConfig.getSort();
+						break;
+					}
+				}
+			}
+			//if there is something to sort
+			if (COLUMN_SORT_TYPE.NONE != sort) {
+				newUri = newUri + "+order+by+"+columnName+"+"+sort.toString();
+			}
+		}
+		return newUri;
+	}
+	
+	public static boolean isQueryService(String uri) {
+		return uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX) || uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX);
 	}
 	
 	/**
@@ -289,6 +323,29 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		};
 		APITableColumnConfig config = tableConfig.getColumnConfigs().get(currentIndex);
 		renderers[currentIndex].init(columnData, config, callback);
+	}
+	
+	/**
+	 * The renderers are built directly from the table column configs.  The view will tell us when column from this renderer was clicked by the user.
+	 * 
+	 * @param index
+	 */
+	@Override
+	public void columnConfigClicked(APITableColumnConfig columnConfig) {
+		//usually handled by JQuery tablesorter plugin, but if this is a query service (evaluation or regular query) then we should append to the uri an appropriate order by
+		if (isQueryService(tableConfig.getUri())) {
+			//set all column sort values
+			for (APITableColumnConfig config : tableConfig.getColumnConfigs()) {
+				COLUMN_SORT_TYPE sort = COLUMN_SORT_TYPE.NONE;
+				if (columnConfig == config) {
+					//flip to ASC if already DESC
+					sort = COLUMN_SORT_TYPE.DESC == config.getSort() ? COLUMN_SORT_TYPE.ASC : COLUMN_SORT_TYPE.DESC;
+				}
+				config.setSort(sort);
+			}
+			//then refresh the data
+			refreshData();
+		}
 	}
 	
 	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray) {

@@ -43,7 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private Callback teamUpdatedCallback;
-	private String message, isMemberMessage;
+	private String message, isMemberMessage, successMessage, buttonText;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
 	
@@ -64,14 +64,16 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 
-	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage) {
+	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
 		this.showUserProfileForm = showUserProfileForm;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		this.isMemberMessage = isMemberMessage;
-		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage);
+		this.successMessage = successMessage;
+		this.buttonText = buttonText;
+		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText);
 	};
 //	
 //	@Override
@@ -102,6 +104,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY)) : 
 				false;
 		this.isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
+		
+		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
+		this.buttonText = descriptor.get(WidgetConstants.JOIN_TEAM_BUTTON_TEXT);
+		
 		refresh();
 	}
 	
@@ -116,7 +122,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null, isMemberMessage);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -127,7 +133,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, showUserProfileForm, null, null, isMemberMessage);
+			configure(teamId, canPublicJoin, showUserProfileForm, null, null, isMemberMessage, successMessage, buttonText);
 		}
 	}
 	
@@ -237,7 +243,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		synapseClient.requestMembership(authenticationController.getCurrentUserPrincipalId(), teamId, message, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				String message = isAcceptingInvite ? "Invitation Accepted" : "Request Sent";
+				String successJoinMessage = successMessage == null ? WidgetConstants.JOIN_TEAM_DEFAULT_SUCCESS_MESSAGE : successMessage;
+				String message = isAcceptingInvite ? successJoinMessage : "Request Sent";
 				view.showInfo(message, "");
 				refresh();
 				if (teamUpdatedCallback != null)

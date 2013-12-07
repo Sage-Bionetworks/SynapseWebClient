@@ -41,6 +41,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getEntityHeaderBatch(String referenceList) throws RestServiceException;
 	
+	public List<String> getEntityHeaderBatch(List<String> entityIds) throws RestServiceException;
+	
 	public SerializableWhitelist junk(SerializableWhitelist l);
 	
 	/**

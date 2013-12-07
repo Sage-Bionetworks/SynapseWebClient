@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -35,6 +36,11 @@ public interface HomeView extends IsWidget, SynapseView {
 
 	public void setFavoritesError(String string);
 	
-	public void refreshMyTeams(String userId);
+	public void refreshMyTeams(List<Team> teams);
+	public void setMyTeamsError(String error);
+	
+	public void setMyChallenges(List<EntityHeader> result);
+	public void setMyChallengesError(String error);
+	
 	public void showOpenTeamInvitesMessage(Boolean visible);
 }

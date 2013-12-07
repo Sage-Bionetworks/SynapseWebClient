@@ -279,7 +279,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				try {										
+				try {
 					Activity activity = new Activity(adapterFactory.createNew(result));
 					addActivityToStack(activity);
 				} catch (JSONObjectAdapterException e) {

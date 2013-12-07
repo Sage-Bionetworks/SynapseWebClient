@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -20,7 +21,7 @@ public interface APITableColumnManagerView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void configure(List<APITableColumnConfig> configs);
 		void deleteColumnConfig(APITableColumnConfig config);
-		void addColumnConfig(String rendererName, String inputColumnNames, String displayColumnName);
+		void addColumnConfig(String rendererName, String inputColumnNames, String displayColumnName, COLUMN_SORT_TYPE sort);
 	}
 
 	/**

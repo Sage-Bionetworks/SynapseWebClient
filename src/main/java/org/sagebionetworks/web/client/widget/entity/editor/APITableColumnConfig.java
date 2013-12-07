@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Set;
 
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+
 /**
  * APITableColumnConfig Package information relating to a column in the API
  * Table (supertable)
@@ -26,6 +28,8 @@ public class APITableColumnConfig {
 	 */
 	private String rendererName;
 
+	private COLUMN_SORT_TYPE sort;
+	
 	public APITableColumnConfig() {
 	}
 
@@ -103,79 +107,68 @@ public class APITableColumnConfig {
 		this.rendererName = rendererName;
 	}
 
+
+	public COLUMN_SORT_TYPE getSort() {
+		return sort;
+	}
+	
+	public void setSort(COLUMN_SORT_TYPE sort) {
+		this.sort = sort;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = ((prime * result) + ((displayColumnName == null) ? 0
-				: displayColumnName.hashCode()));
-		result = ((prime * result) + ((inputColumnNames == null) ? 0
-				: inputColumnNames.hashCode()));
-		result = ((prime * result) + ((rendererName == null) ? 0 : rendererName
-				.hashCode()));
+		result = prime
+				* result
+				+ ((displayColumnName == null) ? 0 : displayColumnName
+						.hashCode());
+		result = prime
+				* result
+				+ ((inputColumnNames == null) ? 0 : inputColumnNames.hashCode());
+		result = prime * result
+				+ ((rendererName == null) ? 0 : rendererName.hashCode());
+		result = prime * result + ((sort == null) ? 0 : sort.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		APITableColumnConfig other = ((APITableColumnConfig) obj);
+		APITableColumnConfig other = (APITableColumnConfig) obj;
 		if (displayColumnName == null) {
-			if (other.displayColumnName != null) {
+			if (other.displayColumnName != null)
 				return false;
-			}
-		} else {
-			if (!displayColumnName.equals(other.displayColumnName)) {
-				return false;
-			}
-		}
+		} else if (!displayColumnName.equals(other.displayColumnName))
+			return false;
 		if (inputColumnNames == null) {
-			if (other.inputColumnNames != null) {
+			if (other.inputColumnNames != null)
 				return false;
-			}
-		} else {
-			if (!inputColumnNames.equals(other.inputColumnNames)) {
-				return false;
-			}
-		}
+		} else if (!inputColumnNames.equals(other.inputColumnNames))
+			return false;
 		if (rendererName == null) {
-			if (other.rendererName != null) {
+			if (other.rendererName != null)
 				return false;
-			}
-		} else {
-			if (!rendererName.equals(other.rendererName)) {
-				return false;
-			}
-		}
+		} else if (!rendererName.equals(other.rendererName))
+			return false;
+		if (sort != other.sort)
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder result;
-		result = new StringBuilder();
-		result.append("");
-		result.append("org.sagebionetworks.repo.model.widget.APITableColumnConfig");
-		result.append(" [");
-		result.append("displayColumnName=");
-		result.append(displayColumnName);
-		result.append(" ");
-		result.append("inputColumnNames=");
-		result.append(inputColumnNames);
-		result.append(" ");
-		result.append("rendererName=");
-		result.append(rendererName);
-		result.append(" ");
-		result.append("]");
-		return result.toString();
+		return "APITableColumnConfig [displayColumnName=" + displayColumnName
+				+ ", inputColumnNames=" + inputColumnNames + ", rendererName="
+				+ rendererName + ", sort=" + sort + "]";
 	}
+	
+	
 
 }
