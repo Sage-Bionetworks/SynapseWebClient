@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
@@ -134,14 +135,19 @@ public class FileHandleServlet extends HttpServlet {
 		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
 		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
+		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);
 		URL resolvedUrl = null;
+		if (redirectUrlString != null) {
+			//simple redirect
+			resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
+		}
+		
 		if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
 
 			// Redirect the user to the temp preview url
-			
 			if (isPreview)
 				resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
 			else

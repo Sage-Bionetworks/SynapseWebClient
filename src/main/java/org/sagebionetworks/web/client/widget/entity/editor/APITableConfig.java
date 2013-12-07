@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 
@@ -89,7 +90,9 @@ public class APITableConfig {
 					inputColumnNames.add(inputColumns[j]);
 				}
 				config.setInputColumnNames(inputColumnNames);
-				
+				if (parts.length > 3) {
+					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3]));
+				} else config.setSort(COLUMN_SORT_TYPE.NONE);
 				columnConfigs.add(config);
 			} catch (Throwable t) {
 				throw new RuntimeException(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i+":"+t.getMessage(), t);

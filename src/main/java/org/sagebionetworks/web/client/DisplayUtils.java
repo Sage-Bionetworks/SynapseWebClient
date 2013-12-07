@@ -110,6 +110,8 @@ import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -125,6 +127,7 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -1564,7 +1567,20 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
-
+	
+	/**
+	 * Create a url that points to the FileHandleServlet.
+	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
+	 * USE TO REQUEST SMALL FILES ONLY and CACHE THE RESULTS
+	 * @param baseURl
+	 * @param encodedRedirectUrl
+	 * @return
+	 */
+	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
+				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
+	}
+	
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
@@ -1931,6 +1947,17 @@ public class DisplayUtils {
 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
 		panel.add(mediaBodyPanel);
 		return panel;
+	}
+	
+	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
+		final SimpleComboBox<String> cb = new SimpleComboBox<String>();
+		cb.add(values);
+		cb.setSimpleValue(defaultValue);
+		cb.setTypeAhead(false);
+		cb.setEditable(false);
+		cb.setForceSelection(true);
+		cb.setTriggerAction(TriggerAction.ALL);
+		return cb;
 	}
 	
 	public static HTML getNewLabel(boolean superScript) {		

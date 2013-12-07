@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
@@ -191,16 +192,15 @@ public class APITableWidgetTest {
 	@Test
 	public void testPagingURI() throws JSONObjectAdapterException {
 		widget.configure(testWikiKey, descriptor, null);
-		String pagedURI = widget.getPagedURI();
+		String pagedURI = widget.getPagedURI(TESTSERVICE_PATH);
 		assertEquals(TESTSERVICE_PATH + "?limit=10&offset=0", pagedURI.toLowerCase());
 	}
 	
 	@Test
 	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
-		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, testServiceCall);
 		widget.configure(testWikiKey, descriptor, null);
-		String pagedURI = widget.getPagedURI();
+		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
+		String pagedURI = widget.getPagedURI(testServiceCall);
 		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
 	}
 	
@@ -277,9 +277,7 @@ public class APITableWidgetTest {
 		verify(mockGinInjector, times(2)).getAPITableColumnRendererNone();
 	}
 
-	@Test
-	public void testCreateRenderer() throws JSONObjectAdapterException {
-		String[] columnNames = new String[]{col1Name};
+	private APITableConfig getTableConfig() {
 		APITableConfig tableConfig = new APITableConfig(descriptor);
 		List<APITableColumnConfig> configList = new ArrayList<APITableColumnConfig>();
 		APITableColumnConfig columnConfig = new APITableColumnConfig();
@@ -287,12 +285,58 @@ public class APITableWidgetTest {
 		inputColName.add(col1Name);
 		columnConfig.setInputColumnNames(inputColName);
 		columnConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
-		
 		configList.add(columnConfig);
+		
+		columnConfig = new APITableColumnConfig();
+		inputColName = new HashSet<String>();
+		inputColName.add(col2Name);
+		columnConfig.setInputColumnNames(inputColName);
+		columnConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
+		configList.add(columnConfig);
+		
 		tableConfig.setColumnConfigs(configList);
-		widget.createRenderers(columnNames, tableConfig, mockGinInjector);
-		//should have tried to create a single user id renderer (based on the table configuration)
-		verify(mockGinInjector).getAPITableColumnRendererUserId();
+		return tableConfig;
 	}
+	@Test
+	public void testCreateRenderer() throws JSONObjectAdapterException {
+		String[] columnNames = new String[]{col1Name, col2Name};
+		
+		widget.createRenderers(columnNames, getTableConfig(), mockGinInjector);
+		//should have tried to create a user id renderer (based on the table configuration)
+		verify(mockGinInjector).getAPITableColumnRendererUserId();
+		verify(mockGinInjector).getAPITableColumnRendererSynapseID();
+	}
+	
+	@Test
+	public void testOrderByURINotQueryService() throws JSONObjectAdapterException {
+		APITableConfig tableConfig = getTableConfig();
+		String inputUri = "/evaluation";
+		assertEquals(inputUri, widget.getOrderedByURI(inputUri, tableConfig));
+		inputUri = "";
+		assertEquals(inputUri, widget.getOrderedByURI(inputUri, tableConfig));
+	}
+	
+	@Test
+	public void testOrderByURIWithQueryService() throws JSONObjectAdapterException {
+		APITableConfig tableConfig = getTableConfig();
+		//and set a sort column
+		APITableColumnConfig sortColumnConfig = tableConfig.getColumnConfigs().get(1);
+		sortColumnConfig.setSort(COLUMN_SORT_TYPE.DESC);
+		String inputUri = ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project";
+		String outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(outputUri.contains("order+by+"));
+		assertTrue(outputUri.contains("desc"));
+		
+		inputUri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_123";
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertTrue(outputUri.contains("order+by+"));
+		assertTrue(outputUri.contains("desc"));
+		
+		sortColumnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
+		assertFalse(outputUri.contains("order+by+"));
+		assertFalse(outputUri.contains("desc"));
+	}
+	
 	
 }

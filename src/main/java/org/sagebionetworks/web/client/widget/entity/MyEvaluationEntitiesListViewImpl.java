@@ -31,7 +31,7 @@ public class MyEvaluationEntitiesListViewImpl extends LayoutContainer implements
 			htmlBuilder.append("<div class=\"myEvaluationListContainer\"\">");
 			String iconHtml = DisplayUtils.getIconHtml(imageBundle.synapseStep16());
 			for (EntityHeader evaluation : evaluations) {
-				htmlBuilder.append("<div>");
+				htmlBuilder.append("<div class=\"margin-top-5\">");
 				htmlBuilder.append(iconHtml);
 				htmlBuilder.append("<a class=\"myEvaluationLink\" href=\"");
 				htmlBuilder.append(DisplayUtils.getSynapseHistoryToken(evaluation.getId()));

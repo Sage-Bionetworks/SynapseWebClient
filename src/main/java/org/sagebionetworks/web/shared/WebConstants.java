@@ -51,6 +51,7 @@ public class WebConstants {
 	 * 
 	 */
 	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
 
 	
 	public static final String OPEN_ID_URI = "/Portal/openid";
@@ -124,6 +125,8 @@ public class WebConstants {
 	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
+	
+	public static final String REDIRECT_URL_KEY = "redirect";
 
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 

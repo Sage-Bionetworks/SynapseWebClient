@@ -44,31 +44,16 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	
 	public void configure(List<Team> teams, boolean isBig) {
 		view.configure(teams, isBig);
+		
+		//then asynchronously load the request counts
+		if (!isBig) {
+			for (Team team : teams) {
+				queryForRequestCount(team.getId());
+			}
+		}
 	}
 	
-	public void configure(String userId, final boolean isBig) {
-		//get the teams associated to the given user
-		getTeams(userId, new AsyncCallback<List<Team>>() {
-			@Override
-			public void onSuccess(List<Team> teams) {
-				configure(teams, isBig);
-				//then asynchronously load the request counts
-				if (!isBig) {
-					for (Team team : teams) {
-						queryForRequestCount(team.getId());
-					}
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
-			}
-		});
-	}
-	
-	public void getTeams(String userId, final AsyncCallback<List<Team>> callback) {
+	public static void getTeams(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<List<Team>> callback) {
 		synapseClient.getTeamsForUser(userId, new AsyncCallback<ArrayList<String>>() {
 			@Override
 			public void onSuccess(ArrayList<String> results) {

@@ -587,6 +587,31 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public List<String> getEntityHeaderBatch(List<String> entityIds)
+			throws RestServiceException {
+		try {
+			List<Reference> list = new ArrayList<Reference>();
+			for (String entityId : entityIds) {
+				Reference ref = new Reference();
+				ref.setTargetId(entityId);
+				list.add(ref);
+			}
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list);
+			List<String> returnList = new ArrayList<String>();
+			for (EntityHeader header : results.getResults()) {
+				returnList.add(EntityFactory.createJSONStringForEntity(header));
+			}
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 
 
 	@Override
@@ -1815,10 +1840,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
+			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
+			long memberCount = allMembers.getTotalNumberOfResults();
 			boolean isAdmin = false;
-			//TODO: once PLFM-2248 is resolved (to figure out isAdmin), set the limit to 1 (to determine the total member count)
-//			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
-			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, MAX_LIMIT, ZERO_OFFSET);
 			Team team = synapseClient.getTeam(teamId);
 			String membershipStatusJsonString = null;
 			//get membership state for the current user
@@ -1826,19 +1850,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,userId);
 				JSONObjectAdapter membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew());
 				membershipStatusJsonString = membershipStatusJson.toJSONString();
-				//find the current user in the member list
-				for (Iterator iterator = allMembers.getResults().iterator(); iterator.hasNext();) {
-					TeamMember member = (TeamMember) iterator.next();
-					if (userId.equals(member.getMember().getOwnerId())){
-						//found it
-						isAdmin = member.getIsAdmin();
-						break;
-					}
+				if (membershipStatus.getIsMember()) {
+					TeamMember teamMember = synapseClient.getTeamMember(teamId, userId);
+					isAdmin = teamMember.getIsAdmin();
 				}
 			}
 			
 			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
-			return new TeamBundle(teamJson.toJSONString(), allMembers.getTotalNumberOfResults(), membershipStatusJsonString, isAdmin);
+			return new TeamBundle(teamJson.toJSONString(), memberCount, membershipStatusJsonString, isAdmin);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -1877,19 +1896,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//must be an admin to the team
-			//TODO: After PLFM-2248 is complete, enable this admin check (remove the try catch method)
-//			TeamBundle teamBundle = getTeamBundle(currentUserId, teamId, true);
-//			if (teamBundle.isUserAdmin()) {
+			//must be an admin to the team open requests.  To get admin status, must be a member
 			try {
 				PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
 				return requests.getTotalNumberOfResults();
 			} catch (SynapseForbiddenException forbiddenEx) {
 				return null;
 			}
-//			} else {
-//				return null;
-//			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

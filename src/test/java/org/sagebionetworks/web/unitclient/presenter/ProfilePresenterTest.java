@@ -12,8 +12,10 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -49,6 +51,7 @@ public class ProfilePresenterTest {
 	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	CookieProvider mockCookieProvider;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	GWTWrapper mockGWTWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	Profile place = Mockito.mock(Profile.class);
@@ -71,7 +74,8 @@ public class ProfilePresenterTest {
 		mockCookieProvider = mock(CookieProvider.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm);	
+		
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
