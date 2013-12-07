@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -161,7 +164,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
@@ -171,7 +174,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(profile.getOwnerId(), false);
+			myTeamsWidget.configure(teams, false);
 			myTeamsPanel.add(myTeamsWidget.asWidget());
 			myTeamsPanel.setVisible(true);
 		

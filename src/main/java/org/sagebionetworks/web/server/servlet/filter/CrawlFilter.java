@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -58,7 +59,6 @@ public class CrawlFilter implements Filter {
 	 * Injected with Gin
 	 */
 	private SynapseClientImpl synapseClient;
-
 	JSONObjectAdapter jsonObjectAdapter;
 	
 	@Override
@@ -161,7 +161,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = escapeHtml(entity.getCreatedBy());
 		try{
-			String wikiPageJson = synapseClient.getWikiPage(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
+			String wikiPageJson = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
 			markdown = escapeHtml(rootPage.getMarkdown());
 		} catch (Exception e) {}
