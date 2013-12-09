@@ -178,9 +178,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		updateProfileView(null, editable);
 	}
 	
-	private void updateProfileView(String userId, final boolean editable) {
+	private void updateProfileView(final String userId, final boolean editable) {
 		view.clear();
 		final boolean isOwner = userId == null;
+		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String userProfileJson) {
@@ -190,7 +191,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile = profile;
 						profileForm.configure(profile, profileUpdatedCallback);
 						
-						TeamListWidget.getTeams(authenticationController.getCurrentUserPrincipalId(), synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
+						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								view.showErrorMessage(caught.getMessage());
