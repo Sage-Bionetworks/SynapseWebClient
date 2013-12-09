@@ -23,6 +23,8 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -38,6 +40,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -62,6 +65,7 @@ public class WikiPageWidgetTest {
 	AuthenticationController mockAuthenticationController;
 
 	WikiPage testPage;
+	UserGroupHeaderResponsePage userGroupResponse;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	
 	@Before
@@ -91,9 +95,17 @@ public class WikiPageWidgetTest {
 		testPage.setMarkdown("my test markdown");
 		testPage.setTitle("My Test Wiki Title");
 
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testPage);
+		userGroupResponse = new UserGroupHeaderResponsePage();
+		userGroupResponse.setChildren(new ArrayList<UserGroupHeader>());
+		
+		EntityWrapper entityWrapper = new EntityWrapper();
+		entityWrapper.setEntityJson("fake entity json");
+		
+		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
+		when(mockNodeModelCreator.createJSONEntity("fake entity json", UserGroupHeaderResponsePage.class)).thenReturn(userGroupResponse);
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -105,7 +117,15 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false));
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), any(List.class));
+	}
+	
+	@Test
+	public void testConfigureGetUserGroupHeadersFailure() {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		// In the case of getUserGroupHeaders failure, the user ids should still be passed to the view for configuration
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), any(List.class));
 	}
 	
 	@Test

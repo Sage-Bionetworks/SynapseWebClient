@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -38,6 +37,7 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -56,7 +56,7 @@ import com.google.inject.Inject;
  *
  */
 public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageWidgetView {
-	
+
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -74,6 +74,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
+	private List<String> displayNames;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -128,7 +129,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, List<String> displayNames) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -136,6 +137,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
+		this.displayNames = displayNames;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -160,6 +162,11 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
 		
+		// Add created/modified information at the end
+		FlowPanel createdAndModifiedSection = new FlowPanel();
+		createdAndModifiedSection.add(wrapWidget(createModifiedAndCreatedSection(), "clearleft"));
+		add(createdAndModifiedSection);
+		
 		layout(true);
 	}
 	
@@ -168,6 +175,23 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		widgetWrapper.addStyleName(styleNames);
 		widgetWrapper.add(widget);
 		return widgetWrapper;
+	}
+	
+	private Widget createModifiedAndCreatedSection() {
+		HTML html;
+		if(displayNames != null && displayNames.size() == 2) {
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " <b>")
+			.appendEscaped(displayNames.get(0))
+			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()) + "<br>")
+			.appendHtmlConstant(DisplayConstants.CREATED_BY + " <b>")
+			.appendEscaped(displayNames.get(1))
+			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
+			html = new HTML(shb.toSafeHtml());
+		} else {
+			html = new HTML();
+		}
+		return html;
 	}
 	
 	private Widget getBreadCrumbs(int colWidth) {
