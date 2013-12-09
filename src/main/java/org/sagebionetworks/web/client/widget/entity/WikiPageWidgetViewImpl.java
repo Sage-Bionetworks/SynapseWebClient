@@ -181,10 +181,10 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		HTML html;
 		if(displayNames != null && displayNames.size() == 2) {
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " <b>")
+			shb.appendHtmlConstant(DisplayConstants.WIKI_MODIFIED_BY + " <b>")
 			.appendEscaped(displayNames.get(0))
 			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()) + "<br>")
-			.appendHtmlConstant(DisplayConstants.CREATED_BY + " <b>")
+			.appendHtmlConstant(DisplayConstants.WIKI_CREATED_BY + " <b>")
 			.appendEscaped(displayNames.get(1))
 			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
 			html = new HTML(shb.toSafeHtml());
