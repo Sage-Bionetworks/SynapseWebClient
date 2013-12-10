@@ -17,6 +17,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -256,6 +257,7 @@ public interface SynapseClient extends RemoteService {
 	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId) throws RestServiceException;
 	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
+	public void deleteMembershipInvitation(String invitationId) throws RestServiceException;
 	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	public String updateTeam(String teamJson) throws RestServiceException;

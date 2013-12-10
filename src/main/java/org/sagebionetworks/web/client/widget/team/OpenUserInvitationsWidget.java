@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -26,6 +27,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
+	private Callback teamRefreshCallback;
 	
 	
 	@Inject
@@ -42,8 +44,26 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.nodeModelCreator = nodeModelCreator;
 	}
 
-	public void configure(String teamId) {
+	@Override
+	public void removeInvitation(String invitationId) {
+		synapseClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				teamRefreshCallback.invoke();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					view.showErrorMessage(caught.getMessage());
+				} 
+			}
+		});
+	}
+	public void configure(String teamId, Callback teamRefreshCallback) {
 		this.teamId = teamId;
+		this.teamRefreshCallback = teamRefreshCallback;
+		
 		//using the given team, try to show all pending membership requests (or nothing if empty)
 		synapseClient.getOpenTeamInvitations(teamId, new AsyncCallback<List<MembershipInvitationBundle>>() {
 			@Override
@@ -51,16 +71,12 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				try {
 					//create the associated object list, and pass to the view to render
 					List<UserProfile> profiles = new ArrayList<UserProfile>();
-					List<String> invitationMessages = new ArrayList<String>();
+					List<MembershipInvtnSubmission> invitations = new ArrayList<MembershipInvtnSubmission>();
 					for (MembershipInvitationBundle b : result) {
-						String requestMessage = "";
-						MembershipInvtnSubmission invite = nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class);
-						if (invite != null && invite.getMessage() != null)
-							requestMessage = invite.getMessage();
-						invitationMessages.add(requestMessage);
+						invitations.add(nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class));
 						profiles.add(nodeModelCreator.createJSONEntity(b.getUserProfileJson(), UserProfile.class));
 					}
-					view.configure(profiles, invitationMessages);
+					view.configure(profiles, invitations);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

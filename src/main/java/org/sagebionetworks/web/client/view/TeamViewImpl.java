@@ -177,7 +177,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			openMembershipRequestsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
 			
-			openUserInvitationsWidget.configure(team.getId());
+			openUserInvitationsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openUserInvitationsWidget.asWidget());
 			
 			//fill in the tools menu button
