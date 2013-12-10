@@ -55,7 +55,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 					for (MembershipInvitationBundle b : result) {
 						String requestMessage = "";
 						MembershipInvtnSubmission invite = nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class);
-						if (invite.getMessage() != null)
+						if (invite != null && invite.getMessage() != null)
 							requestMessage = invite.getMessage();
 						invitationMessages.add(requestMessage);
 						profiles.add(nodeModelCreator.createJSONEntity(b.getUserProfileJson(), UserProfile.class));
