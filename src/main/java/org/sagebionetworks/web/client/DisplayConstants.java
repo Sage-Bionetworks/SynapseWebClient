@@ -520,8 +520,6 @@ public class DisplayConstants {
 	public static final String CREATED_BY = "Created by";
 	public static final String MODIFIED = "Modified";
 	public static final String MODIFIED_BY = "Modified by";
-	public static final String WIKI_MODIFIED_BY = "Wiki modified by";
-	public static final String WIKI_CREATED_BY = "Wiki created by";
 	public static final String ON = "on";
 	public static final String NO_VERSION_COMMENT = "No Version Comment";
 	public static final String ADD_FOLDER = "Add Folder";

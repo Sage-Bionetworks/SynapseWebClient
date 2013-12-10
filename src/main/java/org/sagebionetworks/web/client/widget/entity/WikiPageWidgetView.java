@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.List;
 
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
@@ -30,7 +29,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void editClicked();
 	}
 	
-	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription, List<String> displayNames);
+	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);
 	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();

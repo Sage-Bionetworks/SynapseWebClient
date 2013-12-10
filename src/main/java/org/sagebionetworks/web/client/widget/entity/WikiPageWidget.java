@@ -8,9 +8,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -26,7 +23,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -60,7 +56,6 @@ SynapseWidgetPresenter {
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
-	List<String> displayNames;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -100,7 +95,6 @@ SynapseWidgetPresenter {
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
-		displayNames = new ArrayList<String>();
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -125,35 +119,8 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
-							final boolean isRootWiki = currentPage.getParentWikiId() == null;
-							// User ids of creator and modifier
-							List<String> userIds = new ArrayList<String>();
-							userIds.add(currentPage.getModifiedBy());
-							userIds.add(currentPage.getCreatedBy());
-							// Get the display names of the users
-							synapseClient.getUserGroupHeadersById(userIds, new AsyncCallback<EntityWrapper>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									// Configure with the user ids
-									displayNames.add(currentPage.getModifiedBy());
-									displayNames.add(currentPage.getCreatedBy());
-									view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, displayNames);
-								}
-								@Override
-								public void onSuccess(EntityWrapper result) {
-									try {
-										// Configure with display name results
-										UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(result.getEntityJson(), UserGroupHeaderResponsePage.class);
-										List<UserGroupHeader> headers = response.getChildren();
-										for(int i = 0; i < headers.size(); i++) {
-											displayNames.add(headers.get(i).getDisplayName());
-										}
-										view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, displayNames);
-									} catch(JSONObjectAdapterException e) {
-										view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);      
-									}
-								}
-							});
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
 						} catch (Exception e) {
 							onFailure(e);
 						}

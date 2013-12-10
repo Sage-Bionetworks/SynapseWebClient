@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEdi
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -42,6 +44,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -74,7 +77,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
-	private List<String> displayNames;
+	private PortalGinInjector ginInjector;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -92,7 +95,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	@Inject
 	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
 			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
-			WidgetRegistrar widgetRegistrar) {
+			WidgetRegistrar widgetRegistrar, PortalGinInjector ginInjector) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -100,6 +103,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.breadcrumb = breadcrumb;
 		this.wikiAttachments = wikiAttachments;
 		this.widgetRegistrar = widgetRegistrar;
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -129,7 +133,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, List<String> displayNames) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -137,7 +141,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
-		this.displayNames = displayNames;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -163,9 +166,39 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		add(mainPanel);
 		
 		// Add created/modified information at the end
-		FlowPanel createdAndModifiedSection = new FlowPanel();
-		createdAndModifiedSection.add(wrapWidget(createModifiedAndCreatedSection(), "clearleft"));
-		add(createdAndModifiedSection);
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
+		HTML modifiedText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()));
+		HTML modifiedOnText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.CREATED_BY + " ");
+		HTML createdText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
+		HTML createdOnText = new HTML(shb.toSafeHtml());
+		
+		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
+		modifiedBy.configure(currentPage.getModifiedBy());
+		
+		UserBadge createdBy = ginInjector.getUserBadgeWidget();
+		createdBy.configure(currentPage.getCreatedBy());
+		
+		HorizontalPanel modifiedPanel = new HorizontalPanel();
+		modifiedPanel.add(modifiedText);
+		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
+		modifiedPanel.add(modifiedOnText);
+		add(wrapWidget(modifiedPanel, "clearleft"));
+		
+		HorizontalPanel createdPanel = new HorizontalPanel();
+		createdPanel.add(createdText);
+		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
+		createdPanel.add(createdOnText);
+		add(wrapWidget(createdPanel, "clearleft"));
 		
 		layout(true);
 	}
@@ -175,23 +208,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		widgetWrapper.addStyleName(styleNames);
 		widgetWrapper.add(widget);
 		return widgetWrapper;
-	}
-	
-	private Widget createModifiedAndCreatedSection() {
-		HTML html;
-		if(displayNames != null && displayNames.size() == 2) {
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant(DisplayConstants.WIKI_MODIFIED_BY + " <b>")
-			.appendEscaped(displayNames.get(0))
-			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()) + "<br>")
-			.appendHtmlConstant(DisplayConstants.WIKI_CREATED_BY + " <b>")
-			.appendEscaped(displayNames.get(1))
-			.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
-			html = new HTML(shb.toSafeHtml());
-		} else {
-			html = new HTML();
-		}
-		return html;
 	}
 	
 	private Widget getBreadCrumbs(int colWidth) {
