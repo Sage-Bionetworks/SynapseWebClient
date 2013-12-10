@@ -8,8 +8,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -110,7 +113,7 @@ SynapseWidgetPresenter {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
 				//get the wiki page
-				synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+				synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
 						try {
@@ -119,7 +122,7 @@ SynapseWidgetPresenter {
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
-						} catch (JSONObjectAdapterException e) {
+						} catch (Exception e) {
 							onFailure(e);
 						}
 					}
@@ -153,7 +156,7 @@ SynapseWidgetPresenter {
 	@Override
 	public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback) {
 		//get the wiki page
-		synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
@@ -163,7 +166,6 @@ SynapseWidgetPresenter {
 						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
 						return;
 					}
-					//update with the most current markdown and title
 					currentPage.setMarkdown(updatedMarkdown);
 					if (updatedTitle != null && updatedTitle.length() > 0)
 						currentPage.setTitle(updatedTitle);
@@ -172,16 +174,16 @@ SynapseWidgetPresenter {
 						pageUpdatedCallback.pageUpdated();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
-				}
+				}	
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
-		});				
+		});	
 	}
-	
+
 	public void setOwnerObjectName(final OwnerObjectNameCallback callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -239,7 +241,7 @@ SynapseWidgetPresenter {
 				JSONObjectAdapter json = jsonObjectAdapter.createNew();
 				try {
 					currentPage.writeToJSONObject(json);
-					synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
+					synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
 						@Override
 						public void onSuccess(String result) {
 							//showDefaultViewWithWiki();
@@ -263,10 +265,11 @@ SynapseWidgetPresenter {
 	
 	@Override
 	public void deleteButtonClicked() {
-		synapseClient.deleteWikiPage(wikiKey, new AsyncCallback<Void>() {
+		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
 			
 			@Override
 			public void onSuccess(Void result) {
+				setIsEditing(false);
 				//clear the now invalid page id from the wiki key
 				wikiKey.setWikiPageId(null);
 				if (isEmbeddedInOwnerPage)
@@ -308,29 +311,30 @@ SynapseWidgetPresenter {
 		page.setTitle(name);
 		String wikiPageJson;
 		try {
-			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					if (isCreatingWiki) {
-						String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
-						view.showInfo( type + " Created", "");
-					} else {
-						view.showInfo("Page '" + name + "' Added", "");
-					}
-					
-					refresh();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
+            wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+            synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    if (isCreatingWiki) {
+                        String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
+                        view.showInfo( type + " Created", "");
+                    } else {
+                        view.showInfo("Page '" + name + "' Added", "");
+                    }
+                    
+                    refresh();
+                }
+                
+                @Override
+                public void onFailure(Throwable caught) {
+                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+                        view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+                }
+            });
+	    } catch (JSONObjectAdapterException e) {                        
+	            view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);                
+	    }
+			
 	}
 	
 	public void clear(){
@@ -339,4 +343,5 @@ SynapseWidgetPresenter {
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
+
 }
