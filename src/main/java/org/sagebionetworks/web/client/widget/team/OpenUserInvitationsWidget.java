@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -54,7 +54,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 					List<String> invitationMessages = new ArrayList<String>();
 					for (MembershipInvitationBundle b : result) {
 						String requestMessage = "";
-						MembershipInvitation invite = nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvitation.class);
+						MembershipInvtnSubmission invite = nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class);
 						if (invite.getMessage() != null)
 							requestMessage = invite.getMessage();
 						invitationMessages.add(requestMessage);

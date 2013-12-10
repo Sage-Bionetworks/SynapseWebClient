@@ -170,10 +170,11 @@ public class TeamViewImpl extends Composite implements TeamView {
 			//only show upload link if direct upload is supported
 			if (synapseJSNIUtils.isDirectUploadSupported())
 				mainContainer.add(uploadLink);
+			Callback refreshCallback = getRefreshCallback(team.getId());
 			//show invite UI
-			inviteWidget.configure(team.getId());
+			inviteWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(inviteWidget.asWidget());
-			openMembershipRequestsWidget.configure(team.getId(), getRefreshCallback(team.getId()));
+			openMembershipRequestsWidget.configure(team.getId(), refreshCallback);
 			mainContainer.add(openMembershipRequestsWidget.asWidget());
 			
 			openUserInvitationsWidget.configure(team.getId());
