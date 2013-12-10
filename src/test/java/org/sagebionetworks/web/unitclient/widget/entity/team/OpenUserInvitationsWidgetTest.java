@@ -69,21 +69,41 @@ public class OpenUserInvitationsWidgetTest {
 		testReturn.add(new MembershipInvitationBundle());
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigure() throws Exception {
-		//verify it tries to refresh all members
-		widget.configure(teamId);
+		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), anyList());
 	}
 	
 	public void testConfigureFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
-		widget.configure(teamId);
+		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDeleteOpenInvite() throws Exception {
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		widget.removeInvitation("123");
+		verify(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+		verify(mockTeamUpdatedCallback).invoke();
+		verify(mockView).configure(anyList(), anyList());
+	}
+	
+	public void testDeleteOpenInviteFailure() throws Exception {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		widget.removeInvitation("123");
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	
 }
