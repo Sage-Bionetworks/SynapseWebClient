@@ -638,6 +638,9 @@ public class DisplayConstants {
 	public static final String SIGNING_IN = "Signing in...";
 	public static final String NEW = "new";
 	public static final String QUERY = "Query";
+	public static final String ADD_ROW = "Add Row";
+	public static final String EDIT_COLUMNS = "Edit Columns";
+	public static final String ADD_COLUMN = "Add Column";
 	
 	
 }

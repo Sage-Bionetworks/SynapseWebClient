@@ -1453,3 +1453,14 @@ a.projectTitle:hover {
 }
 
 
+/*===========*/
+
+.largeIconButton {
+	font-size: 22px;
+	line-height: 30px;
+	color: #000000;
+}
+
+.text-align-right {
+	text-align: right;
+}

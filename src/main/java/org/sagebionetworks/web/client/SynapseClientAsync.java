@@ -224,4 +224,6 @@ public interface SynapseClientAsync {
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
+
+	void getColumnModelBatch(List<String> columnIds, AsyncCallback<String> asyncCallback);
 }

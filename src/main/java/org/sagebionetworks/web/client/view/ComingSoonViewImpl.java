@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		table.setId("12345");
 		table.setName("Example Table");
 		table.setCreatedByPrincipalId("2337773");
+		table.setColumnIds(Arrays.asList(new String[] {"1","2","3","4","5","6"}));		
 		tableWidget.configure(table);
 		entityView.setWidget(tableWidget.asWidget());
 	}

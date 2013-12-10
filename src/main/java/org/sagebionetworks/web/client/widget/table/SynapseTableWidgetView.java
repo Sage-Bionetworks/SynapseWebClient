@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.TableObject;
 
@@ -22,7 +26,7 @@ public interface SynapseTableWidgetView extends IsWidget, SynapseView {
 				
 	}
 
-	public void configure(TableObject table, String queryString);
+	public void configure(TableObject table, List<ColumnModel> columns, String queryString, boolean canEdit);
 	
 	
 }
