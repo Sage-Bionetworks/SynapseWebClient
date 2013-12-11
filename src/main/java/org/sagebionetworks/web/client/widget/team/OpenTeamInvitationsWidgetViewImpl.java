@@ -64,7 +64,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, inviteMessages.get(i));
 			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("margin-top-15 col-md-9");
+			teamRendererWidget.addStyleName("margin-top-15 col-xs-8 col-sm-9 col-md-10");
 			Button joinButton = DisplayUtils.createButton(DisplayConstants.JOIN, ButtonType.PRIMARY);
 			joinButton.addStyleName("right margin-top-15 margin-right-15 btn-lg");
 			joinButton.addClickHandler(new ClickHandler() {
@@ -74,7 +74,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 				}
 			});
 			LayoutContainer buttonContainer = new LayoutContainer();
-			buttonContainer.addStyleName("col-md-3");
+			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
 			buttonContainer.add(joinButton);
 			lc.add(teamRendererWidget);
 			lc.add(buttonContainer);

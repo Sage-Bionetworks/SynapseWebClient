@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
 
+	public static final Integer INVITATION_BATCH_LIMIT = 10;
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
@@ -28,7 +29,9 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private SynapseClientAsync synapseClient;
 	private String teamId;
 	private Callback teamRefreshCallback;
-	
+	private Integer currentOffset;
+	private List<UserProfile> profiles;
+	private List<MembershipInvtnSubmission> invitations;
 	
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
@@ -60,23 +63,34 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			}
 		});
 	}
+	
 	public void configure(String teamId, Callback teamRefreshCallback) {
 		this.teamId = teamId;
 		this.teamRefreshCallback = teamRefreshCallback;
-		
+		profiles = new ArrayList<UserProfile>();
+		invitations = new ArrayList<MembershipInvtnSubmission>();
+		currentOffset = 0;
+		getNextBatch();
+	};
+
+	@Override
+	public void getNextBatch() {
 		//using the given team, try to show all pending membership requests (or nothing if empty)
-		synapseClient.getOpenTeamInvitations(teamId, new AsyncCallback<List<MembershipInvitationBundle>>() {
+		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<List<MembershipInvitationBundle>>() {
 			@Override
 			public void onSuccess(List<MembershipInvitationBundle> result) {
 				try {
+					currentOffset += result.size();
+					
 					//create the associated object list, and pass to the view to render
-					List<UserProfile> profiles = new ArrayList<UserProfile>();
-					List<MembershipInvtnSubmission> invitations = new ArrayList<MembershipInvtnSubmission>();
 					for (MembershipInvitationBundle b : result) {
 						invitations.add(nodeModelCreator.createJSONEntity(b.getMembershipInvitationJson(), MembershipInvtnSubmission.class));
 						profiles.add(nodeModelCreator.createJSONEntity(b.getUserProfileJson(), UserProfile.class));
 					}
 					view.configure(profiles, invitations);
+					
+					//show the more button if we maxed out the return results
+					view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -89,8 +103,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				} 
 			}
 		});
-	};
-
+	}
 	
 	@Override
 	public void goTo(Place place) {

@@ -22,9 +22,13 @@ public interface OpenUserInvitationsWidgetView extends IsWidget, SynapseView {
 	 * shows nothing if membershipRequests is empty.
 	 */
 	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations);
+	
+	public void setMoreResultsVisible(boolean isVisible);
+	
 	public interface Presenter extends SynapsePresenter {
 		//use to go to user profile page
 		void goTo(Place place);
 		void removeInvitation(String ownerId);
+		void getNextBatch();
 	}
 }

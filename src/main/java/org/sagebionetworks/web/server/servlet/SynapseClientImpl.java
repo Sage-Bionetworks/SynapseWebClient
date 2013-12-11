@@ -1935,10 +1935,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId) throws RestServiceException {
+	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, MAX_LIMIT, ZERO_OFFSET);
+			PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, limit, offset);
 			//and ask for the team info for each invite, and fill that in the bundle
 			
 			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
