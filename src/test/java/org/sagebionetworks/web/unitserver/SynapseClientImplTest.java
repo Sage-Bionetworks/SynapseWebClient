@@ -1251,8 +1251,11 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetOpenTeamInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		List<MembershipInvitationBundle> invitationBundles = synapseClient.getOpenTeamInvitations("123");
-		verify(mockSynapse).getOpenMembershipInvitationSubmissions(anyString(), anyString(), anyLong(), anyLong());
+		int limit = 55;
+		int offset = 2;
+		String teamId = "132";
+		List<MembershipInvitationBundle> invitationBundles = synapseClient.getOpenTeamInvitations(teamId, limit, offset);
+		verify(mockSynapse).getOpenMembershipInvitationSubmissions(eq(teamId), anyString(), eq((long)limit), eq((long)offset));
 		//we set this up so that a single invite would be returned.  Verify that it is the one we're looking for
 		assertEquals(1, invitationBundles.size());
 		MembershipInvitationBundle invitationBundle = invitationBundles.get(0);

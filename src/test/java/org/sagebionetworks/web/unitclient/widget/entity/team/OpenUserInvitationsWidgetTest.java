@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,42 +63,82 @@ public class OpenUserInvitationsWidgetTest {
 		List<MembershipInvitationBundle> testReturn = new ArrayList<MembershipInvitationBundle>();
 		testReturn.add(new MembershipInvitationBundle());
 		
-		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+	}
+	
+	private void setupGetOpenTeamInvitations(int mockInvitationReturnCount) {
+		List<MembershipInvitationBundle> testReturn = new ArrayList<MembershipInvitationBundle>();
+		for (int i = 0; i < mockInvitationReturnCount; i++) {
+			testReturn.add(new MembershipInvitationBundle());	
+		}
+		
+		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
+		
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigure() throws Exception {
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), anyList());
 	}
 	
 	public void testConfigureFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteOpenInvite() throws Exception {
+		String invitationId = "123";
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		widget.removeInvitation("123");
-		verify(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+		widget.removeInvitation(invitationId);
+		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
 		verify(mockTeamUpdatedCallback).invoke();
 		verify(mockView).configure(anyList(), anyList());
 	}
 	
 	public void testDeleteOpenInviteFailure() throws Exception {
+		String invitationId = "123";
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		widget.removeInvitation("123");
-		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), any(AsyncCallback.class));
+		widget.removeInvitation(invitationId);
+		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	public void testMoreResultsUnavailable() throws Exception {
+		setupGetOpenTeamInvitations(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT - 1);
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).setMoreResultsVisible(eq(false));
+	}
+
+	public void testNoResultsAvailable() throws Exception {
+		setupGetOpenTeamInvitations(0);
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).setMoreResultsVisible(eq(false));
+	}
+
+	public void testMoreResultsAvailableGetNextBatch() throws Exception {
+		setupGetOpenTeamInvitations(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT);
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).setMoreResultsVisible(eq(true));
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), eq(0), any(AsyncCallback.class));
+		
+		//simulate that there are really no more results
+		reset(mockSynapseClient);
+		setupGetOpenTeamInvitations(0);
+		widget.getNextBatch();
+		verify(mockView).setMoreResultsVisible(eq(false));
+		//offset should now be 1*OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), any(AsyncCallback.class));
+	}
+	
 	
 	
 }
