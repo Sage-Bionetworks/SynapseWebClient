@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.impl.client.DefaultBackoffStrategy;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -22,15 +21,22 @@ import com.extjs.gxt.ui.client.widget.grid.RowEditor;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,9 +58,9 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	@UiField
 	SimplePanel queryButtonContainer;
 	@UiField
-	HTMLPanel bottomToolbar;
+	HTMLPanel buttonToolbar;
 	@UiField
-	SimplePanel columnsEditorPanel;
+	SimplePanel columnEditorPanel;
 	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -91,7 +97,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		setupBottomToolbar(columns);
 		queryPanel.setVisible(true);		
 		if(canEdit) {
-			bottomToolbar.setVisible(true);
+			buttonToolbar.setVisible(true);
 		}
 	}
 	
@@ -176,8 +182,19 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 
 
 	private void setupBottomToolbar(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
-		bottomToolbar.clear();
-		Button addRowBtn = DisplayUtils.createButton(DisplayConstants.ADD_ROW);
+		buttonToolbar.clear();
+
+		Button editColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.EDIT_COLUMNS, ButtonType.DEFAULT, "glyphicon-pencil");
+		editColumnsBtn.addStyleName("margin-right-5");
+		editColumnsBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(!columnEditorBuilt) buildColumnsEditor(columns);
+				columnEditorPanel.setVisible( columnEditorPanel.isVisible() ? false : true ); 
+			}
+		});
+		
+		Button addRowBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_ROW, ButtonType.DEFAULT, "glyphicon-plus");
 		addRowBtn.addStyleName("margin-right-5");
 		addRowBtn.addClickHandler(new ClickHandler() {			
 			@Override
@@ -206,17 +223,9 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		        rowEditor.startEditing(store.indexOf(row), true);  
 			}
 		});
-		bottomToolbar.add(addRowBtn);
-		Button editColumnsBtn = DisplayUtils.createButton(DisplayConstants.EDIT_COLUMNS);
-		editColumnsBtn.addStyleName("margin-right-5");
-		bottomToolbar.add(editColumnsBtn);		
-		editColumnsBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				if(!columnEditorBuilt) buildColumnsEditor(columns);
-				columnsEditorPanel.setVisible( columnsEditorPanel.isVisible() ? false : true ); 
-			}
-		});
+		
+		buttonToolbar.add(editColumnsBtn);		
+		buttonToolbar.add(addRowBtn);
 	}
 	
 	private void buildColumnsEditor(List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
@@ -225,6 +234,8 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		String accordionId = "accordion-" + ++sequence;
 		parent.getElement().setId(accordionId);
 		
+		// add header
+		parent.add(new HTML("<h4>" + DisplayConstants.TABLE_COLUMNS + "</h4>"));
 		
 		for(int i=0; i<columns.size(); i++) {
 			org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);
@@ -272,7 +283,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		addColumnBtn.addStyleName("margin-top-15");
 		parent.add(addColumnBtn);
 		
-		columnsEditorPanel.setWidget(parent);
+		columnEditorPanel.setWidget(parent);
 	}
 
 	private Widget createColumnEditor(
@@ -285,54 +296,22 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		form.add(inputLabel);
 		form.add(name);
 		
-		
+		// Column Type
 		inputLabel = new HTML("Column Type: ");
 		inputLabel.addStyleName("margin-top-15");
 		form.add(inputLabel);
-		HTMLPanel columnTypeSelector = new HTMLPanel("");
-		columnTypeSelector.addStyleName("btn-group");
-		columnTypeSelector.getElement().setAttribute("data-toggle", "buttons");
-		String radioName = "columnTypeRadio" + ++sequence;
-		
-		String btns = "";
-		for(String radioLabel : new String[]{"String", "Integer", "Double", "Boolean", "Date", "File" }) {						
-//			Label label = new Label(radioLabel);
-//			label.addStyleName("btn btn-default");		
-//			RadioButton btn = new RadioButton(radioName);
-//			btn.addClickHandler(new ClickHandler() {			
-//				@Override
-//				public void onClick(ClickEvent event) {				
-//				}
-//			});
-//			label.getElement().insertFirst(btn.getElement());
-//			InlineHTML label = new InlineHTML("<label class=\"btn btn-default\"><input type=\"radio\" name=\"options\" id=\"option1\"> " + radioLabel + "</label>");
-//			columnTypeSelector.add(label);
-			btns += "<label class=\"btn btn-default\"> <input type=\"radio\" name=\"options\" id=\"option1\"> " + radioLabel + "</label>";
-		}		
-//		form.add(columnTypeSelector);
+		HTMLPanel columnTypeRadio = createColumnTypeRadio(col);		
+		form.add(columnTypeRadio);
 
-		HTML radio = new HTML(btns);
-		radio.addStyleName("btn-group");
-		radio.getElement().setAttribute("data-toggle", "buttons");		
-		form.add(radio);
-
+		// Default Value		
 		inputLabel = new HTML("Default Value: ");
 		inputLabel.addStyleName("margin-top-15");
 		form.add(inputLabel);
-		HTML defaultValueRadio = new HTML(
-				"<label class=\"btn btn-default\"> <input type=\"radio\" name=\"defaultValueRadio\" id=\"option1\">On</label>"
-				+ "<label class=\"btn btn-default\"> <input type=\"radio\" name=\"defaultValueRadio\" id=\"option1\" data-toggle=\"button\">Off</label>");
-		defaultValueRadio.addStyleName("btn-group");
-		defaultValueRadio.getElement().setAttribute("data-toggle", "buttons");		
-		form.add(defaultValueRadio);
+		HTMLPanel row = createDefaultValueRadio(col);
+		form.add(row);
+
 		
-		TextBox defaultValueBox = new TextBox();
-		defaultValueBox.addStyleName("form-control margin-top-5");
-		defaultValueBox.setWidth("300px");
-		defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
-		defaultValueBox.setEnabled(false);
-		form.add(defaultValueBox);
-		
+		// Save/Cancel
 		// TODO : hide buttons unless a change has been made
 		HTMLPanel buttons = new HTMLPanel("");
 		buttons.addStyleName("margin-top-15");
@@ -344,6 +323,82 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		
 		return form;
 		
+	}
+
+	private HTMLPanel createDefaultValueRadio(
+			org.sagebionetworks.repo.model.table.ColumnModel col) {
+		HTMLPanel row = new HTMLPanel("");		
+		HTMLPanel defaultValueRadio = new HTMLPanel("");
+		defaultValueRadio.addStyleName("btn-group");
+		 						
+		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
+		final Button offBtn = DisplayUtils.createButton(DisplayConstants.OFF);
+		final TextBox defaultValueBox = new TextBox();
+		onBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				offBtn.removeStyleName("active");
+				onBtn.addStyleName("active");
+				defaultValueBox.setVisible(true);
+				showInfo("selected", "on");
+			}
+		});
+		offBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				onBtn.removeStyleName("active");
+				offBtn.addStyleName("active");
+				defaultValueBox.setVisible(false);
+				showInfo("selected", "off");
+			}
+		});
+		if(col.getDefaultValue() != null) {
+			onBtn.addStyleName("active");
+			defaultValueBox.setVisible(true);
+		} else {
+			offBtn.addStyleName("active");
+			defaultValueBox.setVisible(false);
+		}
+		
+		defaultValueRadio.add(onBtn);
+		defaultValueRadio.add(offBtn);			
+		
+		
+		// TODO : choose appropriate input type for default value (string, enum, date, etc)
+		defaultValueBox.addStyleName("form-control display-inline margin-top-5");
+		defaultValueBox.setWidth("300px");
+		defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
+		defaultValueBox.setValue(col.getDefaultValue());
+		
+		row.add(defaultValueRadio);
+		row.add(defaultValueBox);
+		return row;
+	}
+
+	private HTMLPanel createColumnTypeRadio(
+			org.sagebionetworks.repo.model.table.ColumnModel col) {
+		HTMLPanel columnTypeRadio = new HTMLPanel("");
+		columnTypeRadio.addStyleName("btn-group");
+		final List<Button> groupBtns = new ArrayList<Button>(); 
+		for(final ColumnType type : ColumnType.values()) {			
+			String radioLabel = ColumnUtils.getColumnDisplayName(type);
+			final Button btn = DisplayUtils.createButton(radioLabel);
+			btn.addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					for(Button gBtn : groupBtns) {
+						gBtn.removeStyleName("active");
+					}
+					btn.addStyleName("active");
+					showInfo("selected", type + "");
+				}
+			});
+			if(col.getColumnType() == type) btn.addStyleName("active");
+			groupBtns.add(btn);
+			columnTypeRadio.add(btn);
+
+		}
+		return columnTypeRadio;
 	}
 	
 	private static native void enableBootstrapButtonPlugin() /*-{

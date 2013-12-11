@@ -10,6 +10,7 @@ public class Synapse extends Place{
 	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
 	public static final String WIKI_DELIMITER = getDelimiter(Synapse.EntityArea.WIKI);
 	public static final String FILES_DELIMITER = getDelimiter(Synapse.EntityArea.FILES);
+	public static final String TABLES_DELIMITER = getDelimiter(Synapse.EntityArea.TABLES);
 	
 	private String token;
 	private String entityId, areaToken;
@@ -58,6 +59,9 @@ public class Synapse extends Place{
 				return;
 			} else if(toProcess.contains(FILES_DELIMITER)) {
 				area = Synapse.EntityArea.FILES;
+				return;
+			} else if(toProcess.contains(TABLES_DELIMITER)) {
+				area = Synapse.EntityArea.TABLES;
 				return;
 			}
 		} else {
@@ -136,7 +140,7 @@ public class Synapse extends Place{
         }
     }
 
-	public static enum EntityArea { WIKI, FILES, ADMIN }
+	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
 
 	@Override
 	public int hashCode() {

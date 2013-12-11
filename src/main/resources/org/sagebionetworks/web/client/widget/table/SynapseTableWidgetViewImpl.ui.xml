@@ -2,7 +2,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client">
 	<g:HTMLPanel>
-		<g:HTMLPanel ui:field="queryPanel" visible="false">
+	    <g:HTMLPanel ui:field="buttonToolbar" visible="false"/>
+	    <g:SimplePanel ui:field="columnEditorPanel" visible="false" styleName="margin-top-15 panel panel-default panel-body" />
+		<g:HTMLPanel ui:field="queryPanel" visible="false" styleName="margin-top-15">
 			<div class="row">
 				<div class="col-xs-8 col-sm-10 col-md-10">
 					<g:TextBox ui:field="queryField" styleName="form-control" />
@@ -12,9 +14,7 @@
 			</div>
 		</g:HTMLPanel>
 		<g:HTMLPanel ui:field="tablePanel" styleName="margin-top-15">
-			<g:SimplePanel ui:field="tableContainer" />
-			<g:HTMLPanel ui:field="bottomToolbar" visible="false" styleName="margin-top-15"/>			
-			<g:SimplePanel ui:field="columnsEditorPanel" visible="false" styleName="margin-top-15" />
+			<g:SimplePanel ui:field="tableContainer" />									
 		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

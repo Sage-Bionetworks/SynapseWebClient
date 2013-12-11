@@ -66,12 +66,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.add(footerWidget.asWidget());		
 		
 		SynapseTableWidget tableWidget = ginInjector.getSynapseTableWidget();
-		TableObject table = new TableObject();
-		table.setId("12345");
-		table.setName("Example Table");
-		table.setCreatedByPrincipalId("2337773");
-		table.setColumnIds(Arrays.asList(new String[] {"1","2","3","4","5","6"}));		
-		tableWidget.configure(table);
+		tableWidget.configure(getTable());
 		entityView.setWidget(tableWidget.asWidget());
 	}
 
@@ -122,6 +117,15 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	    provenanceWidget.configure(null, configMap, null);
 	    provenanceWidget.setHeight(800);	
 	    entityView.setWidget(provenanceWidget.asWidget());
+	}
+
+	public static TableObject getTable() {
+		TableObject table = new TableObject();
+		table.setId("12345");
+		table.setName("Example Table");
+		table.setCreatedByPrincipalId("2337773");
+		table.setColumnIds(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
+		return table;
 	}
 
 	

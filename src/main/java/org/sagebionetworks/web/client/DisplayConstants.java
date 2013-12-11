@@ -641,6 +641,10 @@ public class DisplayConstants {
 	public static final String ADD_ROW = "Add Row";
 	public static final String EDIT_COLUMNS = "Edit Columns";
 	public static final String ADD_COLUMN = "Add Column";
+	public static final String TABLES = "Tables";
+	public static final String TABLE_COLUMNS = "Table Columns";
+	public static final String ON_CAP = "On";
+	public static final String OFF = "Off";
 	
 	
 }
