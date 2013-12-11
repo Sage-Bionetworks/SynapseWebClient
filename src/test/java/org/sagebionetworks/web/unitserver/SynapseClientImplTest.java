@@ -344,6 +344,9 @@ public class SynapseClientImplTest {
 		membershipStatus.setIsMember(false);
 		membershipStatus.setMembershipApprovalRequired(false);
 		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+	}
+	
+	private void setupTeamInvitations() throws SynapseException{
 		ArrayList<MembershipInvtnSubmission> testInvitations = new ArrayList<MembershipInvtnSubmission>();
 		testInvitation = new MembershipInvtnSubmission();
 		testInvitation.setId("628319");
@@ -357,6 +360,7 @@ public class SynapseClientImplTest {
 		inviteeUserProfile.setUserName("Invitee User");
 		inviteeUserProfile.setOwnerId(inviteeUserId);
 		when(mockSynapse.getUserProfile(eq(inviteeUserId))).thenReturn(inviteeUserProfile);
+
 	}
 	
 	@Test
@@ -1251,6 +1255,7 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetOpenTeamInvitations() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		setupTeamInvitations();
 		int limit = 55;
 		int offset = 2;
 		String teamId = "132";
