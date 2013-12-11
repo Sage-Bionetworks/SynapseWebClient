@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
@@ -10,6 +12,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 
@@ -57,6 +60,8 @@ SynapseWidgetPresenter {
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
+	
+	private List<V2WikiHistorySnapshot> history;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -343,5 +348,46 @@ SynapseWidgetPresenter {
 	private void refresh() {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
+
+	@Override
+	public void previewClicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void restoreClicked() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getHistory() {
+		synapseClient.getV2WikiHistory(wikiKey, new Long(100), new Long(0), new AsyncCallback<String>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				org.sagebionetworks.web.shared.PaginatedResults<V2WikiHistorySnapshot> paginatedHistory;
+				try {
+					paginatedHistory = nodeModelCreator.createPaginatedResults(result, V2WikiHistorySnapshot.class);
+					history = paginatedHistory.getResults();
+					view.updateWikiHistory(history);
+					view.createHistoryEntries();
+					view.createAndPopulate();
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+				
+			}
+			
+		});
+	}
+	
 
 }

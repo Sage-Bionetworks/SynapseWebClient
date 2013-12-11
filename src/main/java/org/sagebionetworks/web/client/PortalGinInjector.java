@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -127,6 +128,8 @@ public interface PortalGinInjector extends Ginjector {
 	public JiraURLHelper getJiraURLHelper();
 		
 	public MarkdownWidget getMarkdownWidget();
+	
+	public WikiHistoryWidget getWikiHistoryWidget();
 	
 	/*
 	 *  Markdown Widgets

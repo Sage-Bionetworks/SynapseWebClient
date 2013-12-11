@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
@@ -26,6 +29,9 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void saveClicked(String title, String md);
 		public void cancelClicked();
 		public void editClicked();
+		public void previewClicked();
+		public void restoreClicked();
+		public void getHistory();
 	}
 	
 	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);
@@ -33,4 +39,7 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void show404();
 	public void show403();
 	public void updateWikiPage(WikiPage newPage);
+	public void updateWikiHistory(List<V2WikiHistorySnapshot> history);
+	public void createHistoryEntries();
+	public void createAndPopulate();
 }

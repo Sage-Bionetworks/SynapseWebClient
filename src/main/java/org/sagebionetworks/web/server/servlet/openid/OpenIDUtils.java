@@ -109,7 +109,7 @@ public class OpenIDUtils {
 			// Send all the Open ID info to the repository services
 			System.out.println(URLDecoder.decode(request.getQueryString(), "UTF-8"));
 			Session session = synapse.passThroughOpenIDParameters(
-					URLDecoder.decode(request.getQueryString(), "UTF-8"), false);
+					URLDecoder.decode(request.getQueryString(), "UTF-8"), true);
 
 			// Redirect the user appropriately
 			String redirectUrl = createRedirectURL(returnToURL,
