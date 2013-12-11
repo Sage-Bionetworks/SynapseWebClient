@@ -37,6 +37,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 
 	@Override
 	public Widget asWidget() {
+		view.setPresenter(this, wikiPagePresenter);		
 		return view.asWidget();
 	}
 	

@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -91,6 +92,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private List<V2WikiHistorySnapshot> historyList;
 	private List<HistoryEntry> historyEntries;
 	private DataGrid<HistoryEntry> historyTable;
+	PortalGinInjector ginInjector;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -108,7 +110,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	@Inject
 	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
 			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
-			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget) {
+			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget, PortalGinInjector ginInjector) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -117,6 +119,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.wikiAttachments = wikiAttachments;
 		this.widgetRegistrar = widgetRegistrar;
 		this.historyWidget = historyWidget;
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -242,10 +245,14 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 
 			@Override
 			public void onClick(ClickEvent event) {
+				WikiHistoryWidget wikiHistoryWidget = ginInjector.getWikiHistoryWidget();
+				wikiHistoryWidget.configure(wikiKey, canEdit, presenter);
+				add(wrapWidget(wikiHistoryWidget.asWidget(), "margin-top5"));
 				//historyWidget.configure(wikiKey, canEdit, presenter);
-				presenter.getHistory();
+				//presenter.getHistory();
 				//createHistoryEntries();
 				//createAndPopulate();
+				layout(true);
 			}
 			
 		});

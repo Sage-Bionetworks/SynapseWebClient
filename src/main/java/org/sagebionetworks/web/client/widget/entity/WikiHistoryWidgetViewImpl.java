@@ -24,6 +24,9 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
@@ -152,11 +155,27 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			historyTable.setRowData(0, historyEntries);
 		}
 		historyTable.setVisible(true);
-		add(historyTable);
+		historyTable.setRowCount(historyEntries.size());
+		
+		System.out.println("Added table to layout");
+		FlowPanel panel = new FlowPanel();
+		panel.add(wrapWidget(historyTable, "margin-top-5"));
+		add(panel);
 		layout(true);
-
 		
 	}
+	
+	private SimplePanel wrapWidget(Widget widget, String styleNames) {
+		SimplePanel widgetWrapper = new SimplePanel();
+		widgetWrapper.addStyleName(styleNames);
+		widgetWrapper.add(widget);
+		return widgetWrapper;
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return this;
+	}	
 	
 	@Override
 	public void showLoading() {
@@ -183,7 +202,8 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter, Presenter wikiPageViewPresenter) {
+	public void setPresenter(Presenter presenter, WikiPageWidgetView.Presenter wikiPageViewPresenter) {
 		this.presenter = presenter;
+		this.wikiPagePresenter = wikiPageViewPresenter;
 	}
 }

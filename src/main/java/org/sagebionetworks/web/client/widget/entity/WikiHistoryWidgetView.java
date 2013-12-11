@@ -17,7 +17,7 @@ public interface WikiHistoryWidgetView extends IsWidget, SynapseView{
 	 * @param presenter
 	 * @param wikiPageViewPresenter TODO
 	 */
-	public void setPresenter(Presenter presenter, Presenter wikiPageViewPresenter);
+	public void setPresenter(Presenter presenter, WikiPageWidgetView.Presenter  wikiPageViewPresenter);
 	
 	/**
 	 * Presenter interface
