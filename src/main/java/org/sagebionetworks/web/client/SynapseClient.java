@@ -229,8 +229,8 @@ public interface SynapseClient extends RemoteService {
     public String getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
     public String getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
     
-	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
-	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
+	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException, SynapseException;
+	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException, SynapseException;
 	public String zipAndUploadFile(String content, String fileName)throws IOException, RestServiceException;
 	
 	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
