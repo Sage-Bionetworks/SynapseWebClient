@@ -81,14 +81,11 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-<<<<<<< HEAD
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
-=======
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
->>>>>>> 2dbfd899f5e41e55a9dc8a74ad2ba1d0cefc45c0
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -2452,7 +2449,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}		
 	}
-<<<<<<< HEAD
 
 	@Override
 	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException {
@@ -2505,6 +2501,4 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 		
-=======
->>>>>>> 2dbfd899f5e41e55a9dc8a74ad2ba1d0cefc45c0
 }
