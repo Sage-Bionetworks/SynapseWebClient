@@ -129,9 +129,9 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			LayoutContainer rowPanel = DisplayUtils.createRowContainer();
 			rowPanel.addStyleName("col-md-12");
 			LayoutContainer left = new LayoutContainer();
-			left.addStyleName("col-md-11");
+			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
 			LayoutContainer right = new LayoutContainer();
-			right.addStyleName("col-md-1");
+			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
 			rowPanel.add(left);
 			rowPanel.add(right);
 			final UserGroupHeader member = teamMember.getMember();

@@ -66,7 +66,7 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 			BigUserBadge renderer = ginInjector.getBigUserBadgeWidget();
 			renderer.configure(profile, requestMessages.get(i));
 			Widget rendererWidget = renderer.asWidget();
-			rendererWidget.addStyleName("margin-top-15 col-md-9");
+			rendererWidget.addStyleName("margin-top-15 col-xs-8 col-sm-9 col-md-10");
 			
 			Button joinButton = DisplayUtils.createButton(DisplayConstants.ACCEPT, ButtonType.PRIMARY);
 			joinButton.addStyleName("right margin-top-15 margin-right-15 btn-lg");
@@ -77,7 +77,7 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 				}
 			});
 			LayoutContainer buttonContainer = new LayoutContainer();
-			buttonContainer.addStyleName("col-md-3");
+			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
 			buttonContainer.add(joinButton);
 			lc.add(rendererWidget);
 			lc.add(buttonContainer);

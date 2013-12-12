@@ -46,6 +46,7 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
+		descriptor.clear();
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, view.getApiUrl());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_QUERY_TABLE_RESULTS, view.isQueryTableResults().toString());

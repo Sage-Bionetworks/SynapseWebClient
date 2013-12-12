@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -26,6 +27,7 @@ public class InviteWidgetTest {
 	String teamId = "123";
 	InviteWidget inviteWidget;
 	AuthenticationController mockAuthenticationController;
+	Callback mockRefreshCallback;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -34,7 +36,8 @@ public class InviteWidgetTest {
 		mockView = mock(InviteWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState);
-		inviteWidget.configure(teamId);
+		mockRefreshCallback = mock(Callback.class);
+		inviteWidget.configure(teamId, mockRefreshCallback);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -45,6 +48,7 @@ public class InviteWidgetTest {
 		inviteWidget.sendInvitation(principalId, "you are invited!", "Wildcat");
 		verify(mockSynapseClient).inviteMember(eq(principalId), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockRefreshCallback).invoke();
 	}
 	
 	@SuppressWarnings("unchecked")

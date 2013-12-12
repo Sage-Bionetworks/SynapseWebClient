@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -15,6 +16,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private String teamId;
+	private Callback teamUpdatedCallback;
 	
 	@Inject
 	public InviteWidget(InviteWidgetView view, SynapseClientAsync synapseClient, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState) {
@@ -25,9 +27,10 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		this.authenticationController = authenticationController;
 	}
 
-	public void configure(String teamId) {
+	public void configure(String teamId, Callback teamUpdatedCallback) {
 		//set team
 		this.teamId = teamId;
+		this.teamUpdatedCallback = teamUpdatedCallback;
 		view.configure();
 	};
 	
@@ -37,6 +40,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Invitation Sent", "The invitation has been sent to " + userDisplayName);
+				teamUpdatedCallback.invoke();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
