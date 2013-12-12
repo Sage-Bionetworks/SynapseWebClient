@@ -93,7 +93,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 					if (result.getTeamMembershipStatusJson() != null)
 						teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
 					else
-						teamMembershipStatus = null; 
+						teamMembershipStatus = null;
 					boolean isAdmin = result.isUserAdmin();
 					view.configure(team, isAdmin, teamMembershipStatus, result.getTotalMemberCount());
 				} catch (JSONObjectAdapterException e) {

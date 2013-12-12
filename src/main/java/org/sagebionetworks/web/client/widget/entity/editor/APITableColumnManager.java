@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 
@@ -35,7 +36,7 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 	
 	@Override
 	public void addColumnConfig(String rendererName, String inputColumnNames,
-			String displayColumnName) {
+			String displayColumnName, COLUMN_SORT_TYPE sort) {
 		if (rendererName == null || inputColumnNames == null || rendererName.trim().length() == 0 || inputColumnNames.trim().length() == 0) {
 			throw new IllegalArgumentException("Renderer and Input Columns are required");
 		}
@@ -50,6 +51,10 @@ public class APITableColumnManager implements APITableColumnManagerView.Presente
 		if (displayColumnName == null || displayColumnName.trim().length()==0) {
 			displayColumnName = APITableWidget.getSingleInputColumnName(newConfig);
 		}
+		if (sort == null) {
+			sort = COLUMN_SORT_TYPE.NONE;
+		}
+		newConfig.setSort(sort);
 		newConfig.setDisplayColumnName(displayColumnName);
 		configs.add(newConfig);
 		view.configure(configs);

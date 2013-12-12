@@ -291,6 +291,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
 	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
+	public static final String ERROR_WIKI_SAVE_MARKDOWN = "Failed to properly save markdown: ";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
 	public static final String ERROR_PROFILE_PICTURE_FAILED = "Failed to upload photo: ";
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
@@ -509,6 +510,7 @@ public class DisplayConstants {
 	public static final String MEMBERS = "Members";
 	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
 	public static final String PENDING_JOIN_REQUESTS = "Pending Join Requests";
+	public static final String PENDING_INVITATIONS = "Pending Invitations";
 	public static final String DELETE_TEAM_SUCCESS = "Team successfully deleted";
 	public static final String UPDATE_TEAM_SUCCESS = "Team successfully updated";
 	public static final String LEAVE_TEAM_SUCCESS = "Successfully left team";
@@ -644,8 +646,10 @@ public class DisplayConstants {
 	public static final String TABLES = "Tables";
 	public static final String TABLE_COLUMNS = "Table Columns";
 	public static final String ON_CAP = "On";
-	public static final String OFF = "Off";
-	
+	public static final String OFF = "Off";	
+	public static final String DETAILS_UNAVAILABLE = "Details unavailable";	 	
+	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
+	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
 	
 }
 

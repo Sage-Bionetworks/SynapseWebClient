@@ -11,8 +11,10 @@ import org.junit.Test;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -33,6 +35,7 @@ public class TeamListWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	TeamListWidgetView mockView;
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	String teamId = "123";
 	TeamListWidget widget;
 	AuthenticationController mockAuthenticationController;
@@ -48,6 +51,10 @@ public class TeamListWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGetTeamsCallback = mock(AsyncCallback.class);
 		widget = new TeamListWidget(mockView, mockSynapseClient, mockGlobalApplicationState,mockAuthenticationController, adapter);
+		teamList = setupUserTeams(adapter, mockSynapseClient);
+	}
+	
+	public static ArrayList<Team> setupUserTeams(JSONObjectAdapter adapter, SynapseClientAsync mockSynapseClient) throws JSONObjectAdapterException {
 		ArrayList<String> teamJsonList = new ArrayList<String>();
 		Team testTeam = new Team();
 		testTeam.setId("42");
@@ -55,22 +62,23 @@ public class TeamListWidgetTest {
 		JSONObjectAdapter t = adapter.createNew();
 		testTeam.writeToJSONObject(t);
 		teamJsonList.add(t.toJSONString());
-		teamList = new ArrayList<Team>();
+		ArrayList<Team> teamList = new ArrayList<Team>();
 		teamList.add(testTeam);
 		AsyncMockStubber.callSuccessWith(teamJsonList).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		return teamList;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetTeams() throws Exception {
-		widget.getTeams("12345", mockGetTeamsCallback);
+		widget.getTeams("12345",mockSynapseClient, adapterFactory, mockGetTeamsCallback);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
 		verify(mockGetTeamsCallback).onSuccess(eq(teamList));
 	}
 	public void testGetTeamsFailure() throws Exception {
 		Exception ex = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
-		widget.getTeams("12345", mockGetTeamsCallback);
+		widget.getTeams("12345",mockSynapseClient, adapterFactory, mockGetTeamsCallback);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
 		verify(mockGetTeamsCallback).onFailure(eq(ex));
 	}

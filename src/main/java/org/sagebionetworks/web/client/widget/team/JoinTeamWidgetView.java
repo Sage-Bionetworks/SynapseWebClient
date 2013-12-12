@@ -16,7 +16,7 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage);
+	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText);
 	void showProfileForm(UserProfile profile, AsyncCallback<Void> callback);
 	
 	void showAccessRequirement(

@@ -133,7 +133,7 @@ public class SynapseMarkdownProcessor {
 	 */
 	public String markdown2Html(String markdown, Boolean isPreview, String clientHostString) throws IOException {
 		String originalMarkdown = markdown;
-		if (markdown == null) return "";
+		if (markdown == null || markdown.equals("")) return "";
 		
 		//trick to maintain newlines when suppressing all html
 		if (markdown != null) {

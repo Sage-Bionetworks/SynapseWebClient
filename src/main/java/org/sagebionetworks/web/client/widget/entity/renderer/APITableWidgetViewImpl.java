@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -8,11 +10,14 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -52,21 +57,39 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			builder.append("<table id=\""+elementId+"\"");
 			
 			//apply tablesorter style
-			builder.append(" class=\"noBackground inline-block scroll-x tablesorter\"");
+			builder.append(" class=\"margin-bottom-0-imp noBackground inline-block scroll-x tablesorter\"");
 			builder.append(">");
-				
+			
 			//headers
 			builder.append("<thead><tr>");
 			if (tableConfig.isShowRowNumber())
 				builder.append("<th>"+tableConfig.getRowNumberColName()+"</th>");	//row number
-			
+			Map<ClickHandler, List<String>> clickHandler2ElementsMap = new HashMap<ClickHandler, List<String>>();
 			//for each renderer, ask for it's list of columns that are being output
 			for (int i = 0; i < renderers.length; i++) {
 				List<String> rendererColumnNames = renderers[i].getColumnNames();
+				final APITableColumnConfig columnConfig = tableConfig.getColumnConfigs().get(i);
+				String style = "";
+				if (COLUMN_SORT_TYPE.DESC == columnConfig.getSort()) {
+					style = "headerSortUp";
+				} else if (COLUMN_SORT_TYPE.ASC == columnConfig.getSort()) {
+					style = "headerSortDown";
+				}
+				ClickHandler clickHandler = new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.columnConfigClicked(columnConfig);
+					}
+				};
+				List<String> headerElements = new ArrayList<String>();
 				for (Iterator<String> iterator = rendererColumnNames.iterator(); iterator.hasNext();) {
 					String columnName = iterator.next();
-					builder.append("<th>"+columnName+"</th>");					
+					String id = elementId + "-header-"+i+"-"+columnName;
+					headerElements.add(id);
+					
+					builder.append("<th class=\"header "+style+"\"><span id=\""+id+"\" anchortext=\""+columnName+"\"></span></th>");
 				}
+				clickHandler2ElementsMap.put(clickHandler, headerElements);
 			}
 			builder.append("</tr></thead><tbody>");
 			if (columnNames.length > 0) {
@@ -106,11 +129,23 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			if (isCssStyled)
 				builder.append("</span>");
 
-			add(new HTMLPanel(builder.toString()));
+			HTMLPanel panel = new HTMLPanel(builder.toString());
+			add(panel);
 			layout(true);
 			//do not apply sorter if paging (service needs to be involved for a true column sort)
 			if(!tableConfig.isPaging()) {
 				synapseJSNIUtils.tablesorter(elementId);
+			}
+			
+			for (ClickHandler clickHandler : clickHandler2ElementsMap.keySet()) {
+				List<String> elementIds = clickHandler2ElementsMap.get(clickHandler);
+				for (String id : elementIds) {
+					Element e = panel.getElementById(id);
+					String anchorText = e.getAttribute("anchorText");
+					Anchor a = new Anchor(anchorText);
+					a.addClickHandler(clickHandler);
+					panel.add(a, id);
+				}
 			}
 		}
 	}	
@@ -118,8 +153,9 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	@Override
 	public void configurePager(int start, int end, int total) {
 		UnorderedListPanel panel = new UnorderedListPanel();
-		panel.setStyleName("pager");
+		panel.setStyleName("pager padding-left-5-imp inline-block margin-top-5");
 		Label label = new Label(start + "-" + end + " of " + total);
+		label.addStyleName("inline-block margin-left-5 margin-right-5");
 		
 		Anchor prev = new Anchor();
 		prev.setHTML("Previous");
@@ -152,7 +188,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			panel.add(next, "disabled");
 		} else {
 			panel.add(next);
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_NEXT, TOOLTIP_POSITION.BOTTOM);
 		}
 		add(panel);
 		layout(true);

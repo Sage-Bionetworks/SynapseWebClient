@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEdi
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -36,17 +39,18 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -55,7 +59,7 @@ import com.google.web.bindery.event.shared.HandlerRegistration;
  *
  */
 public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageWidgetView {
-	
+
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -73,6 +77,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
+	private PortalGinInjector ginInjector;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -88,7 +93,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Inject
-	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, WidgetRegistrar widgetRegistrar) {
+	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
+			WidgetRegistrar widgetRegistrar, PortalGinInjector ginInjector) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
@@ -96,6 +103,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.breadcrumb = breadcrumb;
 		this.wikiAttachments = wikiAttachments;
 		this.widgetRegistrar = widgetRegistrar;
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -156,6 +164,41 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(getCommands(canEdit));
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
+		
+		// Add created/modified information at the end
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
+		HTML modifiedText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()));
+		HTML modifiedOnText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.CREATED_BY + " ");
+		HTML createdText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
+		HTML createdOnText = new HTML(shb.toSafeHtml());
+		
+		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
+		modifiedBy.configure(currentPage.getModifiedBy());
+		
+		UserBadge createdBy = ginInjector.getUserBadgeWidget();
+		createdBy.configure(currentPage.getCreatedBy());
+		
+		HorizontalPanel modifiedPanel = new HorizontalPanel();
+		modifiedPanel.add(modifiedText);
+		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
+		modifiedPanel.add(modifiedOnText);
+		add(wrapWidget(modifiedPanel, "clearleft"));
+		
+		HorizontalPanel createdPanel = new HorizontalPanel();
+		createdPanel.add(createdText);
+		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
+		createdPanel.add(createdOnText);
+		add(wrapWidget(createdPanel, "clearleft"));
 		
 		layout(true);
 	}

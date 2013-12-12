@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
@@ -134,14 +137,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    editPhotoLink.addStyleName("user-profile-change-photo");
 	    editPhotoLink.setText("Edit Photo");
 	    pictureCanvasContainer = new LayoutContainer();
-	    pictureCanvasContainer.setStyleName("span-5 inner-6 view notopmargin");
+	    pictureCanvasContainer.setStyleName("inner-6 view notopmargin");
 	    pictureCanvasPanel.clear();
 	    pictureCanvasPanel.add(pictureCanvasContainer);
 	    
 	    profilePictureContainer = new LayoutContainer();
 	    profilePictureContainer.addStyleName("center");
 		editPhotoButtonContainer = new LayoutContainer();
-		editPhotoButtonContainer.setStyleName("span-4 push-2 notopmargin");
+		editPhotoButtonContainer.setStyleName("center notopmargin");
 		
 		pictureCanvasContainer.add(profilePictureContainer);
 		pictureCanvasContainer.add(editPhotoButtonContainer);
@@ -161,7 +164,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
@@ -171,7 +174,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(profile.getOwnerId(), false);
+			myTeamsWidget.configure(teams, false);
 			myTeamsPanel.add(myTeamsWidget.asWidget());
 			myTeamsPanel.setVisible(true);
 		

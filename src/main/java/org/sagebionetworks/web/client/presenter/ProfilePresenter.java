@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
+import java.util.List;
 
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -20,6 +23,7 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdated
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -45,7 +49,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private UserProfile ownerProfile;
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
-	private JSONObjectAdapter jsonObjectAdapter;
+	private AdapterFactory adapterFactory;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	
 	@Inject
@@ -58,7 +62,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			NodeModelCreator nodeModelCreator,
 			CookieProvider cookieProvider,
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
-			ProfileFormWidget profileForm) {
+			ProfileFormWidget profileForm,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -68,7 +73,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.gwt = gwt;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
 		view.setPresenter(this);
 	}
@@ -184,7 +189,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						if (isOwner)
 							ownerProfile = profile;
 						profileForm.configure(profile, profileUpdatedCallback);
-						view.updateView(profile, editable, isOwner, profileForm.asWidget());
+						
+						TeamListWidget.getTeams(authenticationController.getCurrentUserPrincipalId(), synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								view.showErrorMessage(caught.getMessage());
+							}
+							@Override
+							public void onSuccess(List<Team> teams) {
+								view.updateView(profile, teams, editable, isOwner, profileForm.asWidget());		
+							}
+						});
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}    				

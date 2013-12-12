@@ -15,6 +15,7 @@ public class ClientProperties {
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
 	public static final String ABOUT_SYNAPSE_URL = "https://s3.amazonaws.com/static.synapse.org/About_Synapse.pdf";
+	public static final String TEAM2CHALLENGE_WHITELIST_URL = "https://s3.amazonaws.com/static.synapse.org/teamId2challengeEntityId.json";
 	
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
@@ -117,6 +118,7 @@ public class ClientProperties {
 	public static final WebResource MATHJAX_JS = new WebResource("https://c328740.ssl.cf1.rackcdn.com/mathjax/2.2-latest/MathJax.js?config=default", ResourceType.JAVASCRIPT);
 	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
+	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
 	
 }
 

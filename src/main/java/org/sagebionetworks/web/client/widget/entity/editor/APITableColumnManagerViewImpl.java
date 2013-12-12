@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -24,7 +25,6 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -172,23 +172,30 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		panel.addStyleName("margin-top-left-10");
 		final TextField<String> columnNames = new TextField<String>();
 		final TextField<String> displayColumnName = new TextField<String>();
-		final SimpleComboBox<String> combo = new SimpleComboBox<String>();
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
-		combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
-		//combo.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
-		combo.setSimpleValue(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
-		combo.setTriggerAction(TriggerAction.ALL);
+		List<String> rendererValues = new ArrayList<String>();
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
+		//rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose
+		final SimpleComboBox<String> combo = DisplayUtils.createSimpleComboBox(rendererValues, WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+
+		List<String> sortValues = new ArrayList<String>();
+		sortValues.add(COLUMN_SORT_TYPE.NONE.toString());
+		sortValues.add(COLUMN_SORT_TYPE.DESC.toString());
+		sortValues.add(COLUMN_SORT_TYPE.ASC.toString());
+		final SimpleComboBox<String> sortCb = DisplayUtils.createSimpleComboBox(sortValues, COLUMN_SORT_TYPE.NONE.toString());
 		
 		initNewField("Renderer", combo, panel);
 		initNewField("Input Column Names", columnNames, panel);
 		initNewField("Display Column Name (optional)", displayColumnName, panel);
+		initNewField("Sort", sortCb, panel);
+		
 		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				presenter.addColumnConfig(combo.getValue().getValue(), columnNames.getValue(), displayColumnName.getValue());
+				presenter.addColumnConfig(combo.getValue().getValue(), columnNames.getValue(), displayColumnName.getValue(), COLUMN_SORT_TYPE.valueOf(sortCb.getValue().getValue()));
 			}
 	    });
 

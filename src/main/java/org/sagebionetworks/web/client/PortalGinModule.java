@@ -236,6 +236,8 @@ import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetVi
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
+import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
@@ -629,7 +631,10 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Pending Team Join Requests widget
 		bind(OpenMembershipRequestsWidgetView.class).to(OpenMembershipRequestsWidgetViewImpl.class);
-				
+		
+		// Current User Invites widget
+		bind(OpenUserInvitationsWidgetView.class).to(OpenUserInvitationsWidgetViewImpl.class);
+		
 		// Team List widget (link to search teams page, optionally can create team)
 		bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
 

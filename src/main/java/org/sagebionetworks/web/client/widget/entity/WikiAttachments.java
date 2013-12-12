@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -73,7 +74,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		}
 		else
 			this.callback = callback;	
-		synapseClient.getWikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiAttachmentHandles(wikiKey, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {
 				try {
@@ -123,7 +124,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			}
 
 			// update wiki page minus attachment
-			synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
+			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), adapter.toJSONString(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
