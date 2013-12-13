@@ -350,20 +350,12 @@ SynapseWidgetPresenter {
 	}
 
 	@Override
-	public void previewClicked() {
-		// TODO Auto-generated method stub
+	public void previewClicked(Long wikiVersion) {
+		// get a specific version of the current wiki
+		// set flag that we are now looking at an old version, then we can know to put a yellow notice at the top
+		// show wiki / configure?
 		
-	}
-
-	@Override
-	public void restoreClicked() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void getHistory() {
-		synapseClient.getV2WikiHistory(wikiKey, new Long(100), new Long(0), new AsyncCallback<String>() {
+		synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, wikiVersion, new AsyncCallback<String>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -373,21 +365,16 @@ SynapseWidgetPresenter {
 
 			@Override
 			public void onSuccess(String result) {
-				org.sagebionetworks.web.shared.PaginatedResults<V2WikiHistorySnapshot> paginatedHistory;
-				try {
-					paginatedHistory = nodeModelCreator.createPaginatedResults(result, V2WikiHistorySnapshot.class);
-					history = paginatedHistory.getResults();
-					view.updateWikiHistory(history);
-					view.createHistoryEntries();
-					view.createAndPopulate();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-				
+				System.out.println("Got a preview of another version of a wiki page.");
 			}
 			
 		});
+		
 	}
-	
 
+	@Override
+	public void restoreClicked(final Long wikiVersion) {
+		// make sure dialog showed warning, if ok'ed, call to restore
+		// present the result, or re-configure?
+	}
 }

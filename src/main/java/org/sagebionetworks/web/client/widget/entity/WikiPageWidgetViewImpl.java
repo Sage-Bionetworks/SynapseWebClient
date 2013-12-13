@@ -49,6 +49,7 @@ import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -89,10 +90,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	WikiPageWidgetView.Presenter presenter;
 	private boolean isDescription = false;
 	private WikiHistoryWidget historyWidget;
-	private List<V2WikiHistorySnapshot> historyList;
-	private List<HistoryEntry> historyEntries;
-	private DataGrid<HistoryEntry> historyTable;
 	PortalGinInjector ginInjector;
+	private boolean isHistoryOpen;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -157,6 +156,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
+		this.isHistoryOpen = false;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -245,6 +245,17 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 
 			@Override
 			public void onClick(ClickEvent event) {
+				//WikiHistoryWidget wikiHistoryWidget = ginInjector.getWikiHistoryWidget();
+				if(!isHistoryOpen) {
+					historyWidget.configure(wikiKey, canEdit, presenter);
+					add(wrapWidget(historyWidget.asWidget(), "margin-top5"));
+					layout(true);
+				} else {
+					// hide history
+					historyWidget.hideHistory();
+				}
+				isHistoryOpen = !isHistoryOpen;
+				/*
 				WikiHistoryWidget wikiHistoryWidget = ginInjector.getWikiHistoryWidget();
 				wikiHistoryWidget.configure(wikiKey, canEdit, presenter);
 				add(wrapWidget(wikiHistoryWidget.asWidget(), "margin-top5"));
@@ -253,6 +264,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				//createHistoryEntries();
 				//createAndPopulate();
 				layout(true);
+				*/
 			}
 			
 		});
@@ -268,6 +280,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		btn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				if(isHistoryOpen) {
+					historyWidget.hideHistory();
+				}
 				//change to edit mode
 				removeAll(true);
 				//inform presenter that edit was clicked
@@ -437,126 +452,4 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	public void clear() {
 		removeAll(true);
 	}		
-	
-	private static class HistoryEntry {
-		private CompositeCell<HistoryEntry> actions;
-	    private final String version;
-	    private final Date modifiedOn;
-	    private final String user;
-
-	    public HistoryEntry(String user, Date modifiedOn, String version, CompositeCell<HistoryEntry> actions) {
-	      this.user = user;
-	      this.version = version;
-	      this.modifiedOn = modifiedOn;
-	      this.actions = actions;
-	    }
-	}
-	
-	private static class ActionHasCell implements HasCell<HistoryEntry, HistoryEntry> {
-	    private ActionCell<HistoryEntry> cell;
-
-	    public ActionHasCell(String text, Delegate<HistoryEntry> delegate) {
-	        cell = new ActionCell<HistoryEntry>(text, delegate);
-	    }
-
-	    @Override
-	    public Cell<HistoryEntry> getCell() {
-	        return cell;
-	    }
-
-	    @Override
-	    public FieldUpdater<HistoryEntry, HistoryEntry> getFieldUpdater() {
-	        return null;
-	    }
-
-		@Override
-		public HistoryEntry getValue(HistoryEntry object) {
-			return object;
-		}
-	}
-	
-	@Override
-	public void createHistoryEntries() {
-		if(historyList != null) {
-			System.out.println("History has " + historyList.size() + " entries.");
-			historyEntries = new ArrayList<HistoryEntry>();
-			for(V2WikiHistorySnapshot snapshot: historyList) {
-				// Create an entry
-				List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
-			    cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
-					@Override
-					public void execute(HistoryEntry object) {
-						presenter.previewClicked();
-					}
-			    }));
-			    if(canEdit) {
-			    	cells.add(new ActionHasCell("Restore", new Delegate<HistoryEntry>() {
-						@Override
-						public void execute(HistoryEntry object) {
-							presenter.restoreClicked();
-						}
-				    }));
-			    }
-
-				CompositeCell<HistoryEntry> actions = new CompositeCell<HistoryEntry>(cells);
-				HistoryEntry entry = new HistoryEntry(snapshot.getModifiedBy(), snapshot.getModifiedOn(), snapshot.getVersion(), actions);
-				historyEntries.add(entry);
-			}
-		}
-	}
-	
-	@Override
-	public void createAndPopulate() {
-		historyTable = new DataGrid<HistoryEntry>();
-		List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
-		CompositeCell<HistoryEntry> actions = new CompositeCell<HistoryEntry>(cells);
-		historyTable.addColumn(new Column<HistoryEntry, HistoryEntry>(actions) {
-			@Override
-			public HistoryEntry getValue(HistoryEntry object) {
-				return object;
-			}
-	    }, "Actions");
-		
-	    historyTable.addColumn(new TextColumn<HistoryEntry>() {
-			@Override
-			public String getValue(HistoryEntry object) {
-				return object.version;
-			}
-	    }, "Version");
-	    
-	    DateCell dateCell = new DateCell();
-		historyTable.addColumn(new Column<HistoryEntry, Date>(dateCell) {
-			@Override
-		      public Date getValue(HistoryEntry object) {
-		        return object.modifiedOn;
-		      }
-		}, "Modified On");
-
-		historyTable.addColumn(new TextColumn<HistoryEntry>() {
-			@Override
-			public String getValue(HistoryEntry object) {
-				return object.version;
-			}
-	    }, "Modified By");
-		
-		// Push the data into the widget.
-		if(historyEntries != null) {
-			historyTable.setRowData(0, historyEntries);
-		}
-		historyTable.setVisible(true);
-		historyTable.setRowCount(historyEntries.size());
-		
-		System.out.println("Added table to layout");
-		FlowPanel panel = new FlowPanel();
-		panel.add(wrapWidget(historyTable, "margin-top-5"));
-		add(panel);
-		layout(true);
-
-		
-	}
-
-	@Override
-	public void updateWikiHistory(List<V2WikiHistorySnapshot> history) {
-		historyList = history;
-	}
 }

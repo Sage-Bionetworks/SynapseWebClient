@@ -29,9 +29,8 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void saveClicked(String title, String md);
 		public void cancelClicked();
 		public void editClicked();
-		public void previewClicked();
-		public void restoreClicked();
-		public void getHistory();
+		public void previewClicked(Long wikiVersion);
+		public void restoreClicked(final Long wikiVersion);
 	}
 	
 	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription);
@@ -39,7 +38,4 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 	public void show404();
 	public void show403();
 	public void updateWikiPage(WikiPage newPage);
-	public void updateWikiHistory(List<V2WikiHistorySnapshot> history);
-	public void createHistoryEntries();
-	public void createAndPopulate();
 }

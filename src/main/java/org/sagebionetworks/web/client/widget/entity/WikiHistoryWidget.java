@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -54,9 +54,8 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 
 			@Override
 			public void onSuccess(String result) {
-				org.sagebionetworks.web.shared.PaginatedResults<V2WikiHistorySnapshot> paginatedHistory;
 				try {
-					paginatedHistory = nodeModelCreator.createPaginatedResults(result, V2WikiHistorySnapshot.class);
+					PaginatedResults<JSONEntity> paginatedHistory = nodeModelCreator.createPaginatedResults(result, V2WikiHistorySnapshot.class);
 					view.configure(canEdit, paginatedHistory.getResults(), wikiPagePresenter);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -65,5 +64,10 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 			}
 			
 		});
+	}
+	
+	@Override
+	public void hideHistory() {
+		view.hideHistory();
 	}
 }
