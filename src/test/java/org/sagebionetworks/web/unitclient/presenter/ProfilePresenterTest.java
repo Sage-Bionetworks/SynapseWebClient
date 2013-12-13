@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -33,6 +32,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -92,6 +92,8 @@ public class ProfilePresenterTest {
 		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
 		testUser.writeToJSONObject(adapter);
 		testUserJson = adapter.toJSONString(); 
+		
+		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 	}
 	
 	@Test
@@ -123,9 +125,16 @@ public class ProfilePresenterTest {
 	public void testPublicView() {
 		//view another user profile
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(place.toToken()).thenReturn("12345");
+		String targetUserId = "12345";
+		when(place.toToken()).thenReturn(targetUserId);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		
+		//also verify that it is asking for the correct teams
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
+		
+		assertEquals(targetUserId, captor.getValue());
 	}
 
 	@Test
@@ -152,10 +161,17 @@ public class ProfilePresenterTest {
 	@Test
 	public void testViewMyProfileNoRedirect() {
 		//view another user profile
+		String myPrincipalId = "456";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
 		when(place.toToken()).thenReturn(Profile.VIEW_PROFILE_PLACE_TOKEN);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		
+		//also verify that it is asking for the correct teams
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
+		assertEquals(myPrincipalId, captor.getValue());
 	}
 	
 
