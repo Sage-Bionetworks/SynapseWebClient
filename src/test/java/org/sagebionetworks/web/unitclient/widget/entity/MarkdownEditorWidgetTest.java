@@ -30,7 +30,6 @@ public class MarkdownEditorWidgetTest {
 	WidgetRegistrar mockWidgetRegistrar;
 	MarkdownEditorWidget presenter;
 	IconsImageBundle mockIcons;
-	SageImageBundle mockSageIcons;
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
@@ -42,13 +41,12 @@ public class MarkdownEditorWidgetTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIcons = mock(IconsImageBundle.class);
-		mockSageIcons = mock(SageImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		mockBaseEditWidgetPresenter = mock(BaseEditWidgetDescriptorPresenter.class);
 		mockResourceLoader = mock(ResourceLoader.class);
 		mockCookies = mock(CookieProvider.class);
 		mockGwt = mock(GWTWrapper.class);
-		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader, mockGwt, mockSageIcons);
+		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader, mockGwt);
 	}
 	
 	@Test

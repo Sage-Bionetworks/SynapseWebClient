@@ -65,7 +65,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
-	private SageImageBundle sageImageBundle;
 	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
 	CookieProvider cookies;
 	private TextArea markdownTextArea;
@@ -96,8 +95,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
-			GWTWrapper gwt,
-			SageImageBundle sageImageBundle) {
+			GWTWrapper gwt) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -107,7 +105,6 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
-		this.sageImageBundle = sageImageBundle;
 		widgetSelectionState = new WidgetSelectionState();
 	}
 	
@@ -226,7 +223,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					DisplayUtils.changeButtonToSaving(saveButton, sageImageBundle);
+					DisplayUtils.changeButtonToSaving(saveButton);
 					saveHandler.saveClicked();
 				}
 			});

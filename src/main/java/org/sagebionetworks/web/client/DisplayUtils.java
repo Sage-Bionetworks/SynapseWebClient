@@ -426,9 +426,9 @@ public class DisplayUtils {
 	/*
 	 * Button Saving 
 	 */
-	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button, SageImageBundle sageImageBundle) {
+	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
 		button.addStyleName("disabled");
-		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING +"&nbsp"+ DisplayUtils.getIconHtml(sageImageBundle.loading16())));
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING));
 	}
 
 	
