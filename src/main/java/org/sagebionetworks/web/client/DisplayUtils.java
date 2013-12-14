@@ -423,6 +423,15 @@ public class DisplayUtils {
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
 	}
 	
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button, SageImageBundle sageImageBundle) {
+		button.addStyleName("disabled");
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING +"&nbsp"+ DisplayUtils.getIconHtml(sageImageBundle.loading16())));
+	}
+
+	
 	/**
 	 * Check if an Annotation key is valid with the repository service
 	 * @param key

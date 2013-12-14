@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -65,6 +65,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private IconsImageBundle iconsImageBundle;
+	private SageImageBundle sageImageBundle;
 	BaseEditWidgetDescriptorPresenter widgetDescriptorEditor;
 	CookieProvider cookies;
 	private TextArea markdownTextArea;
@@ -95,7 +96,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SageImageBundle sageImageBundle) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -105,6 +107,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
+		this.sageImageBundle = sageImageBundle;
 		widgetSelectionState = new WidgetSelectionState();
 	}
 	
@@ -223,6 +226,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
+					DisplayUtils.changeButtonToSaving(saveButton, sageImageBundle);
 					saveHandler.saveClicked();
 				}
 			});
