@@ -428,7 +428,7 @@ public class DisplayUtils {
 	 */
 	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
 		button.addStyleName("disabled");
-		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING));
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
 
 	
