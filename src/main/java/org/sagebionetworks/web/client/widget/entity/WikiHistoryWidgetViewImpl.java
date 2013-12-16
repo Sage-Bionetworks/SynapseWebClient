@@ -8,20 +8,15 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView.Presenter;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
-import com.google.gwt.cell.client.ButtonCellBase;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.HasCell;
-import com.google.gwt.cell.client.TextButtonCell;
-import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -29,12 +24,9 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,6 +34,8 @@ import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.cell.client.ValueUpdater;
 
 public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
 	@UiField(provided = true)
@@ -79,14 +73,22 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	private static class ActionHasCell implements HasCell<HistoryEntry, HistoryEntry> {
 	    private ActionCell<HistoryEntry> cell;
 	    private String buttonText;
+	    final private Delegate<HistoryEntry> handler;
 
 	    public ActionHasCell(String text, Delegate<HistoryEntry> delegate) {
+	    	this.handler = delegate;
 	        cell = new ActionCell<HistoryEntry>(text, delegate) {
 	        	@Override
 	        	public void render(Context context, HistoryEntry value, SafeHtmlBuilder sb) {
 	        		sb.appendHtmlConstant("<button>");
 	    			sb.appendEscaped(buttonText);
 	            	sb.appendHtmlConstant("</button>");
+	        	}
+	        	
+	        	@Override
+	        	protected void onEnterKeyDown(Cell.Context context, Element parent, HistoryEntry value, 
+	        			NativeEvent event, ValueUpdater<HistoryEntry> valueUpdater) {
+	        		handler.execute(value);
 	        	}
 	        };
 	        buttonText = text;
@@ -131,21 +133,21 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 				
 				final List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
 				/*
-			    //List<ActionHasCell> cells = new ArrayList<ActionHasCell>();
-				cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
-					@Override
-					public void execute(HistoryEntry object) {
-						wikiPagePresenter.previewClicked();
-					}
-			    }));
-			    if(canEdit) {
-			    	cells.add(new ActionHasCell("Restore", new Delegate<HistoryEntry>() {
-						@Override
-						public void execute(HistoryEntry object) {
-							wikiPagePresenter.restoreClicked();
-						}
-				    }));
-			    }
+			   cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
+			@Override
+			public void execute(HistoryEntry object) {
+				System.out.println("Executing for PREVIEW button");
+				wikiPagePresenter.previewClicked(new Long(object.version));
+			}
+	    }));
+	    if(canEdit) {
+	    	cells.add(new ActionHasCell("Restore", new Delegate<HistoryEntry>() {
+				@Override
+				public void execute(HistoryEntry object) {
+					wikiPagePresenter.restoreClicked(new Long(object.version));
+				}
+		    }));
+	    }
 			    */
 				CompositeCell<HistoryEntry> actions = new CompositeCell<HistoryEntry>(cells);
 				//HistoryEntry entry = new HistoryEntry(actions, snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
@@ -156,16 +158,24 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}
 	
 	private void createAndPopulate() {
+		// Remove any old table first
+		if(historyTable != null) {
+			hideHistory();
+		}
+		
 		historyTable = new CellTable<HistoryEntry>();
+		CellTable.setStyleName(historyTable.getElement(), "wikiHistoryWidget", true);
 		// Create a Pager to control the table.
 	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
 	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	    pager.setDisplay(historyTable);
-
+	    pager.setStyleName("wikiHistoryWidget", true);
+	    /*
 	    final List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
 	    cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
 			@Override
 			public void execute(HistoryEntry object) {
+				System.out.println("Executing for PREVIEW button");
 				wikiPagePresenter.previewClicked(new Long(object.version));
 			}
 	    }));
@@ -192,7 +202,40 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
                 return parent;
             }
 	    };
+	    
 		Column<HistoryEntry, HistoryEntry> actionColumn = new Column<HistoryEntry, HistoryEntry>(compositeCell) {
+			@Override
+			public HistoryEntry getValue(HistoryEntry object) {
+				return object;
+			}
+		};
+	    */
+	    
+	    if(canEdit) {
+		    ActionCell<HistoryEntry> restoreCell = new ActionCell<HistoryEntry>("Restore", new ActionCell.Delegate<HistoryEntry>() {
+		        @Override
+		        public void execute(HistoryEntry object) {
+		        	wikiPagePresenter.restoreClicked(new Long(object.version));
+		        }
+		    });
+		    
+		    Column<HistoryEntry, HistoryEntry> restoreColumn = new Column<HistoryEntry, HistoryEntry>(restoreCell) {
+				@Override
+				public HistoryEntry getValue(HistoryEntry object) {
+					return object;
+				}
+			};
+			historyTable.addColumn(restoreColumn, "Restore");
+	    }
+		
+	    ActionCell<HistoryEntry> previewCell = new ActionCell<HistoryEntry>("Preview", new ActionCell.Delegate<HistoryEntry>() {
+	        @Override
+	        public void execute(HistoryEntry object) {
+	        	wikiPagePresenter.previewClicked(new Long(object.version));
+	        }
+	    });
+	    
+	    Column<HistoryEntry, HistoryEntry> previewColumn = new Column<HistoryEntry, HistoryEntry>(previewCell) {
 			@Override
 			public HistoryEntry getValue(HistoryEntry object) {
 				return object;
@@ -225,17 +268,12 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	        return object.modifiedOn;
 	      }
 	    };
-	    
-	    historyTable.addColumn(actionColumn, "Action");
+
+	    historyTable.addColumn(previewColumn, "Preview");
 		historyTable.addColumn(versionColumn, "Version");
 		historyTable.addColumn(modifiedByColumn, "Modified By");
 		historyTable.addColumn(modifiedOnColumn, "Modified On");
-		/*
-		// Push the data into the widget.
-		if(historyEntries != null) {
-			historyTable.setRowData(0, historyEntries);
-		}
-		*/
+
 		historyTable.setVisible(true);
 		historyTable.setRowCount(historyEntries.size());
 		
@@ -250,6 +288,9 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	        final Range range = display.getVisibleRange();
 	        int start = range.getStart();
             int end = start + range.getLength();
+            if(end > historyEntries.size()) {
+            	end = historyEntries.size();
+            }
 	        List<HistoryEntry> dataInRange = historyEntries.subList(start, end);
             // Push the data back into the list.
             historyTable.setRowData(start, dataInRange);

@@ -95,6 +95,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
+	private boolean isCurrentVersion;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -151,7 +152,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, boolean isCurrentVersion) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -160,6 +161,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
 		this.isHistoryOpen = false;
+		this.isCurrentVersion = isCurrentVersion;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
 		showDefaultViewWithWiki();
@@ -172,6 +174,10 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
+		if(!isCurrentVersion) {
+			// Put notice at the top that user is viewing an old version
+			// Give them options
+		}
 		SimplePanel topBarWrapper = new SimplePanel();
 		topBarWrapper.addStyleName("margin-top-5");
 		String titleString = isRootWiki ? "" : currentPage.getTitle();
@@ -180,7 +186,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		FlowPanel mainPanel = new FlowPanel();
 		mainPanel.add(getBreadCrumbs(colWidth));
-		mainPanel.add(getCommands(canEdit));
+		if(isCurrentVersion) {
+			mainPanel.add(getCommands(canEdit));
+		}
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
 		
@@ -211,6 +219,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		modifiedPanel.add(modifiedText);
 		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
 		modifiedPanel.add(modifiedOnText);
+		modifiedPanel.add(wrapWidget(createHistoryButton(), "padding-left-5"));
 		add(wrapWidget(modifiedPanel, "clearleft"));
 		
 		HorizontalPanel createdPanel = new HorizontalPanel();
@@ -274,31 +283,20 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 
 	private Button createHistoryButton() {
 		Button btn = DisplayUtils.createIconButton("History", DisplayUtils.ButtonType.DEFAULT, null);			
-		btn.addStyleName("display-inline");		
+		btn.setStyleName("wikiHistoryButton", true);
 		btn.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				//WikiHistoryWidget wikiHistoryWidget = ginInjector.getWikiHistoryWidget();
 				if(!isHistoryOpen) {
 					historyWidget.configure(wikiKey, canEdit, presenter);
-					add(wrapWidget(historyWidget.asWidget(), "margin-top5"));
+					add(wrapWidget(historyWidget.asWidget(), "margin-top-10"));
 					layout(true);
 				} else {
 					// hide history
 					historyWidget.hideHistory();
 				}
 				isHistoryOpen = !isHistoryOpen;
-				/*
-				WikiHistoryWidget wikiHistoryWidget = ginInjector.getWikiHistoryWidget();
-				wikiHistoryWidget.configure(wikiKey, canEdit, presenter);
-				add(wrapWidget(wikiHistoryWidget.asWidget(), "margin-top5"));
-				//historyWidget.configure(wikiKey, canEdit, presenter);
-				//presenter.getHistory();
-				//createHistoryEntries();
-				//createAndPopulate();
-				layout(true);
-				*/
 			}
 			
 		});

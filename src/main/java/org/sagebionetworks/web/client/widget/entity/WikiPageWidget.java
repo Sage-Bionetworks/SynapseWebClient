@@ -59,6 +59,7 @@ SynapseWidgetPresenter {
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
+	private boolean isCurrentVersion;
 	
 	private List<V2WikiHistorySnapshot> history;
 	
@@ -100,6 +101,7 @@ SynapseWidgetPresenter {
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
+		this.isCurrentVersion = true;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -125,7 +127,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -349,25 +351,41 @@ SynapseWidgetPresenter {
 	}
 
 	@Override
-	public void previewClicked(Long wikiVersion) {
+	public void previewClicked(final Long wikiVersion) {
 		// get a specific version of the current wiki
 		// set flag that we are now looking at an old version, then we can know to put a yellow notice at the top
-		// show wiki / configure?
-		
-		synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, wikiVersion, new AsyncCallback<String>() {
-
+		// configureVersionOfWiki, just resetting markdown widget, etc.
+		// if wikiVersion is current version, set isCurrentVersion to true, not false
+		isCurrentVersion = false;
+		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
+			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
+				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, wikiVersion, new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						try {
+							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							wikiKey.setWikiPageId(currentPage.getId());
+							originalMarkdown = currentPage.getMarkdown();
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion);
+						} catch (Exception e) {
+							onFailure(e);
+						}
+					}
+					
+				});
 				
 			}
-
-			@Override
-			public void onSuccess(String result) {
-				System.out.println("Got a preview of another version of a wiki page.");
-			}
-			
 		});
+		
 		
 	}
 
