@@ -18,10 +18,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
+import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
@@ -31,6 +34,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -50,11 +54,17 @@ import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -175,9 +185,43 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		if(!isCurrentVersion) {
-			// Put notice at the top that user is viewing an old version
-			// Give them options
+			FlowPanel noticePanel = new FlowPanel();
+			HorizontalPanel noticeWithLink = new HorizontalPanel();
+			SafeHtmlBuilder builder = new SafeHtmlBuilder();
+			
+			ImageResource icon = iconsImageBundle.warning16();	
+			builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
+			HTML warningIcon = new HTML(builder.toSafeHtml());
+			
+			String noticeStart = "You are viewing an old version of this page. View the ";
+			builder = new SafeHtmlBuilder();
+			builder.appendHtmlConstant(noticeStart);
+			HTML startMessage = new HTML(builder.toSafeHtml());
+			
+			Anchor linkToCurrent = new Anchor();
+			linkToCurrent.setHTML("current version.");
+			linkToCurrent.setStyleName("link", true);
+			linkToCurrent.setStyleName("margin-left-5", true);
+			linkToCurrent.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.configure(wikiKey, canEdit, null, true, 24);
+				}
+			});
+			
+			noticeWithLink.add(warningIcon);
+			noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
+			noticeWithLink.add(linkToCurrent);
+			noticePanel.add(noticeWithLink);
+
+			if(canEdit) {
+				Button restoreButton = createRestoreButton();
+				noticePanel.add(restoreButton);
+			}
+
+			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
+		
 		SimplePanel topBarWrapper = new SimplePanel();
 		topBarWrapper.addStyleName("margin-top-5");
 		String titleString = isRootWiki ? "" : currentPage.getTitle();
@@ -220,14 +264,16 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
 		modifiedPanel.add(modifiedOnText);
 		modifiedPanel.add(wrapWidget(createHistoryButton(), "padding-left-5"));
-		add(wrapWidget(modifiedPanel, "clearleft"));
 		
 		HorizontalPanel createdPanel = new HorizontalPanel();
 		createdPanel.add(createdText);
 		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
 		createdPanel.add(createdOnText);
-		add(wrapWidget(createdPanel, "clearleft"));
 		
+		FlowPanel modifiedAndCreatedSection = new FlowPanel();
+		modifiedAndCreatedSection.add(modifiedPanel);
+		modifiedAndCreatedSection.add(createdPanel);
+		add(wrapWidget(modifiedAndCreatedSection, "margin-top-10 clearleft"));
 		layout(true);
 	}
 	
@@ -297,6 +343,22 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 					historyWidget.hideHistory();
 				}
 				isHistoryOpen = !isHistoryOpen;
+			}
+			
+		});
+		return btn;
+	}
+	
+	private Button createRestoreButton() {
+		Button btn = DisplayUtils.createIconButton("Restore", DisplayUtils.ButtonType.DEFAULT, null);
+		btn.setStyleName("wikiHistoryButton", true);
+		btn.setStyleName("margin-top-10", true);
+		btn.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// need a boolean that keeps track of which version we're looking at if isCurrentVersion is false
+				// presenter.restoreClicked(wikiVersion)
 			}
 			
 		});

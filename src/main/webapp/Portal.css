@@ -875,6 +875,10 @@ h1, h2, h3, h4, h5, h6 {
 	padding-right: 5px;
 }
 
+.wikiVersionNotice {
+	font-size: 15px;		
+}
+
 .markdownHi
 
 /** content type div sizes *********/

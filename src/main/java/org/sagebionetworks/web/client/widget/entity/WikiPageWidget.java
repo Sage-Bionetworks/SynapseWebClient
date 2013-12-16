@@ -60,6 +60,7 @@ SynapseWidgetPresenter {
 	private String originalMarkdown;
 	boolean isDescription = false;
 	private boolean isCurrentVersion;
+	private Long version;
 	
 	private List<V2WikiHistorySnapshot> history;
 	
@@ -102,6 +103,7 @@ SynapseWidgetPresenter {
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
 		this.isCurrentVersion = true;
+		this.version = null;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;

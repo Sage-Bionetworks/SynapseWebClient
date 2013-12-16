@@ -8,8 +8,12 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.cell.client.Cell;
@@ -22,16 +26,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.gwt.dom.client.NativeEvent;
@@ -49,27 +56,41 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	private List<HistoryEntry> historyEntries;
 	WikiHistoryWidgetView.Presenter presenter;
 	WikiPageWidgetView.Presenter wikiPagePresenter;
+	PortalGinInjector ginInjector;
 
 	@Inject
-	public WikiHistoryWidgetViewImpl() {
-		
+	public WikiHistoryWidgetViewImpl(PortalGinInjector ginInjector) {
+		this.ginInjector = ginInjector;
 	}
 	
 	private static class HistoryEntry {
-		private CompositeCell<HistoryEntry> actions;
+		private static String entryId = "";
 	    private final String version;
 	    private final Date modifiedOn;
-	    private final String user;
+	    //private final String user;
+	    private final UserBadge userBadge;
 
-	    //public HistoryEntry(CompositeCell<HistoryEntry> actions, String version, String user, Date modifiedOn) {
-	    public HistoryEntry(String version, String user, Date modifiedOn) {
-	      this.user = user;
+	    //public HistoryEntry(String version, String user, Date modifiedOn) {
+	    public HistoryEntry(String version, String user, UserBadge userBadge, Date modifiedOn) {
+	      entryId = user;
+	      //this.user = user;
 	      this.version = version;
 	      this.modifiedOn = modifiedOn;
-	      //this.actions = actions;
+	      this.userBadge = userBadge;
 	    }
 	}
-	
+	static class UserBadgeCell extends AbstractCell<UserBadge> {
+
+		@Override
+		public void render(com.google.gwt.cell.client.Cell.Context context,
+				UserBadge value, SafeHtmlBuilder sb) {
+			if (value == null) {
+		        return;
+		    }
+
+		}
+
+	}
 	private static class ActionHasCell implements HasCell<HistoryEntry, HistoryEntry> {
 	    private ActionCell<HistoryEntry> cell;
 	    private String buttonText;
@@ -150,8 +171,12 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	    }
 			    */
 				CompositeCell<HistoryEntry> actions = new CompositeCell<HistoryEntry>(cells);
+				
+				UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
+				modifiedBy.configure(snapshot.getModifiedBy());
+				//HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedBy, snapshot.getModifiedOn());
 				//HistoryEntry entry = new HistoryEntry(actions, snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
-				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
+				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), snapshot.getModifiedBy(), modifiedBy, snapshot.getModifiedOn());
 				historyEntries.add(entry);
 			}
 		}
@@ -163,7 +188,14 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			hideHistory();
 		}
 		
-		historyTable = new CellTable<HistoryEntry>();
+		ProvidesKey<HistoryEntry> keyProvider = new ProvidesKey<HistoryEntry>() {
+		      public Object getKey(HistoryEntry item) {
+		        // Always do a null check.
+		        return (item == null) ? null : item.entryId;
+		      }
+		};
+		    
+		historyTable = new CellTable<HistoryEntry>(keyProvider);
 		CellTable.setStyleName(historyTable.getElement(), "wikiHistoryWidget", true);
 		// Create a Pager to control the table.
 	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
@@ -251,6 +283,16 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	      }
 	    };
 	    
+	    UserBadgeCell userBadgeCell = new UserBadgeCell();
+	    Column<HistoryEntry, UserBadge> modifiedByColumn = new Column<HistoryEntry, UserBadge>(userBadgeCell) {
+
+			@Override
+			public UserBadge getValue(HistoryEntry object) {
+				return object.userBadge;
+			}
+	    	
+	    };
+	    /*
 	    // Modified by
 	    Column<HistoryEntry, String> modifiedByColumn = new Column<HistoryEntry, String>(
 	        new TextCell()) {
@@ -259,6 +301,7 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	        return object.user;
 	      }
 	    };
+	    */
 	    
 	    // Modified on
 	    Column<HistoryEntry, Date> modifiedOnColumn = new Column<HistoryEntry, Date>(
