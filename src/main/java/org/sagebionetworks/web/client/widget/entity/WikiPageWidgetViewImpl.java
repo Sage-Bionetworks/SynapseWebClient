@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEdi
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -49,6 +50,7 @@ import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
@@ -57,6 +59,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -71,7 +74,7 @@ import com.google.inject.Inject;
  *
  */
 public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageWidgetView {
-	
+
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -108,7 +111,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Inject
 	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
-			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments, 
+			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments,
 			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget, PortalGinInjector ginInjector) {
 		super();
 		this.markdownWidget = markdownWidget;
@@ -181,9 +184,40 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
 		
-		SimplePanel historySection = new SimplePanel();
-		historySection.add(createHistoryButton());
-		add(historySection);
+		// Add created/modified information at the end
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
+		HTML modifiedText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()));
+		HTML modifiedOnText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayConstants.CREATED_BY + " ");
+		HTML createdText = new HTML(shb.toSafeHtml());
+		
+		shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
+		HTML createdOnText = new HTML(shb.toSafeHtml());
+		
+		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
+		modifiedBy.configure(currentPage.getModifiedBy());
+		
+		UserBadge createdBy = ginInjector.getUserBadgeWidget();
+		createdBy.configure(currentPage.getCreatedBy());
+		
+		HorizontalPanel modifiedPanel = new HorizontalPanel();
+		modifiedPanel.add(modifiedText);
+		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
+		modifiedPanel.add(modifiedOnText);
+		add(wrapWidget(modifiedPanel, "clearleft"));
+		
+		HorizontalPanel createdPanel = new HorizontalPanel();
+		createdPanel.add(createdText);
+		createdPanel.add(wrapWidget(createdBy.asWidget(), "padding-left-5"));
+		createdPanel.add(createdOnText);
+		add(wrapWidget(createdPanel, "clearleft"));
 		
 		layout(true);
 	}

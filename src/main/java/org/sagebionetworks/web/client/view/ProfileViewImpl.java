@@ -137,14 +137,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	    editPhotoLink.addStyleName("user-profile-change-photo");
 	    editPhotoLink.setText("Edit Photo");
 	    pictureCanvasContainer = new LayoutContainer();
-	    pictureCanvasContainer.setStyleName("span-5 inner-6 view notopmargin");
+	    pictureCanvasContainer.setStyleName("inner-6 view notopmargin");
 	    pictureCanvasPanel.clear();
 	    pictureCanvasPanel.add(pictureCanvasContainer);
 	    
 	    profilePictureContainer = new LayoutContainer();
 	    profilePictureContainer.addStyleName("center");
 		editPhotoButtonContainer = new LayoutContainer();
-		editPhotoButtonContainer.setStyleName("span-4 push-2 notopmargin");
+		editPhotoButtonContainer.setStyleName("center notopmargin");
 		
 		pictureCanvasContainer.add(profilePictureContainer);
 		pictureCanvasContainer.add(editPhotoButtonContainer);

@@ -379,6 +379,20 @@ public class DisplayUtils {
 				if (matchResult != null)
 					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
 			}
+			
+			//final attempt to communicate a more relevant message. do this by looking for the "reason" stated in the response
+			if (DisplayConstants.ERROR_BAD_REQUEST_MESSAGE.equals(message)) {
+				//look for something in the form: "reason":"This is the reason for the error"
+				RegExp regEx = RegExp.compile("\"reason\"\\s*:\\s*\"(.+)\"", "gm");
+				MatchResult matchResult = regEx.exec(reason);
+				if (matchResult != null && matchResult.getGroupCount()==2) {
+					String parsedReason = matchResult.getGroup(1);
+					if (parsedReason != null && parsedReason.trim().length() > 0) {
+						message = parsedReason;
+					}
+				}
+			}
+			
 			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {
@@ -422,6 +436,15 @@ public class DisplayUtils {
 		button.setText(DisplayConstants.BUTTON_SAVING);
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
 	}
+	
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
+		button.addStyleName("disabled");
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
+	}
+
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service

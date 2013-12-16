@@ -23,6 +23,8 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -38,6 +40,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -90,8 +93,8 @@ public class WikiPageWidgetTest {
 		testPage.setId("wikiPageId");
 		testPage.setMarkdown("my test markdown");
 		testPage.setTitle("My Test Wiki Title");
-
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(testPage);
+		
+		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -107,7 +110,7 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
 		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false));
 	}
-	
+
 	@Test
 	public void testConfigureNoWikiPage(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));

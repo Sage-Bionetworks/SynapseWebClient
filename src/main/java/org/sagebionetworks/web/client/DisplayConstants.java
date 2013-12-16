@@ -510,6 +510,7 @@ public class DisplayConstants {
 	public static final String MEMBERS = "Members";
 	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
 	public static final String PENDING_JOIN_REQUESTS = "Pending Join Requests";
+	public static final String PENDING_INVITATIONS = "Pending Invitations";
 	public static final String DELETE_TEAM_SUCCESS = "Team successfully deleted";
 	public static final String UPDATE_TEAM_SUCCESS = "Team successfully updated";
 	public static final String LEAVE_TEAM_SUCCESS = "Successfully left team";

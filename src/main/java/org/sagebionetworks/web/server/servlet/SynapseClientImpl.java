@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -114,6 +113,7 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -1503,19 +1503,29 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     }
     
     @Override
-	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException {
+	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile = synapseClient.downloadV2WikiMarkdown(properKey);
-		return FileUtils.readFileToString(markdownFile, "UTF-8");
+		File markdownFile;
+		try {
+			markdownFile = synapseClient.downloadV2WikiMarkdown(properKey);
+			return FileUtils.readFileToString(markdownFile, "UTF-8");
+		} catch(SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override
-	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException {
+	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile = synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
-		return FileUtils.readFileToString(markdownFile, "UTF-8");
+		File markdownFile;
+		try {
+			markdownFile = synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
+			return FileUtils.readFileToString(markdownFile, "UTF-8");
+		}catch (SynapseException e) {
+            throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -1922,7 +1932,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				Team team = synapseClient.getTeam(invite.getTeamId());
 				JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
 				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), inviteJson.toJSONString());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), null, inviteJson.toJSONString());
 				returnList.add(b);
 			}
 			
@@ -1931,6 +1941,42 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, limit, offset);
+			//and ask for the team info for each invite, and fill that in the bundle
+			
+			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
+			//now go through and create a MembershipInvitationBundle for each pair
+			
+			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+				UserProfile profile = synapseClient.getUserProfile(invite.getInviteeId());
+				JSONObjectAdapter profileJson = profile.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(null, profileJson.toJSONString(), inviteJson.toJSONString());
+				returnList.add(b);
+			}
+			
+			return returnList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override 
+	public void deleteMembershipInvitation(String invitationId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.deleteMembershipInvitation(invitationId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	
