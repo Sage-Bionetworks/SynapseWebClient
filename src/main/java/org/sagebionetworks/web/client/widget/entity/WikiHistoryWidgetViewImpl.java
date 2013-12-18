@@ -185,7 +185,7 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		historyTable.setRowCount(historyEntries.size());
 		
 		// Set the range to display in the table at one time
-	    historyTable.setVisibleRange(0, 3);
+	    historyTable.setVisibleRange(0, 10);
 
 	    // Create a data provider.
 	    AsyncDataProvider<HistoryEntry> dataProvider = new AsyncDataProvider<HistoryEntry>() {
