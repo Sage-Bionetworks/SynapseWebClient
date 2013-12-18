@@ -23,7 +23,7 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		String url = descriptor.get(WidgetConstants.LINK_URL_KEY);
 		String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);

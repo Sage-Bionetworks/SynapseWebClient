@@ -1,16 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -19,22 +14,21 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
-import org.sagebionetworks.web.client.DisplayUtils.IconSize;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
+
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -44,25 +38,11 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.CompositeCell;
-import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.HasCell;
-import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.DataGrid;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -106,6 +86,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
 	private boolean isCurrentVersion;
+	private Long versionInView;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -161,8 +142,9 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(WikiPage newPage, WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, boolean isCurrentVersion) {
+	public void configure(final WikiPage newPage, final WikiPageKey wikiKey,
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, 
+			boolean isCurrentVersion, final Long versionInView) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
@@ -172,8 +154,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.colWidth = Math.round(colWidth/2);
 		this.isHistoryOpen = false;
 		this.isCurrentVersion = isCurrentVersion;
+		this.versionInView = versionInView;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
-		markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false);
+		if(!isCurrentVersion) {
+			markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false, versionInView);
+		} else {
+			markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false, null);
+		}
 		showDefaultViewWithWiki();
 	}
 	
@@ -185,40 +172,8 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private void showDefaultViewWithWiki() {
 		removeAll(true);
 		if(!isCurrentVersion) {
-			FlowPanel noticePanel = new FlowPanel();
-			HorizontalPanel noticeWithLink = new HorizontalPanel();
-			SafeHtmlBuilder builder = new SafeHtmlBuilder();
-			
-			ImageResource icon = iconsImageBundle.warning16();	
-			builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
-			HTML warningIcon = new HTML(builder.toSafeHtml());
-			
-			String noticeStart = "You are viewing an old version of this page. View the ";
-			builder = new SafeHtmlBuilder();
-			builder.appendHtmlConstant(noticeStart);
-			HTML startMessage = new HTML(builder.toSafeHtml());
-			
-			Anchor linkToCurrent = new Anchor();
-			linkToCurrent.setHTML("current version.");
-			linkToCurrent.setStyleName("link", true);
-			linkToCurrent.setStyleName("margin-left-5", true);
-			linkToCurrent.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.configure(wikiKey, canEdit, null, true, 24);
-				}
-			});
-			
-			noticeWithLink.add(warningIcon);
-			noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
-			noticeWithLink.add(linkToCurrent);
-			noticePanel.add(noticeWithLink);
-
-			if(canEdit) {
-				Button restoreButton = createRestoreButton();
-				noticePanel.add(restoreButton);
-			}
-
+			// Create warning that user is viewing a different version
+			FlowPanel noticePanel = createDifferentVersionNotice();
 			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
 		
@@ -236,6 +191,12 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
 		add(mainPanel);
 		
+		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
+		add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
+		layout(true);
+	}
+	
+	private FlowPanel createdModifiedCreatedSection() {
 		// Add created/modified information at the end
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " ");
@@ -273,8 +234,44 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();
 		modifiedAndCreatedSection.add(modifiedPanel);
 		modifiedAndCreatedSection.add(createdPanel);
-		add(wrapWidget(modifiedAndCreatedSection, "margin-top-10 clearleft"));
-		layout(true);
+		return modifiedAndCreatedSection;
+	}
+	
+	private FlowPanel createDifferentVersionNotice() {
+		FlowPanel noticePanel = new FlowPanel();
+		HorizontalPanel noticeWithLink = new HorizontalPanel();
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		
+		ImageResource icon = iconsImageBundle.warning16();	
+		builder.appendHtmlConstant(AbstractImagePrototype.create(icon).getHTML());
+		HTML warningIcon = new HTML(builder.toSafeHtml());
+		
+		String noticeStart = "You are viewing an old version of this page. View the ";
+		builder = new SafeHtmlBuilder();
+		builder.appendHtmlConstant(noticeStart);
+		HTML startMessage = new HTML(builder.toSafeHtml());
+		
+		Anchor linkToCurrent = new Anchor();
+		linkToCurrent.setHTML("current version.");
+		linkToCurrent.setStyleName("link", true);
+		linkToCurrent.setStyleName("margin-left-5", true);
+		linkToCurrent.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.configure(wikiKey, canEdit, null, true, 24);
+			}
+		});
+		
+		noticeWithLink.add(warningIcon);
+		noticeWithLink.add(wrapWidget(startMessage, "margin-left-5"));
+		noticeWithLink.add(linkToCurrent);
+		noticePanel.add(noticeWithLink);
+
+		if(canEdit) {
+			Button restoreButton = createRestoreButton();
+			noticePanel.add(restoreButton);
+		}
+		return noticePanel;
 	}
 	
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
@@ -335,12 +332,23 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			@Override
 			public void onClick(ClickEvent event) {
 				if(!isHistoryOpen) {
-					historyWidget.configure(wikiKey, canEdit, presenter);
+					ActionHandler actionHandler = new ActionHandler() {
+						@Override
+						public void previewClicked(Long versionToPreview,
+								Long currentVersion) {
+							presenter.previewClicked(versionToPreview, currentVersion);
+						}
+						@Override
+						public void restoreClicked(Long versionToRestore) {
+							presenter.restoreClicked(versionToRestore);
+						}	
+					};
+					historyWidget.configure(wikiKey, canEdit, actionHandler);
 					add(wrapWidget(historyWidget.asWidget(), "margin-top-10"));
 					layout(true);
 				} else {
 					// hide history
-					historyWidget.hideHistory();
+					historyWidget.removeHistoryWidget();
 				}
 				isHistoryOpen = !isHistoryOpen;
 			}
@@ -357,8 +365,14 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 
 			@Override
 			public void onClick(ClickEvent event) {
-				// need a boolean that keeps track of which version we're looking at if isCurrentVersion is false
-				// presenter.restoreClicked(wikiVersion)
+				// If this button is used when viewing the current version for any reason, don't do anything
+				// Otherwise, raise warning to user for confirmation before restoring
+				if(!isCurrentVersion) {
+					// versionInView should be set if !isCurrentVersion
+					if(versionInView != null) {
+						showRestorationWarning(versionInView);
+					}
+				}
 			}
 			
 		});
@@ -375,7 +389,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			@Override
 			public void onClick(ClickEvent event) {
 				if(isHistoryOpen) {
-					historyWidget.hideHistory();
+					historyWidget.removeHistoryWidget();
 				}
 				//change to edit mode
 				removeAll(true);
@@ -514,6 +528,22 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	public void showRestorationWarning(final Long wikiVersion) {
+		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				presenter.restoreClicked(wikiVersion);
+			}	
+		};
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				MessageBox.WARNING, 500, okCallback, cancelCallback);
 	}
 	
 	@Override

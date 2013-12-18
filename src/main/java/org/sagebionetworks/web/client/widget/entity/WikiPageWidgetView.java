@@ -29,11 +29,11 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void saveClicked(String title, String md);
 		public void cancelClicked();
 		public void editClicked();
-		public void previewClicked(final Long wikiVersion);
+		public void previewClicked(final Long versionToPreview, Long currentVersion);
 		public void restoreClicked(final Long wikiVersion);
 	}
 	
-	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription, boolean isCurrentVersion);
+	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isEmbeddedInOwnerPage, int spanWidth, boolean isDescription, boolean isCurrentVersion, Long versionInView);
 	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();

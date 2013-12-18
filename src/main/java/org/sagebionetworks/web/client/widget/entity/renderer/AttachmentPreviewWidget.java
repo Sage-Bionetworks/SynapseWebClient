@@ -22,7 +22,7 @@ public class AttachmentPreviewWidget implements AttachmentPreviewWidgetView.Pres
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		view.configure(wikiKey, descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
 		//set up view based on descriptor parameters

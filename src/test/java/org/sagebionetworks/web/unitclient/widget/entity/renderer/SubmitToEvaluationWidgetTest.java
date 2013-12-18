@@ -105,7 +105,7 @@ public class SubmitToEvaluationWidgetTest {
 
 	@Test
 	public void testHappyCaseConfigure() throws Exception {
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynapseClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
 		verify(mockView).configure(any(WikiPageKey.class), eq(true), eq(TEST_UNAVAILABLE_MESSAGE));
 	}
@@ -113,7 +113,7 @@ public class SubmitToEvaluationWidgetTest {
 	@Test
 	public void testConfigureServiceFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getAvailableEvaluations(anySet(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynapseClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -121,7 +121,7 @@ public class SubmitToEvaluationWidgetTest {
 	
 	@Test
 	public void testSubmitToChallengeClickedAnonymous() throws Exception {
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.submitToChallengeClicked();
 		verify(mockView).showAnonymousRegistrationMessage();
@@ -130,7 +130,7 @@ public class SubmitToEvaluationWidgetTest {
 	
 	@Test
 	public void testSubmitToChallengeClickedLoggedIn() throws Exception {
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		widget.submitToChallengeClicked();
 		verify(mockView, times(0)).showAnonymousRegistrationMessage();

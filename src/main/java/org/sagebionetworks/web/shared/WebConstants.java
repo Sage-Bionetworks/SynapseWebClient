@@ -145,6 +145,8 @@ public class WebConstants {
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+	
+	public static final String WIKI_VERSION_PARAM_KEY = "wikiVersion";
 
 	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
 

@@ -60,9 +60,7 @@ SynapseWidgetPresenter {
 	private String originalMarkdown;
 	boolean isDescription = false;
 	private boolean isCurrentVersion;
-	private Long version;
-	
-	private List<V2WikiHistorySnapshot> history;
+	private Long versionInView;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -103,7 +101,7 @@ SynapseWidgetPresenter {
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
 		this.isCurrentVersion = true;
-		this.version = null;
+		this.versionInView = null;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -129,7 +127,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -353,21 +351,27 @@ SynapseWidgetPresenter {
 	}
 
 	@Override
-	public void previewClicked(final Long wikiVersion) {
-		// get a specific version of the current wiki
-		// set flag that we are now looking at an old version, then we can know to put a yellow notice at the top
-		// configureVersionOfWiki, just resetting markdown widget, etc.
-		// if wikiVersion is current version, set isCurrentVersion to true, not false
-		isCurrentVersion = false;
+	public void previewClicked(final Long versionToPreview, Long currentVersion) {
+		isCurrentVersion = versionToPreview.equals(currentVersion);
+		versionInView = versionToPreview;
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
-				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, wikiVersion, new AsyncCallback<String>() {
+				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<String>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						
+						if (caught instanceof NotFoundException) {
+							if (callback != null)
+								callback.noWikiFound();
+						}
+						else if (caught instanceof ForbiddenException) {
+							view.show403();
+						}
+						else {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+						}
 					}
 
 					@Override
@@ -377,7 +381,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -387,13 +391,21 @@ SynapseWidgetPresenter {
 				
 			}
 		});
-		
-		
 	}
 
 	@Override
 	public void restoreClicked(final Long wikiVersion) {
-		// make sure dialog showed warning, if ok'ed, call to restore
-		// present the result, or re-configure?
+		// User has confirmed. Restore and refresh the page to see the update.
+		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), wikiVersion, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				refresh();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 }

@@ -26,7 +26,7 @@ public class BookmarkWidget implements BookmarkWidgetView.Presenter, WidgetRende
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		descriptor = widgetDescriptor;
 		view.configure(descriptor.get(WidgetConstants.BOOKMARK_KEY), descriptor.get(WidgetConstants.TEXT_KEY));
 	}

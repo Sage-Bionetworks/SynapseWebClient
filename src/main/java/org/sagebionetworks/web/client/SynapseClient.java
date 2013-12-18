@@ -223,7 +223,7 @@ public interface SynapseClient extends RemoteService {
     public String getV2WikiPage(WikiPageKey key) throws RestServiceException;
     public String getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
     public String updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
-    public String restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate) throws RestServiceException;
+    public String restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public String getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
     public String getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;

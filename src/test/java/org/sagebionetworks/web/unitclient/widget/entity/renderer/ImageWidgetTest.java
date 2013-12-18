@@ -48,7 +48,7 @@ public class ImageWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(wikiKey,descriptor, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
+		widget.configure(wikiKey,descriptor, null, null);
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(Long.class));
 	}
 }

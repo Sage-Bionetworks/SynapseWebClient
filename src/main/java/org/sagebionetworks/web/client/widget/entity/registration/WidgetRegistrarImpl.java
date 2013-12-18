@@ -96,7 +96,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Callback widgetRefreshRequired) { 
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, boolean isWiki, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(WidgetConstants.BOOKMARK_CONTENT_TYPE)) {
@@ -139,7 +139,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
-			presenter.configure(wikiKey, model, widgetRefreshRequired);
+			presenter.configure(wikiKey, model, widgetRefreshRequired, wikiVersionInView);
 		return presenter;
 	}
 	@Override

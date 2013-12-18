@@ -54,7 +54,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.wikiKey = wikiKey;
 		this.descriptor = widgetDescriptor;
 		

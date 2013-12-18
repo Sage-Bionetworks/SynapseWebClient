@@ -8,11 +8,14 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ActionCell.Delegate;
@@ -24,6 +27,7 @@ import com.google.gwt.cell.client.HasCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellList;
@@ -45,95 +49,35 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.cell.client.ValueUpdater;
 
 public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
-	@UiField(provided = true)
 	CellTable<HistoryEntry> historyTable;
-
-	@UiField(provided = true)
 	SimplePager pager;
 
 	private boolean canEdit;
 	private List<V2WikiHistorySnapshot> historyList;
 	private List<HistoryEntry> historyEntries;
+	private String currentVersion;
 	WikiHistoryWidgetView.Presenter presenter;
-	WikiPageWidgetView.Presenter wikiPagePresenter;
-	PortalGinInjector ginInjector;
+	private ActionHandler actionHandler;
 
 	@Inject
-	public WikiHistoryWidgetViewImpl(PortalGinInjector ginInjector) {
-		this.ginInjector = ginInjector;
+	public WikiHistoryWidgetViewImpl() {
 	}
 	
 	private static class HistoryEntry {
-		private static String entryId = "";
 	    private final String version;
 	    private final Date modifiedOn;
-	    //private final String user;
-	    private final UserBadge userBadge;
+	    private final String user;
 
-	    //public HistoryEntry(String version, String user, Date modifiedOn) {
-	    public HistoryEntry(String version, String user, UserBadge userBadge, Date modifiedOn) {
-	      entryId = user;
-	      //this.user = user;
+	    public HistoryEntry(String version, String user, Date modifiedOn) {
+	      this.user = user;
 	      this.version = version;
 	      this.modifiedOn = modifiedOn;
-	      this.userBadge = userBadge;
 	    }
 	}
-	static class UserBadgeCell extends AbstractCell<UserBadge> {
 
-		@Override
-		public void render(com.google.gwt.cell.client.Cell.Context context,
-				UserBadge value, SafeHtmlBuilder sb) {
-			if (value == null) {
-		        return;
-		    }
-
-		}
-
-	}
-	private static class ActionHasCell implements HasCell<HistoryEntry, HistoryEntry> {
-	    private ActionCell<HistoryEntry> cell;
-	    private String buttonText;
-	    final private Delegate<HistoryEntry> handler;
-
-	    public ActionHasCell(String text, Delegate<HistoryEntry> delegate) {
-	    	this.handler = delegate;
-	        cell = new ActionCell<HistoryEntry>(text, delegate) {
-	        	@Override
-	        	public void render(Context context, HistoryEntry value, SafeHtmlBuilder sb) {
-	        		sb.appendHtmlConstant("<button>");
-	    			sb.appendEscaped(buttonText);
-	            	sb.appendHtmlConstant("</button>");
-	        	}
-	        	
-	        	@Override
-	        	protected void onEnterKeyDown(Cell.Context context, Element parent, HistoryEntry value, 
-	        			NativeEvent event, ValueUpdater<HistoryEntry> valueUpdater) {
-	        		handler.execute(value);
-	        	}
-	        };
-	        buttonText = text;
-	    }
-
-	    @Override
-	    public Cell<HistoryEntry> getCell() {
-	        return cell;
-	    }
-
-	    @Override
-	    public FieldUpdater<HistoryEntry, HistoryEntry> getFieldUpdater() {
-	        return null;
-	    }
-
-		@Override
-		public HistoryEntry getValue(HistoryEntry object) {
-			return object;
-		}
-	}
-	
 	@Override
 	public void configure(boolean canEdit, List<JSONEntity> historyAsList, 
-			WikiPageWidgetView.Presenter wikiPageWidgetPresenter) {
+			ActionHandler actionHandler) {
 		this.canEdit = canEdit;
 		List<V2WikiHistorySnapshot> historyAsListOfHeaders = new ArrayList<V2WikiHistorySnapshot>();
 		for(int i = 0; i < historyAsList.size(); i++) {
@@ -141,9 +85,10 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			historyAsListOfHeaders.add(snapshot);
 		}
 		this.historyList = historyAsListOfHeaders;
-		this.wikiPagePresenter = wikiPageWidgetPresenter;
+		this.currentVersion = historyList.get(0).getVersion();
+		this.actionHandler = actionHandler;
 		createHistoryEntries();
-		createAndPopulate();
+		createHistoryWidget();
 	}
 	
 	private void createHistoryEntries() {
@@ -151,103 +96,32 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			historyEntries = new ArrayList<HistoryEntry>();
 			for(V2WikiHistorySnapshot snapshot: historyList) {
 				// Create an entry
-				
-				final List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
-				/*
-			   cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
-			@Override
-			public void execute(HistoryEntry object) {
-				System.out.println("Executing for PREVIEW button");
-				wikiPagePresenter.previewClicked(new Long(object.version));
-			}
-	    }));
-	    if(canEdit) {
-	    	cells.add(new ActionHasCell("Restore", new Delegate<HistoryEntry>() {
-				@Override
-				public void execute(HistoryEntry object) {
-					wikiPagePresenter.restoreClicked(new Long(object.version));
-				}
-		    }));
-	    }
-			    */
-				CompositeCell<HistoryEntry> actions = new CompositeCell<HistoryEntry>(cells);
-				
-				UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
-				modifiedBy.configure(snapshot.getModifiedBy());
-				//HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedBy, snapshot.getModifiedOn());
-				//HistoryEntry entry = new HistoryEntry(actions, snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
-				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), snapshot.getModifiedBy(), modifiedBy, snapshot.getModifiedOn());
+				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
 				historyEntries.add(entry);
 			}
 		}
 	}
 	
-	private void createAndPopulate() {
+	private void createHistoryWidget() {
 		// Remove any old table first
 		if(historyTable != null) {
-			hideHistory();
+			removeHistoryWidget();
 		}
-		
-		ProvidesKey<HistoryEntry> keyProvider = new ProvidesKey<HistoryEntry>() {
-		      public Object getKey(HistoryEntry item) {
-		        // Always do a null check.
-		        return (item == null) ? null : item.entryId;
-		      }
-		};
-		    
-		historyTable = new CellTable<HistoryEntry>(keyProvider);
+
+		historyTable = new CellTable<HistoryEntry>();
 		CellTable.setStyleName(historyTable.getElement(), "wikiHistoryWidget", true);
 		// Create a Pager to control the table.
 	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
 	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	    pager.setDisplay(historyTable);
 	    pager.setStyleName("wikiHistoryWidget", true);
-	    /*
-	    final List<HasCell<HistoryEntry, ?>> cells = new LinkedList<HasCell<HistoryEntry, ?>>();
-	    cells.add(new ActionHasCell("Preview", new Delegate<HistoryEntry>() {
-			@Override
-			public void execute(HistoryEntry object) {
-				System.out.println("Executing for PREVIEW button");
-				wikiPagePresenter.previewClicked(new Long(object.version));
-			}
-	    }));
-	    if(canEdit) {
-	    	cells.add(new ActionHasCell("Restore", new Delegate<HistoryEntry>() {
-				@Override
-				public void execute(HistoryEntry object) {
-					wikiPagePresenter.restoreClicked(new Long(object.version));
-				}
-		    }));
-	    }
-	    CompositeCell<HistoryEntry> compositeCell = new CompositeCell<HistoryEntry>(cells) {
-	    	@Override
-            public void render(Context context, HistoryEntry value, SafeHtmlBuilder sb) {
-                for (HasCell<HistoryEntry, ?> hasCell : cells) {
-                	//render(context, value, sb, hasCell);
-                	ActionCell<HistoryEntry> cell = (ActionCell<HistoryEntry>) hasCell.getCell();
-                	cell.render(context, value, sb);
-                }
-			}
-			
-			@Override
-            protected Element getContainerElement(Element parent) {
-                return parent;
-            }
-	    };
 	    
-		Column<HistoryEntry, HistoryEntry> actionColumn = new Column<HistoryEntry, HistoryEntry>(compositeCell) {
-			@Override
-			public HistoryEntry getValue(HistoryEntry object) {
-				return object;
-			}
-		};
-	    */
-	    
+	    // Restore if edit permissions granted
 	    if(canEdit) {
 		    ActionCell<HistoryEntry> restoreCell = new ActionCell<HistoryEntry>("Restore", new ActionCell.Delegate<HistoryEntry>() {
 		        @Override
 		        public void execute(HistoryEntry object) {
-		        	wikiPagePresenter.restoreClicked(new Long(object.version));
+		        	showRestorationWarning(new Long(object.version));
 		        }
 		    });
 		    
@@ -260,10 +134,11 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			historyTable.addColumn(restoreColumn, "Restore");
 	    }
 		
+	    // Preview
 	    ActionCell<HistoryEntry> previewCell = new ActionCell<HistoryEntry>("Preview", new ActionCell.Delegate<HistoryEntry>() {
 	        @Override
 	        public void execute(HistoryEntry object) {
-	        	wikiPagePresenter.previewClicked(new Long(object.version));
+	        	actionHandler.previewClicked(new Long(object.version), new Long(currentVersion));
 	        }
 	    });
 	    
@@ -283,16 +158,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	      }
 	    };
 	    
-	    UserBadgeCell userBadgeCell = new UserBadgeCell();
-	    Column<HistoryEntry, UserBadge> modifiedByColumn = new Column<HistoryEntry, UserBadge>(userBadgeCell) {
-
-			@Override
-			public UserBadge getValue(HistoryEntry object) {
-				return object.userBadge;
-			}
-	    	
-	    };
-	    /*
 	    // Modified by
 	    Column<HistoryEntry, String> modifiedByColumn = new Column<HistoryEntry, String>(
 	        new TextCell()) {
@@ -301,7 +166,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	        return object.user;
 	      }
 	    };
-	    */
 	    
 	    // Modified on
 	    Column<HistoryEntry, Date> modifiedOnColumn = new Column<HistoryEntry, Date>(
@@ -316,12 +180,11 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		historyTable.addColumn(versionColumn, "Version");
 		historyTable.addColumn(modifiedByColumn, "Modified By");
 		historyTable.addColumn(modifiedOnColumn, "Modified On");
-
+		
 		historyTable.setVisible(true);
 		historyTable.setRowCount(historyEntries.size());
 		
-		// Set the range to display. In this case, our visible range is smaller than
-	    // the data set.
+		// Set the range to display in the table at one time
 	    historyTable.setVisibleRange(0, 3);
 
 	    // Create a data provider.
@@ -351,10 +214,25 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}
 	
 	@Override
-	public void hideHistory() {
+	public void removeHistoryWidget() {
 		historyTable.removeFromParent();
 		pager.removeFromParent();
 		layout(true);
+	}
+	
+	public void showRestorationWarning(final Long wikiVersion) {
+		org.sagebionetworks.web.client.utils.Callback okCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+				actionHandler.restoreClicked(wikiVersion);
+			}	
+		};
+		org.sagebionetworks.web.client.utils.Callback cancelCallback = new org.sagebionetworks.web.client.utils.Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+		DisplayUtils.showOkCancelMessage("Warning", "Are you sure you want to replace the current version with this one?", MessageBox.WARNING, 500, okCallback, cancelCallback);
 	}
 	
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
@@ -370,32 +248,25 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}	
 	
 	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void showLoading() {}
 
 	@Override
 	public void showInfo(String title, String message) {
-		// TODO Auto-generated method stub
-		
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
 	public void showErrorMessage(String message) {
-		// TODO Auto-generated method stub
-		
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		removeAll(true);
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter, WikiPageWidgetView.Presenter wikiPageViewPresenter) {
+	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		this.wikiPagePresenter = wikiPageViewPresenter;
 	}
 }

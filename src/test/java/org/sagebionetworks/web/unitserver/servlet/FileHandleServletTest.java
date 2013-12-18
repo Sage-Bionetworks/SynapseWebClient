@@ -113,6 +113,11 @@ public class FileHandleServletTest {
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString());
 		verify(mockResponse).sendRedirect(anyString());
+		
+		when(mockRequest.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY)).thenReturn("1");
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getVersionOfV2WikiAttachmentPreviewTemporaryUrl(any(WikiPageKey.class), anyString(), anyLong());
+		verify(mockResponse).sendRedirect(anyString());
 	}
 	
 	@Test
@@ -123,6 +128,11 @@ public class FileHandleServletTest {
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockSynapse).getV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString());
+		verify(mockResponse).sendRedirect(anyString());
+	
+		when(mockRequest.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY)).thenReturn("1");
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockSynapse).getVersionOfV2WikiAttachmentTemporaryUrl(any(WikiPageKey.class), anyString(), anyLong());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 
