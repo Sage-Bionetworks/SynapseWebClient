@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnType;
@@ -9,6 +10,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
+import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.TableObject;
 
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -21,22 +24,20 @@ import com.extjs.gxt.ui.client.widget.grid.RowEditor;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FocusListener;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -94,7 +95,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		setupQuery(queryString);		
 		buildColumns(columns);
 		setupTable();		
-		setupBottomToolbar(columns);
+		setupEditorToolbar(columns);
 		queryPanel.setVisible(true);		
 		if(canEdit) {
 			buttonToolbar.setVisible(true);
@@ -181,12 +182,12 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	}
 
 
-	private void setupBottomToolbar(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+	private void setupEditorToolbar(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
 		buttonToolbar.clear();
 
-		Button editColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.EDIT_COLUMNS, ButtonType.DEFAULT, "glyphicon-pencil");
-		editColumnsBtn.addStyleName("margin-right-5");
-		editColumnsBtn.addClickHandler(new ClickHandler() {			
+		Button showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
+		showColumnsBtn.addStyleName("margin-right-5");
+		showColumnsBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				if(!columnEditorBuilt) buildColumnsEditor(columns);
@@ -224,42 +225,37 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 			}
 		});
 		
-		buttonToolbar.add(editColumnsBtn);		
+		buttonToolbar.add(showColumnsBtn);		
 		buttonToolbar.add(addRowBtn);
 	}
 	
 	private void buildColumnsEditor(List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
-		HTMLPanel parent = new HTMLPanel("");
+		FlowPanel parent = new FlowPanel();
 		parent.addStyleName("panel-group");
 		String accordionId = "accordion-" + ++sequence;
 		parent.getElement().setId(accordionId);
 		
 		// add header
-		parent.add(new HTML("<h4>" + DisplayConstants.TABLE_COLUMNS + "</h4>"));
+		parent.add(new HTML("<h4>" + DisplayConstants.COLUMN_DETAILS + "</h4>"));
 		
 		for(int i=0; i<columns.size(); i++) {
 			org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);
-			HTMLPanel panel = new HTMLPanel("");
+			FlowPanel panel = new FlowPanel();
 			panel.addStyleName("panel panel-default");
 			String colContentId = "contentId" + ++sequence;
 
-			HTMLPanel columnEntry = new HTMLPanel("");
+			FlowPanel columnEntry = new FlowPanel();
 			columnEntry.addStyleName("panel-heading row");			
-			String expandLinkPart = "<a data-toggle=\"collapse\" data-parent=\"#" + accordionId + "\" href=\"#" + colContentId + "\"";
-			String expandLinkOpen = expandLinkPart + ">";
-			String expandLinkStyleOpen = expandLinkPart + " class=\"link\">";
+			String expandLinkStyleOpen = "<a data-toggle=\"collapse\" data-parent=\"#" + accordionId + "\" href=\"#" + colContentId + "\" class=\"link\">";
 			
-			HTMLPanel left = new HTMLPanel("");			
+			FlowPanel left = new FlowPanel();			
 			left.addStyleName("col-xs-7 col-sm-9 col-md-10");
 			left.add(new HTML("<h4>" + expandLinkStyleOpen + SafeHtmlUtils.fromString(col.getName()).asString() + "</a></h4>"));
-			HTMLPanel right = new HTMLPanel("");
+			FlowPanel right = new FlowPanel();
 			right.addStyleName("col-xs-5 col-sm-3 col-md-2 text-align-right largeIconButton");
 			Anchor moveUp = new Anchor(SafeHtmlUtils.fromSafeConstant("<span class=\"glyphicon glyphicon-arrow-up margin-right-5\"></span>"));
 			Anchor moveDown = new Anchor(SafeHtmlUtils.fromSafeConstant("<span class=\"glyphicon glyphicon-arrow-down margin-right-5\"></span>"));
-			InlineHTML editLink = new InlineHTML(expandLinkOpen + "<span class=\"glyphicon glyphicon-pencil margin-right-5\"></span></a>");
-			editLink.addStyleName("display-inline");
 			Anchor delete = new Anchor(SafeHtmlUtils.fromSafeConstant("<span class=\"glyphicon glyphicon-remove\"></span>"));
-			right.add(editLink);
 			if(i!=0) right.add(moveUp);
 			if(i!=columns.size()-1) right.add(moveDown);
 			right.add(delete);
@@ -268,29 +264,61 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 			columnEntry.add(right);
 			panel.add(columnEntry);
 			
-			HTMLPanel columnContent = new HTMLPanel("");
+			FlowPanel columnContent = new FlowPanel();
 			columnContent.addStyleName("panel-collapse collapse");
 			columnContent.getElement().setId(colContentId);
-			HTMLPanel columnContentBody = new HTMLPanel("");
+			FlowPanel columnContentBody = new FlowPanel();
 			columnContentBody.addStyleName("panel-body");		
-			columnContentBody.add(createColumnEditor(col));
+			columnContentBody.add(createColumnView(col));
 			columnContent.add(columnContentBody);
 			panel.add(columnContent);		
 			parent.add(panel);
 		}
-		
+
+		// Add Column
+		final FlowPanel addColumnPanel = new FlowPanel();
+		addColumnPanel.addStyleName("well margin-top-15");
+		addColumnPanel.setVisible(false);
+		org.sagebionetworks.repo.model.table.ColumnModel newColumn = new org.sagebionetworks.repo.model.table.ColumnModel();
+		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
+		addColumnPanel.add(createColumnEditor(newColumn));
+
 		Button addColumnBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_COLUMN, ButtonType.DEFAULT, "glyphicon-plus");
-		addColumnBtn.addStyleName("margin-top-15");
+		addColumnBtn.addStyleName("margin-top-15");	
+		addColumnBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(addColumnPanel.isVisible()) addColumnPanel.setVisible(false);
+				else addColumnPanel.setVisible(true);
+			}
+		});
 		parent.add(addColumnBtn);
+		parent.add(addColumnPanel);
 		
 		columnEditorPanel.setWidget(parent);
 	}
 
-	private Widget createColumnEditor(
-			org.sagebionetworks.repo.model.table.ColumnModel col) {
-		HTMLPanel form = new HTMLPanel("");
+	private Widget createColumnView(org.sagebionetworks.repo.model.table.ColumnModel col) {
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.NAME + "</span>: ").appendEscaped(col.getName()).appendHtmlConstant("<br/>")
+		.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.TYPE + "</span>: ").appendEscaped(ColumnUtils.getColumnDisplayName(col.getColumnType())).appendHtmlConstant("<br/>");
+		if(col.getDefaultValue() != null) 
+			shb.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.DEFAULT_VALUE + "</span>: ").appendEscaped(col.getDefaultValue()).appendHtmlConstant("<br/>");
+		if(col.getEnumValues() != null && col.getEnumValues().size() > 0) {
+			shb.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.RESTRICTED_VALUES + "</span>: ");
+			String values = "";
+			for(String val : col.getEnumValues()) values += val + ", ";
+			values = values.substring(0, values.length()-2); // chop last comma
+			shb.appendEscaped(values).appendHtmlConstant("<br/>");
+		}		
+		return new HTML(shb.toSafeHtml());
+	}
+	
+	private Widget createColumnEditor(final org.sagebionetworks.repo.model.table.ColumnModel col) {
+		FlowPanel form = new FlowPanel();
+		form.addStyleName("margin-top-15");
 		final TextBox name = new TextBox();
-		name.setValue(SafeHtmlUtils.fromString(col.getName()).asString());
+		if(col.getName() != null) name.setValue(SafeHtmlUtils.fromString(col.getName()).asString());
 		name.addStyleName("form-control");
 		HTML inputLabel = new HTML("Name: ");
 		form.add(inputLabel);
@@ -299,36 +327,67 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		// Column Type
 		inputLabel = new HTML("Column Type: ");
 		inputLabel.addStyleName("margin-top-15");
-		form.add(inputLabel);
-		HTMLPanel columnTypeRadio = createColumnTypeRadio(col);		
-		form.add(columnTypeRadio);
+		form.add(inputLabel);		
+		form.add(createColumnTypeRadio(col));
 
+		// Enum Values
+		inputLabel = new HTML("Restricted Values: ");
+		inputLabel.addStyleName("margin-top-15");
+		form.add(inputLabel);	
+		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
+		list.append("some stuff");
+		list.append(Arrays.asList(new String[] {"even", "more"}));		
+		form.add(createRestrictedValues(col, list));
+		
 		// Default Value		
 		inputLabel = new HTML("Default Value: ");
 		inputLabel.addStyleName("margin-top-15");
 		form.add(inputLabel);
-		HTMLPanel row = createDefaultValueRadio(col);
-		form.add(row);
+		form.add(createDefaultValueRadio(col));
 
 		
 		// Save/Cancel
 		// TODO : hide buttons unless a change has been made
-		HTMLPanel buttons = new HTMLPanel("");
+		FlowPanel buttons = new FlowPanel();
 		buttons.addStyleName("margin-top-15");
-		Button save = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);		
-		Button cancel = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL, ButtonType.LINK);
+		Button save = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
+		save.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+//				if(name.getValue() == null || name.getValue().length() == 0) {
+//					name.addStyleName("has-error");					
+//				}
+				List<String> restrictedValues = list.getValues();
+				if(restrictedValues.size() > 0) col.setEnumValues(restrictedValues);
+				presenter.createColumn(col);
+			}
+		});
 		buttons.add(save);
-		buttons.add(cancel);
 		form.add(buttons);
 		
 		return form;
 		
 	}
 
-	private HTMLPanel createDefaultValueRadio(
+	private Widget createRestrictedValues(org.sagebionetworks.repo.model.table.ColumnModel col, ListCreatorViewWidget list) {
+		FlowPanel row = new FlowPanel();
+		row.addStyleName("row");
+		FlowPanel left = new FlowPanel();
+		left.addStyleName("col-sm-6");
+		FlowPanel right = new FlowPanel();
+		right.addStyleName("col-sm-6");
+		row.add(left);
+		row.add(right);		
+		left.add(list);		
+		return row;
+	}
+
+
+
+	private Widget createDefaultValueRadio(
 			org.sagebionetworks.repo.model.table.ColumnModel col) {
-		HTMLPanel row = new HTMLPanel("");		
-		HTMLPanel defaultValueRadio = new HTMLPanel("");
+		FlowPanel row = new FlowPanel();		
+		FlowPanel defaultValueRadio = new FlowPanel();
 		defaultValueRadio.addStyleName("btn-group");
 		 						
 		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
@@ -375,9 +434,9 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		return row;
 	}
 
-	private HTMLPanel createColumnTypeRadio(
+	private Widget createColumnTypeRadio(
 			org.sagebionetworks.repo.model.table.ColumnModel col) {
-		HTMLPanel columnTypeRadio = new HTMLPanel("");
+		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
 		for(final ColumnType type : ColumnType.values()) {			
@@ -393,7 +452,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 					showInfo("selected", type + "");
 				}
 			});
-			if(col.getColumnType() == type) btn.addStyleName("active");
+			if(col.getColumnType() != null && col.getColumnType() == type) btn.addStyleName("active");
 			groupBtns.add(btn);
 			columnTypeRadio.add(btn);
 

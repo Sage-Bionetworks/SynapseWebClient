@@ -1464,7 +1464,16 @@ a.projectTitle:hover {
 	line-height: 30px;
 	color: #000000;
 }
+.largeIconShiftUp {
+	position: relative; 
+	top:-7px;
+}
 
 .text-align-right {
 	text-align: right;
+}
+
+.inlineField {
+	overflow: hidden; 
+	padding-right: .5em;	
 }

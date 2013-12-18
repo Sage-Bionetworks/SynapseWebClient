@@ -79,5 +79,11 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void createColumn(ColumnModel col) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

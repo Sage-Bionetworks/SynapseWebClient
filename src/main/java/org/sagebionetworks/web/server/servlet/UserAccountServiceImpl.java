@@ -213,10 +213,10 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			
 			for (UserGroup userGroup : allGroups.getResults()) {
 				if (userGroup.getName() != null){
-					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
-						results.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
-					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
-						results.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
+//					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
+//						results.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
+//					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
+//						results.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
 				}
 			}
 			

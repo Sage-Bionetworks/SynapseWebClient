@@ -23,6 +23,8 @@ public interface SynapseTableWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 
 		void query(String query);
+
+		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
 				
 	}
 
