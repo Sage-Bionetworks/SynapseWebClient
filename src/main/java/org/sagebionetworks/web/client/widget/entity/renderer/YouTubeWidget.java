@@ -22,7 +22,7 @@ public class YouTubeWidget implements YouTubeWidgetView.Presenter, WidgetRendere
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		view.configure(descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY));

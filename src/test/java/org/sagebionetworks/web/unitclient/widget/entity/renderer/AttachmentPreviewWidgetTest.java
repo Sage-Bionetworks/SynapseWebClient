@@ -42,7 +42,7 @@ public class AttachmentPreviewWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(wikiKey,descriptor, null);
+		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView).configure(any(WikiPageKey.class), anyString());
 	}
 }

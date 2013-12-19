@@ -31,7 +31,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);

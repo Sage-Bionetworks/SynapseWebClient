@@ -22,7 +22,7 @@ public class ReferenceWidget implements ReferenceWidgetView.Presenter, WidgetRen
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		descriptor = widgetDescriptor;
 		view.configure(descriptor.get(WidgetConstants.REFERENCE_FOOTNOTE_KEY));
 	}

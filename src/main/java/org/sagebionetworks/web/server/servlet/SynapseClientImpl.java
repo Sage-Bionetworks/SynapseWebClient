@@ -1403,14 +1403,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
     @Override
     public String restoreV2WikiPage(String ownerId, String ownerType,
-                    String wikiPageJson, Long versionToUpdate)
+                    String wikiId, Long versionToUpdate)
                     throws RestServiceException {
             org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
             try {
-                    JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-                    @SuppressWarnings("unchecked")
-                    V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,V2WikiPage.class);
-                    V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId, ObjectType.valueOf(ownerType), page, versionToUpdate);
+                    V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId, ObjectType.valueOf(ownerType), wikiId, versionToUpdate);
                     return EntityFactory.createJSONStringForEntity(returnPage);
             } catch (SynapseException e) {
                     throw ExceptionUtil.convertSynapseException(e);

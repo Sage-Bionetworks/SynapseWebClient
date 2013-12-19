@@ -108,7 +108,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false));
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), eq(true), any(Long.class));
 	}
 
 	@Test

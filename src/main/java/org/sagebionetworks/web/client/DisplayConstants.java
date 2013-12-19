@@ -290,6 +290,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
+	public static final String ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED = "Failed to load the history of the wiki page.";
 	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
 	public static final String ERROR_WIKI_SAVE_MARKDOWN = "Failed to properly save markdown: ";
 	public static final String ERRROR_ATTACHMENT_FAILED = "Failed to upload attachment: ";
@@ -643,5 +644,7 @@ public class DisplayConstants {
 	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
 	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
 	
+	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
+	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
 }
 

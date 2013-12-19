@@ -60,7 +60,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	
 	@Override
 	public void configure(WikiPageKey wikiKey,
-			Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+			Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.clear();
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
