@@ -34,7 +34,7 @@ public class OldImageWidget implements OldImageWidgetView.Presenter, WidgetRende
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		//TODO: change to support other object types

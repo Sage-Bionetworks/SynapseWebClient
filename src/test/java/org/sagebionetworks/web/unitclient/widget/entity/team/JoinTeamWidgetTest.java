@@ -170,7 +170,7 @@ public class JoinTeamWidgetTest {
 		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
 		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
 		Callback mockWidgetRefreshRequired = mock(Callback.class);
-		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired);
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
 		joinWidget.sendJoinRequestStep3();
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());

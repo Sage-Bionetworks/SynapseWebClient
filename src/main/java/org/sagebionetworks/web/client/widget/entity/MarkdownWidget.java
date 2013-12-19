@@ -64,6 +64,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	private WikiPageKey wikiKey;
 	private boolean isWiki;
 	private boolean isPreview;
+	private Long wikiVersionInView;
 	
 	@Inject
 	public MarkdownWidget(SynapseClientAsync synapseClient,
@@ -98,7 +99,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 				try {
 					WikiPage page = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 					wikiKey.setWikiPageId(page.getId());
-					setMarkdown(page.getMarkdown(), wikiKey, true, isPreview);
+					setMarkdown(page.getMarkdown(), wikiKey, true, isPreview, null);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -112,19 +113,21 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	}
 
 	public void refresh() {
-		setMarkdown(md, wikiKey, isWiki, isPreview);
+		setMarkdown(md, wikiKey, isWiki, isPreview, null);
 	}
 	
 	/**
 	 * @param md
+	 * @param wikiVersionInView TODO
 	 * @param attachmentBaseUrl if null, will use file handles
 	 */
-	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview) {
+	public void setMarkdown(final String md, final WikiPageKey wikiKey, final boolean isWiki, final boolean isPreview, final Long wikiVersionInView) {
 		final SynapseView view = this;
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.isWiki = isWiki;
 		this.isPreview= isPreview;
+		this.wikiVersionInView = wikiVersionInView;
 		synapseClient.markdown2Html(md, isPreview, DisplayUtils.isInTestWebsite(cookies), gwt.getHostPrefix(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -155,7 +158,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 						}
 					};
 					//asynchronously load the widgets
-					Set<String> contentTypes = loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired);
+					Set<String> contentTypes = loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired, wikiVersionInView);
 
 					//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 					if (!contentTypes.contains(WidgetConstants.NO_AUTO_WIKI_SUBPAGES)) {
@@ -181,14 +184,18 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	/**
 	 * Shared method for loading the widgets into the html returned by the service (used to render the entity page, and to generate a preview of the description)
 	 * @param panel
-	 * @param bundle
 	 * @param widgetRegistrar
 	 * @param synapseClient
+	 * @param wikiVersionInView TODO
+	 * @param bundle
 	 * @param nodeModelCreator
 	 * @param view
 	 * @throws JSONObjectAdapterException 
 	 */
-	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired) throws JSONObjectAdapterException {
+	public static Set<String> loadWidgets(final HTMLPanel panel, WikiPageKey wikiKey, boolean isWiki, 
+			final WidgetRegistrar widgetRegistrar, SynapseClientAsync synapseClient, 
+			IconsImageBundle iconsImageBundle, Boolean isPreview, Callback widgetRefreshRequired, 
+			Long wikiVersionInView) throws JSONObjectAdapterException {
 		Set<String> contentTypes = new HashSet<String>();
 		final String suffix = SharedMarkdownUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
@@ -203,7 +210,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 						innerText = innerText.trim();
 						String contentType = widgetRegistrar.getWidgetContentType(innerText);
 						Map<String, String> widgetDescriptor = widgetRegistrar.getWidgetDescriptor(innerText);
-						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki, widgetRefreshRequired);
+						WidgetRendererPresenter presenter = widgetRegistrar.getWidgetRendererForWidgetDescriptor(wikiKey, contentType, widgetDescriptor, isWiki, widgetRefreshRequired, wikiVersionInView);
 						if (presenter == null)
 							throw new IllegalArgumentException("Unable to render widget from the specified markdown.");
 						panel.add(presenter.asWidget(), currentWidgetDiv);

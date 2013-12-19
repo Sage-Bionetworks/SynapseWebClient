@@ -57,7 +57,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		view.setPresenter(this);
 	}	
 	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null);
 	}
 

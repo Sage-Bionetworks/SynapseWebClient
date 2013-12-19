@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
@@ -9,6 +11,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 
@@ -56,6 +59,8 @@ SynapseWidgetPresenter {
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
 	boolean isDescription = false;
+	private boolean isCurrentVersion;
+	private Long versionInView;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -95,6 +100,8 @@ SynapseWidgetPresenter {
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		this.spanWidth = spanWidth;
+		this.isCurrentVersion = true;
+		this.versionInView = null;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -120,7 +127,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -343,4 +350,62 @@ SynapseWidgetPresenter {
 		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
 	}
 
+	@Override
+	public void previewClicked(final Long versionToPreview, Long currentVersion) {
+		isCurrentVersion = versionToPreview.equals(currentVersion);
+		versionInView = versionToPreview;
+		setOwnerObjectName(new OwnerObjectNameCallback() {
+			@Override
+			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
+				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						if (caught instanceof NotFoundException) {
+							if (callback != null)
+								callback.noWikiFound();
+						}
+						else if (caught instanceof ForbiddenException) {
+							view.show403();
+						}
+						else {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+						}
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						try {
+							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							wikiKey.setWikiPageId(currentPage.getId());
+							originalMarkdown = currentPage.getMarkdown();
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
+						} catch (Exception e) {
+							onFailure(e);
+						}
+					}
+					
+				});
+				
+			}
+		});
+	}
+
+	@Override
+	public void restoreClicked(final Long wikiVersion) {
+		// User has confirmed. Restore and refresh the page to see the update.
+		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), wikiVersion, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				refresh();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
 }

@@ -732,10 +732,10 @@ public class SynapseClientImplTest {
      
      @Test
      public void testRestoreV2WikiPage() throws Exception {
-         String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
-         Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong())).thenReturn(v2Page);
-         synapseClient.restoreV2WikiPage("ownerId", ObjectType.ENTITY.toString(), wikiPageJson, new Long(2));
-         verify(mockSynapse).restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong());
+         String wikiId = "syn123";
+         Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(String.class), anyLong())).thenReturn(v2Page);
+         synapseClient.restoreV2WikiPage("ownerId", ObjectType.ENTITY.toString(), wikiId, new Long(2));
+         verify(mockSynapse).restoreV2WikiPage(anyString(), any(ObjectType.class), any(String.class), anyLong());
      }
      
      @Test
