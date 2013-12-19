@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -31,6 +33,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private WikiPageKey wikiKey;
+	private Map<String, String> mapIdToName;
 
 	public interface ActionHandler{
 		public void previewClicked(Long versionToPreview, Long currentVersion);
@@ -57,6 +60,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	@Override
 	public void configure(final WikiPageKey key, final boolean canEdit, final ActionHandler actionHandler) {
 		this.wikiKey = key;
+		this.mapIdToName = new HashMap<String, String>();
 		view.configure(canEdit, actionHandler);
 	}
 	
@@ -80,16 +84,19 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 						V2WikiHistorySnapshot snapshot = (V2WikiHistorySnapshot) historyAsList.get(i);
 						historyAsListOfHeaders.add(snapshot);
 					}
-					// Update history data structure
+					// Update/append to history data structure
 					view.updateHistoryList(historyAsListOfHeaders);
 					
-					// Prepare all user ids
-					List<String> userIds = new ArrayList<String>();
+					// Prepare ids that are not mapped to a display name in the map
+					final List<String> idsToSearch = new ArrayList<String>();
 					for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
-						userIds.add(historyAsListOfHeaders.get(i).getModifiedBy());
+						String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
+						if(mapIdToName != null && !mapIdToName.containsKey(modifiedById)) {
+							idsToSearch.add(modifiedById);
+						}
 					}
-					// Call to get user headers from the list of ids
-					synapseClient.getUserGroupHeadersById(userIds, new AsyncCallback<EntityWrapper>() {
+					// Call to get user headers from the list of needed ids
+					synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<EntityWrapper>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -99,14 +106,14 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 						public void onSuccess(EntityWrapper result) {
 							try {
 								UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(result.getEntityJson(), UserGroupHeaderResponsePage.class);
-								// Store all the user display names
-								List<String> displayNames = new ArrayList<String>();
+								// Store display names along with the associated id in the map
 								List<UserGroupHeader> headers = response.getChildren();
 								for(int i = 0; i < headers.size(); i++) {
-									displayNames.add(headers.get(i).getDisplayName());
+									String displayName = headers.get(i).getDisplayName();
+									mapIdToName.put(idsToSearch.get(i), displayName);
 								}
 								// Now we're ready to build the history widget
-								view.buildHistoryWidget(displayNames);
+								view.buildHistoryWidget();
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}
@@ -122,7 +129,17 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	}
 	
 	@Override
-	public void removeHistoryWidget() {
-		view.removeHistoryWidget();
+	public String getNameForUserId(String userId) {
+		return mapIdToName.get(userId);
+	}
+	
+	@Override
+	public void hideHistoryWidget() {
+		view.hideHistoryWidget();
+	}
+	
+	@Override
+	public void showHistoryWidget() {
+		view.showHistoryWidget();
 	}
 }

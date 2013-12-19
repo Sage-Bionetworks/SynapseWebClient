@@ -85,6 +85,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private WikiHistoryWidget historyWidget;
 	PortalGinInjector ginInjector;
 	private boolean isHistoryOpen;
+	private boolean isHistoryWidgetBuilt;
 	private boolean isCurrentVersion;
 	private Long versionInView;
 	
@@ -153,6 +154,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.isRootWiki = isRootWiki;
 		this.colWidth = Math.round(colWidth/2);
 		this.isHistoryOpen = false;
+		this.isHistoryWidgetBuilt = false;
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
@@ -332,23 +334,30 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			@Override
 			public void onClick(ClickEvent event) {
 				if(!isHistoryOpen) {
-					ActionHandler actionHandler = new ActionHandler() {
-						@Override
-						public void previewClicked(Long versionToPreview,
-								Long currentVersion) {
-							presenter.previewClicked(versionToPreview, currentVersion);
-						}
-						@Override
-						public void restoreClicked(Long versionToRestore) {
-							presenter.restoreClicked(versionToRestore);
-						}	
-					};
-					historyWidget.configure(wikiKey, canEdit, actionHandler);
-					add(wrapWidget(historyWidget.asWidget(), "margin-top-10"));
-					layout(true);
+					// If history widget is already built, make it show
+					if(isHistoryWidgetBuilt) {
+						historyWidget.showHistoryWidget();
+					} else {
+						// Configure the history widget and built the history table
+						ActionHandler actionHandler = new ActionHandler() {
+							@Override
+							public void previewClicked(Long versionToPreview,
+									Long currentVersion) {
+								presenter.previewClicked(versionToPreview, currentVersion);
+							}
+							@Override
+							public void restoreClicked(Long versionToRestore) {
+								presenter.restoreClicked(versionToRestore);
+							}	
+						};
+						historyWidget.configure(wikiKey, canEdit, actionHandler);
+						isHistoryWidgetBuilt = true;
+						add(wrapWidget(historyWidget.asWidget(), "margin-top-10"));
+						layout(true);
+					}
 				} else {
 					// hide history
-					historyWidget.removeHistoryWidget();
+					historyWidget.hideHistoryWidget();
 				}
 				isHistoryOpen = !isHistoryOpen;
 			}
@@ -389,7 +398,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			@Override
 			public void onClick(ClickEvent event) {
 				if(isHistoryOpen) {
-					historyWidget.removeHistoryWidget();
+					historyWidget.hideHistoryWidget();
 				}
 				//change to edit mode
 				removeAll(true);

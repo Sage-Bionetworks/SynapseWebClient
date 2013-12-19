@@ -22,12 +22,15 @@ public interface WikiHistoryWidgetView extends IsWidget, SynapseView{
 	 */
 	public interface Presenter {
 		public void configure(final WikiPageKey key, final boolean canEdit, ActionHandler actionHandler);
-		public void removeHistoryWidget();
+		public void hideHistoryWidget();
+		public void showHistoryWidget();
 		public void configureNextPage(Long offset, Long limit);
+		public String getNameForUserId(String userId);
 	}
 	
 	public void configure(boolean canEdit, ActionHandler actionHandler);
 	public void updateHistoryList(List<V2WikiHistorySnapshot> historyResults);
-	public void buildHistoryWidget(List<String> userNameResults);
-	public void removeHistoryWidget();
+	public void buildHistoryWidget();
+	public void hideHistoryWidget();
+	public void showHistoryWidget();
 }

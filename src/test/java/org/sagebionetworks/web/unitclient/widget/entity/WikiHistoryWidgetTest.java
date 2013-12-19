@@ -81,11 +81,17 @@ public class WikiHistoryWidgetTest {
 	}
 	
 	@Test
-	public void testRemoveHistoryWidget() {
-		presenter.removeHistoryWidget();
-		verify(mockView).removeHistoryWidget();
+	public void testHideHistoryWidget() {
+		presenter.hideHistoryWidget();
+		verify(mockView).hideHistoryWidget();
 	}
 	
+	@Test
+	public void testShowHistoryWidget() {
+		presenter.showHistoryWidget();
+		verify(mockView).showHistoryWidget();
+	}
+
 	@Test
 	public void testConfigure() {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, new ActionHandler() {
@@ -118,7 +124,7 @@ public class WikiHistoryWidgetTest {
 	public void testConfigureNextPage() {
 		presenter.configureNextPage(new Long(0), new Long(10));
 		verify(mockView).updateHistoryList(any(List.class));
-		verify(mockView).buildHistoryWidget(any(List.class));
+		verify(mockView).buildHistoryWidget();
 
 	}
 }

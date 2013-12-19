@@ -56,11 +56,11 @@ import com.google.gwt.cell.client.ValueUpdater;
 public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
 	CellTable<HistoryEntry> historyTable;
 	Button loadMoreHistoryButton;
-	HTML inlineErrorMessage;
+	HTMLPanel inlineErrorMessagePanel;
+	FlowPanel historyPanel;
 	private boolean canEdit;
 	private List<V2WikiHistorySnapshot> historyList;
 	private List<HistoryEntry> historyEntries;
-	private List<String> modifiedByUserNames;
 	private String currentVersion;
 	WikiHistoryWidgetView.Presenter presenter;
 	private ActionHandler actionHandler;
@@ -94,7 +94,6 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		this.offset = 0;
 		// Reset history
 		historyList = new ArrayList<V2WikiHistorySnapshot>();
-		modifiedByUserNames = new ArrayList<String>();
 		historyEntries = new ArrayList<HistoryEntry>();
 		presenter.configureNextPage(new Long(offset), new Long(10));
 	}
@@ -111,10 +110,7 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}
 	
 	@Override
-	public void buildHistoryWidget(List<String> userNameResults) {
-		for(int i = 0; i < userNameResults.size(); i++) {
-			modifiedByUserNames.add(userNameResults.get(i));
-		}
+	public void buildHistoryWidget() {
 		// We have all the data to create entries for the table
 		createHistoryEntries();
 		// Create or build upon the history widget
@@ -128,8 +124,8 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		    // Push in data
 		    historyTable.setRowData(0, historyEntries);
 		    // Disable button if no more history exists
-			if(hasReachedEndOfHistory) {
-				loadMoreHistoryButton.setEnabled(false);
+		    if(hasReachedEndOfHistory) {
+				hideLoadMoreButton();
 			}
 		}
 	}
@@ -139,7 +135,12 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			for(int i = offset; i < historyList.size(); i++) {
 				V2WikiHistorySnapshot snapshot = historyList.get(i);
 				// Create an entry
-				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedByUserNames.get(i), snapshot.getModifiedOn());
+				String userId = snapshot.getModifiedBy();
+				String modifiedByName = presenter.getNameForUserId(userId);
+				if(modifiedByName == null) {
+					modifiedByName = userId;
+				}
+				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedByName, snapshot.getModifiedOn());
 				historyEntries.add(entry);
 			}
 			// Check if we've reached the end of the history from this recent call
@@ -152,10 +153,10 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	
 	private void createHistoryWidget() {
 		// Remove any old table or inline error message first
-		if(historyTable != null) {
-			removeHistoryWidget();
+		if(historyPanel != null || inlineErrorMessagePanel != null) {
+			hideHistoryWidget();
 		}
-
+		
 		historyTable = new CellTable<HistoryEntry>();
 
 		loadMoreHistoryButton = DisplayUtils.createIconButton("Load more history", DisplayUtils.ButtonType.DEFAULT, null);
@@ -169,10 +170,10 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			}
 			
 		});
-		// Disable if we've reached the end
 		if(hasReachedEndOfHistory) {
-			loadMoreHistoryButton.setEnabled(false);
+			hideLoadMoreButton();
 		}
+		
 	    // Restore if edit permissions granted
 	    if(canEdit) {
 		    ActionCell<HistoryEntry> restoreCell = new ActionCell<HistoryEntry>("Restore", new ActionCell.Delegate<HistoryEntry>() {
@@ -180,7 +181,16 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		        public void execute(HistoryEntry object) {
 		        	showRestorationWarning(new Long(object.version));
 		        }
-		    });
+		    }) {
+		    	@Override
+		        public void render(Cell.Context context, HistoryEntry value, SafeHtmlBuilder sb) {
+		        	if(value.version.equals(currentVersion)) {
+		        		sb.appendHtmlConstant("<span>(Current Wiki)</span>");
+		        	} else {
+		        		sb.appendHtmlConstant("<button>Restore</button>");
+		        	}
+		        }
+		    };
 		    
 		    Column<HistoryEntry, HistoryEntry> restoreColumn = new Column<HistoryEntry, HistoryEntry>(restoreCell) {
 				@Override
@@ -245,26 +255,34 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	    historyTable.setVisibleRange(0, historyEntries.size());
 	    historyTable.setRowData(0, historyEntries);
 	    
-		FlowPanel panel = new FlowPanel();
-		panel.add(wrapWidget(historyTable, "margin-top-5"));
-		panel.add(loadMoreHistoryButton);
-		add(panel);
+		historyPanel = new FlowPanel();
+		historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
+		historyPanel.add(loadMoreHistoryButton);
+		add(historyPanel);
 		layout(true);
 		
 	}
 	
 	@Override
-	public void removeHistoryWidget() {
-		if(historyTable != null) {
-			historyTable.removeFromParent();
+	public void hideHistoryWidget() {
+		if(historyPanel != null) {
+			historyPanel.setVisible(false);
 		}
-		if(loadMoreHistoryButton != null) {
-			loadMoreHistoryButton.removeFromParent();
-		} 
-		if(inlineErrorMessage != null) {
-			inlineErrorMessage.removeFromParent();
+		if(inlineErrorMessagePanel != null) {
+			inlineErrorMessagePanel.setVisible(false);
 		}
 		layout(true);
+	}
+	
+	@Override
+	public void showHistoryWidget() {
+		if(historyPanel != null) {
+			historyPanel.setVisible(true);
+		}
+	}
+	
+	private void hideLoadMoreButton() {
+		loadMoreHistoryButton.setVisible(false);
 	}
 	
 	public void showRestorationWarning(final Long wikiVersion) {
@@ -279,7 +297,7 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			public void invoke() {
 			}	
 		};
-		DisplayUtils.showOkCancelMessage("Warning", "Are you sure you want to replace the current version with this one?", MessageBox.WARNING, 500, okCallback, cancelCallback);
+		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, MessageBox.WARNING, 500, okCallback, cancelCallback);
 	}
 	
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {
@@ -307,10 +325,8 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		// Show an inline error message
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		builder.appendHtmlConstant(message);
-		inlineErrorMessage = new HTML(builder.toSafeHtml());
-		SimplePanel panel = new SimplePanel();
-		panel.add(inlineErrorMessage);
-		add(panel);
+		inlineErrorMessagePanel = new HTMLPanel(builder.toSafeHtml());
+		add(inlineErrorMessagePanel);
 		layout(true);
 	}
 
