@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -51,7 +57,12 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	@Override
 	public void configure(final WikiPageKey key, final boolean canEdit, final ActionHandler actionHandler) {
 		this.wikiKey = key;
-		synapseClient.getV2WikiHistory(wikiKey, new Long(100), new Long(0), new AsyncCallback<String>() {
+		view.configure(canEdit, actionHandler);
+	}
+	
+	@Override
+	public void configureNextPage(Long offset, Long limit) {
+		synapseClient.getV2WikiHistory(wikiKey, limit, offset, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
@@ -62,7 +73,46 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 			public void onSuccess(String result) {
 				try {
 					PaginatedResults<JSONEntity> paginatedHistory = nodeModelCreator.createPaginatedResults(result, V2WikiHistorySnapshot.class);
-					view.configure(canEdit, paginatedHistory.getResults(), actionHandler);
+					List<JSONEntity> historyAsList = paginatedHistory.getResults();
+					// Create paginated history into list of V2 History Snapshots
+					List<V2WikiHistorySnapshot> historyAsListOfHeaders = new ArrayList<V2WikiHistorySnapshot>();
+					for(int i = 0; i < historyAsList.size(); i++) {
+						V2WikiHistorySnapshot snapshot = (V2WikiHistorySnapshot) historyAsList.get(i);
+						historyAsListOfHeaders.add(snapshot);
+					}
+					// Update history data structure
+					view.updateHistoryList(historyAsListOfHeaders);
+					
+					// Prepare all user ids
+					List<String> userIds = new ArrayList<String>();
+					for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
+						userIds.add(historyAsListOfHeaders.get(i).getModifiedBy());
+					}
+					// Call to get user headers from the list of ids
+					synapseClient.getUserGroupHeadersById(userIds, new AsyncCallback<EntityWrapper>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
+						}
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							try {
+								UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(result.getEntityJson(), UserGroupHeaderResponsePage.class);
+								// Store all the user display names
+								List<String> displayNames = new ArrayList<String>();
+								List<UserGroupHeader> headers = response.getChildren();
+								for(int i = 0; i < headers.size(); i++) {
+									displayNames.add(headers.get(i).getDisplayName());
+								}
+								// Now we're ready to build the history widget
+								view.buildHistoryWidget(displayNames);
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}
+						}
+						
+					});
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

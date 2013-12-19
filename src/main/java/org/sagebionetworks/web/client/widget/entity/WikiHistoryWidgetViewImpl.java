@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
-import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
@@ -37,7 +37,10 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -46,18 +49,25 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.inject.Inject;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.cell.client.ValueUpdater;
 
 public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHistoryWidgetView {
 	CellTable<HistoryEntry> historyTable;
-	SimplePager pager;
-
+	Button loadMoreHistoryButton;
+	HTML inlineErrorMessage;
 	private boolean canEdit;
 	private List<V2WikiHistorySnapshot> historyList;
 	private List<HistoryEntry> historyEntries;
+	private List<String> modifiedByUserNames;
 	private String currentVersion;
 	WikiHistoryWidgetView.Presenter presenter;
 	private ActionHandler actionHandler;
+	private boolean isFirstGetHistory;
+	private int offset;
+	private int resultSize;
+	private boolean hasReachedEndOfHistory;
 
 	@Inject
 	public WikiHistoryWidgetViewImpl() {
@@ -76,46 +86,93 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	}
 
 	@Override
-	public void configure(boolean canEdit, List<JSONEntity> historyAsList, 
-			ActionHandler actionHandler) {
+	public void configure(boolean canEdit, ActionHandler actionHandler) {
 		this.canEdit = canEdit;
-		List<V2WikiHistorySnapshot> historyAsListOfHeaders = new ArrayList<V2WikiHistorySnapshot>();
-		for(int i = 0; i < historyAsList.size(); i++) {
-			V2WikiHistorySnapshot snapshot = (V2WikiHistorySnapshot) historyAsList.get(i);
-			historyAsListOfHeaders.add(snapshot);
-		}
-		this.historyList = historyAsListOfHeaders;
-		this.currentVersion = historyList.get(0).getVersion();
 		this.actionHandler = actionHandler;
+		this.isFirstGetHistory = true;
+		this.hasReachedEndOfHistory = false;
+		this.offset = 0;
+		// Reset history
+		historyList = new ArrayList<V2WikiHistorySnapshot>();
+		modifiedByUserNames = new ArrayList<String>();
+		historyEntries = new ArrayList<HistoryEntry>();
+		presenter.configureNextPage(new Long(offset), new Long(10));
+	}
+	
+	@Override
+	public void updateHistoryList(List<V2WikiHistorySnapshot> historyResults) {
+		for(int i = 0; i < historyResults.size(); i++) {
+			historyList.add(historyResults.get(i));
+		}
+		resultSize = historyResults.size();
+		if(isFirstGetHistory) {
+			currentVersion = historyResults.get(0).getVersion();
+		}
+	}
+	
+	@Override
+	public void buildHistoryWidget(List<String> userNameResults) {
+		for(int i = 0; i < userNameResults.size(); i++) {
+			modifiedByUserNames.add(userNameResults.get(i));
+		}
+		// We have all the data to create entries for the table
 		createHistoryEntries();
-		createHistoryWidget();
+		// Create or build upon the history widget
+		if(isFirstGetHistory) {
+			isFirstGetHistory = false;
+			createHistoryWidget();
+		} else {
+			historyTable.setRowCount(historyEntries.size());
+			// Set the range to display all of retrieved history so far
+		    historyTable.setVisibleRange(0, historyEntries.size());
+		    // Push in data
+		    historyTable.setRowData(0, historyEntries);
+		    // Disable button if no more history exists
+			if(hasReachedEndOfHistory) {
+				loadMoreHistoryButton.setEnabled(false);
+			}
+		}
 	}
 	
 	private void createHistoryEntries() {
 		if(historyList != null) {
-			historyEntries = new ArrayList<HistoryEntry>();
-			for(V2WikiHistorySnapshot snapshot: historyList) {
+			for(int i = offset; i < historyList.size(); i++) {
+				V2WikiHistorySnapshot snapshot = historyList.get(i);
 				// Create an entry
-				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), snapshot.getModifiedBy(), snapshot.getModifiedOn());
+				HistoryEntry entry = new HistoryEntry(snapshot.getVersion(), modifiedByUserNames.get(i), snapshot.getModifiedOn());
 				historyEntries.add(entry);
+			}
+			// Check if we've reached the end of the history from this recent call
+			V2WikiHistorySnapshot lastSnapshot = historyList.get(historyList.size() - 1);
+			if(lastSnapshot.getVersion().equals("0")) {
+				hasReachedEndOfHistory = true;
 			}
 		}
 	}
 	
 	private void createHistoryWidget() {
-		// Remove any old table first
+		// Remove any old table or inline error message first
 		if(historyTable != null) {
 			removeHistoryWidget();
 		}
 
 		historyTable = new CellTable<HistoryEntry>();
-		CellTable.setStyleName(historyTable.getElement(), "wikiHistoryWidget", true);
-		// Create a Pager to control the table.
-	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
-	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
-	    pager.setDisplay(historyTable);
-	    pager.setStyleName("wikiHistoryWidget", true);
-	    
+
+		loadMoreHistoryButton = DisplayUtils.createIconButton("Load more history", DisplayUtils.ButtonType.DEFAULT, null);
+		loadMoreHistoryButton.setStyleName("wikiHistoryButton", true);
+		loadMoreHistoryButton.setStyleName("margin-top-10", true);
+		loadMoreHistoryButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+		        offset += resultSize;
+		        presenter.configureNextPage(new Long(offset), new Long(10));
+			}
+			
+		});
+		// Disable if we've reached the end
+		if(hasReachedEndOfHistory) {
+			loadMoreHistoryButton.setEnabled(false);
+		}
 	    // Restore if edit permissions granted
 	    if(canEdit) {
 		    ActionCell<HistoryEntry> restoreCell = new ActionCell<HistoryEntry>("Restore", new ActionCell.Delegate<HistoryEntry>() {
@@ -185,29 +242,12 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 		historyTable.setRowCount(historyEntries.size());
 		
 		// Set the range to display in the table at one time
-	    historyTable.setVisibleRange(0, 10);
-
-	    // Create a data provider.
-	    AsyncDataProvider<HistoryEntry> dataProvider = new AsyncDataProvider<HistoryEntry>() {
-	      @Override
-	      protected void onRangeChanged(HasData<HistoryEntry> display) {
-	        final Range range = display.getVisibleRange();
-	        int start = range.getStart();
-            int end = start + range.getLength();
-            if(end > historyEntries.size()) {
-            	end = historyEntries.size();
-            }
-	        List<HistoryEntry> dataInRange = historyEntries.subList(start, end);
-            // Push the data back into the list.
-            historyTable.setRowData(start, dataInRange);
-	      }
-	    };
-
-	    // Connect the list to the data provider.
-	    dataProvider.addDataDisplay(historyTable);
+	    historyTable.setVisibleRange(0, historyEntries.size());
+	    historyTable.setRowData(0, historyEntries);
+	    
 		FlowPanel panel = new FlowPanel();
 		panel.add(wrapWidget(historyTable, "margin-top-5"));
-		panel.add(pager);
+		panel.add(loadMoreHistoryButton);
 		add(panel);
 		layout(true);
 		
@@ -215,8 +255,15 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 	
 	@Override
 	public void removeHistoryWidget() {
-		historyTable.removeFromParent();
-		pager.removeFromParent();
+		if(historyTable != null) {
+			historyTable.removeFromParent();
+		}
+		if(loadMoreHistoryButton != null) {
+			loadMoreHistoryButton.removeFromParent();
+		} 
+		if(inlineErrorMessage != null) {
+			inlineErrorMessage.removeFromParent();
+		}
 		layout(true);
 	}
 	
@@ -257,7 +304,14 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		// Show an inline error message
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		builder.appendHtmlConstant(message);
+		inlineErrorMessage = new HTML(builder.toSafeHtml());
+		SimplePanel panel = new SimplePanel();
+		panel.add(inlineErrorMessage);
+		add(panel);
+		layout(true);
 	}
 
 	@Override

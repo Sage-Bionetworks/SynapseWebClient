@@ -224,7 +224,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		modifiedPanel.add(modifiedText);
 		modifiedPanel.add(wrapWidget(modifiedBy.asWidget(), "padding-left-5"));
 		modifiedPanel.add(modifiedOnText);
-		modifiedPanel.add(wrapWidget(createHistoryButton(), "padding-left-5"));
 		
 		HorizontalPanel createdPanel = new HorizontalPanel();
 		createdPanel.add(createdText);
@@ -234,6 +233,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		FlowPanel modifiedAndCreatedSection = new FlowPanel();
 		modifiedAndCreatedSection.add(modifiedPanel);
 		modifiedAndCreatedSection.add(createdPanel);
+		modifiedAndCreatedSection.add(wrapWidget(createHistoryButton(), "margin-top-5"));
 		return modifiedAndCreatedSection;
 	}
 	
@@ -325,7 +325,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 
 	private Button createHistoryButton() {
-		Button btn = DisplayUtils.createIconButton("History", DisplayUtils.ButtonType.DEFAULT, null);			
+		Button btn = DisplayUtils.createIconButton("Show Wiki History", DisplayUtils.ButtonType.DEFAULT, null);			
 		btn.setStyleName("wikiHistoryButton", true);
 		btn.addClickHandler(new ClickHandler() {
 
