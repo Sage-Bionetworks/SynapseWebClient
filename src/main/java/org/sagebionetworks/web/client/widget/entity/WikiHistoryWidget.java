@@ -91,7 +91,8 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 					final List<String> idsToSearch = new ArrayList<String>();
 					for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
 						String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
-						if(mapIdToName != null && !mapIdToName.containsKey(modifiedById)) {
+						// Only add unique ids to the list being built
+						if(mapIdToName != null && !mapIdToName.containsKey(modifiedById) && !idsToSearch.contains(modifiedById)) {
 							idsToSearch.add(modifiedById);
 						}
 					}
@@ -109,8 +110,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 								// Store display names along with the associated id in the map
 								List<UserGroupHeader> headers = response.getChildren();
 								for(int i = 0; i < headers.size(); i++) {
-									String displayName = headers.get(i).getDisplayName();
-									mapIdToName.put(idsToSearch.get(i), displayName);
+									mapIdToName.put(idsToSearch.get(i), headers.get(i).getDisplayName());
 								}
 								// Now we're ready to build the history widget
 								view.buildHistoryWidget();
