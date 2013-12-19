@@ -316,57 +316,87 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	
 	private Widget createColumnEditor(final org.sagebionetworks.repo.model.table.ColumnModel col) {
 		FlowPanel form = new FlowPanel();
-		form.addStyleName("margin-top-15");
+		form.addStyleName("margin-top-15");		
+		
+		// Column Name	
+		FlowPanel formGroup = new FlowPanel();		
+		formGroup.addStyleName("form-group");
+		InlineHTML inputLabels = new InlineHTML(DisplayConstants.COLUMN_NAME + ": ");
+//		inputLabel.addStyleName("boldText");
 		final TextBox name = new TextBox();
 		if(col.getName() != null) name.setValue(SafeHtmlUtils.fromString(col.getName()).asString());
 		name.addStyleName("form-control");
-		HTML inputLabel = new HTML("Name: ");
-		form.add(inputLabel);
-		form.add(name);
+		DisplayUtils.setPlaceholder(name, DisplayConstants.COLUMN_NAME);
+		final InlineHTML columnNameError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_TYPE + " " + DisplayConstants.REQUIRED);
+		columnNameError.addStyleName("text-danger-imp");
+		columnNameError.setVisible(false);
+		formGroup.add(inputLabels);
+		formGroup.add(name);
+		formGroup.add(columnNameError);
+		form.add(formGroup);
 		
 		// Column Type
-		inputLabel = new HTML("Column Type: ");
-		inputLabel.addStyleName("margin-top-15");
+		HTML inputLabel = new HTML(DisplayConstants.COLUMN_TYPE + ": ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		final InlineHTML columnTypeError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_TYPE + " " + DisplayConstants.REQUIRED);
+		columnTypeError.addStyleName("text-danger-imp");
+		columnTypeError.setVisible(false);
 		form.add(inputLabel);		
-		form.add(createColumnTypeRadio(col));
-
-		// Enum Values
-		inputLabel = new HTML("Restricted Values: ");
-		inputLabel.addStyleName("margin-top-15");
-		form.add(inputLabel);	
-		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
-		list.append("some stuff");
-		list.append(Arrays.asList(new String[] {"even", "more"}));		
-		form.add(createRestrictedValues(col, list));
+		form.add(createColumnTypeRadio(col));		
+		form.add(columnTypeError);
 		
-		// Default Value		
-		inputLabel = new HTML("Default Value: ");
-		inputLabel.addStyleName("margin-top-15");
+
+		// Display Name
+		inputLabel = new HTML(DisplayConstants.DISPLAY_NAME + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		final TextBox displayName = new TextBox();
+		// TODO : fill in display name if available from model in future
+		displayName.addStyleName("form-control");
+		DisplayUtils.setPlaceholder(displayName, DisplayConstants.DISPLAY_NAME);
+		form.add(inputLabel);
+		form.add(displayName);
+				
+		// Default Value	
+		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
 		form.add(inputLabel);
 		form.add(createDefaultValueRadio(col));
 
+		// Enum Values
+		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		form.add(inputLabel);	
+		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
+		form.add(createRestrictedValues(col, list));
 		
-		// Save/Cancel
-		// TODO : hide buttons unless a change has been made
-		FlowPanel buttons = new FlowPanel();
-		buttons.addStyleName("margin-top-15");
-		Button save = DisplayUtils.createButton(DisplayConstants.SAVE_BUTTON_LABEL, ButtonType.PRIMARY);
+		// Create column
+		Button save = DisplayUtils.createButton(DisplayConstants.CREATE_COLUMN, ButtonType.PRIMARY);
+		save.addStyleName("margin-top-15");
 		save.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-//				if(name.getValue() == null || name.getValue().length() == 0) {
-//					name.addStyleName("has-error");					
-//				}
+				if(name.getValue() == null || name.getValue().length() == 0) {
+					name.addStyleName("has-error");
+					columnNameError.setVisible(true);
+					return;
+				} else {
+					name.removeStyleName("has-error");
+					columnNameError.setVisible(false);
+				}
+				if(col.getColumnType() == null) {
+					columnTypeError.setVisible(true);
+					return;
+				} else {
+					columnTypeError.setVisible(false);
+				}
 				List<String> restrictedValues = list.getValues();
 				if(restrictedValues.size() > 0) col.setEnumValues(restrictedValues);
 				presenter.createColumn(col);
 			}
 		});
-		buttons.add(save);
-		form.add(buttons);
+		form.add(save);
 		
-		return form;
-		
+		return form;		
 	}
 
 	private Widget createRestrictedValues(org.sagebionetworks.repo.model.table.ColumnModel col, ListCreatorViewWidget list) {
@@ -393,13 +423,13 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
 		final Button offBtn = DisplayUtils.createButton(DisplayConstants.OFF);
 		final TextBox defaultValueBox = new TextBox();
+		DisplayUtils.setPlaceholder(defaultValueBox, DisplayConstants.DEFAULT_VALUE);
 		onBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				offBtn.removeStyleName("active");
 				onBtn.addStyleName("active");
 				defaultValueBox.setVisible(true);
-				showInfo("selected", "on");
 			}
 		});
 		offBtn.addClickHandler(new ClickHandler() {			
@@ -408,7 +438,6 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 				onBtn.removeStyleName("active");
 				offBtn.addStyleName("active");
 				defaultValueBox.setVisible(false);
-				showInfo("selected", "off");
 			}
 		});
 		if(col.getDefaultValue() != null) {
@@ -434,8 +463,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		return row;
 	}
 
-	private Widget createColumnTypeRadio(
-			org.sagebionetworks.repo.model.table.ColumnModel col) {
+	private Widget createColumnTypeRadio(final org.sagebionetworks.repo.model.table.ColumnModel col) {
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
@@ -449,22 +477,14 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 						gBtn.removeStyleName("active");
 					}
 					btn.addStyleName("active");
-					showInfo("selected", type + "");
+					col.setColumnType(type);
 				}
 			});
 			if(col.getColumnType() != null && col.getColumnType() == type) btn.addStyleName("active");
 			groupBtns.add(btn);
 			columnTypeRadio.add(btn);
-
 		}
 		return columnTypeRadio;
 	}
 	
-	private static native void enableBootstrapButtonPlugin() /*-{
-		$wnd.jQuery('.btn').button();
-	}-*/;
-	
-	
-
-
 }

@@ -127,7 +127,6 @@ import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -149,6 +148,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -1972,5 +1972,15 @@ public class DisplayUtils {
 		    };
 		t.schedule(30000); // hide after 30 seconds
 	    return label;
+	}
+	
+	public static void setPlaceholder(Widget w, String placeholder) {
+		w.getElement().setAttribute("placeholder", placeholder);
+	}
+	
+	public static InlineHTML createFormHelpText(String text) {
+		InlineHTML label = new InlineHTML(text);
+		label.addStyleName("help-block");
+		return label;
 	}
 }

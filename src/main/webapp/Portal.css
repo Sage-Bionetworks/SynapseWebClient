@@ -1477,3 +1477,7 @@ a.projectTitle:hover {
 	overflow: hidden; 
 	padding-right: .5em;	
 }
+
+.text-danger-imp {
+	color: #f94e4b !important;
+}

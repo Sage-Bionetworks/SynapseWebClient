@@ -656,6 +656,13 @@ public class DisplayConstants {
 	public static final String RESTRICTED_VALUES = "Restricted Values";
 	public static final String COPY_COLUMN_DATA_INTO_NEW_COLUMN = "Copy Column Data Into New Column";
 	public static final String ADD_VALUE = "Add Value";
+	public static final String CREATE_COLUMN = "Create Column";
+	public static final String COLUMN_NAME = "Column Name";
+	public static final String COLUMN_TYPE = "Column Type";
+	public static final String RESTRICT_VALUES = "Restrict Values";
+	public static final String DISPLAY_NAME = "Display Name";
+	public static final String OPTIONAL = "optional";
+	public static final String REQUIRED = "required";
 	
 }
 
