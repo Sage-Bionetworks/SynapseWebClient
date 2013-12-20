@@ -390,7 +390,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	public void showFormattingGuideDialog() {
         final Dialog window = new Dialog();
         window.setMaximizable(false);
-        window.setSize(550, 600);
+        window.setSize(590, 600);
         window.setPlain(true); 
         window.setModal(true); 
 
