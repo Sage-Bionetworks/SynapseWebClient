@@ -1506,10 +1506,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile;
 		try {
-			markdownFile = synapseClient.downloadV2WikiMarkdown(properKey);
-			return FileUtils.readFileToString(markdownFile, "UTF-8");
+			return synapseClient.downloadV2WikiMarkdown(properKey);
 		} catch(SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1519,10 +1517,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile;
 		try {
-			markdownFile = synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
-			return FileUtils.readFileToString(markdownFile, "UTF-8");
+			return synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
 		}catch (SynapseException e) {
             throw ExceptionUtil.convertSynapseException(e);
 		}
