@@ -250,4 +250,6 @@ public interface SynapseClientAsync {
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
+	
+	void sendMessage(String recipientPrincipalId, String subject, String htmlMessage, AsyncCallback<String> callback);
 }
