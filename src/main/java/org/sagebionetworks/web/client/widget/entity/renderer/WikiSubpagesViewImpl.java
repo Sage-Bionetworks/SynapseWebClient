@@ -34,7 +34,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
 			return;
-		addStyleName("margin-10 well");
+		addStyleName("bs-sidebar");
 		if (parentContainer != null)
 			parentContainer.addStyleName("col-xs-12 col-md-3 col-md-push-9");	
 		if (markdownContainer != null)
@@ -44,30 +44,30 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (mainPage.getChildCount() > 0) {
 			//traverse the tree, and create anchors
 			UnorderedListPanel ul = new UnorderedListPanel();
-			ul.addStyleName("nav nav-pills nav-stacked");
-			addTreeItemsRecursive(ul, root.getChildren(),0);
+			ul.addStyleName("notopmargin nav bs-sidenav");
+			addTreeItemsRecursive(ul, root.getChildren());
 			add(new HTML("<h3>Pages</h3>"));
 			add(ul);
 		}
 	}	
 	
-	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children, int marginleft) {
+	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {
 		for (ModelData modelData : children) {
 			TocItem treeItem = (TocItem)modelData;
 			String styleName = treeItem.isCurrentPage() ? "active" : "";
-			ul.add(getListItem(treeItem, marginleft), styleName);
+			ul.add(getListItem(treeItem), styleName);
 			if (treeItem.getChildCount() > 0){
 				UnorderedListPanel subList = new UnorderedListPanel();
-				subList.addStyleName("nav nav-pills nav-stacked");
+				subList.addStyleName("nav");
+				subList.setVisible(true);
 				ul.add(subList);
-				addTreeItemsRecursive(subList, treeItem.getChildren(), marginleft+15);
+				addTreeItemsRecursive(subList, treeItem.getChildren());
 			}
 		}
 	}
 	
-	private Widget getListItem(final TocItem treeItem, int marginleft) {
-		HTML text = new HTML("<label style=\"margin-left:"+marginleft+"px; margin-bottom:0px\">"+SafeHtmlUtils.htmlEscape(treeItem.getText())+"</label>");
-		Anchor l = new Anchor(SafeHtmlUtils.fromSafeConstant(text.getHTML()));
+	private Widget getListItem(final TocItem treeItem) {
+		Anchor l = new Anchor(treeItem.getText());
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -1473,4 +1473,46 @@ a.projectTitle:hover {
   }
 }
 
+/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
+/* By default it's not affixed in mobile views, so undo that */
+
+/* First level of nav */
+.bs-sidenav {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-top:    10px;
+  padding-bottom: 10px;
+  text-shadow: 0 1px 0 #fff;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+/* All levels of nav */
+.bs-sidebar .nav > li > a {
+  display: block;
+  color: #BC3226;
+  padding: 5px 20px;
+}
+.bs-sidebar .nav > li > a:hover,
+.bs-sidebar .nav > li > a:focus {
+  text-decoration:underline;
+  background-color: #f9f9f9;
+  border-right: 1px solid #f9f9f9;
+}
+.bs-sidebar .nav > .active > a,
+.bs-sidebar .nav > .active:hover > a,
+.bs-sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: black;
+  text-decoration:none;
+  background-color: transparent;
+  border-right: 1px solid black;
+}
+
+.bs-sidebar .nav .nav > li > a {
+  padding-top:    3px;
+  padding-bottom: 3px;
+  padding-left: 30px;
+  font-size: 90%;
+}
 
