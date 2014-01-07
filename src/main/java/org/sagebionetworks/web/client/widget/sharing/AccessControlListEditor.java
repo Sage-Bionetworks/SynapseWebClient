@@ -69,7 +69,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private UserEntityPermissions uep;
 	private AccessControlList acl;	
 	private Map<String, UserGroupHeader> userGroupHeaders;
-	private Set<String> originalPrincipalIdSet, newPrincipalIdSet;
+	private Set<String> originalPrincipalIdSet;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
@@ -473,7 +473,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	public void notifyNewUsers() {
 		//create the principal id set
-		newPrincipalIdSet = new HashSet<String>();
+		HashSet<String> newPrincipalIdSet = new HashSet<String>();
 		for (ResourceAccess ra : acl.getResourceAccess()) {
 			newPrincipalIdSet.add(ra.getPrincipalId().toString());
 		}

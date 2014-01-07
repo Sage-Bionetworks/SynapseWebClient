@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +20,6 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.entity.ContentType;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
@@ -123,7 +121,7 @@ import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-	// This will be appened to the User-Agent header.
+	// This will be appended to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
@@ -133,8 +131,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
 	
-	private static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
-	private static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType.create("text/html", MESSAGE_CHARSET);
 	/**
 	 * Injected with Gin
 	 */

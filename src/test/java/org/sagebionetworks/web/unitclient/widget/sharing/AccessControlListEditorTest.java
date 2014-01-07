@@ -1,13 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.sharing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -37,6 +31,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -70,6 +65,7 @@ public class AccessControlListEditorTest {
 
 	// Mock components
 	private SynapseClientAsync mockSynapseClient;
+	private GWTWrapper mockGwt;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
 	private UserAccountServiceAsync mockUserAccountService;
@@ -115,10 +111,12 @@ public class AccessControlListEditorTest {
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		
+		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRPWrapper).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<List<String>>any(), any(AsyncCallback.class));
 
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+		
 		mockPushToSynapseCallback = mock(AsyncCallback.class);
 		
 		// instantiate the ACLEditor
@@ -128,7 +126,8 @@ public class AccessControlListEditorTest {
 				mockAuthenticationController,
 				new JSONObjectAdapterImpl(),
 				mockUserAccountService,
-				mockGlobalApplicationState
+				mockGlobalApplicationState, 
+				mockGwt
 		);
 		acle.setResource(project);
 	}
@@ -209,6 +208,11 @@ public class AccessControlListEditorTest {
 		userHeader.setOwnerId(new Long(USER_ID).toString());
 		children.add(userHeader);
 		
+		// add the non-owner non-admin user
+		UserGroupHeader user2Header = new UserGroupHeader();
+		user2Header.setOwnerId(new Long(USER2_ID).toString());
+		children.add(user2Header);
+		
 		// add the public group
 		UserGroupHeader publicHeader = new UserGroupHeader();
 		publicHeader.setOwnerId(new Long(TEST_PUBLIC_PRINCIPAL_ID).toString());
@@ -254,14 +258,16 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void addAccessTest() throws Exception {
-		// create response ACL: add permissions for USER
+		// create response ACL: add permissions for USER2
 		ResourceAccess ra = new ResourceAccess();
-		ra.setPrincipalId(USER_ID);
+		ra.setPrincipalId(USER2_ID);
 		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
 		localACL.getResourceAccess().add(ra);
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
@@ -275,7 +281,7 @@ public class AccessControlListEditorTest {
 		
 		// update
 		acle.asWidget();
-		acle.setAccess(USER_ID, PermissionLevel.CAN_VIEW);
+		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
@@ -297,6 +303,14 @@ public class AccessControlListEditorTest {
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(5)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		
+		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
+		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), any(AsyncCallback.class));
+		Set recipientSet = recipientSetCaptor.getValue();
+		//should try to send a notification message to a single recipient principal id, USER2_ID
+		assertEquals(1, recipientSet.size());
+		assertTrue(recipientSet.contains(Long.toString(USER2_ID)));
+
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -338,6 +352,8 @@ public class AccessControlListEditorTest {
 		assertTrue(localACL.equals(returnedACL));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -372,6 +388,8 @@ public class AccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -396,6 +414,8 @@ public class AccessControlListEditorTest {
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@SuppressWarnings("unchecked")

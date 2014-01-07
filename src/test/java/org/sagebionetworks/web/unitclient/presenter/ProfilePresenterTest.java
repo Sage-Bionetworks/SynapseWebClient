@@ -11,11 +11,13 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
@@ -26,6 +28,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -35,6 +38,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -80,7 +84,6 @@ public class ProfilePresenterTest {
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
@@ -94,6 +97,15 @@ public class ProfilePresenterTest {
 		testUserJson = adapter.toJSONString(); 
 		
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		setupGetUserProfile();
+	}
+	
+	private void setupGetUserProfile() throws JSONObjectAdapterException {
+		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
+		userProfile.writeToJSONObject(adapter);
+		String userProfileJson = adapter.toJSONString(); 
+
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -184,5 +196,56 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 
+	//if notification settings are null, should still successfully update with user specified notification setting
+	public void testUpdateMyNotificationSettingsLazyInstantiation() throws JSONObjectAdapterException {
+		//creates new UserProfile notification settings
+		boolean sendEmailNotifications = true;
+		boolean markEmailedMessagesAsRead = true;
+		profilePresenter.setPlace(place);
+		assertNull(userProfile.getNotificationSettings());
+		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		
+		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		//should have called updateUserProfile
+		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
+		//with our new notification settings
+		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		assertNotNull(updatedProfile.getNotificationSettings());
+		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
+		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+	}
 	
+	@Test
+	public void testUpdateMyNotificationSettings() throws JSONObjectAdapterException {
+		//updates existing UserProfile notification settings
+		boolean sendEmailNotifications = false;
+		boolean markEmailedMessagesAsRead = false;
+		profilePresenter.setPlace(place);
+		Settings notificationSettings = new Settings();
+		notificationSettings.setMarkEmailedMessagesAsRead(true);
+		notificationSettings.setSendEmailNotifications(true);
+		userProfile.setNotificationSettings(notificationSettings);
+		setupGetUserProfile();
+		assertNotNull(userProfile.getNotificationSettings());
+		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		
+		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		//should have called updateUserProfile
+		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
+		//with our new notification settings
+		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
+		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+	}
+	
+	@Test
+	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
+		profilePresenter.setPlace(place);
+		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		profilePresenter.updateMyNotificationSettings(true, true);
+		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
 }

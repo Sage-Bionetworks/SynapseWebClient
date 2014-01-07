@@ -90,6 +90,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -155,7 +156,7 @@ public class SynapseClientImplTest {
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
-	
+	MessageToUser sentMessage;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -344,6 +345,10 @@ public class SynapseClientImplTest {
 		membershipStatus.setIsMember(false);
 		membershipStatus.setMembershipApprovalRequired(false);
 		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		
+		sentMessage = new MessageToUser();
+		sentMessage.setId("987");
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
 	}
 	
 	private void setupTeamInvitations() throws SynapseException{
@@ -1316,6 +1321,20 @@ public class SynapseClientImplTest {
 		}
 	}
 	
+	@Test
+	public void testSendMessage() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		//essentially a pass through to sendStringMessage
+		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor.forClass(MessageToUser.class);
+		Set<String> recipients = new HashSet<String>();
+		recipients.add("333");
+		String subject = "The Mathematics of Quantum Neutrino Fields";
+		String messageBody = "Atoms are not to be trusted, they make up everything";
+		synapseClient.sendMessage(recipients, subject, messageBody);
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		MessageToUser toSendMessage = arg.getValue();
+		assertEquals(subject, toSendMessage.getSubject());
+		assertEquals(recipients, toSendMessage.getRecipients());
+	}
 
 	
 }
