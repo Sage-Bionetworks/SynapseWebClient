@@ -471,7 +471,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 	}
 	
-	private void notifyNewUsers() {
+	public void notifyNewUsers() {
 		//create the principal id set
 		newPrincipalIdSet = new HashSet<String>();
 		for (ResourceAccess ra : acl.getResourceAccess()) {
@@ -481,6 +481,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		for (String principalId : originalPrincipalIdSet) {
 			newPrincipalIdSet.remove(principalId);
 		}
+		//never try to notify all users
+		newPrincipalIdSet.remove(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
+		newPrincipalIdSet.remove(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
+		newPrincipalIdSet.remove(publicPrincipalIds.getPublicAclPrincipalId().toString());
+		
 		if (newPrincipalIdSet.size() > 0) {
 			//now send a message to these users
 			String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
