@@ -663,6 +663,9 @@ public class DisplayConstants {
 	public static final String DISPLAY_NAME = "Display Name";
 	public static final String OPTIONAL = "optional";
 	public static final String REQUIRED = "required";
+	public static final String CONFIRM_DELETE_COLUMN = "Are you sure you want to delete Column: ";
+	public static final String COLUMN_CREATION_FAILED = "Column creation failed. Please try again.";
+	public static final String TABLE_UPDATE_FAILED = "Updating the table failed. Please try again.";
 	
 }
 

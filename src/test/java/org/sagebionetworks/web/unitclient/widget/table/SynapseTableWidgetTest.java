@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -13,7 +14,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetView;
-import org.sagebionetworks.web.shared.TableObject;
 
 
 public class SynapseTableWidgetTest {
@@ -26,7 +26,7 @@ public class SynapseTableWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	SynapseTableWidget tableWidget;
-	TableObject table;
+	TableEntity table;
 	
 	@Before
 	public void setup(){		
@@ -38,9 +38,9 @@ public class SynapseTableWidgetTest {
 				
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
-		tableWidget = new SynapseTableWidget(mockView, mockSynapseClient, mockAuthenticationController, adapterFactory);
+		tableWidget = new SynapseTableWidget(mockView, mockSynapseClient, mockAuthenticationController, adapterFactory, mockGlobalApplicationState);
 		
-		table = new TableObject();
+		table = new TableEntity();
 	}
 	
 	@Test

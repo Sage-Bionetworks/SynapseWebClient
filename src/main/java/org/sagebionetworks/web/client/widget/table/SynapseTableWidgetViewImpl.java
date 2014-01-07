@@ -1,22 +1,23 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
-import org.sagebionetworks.web.shared.TableObject;
 
 import com.extjs.gxt.ui.client.data.BaseModelData;
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
@@ -26,10 +27,10 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -72,6 +73,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	private boolean columnEditorBuilt = false;
 	private List<org.sagebionetworks.repo.model.table.ColumnModel> columns;
 	FlowPanel addColumnPanel;
+	List<ColumnDetailsPanel> columnPanelOrder;
 	
 	@Inject
 	public SynapseTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle,
@@ -84,7 +86,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	}
 
 	@Override
-	public void configure(TableObject table, List<org.sagebionetworks.repo.model.table.ColumnModel> columns, String queryString, boolean canEdit) {
+	public void configure(TableEntity table, List<org.sagebionetworks.repo.model.table.ColumnModel> columns, String queryString, boolean canEdit) {
 		this.columns = columns;
 		
 		// clear out old view
@@ -265,10 +267,63 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		parent.add(new HTML("<h4>" + DisplayConstants.COLUMN_DETAILS + "</h4>"));
 		
 		final FlowPanel allColumnsPanel = new FlowPanel();
-		final List<ColumnDetailsPanel> columnPanelOrder = new ArrayList<ColumnDetailsPanel>();
+		columnPanelOrder = new ArrayList<ColumnDetailsPanel>();
 		for(int i=0; i<columns.size(); i++) {
-			org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);			
-			ColumnDetailsPanel columnPanel = new ColumnDetailsPanel(accordionId, allColumnsPanel, columnPanelOrder, i, columns.size(), col, "contentId" + ++sequence);
+			final org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);			
+			final ColumnDetailsPanel columnPanel = new ColumnDetailsPanel(accordionId, col, "contentId" + ++sequence);
+			
+			columnPanel.getMoveUp().addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					// swap columns
+					int formerIdx = columnPanelOrder.indexOf(columnPanel);
+					swapColumns(allColumnsPanel, columnPanel, formerIdx, formerIdx-1);
+				}
+
+			});
+			columnPanel.getMoveDown().addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					// swap columns
+					int formerIdx = columnPanelOrder.indexOf(columnPanel);
+					swapColumns(allColumnsPanel, columnPanel, formerIdx, formerIdx+1);
+				}
+
+			});
+			columnPanel.getDelete().addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					MessageBox.confirm("Confirm", DisplayConstants.CONFIRM_DELETE_COLUMN + col.getName(), new Listener<MessageBoxEvent>() {
+						public void handleEvent(MessageBoxEvent ce) {
+							presenter.updateColumnOrder(extractColumns());
+							com.extjs.gxt.ui.client.widget.button.Button btn = ce.getButtonClicked();	
+							if (btn.getText().equals("Yes")) {
+								columnPanel.addStyleName("fade");
+								// allow for fade before removal
+								Timer t = new Timer() {								
+									@Override
+									public void run() {
+										allColumnsPanel.remove(columnPanel);
+										columnPanelOrder.remove(columnPanel);
+										// presenter.update
+										
+										// update ends, if needed
+										int size = columnPanelOrder.size();
+										if(size > 0) {
+											setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
+											setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
+										}
+									}
+								};
+								t.schedule(250);
+							}
+						}
+					});
+				}
+			});
+			if(i==0) columnPanel.getMoveUp().setVisible(false);
+			if(i==columnPanelOrder.size()-1) columnPanel.getMoveDown().setVisible(false); 
+			
 			columnPanelOrder.add(columnPanel);
 			allColumnsPanel.add(columnPanel);
 		}
@@ -504,5 +559,61 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
 		addColumnPanel.add(createColumnEditor(newColumn));
 	}
+
+	private static void setArrowVisibility(int idx, int size, Anchor moveUp, Anchor moveDown) {
+		if(idx == 0) moveUp.setVisible(false);
+		else moveUp.setVisible(true);
+		if(idx == size-1) moveDown.setVisible(false);
+		else moveDown.setVisible(true);
+	}
+
+	private void swapColumns(final FlowPanel allColumnsPanel, final ColumnDetailsPanel thisColumn,
+			final int formerIdx, final int newIdx) {
+		final ColumnDetailsPanel displacedColumn = columnPanelOrder.get(newIdx);
+		// fade out		
+		thisColumn.addStyleName("fade");
+		Timer t1 = new Timer() {			
+			@Override
+			public void run() {
+				// swap columns
+				columnPanelOrder.set(newIdx, thisColumn);				
+				columnPanelOrder.set(formerIdx, displacedColumn);
+				allColumnsPanel.remove(thisColumn);
+				allColumnsPanel.insert(thisColumn, newIdx);
+				setArrowVisibility(newIdx, columnPanelOrder.size(), thisColumn.getMoveUp(), thisColumn.getMoveDown());
+				setArrowVisibility(formerIdx, columnPanelOrder.size(), displacedColumn.getMoveUp(), displacedColumn.getMoveDown());
+
+				// fade in
+				Timer t2 = new Timer() {					
+					@Override
+					public void run() {
+						thisColumn.addStyleName("in");
+						
+						// cleanup
+						Timer t3 = new Timer() {			
+							@Override
+							public void run() {
+								thisColumn.removeStyleName("fade");
+								thisColumn.removeStyleName("in");
+							}
+						};
+						t3.schedule(250);
+
+					}
+				};
+				t2.schedule(250);
+			}
+		};
+		t1.schedule(250);		
+	}
+
+	private List<String> extractColumns() {
+		List<String> columns = new ArrayList<String>();
+		for(ColumnDetailsPanel colD : columnPanelOrder) {
+			columns.add(colD.getCol().getId());
+		}		
+		return columns;
+	}
+
 	
 }

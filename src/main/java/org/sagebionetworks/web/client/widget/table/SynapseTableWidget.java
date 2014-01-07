@@ -5,13 +5,17 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.TableObject;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -24,8 +28,9 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private AdapterFactory adapterFactory;
+	GlobalApplicationState globalApplicationState;
 	
-	private TableObject table;
+	private TableEntity table;
 	private String queryString = "select *";
 	private List<ColumnModel> columns;
 	
@@ -33,15 +38,17 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	public SynapseTableWidget(SynapseTableWidgetView view, 
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController, 
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.adapterFactory = adapterFactory;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}	
 	
-	public void configure(final TableObject table) {
+	public void configure(final TableEntity table) {
 		this.table = table;		
 		synapseClient.getColumnModelBatch(table.getColumnIds(), new AsyncCallback<String>() {
 			@Override
@@ -82,8 +89,70 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 
 	@Override
 	public void createColumn(ColumnModel col) {
-		// TODO Auto-generated method stub
-		
+		try {						
+			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
+						if(newCol.getId() != null) {
+							table.getColumnIds().add(newCol.getId());
+							updateTableEntity();
+						}
+						else {
+							onFailure(null);
+						}
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							view.showErrorMessage(DisplayConstants.COLUMN_CREATION_FAILED);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateColumnOrder(List<String> columnIds) {
+		table.setColumnIds(columnIds);
+		updateTableEntity();
+	}
+	
+	/*
+	 * Private Methods
+	 */
+	
+	private void updateTableEntity() {
+		try {
+			String entityJson = table.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.updateEntity(entityJson, new AsyncCallback<EntityWrapper>() {
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					TableEntity newTable;
+					try {
+						newTable = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
+						configure(newTable);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
+		}
 	}
 	
 }

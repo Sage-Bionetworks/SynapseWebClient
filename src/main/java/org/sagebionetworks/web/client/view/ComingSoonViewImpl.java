@@ -5,21 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
-import org.sagebionetworks.web.shared.TableObject;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -119,11 +117,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 
-	public static TableObject getTable() {
-		TableObject table = new TableObject();
+	public static TableEntity getTable() {
+		TableEntity table = new TableEntity();
 		table.setId("12345");
 		table.setName("Example Table");
-		table.setCreatedByPrincipalId("2337773");
+		table.setCreatedBy("2337773");
 		table.setColumnIds(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
 		return table;
 	}

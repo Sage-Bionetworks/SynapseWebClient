@@ -252,4 +252,6 @@ public interface SynapseClientAsync {
 	void getAPIKey(AsyncCallback<String> callback);
 
 	void getColumnModelBatch(List<String> columnIds, AsyncCallback<String> asyncCallback);
+
+	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 }

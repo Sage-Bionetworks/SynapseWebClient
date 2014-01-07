@@ -2451,6 +2451,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public String createColumnModel(String columnModelJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			ColumnModel column = new ColumnModel(adapterFactory.createNew(columnModelJson));
+			ColumnModel createdColumn = synapseClient.createColumnModel(column);
+			return createdColumn.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
+	@Override
 	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2500,5 +2513,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-		
+
+	
+	
+	
 }
