@@ -313,6 +313,34 @@ public class AccessControlListEditorTest {
 
 	}
 	
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void addPublicAccessTest() throws Exception {
+		// add view to public
+		ResourceAccess ra = new ResourceAccess();
+		ra.setPrincipalId(TEST_PUBLIC_PRINCIPAL_ID);
+		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+		localACL.getResourceAccess().add(ra);
+		EntityWrapper expectedEntityWrapper = new EntityWrapper(
+				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
+				AccessControlList.class.getName());
+		
+		// configure mocks
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(mockSynapseClient).updateAcl(any(EntityWrapper.class), anyBoolean(), any(AsyncCallback.class));
+		ArgumentCaptor<EntityWrapper> captor = ArgumentCaptor.forClass(EntityWrapper.class);
+		
+		// update
+		acle.asWidget();
+		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
+		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
+		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
+
+		//verify we do not even attempt to send a message to public
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void changeAccessTest() throws Exception {
