@@ -251,5 +251,5 @@ public interface SynapseClientAsync {
 
 	void getAPIKey(AsyncCallback<String> callback);
 	
-	void sendMessage(String recipientPrincipalId, String subject, String htmlMessage, AsyncCallback<String> callback);
+	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
 }

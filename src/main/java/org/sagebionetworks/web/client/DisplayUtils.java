@@ -2011,4 +2011,9 @@ public class DisplayUtils {
 		t.schedule(30000); // hide after 30 seconds
 	    return label;
 	}
+	
+	public static String getShareMessage(String entityId, String hostUrl) {
+		return "I've shared an item with you\n"+hostUrl+"#!Synapse:"+entityId+"\n\n\n\nTo turn off email notifications, please visit your profile page at "+hostUrl+"#!Profile:v";
+		//alternatively, could use the gwt I18n Messages class client side
+	}
 }

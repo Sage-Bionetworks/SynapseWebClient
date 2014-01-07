@@ -18,6 +18,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -26,7 +27,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -62,12 +62,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
+	GWTWrapper gwt;
 	
 	// Entity components
 	private Entity entity;
 	private UserEntityPermissions uep;
 	private AccessControlList acl;	
 	private Map<String, UserGroupHeader> userGroupHeaders;
+	private Set<String> originalPrincipalIdSet, newPrincipalIdSet;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
@@ -76,7 +78,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			UserAccountServiceAsync userAccountService,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		this.userAccountService = userAccountService;
@@ -84,6 +87,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.gwt = gwt;
+		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);		
 	}	
@@ -168,6 +173,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 					// retrieve ACL and user entity permissions from bundle
 					acl = nodeModelCreator.createJSONEntity(bundle.getAclJson(), AccessControlList.class);
 					uep = nodeModelCreator.createJSONEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
+					//initialize original principal id set
+					originalPrincipalIdSet = new HashSet<String>();
+					for (final ResourceAccess ra : acl.getResourceAccess()) {
+						final String principalId = ra.getPrincipalId().toString();
+						originalPrincipalIdSet.add(principalId);
+					}
 					fetchUserGroupHeaders(new AsyncCallback<Void>() {
 						public void onSuccess(Void result) {
 							// update the view
@@ -443,10 +454,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			// Local ACL exists in Portal, but does not exist in Repo
 			// Create local ACL in Repo
 			synapseClient.createAcl(aclEW, callback);
+			notifyNewUsers();
 		} else if (hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL exists in both Portal and Repo
 			// Apply updates to local ACL in Repo
-			synapseClient.updateAcl(aclEW, recursive, callback);				
+			synapseClient.updateAcl(aclEW, recursive, callback);
+			notifyNewUsers();
 		} else if (!hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL does not exist in Portal but does exist in Repo
 			// Delete local ACL in Repo
@@ -455,6 +468,34 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			// Local ACL does not exist in both Portal and Repo
 			// Do not modify Repo
 			throw new IllegalStateException("Cannot modify an inherited ACL.");
+		}
+	}
+	
+	private void notifyNewUsers() {
+		//create the principal id set
+		newPrincipalIdSet = new HashSet<String>();
+		for (ResourceAccess ra : acl.getResourceAccess()) {
+			newPrincipalIdSet.add(ra.getPrincipalId().toString());
+		}
+		//now remove all of the original entries
+		for (String principalId : originalPrincipalIdSet) {
+			newPrincipalIdSet.remove(principalId);
+		}
+		if (newPrincipalIdSet.size() > 0) {
+			//now send a message to these users
+			String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
+			synapseClient.sendMessage(newPrincipalIdSet, entity.getName(), message, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)){
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
+			});
 		}
 	}
 	

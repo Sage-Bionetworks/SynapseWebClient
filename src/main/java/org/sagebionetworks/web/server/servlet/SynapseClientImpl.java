@@ -2441,7 +2441,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		private static String getProperty(String key) {
 			return props.getProperty(key);
 		}
-				
 	}
 
 	@Override
@@ -2455,17 +2454,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String sendMessage(String recipientPrincipalId, String subject, String htmlMessage) throws RestServiceException {
+	public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			MessageToUser message = new MessageToUser();
-			Set<String> recipients = new HashSet<String>();
-			recipients.add(recipientPrincipalId);
 			message.setRecipients(recipients);
 			message.setSubject(subject);
-			String fileHandleId = synapseClient.uploadToFileHandle(htmlMessage.getBytes(MESSAGE_CHARSET), HTML_MESSAGE_CONTENT_TYPE);
-			message.setFileHandleId(fileHandleId);
-			MessageToUser sentMessage = synapseClient.sendMessage(message);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, messageBody);
 			JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
 		} catch (SynapseException e) {

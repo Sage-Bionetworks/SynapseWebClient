@@ -183,6 +183,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
@@ -218,7 +219,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				if(profile.getNotificationSettings() != null) {
 					isNotify = profile.getNotificationSettings().getSendEmailNotifications();
 				}
-				emailNotificationsCheckbox.setChecked(isNotify);
+				emailNotificationsCheckbox.setValue(isNotify, false);
 			}
 		}
 	}
