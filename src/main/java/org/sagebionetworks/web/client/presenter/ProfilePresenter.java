@@ -196,7 +196,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 						@Override
 						public void onSuccess(Void result) {
-							view.showInfo("Updated Notification Settings", "");
+							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
 						}
 						
 						@Override
