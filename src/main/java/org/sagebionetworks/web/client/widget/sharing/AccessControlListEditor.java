@@ -484,10 +484,10 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (newPrincipalIdSet.size() > 0) {
 			//now send a message to these users
 			String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
-			synapseClient.sendMessage(newPrincipalIdSet, entity.getName(), message, new AsyncCallback<String>() {
+			String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
+			synapseClient.sendMessage(newPrincipalIdSet, subject, message, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					
 				}
 				@Override
 				public void onFailure(Throwable caught) {

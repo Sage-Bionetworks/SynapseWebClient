@@ -2013,7 +2013,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getShareMessage(String entityId, String hostUrl) {
-		return "I've shared an item with you\n"+hostUrl+"#!Synapse:"+entityId+"\n\n\n\nTo turn off email notifications, please visit your profile page at "+hostUrl+"#!Profile:v";
+		return DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
 	}
 }
