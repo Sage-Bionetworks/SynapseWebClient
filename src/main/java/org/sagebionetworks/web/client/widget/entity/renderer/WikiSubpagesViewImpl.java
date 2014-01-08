@@ -29,10 +29,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	private Presenter presenter;
 	private GlobalApplicationState globalAppState;
-	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 col-md-push-9";
-	private static final String SHOW_SUBPAGES_MD_STYLE="col-md-9 col-md-pull-3";
-	private static final String HIDE_SUBPAGES_STYLE="col-xs-12 col-md-1 col-md-push-11";
-	private static final String HIDE_SUBPAGES_MD_STYLE="col-md-11 col-md-pull-1";
+	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3";
+	private static final String SHOW_SUBPAGES_MD_STYLE="col-md-9";
+	private static final String HIDE_SUBPAGES_STYLE="col-xs-12 col-md-12";
+	private static final String HIDE_SUBPAGES_MD_STYLE="col-md-12";
 	
 	private Button showHideButton;
 	private LayoutContainer ulContainer;
@@ -54,26 +54,24 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (mainPage.getChildCount() == 0)
 			return;
 		addStyleName("bs-sidebar");
-		
 		//only show the tree if the root has children
 		if (mainPage.getChildCount() > 0) {
 			//traverse the tree, and create anchors
 			final UnorderedListPanel ul = new UnorderedListPanel();
 			ul.addStyleName("notopmargin nav bs-sidenav");
 			addTreeItemsRecursive(ul, root.getChildren());
-			showHideButton = DisplayUtils.createButton(DisplayConstants.RIGHT_ARROWS);
-			showHideButton.addStyleName("btn-xs");
+			showHideButton = DisplayUtils.createButton("");
 			ulContainer = new LayoutContainer();
 			ulContainer.setVisible(true);
-			ulContainer.add(new HTML("<h3>Pages</h3>"));
+			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 			ulContainer.add(ul);
 
 			AnimationProtectorViewImpl protector = new AnimationProtectorViewImpl(showHideButton, ulContainer);
 			protector.setContainerVisible(true);
 			showSubpages();
 			AnimationProtector animation = new AnimationProtector(protector);
-			animation.setOutDirection(Direction.RIGHT);
-			animation.setInDirection(Direction.LEFT);
+			animation.setOutDirection(Direction.LEFT);
+			animation.setInDirection(Direction.RIGHT);
 			
 			FxConfig hideConfig = new FxConfig(400);
 			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
@@ -102,9 +100,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			parentContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
 		if (markdownContainer != null)
 			markdownContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
-
 		ulContainer.layout(true);
-		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
+		removeStyleName("well");
+		showHideButton.setStyleName("btn btn-default btn-xs left");
 	}
 	
 	private void showSubpages() {
@@ -113,7 +112,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (markdownContainer != null)
 			markdownContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
 		ulContainer.layout(true);
-		showHideButton.setText(DisplayConstants.RIGHT_ARROWS);
+		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+		addStyleName("well");
+		showHideButton.setStyleName("btn btn-default btn-xs right");
 	}
 	
 	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {

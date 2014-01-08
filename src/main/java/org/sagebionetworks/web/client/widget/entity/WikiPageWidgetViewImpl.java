@@ -179,6 +179,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
 		
+		add(getBreadCrumbs(colWidth));
 		SimplePanel topBarWrapper = new SimplePanel();
 		topBarWrapper.addStyleName("margin-top-5");
 		String titleString = isRootWiki ? "" : currentPage.getTitle();
@@ -186,7 +187,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
-		mainPanel.add(getBreadCrumbs(colWidth));
 		if(isCurrentVersion) {
 			mainPanel.add(getCommands(canEdit));
 		}

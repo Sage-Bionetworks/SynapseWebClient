@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -94,18 +93,4 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 			}
 		}, false, 24);
 	}
-
-	
-	private LayoutContainer initContainerAndPanel(LayoutContainer container,
-			SimplePanel panel) {
-		if (container == null) {
-			container = new LayoutContainer();
-			container.setAutoHeight(true);
-			container.setAutoWidth(true);
-			panel.clear();
-			panel.add(container);
-		}
-		return container;
-	}
-
 }
