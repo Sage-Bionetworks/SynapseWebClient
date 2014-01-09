@@ -92,18 +92,11 @@ public class EntityListRenderer extends LayoutContainer {
 			Anchor link = new Anchor();
 			link.setHref(display.getDownloadUrl());
 			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
-			//DisplayConstants.BUTTON_DOWNLOAD
 			link.setStyleName("link");
 			if(isLoggedIn) {
+				// logged in users want to stay on the entity list page when downloading
 				link.setTarget("_new");
-			} else {
-				link.addClickHandler(new ClickHandler() {					
-					@Override
-					public void onClick(ClickEvent event) {
-						MessageBox.info(DisplayConstants.INFO, DisplayConstants.LOGIN_TO_DOWNLOAD, null);
-					}
-				});				
-			}
+			} 
 			downloadLink = link;
 		} else {
 			downloadLink = new HTML("");
