@@ -5,10 +5,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
@@ -41,8 +40,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			CookieProvider cookieProvider, UserAccountServiceAsync userService,
 			AuthenticationController authenticationController,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator) {
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -51,7 +49,6 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator=nodeModelCreator;
 		
 		view.setPresenter(this);
 	}
@@ -71,7 +68,18 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Assume all tokens other than the default are session tokens
 		if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
 			sessionToken = place.toToken();
-			view.showResetForm();
+			// validate that session token is still valid before showing form
+			view.showLoading();
+			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					view.showResetForm();	
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showExpiredRequest();
+				}
+			});
 		} else {
 			view.showRequestForm();
 		}
@@ -101,7 +109,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
+				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
 				globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
 			}

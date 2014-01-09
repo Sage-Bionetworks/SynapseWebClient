@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.sagebionetworks.web.client.SynapseView;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface PasswordResetView extends IsWidget{
+public interface PasswordResetView extends IsWidget, SynapseView {
 	
 	/**
 	 * Set this view's presenter
@@ -19,11 +21,7 @@ public interface PasswordResetView extends IsWidget{
 	public void showPasswordResetSuccess();
 	
 	public void showRequestSentSuccess();
-	
-	public void showInfo(String infoMessage);
-	
-	public void showErrorMessage(String errorMessage);
-	
+		
 	public void clear();
 	
 	public interface Presenter {
@@ -32,5 +30,7 @@ public interface PasswordResetView extends IsWidget{
 		
 		public void resetPassword(String newPassword);
 	}
+
+	public void showExpiredRequest();
 
 }

@@ -321,6 +321,13 @@ public class EntityPageTopTest {
 		assertEquals(projectId, gotoPlace.getEntityId());
 	}
 	
+	@Test 
+	public void testEntityDeleted_SWC_1116() {
+		String id = "syn123";
+		EntityDeletedEvent event = new EntityDeletedEvent(id);
+		pageTop.entityDeleted(event);		
+	}
+	
 	/*
 	 * Private Methods
 	 */

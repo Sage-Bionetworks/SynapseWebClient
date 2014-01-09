@@ -646,5 +646,8 @@ public class DisplayConstants {
 	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
+	public static final String FORBIDDEN = "Forbidden";
+	public static final String SET_PASSWORD_EXPIRED = "This set password request has expired. Please make a new request via the login page.";
+	public static final String REQUEST_EXPIRED = "Request Expired";
 }
 

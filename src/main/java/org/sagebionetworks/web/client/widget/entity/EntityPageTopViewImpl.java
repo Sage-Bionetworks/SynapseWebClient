@@ -505,8 +505,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false, area);
-		// Created By/Modified By
-		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
 		

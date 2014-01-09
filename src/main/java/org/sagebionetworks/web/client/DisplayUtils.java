@@ -1439,7 +1439,7 @@ public class DisplayUtils {
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
 				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
-						+ DisplayConstants.UNAUTHORIZED
+						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
 						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");

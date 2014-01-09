@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -25,7 +27,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
-import com.extjs.gxt.ui.client.Style.IconAlign;
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -54,7 +55,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -64,7 +64,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.web.bindery.autobean.vm.impl.BeanMethod;
 
 public class SearchViewImpl extends Composite implements SearchView {
 
@@ -78,7 +77,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private static final int WEEK_MS = DAY_MS * 7;
 	private static final int MONTH_MS = DAY_MS * 30;
 	private static final int YEAR_MS = DAY_MS * 365;
-  
+	private static Map<String,String> facetToDisplay;
+	
+	static {
+		facetToDisplay = new HashMap<String, String>();
+		facetToDisplay.put("node_type", "Type");
+	}
 	
 	public interface SearchViewImplUiBinder extends
 			UiBinder<Widget, SearchViewImpl> {
@@ -587,7 +591,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
 			lc = new LayoutContainer();
 			lc.setWidth(188);
-			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));
+			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
+			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
 			FlexTable flexTable = new FlexTable();
 			int i=0;
 			

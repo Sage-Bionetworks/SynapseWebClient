@@ -290,7 +290,7 @@ public class FileHandleServlet extends HttpServlet {
 					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client);
+					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client, true);
 				}
 			}
 			
@@ -333,15 +333,17 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity = client.createEntity(fileEntity);
 		return fileEntity;
 	}
-	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client) throws SynapseException {
+	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client, boolean setNameAsFileName) throws SynapseException {
+		if(setNameAsFileName) {
 		String originalFileEntityName = fileEntity.getName();
-		try{
-			//and try to set the name to the filename
-			fileEntity.setName(newFileHandle.getFileName());
-			fileEntity = client.putEntity(fileEntity);
-		} catch(Throwable t){
-			fileEntity.setName(originalFileEntityName);
-		};
+			try{
+				//and try to set the name to the filename
+				fileEntity.setName(newFileHandle.getFileName());
+				fileEntity = client.putEntity(fileEntity);
+			} catch(Throwable t){
+				fileEntity.setName(originalFileEntityName);
+			};
+		}
 		
 		// now lock down restricted data
 		if (isRestricted) {
