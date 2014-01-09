@@ -14,21 +14,18 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,6 +44,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	SpanElement contentHtml;
 	@UiField 
 	SpanElement pageTitle;
+	@UiField
+	SimplePanel loadingPanel;	
 
 	private Presenter presenter;
 	private FormPanel requestFormPanel;
@@ -54,13 +53,19 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	private FormData formData;  
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
+	private SageImageBundle sageImageBundle;
 
 	@Inject
-	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter, SageImageBundle imageBundle) {		
+	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
+			Header headerWidget, Footer footerWidget,
+			IconsImageBundle iconsImageBundle, QueryFilter filter,
+			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
+		
 		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -68,8 +73,9 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		
 		formData = new FormData("-20");  
 		createRequestForm();
-		createResetForm();
+		createResetForm();			
 		
+		loadingPanel.setVisible(false);
 		contentPanel.add(requestFormPanel);
 	}
 
@@ -163,6 +169,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showRequestForm() {
+		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
 		contentHtml.setInnerHTML("");		
 		contentPanel.clear();
@@ -172,6 +179,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showResetForm() {
+		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.SET_PASSWORD);
 		contentHtml.setInnerHTML("");
 		contentPanel.clear();
@@ -181,15 +189,17 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	
 	@Override
 	public void clear() {
+		loadingPanel.setVisible(false);
 		contentHtml.setInnerHTML("");
 		contentPanel.clear();
 	}
 
 	@Override
 	public void showPasswordResetSuccess() {
+		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.SUCCESS);
 		contentPanel.clear();		
-		contentHtml.setInnerHTML(AbstractImagePrototype.create(iconsImageBundle.informationBalloon16()).getHTML() + " Your password has been changed.");
+		contentHtml.setInnerHTML("Your password has been changed.");
 	}
 
 
@@ -201,20 +211,33 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showRequestSentSuccess() {
+		loadingPanel.setVisible(false);
 		pageTitle.setInnerHTML(DisplayConstants.REQUEST_SENT);
 		contentPanel.clear();		
-		contentHtml.setInnerHTML(AbstractImagePrototype.create(iconsImageBundle.informationBalloon16()).getHTML() + " Your password reset request has been sent. Please check your Email.");
+		contentHtml.setInnerHTML("Your password reset request has been sent. Please check your Email.");
 	}
-
-
-	@Override
-	public void showInfo(String infoMessage) {
-		DisplayUtils.showInfo("", infoMessage);
-	}
-
 
 	@Override
 	public void showMessage(String message) {
 		contentHtml.setInnerHTML(message);
+	}
+
+	@Override
+	public void showLoading() {
+		loadingPanel.setWidget(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingPanel.setVisible(true);		
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+
+	@Override
+	public void showExpiredRequest() {
+		loadingPanel.setVisible(false);
+		pageTitle.setInnerHTML(DisplayConstants.REQUEST_EXPIRED);
+		contentHtml.setInnerHTML(DisplayConstants.SET_PASSWORD_EXPIRED);
 	}  
 }
