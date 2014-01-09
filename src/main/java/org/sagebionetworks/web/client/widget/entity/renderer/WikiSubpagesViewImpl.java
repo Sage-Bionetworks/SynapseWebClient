@@ -72,7 +72,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			animation.setOutDirection(Direction.LEFT);
 			animation.setInDirection(Direction.RIGHT);
 			
-			FxConfig hideConfig = new FxConfig(400);
+			FxConfig hideConfig = new FxConfig(300);
 			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 				@Override
 				public void handleEvent(FxEvent be) {
@@ -80,7 +80,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			animation.setHideConfig(hideConfig);
-			FxConfig showConfig = new FxConfig(400);
+			//already jumpy when showing the hidden subpages (because of the container width change), so make this quick
+			FxConfig showConfig = new FxConfig(10);
 			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
 				@Override
 				public void handleEvent(FxEvent be) {
