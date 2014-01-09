@@ -21,7 +21,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,8 +35,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private Button showHideButton;
 	private LayoutContainer ulContainer;
-	private FlowPanel parentContainer;
-	private HTMLPanel markdownContainer;
+	private FlowPanel wikiSubpagesContainer;
+	private FlowPanel wikiPageContainer;
 	
 	@Inject
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
@@ -45,10 +44,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(TocItem root, FlowPanel parentContainer, HTMLPanel markdownContainer) {
+	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
-		this.parentContainer = parentContainer;
-		this.markdownContainer = markdownContainer;
+		this.wikiSubpagesContainer = wikiSubpagesContainer;
+		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
@@ -96,10 +95,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private void hideSubpages() {
 		// This call to layout is necessary to force the scroll bar to appear on page-load
-		if (parentContainer != null)
-			parentContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
-		if (markdownContainer != null)
-			markdownContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
+		if (wikiSubpagesContainer != null)
+			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
+		if (wikiPageContainer != null)
+			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
 		ulContainer.layout(true);
 		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
 		removeStyleName("well");
@@ -107,10 +106,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	private void showSubpages() {
-		if (parentContainer != null)
-			parentContainer.setStyleName(SHOW_SUBPAGES_STYLE);
-		if (markdownContainer != null)
-			markdownContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
+		if (wikiSubpagesContainer != null)
+			wikiSubpagesContainer.setStyleName(SHOW_SUBPAGES_STYLE);
+		if (wikiPageContainer != null)
+			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
 		ulContainer.layout(true);
 		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 		addStyleName("well");

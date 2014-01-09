@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEdi
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -178,23 +179,31 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			FlowPanel noticePanel = createDifferentVersionNotice();
 			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
+		FlowPanel wikiPagePanel = new FlowPanel();
+		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
+		FlowPanel wikiSubpagesPanel = new FlowPanel();
+		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
+		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
+		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel);
+		wikiSubpagesPanel.add(widget.asWidget());
+		add(wikiSubpagesPanel);
+		add(wikiPagePanel);
 		
-		add(getBreadCrumbs(colWidth));
+		wikiPagePanel.add(getBreadCrumbs(colWidth));
 		SimplePanel topBarWrapper = new SimplePanel();
-		topBarWrapper.addStyleName("margin-top-5");
 		String titleString = isRootWiki ? "" : currentPage.getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
-		add(topBarWrapper);
+		wikiPagePanel.add(topBarWrapper);
 		
 		FlowPanel mainPanel = new FlowPanel();
 		if(isCurrentVersion) {
 			mainPanel.add(getCommands(canEdit));
 		}
 		mainPanel.add(wrapWidget(markdownWidget.asWidget(), "margin-top-5"));
-		add(mainPanel);
+		wikiPagePanel.add(mainPanel);
 		
 		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
-		add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
+		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
 		layout(true);
 	}
 	

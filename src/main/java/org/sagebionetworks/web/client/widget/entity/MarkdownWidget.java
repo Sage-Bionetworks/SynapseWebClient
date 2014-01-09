@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -31,15 +29,12 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.ResizeLayoutPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
 /**
@@ -160,14 +155,6 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					};
 					//asynchronously load the widgets
 					Set<String> contentTypes = loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, isPreview, widgetRefreshRequired, wikiVersionInView);
-
-					//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
-					if (!contentTypes.contains(WidgetConstants.NO_AUTO_WIKI_SUBPAGES)) {
-						WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
-						//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
-						widget.configure(wikiKey, new HashMap<String, String>(), widgetRefreshRequired, wikiSubpagesPanel, panel);
-						wikiSubpagesPanel.add(widget.asWidget());
-					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
