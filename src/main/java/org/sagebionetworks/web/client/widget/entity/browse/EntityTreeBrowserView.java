@@ -40,6 +40,11 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * @param showContextMenu
 	 */
 	public void setShowContextMenu(boolean showContextMenu);
+
+	/*
+	 * Explicityly sets the height of the widget
+	 */
+	public void setWidgetHeight(int height);
 	
 	/**
 	 * Presenter interface
@@ -57,5 +62,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void deleteEntity(EntityTreeModel model);
 
 	}
+
 
 }

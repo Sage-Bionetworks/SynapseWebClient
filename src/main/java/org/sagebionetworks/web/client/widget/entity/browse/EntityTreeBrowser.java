@@ -94,6 +94,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		});
 	}
 	
+	public void setWidgetHeight(int height) {
+		view.setWidgetHeight(height);
+	}
+	
 	/**
 	 * Configure tree view to be filled initially with the given headers.
 	 * @param rootEntities
