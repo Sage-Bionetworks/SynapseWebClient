@@ -63,6 +63,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -92,6 +94,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ComboBox<ModelData> peopleCombo;
+	private CheckBox notifyPeopleCheckbox;
+	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
@@ -272,9 +276,9 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			});
 
 			fieldSet.add(shareButton);
+			
 			form2.add(fieldSet);
 			
-
 			//Make Public button
 			publicButton = new Button();
 			publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
@@ -292,7 +296,21 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					
 				}
 			});
-			form2.add(publicButton, tdLeft);
+			publicButton.addStyleName("left");
+			
+			if (notifyPeopleCheckbox == null) {
+				notifyPeopleCheckbox = new CheckBox("Notify people via email");
+				setIsNotifyPeople(true);
+				DisplayUtils.addToolTip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+			}
+			
+			FlowPanel cbPanel = new FlowPanel();
+			cbPanel.addStyleName("margin-top-0 margin-right-10 checkbox right");
+			cbPanel.add(notifyPeopleCheckbox);
+			FlowPanel publicButtonAndCheckbox = new FlowPanel();
+			publicButtonAndCheckbox.add(publicButton);
+			publicButtonAndCheckbox.add(cbPanel);
+			form2.add(publicButtonAndCheckbox);
 			add(form2);
 			
 			// 'Delete ACL' button
@@ -319,6 +337,17 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		
 		this.add(hPanel, new MarginData(10, 0, 0, 0));
 		this.layout(true);
+	}
+	
+	@Override
+	public Boolean isNotifyPeople(){
+		return notifyPeopleCheckbox.getValue();
+	}
+	
+	@Override
+	public void setIsNotifyPeople(Boolean value) {
+		if (notifyPeopleCheckbox != null && value != null)
+			notifyPeopleCheckbox.setValue(value);
 	}
 	
 	@Override

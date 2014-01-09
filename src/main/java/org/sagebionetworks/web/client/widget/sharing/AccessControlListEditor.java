@@ -179,6 +179,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						final String principalId = ra.getPrincipalId().toString();
 						originalPrincipalIdSet.add(principalId);
 					}
+					//default notification to true
+					view.setIsNotifyPeople(true);
 					fetchUserGroupHeaders(new AsyncCallback<Void>() {
 						public void onSuccess(Void result) {
 							// update the view
@@ -472,35 +474,37 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	public void notifyNewUsers() {
-		//create the principal id set
-		HashSet<String> newPrincipalIdSet = new HashSet<String>();
-		for (ResourceAccess ra : acl.getResourceAccess()) {
-			newPrincipalIdSet.add(ra.getPrincipalId().toString());
-		}
-		//now remove all of the original entries
-		for (String principalId : originalPrincipalIdSet) {
-			newPrincipalIdSet.remove(principalId);
-		}
-		//never try to notify all users
-		newPrincipalIdSet.remove(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
-		newPrincipalIdSet.remove(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
-		newPrincipalIdSet.remove(publicPrincipalIds.getPublicAclPrincipalId().toString());
-		
-		if (newPrincipalIdSet.size() > 0) {
-			//now send a message to these users
-			String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
-			String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
-			synapseClient.sendMessage(newPrincipalIdSet, subject, message, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)){
-						view.showErrorMessage(caught.getMessage());
+		if (view.isNotifyPeople()) {
+			//create the principal id set
+			HashSet<String> newPrincipalIdSet = new HashSet<String>();
+			for (ResourceAccess ra : acl.getResourceAccess()) {
+				newPrincipalIdSet.add(ra.getPrincipalId().toString());
+			}
+			//now remove all of the original entries
+			for (String principalId : originalPrincipalIdSet) {
+				newPrincipalIdSet.remove(principalId);
+			}
+			//never try to notify all users
+			newPrincipalIdSet.remove(publicPrincipalIds.getAnonymousUserPrincipalId().toString());
+			newPrincipalIdSet.remove(publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
+			newPrincipalIdSet.remove(publicPrincipalIds.getPublicAclPrincipalId().toString());
+			
+			if (newPrincipalIdSet.size() > 0) {
+				//now send a message to these users
+				String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
+				String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
+				synapseClient.sendMessage(newPrincipalIdSet, subject, message, new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
 					}
-				}
-			});
+					@Override
+					public void onFailure(Throwable caught) {
+						if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)){
+							view.showErrorMessage(caught.getMessage());
+						}
+					}
+				});
+			}
 		}
 	}
 	

@@ -130,6 +130,7 @@ public class AccessControlListEditorTest {
 				mockGwt
 		);
 		acle.setResource(project);
+		when(mockACLEView.isNotifyPeople()).thenReturn(true);
 	}
 	
 	private static Project createProject() {
@@ -313,6 +314,24 @@ public class AccessControlListEditorTest {
 
 	}
 	
+	@Test
+	public void isNotifyFalseTest() throws Exception {
+		when(mockACLEView.isNotifyPeople()).thenReturn(false);
+		EntityWrapper expectedEntityWrapper = new EntityWrapper(
+				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
+				AccessControlList.class.getName());
+		
+		// configure mocks
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(mockSynapseClient).updateAcl(any(EntityWrapper.class), anyBoolean(), any(AsyncCallback.class));
+		
+		// update
+		acle.asWidget();
+		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
+		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
+
+		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
