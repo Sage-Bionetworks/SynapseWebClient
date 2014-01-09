@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -98,14 +96,25 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			if(authenticationController.getCurrentUserSessionData() != null 
 					&& authenticationController.getCurrentUserSessionData().getProfile() != null
 					&& authenticationController.getCurrentUserSessionData().getProfile().getEmail() != null) {
-				String username = authenticationController.getCurrentUserSessionData().getProfile().getEmail();
+				final String username = authenticationController.getCurrentUserSessionData().getProfile().getEmail();
 				authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
 					@Override
 					public void onSuccess(String userSessionJson) {
 						userService.changePassword(authenticationController.getCurrentUserSessionToken(), newPassword, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {
-								view.showPasswordChangeSuccess();
+								view.showPasswordChangeSuccess();								
+								// login user as session token has changed
+								authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
+									@Override
+									public void onSuccess(String result) {
+									}
+									@Override
+									public void onFailure(Throwable caught) {
+										// if login fails, simple send them to the login page to get a new session
+										globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+									}
+								});
 							}
 
 							@Override
