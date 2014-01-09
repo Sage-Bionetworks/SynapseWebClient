@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -91,31 +93,39 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	}
 
 	@Override
-	public void resetPassword(final String username, final String existingPassword, final String newPassword) {		
+	public void resetPassword(final String existingPassword, final String newPassword) {		
 		if(authenticationController.isLoggedIn()) {
-			authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
-				@Override
-				public void onSuccess(String userSessionJson) {
-					userService.changePassword(authenticationController.getCurrentUserSessionToken(), newPassword, new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							view.showPasswordChangeSuccess();
-						}
+			if(authenticationController.getCurrentUserSessionData() != null 
+					&& authenticationController.getCurrentUserSessionData().getProfile() != null
+					&& authenticationController.getCurrentUserSessionData().getProfile().getEmail() != null) {
+				String username = authenticationController.getCurrentUserSessionData().getProfile().getEmail();
+				authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
+					@Override
+					public void onSuccess(String userSessionJson) {
+						userService.changePassword(authenticationController.getCurrentUserSessionToken(), newPassword, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								view.showPasswordChangeSuccess();
+							}
 
-						@Override
-						public void onFailure(Throwable caught) {						
-							view.passwordChangeFailed();
-							view.showErrorMessage("Password Change failed. Please try again.");
-						}
-					});
-				}
+							@Override
+							public void onFailure(Throwable caught) {						
+								view.passwordChangeFailed();
+								view.showErrorMessage("Password Change failed. Please try again.");
+							}
+						});
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.passwordChangeFailed();
+						view.showErrorMessage("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
+					}
+				});
 				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.passwordChangeFailed();
-					view.showErrorMessage("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
-				}
-			});
+			} else {
+				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
 		} else {
 			view.passwordChangeFailed();
 			view.showInfo("Error","Reset Password failed. Please Login again.");

@@ -70,8 +70,6 @@ public class SettingsPresenterTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		
-		
-//		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
 		profile.setEmail("testuser@test.com");
 		testUser.setProfile(profile);
@@ -117,7 +115,7 @@ public class SettingsPresenterTest {
 		
 		String newPassword = "otherpassword";
 		
-		profilePresenter.resetPassword("testuser@test.com", password, newPassword);
+		profilePresenter.resetPassword(password, newPassword);
 	}
 	
 	@Test
