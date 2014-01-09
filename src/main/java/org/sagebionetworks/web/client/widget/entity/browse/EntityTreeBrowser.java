@@ -177,24 +177,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return MAX_FOLDER_LIMIT;
 	}
 
-	@Override
-	public void deleteEntity(final EntityTreeModel entityModel) {
-		final String entityId = entityModel.getId();
-		synapseClient.deleteEntityById(entityId, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo("Deleted", "Synapse id " + entityId + " was successfully deleted.");
-				view.removeEntity(entityModel);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
-				}
-			}
-		});
-	}
-
 	/**
 	 * Show links if true
 	 * @param makeLinks Make the labels entity links if true 
@@ -202,15 +184,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void setMakeLinks(boolean makeLinks) {
 		view.setMakeLinks(makeLinks);
 	}
-
-	/**
-	 * Show the right click menu
-	 * @param showContextMenu
-	 */
-	public void setShowContextMenu(boolean showContextMenu) {
-		view.setShowContextMenu(showContextMenu);
-	}
-
+	
 	
 	/*
 	 * Private Methods

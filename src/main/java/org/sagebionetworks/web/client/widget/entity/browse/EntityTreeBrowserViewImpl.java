@@ -58,7 +58,6 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	private TreeStore<EntityTreeModel> store;
 	private HashMap<String, ImageResource> typeToIcon = new HashMap<String, ImageResource>();
 	private boolean makeLinks = true;
-	private boolean showContextMenu = true;
 	private Integer height = null; 
 	
 	@Override
@@ -101,10 +100,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		});
 		tree.setAutoHeight(true);
 		tree.setAutoWidth(true);
-		
-		
-		configureContextMenu();
-		
+				
 		cp = new ContentPanel();  
 	    cp.setHeaderVisible(false);  
 	    cp.setLayout(new FitLayout());  
@@ -127,40 +123,6 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 					cp.setScrollMode(Scroll.AUTO);
 				}
 			}
-		}
-	}
-
-	private void configureContextMenu() {
-		if(tree == null) return;
-		if(showContextMenu) {
-			Menu contextMenu = new Menu();
-	
-			MenuItem remove = new MenuItem();
-			remove.setText("Delete");
-			remove.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			remove.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent ce) {
-					final EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
-					if (model != null) {
-						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(EntityTreeModel.KEY_NAME), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(EntityTreeModel.KEY_NAME) +"?", new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 												
-								Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.deleteEntity(model);
-									
-								}
-							}
-						});					
-					}
-				}
-			});
-			contextMenu.add(remove);
-	
-			tree.setContextMenu(contextMenu);
-		} else {
-			
-			tree.setContextMenu(null);
 		}
 	}
 
@@ -221,13 +183,6 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	public void setMakeLinks(boolean makeLinks) {
 		this.makeLinks = makeLinks;
 	}
-
-	@Override
-	public void setShowContextMenu(boolean showContextMenu) {
-		this.showContextMenu = showContextMenu;
-		configureContextMenu();
-	}
-
 	
 	/*
 	 * Private Methods
