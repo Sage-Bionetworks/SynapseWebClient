@@ -971,12 +971,12 @@ public class SynapseClientImplTest {
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
-		//update the data file handle id, and update the name
-		verify(mockSynapse, Mockito.times(2)).putEntity(any(FileEntity.class));
+		//update the data file handle id, but not update the name
+		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
 		//do not lock down (restricted=false)
 		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
 	}
-
+	
 	@Test
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";

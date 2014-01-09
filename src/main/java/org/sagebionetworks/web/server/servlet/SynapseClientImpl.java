@@ -2168,7 +2168,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				fileEntity = synapseClient.putEntity(fileEntity);
 			}
 			//fix name and lock down
-			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient);
+			boolean changeName = entityId == null && parentEntityId != null; // don't change entity name on update 
+			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient, changeName);
 			return fileEntity.getId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
