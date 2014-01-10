@@ -76,6 +76,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -113,7 +114,6 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -121,7 +121,7 @@ import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-	// This will be appened to the User-Agent header.
+	// This will be appended to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
@@ -2438,7 +2438,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		private static String getProperty(String key) {
 			return props.getProperty(key);
 		}
-				
 	}
 
 	@Override
@@ -2449,5 +2448,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}		
+	}
+	
+	@Override
+	public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			MessageToUser message = new MessageToUser();
+			message.setRecipients(recipients);
+			message.setSubject(subject);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, messageBody);
+			JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
+			return sentMessageJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
 	}
 }
