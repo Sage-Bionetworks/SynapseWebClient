@@ -174,7 +174,7 @@ public class DisplayConstants {
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
-	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields are required.";
+	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
 	public static final String TITLE_ADD_ANNOTATION = "Add Annotation";
 	public static final String BUTTON_RETURN_TO_LAYER = "Return to Layer";
 	public static final String LABEL_GOTO_SYNAPSE_ID = "Enter a Synapse Id...";
