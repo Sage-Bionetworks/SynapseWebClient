@@ -338,6 +338,8 @@ public class DisplayConstants {
 	public static final String ERROR_VERSIONS_NOT_FOUND = "No version information was found for this entity.\nTry refreshing the page.";
 	public static final String SHOW_LC = "show";
 	public static final String HIDE_LC = "hide";
+	public static final String LEFT_ARROWS = "<<";
+	public static final String RIGHT_ARROWS = ">>";
 	public static final String NOT_FOUND = "Not Found";
 	public static final String ERROR_LOADING = "Error Loading";
 	public static final String PREVIEW_FAILED_TEXT = "Preview failed: ";
