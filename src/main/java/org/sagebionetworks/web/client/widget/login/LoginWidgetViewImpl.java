@@ -158,7 +158,7 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showAuthenticationFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4>");
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">If you are confident that the credentials filled in are correct, please report this issue to synapseInfo@sagebase.org</span>");
 		clear();
 	}
 
