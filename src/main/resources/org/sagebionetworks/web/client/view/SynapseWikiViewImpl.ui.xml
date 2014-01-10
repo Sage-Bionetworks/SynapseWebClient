@@ -20,10 +20,14 @@
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp "></div>
-		<div class="container">
-			<g:SimplePanel ui:field="fullWidthPanel" styleName="margin-top-15"/>
-			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
+	        <div class="row">
+		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12 margin-left-10"/>
+		   	</div>
+	    	
+		    <div class="clear"></div>
+        </div>
+		
 		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 
