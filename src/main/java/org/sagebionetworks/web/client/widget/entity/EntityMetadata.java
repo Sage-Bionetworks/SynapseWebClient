@@ -106,7 +106,7 @@ public class EntityMetadata implements Presenter {
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		return jiraURLHelper.createFlagIssue(
 				userProfile.getUserName(), 
-				userProfile.getDisplayName(), 
+				DisplayUtils.getDisplayName(userProfile), 
 				bundle.getEntity().getId());
 	}
 
@@ -115,7 +115,7 @@ public class EntityMetadata implements Presenter {
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		return jiraURLHelper.createAccessRestrictionIssue(
 				userProfile.getUserName(), 
-				userProfile.getDisplayName(), 
+				DisplayUtils.getDisplayName(userProfile), 
 				bundle.getEntity().getId());
 	}
 
@@ -125,7 +125,7 @@ public class EntityMetadata implements Presenter {
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		return jiraURLHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
-				userProfile.getDisplayName(), 
+				DisplayUtils.getDisplayName(userProfile), 
 				userProfile.getUserName(), 
 				bundle.getEntity().getId(), 
 				getAccessRequirement().getId().toString());

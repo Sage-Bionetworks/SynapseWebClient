@@ -66,6 +66,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.view.users.UsernameTextFieldView;
+import org.sagebionetworks.web.client.view.users.UsernameTextFieldViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -613,6 +615,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 
+		bind(UsernameTextFieldView.class).to(UsernameTextFieldViewImpl.class);
+		
 		/*
 		 * Teams Places
 		 */

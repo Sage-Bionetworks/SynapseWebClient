@@ -123,6 +123,8 @@ public class DisplayConstants {
 	public static final String GET_PATH_CLIENT_ENTITY = "Get the path to the local copy of the data file";
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
+	public static final String DUPLICATE_USERNAME_ERROR = "username has already been taken";
+	public static final String REQUIRED_USERNAME_ERROR = "username is required";
 	
 	/*
 	 * Service Constants (move to another file?)
@@ -435,6 +437,7 @@ public class DisplayConstants {
 	public static final String ID_MNU_USER_LOGOUT = "id_mnu_user_logout";
 	public static final String ID_MNU_USER_SETTINGS = "id_mnu_user_settings";
 	public static final String ID_BTN_LOGIN_GOOGLE = "login-via-gapp-google";
+	public static final String ID_INP_USERNAME = "id_inp_username";
 	public static final String ID_INP_EMAIL_ADDRESS = "id_inp_email_address";
 	public static final String ID_INP_EMAIL_ADDRESS2 = "id_inp_email_address2";
 	public static final String ID_INP_FIRSTNAME = "id_inp_firstname";
@@ -627,7 +630,7 @@ public class DisplayConstants {
 	public static final String VIEW_EDIT_PROFILE = "View / Edit Profile";
 	public static final String SHOW = "Show";
 	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
-	public static final String EMAIL_ADDRESS = "Email Address";
+	public static final String EMAIL_ADDRESS = "Username or Email Address";
 	public static final String SET_PASSWORD = "Set Password";
 	public static final String SUCCESS = "Success";
 	public static final String REQUEST_SENT = "Request Sent";
