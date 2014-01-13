@@ -149,13 +149,13 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 		     final TextField<String> firstName = new TextField<String>();  
 		     firstName.setFieldLabel("First Name");  
-		     firstName.setAllowBlank(false);
+		     firstName.setAllowBlank(true);
 		     firstName.setId(DisplayConstants.ID_INP_FIRSTNAME);
 		     fieldSet.add(firstName, formData);  
 		   
 		     final TextField<String> lastName = new TextField<String>();  
 		     lastName.setFieldLabel("Last Name");
-		     lastName.setAllowBlank(false);
+		     lastName.setAllowBlank(true);
 		     lastName.setId(DisplayConstants.ID_INP_LASTNAME);
 		     fieldSet.add(lastName, formData);
 		     
@@ -195,8 +195,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	private boolean validateForm(TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
 		if (email.getValue() != null && email.getValue().length() > 0 && email.isValid() 
-				&& firstName.getValue() != null && firstName.getValue().trim().length() > 0
-				&& lastName.getValue() != null && lastName.getValue().trim().length() > 0 && usernameTextField.validate()) {
+				&& usernameTextField.validate()) {
 			return true;
 		}
 		return false;
