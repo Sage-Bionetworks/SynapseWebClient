@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -171,6 +172,47 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead){
+		//get my profile
+		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userProfileJson) {
+				try {
+					UserProfile myProfile = new UserProfile(adapterFactory.createNew(userProfileJson));
+					Settings settings = myProfile.getNotificationSettings();
+					if (settings == null) {
+						settings = new Settings();
+						settings.setMarkEmailedMessagesAsRead(false);
+						settings.setSendEmailNotifications(true);
+						myProfile.setNotificationSettings(settings);
+					}
+					settings.setSendEmailNotifications(sendEmailNotifications);
+					settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
+					JSONObjectAdapter adapter = myProfile.writeToJSONObject(adapterFactory.createNew());
+					userProfileJson = adapter.toJSONString();
+					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(caught.getMessage());
+						}
+					});
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}    				
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				profileUpdatedCallback.onFailure(caught);
+			}
+		});
 	}
 	
 	private void updateProfileView(boolean editable) {

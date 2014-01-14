@@ -304,4 +304,5 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAPIKey() throws RestServiceException;
 	
+	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 }

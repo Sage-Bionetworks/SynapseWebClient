@@ -23,6 +23,10 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
+		// Prepopulate reference text from the map.  
+		if(widgetDescriptor.containsKey(WidgetConstants.TEXT_KEY)) {
+			view.setReference(widgetDescriptor.get(WidgetConstants.TEXT_KEY));
+		}
 	}
 	
 	@Override

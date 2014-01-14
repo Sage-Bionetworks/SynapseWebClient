@@ -53,6 +53,14 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void alertUnsavedViewChanges(Callback saveCallback);
 	
 	/**
+	 * true if user would like to notify newly added people that this item has been shared with them.
+	 * @return
+	 */
+	public Boolean isNotifyPeople();
+	
+	public void setIsNotifyPeople(Boolean value);
+	
+	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {

@@ -35,7 +35,8 @@ public class WebConstants {
 	 */
 	public static final String VALID_ANNOTATION_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
 	public static final String VALID_URL_REGEX = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-	public static final String VALID_EMAIL_REGEX = "^[_A-Za-z0-9-+.]+@[_A-Za-z0-9.]+";
+	//copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_EMAIL, added uppercase support
+	public static final String VALID_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 	public static final String WIDGET_NAME_REGEX = "[a-z,A-Z,0-9,., ,\\-,\\+,(,)]";
 	public static final String VALID_WIDGET_NAME_REGEX = "^"+WIDGET_NAME_REGEX+"+";
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
@@ -88,7 +89,7 @@ public class WebConstants {
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br>--strike out--<br></code></pre><br>" +
 			"<h3>Subscript/Superscript</h3><pre><code>~subscript~  ^superscript^<br></code></pre><br>" +
 			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><br>" +
-			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
+			"<h3>Tables</h3><pre><code>Header 1 | Header 2 | Header 3<br>--- | --- | ---<br>Row 1 Content Cell 1  |  Row 1 Content Cell 2  |  Row 1 Content Cell 3<br>Row 2 Content Cell 1  |  Row 2 Content Cell 2  |  Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
 			"<h3>Inline LaTeX</h3><pre><code>$\\[x^2\\]$<br></code></pre><br>" +
 			"<h3>LaTeX Blocks</h3><p>Wrap your math blocks in $$<pre><code>$$<br>\\begin{aligned}<br>x^2<br>\\end{aligned}<br>$$<br></code></pre></p><br>" +
