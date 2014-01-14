@@ -542,7 +542,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);  
+		com.google.gwt.user.client.Window.alert(message);  
 	}
 	
 	public static void showOkCancelMessage(

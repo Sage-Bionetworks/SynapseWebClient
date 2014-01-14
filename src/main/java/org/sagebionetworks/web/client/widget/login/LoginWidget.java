@@ -9,6 +9,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
@@ -124,9 +126,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {
+			public void onFailure(Throwable caught) {				
 				view.clear();
-				view.showAuthenticationFailed();
+				if(caught instanceof ReadOnlyModeException) {
+					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
+				} else if(caught instanceof SynapseDownException) {
+					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
+				} else {				
+					view.showAuthenticationFailed();
+				}
 			}
 		});
 	}
