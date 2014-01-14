@@ -191,7 +191,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 //	        window.setHeight(500);
 	        window.setPlain(true); 
 	        window.setModal(true); 
-	        window.setHeading("Please Set Your Username..."); 
+	        window.setHeading("Username"); 
 	        window.setLayout(new FlowLayout());
 	        window.setScrollMode(Scroll.AUTO);
 	        window.setButtons(Dialog.OK);
@@ -209,7 +209,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	            	if (username.getValue() != null && username.getValue().trim().length() > 0 && callback!=null)
 	            		callback.invoke(username.getValue().trim());
 	            	else
-	            		showErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+	            		showErrorMessage(DisplayConstants.FILL_IN_USERNAME);
 	            }
 	        });
 	        window.add(lc);
@@ -226,16 +226,19 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	 private FormPanel createForm(TextBox username) {
 		 FormPanel formPanel = new FormPanel();
+		 formPanel.getElement().setAttribute("role", "form");
+		 
 		 FlowPanel textFieldPanel = new FlowPanel();
-		 textFieldPanel.setStyleName("form-group");
-	     Label usernameLabel = new Label("Username");
-	     usernameLabel.getElement().setAttribute("for", DisplayConstants.ID_INP_USERNAME);
-	     textFieldPanel.add(usernameLabel);
-	     username.getElement().setAttribute("placeholder", "Please enter a Synapse username");
+		 textFieldPanel.setStyleName("form-group margin-10");
+		 HTML infoPanel = new HTML(DisplayConstants.FILL_IN_USERNAME);
+		 infoPanel.setStyleName("bs-callout bs-callout-info");
+	    
+	     textFieldPanel.add(infoPanel);
+	     username.getElement().setAttribute("placeholder", "Your new username");
 	     username.setStyleName("form-control");
 	     username.getElement().setId(DisplayConstants.ID_INP_USERNAME);
 	     textFieldPanel.add(username);
-	     	     
+	     formPanel.add(textFieldPanel);
 	     return formPanel;
 	 }
 	
