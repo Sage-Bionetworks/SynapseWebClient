@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
@@ -104,8 +106,10 @@ public class EntityMetadata implements Presenter {
 	public String getJiraFlagUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		List<String> emailAddresses = userProfile.getEmails();
+		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createFlagIssue(
-				userProfile.getUserName(), 
+				emailAddresses.get(0), 
 				DisplayUtils.getDisplayName(userProfile), 
 				bundle.getEntity().getId());
 	}
@@ -113,8 +117,10 @@ public class EntityMetadata implements Presenter {
 	public String getJiraRestrictionUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		List<String> emailAddresses = userProfile.getEmails();
+		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createAccessRestrictionIssue(
-				userProfile.getUserName(), 
+				emailAddresses.get(0),
 				DisplayUtils.getDisplayName(userProfile), 
 				bundle.getEntity().getId());
 	}
@@ -123,10 +129,12 @@ public class EntityMetadata implements Presenter {
 	public String getJiraRequestAccessUrl() {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
+		List<String> emailAddresses = userProfile.getEmails();
+		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
 				DisplayUtils.getDisplayName(userProfile), 
-				userProfile.getUserName(), 
+				emailAddresses.get(0), 
 				bundle.getEntity().getId(), 
 				getAccessRequirement().getId().toString());
 	}

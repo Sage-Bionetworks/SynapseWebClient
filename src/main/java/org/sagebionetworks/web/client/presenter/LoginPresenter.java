@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -13,6 +17,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -38,9 +43,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private CookieProvider cookies;
 	private GWTWrapper gwtWrapper;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private JSONObjectAdapter jsonObjectAdapter;
+	private SynapseClientAsync synapseClient;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils, JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -48,6 +55,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.cookies = cookies;
 		this.gwtWrapper = gwtWrapper;
 		this.synapseJSNIUtils=synapseJSNIUtils;
+		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	} 
 
@@ -102,19 +111,52 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void setNewUser(UserSessionData newUser) {	
-		// Allow the user to proceed.		
-		
-		//TODO: check for default gamertag
-		String ownerId = newUser.getProfile().getOwnerId();
-		String screenName = newUser.getProfile().getScreenname();
-		if (ownerId != null && ownerId.equals(screenName)) {
-			//set your screenname!
+		//check for default username
+		final UserProfile profile = newUser.getProfile();
+		if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
 			
+			//set your username!
+			//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
+			//for now, just give it a try. 
+			view.showSetUsernameDialog(new CallbackP<String>() {
+				@Override
+				public void invoke(String newUsername) {
+					//try to save the profile with the new username
+					profile.setUserName(newUsername);
+					updateProfile(profile);
+				}
+			});
 		}
-		
-		forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());		
+		else {
+			// Allow the user to proceed.		
+			forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+		}
 	}
 
+	public void updateProfile(final UserProfile profile) {
+		try { 
+			JSONObjectAdapter adapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
+			String userProfileJson = adapter.toJSONString();
+	
+			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					view.hideSetUsernameDialog();
+					view.showInfo("Successfully updated your username", "");
+					authenticationController.getCurrentUserSessionData().setProfile(profile);
+					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
+	}
+	
 	@Override
     public String mayStop() {
         view.clear();

@@ -7,22 +7,35 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 
+import com.extjs.gxt.ui.client.Style.Scroll;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,7 +57,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Window logginInWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
-	
+	private Dialog window;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
 	@Inject
@@ -168,5 +181,62 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void showTermsOfUse(String content, final AcceptTermsOfUseCallback callback) {
         TermsOfUseHelper.showTermsOfUse(content, callback);
      }
+	
+	@Override
+	public void showSetUsernameDialog(final CallbackP<String> callback) {
+        if (window == null) {
+        	window = new Dialog();
+	        window.setMaximizable(false);
+//	        window.setWidth(400);
+//	        window.setHeight(500);
+	        window.setPlain(true); 
+	        window.setModal(true); 
+	        window.setHeading("Please Set Your Username..."); 
+	        window.setLayout(new FlowLayout());
+	        window.setScrollMode(Scroll.AUTO);
+	        window.setButtons(Dialog.OK);
+	        window.setHideOnButtonClick(false);
+	        
+	        final TextBox username = new TextBox();  
+		     
+	        LayoutContainer lc = new LayoutContainer();
+	        lc.add(createForm(username));
+	        Button saveButton = window.getButtonById(Dialog.OK);
+//	        saveButton.setStyleName("btn btn-primary");
+	        saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+	            @Override
+	            public void componentSelected(ButtonEvent ce) {
+	            	if (username.getValue() != null && username.getValue().trim().length() > 0 && callback!=null)
+	            		callback.invoke(username.getValue().trim());
+	            	else
+	            		showErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+	            }
+	        });
+	        window.add(lc);
+        }
+        // show the window
+        window.show();		
+	}
+	
+	@Override
+	public void hideSetUsernameDialog() {
+		if (window != null)
+			window.hide();
+	}
 
+	 private FormPanel createForm(TextBox username) {
+		 FormPanel formPanel = new FormPanel();
+		 FlowPanel textFieldPanel = new FlowPanel();
+		 textFieldPanel.setStyleName("form-group");
+	     Label usernameLabel = new Label("Username");
+	     usernameLabel.getElement().setAttribute("for", DisplayConstants.ID_INP_USERNAME);
+	     textFieldPanel.add(usernameLabel);
+	     username.getElement().setAttribute("placeholder", "Please enter a Synapse username");
+	     username.setStyleName("form-control");
+	     username.getElement().setId(DisplayConstants.ID_INP_USERNAME);
+	     textFieldPanel.add(username);
+	     	     
+	     return formPanel;
+	 }
+	
 }

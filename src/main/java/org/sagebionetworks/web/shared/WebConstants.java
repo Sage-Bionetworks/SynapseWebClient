@@ -45,6 +45,8 @@ public class WebConstants {
 	public static final String HTML_ELLIPSIS = "&hellip;";
 	public static final String URL_PROTOCOL = "http://";
 	
+	public static final String TEMPORARY_USERNAME_PREFIX = "TEMPORARY-";
+	
 	// OpenID related constants
 	/**
 	 * A token built into the redirect URL by the authentication controller at the end of OpenID

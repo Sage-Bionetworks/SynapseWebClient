@@ -54,22 +54,20 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	private Header headerWidget;
 	private Footer footerWidget;
 	private SageImageBundle sageImageBundle;
-	private UsernameTextField usernameTextField; 
+	 
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter, SageImageBundle imageBundle, SageImageBundle sageImageBundle, UsernameTextField usernameTextField) {		
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter, SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = iconsImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
-		this.usernameTextField = usernameTextField;
 		
 		// header setup
 		header.clear();
 		footer.clear();
 		headerWidget.configure(false);
-		usernameTextField.configure(null);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 	}
@@ -80,7 +78,6 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		this.presenter = presenter;
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		usernameTextField.configure(null);
 	}
 
 	@Override
@@ -137,7 +134,11 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     layout.setLabelWidth(100);  
 		     fieldSet.setLayout(layout);  
 		     
-		     fieldSet.add(usernameTextField.asWidget(), formData);
+		     final TextField<String> username = new TextField<String>();  
+		     username.setFieldLabel("Username");
+		     username.setAllowBlank(false);
+		     username.setId(DisplayConstants.ID_INP_USERNAME);
+		     fieldSet.add(username, formData);  
 		     
 		     final TextField<String> email = new TextField<String>();  
 		     email.setRegex(WebConstants.VALID_EMAIL_REGEX);
@@ -168,9 +169,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     registerButton = new Button(DisplayConstants.BUTTON_REGISTER, new SelectionListener<ButtonEvent>(){
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						if(validateForm(email, firstName, lastName)) {
+						if(validateForm(username, email, firstName, lastName)) {
 							DisplayUtils.changeButtonToSaving(registerButton, sageImageBundle);						
-							presenter.registerUser(email.getValue(), firstName.getValue().trim(), lastName.getValue().trim());
+							presenter.registerUser(username.getValue(), email.getValue(), firstName.getValue(), lastName.getValue());
 						} else {
 							showErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 						}
@@ -193,9 +194,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	 }
 
-	private boolean validateForm(TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
+	private boolean validateForm(TextField<String> username,TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
 		if (email.getValue() != null && email.getValue().length() > 0 && email.isValid() 
-				&& usernameTextField.validate()) {
+				&& username.getValue() != null && username.getValue().trim().length() > 0) {
 			return true;
 		}
 		return false;

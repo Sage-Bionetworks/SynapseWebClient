@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -111,7 +112,10 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			public void onSuccess(Void result) {
 				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
-				globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
+				
+				//password has been reset, need to re-login (may pop up terms of service if new user)
+				authenticationController.logoutUser();
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
 			}
 
 			@Override

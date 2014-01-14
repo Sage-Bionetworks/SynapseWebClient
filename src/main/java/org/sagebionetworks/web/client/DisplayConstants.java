@@ -53,7 +53,7 @@ public class DisplayConstants {
 	
 	public static final String PASSWORD_RESET_FAILED_TEXT = "Password reset failed. Please try again.";
 	public static final String PASSWORD_SET_FAILED_TEXT = "Password change failed. Please try again.";
-	public static final String PASSWORD_RESET_TEXT = "Your password has been reset.";
+	public static final String PASSWORD_RESET_TEXT = "Your password has been set.";
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	public static final String PASSWORD_AND_EMAIL_SET_TEXT = "Your new email address and password have been set. Please login to verify.";
 	public static final String EMAIL_SET_FAILED_TEXT = "Email address change failed. Please try again.";
@@ -161,7 +161,7 @@ public class DisplayConstants {
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";	
-	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account associated with this email.  If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
+	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account with this username/email.  If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
 	public static final String ERROR_UNABLE_TO_UPDATE_ATTACHMENTS = "The attachments could not be updated because this entity has conflicting changes. Please reload the page and try again.";
 	public static final String ERROR_GENERIC = "An error occurred. Please try again.";

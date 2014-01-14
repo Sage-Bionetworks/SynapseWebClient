@@ -576,15 +576,43 @@ public class DisplayUtils {
 	
 	public static String getDisplayName(UserProfile profile) {
 		StringBuilder sb = new StringBuilder();
+		boolean hasDisplayName = false;
 		if (profile.getFirstName() != null) {
-			sb.append(profile.getFirstName());
+			sb.append(profile.getFirstName().trim());
+			hasDisplayName = true;
 		}
 		if (profile.getLastName() != null) {
 			sb.append(" ");
-			sb.append(profile.getLastName());
+			sb.append(profile.getLastName().trim());
+			hasDisplayName = true;
 		}
+		
+		sb.append(getUserName(profile, hasDisplayName));
+		
 		return sb.toString();
 	}
+	
+	public static boolean isTemporaryUsername(String username){
+		if(username == null) throw new IllegalArgumentException("UserName cannot be null");
+		return username.startsWith(WebConstants.TEMPORARY_USERNAME_PREFIX);
+	}
+
+	public static String getUserName(UserProfile profile, boolean inParens) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (profile.getUserName() != null && !isTemporaryUsername(profile.getUserName())) {
+			//if the name is filled in, then put the username in parens
+			if (inParens)
+				sb.append(" (");
+			sb.append(profile.getUserName());
+			if (inParens)
+				sb.append(")");
+		}
+		
+		return sb.toString();
+	}
+	
+
 	
 	/**
 	 * Returns the NodeType for this entity class. 
