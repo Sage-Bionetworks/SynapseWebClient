@@ -211,9 +211,15 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-		 presenter.updateProfile(firstName.getValue().trim(), lastName.getValue().trim(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null, teamName.getValue(), url.getValue());
+		 presenter.updateProfile(trim(firstName.getValue()), trim(lastName.getValue()), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null, teamName.getValue(), url.getValue());
 //TODO: uncomment to add ability to change email
 //		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
+	 }
+	 
+	 private String trim(String value) {
+		 if (value == null)
+			 return null;
+		 else return value.trim();
 	 }
 	 
 	 private void updateUserForm(UserProfile profile) {

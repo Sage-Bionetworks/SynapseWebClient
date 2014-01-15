@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -17,7 +18,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -45,9 +45,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseClientAsync synapseClient;
+	private AdapterFactory adapterFactory;
+	private UserProfile profile;
 	
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils, JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient){
+	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils, JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient, AdapterFactory adapterFactory){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -57,6 +59,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.synapseJSNIUtils=synapseJSNIUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseClient = synapseClient;
+		this.adapterFactory = adapterFactory;
 		view.setPresenter(this);
 	} 
 
@@ -110,27 +113,38 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	}
 	
 	@Override
+	public void setUsername(String newUsername) {
+		if (profile != null) {
+			profile.setUserName(newUsername);
+			updateProfile(profile);
+		}
+	}
+	
+	@Override
 	public void setNewUser(UserSessionData newUser) {	
-		//check for default username
-		final UserProfile profile = newUser.getProfile();
-		if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-			
-			//set your username!
-			//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
-			//for now, just give it a try. 
-			view.showSetUsernameDialog(new CallbackP<String>() {
-				@Override
-				public void invoke(String newUsername) {
-					//try to save the profile with the new username
-					profile.setUserName(newUsername);
-					updateProfile(profile);
+		//get my profile, and check for a default username
+		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile result) {
+				profile = result;
+				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
+					//set your username!
+					//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
+					//for now, just give it a try. 
+					view.showSetUsernameUI();
 				}
-			});
-		}
-		else {
-			// Allow the user to proceed.		
-			forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-		}
+				else {
+					// Allow the user to proceed.		
+					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				//could not determine
+				forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+			}
+		});
 	}
 
 	public void updateProfile(final UserProfile profile) {
@@ -141,7 +155,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.hideSetUsernameDialog();
 					view.showInfo("Successfully updated your username", "");
 					authenticationController.getCurrentUserSessionData().setProfile(profile);
 					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
@@ -149,7 +162,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					view.showSetUsernameFailed();
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

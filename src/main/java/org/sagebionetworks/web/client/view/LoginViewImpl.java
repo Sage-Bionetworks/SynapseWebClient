@@ -7,33 +7,24 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 
-import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,7 +40,18 @@ public class LoginViewImpl extends Composite implements LoginView {
 	SimplePanel loginWidgetPanel;
 	@UiField
 	SimplePanel logoutPanel;
+	@UiField
+	HTMLPanel loginView;
+	@UiField
+	HTMLPanel changeUsernameView;
+	@UiField
+	Button changeUsernameButton;
+	@UiField
+	TextBox username;
+	@UiField
+	SpanElement messageLabel;
 
+	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -57,7 +59,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Window logginInWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private Dialog window;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
 	@Inject
@@ -73,6 +74,16 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		username.getElement().setAttribute("placeholder", "Username");
+		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
+		changeUsernameButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				messageLabel.setInnerHTML("");
+				changeUsernameButton.setEnabled(false);
+				presenter.setUsername(username.getValue());
+			}
+		});
 
 	}
 
@@ -138,6 +149,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showLogin(String openIdActionUrl, String openIdReturnUrl) {
 		clear();
+		loginView.setVisible(true);
+		changeUsernameView.setVisible(false);
 		headerWidget.refresh();
 	  	loginWidget.setOpenIdActionUrl(openIdActionUrl);
 		loginWidget.setOpenIdReturnUrl(openIdReturnUrl);
@@ -175,6 +188,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
+		changeUsernameButton.setEnabled(true);
 	}
 	
 	@Override
@@ -183,63 +197,14 @@ public class LoginViewImpl extends Composite implements LoginView {
      }
 	
 	@Override
-	public void showSetUsernameDialog(final CallbackP<String> callback) {
-        if (window == null) {
-        	window = new Dialog();
-	        window.setMaximizable(false);
-//	        window.setWidth(400);
-//	        window.setHeight(500);
-	        window.setPlain(true); 
-	        window.setModal(true); 
-	        window.setHeading("Username"); 
-	        window.setLayout(new FlowLayout());
-	        window.setScrollMode(Scroll.AUTO);
-	        window.setButtons(Dialog.OK);
-	        window.setHideOnButtonClick(false);
-	        
-	        final TextBox username = new TextBox();  
-		     
-	        LayoutContainer lc = new LayoutContainer();
-	        lc.add(createForm(username));
-	        Button saveButton = window.getButtonById(Dialog.OK);
-//	        saveButton.setStyleName("btn btn-primary");
-	        saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-	            @Override
-	            public void componentSelected(ButtonEvent ce) {
-	            	if (username.getValue() != null && username.getValue().trim().length() > 0 && callback!=null)
-	            		callback.invoke(username.getValue().trim());
-	            	else
-	            		showErrorMessage(DisplayConstants.FILL_IN_USERNAME);
-	            }
-	        });
-	        window.add(lc);
-        }
-        // show the window
-        window.show();		
+	public void showSetUsernameUI() {
+		loginView.setVisible(false);
+		changeUsernameView.setVisible(true);
 	}
 	
 	@Override
-	public void hideSetUsernameDialog() {
-		if (window != null)
-			window.hide();
+	public void showSetUsernameFailed() {
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
+		clear();
 	}
-
-	 private FormPanel createForm(TextBox username) {
-		 FormPanel formPanel = new FormPanel();
-		 formPanel.getElement().setAttribute("role", "form");
-		 
-		 FlowPanel textFieldPanel = new FlowPanel();
-		 textFieldPanel.setStyleName("form-group margin-10");
-		 HTML infoPanel = new HTML(DisplayConstants.FILL_IN_USERNAME);
-		 infoPanel.setStyleName("bs-callout bs-callout-info");
-	    
-	     textFieldPanel.add(infoPanel);
-	     username.getElement().setAttribute("placeholder", "Your new username");
-	     username.setStyleName("form-control");
-	     username.getElement().setId(DisplayConstants.ID_INP_USERNAME);
-	     textFieldPanel.add(username);
-	     formPanel.add(textFieldPanel);
-	     return formPanel;
-	 }
-	
 }

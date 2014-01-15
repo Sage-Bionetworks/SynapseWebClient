@@ -171,7 +171,6 @@ public class DisplayConstants {
 	public static final String ERROR_BAD_REQUEST_MESSAGE = "An unknown communication error occurred. Please reload the page.";
 	public static final String ERROR_DUPLICATE_ENTITY_MESSAGE = "An entity with this name already exists. Please enter a different name.";
 	public static final String ERROR_DUPLICATE_NAME_MESSAGE = "This name already exists. Please enter a different name.";
-	public static final String FILL_IN_USERNAME = "Please take a moment to set your username:";
 	public static final String ERROR_INVALID_ENTITY_NAME = "Name contains contains an invalid character";
 	public static final String NO_HEADERS_FOUND = "No Headers were found on this page.";
 	public static final String ERROR_TITLE_LOGIN_REQUIRED = "Login Required";
