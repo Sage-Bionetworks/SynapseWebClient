@@ -657,5 +657,6 @@ public class DisplayConstants {
 	public static final String SET_PASSWORD_EXPIRED = "This set password request has expired. Please make a new request via the login page.";
 	public static final String REQUEST_EXPIRED = "Request Expired";
 	public static final String UNABLE_TO_LOAD_VERSIONS = "Unable to load entity versions. Please re-select the entity.";
+	public static final String SYNAPSE_ACCOUNT_NUMBER = "Synapse Account Number";
 }
 
