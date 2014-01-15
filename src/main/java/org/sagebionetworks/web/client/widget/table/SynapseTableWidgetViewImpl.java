@@ -322,7 +322,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 				}
 			});
 			if(i==0) columnPanel.getMoveUp().setVisible(false);
-			if(i==columnPanelOrder.size()-1) columnPanel.getMoveDown().setVisible(false); 
+			if(i==columns.size()-1) columnPanel.getMoveDown().setVisible(false); 
 			
 			columnPanelOrder.add(columnPanel);
 			allColumnsPanel.add(columnPanel);

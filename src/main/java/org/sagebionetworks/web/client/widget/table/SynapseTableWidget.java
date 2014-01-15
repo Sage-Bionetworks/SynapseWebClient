@@ -69,7 +69,7 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
 	}
 
@@ -89,8 +89,8 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 
 	@Override
 	public void createColumn(ColumnModel col) {
-		try {						
-			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		try {									
+			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
 			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
@@ -137,7 +137,7 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 				@Override
 				public void onSuccess(EntityWrapper result) {
 					TableEntity newTable;
-					try {
+					try {						
 						newTable = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
 						configure(newTable);
 					} catch (JSONObjectAdapterException e) {

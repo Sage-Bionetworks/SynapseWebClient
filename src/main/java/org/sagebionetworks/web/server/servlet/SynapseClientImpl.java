@@ -2457,7 +2457,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String createColumnModel(String columnModelJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			ColumnModel column = new ColumnModel(adapterFactory.createNew(columnModelJson));
+			ColumnModel column = new ColumnModel(adapterFactory.createNew(columnModelJson));			
 			ColumnModel createdColumn = synapseClient.createColumnModel(column);
 			return createdColumn.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
 		} catch (Exception e) {
