@@ -90,6 +90,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -155,7 +156,7 @@ public class SynapseClientImplTest {
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
-	
+	MessageToUser sentMessage;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -344,6 +345,10 @@ public class SynapseClientImplTest {
 		membershipStatus.setIsMember(false);
 		membershipStatus.setMembershipApprovalRequired(false);
 		when(mockSynapse.getTeamMembershipStatus(anyString(), anyString())).thenReturn(membershipStatus);
+		
+		sentMessage = new MessageToUser();
+		sentMessage.setId("987");
+		when(mockSynapse.sendStringMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
 	}
 	
 	private void setupTeamInvitations() throws SynapseException{
@@ -732,10 +737,10 @@ public class SynapseClientImplTest {
      
      @Test
      public void testRestoreV2WikiPage() throws Exception {
-         String wikiPageJson = EntityFactory.createJSONStringForEntity(v2Page);
-         Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong())).thenReturn(v2Page);
-         synapseClient.restoreV2WikiPage("ownerId", ObjectType.ENTITY.toString(), wikiPageJson, new Long(2));
-         verify(mockSynapse).restoreV2WikiPage(anyString(), any(ObjectType.class), any(V2WikiPage.class), anyLong());
+         String wikiId = "syn123";
+         Mockito.when(mockSynapse.restoreV2WikiPage(anyString(), any(ObjectType.class), any(String.class), anyLong())).thenReturn(v2Page);
+         synapseClient.restoreV2WikiPage("ownerId", ObjectType.ENTITY.toString(), wikiId, new Long(2));
+         verify(mockSynapse).restoreV2WikiPage(anyString(), any(ObjectType.class), any(String.class), anyLong());
      }
      
      @Test
@@ -775,12 +780,12 @@ public class SynapseClientImplTest {
  	
  	@Test
  	public void testGetMarkdown() throws IOException, RestServiceException, SynapseException {
- 		File file = File.createTempFile("pre", "txt");
- 		Mockito.when(mockSynapse.downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(file);
+ 		String someMarkDown = "someMarkDown";
+ 		Mockito.when(mockSynapse.downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(someMarkDown);
         synapseClient.getMarkdown(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
         verify(mockSynapse).downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
         
-        Mockito.when(mockSynapse.downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(file);
+        Mockito.when(mockSynapse.downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(someMarkDown);
         synapseClient.getVersionOfMarkdown(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
         verify(mockSynapse).downloadVersionOfV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
  	}
@@ -971,12 +976,12 @@ public class SynapseClientImplTest {
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
-		//update the data file handle id, and update the name
-		verify(mockSynapse, Mockito.times(2)).putEntity(any(FileEntity.class));
+		//update the data file handle id, but not update the name
+		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
 		//do not lock down (restricted=false)
 		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
 	}
-
+	
 	@Test
 	public void testGetChunkedFileToken() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String fileName = "test file.zip";
@@ -1316,6 +1321,20 @@ public class SynapseClientImplTest {
 		}
 	}
 	
+	@Test
+	public void testSendMessage() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		//essentially a pass through to sendStringMessage
+		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor.forClass(MessageToUser.class);
+		Set<String> recipients = new HashSet<String>();
+		recipients.add("333");
+		String subject = "The Mathematics of Quantum Neutrino Fields";
+		String messageBody = "Atoms are not to be trusted, they make up everything";
+		synapseClient.sendMessage(recipients, subject, messageBody);
+		verify(mockSynapse).sendStringMessage(arg.capture(), eq(messageBody));
+		MessageToUser toSendMessage = arg.getValue();
+		assertEquals(subject, toSendMessage.getSubject());
+		assertEquals(recipients, toSendMessage.getRecipients());
+	}
 
 	
 }

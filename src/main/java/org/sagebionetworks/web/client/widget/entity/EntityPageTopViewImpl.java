@@ -520,8 +520,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Wiki Tab: Wiki
 		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false, area);
-		// Created By/Modified By
-		wikiTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
 		
@@ -682,7 +680,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		configMap.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
 		configMap.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, Integer.toString(1));		
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
-	    provenanceWidget.configure(null, configMap, null);
+	    provenanceWidget.configure(null, configMap, null, null);
 	    final Widget provViewWidget = provenanceWidget.asWidget(); 
 	    final LayoutContainer border = new LayoutContainer();
 	    border.add(provViewWidget);
@@ -744,7 +742,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	    if(description != null && !("".equals(description))) {
 	    	if (!DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 				lc.add(markdownWidget);
-		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null, versionNumber), false, false);
+		    		markdownWidget.setMarkdown(description, new WikiPageKey(bundle.getEntity().getId(),  ObjectType.ENTITY.toString(), null, versionNumber), false, false, null);
 	    	}
 	    	else {
 	    		Label plainDescriptionText = new Label();

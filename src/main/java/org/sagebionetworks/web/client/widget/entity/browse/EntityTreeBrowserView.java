@@ -35,11 +35,10 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 */
 	public void setMakeLinks(boolean makeLinks);
 
-	/**
-	 * Show the right click menu
-	 * @param showContextMenu
+	/*
+	 * Explicityly sets the height of the widget
 	 */
-	public void setShowContextMenu(boolean showContextMenu);
+	public void setWidgetHeight(int height);
 	
 	/**
 	 * Presenter interface
@@ -54,8 +53,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 		ImageResource getIconForType(String type);
 
-		void deleteEntity(EntityTreeModel model);
-
 	}
+
 
 }

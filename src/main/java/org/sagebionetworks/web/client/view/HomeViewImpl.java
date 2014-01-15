@@ -430,6 +430,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer getMyProjectsContainer() {
 		LayoutContainer myProjContainer = new LayoutContainer();
 		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
+		myProjectsTreeBrowser.setWidgetHeight(180);
 		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
 		return myProjContainer;
 	}

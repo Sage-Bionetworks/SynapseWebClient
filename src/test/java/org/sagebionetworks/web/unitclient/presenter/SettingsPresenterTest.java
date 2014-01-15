@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -53,6 +54,8 @@ public class SettingsPresenterTest {
 	UserSessionData testUser = new UserSessionData();
 	UserProfile profile = new UserProfile();
 	String password = "password";
+	String newPassword = "otherpassword";
+	String username = "testuser@test.com";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -68,12 +71,11 @@ public class SettingsPresenterTest {
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 		
-		
-//		profilePresenter.setPlace(place);
 		profile.setDisplayName("tester");
-		profile.setEmail("testuser@test.com");
+		profile.setEmail(username);
 		testUser.setProfile(profile);
 		testUser.setSession(new Session());
 		testUser.getSession().setSessionToken("token");
@@ -112,12 +114,52 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
+		
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
 		profilePresenter.setPlace(place);
 		
-		String newPassword = "otherpassword";
+		profilePresenter.resetPassword(password, newPassword);
+		verify(mockView).showPasswordChangeSuccess();		
+	}
+	
+	@Test
+	public void testResetPasswordFailInitialLogin() throws RestServiceException {		
+		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		
-		profilePresenter.resetPassword("testuser@test.com", password, newPassword);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter.setPlace(place);
+		
+		profilePresenter.resetPassword(password, newPassword);
+		verify(mockView).passwordChangeFailed();		
+	}
+
+	@Test
+	public void testResetPasswordFailChangePw() throws RestServiceException {		
+		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter.setPlace(place);
+		
+		profilePresenter.resetPassword(password, newPassword);
+		verify(mockView).passwordChangeFailed();		
+	}
+	
+	@Test
+	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
+		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
+		
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter.setPlace(place);
+		
+		profilePresenter.resetPassword(password, newPassword);
+		verify(mockView).showPasswordChangeSuccess();
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
 	}
 	
 	@Test

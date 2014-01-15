@@ -119,7 +119,7 @@ public class EntityPageTopTest {
 		entityAttachments.add(attachment1);
 		entity.setAttachments(entityAttachments);
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
-		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean(), any(Callback.class))).thenReturn(testWidgetRenderer);
+		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean(), any(Callback.class), any(Long.class))).thenReturn(testWidgetRenderer);
 
 		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
 		projectHeader = new EntityHeader();
@@ -319,6 +319,13 @@ public class EntityPageTopTest {
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());
+	}
+	
+	@Test 
+	public void testEntityDeleted_SWC_1116() {
+		String id = "syn123";
+		EntityDeletedEvent event = new EntityDeletedEvent(id);
+		pageTop.entityDeleted(event);		
 	}
 	
 	/*

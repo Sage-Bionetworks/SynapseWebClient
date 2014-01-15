@@ -18,7 +18,9 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		"http://shiny.synapse.org/", 
 		"https://shiny.synapse.org/", 
 		"http://spark.rstudio.com/",
-		"https://s3.amazonaws.com/static.synapse.org/" };
+		"https://s3.amazonaws.com/static.synapse.org/",
+		"https://belltown.fhcrc.org:9898/"
+		};
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
@@ -31,7 +33,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);

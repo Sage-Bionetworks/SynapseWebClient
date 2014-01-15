@@ -38,6 +38,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -63,6 +64,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel myTeamsPanel;
 	@UiField
 	SimplePanel myTeamInvitesPanel;
+	
+	@UiField
+	SimplePanel notificationsPanel;
+	@UiField
+	CheckBox emailNotificationsCheckbox;
 
 	@UiField
 	SimplePanel editProfileButtonPanel;
@@ -148,6 +154,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		pictureCanvasContainer.add(profilePictureContainer);
 		pictureCanvasContainer.add(editPhotoButtonContainer);
+		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
+		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
+	}
+	
+	private ClickHandler getNotificationsClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//update notification settings
+				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
+			}
+		};
 	}
 
 
@@ -165,6 +183,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
@@ -181,6 +200,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
 			updateViewProfile(profile);
 			viewProfilePanel.add(profileWidget);
+			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
 				editPhotoButtonContainer.add(editPhotoLink);
 				editPhotoButtonContainer.layout();
@@ -194,6 +214,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				});
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
+				
+				boolean isNotify = true;
+				if(profile.getNotificationSettings() != null) {
+					isNotify = profile.getNotificationSettings().getSendEmailNotifications();
+				}
+				emailNotificationsCheckbox.setValue(isNotify, false);
 			}
 		}
 	}
@@ -396,5 +422,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editPhotoButtonContainer.removeAll();
 		profilePictureContainer.removeAll();
 		pictureCanvasContainer.setVisible(false);
+		notificationsPanel.setVisible(false);
 	}
 }

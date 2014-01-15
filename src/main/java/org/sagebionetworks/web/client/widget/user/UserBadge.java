@@ -40,7 +40,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//get the user id from the descriptor, and pass to the other configure
 		configure(widgetDescriptor.get(WidgetConstants.USERBADGE_WIDGET_ID_KEY));
 	}

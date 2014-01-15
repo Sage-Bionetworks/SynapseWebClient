@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 
+import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
@@ -57,7 +58,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	private TreeStore<EntityTreeModel> store;
 	private HashMap<String, ImageResource> typeToIcon = new HashMap<String, ImageResource>();
 	private boolean makeLinks = true;
-	private boolean showContextMenu = true;
+	private Integer height = null; 
 	
 	@Override
 	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
@@ -68,7 +69,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	    tree = new TreePanel<EntityTreeModel>(store);  
 	    tree.setStateful(true);  
 	    tree.setDisplayProperty(EntityTreeModel.KEY_LINK); 
-	    tree.setBorders(false);	    	    
+	    tree.setBorders(false);
 	    
 	    // statefull components need a defined id  
 	    tree.setId("statefullasyncentitytree_" + (Math.random()*100));  
@@ -99,51 +100,29 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 		});
 		tree.setAutoHeight(true);
 		tree.setAutoWidth(true);
-		
-		
-		configureContextMenu();
-		
+				
 		cp = new ContentPanel();  
 	    cp.setHeaderVisible(false);  
 	    cp.setLayout(new FitLayout());  
 	    cp.add(tree);  
-	    cp.setAutoHeight(true);
+	    determineHeight();	    
 	    cp.setAutoWidth(true);
 	    cp.setBorders(false);
 	    add(cp);  		
 	};
 		
-	private void configureContextMenu() {
-		if(tree == null) return;
-		if(showContextMenu) {
-			Menu contextMenu = new Menu();
-	
-			MenuItem remove = new MenuItem();
-			remove.setText("Delete");
-			remove.setIcon(AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			remove.addSelectionListener(new SelectionListener<MenuEvent>() {
-				public void componentSelected(MenuEvent ce) {
-					final EntityTreeModel model = tree.getSelectionModel().getSelectedItem();
-					if (model != null) {
-						MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + model.get(EntityTreeModel.KEY_NAME), DisplayConstants.PROMPT_SURE_DELETE + " " + model.get(EntityTreeModel.KEY_NAME) +"?", new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 												
-								Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.deleteEntity(model);
-									
-								}
-							}
-						});					
-					}
+	private void determineHeight() {
+		if(cp != null) {
+			if(height == null) {
+				cp.setAutoHeight(true);
+				cp.setScrollMode(Scroll.NONE);
+			} else {
+				if(isRendered()) {
+					cp.setAutoHeight(false);
+					cp.setHeight(height);
+					cp.setScrollMode(Scroll.AUTO);
 				}
-			});
-			contextMenu.add(remove);
-	
-			tree.setContextMenu(contextMenu);
-		} else {
-			
-			tree.setContextMenu(null);
+			}
 		}
 	}
 
@@ -204,13 +183,6 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	public void setMakeLinks(boolean makeLinks) {
 		this.makeLinks = makeLinks;
 	}
-
-	@Override
-	public void setShowContextMenu(boolean showContextMenu) {
-		this.showContextMenu = showContextMenu;
-		configureContextMenu();
-	}
-
 	
 	/*
 	 * Private Methods
@@ -304,6 +276,12 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	@Override
 	public void removeEntity(EntityTreeModel entityModel) {
 		store.remove(entityModel);
+	}
+
+	@Override
+	public void setWidgetHeight(int height) {
+		this.height = height;
+		determineHeight();		
 	}
 	
 }

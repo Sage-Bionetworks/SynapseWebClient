@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -23,7 +25,6 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -43,7 +44,6 @@ public class PasswordResetPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	SageImageBundle mockSageImageBundle;
 	IconsImageBundle mockIconsImageBundle;
-	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
 	PasswordReset place = Mockito.mock(PasswordReset.class);
 	UserSessionData currentUserSessionData = new UserSessionData();
@@ -58,14 +58,13 @@ public class PasswordResetPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSageImageBundle = mock(SageImageBundle.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		
 		presenter = new PasswordResetPresenter(mockView, mockCookieProvider,
 				mockUserService, mockAuthenticationController,
 				mockSageImageBundle, mockIconsImageBundle,
-				mockGlobalApplicationState, mockNodeModelCreator);			
+				mockGlobalApplicationState);			
 		verify(mockView).setPresenter(presenter);
 		when(place.toToken()).thenReturn(ClientProperties.DEFAULT_PLACE_TOKEN);
 		currentUserSessionData.setProfile(new UserProfile());
@@ -79,7 +78,6 @@ public class PasswordResetPresenterTest {
 		reset(mockAuthenticationController);
 		reset(mockSageImageBundle);
 		reset(mockIconsImageBundle);
-		reset(mockNodeModelCreator);
 
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -87,7 +85,6 @@ public class PasswordResetPresenterTest {
 	
 	@Test
 	public void testStart() {
-		resetAll();
 		presenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -95,6 +92,22 @@ public class PasswordResetPresenterTest {
 		
 		presenter.start(panel, eventBus);		
 		verify(panel).setWidget(mockView);
+	}
+	
+	@Test
+	public void testSetPasswordLoad() {
+		AsyncMockStubber.callSuccessWith("tokenIsValid").when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		PasswordReset place = new PasswordReset("someSessionToken");
+		presenter.setPlace(place);		
+		verify(mockView).showResetForm();
+	}
+
+	@Test
+	public void testSetPasswordLoadFail() {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		PasswordReset place = new PasswordReset("someSessionToken");
+		presenter.setPlace(place);		
+		verify(mockView).showExpiredRequest();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,7 +119,7 @@ public class PasswordResetPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
-		verify(mockView).showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
+		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
 		//verify that place is changed to Home
 		verify(mockPlaceChanger).goTo(any(Home.class));
 	}

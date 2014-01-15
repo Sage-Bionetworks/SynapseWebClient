@@ -141,7 +141,7 @@ public interface SynapseClientAsync {
     public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
     public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
     public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiPageJson, Long versionToUpdate, AsyncCallback<String> callback);
+    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate, AsyncCallback<String> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
     public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
     public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
@@ -254,4 +254,6 @@ public interface SynapseClientAsync {
 	void getColumnModelBatch(List<String> columnIds, AsyncCallback<String> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
+	
+	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
 }

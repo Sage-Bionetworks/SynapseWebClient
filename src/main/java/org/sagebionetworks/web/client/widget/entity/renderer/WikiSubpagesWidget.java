@@ -28,7 +28,9 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
@@ -44,8 +46,8 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Synapse ownerObjectLink;
-	private HTMLPanel markdownContainer;
-	private ResizeLayoutPanel parentContainer;
+	private FlowPanel wikiSubpagesContainer;
+	private FlowPanel wikiPageContainer;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
@@ -57,13 +59,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 		view.setPresenter(this);
 	}	
 	@Override
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, ResizeLayoutPanel parentContainer, HTMLPanel markdownContainer) {
-		this.parentContainer = parentContainer;
-		this.markdownContainer = markdownContainer;
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+		this.wikiPageContainer = wikiPageContainer;
+		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
 		view.clear();
 		//figure out owner object name/link
@@ -155,7 +157,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 						}
 					}
 					
-					view.configure(root, parentContainer, markdownContainer);
+					view.configure(root, wikiSubpagesContainer, wikiPageContainer);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}

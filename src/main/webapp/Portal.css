@@ -863,6 +863,20 @@ h1, h2, h3, h4, h5, h6 {
 	margin-bottom: 4px;
 }
 
+/** WikiPage Markdown History Widget **/
+.wikiHistoryButton {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.wikiVersionNotice {
+	font-size: 15px;		
+}
+
+.markdownHi
+
 /** content type div sizes *********/
 .youtube {
 	width: 480px;
@@ -1350,6 +1364,9 @@ a.projectTitle:hover {
 	padding-right: 15px !important;
 }
 
+.padding-left-0 {
+	padding-left: 0px;
+}
 .padding-left-5 {
 	padding-left: 5px;
 }
@@ -1359,6 +1376,9 @@ a.projectTitle:hover {
 
 .padding-left-10 {
 	padding-left: 10px;
+}
+.padding-left-30 {
+	padding-left: 30px;
 }
 
 .padding-left-74 {
@@ -1456,6 +1476,48 @@ a.projectTitle:hover {
   }
 }
 
+/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
+/* By default it's not affixed in mobile views, so undo that */
+
+/* First level of nav */
+.bs-sidenav {
+  margin-top: 30px;
+  margin-bottom: 5px;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.bs-sidebar {
+  padding: 5px 10px 30px 0px;
+}
+
+/* All levels of nav */
+.bs-sidebar .nav > li > a {
+  display: block;
+  color: #BC3226;
+  padding: 5px 20px;
+}
+.bs-sidebar .nav > li > a:hover,
+.bs-sidebar .nav > li > a:focus {
+  text-decoration:underline;
+  background-color: transparent;
+  border-right: 1px solid #BC3226;
+}
+.bs-sidebar .nav > .active > a,
+.bs-sidebar .nav > .active:hover > a,
+.bs-sidebar .nav > .active:focus > a {
+  font-weight: bold;
+  color: black;
+  text-decoration:none;
+  background-color: transparent;
+  border-right: 0px;
+}
+
+.bs-sidebar .nav .nav > li > a {
+  padding-top:    3px;
+  padding-bottom: 3px;
+  padding-left: 30px;
+  font-size: 90%;
+}
 
 /*===========*/
 

@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -133,7 +134,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     layout.setLabelWidth(100);  
 		     fieldSet.setLayout(layout);  
 		     
-		     final TextField<String> email = new TextField<String>();  
+		     final TextField<String> email = new TextField<String>();
+		     email.setRegex(WebConstants.VALID_EMAIL_REGEX);
+		     email.getMessages().setRegexText(WebConstants.INVALID_EMAIL_MESSAGE);
 		     email.setFieldLabel("Email Address");
 		     email.setAllowBlank(false);
 		     email.setId(DisplayConstants.ID_INP_EMAIL_ADDRESS);
@@ -162,7 +165,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 					public void componentSelected(ButtonEvent ce) {
 						if(validateForm(email, firstName, lastName)) {
 							DisplayUtils.changeButtonToSaving(registerButton, sageImageBundle);						
-							presenter.registerUser(email.getValue(), firstName.getValue(), lastName.getValue());
+							presenter.registerUser(email.getValue(), firstName.getValue().trim(), lastName.getValue().trim());
 						} else {
 							showErrorMessage(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
 						}
@@ -186,9 +189,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	 }
 
 	private boolean validateForm(TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
-		if (email.getValue() != null && email.getValue().length() > 0
-				&& firstName.getValue() != null && firstName.getValue().length() > 0
-				&& lastName.getValue() != null && lastName.getValue().length() > 0) {
+		if (email.getValue() != null && email.getValue().length() > 0 && email.isValid() 
+				&& firstName.getValue() != null && firstName.getValue().trim().length() > 0
+				&& lastName.getValue() != null && lastName.getValue().trim().length() > 0) {
 			return true;
 		}
 		return false;

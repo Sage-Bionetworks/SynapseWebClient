@@ -77,6 +77,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -116,7 +117,6 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -124,7 +124,7 @@ import com.google.inject.Inject;
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-	// This will be appened to the User-Agent header.
+	// This will be appended to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
@@ -1406,14 +1406,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
     @Override
     public String restoreV2WikiPage(String ownerId, String ownerType,
-                    String wikiPageJson, Long versionToUpdate)
+                    String wikiId, Long versionToUpdate)
                     throws RestServiceException {
             org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
             try {
-                    JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-                    @SuppressWarnings("unchecked")
-                    V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,V2WikiPage.class);
-                    V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId, ObjectType.valueOf(ownerType), page, versionToUpdate);
+                    V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId, ObjectType.valueOf(ownerType), wikiId, versionToUpdate);
                     return EntityFactory.createJSONStringForEntity(returnPage);
             } catch (SynapseException e) {
                     throw ExceptionUtil.convertSynapseException(e);
@@ -1506,19 +1503,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     }
     
     @Override
-	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException {
+	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile = synapseClient.downloadV2WikiMarkdown(properKey);
-		return FileUtils.readFileToString(markdownFile, "UTF-8");
+		try {
+			return synapseClient.downloadV2WikiMarkdown(properKey);
+		} catch(SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override
-	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException {
+	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-		File markdownFile = synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
-		return FileUtils.readFileToString(markdownFile, "UTF-8");
+		try {
+			return synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
+		}catch (SynapseException e) {
+            throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 	
 	@Override
@@ -2168,7 +2171,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				fileEntity = synapseClient.putEntity(fileEntity);
 			}
 			//fix name and lock down
-			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient);
+			boolean changeName = entityId == null && parentEntityId != null; // don't change entity name on update 
+			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient, changeName);
 			return fileEntity.getId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2437,7 +2441,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		private static String getProperty(String key) {
 			return props.getProperty(key);
 		}
-				
 	}
 
 	@Override
@@ -2514,7 +2517,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	
-	
-	
+	@Override
+	public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			MessageToUser message = new MessageToUser();
+			message.setRecipients(recipients);
+			message.setSubject(subject);
+			MessageToUser sentMessage = synapseClient.sendStringMessage(message, messageBody);
+			JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
+			return sentMessageJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 }

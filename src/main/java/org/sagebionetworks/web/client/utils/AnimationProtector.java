@@ -16,7 +16,8 @@ public class AnimationProtector {
 	private FxConfig userHideConfig = null;
 	private FxConfig showConfig     = null;
 	private FxConfig userShowConfig = null;
-
+	private Direction outDirection, inDirection;
+	
 	private boolean animating = false;
 
 	private HandlerRegistration clickRegistration = null;
@@ -41,6 +42,8 @@ public class AnimationProtector {
 					userHideConfig.getEffectCompleteListener().handleEvent(be);
 			}
 		});
+		outDirection = Direction.UP;
+		inDirection = Direction.DOWN;
 	}
 
 	public void setView(AnimationProtectorView view) {
@@ -107,14 +110,22 @@ public class AnimationProtector {
 
 			if (!shouldBeVisible && isCurrentlyVisible) {
 				animating = true;
-				view.slideContainerOut(Direction.UP, hideConfig);
+				view.slideContainerOut(outDirection, hideConfig);
 
 			} else if (shouldBeVisible && !isCurrentlyVisible) {
 				animating = true;
 				view.setContainerVisible(true);
-				view.slideContainerIn(Direction.DOWN, showConfig);
+				view.slideContainerIn(inDirection, showConfig);
 			}
 		}
+	}
+	
+	public void setInDirection(Direction inDirection) {
+		this.inDirection = inDirection;
+	}
+	
+	public void setOutDirection(Direction outDirection) {
+		this.outDirection = outDirection;
 	}
 	
 	public boolean isVisible() {

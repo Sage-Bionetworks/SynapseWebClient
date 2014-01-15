@@ -94,7 +94,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 //	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.widgetRefreshRequired = widgetRefreshRequired;
 		this.teamId = null;
 		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) 

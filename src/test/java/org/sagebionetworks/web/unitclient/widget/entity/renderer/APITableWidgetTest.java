@@ -114,7 +114,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
@@ -132,7 +132,7 @@ public class APITableWidgetTest {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY);
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE);
 		
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 	}
 	
@@ -149,7 +149,7 @@ public class APITableWidgetTest {
 		};
 		//return our renderer that always fails to initialize when asked for the Synapse ID column renderer
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		
 		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
@@ -160,7 +160,7 @@ public class APITableWidgetTest {
 	@Test
 	public void testMissingServiceURI() throws JSONObjectAdapterException {
 		descriptor.remove(WidgetConstants.API_TABLE_WIDGET_PATH_KEY);
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).showError(anyString());
 	}
 	
@@ -169,14 +169,14 @@ public class APITableWidgetTest {
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).showError(eq(errorMessage));
 	}
 	
 	@Test
 	public void testNoPaging() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "false");
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -184,21 +184,21 @@ public class APITableWidgetTest {
 	@Test
 	public void testPagerNotNecessary() throws JSONObjectAdapterException {
 		testReturnJSONObject.put("totalNumberOfResults", 2);
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView, Mockito.times(0)).configurePager(anyInt(), anyInt(), anyInt());
 	}
 	
 	@Test
 	public void testPagingURI() throws JSONObjectAdapterException {
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		String pagedURI = widget.getPagedURI(TESTSERVICE_PATH);
 		assertEquals(TESTSERVICE_PATH + "?limit=10&offset=0", pagedURI.toLowerCase());
 	}
 	
 	@Test
 	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
 		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
@@ -213,7 +213,7 @@ public class APITableWidgetTest {
 		String testUserId = "12345test";
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
 		
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
@@ -225,7 +225,7 @@ public class APITableWidgetTest {
 	public void testLoggedInOnly() throws JSONObjectAdapterException {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_SHOW_IF_LOGGED_IN, "true");
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(testWikiKey, descriptor, null);
+		widget.configure(testWikiKey, descriptor, null, null);
 		
 		verify(mockView).clear();
 		verify(mockView, times(0)).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));

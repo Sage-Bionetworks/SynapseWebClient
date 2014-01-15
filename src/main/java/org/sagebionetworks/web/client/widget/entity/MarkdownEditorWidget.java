@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.Style.VerticalAlignment;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -223,6 +223,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			saveButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
+					DisplayUtils.changeButtonToSaving(saveButton);
 					saveHandler.saveClicked();
 				}
 			});
@@ -378,7 +379,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}
 		DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 		MarkdownWidget.loadMath(panel, synapseJSNIUtils, true, resourceLoader);
-		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true, null);
+		MarkdownWidget.loadWidgets(panel, wikiKey, isWiki, widgetRegistrar, synapseClient, iconsImageBundle, true, null, null);
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
@@ -389,7 +390,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	public void showFormattingGuideDialog() {
         final Dialog window = new Dialog();
         window.setMaximizable(false);
-        window.setSize(550, 600);
+        window.setSize(590, 600);
         window.setPlain(true); 
         window.setModal(true); 
 

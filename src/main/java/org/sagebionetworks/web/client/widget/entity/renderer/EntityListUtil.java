@@ -31,6 +31,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -166,7 +167,8 @@ public class EntityListUtil {
 		// download
 		String downloadUrl = null;
 		if(!isLoggedIn) {				
-			downloadUrl = "#!" + nameLinkUrl;
+			if(bundle.getEntity() instanceof FileEntity || bundle.getEntity() instanceof Locationable)
+				downloadUrl = "#" + nameLinkUrl;
 		} else if(referencedEntity instanceof Locationable) {
 			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
 			if(locations != null && locations.size() > 0) {

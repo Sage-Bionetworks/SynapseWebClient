@@ -20,7 +20,7 @@ public class EmptyWidget implements EmptyWidgetView.Presenter, WidgetRendererPre
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 	}
 	
 	@Override

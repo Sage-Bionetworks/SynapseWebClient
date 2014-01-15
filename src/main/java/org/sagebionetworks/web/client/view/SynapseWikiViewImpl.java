@@ -6,11 +6,11 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,9 +25,8 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 	SimplePanel footer;
 	
 	@UiField
-	SimplePanel fullWidthPanel;
+	FlowPanel mainContainer;
 
-	private LayoutContainer fullWidthContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -81,10 +80,9 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 
 	@Override
 	public void showPage(final WikiPageKey wikiKey, final boolean canEdit){
-		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
-		fullWidthContainer.removeAll();
+		mainContainer.clear();
 		
-		fullWidthContainer.add(wikiPage.asWidget());
+		mainContainer.add(wikiPage.asWidget());
 		wikiPage.configure(wikiKey, canEdit, new WikiPageWidget.Callback() {
 			@Override
 			public void pageUpdated() {
@@ -94,20 +92,5 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 			public void noWikiFound() {
 			}
 		}, false, 24);
-		fullWidthContainer.layout(true);
 	}
-
-	
-	private LayoutContainer initContainerAndPanel(LayoutContainer container,
-			SimplePanel panel) {
-		if (container == null) {
-			container = new LayoutContainer();
-			container.setAutoHeight(true);
-			container.setAutoWidth(true);
-			panel.clear();
-			panel.add(container);
-		}
-		return container;
-	}
-
 }

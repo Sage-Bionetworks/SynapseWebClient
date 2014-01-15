@@ -20,7 +20,6 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FileUploadField;
-import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
@@ -105,24 +104,9 @@ public class AddAttachmentDialog {
 		file.setName("uploadedfile");
 		file.setFieldLabel("File");
 		
-		file.addListener(Events.OnChange, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				final String fullPath = file.getValue();
-				final int lastIndex = fullPath.lastIndexOf('\\');
-				final String fileName = fullPath.substring(lastIndex + 1);
-				file.setValue(fileName);
-			}
-		});
-		file.setWidth(365);
-		
-		FormData basicFormData = new FormData("-50");
-		Margins margins = new Margins(10, 10, 0, 10);
-		basicFormData.setMargins(margins);
-		
-		panel.add(file, basicFormData);
-
-		Button btn = new Button(buttonText);
+		final Button btn = new Button(buttonText);
+		// Disable until file is selected
+		btn.disable();
 		btn.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -137,8 +121,25 @@ public class AddAttachmentDialog {
 				loading.show();
 			}
 		});
-	    FormButtonBinding binding = new FormButtonBinding(panel);  
-	    binding.addButton(btn);
+		
+		file.addListener(Events.OnChange, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				final String fullPath = file.getValue();
+				final int lastIndex = fullPath.lastIndexOf('\\');
+				final String fileName = fullPath.substring(lastIndex + 1);
+				file.setValue(fileName);
+				// Now enable for submission
+				btn.enable();
+			}
+		});
+		file.setWidth(365);
+		
+		FormData basicFormData = new FormData("-50");
+		Margins margins = new Margins(10, 10, 0, 10);
+		basicFormData.setMargins(margins);
+		
+		panel.add(file, basicFormData);
 		// If we do not add this button the panel then it is not part of the form
 		panel.addButton(btn);
 		// Listen to update events
@@ -153,6 +154,10 @@ public class AddAttachmentDialog {
 				result.setUploadStatus(UploadStatus.SUCCESS);
 				if(event != null && event.getResultHtml() != null){
 					result = getUploadResult(event.getResultHtml());
+				}
+				// Disable upload button if this upload was successful
+				if(UploadStatus.SUCCESS == result.getUploadStatus()) {
+					btn.disable();
 				}
 				// Let the caller know we are done.
 				callback.onSaveAttachment(result);

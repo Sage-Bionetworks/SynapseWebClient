@@ -3,9 +3,6 @@ package org.sagebionetworks.web.server.servlet;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
-import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.UserGroup;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -192,11 +189,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		if (publicPrincipalIds == null) {
 			try {
 				validateService();
-				SynapseClient synapseClient = createSynapseClient();
-				SynapseClient anonymousClient = createAnonymousSynapseClient();
-				UserProfile anonymousProfile = anonymousClient.getMyProfile();
-				String anonymousPrincipalId = anonymousProfile.getOwnerId();
-				initPublicAndAuthenticatedPrincipalIds(synapseClient, anonymousPrincipalId);
+				initPublicAndAuthenticatedPrincipalIds();
 			} catch (Exception e) {
 				throw new RestClientException(e.getMessage());
 			}
@@ -204,21 +197,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		return publicPrincipalIds;
 	}
 	
-	public static void initPublicAndAuthenticatedPrincipalIds(SynapseClient synapseClient, String anonymousPrincipalId) {
+	public static void initPublicAndAuthenticatedPrincipalIds() {
 		try {
-			//TODO:  change to synapseClient.getUserGroupHeadersByPrefix() after exposure?
 			PublicPrincipalIds results = new PublicPrincipalIds();
-			results.setAnonymousUserId(Long.parseLong(anonymousPrincipalId));
-			PaginatedResults<UserGroup> allGroups = synapseClient.getGroups(0, Integer.MAX_VALUE);
-			
-			for (UserGroup userGroup : allGroups.getResults()) {
-				if (userGroup.getName() != null){
-//					if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.PUBLIC.name()))
-//						results.setPublicAclPrincipalId(Long.parseLong(userGroup.getId()));
-//					else if (userGroup.getName().equals(AuthorizationConstants.DEFAULT_GROUPS.AUTHENTICATED_USERS.name()))
-//						results.setAuthenticatedAclPrincipalId(Long.parseLong(userGroup.getId()));
-				}
-			}
+			results.setPublicAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.PUBLIC_GROUP.getPrincipalId());
+			results.setAuthenticatedAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.AUTHENTICATED_USERS_GROUP.getPrincipalId());
+			results.setAnonymousUserId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.ANONYMOUS_USER.getPrincipalId());
 			
 			publicPrincipalIds = results;
 		} catch (Exception e) {

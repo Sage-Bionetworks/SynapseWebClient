@@ -379,6 +379,20 @@ public class DisplayUtils {
 				if (matchResult != null)
 					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
 			}
+			
+			//final attempt to communicate a more relevant message. do this by looking for the "reason" stated in the response
+			if (DisplayConstants.ERROR_BAD_REQUEST_MESSAGE.equals(message)) {
+				//look for something in the form: "reason":"This is the reason for the error"
+				RegExp regEx = RegExp.compile("\"reason\"\\s*:\\s*\"(.+)\"", "gm");
+				MatchResult matchResult = regEx.exec(reason);
+				if (matchResult != null && matchResult.getGroupCount()==2) {
+					String parsedReason = matchResult.getGroup(1);
+					if (parsedReason != null && parsedReason.trim().length() > 0) {
+						message = parsedReason;
+					}
+				}
+			}
+			
 			view.showErrorMessage(message);
 			return true;
 		} else if(ex instanceof NotFoundException) {
@@ -422,6 +436,15 @@ public class DisplayUtils {
 		button.setText(DisplayConstants.BUTTON_SAVING);
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
 	}
+	
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
+		button.addStyleName("disabled");
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
+	}
+
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -519,7 +542,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);  
+		com.google.gwt.user.client.Window.alert(message);  
 	}
 	
 	public static void showOkCancelMessage(
@@ -1416,7 +1439,7 @@ public class DisplayUtils {
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
 				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
-						+ DisplayConstants.UNAUTHORIZED
+						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
 						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
@@ -1535,6 +1558,21 @@ public class DisplayUtils {
 	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
 
+	/**
+	 * Create the URL to a version of a wiki's attachments.
+	 * @param baseFileHandleUrl
+	 * @param wikiKey
+	 * @param fileName
+	 * @param preview
+	 * @param wikiVersion
+	 * @return
+	 */
+	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
+			boolean preview, Long wikiVersion) {
+		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
+		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
+	}
+	
 	/**
 		 * Create the url to a wiki filehandle.
 		 * @param baseURl
@@ -1982,5 +2020,10 @@ public class DisplayUtils {
 		InlineHTML label = new InlineHTML(text);
 		label.addStyleName("help-block");
 		return label;
+	}
+
+	public static String getShareMessage(String entityId, String hostUrl) {
+		return DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
+		//alternatively, could use the gwt I18n Messages class client side
 	}
 }

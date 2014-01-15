@@ -135,7 +135,7 @@ public class FileHandleServlet extends HttpServlet {
 		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
 		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
-		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);
+		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
 		URL resolvedUrl = null;
 		if (redirectUrlString != null) {
 			//simple redirect
@@ -146,12 +146,24 @@ public class FileHandleServlet extends HttpServlet {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
 			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-
-			// Redirect the user to the temp preview url
-			if (isPreview)
-				resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
-			else
-				resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
+			String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
+			
+			// Redirect the user to the url
+			// If we're rendering a version of a wiki page, 
+			// we must get the URL for the attachment from that version of the wiki
+			if(wikiVersion != null) {
+				if(isPreview) {
+					resolvedUrl = client.getVersionOfV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName, new Long(wikiVersion));
+				} else {
+					resolvedUrl = client.getVersionOfV2WikiAttachmentTemporaryUrl(properKey, fileName, new Long(wikiVersion));
+				}
+			} else {
+				if(isPreview) {
+					resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
+				} else {
+					resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
+				}
+			}
 			//Done
 		}
 		else if (entityId != null) {
@@ -278,7 +290,7 @@ public class FileHandleServlet extends HttpServlet {
 					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client);
+					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client, true);
 				}
 			}
 			
@@ -321,15 +333,17 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity = client.createEntity(fileEntity);
 		return fileEntity;
 	}
-	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client) throws SynapseException {
+	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client, boolean setNameAsFileName) throws SynapseException {
+		if(setNameAsFileName) {
 		String originalFileEntityName = fileEntity.getName();
-		try{
-			//and try to set the name to the filename
-			fileEntity.setName(newFileHandle.getFileName());
-			fileEntity = client.putEntity(fileEntity);
-		} catch(Throwable t){
-			fileEntity.setName(originalFileEntityName);
-		};
+			try{
+				//and try to set the name to the filename
+				fileEntity.setName(newFileHandle.getFileName());
+				fileEntity = client.putEntity(fileEntity);
+			} catch(Throwable t){
+				fileEntity.setName(originalFileEntityName);
+			};
+		}
 		
 		// now lock down restricted data
 		if (isRestricted) {
