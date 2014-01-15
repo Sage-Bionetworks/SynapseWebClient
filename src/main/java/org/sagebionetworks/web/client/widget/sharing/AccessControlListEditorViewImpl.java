@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -126,14 +125,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		if (!aclEntry.getPrincipal().getIsIndividual())
+		if (!aclEntry.isIndividual())
 			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), 0); // insert groups first
 		else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
 			for (; insertIndex < permissionsStore.getCount(); insertIndex++) {
-				UserGroupHeader item = permissionsStore.getAt(insertIndex).getAclEntry().getPrincipal();
-				if (item.getIsIndividual())
+				if (permissionsStore.getAt(insertIndex).getAclEntry().isIndividual())
 					break;
 			}
 			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), insertIndex); // insert owner
@@ -233,7 +231,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			
 			
 			// user/group combobox
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
+			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
 			peopleCombo.setEmptyText("Enter name...");
 			peopleCombo.setFieldLabel("Name");
 			peopleCombo.setForceSelection(true);
@@ -435,7 +433,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	private Menu createEditAccessMenu(final AclEntry aclEntry) {
-		final Long principalId = Long.parseLong(aclEntry.getPrincipal().getOwnerId());
+		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
 		Menu menu = new Menu();
 		menu.setEnableScrolling(false);
 		MenuItem item;
@@ -486,50 +484,54 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					ListStore<PermissionsTableEntry> store,
 					Grid<PermissionsTableEntry> grid) {
 				PermissionsTableEntry entry = store.getAt(rowIndex);
-				UserGroupHeader principal = entry.getAclEntry().getPrincipal();
+				AclEntry aclEntry = entry.getAclEntry();
 				String principalHtml = "";
 				Long publicPrincipalId = publicPrincipalIds.getPublicAclPrincipalId();
 				Long authenticatedPrincipalId = publicPrincipalIds.getAuthenticatedAclPrincipalId();
 				Long anonymousUserPrincipalId = publicPrincipalIds.getAnonymousUserPrincipalId();
 				
-				if (principal != null) {
-					if (publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString())) {
+				if (aclEntry != null & aclEntry.getOwnerId() != null) {
+					if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())) {
 						//is public group
-						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
-					} else if (authenticatedPrincipalId != null && principal.getOwnerId().equals(authenticatedPrincipalId.toString())) {
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
+					} else if (authenticatedPrincipalId != null && aclEntry.getOwnerId().equals(authenticatedPrincipalId.toString())) {
 						//is authenticated group
-						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);	
-					} else if (anonymousUserPrincipalId != null && principal.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);	
+					} else if (anonymousUserPrincipalId != null && aclEntry.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
 						//is anonymous user
-						principalHtml = DisplayUtils.getUserNameEmailHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
-					} else
-						principalHtml = DisplayUtils.getUserNameEmailHtml(principal);
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
+					} else if (aclEntry.isIndividual() && aclEntry.getProfile() != null) {
+						principalHtml = DisplayUtils.getUserListItemHtml(aclEntry.getProfile());
+					} else if (!aclEntry.isIndividual() && aclEntry.getTeam() != null) {
+						principalHtml = DisplayUtils.getUserListItemHtml(aclEntry.getTeam());
+					} else {
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(aclEntry.getDisplayName(), "");
+					}
 				}
 				
 				String iconHtml = "";
-				if (principal.getPic() != null) {
-					// Principal has a profile picture
-					String url = DisplayUtils.createUserProfileAttachmentUrl(
-							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
-							principal.getOwnerId(), 
-							principal.getPic().getPreviewId(), 
-							null
-					);
-					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				} else if (publicPrincipalId != null && principal.getOwnerId().equals(publicPrincipalId.toString())){
+				if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())){
 					ImageResource icon = iconsImageBundle.globe32();
 					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
-				} else if (!principal.getIsIndividual()) {
+				} else if (!aclEntry.isIndividual() && aclEntry.getTeam() != null) {
 					//if a group, then try to fill in the icon from the team
 					String url = DisplayUtils.createTeamIconUrl(
 							synapseJSNIUtils.getBaseFileHandleUrl(), 
-							principal.getOwnerId()
+							aclEntry.getOwnerId()
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				
+				} else if (aclEntry.getProfile() != null && aclEntry.getProfile().getPic() != null) {
+					// Principal has a profile picture
+					String url = DisplayUtils.createUserProfileAttachmentUrl(
+							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
+							aclEntry.getOwnerId(), 
+							aclEntry.getProfile().getPic().getPreviewId(), 
+							null
+					);
+					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
 				} else {
 					// Default to generic user or group avatar
-					ImageResource icon = principal.getIsIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
+					ImageResource icon = aclEntry.isIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
 					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
 				}
 				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
@@ -593,7 +595,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					removeAnchor.addClickHandler(new ClickHandler() {			
 						@Override
 						public void onClick(ClickEvent event) {
-							Long principalId = (Long.parseLong(entry.getAclEntry().getPrincipal().getOwnerId()));
+							Long principalId = (Long.parseLong(entry.getAclEntry().getOwnerId()));
 							callback.invoke(principalId);
 						}
 					});

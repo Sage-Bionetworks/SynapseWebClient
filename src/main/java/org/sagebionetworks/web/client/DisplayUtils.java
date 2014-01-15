@@ -186,15 +186,23 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and e-mail address for a given UserGroupHeader
+	 * Returns a properly aligned name and username for a given UserProfile
 	 * @param principal
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(UserGroupHeader principal) {
-		if (principal == null) return "";
-		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
-		String email = principal.getEmail() == null ? "" : principal.getEmail();
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
+	public static String getUserListItemHtml(UserProfile profile) {
+		if (profile == null) return "";
+		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(getDisplayName(profile), "").asString();
+	}
+	
+	/**
+	 * Returns a properly aligned name for a given Team
+	 * @param principal
+	 * @return
+	 */
+	public static String getUserListItemHtml(org.sagebionetworks.repo.model.Team team) {
+		if (team == null) return "";
+		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(team.getName(), "").asString();
 	}
 	
 	/**
@@ -202,8 +210,8 @@ public class DisplayUtils {
 	 * @param name of user or group
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, description).asString();
+	public static String getUserNameDescriptionHtml(String name, String description) {
+		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
 	}
 	
 	
@@ -575,19 +583,23 @@ public class DisplayUtils {
 	}
 	
 	public static String getDisplayName(UserProfile profile) {
+		return getDisplayName(profile.getFirstName(), profile.getLastName(), profile.getUserName());
+	}
+	
+	public static String getDisplayName(String firstName, String lastName, String userName) {
 		StringBuilder sb = new StringBuilder();
 		boolean hasDisplayName = false;
-		if (profile.getFirstName() != null) {
-			sb.append(profile.getFirstName().trim());
+		if (firstName != null) {
+			sb.append(firstName.trim());
 			hasDisplayName = true;
 		}
-		if (profile.getLastName() != null) {
+		if (lastName != null) {
 			sb.append(" ");
-			sb.append(profile.getLastName().trim());
+			sb.append(lastName.trim());
 			hasDisplayName = true;
 		}
 		
-		sb.append(getUserName(profile, hasDisplayName));
+		sb.append(getUserName(userName, hasDisplayName));
 		
 		return sb.toString();
 	}
@@ -597,14 +609,14 @@ public class DisplayUtils {
 		return username.startsWith(WebConstants.TEMPORARY_USERNAME_PREFIX);
 	}
 
-	public static String getUserName(UserProfile profile, boolean inParens) {
+	public static String getUserName(String userName, boolean inParens) {
 		StringBuilder sb = new StringBuilder();
 		
-		if (profile.getUserName() != null && !isTemporaryUsername(profile.getUserName())) {
+		if (userName != null && !isTemporaryUsername(userName)) {
 			//if the name is filled in, then put the username in parens
 			if (inParens)
 				sb.append(" (");
-			sb.append(profile.getUserName());
+			sb.append(userName);
 			if (inParens)
 				sb.append(")");
 		}
@@ -1061,7 +1073,11 @@ public class DisplayUtils {
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
 		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
-	
+
+	public static String createUserProfilePicUrl(String baseURl, String userId){
+		return createAttachmentUrl(baseURl, userId, null, WebConstants.USER_PROFILE_PARAM_KEY);
+	}
+
 	/**
 	 * Create the url to an attachment image.
 	 * @param baseURl

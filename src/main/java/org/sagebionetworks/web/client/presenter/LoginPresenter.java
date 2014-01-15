@@ -156,7 +156,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				@Override
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully updated your username", "");
-					authenticationController.getCurrentUserSessionData().setProfile(profile);
+					authenticationController.updateCachedProfile(profile);
 					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 				}
 				

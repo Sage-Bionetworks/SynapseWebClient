@@ -68,7 +68,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				nameWidget = html;
 			}
 			//also add the username in a popup (in case this is a small view of the display name)
-			DisplayUtils.addToolTip(nameWidget, DisplayUtils.getUserName(profile, false));
+			DisplayUtils.addToolTip(nameWidget, DisplayUtils.getUserName(profile.getUserName(), false));
 			Image profilePicture; 
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				profilePicture = new Image();

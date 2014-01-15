@@ -67,6 +67,8 @@ public interface SynapseClientAsync {
 	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
 	
+	void getTeam(String teamId, AsyncCallback<String> callback);
+	
 	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
 	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
