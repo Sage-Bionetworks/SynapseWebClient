@@ -301,8 +301,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 private void updateViewProfile(UserProfile profile) {
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
-		 if (name.length() == 0)
-			 name = profile.getDisplayName();
 		 
 		 String company = fixIfNullString(profile.getCompany());
 		 String position = fixIfNullString(profile.getPosition());
