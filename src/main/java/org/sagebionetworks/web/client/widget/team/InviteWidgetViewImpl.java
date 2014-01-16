@@ -102,7 +102,6 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 					if(peopleCombo.getValue() != null) {
 						ModelData selectedModel = peopleCombo.getValue();
 						String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-//						String displayName = (String) selectedModel.get(UserGroupSearchBox.KEY_DISPLAY_NAME);
 						String userName = (String) selectedModel.get(UserGroupSearchBox.KEY_USERNAME);
 						presenter.sendInvitation(principalIdStr, messageArea.getValue(), userName);
 						//do not clear message, but do clear the target user

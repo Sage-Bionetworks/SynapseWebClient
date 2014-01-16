@@ -19,9 +19,6 @@ public class PermissionsTableEntry extends BaseModelData {
 	public PermissionsTableEntry(Map<PermissionLevel, String> permissionDisplay, AclEntry aclEntry) {			
 		super();
 		this.aclEntry = aclEntry;
-//		UserGroupHeader principal = aclEntry.getPrincipal();
-//		this.set(EvaluationAccessControlListEditorViewImpl.PRINCIPAL_COLUMN_ID, principal);			
-//		this.set(EvaluationAccessControlListEditorViewImpl.REMOVE_COLUMN_ID, principal);			
 		PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));			
 		if(level != null) {
 			this.set(EvaluationAccessControlListEditorViewImpl.ACCESS_COLUMN_ID, permissionDisplay.get(level)); 

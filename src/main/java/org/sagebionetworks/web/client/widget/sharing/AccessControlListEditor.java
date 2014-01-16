@@ -260,23 +260,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		}
 	}
-
-	public static void getUserProfile(String userId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory,  final AsyncCallback<UserProfile> callback){
-		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String userProfileJson) {
-				try {
-					callback.onSuccess(new UserProfile(adapterFactory.createNew(userProfileJson)));
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
 	
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
 		List<String> ids = new ArrayList<String>();

@@ -123,8 +123,6 @@ public class DisplayConstants {
 	public static final String GET_PATH_CLIENT_ENTITY = "Get the path to the local copy of the data file";
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
-	public static final String DUPLICATE_USERNAME_ERROR = "username has already been taken";
-	public static final String REQUIRED_USERNAME_ERROR = "username is required";
 	
 	/*
 	 * Service Constants (move to another file?)
