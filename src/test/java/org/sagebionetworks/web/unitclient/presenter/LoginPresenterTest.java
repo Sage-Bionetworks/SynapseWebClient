@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,10 +14,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -79,16 +83,27 @@ public class LoginPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
-				
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 	}	
+	
+	private void setPlace() {
+		LoginPlace place = Mockito.mock(LoginPlace.class);
+		loginPresenter.setPlace(place);
+	}
+	
+	private void setMyProfile(UserProfile profile) throws JSONObjectAdapterException {
+		jsonObjectAdapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
+		String userProfileJson = jsonObjectAdapter.toJSONString();
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
 	
 	@Test
 	public void testSetPlaceDefault() {
-		LoginPlace place = Mockito.mock(LoginPlace.class);
-		loginPresenter.setPlace(place);
+		setPlace();
 		Assert.assertEquals("/Portal.html?foo=bar#!LoginPlace", loginPresenter.getOpenIdReturnUrl());
 	}
 	
@@ -125,6 +140,53 @@ public class LoginPresenterTest {
 		
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).loginUserSSO(eq(fakeToken), any(AsyncCallback.class));
+		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+	}
+	
+	@Test
+	public void testUpdateProfile() {
+		setPlace();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		loginPresenter.updateProfile(profile);
+		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
+		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+	}
+	
+	@Test
+	public void testUpdateProfileFailed() {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		setPlace();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		loginPresenter.updateProfile(profile);
+		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockView).showSetUsernameFailed();
+	}
+	
+	@Test
+	public void testSetNewUserTempUsername() throws JSONObjectAdapterException {
+		//if the user has a temp username, then it should show the UI to set the username
+		setPlace();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
+		setMyProfile(profile);
+		loginPresenter.setNewUser(usd);
+		verify(mockView).showSetUsernameUI();
+	}
+	
+	@Test
+	public void testSetNewUser() throws JSONObjectAdapterException {
+		//if the user has a temp username, then it should show the UI to set the username
+		setPlace();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("chewbacca");
+		setMyProfile(profile);
+		loginPresenter.setNewUser(usd);
+		verify(mockView, never()).showSetUsernameUI();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
 

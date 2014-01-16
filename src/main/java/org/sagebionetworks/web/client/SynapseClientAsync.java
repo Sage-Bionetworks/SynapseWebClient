@@ -91,8 +91,6 @@ public interface SynapseClientAsync {
 
 	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	
-	public void getAllGroups(AsyncCallback<EntityWrapper> callback);
-	
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
 	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);

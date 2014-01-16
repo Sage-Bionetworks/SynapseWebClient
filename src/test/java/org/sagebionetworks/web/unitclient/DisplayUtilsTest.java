@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class DisplayUtilsTest {
 	
@@ -208,6 +209,30 @@ public class DisplayUtilsTest {
 		EntityHeader file = new EntityHeader();
 		path.setPath(Arrays.asList(new EntityHeader[] { root, project, file }));
 		assertEquals(project, DisplayUtils.getProjectHeader(path));
+	}
+	
+	@Test
+	public void testGetDisplayName() {
+		//DisplayUtils.getDisplayName(firstName, lastName, userName)
+		String fName = "Strong";
+		String lName = "Bad";
+		String userName = "SBEmail";
+		String tempUserName = WebConstants.TEMPORARY_USERNAME_PREFIX + "1234";
+		
+		//first, verify that the temp username is recognized as a temp username
+		assertTrue(DisplayUtils.isTemporaryUsername(tempUserName));
+		assertFalse(DisplayUtils.isTemporaryUsername(userName));
+		
+		//try combinations
+		//display of an old user (first name and last name are set, but has a temp username)
+		assertEquals("Strong Bad", DisplayUtils.getDisplayName(fName, lName, tempUserName));
+		
+		//possible new user state, where first and last names are not filled in during registration
+		assertEquals("SBEmail", DisplayUtils.getDisplayName(null, null, userName));
+		assertEquals("SBEmail", DisplayUtils.getDisplayName("", "", userName));
+		
+		//old user who has set the username
+		assertEquals("Strong Bad (SBEmail)", DisplayUtils.getDisplayName(fName, lName, userName));
 	}
 }
 

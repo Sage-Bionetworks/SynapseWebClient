@@ -569,11 +569,11 @@ public class DisplayUtils {
 	public static String getDisplayName(String firstName, String lastName, String userName) {
 		StringBuilder sb = new StringBuilder();
 		boolean hasDisplayName = false;
-		if (firstName != null) {
+		if (firstName != null && firstName.length() > 0) {
 			sb.append(firstName.trim());
 			hasDisplayName = true;
 		}
-		if (lastName != null) {
+		if (lastName != null && lastName.length() > 0) {
 			sb.append(" ");
 			sb.append(lastName.trim());
 			hasDisplayName = true;

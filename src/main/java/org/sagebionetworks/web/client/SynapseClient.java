@@ -171,8 +171,6 @@ public interface SynapseClient extends RemoteService {
 
 	public EntityWrapper getAllUsers() throws RestServiceException;
 	
-	public EntityWrapper getAllGroups() throws RestServiceException;
-
 	public String createUserProfileAttachmentPresignedUrl(String id,
 			String tokenOrPreviewId) throws RestServiceException;
 
