@@ -120,9 +120,6 @@ public class UserGroupSearchBox {
 				// jane42  |  114085
 				
 				StringBuilder sb = new StringBuilder();
-				Boolean isIndividual = value.get(KEY_IS_INDIVIDUAL);
-				if (isIndividual != null && !isIndividual)
-					sb.append("(Team) ");
 				
 //				sb.append(value.get(KEY_DISPLAY_NAME).toString());
 				
@@ -139,7 +136,12 @@ public class UserGroupSearchBox {
 				String username = value.get(KEY_USERNAME);
 				if (username != null && !DisplayUtils.isTemporaryUsername(username))
 					sb.append(username + "  |  ");
-				sb.append(value.get(KEY_PRINCIPAL_ID));				
+				sb.append(value.get(KEY_PRINCIPAL_ID));
+				
+				Boolean isIndividual = value.get(KEY_IS_INDIVIDUAL);
+				if (isIndividual != null && !isIndividual)
+					sb.append(" (Team)");
+
 				return sb.toString();
 			}
 			
@@ -173,9 +175,6 @@ public class UserGroupSearchBox {
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',
 				'<div>',
-				'<tpl if="!isIndividual">',
-			        '(Team) ',
-			    '</tpl>',
 				'<img class="margin-right-5 vertical-align-bottom tiny-thumbnail-image-container" src="',
 				'<tpl if="isIndividual">',
 					baseProfileAttachmentUrl,
@@ -186,8 +185,12 @@ public class UserGroupSearchBox {
 					baseFileHandleUrl,
 					'?teamId={ownerId}" />',
 			    '</tpl>',
-				'<span class="search-item" qtitle="{userName}" qtip="{userName}">',
-				'{userName}</span>',
+				'<span class="search-item margin-right-5">',
+				'{firstName} {lastName} <span class="boldText">{userName}</span></span>',
+				'<tpl if="!isIndividual">',
+			        '(Team)',
+			    '</tpl>',
+				
 				'</div>',
 				'</tpl>' ].join("");
 				
