@@ -13,7 +13,9 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -64,6 +66,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	PublicPrincipalIds publicPrincipalIds;
 	GWTWrapper gwt;
 	
+	private AdapterFactory adapterFactory;
+	
 	// Entity components
 	private Entity entity;
 	private UserEntityPermissions uep;
@@ -79,7 +83,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			JSONObjectAdapter jsonObjectAdapter,
 			UserAccountServiceAsync userAccountService,
 			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		this.userAccountService = userAccountService;
@@ -88,6 +93,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
+		this.adapterFactory = adapterFactory;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);		
@@ -240,18 +246,21 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private void populateAclEntries() {
+		
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
-			UserGroupHeader header = userGroupHeaders.get(principalId);
+			final UserGroupHeader header = userGroupHeaders.get(principalId);
 			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
-				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
+					header.getUserName();
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, title, "", header.getIsIndividual()));
 			} else {
 				showErrorMessage("Could not find user " + principalId);
 			}
 		}
 	}
-
+	
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
 		List<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())

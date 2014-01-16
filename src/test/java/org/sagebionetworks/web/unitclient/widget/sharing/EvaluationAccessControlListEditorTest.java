@@ -100,7 +100,7 @@ public class EvaluationAccessControlListEditorTest {
 		evaluation.setName("Test Evaluation");
 		acl = createACL(EVALUATION_ID);
 		uep = createUEP();
-		userGroupHeaderRP = createUGHRP();
+		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
 		
 		userGroupHeaderRPWrapper = new EntityWrapper(userGroupHeaderRP.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName());
 		// set up mocks
@@ -128,7 +128,8 @@ public class EvaluationAccessControlListEditorTest {
 				mockAuthenticationController,
 				new JSONObjectAdapterImpl(),
 				mockUserAccountService,
-				mockGlobalApplicationState
+				mockGlobalApplicationState,
+				adapterFactory
 		);
 		acle.setResource(evaluation);
 	}
@@ -168,34 +169,6 @@ public class EvaluationAccessControlListEditorTest {
 		uep.setCanPublicRead(false);
 		uep.setOwnerPrincipalId(OWNER_ID);
 		return uep;
-	}
-
-	private UserGroupHeaderResponsePage createUGHRP() {
-		UserGroupHeaderResponsePage ughrp = new UserGroupHeaderResponsePage();		
-		List<UserGroupHeader> children = new ArrayList<UserGroupHeader>();
-
-		// add the owner admin user
-		UserGroupHeader ownerHeader = new UserGroupHeader();
-		ownerHeader.setOwnerId(new Long(OWNER_ID).toString());
-		children.add(ownerHeader);
-		
-		// add the non-owner admin user
-		UserGroupHeader adminHeader = new UserGroupHeader();
-		adminHeader.setOwnerId(new Long(ADMIN_ID).toString());
-		children.add(adminHeader);
-		
-		// add the non-owner non-admin user
-		UserGroupHeader userHeader = new UserGroupHeader();
-		userHeader.setOwnerId(new Long(USER_ID).toString());
-		children.add(userHeader);
-		
-		// add the public group
-		UserGroupHeader publicHeader = new UserGroupHeader();
-		publicHeader.setOwnerId(new Long(TEST_PUBLIC_PRINCIPAL_ID).toString());
-		children.add(publicHeader);
-		
-		ughrp.setChildren(children);
-		return ughrp;
 	}
 
 	//can't create ACL (acl created for every evaluation)

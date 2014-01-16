@@ -549,15 +549,6 @@ public class SynapseClientImplTest {
 			nodeModelCreator.createPaginatedResults(ew.getEntityJson(), UserProfile.class);
 		assertEquals(this.pgups.getResults(), clone.getResults());
 	}
-
-
-	@Test
-	public void testGetAllGroups() throws Exception {
-		EntityWrapper ew = synapseClient.getAllGroups();
-		org.sagebionetworks.web.shared.PaginatedResults<UserGroup> clone = 
-			nodeModelCreator.createPaginatedResults(ew.getEntityJson(), UserGroup.class);
-		assertEquals(this.pgugs.getResults(), clone.getResults());
-	}
 	
 	@Test
 	public void testGetUserProfile() throws Exception {

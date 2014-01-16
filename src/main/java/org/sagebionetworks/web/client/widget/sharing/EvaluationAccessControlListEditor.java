@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -55,6 +56,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	private boolean unsavedViewChanges;
 	private PublicPrincipalIds publicPrincipalIds = null;
 	GlobalApplicationState globalApplicationState;
+	private AdapterFactory adapterFactory;
 	
 	// Entity components
 	private Evaluation evaluation;
@@ -69,7 +71,8 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			UserAccountServiceAsync userAccountService,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		this.userAccountService = userAccountService;
@@ -77,6 +80,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.adapterFactory = adapterFactory;
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);		
 	}	
@@ -227,11 +231,14 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 		view.setIsOpenParticipation(false);
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			Long pricipalIdLong = ra.getPrincipalId();
-			String principalId = ra.getPrincipalId().toString();
-			UserGroupHeader header = userGroupHeaders.get(principalId);
-			boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
+			final String principalId = ra.getPrincipalId().toString();
+			final UserGroupHeader header = userGroupHeaders.get(principalId);
+			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
-				view.addAclEntry(new AclEntry(header, ra.getAccessType(), isOwner));
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
+					header.getUserName();
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, title, "", header.getIsIndividual()));
+
 				if (pricipalIdLong.equals(publicPrincipalIds.getAuthenticatedAclPrincipalId())) {
 					PermissionLevel level = AclUtils.getPermissionLevel(ra.getAccessType());
 					view.setIsOpenParticipation(PermissionLevel.CAN_PARTICIPATE_EVALUATION.equals(level));

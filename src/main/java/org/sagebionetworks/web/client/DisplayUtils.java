@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -185,24 +186,12 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and e-mail address for a given UserGroupHeader
-	 * @param principal
-	 * @return
-	 */
-	public static String getUserNameEmailHtml(UserGroupHeader principal) {
-		if (principal == null) return "";
-		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
-		String email = principal.getEmail() == null ? "" : principal.getEmail();
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
-	}
-	
-	/**
 	 * Returns a properly aligned name and description for a special user or group
 	 * @param name of user or group
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, description).asString();
+	public static String getUserNameDescriptionHtml(String name, String description) {
+		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
 	}
 	
 	
@@ -572,6 +561,50 @@ public class DisplayUtils {
 	    box.show();
 
 	}
+	
+	public static String getDisplayName(UserProfile profile) {
+		return getDisplayName(profile.getFirstName(), profile.getLastName(), profile.getUserName());
+	}
+	
+	public static String getDisplayName(String firstName, String lastName, String userName) {
+		StringBuilder sb = new StringBuilder();
+		boolean hasDisplayName = false;
+		if (firstName != null && firstName.length() > 0) {
+			sb.append(firstName.trim());
+			hasDisplayName = true;
+		}
+		if (lastName != null && lastName.length() > 0) {
+			sb.append(" ");
+			sb.append(lastName.trim());
+			hasDisplayName = true;
+		}
+		
+		sb.append(getUserName(userName, hasDisplayName));
+		
+		return sb.toString();
+	}
+	
+	public static boolean isTemporaryUsername(String username){
+		if(username == null) throw new IllegalArgumentException("UserName cannot be null");
+		return username.startsWith(WebConstants.TEMPORARY_USERNAME_PREFIX);
+	}
+
+	public static String getUserName(String userName, boolean inParens) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (userName != null && !isTemporaryUsername(userName)) {
+			//if the name is filled in, then put the username in parens
+			if (inParens)
+				sb.append(" (");
+			sb.append(userName);
+			if (inParens)
+				sb.append(")");
+		}
+		
+		return sb.toString();
+	}
+	
+
 	
 	/**
 	 * Returns the NodeType for this entity class. 
@@ -1020,7 +1053,11 @@ public class DisplayUtils {
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
 		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
-	
+
+	public static String createUserProfilePicUrl(String baseURl, String userId){
+		return createAttachmentUrl(baseURl, userId, "", null, WebConstants.USER_PROFILE_PARAM_KEY);
+	}
+
 	/**
 	 * Create the url to an attachment image.
 	 * @param baseURl

@@ -67,7 +67,8 @@ public class EntityMetadataTest {
 	String entityId = "syn123";
 	EntityBundle bundle;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-
+	List<String> emailAddresses;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -83,8 +84,11 @@ public class EntityMetadataTest {
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 
 		UserSessionData usd = new UserSessionData();
+		emailAddresses = new ArrayList<String>();
+		emailAddresses.add("test@test.com");
 		UserProfile up = new UserProfile();
 		up.setOwnerId("101");
+		up.setEmails(emailAddresses);
 		usd.setProfile(up);
 		
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);

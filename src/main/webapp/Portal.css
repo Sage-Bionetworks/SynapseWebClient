@@ -523,6 +523,16 @@ a.shortBtn {
 	vertical-align: middle;
 }
 
+.tiny-thumbnail-image-container {
+	display: inline-block;	
+	width: 20px; 
+	height: 20px; 
+	overflow: hidden;
+	position: relative;
+	vertical-align: middle;
+}
+
+
 .margin-10 {
 	margin: 10px;
 }
