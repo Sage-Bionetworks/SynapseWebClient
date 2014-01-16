@@ -107,7 +107,7 @@ public class EntityMetadata implements Presenter {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		List<String> emailAddresses = userProfile.getEmails();
-		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createFlagIssue(
 				emailAddresses.get(0), 
 				DisplayUtils.getDisplayName(userProfile), 
@@ -118,7 +118,7 @@ public class EntityMetadata implements Presenter {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		List<String> emailAddresses = userProfile.getEmails();
-		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createAccessRestrictionIssue(
 				emailAddresses.get(0),
 				DisplayUtils.getDisplayName(userProfile), 
@@ -130,7 +130,7 @@ public class EntityMetadata implements Presenter {
 		UserProfile userProfile = getUserProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		List<String> emailAddresses = userProfile.getEmails();
-		if (emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
 		return jiraURLHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
 				DisplayUtils.getDisplayName(userProfile), 

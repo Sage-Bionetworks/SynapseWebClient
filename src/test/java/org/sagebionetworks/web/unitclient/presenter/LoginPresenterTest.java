@@ -15,11 +15,14 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -47,7 +50,9 @@ public class LoginPresenterTest {
 	CookieProvider mockCookieProvier;
 	GWTWrapper mockGwtWrapper;
 	SynapseJSNIUtils mockJSNIUtils;
+	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	PlaceChanger mockPlaceChanger;
 	AcceptsOneWidget mockPanel;
 	EventBus mockEventBus;
@@ -65,6 +70,7 @@ public class LoginPresenterTest {
 		mockPlaceChanger = mock(PlaceChanger.class);		
 		mockPanel = mock(AcceptsOneWidget.class);
 		mockEventBus = mock(EventBus.class);
+		mockSynapseClient = mock(SynapseClientAsync.class);
 		usd = new UserSessionData();
 		Session session = new Session();
 		session.setAcceptsTermsOfUse(true);
@@ -74,7 +80,7 @@ public class LoginPresenterTest {
 		when(mockJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 				
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 	}	

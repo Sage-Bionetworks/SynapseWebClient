@@ -33,6 +33,11 @@ public class RegisterAccountPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	
+	String username = "Ms.Information";
+	String email = "test@test.com";
+	String firstName = "Hello";
+	String lastName = "Goodbye";
+	
 	@Before
 	public void setup() {
 		mockView = mock(RegisterAccountView.class);
@@ -77,11 +82,7 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState);	
 		registerAccountPresenter.setPlace(place);
 		
-		String email = "test@test.com";
-		String firstName = "Hello";
-		String lastName = "Goodbye";
-		
-		registerAccountPresenter.registerUser(email, firstName, lastName);
+		registerAccountPresenter.registerUser(username, email, firstName, lastName);
 	}
 
 
@@ -96,11 +97,7 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState);	
 		registerAccountPresenter.setPlace(place);
 		
-		String email = "test@test.com";
-		String firstName = "Hello";
-		String lastName = "Goodbye";
-		
-		registerAccountPresenter.registerUser(email, firstName, lastName);
+		registerAccountPresenter.registerUser(username, email, firstName, lastName);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
 	}
@@ -116,11 +113,7 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState);	
 		registerAccountPresenter.setPlace(place);
 		
-		String email = "test@test.com";
-		String firstName = "Hello";
-		String lastName = "Goodbye";
-		
-		registerAccountPresenter.registerUser(email, firstName, lastName);
+		registerAccountPresenter.registerUser(username, email, firstName, lastName);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
 	}

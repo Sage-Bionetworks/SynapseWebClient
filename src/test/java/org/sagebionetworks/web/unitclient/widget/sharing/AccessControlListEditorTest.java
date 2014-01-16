@@ -91,7 +91,6 @@ public class AccessControlListEditorTest {
 	private static EntityWrapper userGroupHeaderRPWrapper;
 	GlobalApplicationState mockGlobalApplicationState;
 	
-	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -127,7 +126,8 @@ public class AccessControlListEditorTest {
 				new JSONObjectAdapterImpl(),
 				mockUserAccountService,
 				mockGlobalApplicationState, 
-				mockGwt
+				mockGwt,
+				adapterFactory
 		);
 		acle.setResource(project);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
@@ -190,33 +190,38 @@ public class AccessControlListEditorTest {
 		return uep;
 	}
 
-	private UserGroupHeaderResponsePage createUGHRP() {
+	public static UserGroupHeaderResponsePage createUGHRP() {
 		UserGroupHeaderResponsePage ughrp = new UserGroupHeaderResponsePage();		
 		List<UserGroupHeader> children = new ArrayList<UserGroupHeader>();
 
 		// add the owner admin user
 		UserGroupHeader ownerHeader = new UserGroupHeader();
 		ownerHeader.setOwnerId(new Long(OWNER_ID).toString());
+		ownerHeader.setIsIndividual(true);
 		children.add(ownerHeader);
 		
 		// add the non-owner admin user
 		UserGroupHeader adminHeader = new UserGroupHeader();
 		adminHeader.setOwnerId(new Long(ADMIN_ID).toString());
+		adminHeader.setIsIndividual(true);
 		children.add(adminHeader);
 		
 		// add the non-owner non-admin user
 		UserGroupHeader userHeader = new UserGroupHeader();
 		userHeader.setOwnerId(new Long(USER_ID).toString());
+		userHeader.setIsIndividual(true);
 		children.add(userHeader);
 		
 		// add the non-owner non-admin user
 		UserGroupHeader user2Header = new UserGroupHeader();
 		user2Header.setOwnerId(new Long(USER2_ID).toString());
+		user2Header.setIsIndividual(true);
 		children.add(user2Header);
 		
 		// add the public group
 		UserGroupHeader publicHeader = new UserGroupHeader();
 		publicHeader.setOwnerId(new Long(TEST_PUBLIC_PRINCIPAL_ID).toString());
+		publicHeader.setIsIndividual(false);
 		children.add(publicHeader);
 		
 		ughrp.setChildren(children);
