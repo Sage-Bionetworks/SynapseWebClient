@@ -14,7 +14,7 @@ public class DisplayUtilsGWT {
 				"</div>")
 		SafeHtml nameAndUsername(String name, String email);
 		
-		@Template("<span class=\"thumbnail-image-container\" " +
+		@Template("<span class=\"thumbnail-image-container header-username-picture-container\" " +
 				"style = \"background: url({0}) no-repeat center center; background-size: 125%\"/>" +
 		    	"</span></span>")
 		SafeHtml profilePicture(String url);		

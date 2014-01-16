@@ -186,26 +186,6 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and username for a given UserProfile
-	 * @param principal
-	 * @return
-	 */
-	public static String getUserListItemHtml(UserProfile profile) {
-		if (profile == null) return "";
-		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(getDisplayName(profile), "").asString();
-	}
-	
-	/**
-	 * Returns a properly aligned name for a given Team
-	 * @param principal
-	 * @return
-	 */
-	public static String getUserListItemHtml(org.sagebionetworks.repo.model.Team team) {
-		if (team == null) return "";
-		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(team.getName(), "").asString();
-	}
-	
-	/**
 	 * Returns a properly aligned name and description for a special user or group
 	 * @param name of user or group
 	 * @return
@@ -1075,7 +1055,7 @@ public class DisplayUtils {
 	}
 
 	public static String createUserProfilePicUrl(String baseURl, String userId){
-		return createAttachmentUrl(baseURl, userId, null, WebConstants.USER_PROFILE_PARAM_KEY);
+		return createAttachmentUrl(baseURl, userId, "", null, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
 
 	/**

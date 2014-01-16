@@ -500,12 +500,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					} else if (anonymousUserPrincipalId != null && aclEntry.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
 						//is anonymous user
 						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
-					} else if (aclEntry.isIndividual() && aclEntry.getProfile() != null) {
-						principalHtml = DisplayUtils.getUserListItemHtml(aclEntry.getProfile());
-					} else if (!aclEntry.isIndividual() && aclEntry.getTeam() != null) {
-						principalHtml = DisplayUtils.getUserListItemHtml(aclEntry.getTeam());
 					} else {
-						principalHtml = DisplayUtils.getUserNameDescriptionHtml(aclEntry.getDisplayName(), "");
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(aclEntry.getTitle(), aclEntry.getSubtitle());
 					}
 				}
 				
@@ -513,26 +509,20 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())){
 					ImageResource icon = iconsImageBundle.globe32();
 					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
-				} else if (!aclEntry.isIndividual() && aclEntry.getTeam() != null) {
+				} else if (!aclEntry.isIndividual()) {
 					//if a group, then try to fill in the icon from the team
 					String url = DisplayUtils.createTeamIconUrl(
 							synapseJSNIUtils.getBaseFileHandleUrl(), 
 							aclEntry.getOwnerId()
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				} else if (aclEntry.getProfile() != null && aclEntry.getProfile().getPic() != null) {
-					// Principal has a profile picture
-					String url = DisplayUtils.createUserProfileAttachmentUrl(
+				} else {
+					// try to get the userprofile picture
+					String url = DisplayUtils.createUserProfilePicUrl(
 							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
-							aclEntry.getOwnerId(), 
-							aclEntry.getProfile().getPic().getPreviewId(), 
-							null
+							aclEntry.getOwnerId() 
 					);
 					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				} else {
-					// Default to generic user or group avatar
-					ImageResource icon = aclEntry.isIndividual() ? iconsImageBundle.userBusinessGrey40() : iconsImageBundle.usersGrey40();
-					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
 				}
 				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
 			}

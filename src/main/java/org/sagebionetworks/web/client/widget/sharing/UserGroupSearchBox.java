@@ -32,13 +32,14 @@ public class UserGroupSearchBox {
 	public static final String KEY_LIMIT = "limit";
 
 	// This is the value to get and set.
-//	public static final String KEY_DISPLAY_NAME = "displayName";
 	public static final String KEY_TOTAL_NUMBER_OF_RESULTS = "totalNumberOfResults";
 	public static final String KEY_CHILDREN = "children";
 	public static final String KEY_PROFILE_PICTURE = "pic";
 	public static final String KEY_IS_INDIVIDUAL = "isIndividual";
 	public static final String KEY_PRINCIPAL_ID = "ownerId";
 	public static final String KEY_USERNAME = "userName";
+	public static final String KEY_FIRSTNAME = "firstName";
+	public static final String KEY_LASTNAME = "lastName";
 
 	/**
 	 * Create a new editor for a given concept URL.
@@ -55,7 +56,8 @@ public class UserGroupSearchBox {
 		ModelType type = new ModelType();
 		type.setRoot(KEY_CHILDREN);
 		type.setTotalName(KEY_TOTAL_NUMBER_OF_RESULTS);
-//		type.addField(KEY_DISPLAY_NAME, KEY_DISPLAY_NAME);
+		type.addField(KEY_FIRSTNAME, KEY_FIRSTNAME);
+		type.addField(KEY_LASTNAME, KEY_LASTNAME);
 		type.addField(KEY_PROFILE_PICTURE, KEY_PROFILE_PICTURE);
 		type.addField(KEY_IS_INDIVIDUAL, KEY_IS_INDIVIDUAL);
 		type.addField(KEY_PRINCIPAL_ID, KEY_PRINCIPAL_ID);
@@ -123,6 +125,16 @@ public class UserGroupSearchBox {
 					sb.append("(Team) ");
 				
 //				sb.append(value.get(KEY_DISPLAY_NAME).toString());
+				
+				String firstName = value.get(KEY_FIRSTNAME);
+				if (firstName == null)
+					firstName = "";
+				String lastName = value.get(KEY_LASTNAME);
+				if (lastName == null)
+					lastName = "";
+				if (firstName.length() > 0 || lastName.length() > 0) {
+					sb.append(firstName + " " + lastName + "  |  ");
+				}
 				
 				String username = value.get(KEY_USERNAME);
 				if (username != null && !DisplayUtils.isTemporaryUsername(username))

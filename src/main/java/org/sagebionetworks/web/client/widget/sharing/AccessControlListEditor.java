@@ -11,7 +11,6 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -253,34 +252,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
 			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
-				if (header.getIsIndividual()) {
-					AccessControlListEditor.getUserProfile(principalId, synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, profile));
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							//unable to get the profile, just use header info
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, header.getUserName(), true));
-//							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} else {
-					AccessControlListEditor.getTeam(principalId, synapseClient, adapterFactory, new AsyncCallback<Team>() {
-						@Override
-						public void onSuccess(Team team) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, team));
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, header.getUserName(), false));
-//							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				}
-				
-				
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
+					header.getUserName();
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, title, "", header.getIsIndividual()));
 			} else {
 				showErrorMessage("Could not find user " + principalId);
 			}
@@ -293,23 +267,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			public void onSuccess(String userProfileJson) {
 				try {
 					callback.onSuccess(new UserProfile(adapterFactory.createNew(userProfileJson)));
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
-	
-	public static void getTeam(String teamId, SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<Team> callback){
-		synapseClient.getTeam(teamId, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String json) {
-				try {
-					callback.onSuccess(new Team(adapterFactory.createNew(json)));
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}    				

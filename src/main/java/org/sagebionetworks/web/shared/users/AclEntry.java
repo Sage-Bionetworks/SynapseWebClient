@@ -3,79 +3,25 @@ package org.sagebionetworks.web.shared.users;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.UserProfile;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AclEntry implements IsSerializable {
-
-	private Team team;
-	private UserProfile profile;
 	private Set<ACCESS_TYPE> accessTypes;
 	private boolean isOwner, isIndividual;
-	private String ownerId, displayName;
+	private String ownerId, title, subtitle;
 	
 	public AclEntry() {}
 
-	/**
-	 * Create a new ACLEntry.  If no Team or UserProfile is available, at the very least provide a display name to use (used for groups that have no Teams, for example)
-	 * @param ownerId
-	 * @param accessTypes
-	 * @param isOwner
-	 * @param displayName
-	 */
-	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, String displayName, boolean isIndividual) {
-		this(ownerId, accessTypes, isOwner, null, null, displayName, isIndividual);
-	}
-
-	/**
-	 * Create a new ACLEntry.  Give a Team to help rendering of the principal
-	 * @param ownerId
-	 * @param accessTypes
-	 * @param isOwner
-	 * @param team
-	 */
-	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, Team team) {
-		this(ownerId, accessTypes, isOwner, null, team, null, false);
-	}
-
-	/**
-	 * Create a new ACLEntry.  Give a UserProfile to help rendering of the principal
-	 * @param ownerId
-	 * @param accessTypes
-	 * @param isOwner
-	 * @param profile
-	 */
-	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, UserProfile profile) {
-		this(ownerId, accessTypes, isOwner, profile, null, null, true);
-	}
-
-	private AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, UserProfile profile, Team team, String displayName, boolean isIndividual) {
+	
+	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, String title, String subtitle, boolean isIndividual) {
 		super();
 		this.ownerId = ownerId;
-		this.team = team;
-		this.profile = profile;
 		this.accessTypes = accessTypes;
 		this.isOwner = isOwner;
-		this.displayName = displayName;
+		this.title = title;
 		this.isIndividual = isIndividual;
-	}
-
-	public UserProfile getProfile() {
-		return profile;
-	}
-
-	public void setProfile(UserProfile profile) {
-		this.profile = profile;
-	}
-	
-	public Team getTeam() {
-		return team;
-	}
-	
-	public void setTeam(Team team) {
-		this.team = team;
+		this.subtitle = subtitle;
 	}
 
 	public Set<ACCESS_TYPE> getAccessTypes() {
@@ -106,13 +52,22 @@ public class AclEntry implements IsSerializable {
 		this.ownerId = ownerId;
 	}
 	
-	public String getDisplayName() {
-		return displayName;
+	public String getTitle() {
+		return title;
 	}
 	
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setTitle(String title) {
+		this.title = title;
 	}
+	
+	public String getSubtitle() {
+		return subtitle;
+	}
+	
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -120,11 +75,15 @@ public class AclEntry implements IsSerializable {
 		int result = 1;
 		result = prime * result
 				+ ((accessTypes == null) ? 0 : accessTypes.hashCode());
+		result = prime * result + (isIndividual ? 1231 : 1237);
 		result = prime * result + (isOwner ? 1231 : 1237);
-		result = prime * result + ((profile == null) ? 0 : profile.hashCode());
-		result = prime * result + ((team == null) ? 0 : team.hashCode());
+		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
+		result = prime * result
+				+ ((subtitle == null) ? 0 : subtitle.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -140,27 +99,35 @@ public class AclEntry implements IsSerializable {
 				return false;
 		} else if (!accessTypes.equals(other.accessTypes))
 			return false;
+		if (isIndividual != other.isIndividual)
+			return false;
 		if (isOwner != other.isOwner)
 			return false;
-		if (profile == null) {
-			if (other.profile != null)
+		if (ownerId == null) {
+			if (other.ownerId != null)
 				return false;
-		} else if (!profile.equals(other.profile))
+		} else if (!ownerId.equals(other.ownerId))
 			return false;
-		if (team == null) {
-			if (other.team != null)
+		if (subtitle == null) {
+			if (other.subtitle != null)
 				return false;
-		} else if (!team.equals(other.team))
+		} else if (!subtitle.equals(other.subtitle))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
 			return false;
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "AclEntry [team=" + team + ", profile=" + profile
-				+ ", accessTypes=" + accessTypes + ", isOwner=" + isOwner + "]";
+		return "AclEntry [accessTypes=" + accessTypes + ", isOwner=" + isOwner
+				+ ", isIndividual=" + isIndividual + ", ownerId=" + ownerId
+				+ ", title=" + title + ", subtitle=" + subtitle + "]";
 	}
-
 	
 	
 }

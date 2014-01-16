@@ -11,10 +11,8 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
-import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -237,32 +235,10 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
 			final boolean isOwner = (ra.getPrincipalId().equals(uep.getOwnerPrincipalId()));
 			if (header != null) {
-				if (header.getIsIndividual()) {
-					AccessControlListEditor.getUserProfile(principalId, synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, profile));
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, header.getUserName(), true));
-//							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} else {
-					AccessControlListEditor.getTeam(header.getOwnerId(), synapseClient, adapterFactory, new AsyncCallback<Team>() {
-						@Override
-						public void onSuccess(Team team) {
-							view.addAclEntry(new AclEntry(principalId,ra.getAccessType(), isOwner, team));
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, header.getUserName(), false));
-//							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				}
-				
+				String title = header.getIsIndividual() ? DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName()) : 
+					header.getUserName();
+				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), isOwner, title, "", header.getIsIndividual()));
+
 				if (pricipalIdLong.equals(publicPrincipalIds.getAuthenticatedAclPrincipalId())) {
 					PermissionLevel level = AclUtils.getPermissionLevel(ra.getAccessType());
 					view.setIsOpenParticipation(PermissionLevel.CAN_PARTICIPATE_EVALUATION.equals(level));
