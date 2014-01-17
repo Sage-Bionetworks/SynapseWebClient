@@ -118,10 +118,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void setUsername(String newUsername) {
 		if (profile != null) {
 			//quick check to see if it's valid.
-			RegExp regEx = RegExp.compile(WebConstants.VALID_USERNAME_REGEX, "gm");
-			MatchResult matchResult = regEx.exec(newUsername);
-			//the entire string must match (group 0 is the whole matched string)
-			if (matchResult != null && newUsername.equals(matchResult.getGroup(0))) {
+			if (isValidUsername(newUsername)) {
 				profile.setUserName(newUsername);
 				updateProfile(profile);
 			} else {
@@ -129,6 +126,22 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				view.showUsernameInvalid();
 			}
 		}
+	}
+	
+	public static boolean isValidUsername(String username) {
+		if (username == null) return false;
+		RegExp regEx = RegExp.compile(WebConstants.VALID_USERNAME_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(username);
+		//the entire string must match (group 0 is the whole matched string)
+		return (matchResult != null && username.equals(matchResult.getGroup(0))); 
+	}
+	
+	public static boolean isValidEmail(String email) {
+		if (email == null) return false;
+		RegExp regEx = RegExp.compile(WebConstants.VALID_EMAIL_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(email);
+		//the entire string must match (group 0 is the whole matched string)
+		return (matchResult != null && email.equals(matchResult.getGroup(0))); 
 	}
 	
 	@Override
