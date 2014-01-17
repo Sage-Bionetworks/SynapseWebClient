@@ -74,6 +74,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 				
 				@Override
 				public void onFailure(Throwable e) {
+					//do nothing.  validation has failed, but updating the username will fail if it's already taken.
 					e.printStackTrace();
 				}
 			});
@@ -91,6 +92,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 			
 			@Override
 			public void onFailure(Throwable e) {
+				//do nothing.  validation has failed, but updating the email will fail if it's already taken.
 				e.printStackTrace();
 			}
 		});
