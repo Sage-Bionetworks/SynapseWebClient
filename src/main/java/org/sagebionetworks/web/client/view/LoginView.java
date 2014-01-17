@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 
 import com.google.gwt.place.shared.Place;
@@ -25,7 +24,8 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	public void showSetUsernameUI();
 	
-	public void showSetUsernameFailed();
+	public void showUsernameInvalid();
+	public void showUsernameTaken();
 
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);

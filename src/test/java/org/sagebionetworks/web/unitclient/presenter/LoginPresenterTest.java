@@ -162,7 +162,7 @@ public class LoginPresenterTest {
 		profile.setOwnerId("1233");
 		loginPresenter.updateProfile(profile);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockView).showSetUsernameFailed();
+		verify(mockView).showUsernameTaken();
 	}
 	
 	@Test

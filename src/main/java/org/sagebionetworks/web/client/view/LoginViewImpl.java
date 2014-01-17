@@ -203,8 +203,14 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	@Override
-	public void showSetUsernameFailed() {
+	public void showUsernameInvalid() {
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username format is invalid.</h4> <span class=\"text-warning\">"+DisplayConstants.USERNAME_FORMAT_ERROR+"</span>");
+		clear();
+	}
+	@Override
+	public void showUsernameTaken() {
 		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
 		clear();
 	}
+
 }

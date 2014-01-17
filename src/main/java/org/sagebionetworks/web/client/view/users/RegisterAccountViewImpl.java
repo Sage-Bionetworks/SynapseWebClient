@@ -136,6 +136,8 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		     
 		     final TextField<String> username = new TextField<String>();  
 		     username.setFieldLabel("Username");
+		     username.setRegex(WebConstants.VALID_USERNAME_REGEX);
+		     username.getMessages().setRegexText(DisplayConstants.USERNAME_FORMAT_ERROR);
 		     username.setAllowBlank(false);
 		     username.setId(DisplayConstants.ID_INP_USERNAME);
 		     fieldSet.add(username, formData);  
@@ -196,7 +198,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	private boolean validateForm(TextField<String> username,TextField<String> email, TextField<String> firstName, TextField<String> lastName) {
 		if (email.getValue() != null && email.getValue().length() > 0 && email.isValid() 
-				&& username.getValue() != null && username.getValue().trim().length() > 0) {
+				&& username.getValue() != null && username.getValue().trim().length() > 0 && username.isValid()) {
 			return true;
 		}
 		return false;

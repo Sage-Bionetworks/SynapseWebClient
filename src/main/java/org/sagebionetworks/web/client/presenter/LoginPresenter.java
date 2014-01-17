@@ -26,6 +26,8 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -115,8 +117,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void setUsername(String newUsername) {
 		if (profile != null) {
-			profile.setUserName(newUsername);
-			updateProfile(profile);
+			//quick check to see if it's valid.
+			RegExp regEx = RegExp.compile(WebConstants.VALID_USERNAME_REGEX, "gm");
+			MatchResult matchResult = regEx.exec(newUsername);
+			//the entire string must match (group 0 is the whole matched string)
+			if (matchResult != null && newUsername.equals(matchResult.getGroup(0))) {
+				profile.setUserName(newUsername);
+				updateProfile(profile);
+			} else {
+				//invalid username
+				view.showUsernameInvalid();
+			}
 		}
 	}
 	
@@ -162,7 +173,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showSetUsernameFailed();
+					view.showUsernameTaken();
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

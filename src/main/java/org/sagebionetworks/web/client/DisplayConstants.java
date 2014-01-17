@@ -19,6 +19,8 @@ public class DisplayConstants {
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
 	public static final String FOLLOW_ANALYSIS_HTML = "Following an analysis project allows you to be notified when the analysis has new comments or additional steps.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
 	public static final String FOLLOW_STEP_HTML = "REMOVE ME, we don't want to follow steps";
+
+	public static final String USERNAME_FORMAT_ERROR = "User names can only contain letters, numbers, dots (.), dashes (-) and underscores (_). They must also be at least 3 characters long.";
 	
 	public static final String SHARED_ON_SYNAPSE = "I've shared an item with you on Synapse";
 	public static final String SHARED_ON_SYNAPSE_SUBJECT = " (shared on Synapse)";

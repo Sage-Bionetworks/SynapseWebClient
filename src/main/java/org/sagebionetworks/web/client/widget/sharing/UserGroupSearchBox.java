@@ -120,28 +120,16 @@ public class UserGroupSearchBox {
 				// jane42  |  114085
 				
 				StringBuilder sb = new StringBuilder();
-				
-//				sb.append(value.get(KEY_DISPLAY_NAME).toString());
-				
-				String firstName = value.get(KEY_FIRSTNAME);
-				if (firstName == null)
-					firstName = "";
-				String lastName = value.get(KEY_LASTNAME);
-				if (lastName == null)
-					lastName = "";
-				if (firstName.length() > 0 || lastName.length() > 0) {
-					sb.append(firstName + " " + lastName + "  |  ");
-				}
-				
-				String username = value.get(KEY_USERNAME);
-				if (username != null && !DisplayUtils.isTemporaryUsername(username))
-					sb.append(username + "  |  ");
-				sb.append(value.get(KEY_PRINCIPAL_ID));
-				
 				Boolean isIndividual = value.get(KEY_IS_INDIVIDUAL);
 				if (isIndividual != null && !isIndividual)
-					sb.append(" (Team)");
+					sb.append("(Team) ");
 
+				String firstName = value.get(KEY_FIRSTNAME);
+				String lastName = value.get(KEY_LASTNAME);
+				String username = value.get(KEY_USERNAME);
+				sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
+				sb.append("  |  "+ value.get(KEY_PRINCIPAL_ID));
+	
 				return sb.toString();
 			}
 			
@@ -174,8 +162,8 @@ public class UserGroupSearchBox {
 
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',
-				'<div>',
-				'<img class="margin-right-5 vertical-align-bottom tiny-thumbnail-image-container" onerror="this.style.display=\'none\';" src="',
+				'<div class="margin-left-5" style="height:23px">',
+				'<img class="margin-right-5 vertical-align-center tiny-thumbnail-image-container" onerror="this.style.display=\'none\';" src="',
 				'<tpl if="isIndividual">',
 					baseProfileAttachmentUrl,
 					'?userId={ownerId}&waitForUrl=true" />',
@@ -185,7 +173,7 @@ public class UserGroupSearchBox {
 					baseFileHandleUrl,
 					'?teamId={ownerId}" />',
 			    '</tpl>',
-				'<span class="search-item margin-right-5">',
+				'<span class="search-item movedown-1 margin-right-5">',
 				'<span class="font-italic">{firstName} {lastName} </span> ',
 				'<tpl if="!userName.indexOf(\'TEMPORARY-\') == 0">',
 					'{userName}',
