@@ -647,9 +647,33 @@ public class DisplayConstants {
 	public static final String FORGOT_PASSWORD = "forgot password?";
 	public static final String SIGNING_IN = "Signing in...";
 	public static final String NEW = "new";
+	public static final String QUERY = "Query";
+	public static final String ADD_ROW = "Add Row";
+	public static final String COLUMN_DETAILS = "Column Details";
+	public static final String ADD_COLUMN = "Add Column";
+	public static final String TABLES = "Tables";
+	public static final String TABLE_COLUMNS = "Table Columns";
+	public static final String ON_CAP = "On";
+	public static final String OFF = "Off";	
 	public static final String DETAILS_UNAVAILABLE = "Details unavailable";	 	
 	public static final String CREATE_ACCOUNT_MESSAGE_SSO = "The email address supplied by Google was not found in our user list. Please check that you are signed in to the proper Google account, or complete registration if you are new to Synapse.";
 	public static final String SSO_ERROR_UNKNOWN = "An unknown error occurred while signing you in with Google Account Login. Please try again or use your Synapse username and password.";
+	public static final String NAME = "Name";
+	public static final String TYPE = "Type";
+	public static final String DEFAULT_VALUE = "Default Value";
+	public static final String RESTRICTED_VALUES = "Restricted Values";
+	public static final String COPY_COLUMN_DATA_INTO_NEW_COLUMN = "Copy Column Data Into New Column";
+	public static final String ADD_VALUE = "Add Value";
+	public static final String CREATE_COLUMN = "Create Column";
+	public static final String COLUMN_NAME = "Column Name";
+	public static final String COLUMN_TYPE = "Column Type";
+	public static final String RESTRICT_VALUES = "Restrict Values";
+	public static final String DISPLAY_NAME = "Display Name";
+	public static final String OPTIONAL = "optional";
+	public static final String REQUIRED = "required";
+	public static final String CONFIRM_DELETE_COLUMN = "Are you sure you want to delete Column: ";
+	public static final String COLUMN_CREATION_FAILED = "Column creation failed. Please try again.";
+	public static final String TABLE_UPDATE_FAILED = "Updating the table failed. Please try again.";
 	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
@@ -658,5 +682,8 @@ public class DisplayConstants {
 	public static final String REQUEST_EXPIRED = "Request Expired";
 	public static final String UNABLE_TO_LOAD_VERSIONS = "Unable to load entity versions. Please re-select the entity.";
 	public static final String SYNAPSE_ACCOUNT_NUMBER = "Synapse Account Number";
+	public static final String LOGIN_READ_ONLY_MODE = "Synapse is currently in READ ONLY mode. You can browse during this time but not login or modify.";
+	public static final String LOGIN_DOWN_MODE = "Synapse is currently DOWN. Please try back soon.";
+
 }
 

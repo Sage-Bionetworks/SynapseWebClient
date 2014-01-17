@@ -250,6 +250,10 @@ public interface SynapseClientAsync {
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
+
+	void getColumnModelBatch(List<String> columnIds, AsyncCallback<String> asyncCallback);
+
+	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
 	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
 }

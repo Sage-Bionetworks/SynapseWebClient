@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -81,6 +82,8 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -2449,7 +2452,71 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}		
 	}
+
+	@Override
+	public String createColumnModel(String columnModelJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			ColumnModel column = new ColumnModel(adapterFactory.createNew(columnModelJson));			
+			ColumnModel createdColumn = synapseClient.createColumnModel(column);
+			return createdColumn.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	
+	@Override
+	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			// TODO : connect to Java Client
+			BatchResults<ColumnModel> results = new BatchResults<ColumnModel>();
+			
+			ColumnModel cm1 = new ColumnModel();
+			cm1.setId("1");
+			cm1.setName("stringCol");
+			cm1.setColumnType(ColumnType.STRING);
+			cm1.setDefaultValue("DefaultValue");
+			
+			ColumnModel cm2 = new ColumnModel();
+			cm2.setId("2");
+			cm2.setName("stringColEnum");
+			cm2.setColumnType(ColumnType.STRING);			
+			cm2.setEnumValues(Arrays.asList(new String[]{ "Level A", "Level B", "Level C" }));
+			
+			ColumnModel cm3 = new ColumnModel();
+			cm3.setId("3");
+			cm3.setName("doubleCol");
+			cm3.setColumnType(ColumnType.DOUBLE);
+			cm3.setDefaultValue("0.0");
+			
+			ColumnModel cm4 = new ColumnModel();
+			cm4.setId("4");
+			cm4.setName("longCol");
+			cm4.setColumnType(ColumnType.LONG);
+			cm4.setDefaultValue("0");
+			
+			ColumnModel cm5 = new ColumnModel();
+			cm5.setId("5");
+			cm5.setName("booleanCol");
+			cm5.setColumnType(ColumnType.BOOLEAN);
+			cm5.setDefaultValue("FALSE");
+			
+			ColumnModel cm6 = new ColumnModel();
+			cm6.setId("6");
+			cm6.setName("FileHandleCol");
+			cm6.setColumnType(ColumnType.FILEHANDLEID);			
+			
+			results.setResults(Arrays.asList(new ColumnModel[] { cm1, cm2, cm3, cm4, cm5, cm6 }));
+			return EntityFactory.createJSONStringForEntity(results);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
 	@Override
 	public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2466,4 +2533,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
 }

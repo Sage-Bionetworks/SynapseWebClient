@@ -16,6 +16,7 @@
 				    <ul class="nav nav-tabs entity-tabs">				        
 					    <li class="entity-tab active margin-left-15" ui:field="wikiListItem"><g:Anchor styleName="text-align-center no-background" ui:field="wikiLink"/></li>
 					    <li class="entity-tab" ui:field="filesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="fileLink"/></li>
+					    <li class="entity-tab" ui:field="tablesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="tablesLink"/></li>
 					    <li class="entity-tab" ui:field="adminListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="adminLink"/></li>
 				    </ul>
 				</div>

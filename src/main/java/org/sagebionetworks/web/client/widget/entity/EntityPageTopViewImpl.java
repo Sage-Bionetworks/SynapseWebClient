@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -83,6 +85,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	Anchor fileLink;
 	@UiField
+	Anchor tablesLink;
+	@UiField
 	Anchor adminLink;
 	@UiField
 	DivElement navtabContainer;
@@ -90,6 +94,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	LIElement wikiListItem;
 	@UiField
 	LIElement filesListItem;
+	@UiField
+	LIElement tablesListItem;
 	@UiField
 	LIElement adminListItem;
 	@UiField
@@ -106,7 +112,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private Breadcrumb breadcrumb;
 	private AnnotationsWidget annotationsWidget;
 	private LayoutContainer fullWidthContainer;
-	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, adminTabContainer;
+	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, tablesTabContainer, adminTabContainer;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
@@ -121,6 +127,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
+	private SynapseTableWidget synapseTableWidget;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	private static final int MAX_DISPLAY_NAME_CHAR = 40;
@@ -141,7 +148,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget, 
 			PreviewWidget previewWidget, CookieProvider cookies,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			SynapseTableWidget synapseTableWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -162,6 +170,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.wikiPageWidget = wikiPageWidget;
 		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
+		this.synapseTableWidget = synapseTableWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		initProjectLayout();
 	}
@@ -173,12 +182,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
 		filesTabContainer = new LayoutContainer();
 		filesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
+		tablesTabContainer = new LayoutContainer();
+		tablesTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
 		adminTabContainer = new LayoutContainer();
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
 		wikiLink.setText(DisplayConstants.WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
 		fileLink.setText(DisplayConstants.FILES);		
 		fileLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.FILES));
+		tablesLink.setText(DisplayConstants.TABLES);		
+		tablesLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.TABLES));
 		adminLink.setText(DisplayConstants.CHALLENGE_ADMIN);
 		adminLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.ADMIN));
 	}
@@ -212,11 +225,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		topFullWidthContainer = initContainerAndPanel(topFullWidthContainer, topFullWidthPanel);
 
 		fullWidthContainer.removeAll();
-		topFullWidthContainer.removeAll();
+		topFullWidthContainer.removeAll();		
 		adminListItem.addClassName("hide");
+		
+		// disable tables completely for now
+		//if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide");
+		tablesListItem.addClassName("hide");
+		
 		currentTabContainer.removeAll();
 		wikiTabContainer.removeAll();
 		filesTabContainer.removeAll();
+		tablesTabContainer.removeAll();
 		adminTabContainer.removeAll();
 
 		// project header
@@ -518,6 +537,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Padding Bottom
 		filesTabContainer.add(createBottomPadding());
 
+		// Tables Tab
+		synapseTableWidget.configure(ComingSoonViewImpl.getTable()); // TODO temporary
+		tablesTabContainer.add(synapseTableWidget.asWidget());
+		
 		// Admin Tab: evaluations
 		row = DisplayUtils.createRowContainer();
 		row.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
@@ -544,9 +567,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		wikiListItem.removeClassName("active");
 		filesListItem.removeClassName("active");
+		tablesListItem.removeClassName("active");
 		adminListItem.removeClassName("active");
 		wikiLink.addStyleName("link");
 		fileLink.addStyleName("link");
+		tablesLink.addStyleName("link");
 		adminLink.addStyleName("link");
 		
 		LIElement tab; 
@@ -561,6 +586,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			tab = filesListItem;
 			link = fileLink;
 			targetContainer = filesTabContainer;
+		} else if(targetTab == Synapse.EntityArea.TABLES) {
+			tab = tablesListItem;
+			link = tablesLink;
+			targetContainer = tablesTabContainer;
 		} else {
 			tab = adminListItem;
 			link = adminLink;

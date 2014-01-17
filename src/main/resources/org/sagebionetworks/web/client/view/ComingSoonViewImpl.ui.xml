@@ -14,24 +14,17 @@
 	</ui:style>
 
 	<g:HTMLPanel>
-
+		<!-- HEADER -->
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp "></div>
-		<div class="container margin-top-15">
-			<ul class="breadcrumbs">
-				<li>
-					<a href="#">Home</a>
-					> All Projects
-				</li>
-			</ul>
-			<h2>Coming Soon</h2>
+		<div class="separator separator-header-page"></div>
+		<h2>Coming Soon</h2>
+		<div style="margin: 15px;">
 			<g:SimplePanel ui:field="entityView" />
-			<g:FlexTable ui:field="flextTable1"></g:FlexTable>
-			This page is coming soon.
-			<div class="clear"></div>
-		
-		<g:SimplePanel ui:field="footer" />
 		</div>
+		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+		This page is coming soon.
+		<div class="clear"></div>
+		<g:SimplePanel ui:field="footer" />	    
 	</g:HTMLPanel>
 </ui:UiBinder> 
