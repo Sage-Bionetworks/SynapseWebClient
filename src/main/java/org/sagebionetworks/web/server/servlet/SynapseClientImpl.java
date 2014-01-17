@@ -2533,22 +2533,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
-	@Override
-    public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
-        org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-        try {
-            MessageToUser message = new MessageToUser();
-            message.setRecipients(recipients);
-            message.setSubject(subject);
-            MessageToUser sentMessage = synapseClient.sendStringMessage(message, messageBody);
-            JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
-            return sentMessageJson.toJSONString();
-        } catch (SynapseException e) {
-                throw ExceptionUtil.convertSynapseException(e);
-        } catch (JSONObjectAdapterException e) {
-                throw new UnknownErrorException(e.getMessage());
-        }
-    }
 	
 }
