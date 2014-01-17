@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -63,9 +65,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
 		
-		SynapseTableWidget tableWidget = ginInjector.getSynapseTableWidget();
-		tableWidget.configure(getTable());
-		entityView.setWidget(tableWidget.asWidget());
 	}
 
 	@Override
@@ -122,14 +121,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		table.setId("12345");
 		table.setName("Example Table");
 		table.setCreatedBy("2337773");
-		table.setColumnIds(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
+		List<String> columns = new ArrayList<String>();
+		columns.addAll(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
+		table.setColumnIds(columns);
 		return table;
 	}
 
-	
-	
-	
-	
-	
 	
 }

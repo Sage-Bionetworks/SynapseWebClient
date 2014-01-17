@@ -206,28 +206,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		addRowBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-		    	BaseModelData row = new BaseModelData();  
-		    	// fill default values
-		    	for(org.sagebionetworks.repo.model.table.ColumnModel columnModel : columns) {		    		
-		    		if(columnModel.getDefaultValue() != null) {
-		    			Object value = null;
-		    			if(columnModel.getColumnType() == ColumnType.LONG) {
-		    				value = new Long(columnModel.getDefaultValue());
-		    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
-		    				value = new Double(columnModel.getDefaultValue()); 
-		    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
-		    				value = columnModel.getDefaultValue().toLowerCase(); 
-		    			} else {
-		    				value = columnModel.getDefaultValue();
-		    			}
-		    			row.set(columnModel.getName(), value);
-		    		}
-		    	}
-		    	
-		    	// add row
-		        rowEditor.stopEditing(false);  
-		        store.insert(row, store.getCount());  
-		        rowEditor.startEditing(store.indexOf(row), true);  
+		    	addRow(columns);  
 			}
 		});
 		
@@ -245,6 +224,38 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 			columnConfigs.add(ColumnUtils.getColumnConfig(col));
 		}			  	  
 	}
+	
+	/**
+	 * Method that adds an empty row to the table
+	 * @param columns
+	 */
+	private void addRow(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+		BaseModelData row = new BaseModelData();  
+    	// fill default values
+    	for(org.sagebionetworks.repo.model.table.ColumnModel columnModel : columns) {		    		
+    		if(columnModel.getDefaultValue() != null) {
+    			Object value = null;
+    			if(columnModel.getColumnType() == ColumnType.LONG) {
+    				value = new Long(columnModel.getDefaultValue());
+    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
+    				value = new Double(columnModel.getDefaultValue()); 
+    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
+    				value = columnModel.getDefaultValue().toLowerCase(); 
+    			} else {
+    				value = columnModel.getDefaultValue();
+    			}
+    			row.set(columnModel.getName(), value);
+    		}
+    	}
+    	
+    	// add row
+        rowEditor.stopEditing(false);  
+        store.insert(row, store.getCount());  
+        rowEditor.startEditing(store.indexOf(row), true);
+        
+        // TODO: update presenter with new row. or wait for save on row editor. Depends on table impl
+	}
+
 	
 	
 	/* ================

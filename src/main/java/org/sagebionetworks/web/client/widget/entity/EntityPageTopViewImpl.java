@@ -227,7 +227,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.removeAll();
 		topFullWidthContainer.removeAll();		
 		adminListItem.addClassName("hide");
-		if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide"); 
+		
+		// disable tables completely for now
+		//if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide");
+		tablesListItem.addClassName("hide");
+		
 		currentTabContainer.removeAll();
 		wikiTabContainer.removeAll();
 		filesTabContainer.removeAll();
