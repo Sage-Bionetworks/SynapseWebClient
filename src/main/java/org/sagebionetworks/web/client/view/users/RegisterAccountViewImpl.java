@@ -126,7 +126,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	
 	@Override
 	public void markEmailUnavailable() {
-		email.markInvalid(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
+		email.markInvalid(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
 	}
 	
 	/*
