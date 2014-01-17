@@ -22,10 +22,17 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
 	
+	public void showSetUsernameUI();
+	
+	public void showUsernameInvalid();
+	public void showUsernameTaken();
+
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		
 		void setNewUser(UserSessionData newUser);
+		
+		void setUsername(String newUsername);
     }
 	
 }

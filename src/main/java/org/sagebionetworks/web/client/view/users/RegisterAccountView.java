@@ -28,7 +28,7 @@ public interface RegisterAccountView extends IsWidget {
 	public interface Presenter {	
 		void goTo(Place place);
 		
-		void registerUser(String email, String firstName, String lastName);
+		void registerUser(String username, String email, String firstName, String lastName);
 	}
 
 	public void showAccountCreationFailed();

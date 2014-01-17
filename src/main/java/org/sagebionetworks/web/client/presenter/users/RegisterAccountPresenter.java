@@ -59,8 +59,8 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	}
 
 	@Override
-	public void registerUser(String email, String firstName, String lastName) {
-		UserRegistration userInfo = new UserRegistration(email, firstName, lastName, firstName + " " + lastName);
+	public void registerUser(String username, String email, String firstName, String lastName) {
+		UserRegistration userInfo = new UserRegistration(username, email, firstName, lastName);
 		userService.createUser(userInfo, new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {

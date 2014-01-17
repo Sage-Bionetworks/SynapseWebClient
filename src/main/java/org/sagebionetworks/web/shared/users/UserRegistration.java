@@ -7,7 +7,7 @@ public class UserRegistration implements IsSerializable {
 	private String email;
 	private String firstName;
 	private String lastName;
-	private String displayName;
+	private String userName;
 
 	/*
 	 * Default constructor required
@@ -15,13 +15,13 @@ public class UserRegistration implements IsSerializable {
 	public UserRegistration() {		
 	}
 	
-	public UserRegistration(String email, String firstName,
-			String lastName, String displayName) {
+	public UserRegistration(String userName, String email, String firstName,
+			String lastName) {
 		super();
 		this.email = email;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.displayName = displayName;
+		this.userName = userName;
 	}
 
 	public String getEmail() {
@@ -48,12 +48,12 @@ public class UserRegistration implements IsSerializable {
 		this.lastName = lastName;
 	}
 
-	public String getDisplayName() {
-		return displayName;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class UserRegistration implements IsSerializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((displayName == null) ? 0 : displayName.hashCode());
+				+ ((userName == null) ? 0 : userName.hashCode());
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		result = prime * result
 				+ ((firstName == null) ? 0 : firstName.hashCode());
@@ -79,10 +79,10 @@ public class UserRegistration implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		UserRegistration other = (UserRegistration) obj;
-		if (displayName == null) {
-			if (other.displayName != null)
+		if (userName == null) {
+			if (other.userName != null)
 				return false;
-		} else if (!displayName.equals(other.displayName))
+		} else if (!userName.equals(other.userName))
 			return false;
 		if (email == null) {
 			if (other.email != null)
@@ -105,7 +105,7 @@ public class UserRegistration implements IsSerializable {
 	@Override
 	public String toString() {
 		return "UserRegistration [email=" + email + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", displayName=" + displayName
+				+ ", lastName=" + lastName + ", userName=" + userName
 				+ "]";
 	}
 

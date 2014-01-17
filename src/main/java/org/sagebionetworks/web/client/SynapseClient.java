@@ -125,6 +125,14 @@ public interface SynapseClient extends RemoteService {
 	public String getUserProfile(String userId) throws RestServiceException;
 	
 	/**
+	 * Return the specified team object in json string
+	 * @param teamId
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public String getTeam(String teamId) throws RestServiceException;
+	
+	/**
 	 * Batch get headers for users/groups matching a list of Synapse IDs.
 	 * 
 	 * @param ids
@@ -163,8 +171,6 @@ public interface SynapseClient extends RemoteService {
 
 	public EntityWrapper getAllUsers() throws RestServiceException;
 	
-	public EntityWrapper getAllGroups() throws RestServiceException;
-
 	public String createUserProfileAttachmentPresignedUrl(String id,
 			String tokenOrPreviewId) throws RestServiceException;
 

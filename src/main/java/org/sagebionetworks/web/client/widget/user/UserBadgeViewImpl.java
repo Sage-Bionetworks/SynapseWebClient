@@ -47,9 +47,10 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		
 		if(profile != null) {
-			String name = maxNameLength == null ? profile.getDisplayName() : DisplayUtils.stubStrPartialWord(profile.getDisplayName(), maxNameLength); 
+			String displayName = DisplayUtils.getDisplayName(profile);
+			String name = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
 			
-			Widget nameWidget;	
+			Widget nameWidget;
 			final Anchor userAnchor = new Anchor();
 			if(profile.getOwnerId() != null) {				
 				userAnchor.setText(name);
@@ -65,8 +66,9 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				HTML html = new HTML(name);
 				html.addStyleName("usernamelink");
 				nameWidget = html;
-			}				
-			
+			}
+			//also add the username in a popup (in case this is a small view of the display name)
+			DisplayUtils.addToolTip(nameWidget, DisplayUtils.getUserName(profile.getUserName(), false));
 			Image profilePicture; 
 			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 				profilePicture = new Image();

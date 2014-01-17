@@ -3,12 +3,12 @@ package org.sagebionetworks.web.client.presenter;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -20,23 +20,23 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		
 	private ProfileFormView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private UserProfile ownerProfile;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private ProfileUpdatedCallback profileUpdatedCallback;
+	private AdapterFactory adapterFactory;
 	
 	@Inject
 	public ProfileFormWidget(ProfileFormView view,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.adapterFactory = adapterFactory;
 		view.setPresenter(this);
 	}
 	
@@ -65,11 +65,10 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
 				//get the owner profile (may or may not be currently set
-				synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+				ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 					@Override
-					public void onSuccess(String userProfileJson) {
+					public void onSuccess(UserProfile profile) {
 						try {
-							final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 							ownerProfile = profile;
 							ownerProfile.setFirstName(firstName);
 							ownerProfile.setLastName(lastName);
@@ -92,7 +91,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 								ownerProfile.setPic(pic);
 							
 							JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-							userProfileJson = adapter.toJSONString();
+							String userProfileJson = adapter.toJSONString();
 
 							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 								@Override
@@ -117,6 +116,24 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 					}
 				});
 		}
+	}
+	
+	
+	public static void getMyProfile(SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<UserProfile> callback){
+		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userProfileJson) {
+				try {
+					callback.onSuccess(new UserProfile(adapterFactory.createNew(userProfileJson)));
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}    				
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
 	}
 	
 	@Override

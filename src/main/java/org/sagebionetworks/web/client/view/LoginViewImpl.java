@@ -16,13 +16,17 @@ import org.sagebionetworks.web.client.widget.login.UserListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,7 +40,18 @@ public class LoginViewImpl extends Composite implements LoginView {
 	SimplePanel loginWidgetPanel;
 	@UiField
 	SimplePanel logoutPanel;
+	@UiField
+	HTMLPanel loginView;
+	@UiField
+	HTMLPanel changeUsernameView;
+	@UiField
+	Button changeUsernameButton;
+	@UiField
+	TextBox username;
+	@UiField
+	SpanElement messageLabel;
 
+	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -44,7 +59,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Window logginInWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
-	
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	
 	@Inject
@@ -60,6 +74,16 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		username.getElement().setAttribute("placeholder", "Username");
+		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
+		changeUsernameButton.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				messageLabel.setInnerHTML("");
+				changeUsernameButton.setEnabled(false);
+				presenter.setUsername(username.getValue());
+			}
+		});
 
 	}
 
@@ -125,6 +149,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showLogin(String openIdActionUrl, String openIdReturnUrl) {
 		clear();
+		loginView.setVisible(true);
+		changeUsernameView.setVisible(false);
 		headerWidget.refresh();
 	  	loginWidget.setOpenIdActionUrl(openIdActionUrl);
 		loginWidget.setOpenIdReturnUrl(openIdReturnUrl);
@@ -162,11 +188,29 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
+		changeUsernameButton.setEnabled(true);
 	}
 	
 	@Override
 	public void showTermsOfUse(String content, final AcceptTermsOfUseCallback callback) {
         TermsOfUseHelper.showTermsOfUse(content, callback);
      }
+	
+	@Override
+	public void showSetUsernameUI() {
+		loginView.setVisible(false);
+		changeUsernameView.setVisible(true);
+	}
+	
+	@Override
+	public void showUsernameInvalid() {
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username format is invalid.</h4> <span class=\"text-warning\">"+DisplayConstants.USERNAME_FORMAT_ERROR+"</span>");
+		clear();
+	}
+	@Override
+	public void showUsernameTaken() {
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
+		clear();
+	}
 
 }

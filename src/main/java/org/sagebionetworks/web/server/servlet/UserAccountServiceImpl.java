@@ -137,7 +137,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		user.setEmail(userInfo.getEmail());
 		user.setFirstName(userInfo.getFirstName());
 		user.setLastName(userInfo.getLastName());
-		user.setDisplayName(userInfo.getDisplayName());
+		user.setUserName(userInfo.getUserName());
 		try {
 			client.createUser(user);
 		} catch (SynapseException e) {
