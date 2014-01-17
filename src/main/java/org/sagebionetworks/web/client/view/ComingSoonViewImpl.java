@@ -1,21 +1,25 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -48,7 +52,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
-			ActionMenu actionMenu) {		
+			ActionMenu actionMenu, PortalGinInjector ginInjector) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
@@ -60,11 +64,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
-		FileEntity fake = new FileEntity();
-		fake.setId("syn123");
-		fake.setName("fake");
-		EntityBundle bundle = new EntityBundle(fake, null, null, null, null, null, null);
-		entityView.setWidget(actionMenu.asWidget(bundle, true, true, new Long(1)));
+		
 	}
 
 	@Override
@@ -116,10 +116,16 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}
 
-	
-	
-	
-	
-	
+	public static TableEntity getTable() {
+		TableEntity table = new TableEntity();
+		table.setId("12345");
+		table.setName("Example Table");
+		table.setCreatedBy("2337773");
+		List<String> columns = new ArrayList<String>();
+		columns.addAll(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
+		table.setColumnIds(columns);
+		return table;
+	}
+
 	
 }

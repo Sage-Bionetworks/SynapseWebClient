@@ -1,3 +1,4 @@
+
 package org.sagebionetworks.web.client;
 
 import java.io.IOException;
@@ -303,6 +304,11 @@ public interface SynapseClient extends RemoteService {
 	public String getSynapseProperty(String key);
 	
 	public String getAPIKey() throws RestServiceException;
+
+	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException;
 	
+	public String createColumnModel(String columnModelJson) throws RestServiceException;
+
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
+
 }

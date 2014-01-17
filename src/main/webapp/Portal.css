@@ -1519,3 +1519,27 @@ a.projectTitle:hover {
   font-size: 90%;
 }
 
+/*===========*/
+
+.largeIconButton {
+	font-size: 22px;
+	line-height: 30px;
+	color: #000000;
+}
+.largeIconShiftUp {
+	position: relative; 
+	top:-7px;
+}
+
+.text-align-right {
+	text-align: right;
+}
+
+.inlineField {
+	overflow: hidden; 
+	padding-right: .5em;	
+}
+
+.text-danger-imp {
+	color: #f94e4b !important;
+}
