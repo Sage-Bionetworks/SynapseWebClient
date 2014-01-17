@@ -348,6 +348,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 builder.appendHtmlConstant("<p><a href=\""+url+"\" class=\"link\" target=\"_blank\">" + url + "</a></p>");
 		 }
 		 
+		 // Account number
+		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
