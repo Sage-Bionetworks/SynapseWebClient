@@ -175,7 +175,7 @@ public class UserGroupSearchBox {
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',
 				'<div>',
-				'<img class="margin-right-5 vertical-align-bottom tiny-thumbnail-image-container" src="',
+				'<img class="margin-right-5 vertical-align-bottom tiny-thumbnail-image-container" onerror="this.style.display=\'none\';" src="',
 				'<tpl if="isIndividual">',
 					baseProfileAttachmentUrl,
 					'?userId={ownerId}&waitForUrl=true" />',
