@@ -252,4 +252,6 @@ public interface SynapseClientAsync {
 	void getAPIKey(AsyncCallback<String> callback);
 	
 	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
+	
+	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 }

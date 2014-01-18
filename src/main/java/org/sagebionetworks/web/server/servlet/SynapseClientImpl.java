@@ -77,6 +77,9 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
+import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
+import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -2464,6 +2467,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			AliasType type = AliasType.valueOf(aliasType);
+			AliasCheckRequest request= new AliasCheckRequest();
+			request.setAlias(alias);
+			request.setType(type);
+			AliasCheckResponse response = synapseClient.checkAliasAvailable(request);
+			return response.getAvailable();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 }

@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -25,17 +27,19 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	private CookieProvider cookieProvider;
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
+	private SynapseClientAsync synapseClient;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
 			CookieProvider cookieProvider, UserAccountServiceAsync userService,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
-
+		this.synapseClient = synapseClient;
 		view.setPresenter(this);
 	}
 
@@ -58,6 +62,43 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		view.showDefault();
 	}
 
+	@Override
+	public void checkUsernameAvailable(String username) {
+		if (username.trim().length() > 3) {
+			synapseClient.isAliasAvailable(username, AliasType.USER_NAME.toString(), new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean isAvailable) {
+					if (!isAvailable)
+						view.markUsernameUnavailable();
+				}
+				
+				@Override
+				public void onFailure(Throwable e) {
+					//do nothing.  validation has failed, but updating the username will fail if it's already taken.
+					e.printStackTrace();
+				}
+			});
+		}
+	}
+	
+	@Override
+	public void checkEmailAvailable(String email) {
+		synapseClient.isAliasAvailable(email, AliasType.USER_EMAIL.toString(), new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isAvailable) {
+				if (!isAvailable)
+					view.markEmailUnavailable();
+			}
+			
+			@Override
+			public void onFailure(Throwable e) {
+				//do nothing.  validation has failed, but updating the email will fail if it's already taken.
+				e.printStackTrace();
+			}
+		});
+	}
+
+	
 	@Override
 	public void registerUser(String username, String email, String firstName, String lastName) {
 		UserRegistration userInfo = new UserRegistration(username, email, firstName, lastName);

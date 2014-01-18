@@ -163,8 +163,11 @@ public class DisplayConstants {
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
-	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";	
-	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account with this username/email.  If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
+	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
+	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
+	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account with this username/email.  " + FORGOT_PASSWORD_MESSAGE;
+	public static final String ERROR_USERNAME_ALREADY_EXISTS = "There is an existing account with this username.  " + FORGOT_PASSWORD_MESSAGE;
+	public static final String ERROR_EMAIL_ALREADY_EXISTS = "There is an existing account with this email.  " + FORGOT_PASSWORD_MESSAGE;
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
 	public static final String ERROR_UNABLE_TO_UPDATE_ATTACHMENTS = "The attachments could not be updated because this entity has conflicting changes. Please reload the page and try again.";
 	public static final String ERROR_GENERIC = "An error occurred. Please try again.";
