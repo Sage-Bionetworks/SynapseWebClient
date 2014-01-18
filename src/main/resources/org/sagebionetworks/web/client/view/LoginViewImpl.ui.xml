@@ -15,7 +15,8 @@
 			<g:SimplePanel ui:field="header" />
 		        <div class="separator margin-top-10-imp"></div>
 		    	<div class="container margin-top-15"> 		
-				<!-- LoginView -->				
+				<g:HTMLPanel ui:field="loginView" visible="true">
+					<!-- LoginView -->				
 					<div class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
 						<h2>Login to Synapse </h2>
 						<g:SimplePanel ui:field="loginWidgetPanel" />						
@@ -23,6 +24,21 @@
 						<g:SimplePanel ui:field="logoutPanel" />
 					</div>
 					<br/>
+				</g:HTMLPanel>
+				<g:HTMLPanel ui:field="changeUsernameView" visible="false">
+					<!-- changeUsernameView -->				
+					<div class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
+						<h2>Set Username </h2>
+						<div class="signin-panel panel panel-body margin-top-15">
+			   				<h4 class="form-signin-heading">Synapse now requires a username. Please take a moment to carefully choose yours.</h4>
+							<g:TextBox ui:field="username" styleName="form-control"/>
+							<g:Button ui:field="changeUsernameButton" styleName="btn btn-large btn-primary margin-top-10" />
+							<span ui:field="messageLabel" />
+						</div>						
+					</div>
+					<br/>
+				</g:HTMLPanel>
+				
         		</div> <!-- close class="container" -->
 
 				

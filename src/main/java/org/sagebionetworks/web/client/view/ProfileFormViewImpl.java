@@ -108,12 +108,12 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     
 	     firstName = new TextField<String>();  
 	     firstName.setFieldLabel("First Name");  
-	     firstName.setAllowBlank(false);
+	     firstName.setAllowBlank(true);
 	     left.add(firstName, formData);
 	   
 	     lastName = new TextField<String>();  
 	     lastName.setFieldLabel("Last Name");  
-	     lastName.setAllowBlank(false);
+	     lastName.setAllowBlank(true);
 	     right.add(lastName, formData);
 	     
 	     position = new TextField<String>();  
@@ -171,14 +171,10 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	     updateUserInfoButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
 	    	 @Override
 	    	 public void componentSelected(ButtonEvent ce) {
-	    		 if(firstName.getValue().trim().equals("") || firstName.getValue().trim() == null) {
-	    			 MessageBox.alert("Error", "Please enter your first name.", null);
-	    		 } else if(lastName.getValue().trim().equals("") || lastName.getValue() == null) {
-	    			 MessageBox.alert("Error", "Please enter your last name.", null);
-    			 //TODO: uncomment to add ability to change email
+	    		 //TODO: uncomment to add ability to change email
 //	    		 } else if(!email.isValid()) {
 //		    			 MessageBox.alert("Error", email.getErrorMessage(), null);
-	    		 } else if(!url.isValid()) {
+	    		 if(!url.isValid()) {
 	    			 MessageBox.alert("Error", url.getErrorMessage(), null);
 	    		 } else {
 	    			 startSave();
@@ -215,9 +211,15 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), null, null, teamName.getValue(), url.getValue());
+		 presenter.updateProfile(trim(firstName.getValue()), trim(lastName.getValue()), trim(summary.getValue()), trim(position.getValue()), trim(location.getValue()), trim(industry.getValue()), trim(company.getValue()), null, null, trim(teamName.getValue()), trim(url.getValue()));
 //TODO: uncomment to add ability to change email
 //		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
+	 }
+	 
+	 private String trim(String value) {
+		 if (value == null)
+			 return null;
+		 else return value.trim();
 	 }
 	 
 	 private void updateUserForm(UserProfile profile) {

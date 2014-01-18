@@ -104,6 +104,12 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
 		String tokenId = request.getParameter(WebConstants.TOKEN_ID_PARAM_KEY);
 		try {
+			if (tokenId == null || tokenId.trim().length() == 0) {
+				//if token is null, assume we want the user profile picture
+				UserProfile profile = client.getUserProfile(userId);
+				if (profile.getPic() != null)
+					tokenId = profile.getPic().getTokenId();
+			}
 			PresignedUrl url = null;
 			url = client.waitForPreviewToBeCreated(userId, AttachmentType.USER_PROFILE, tokenId, MAX_TIME_OUT);
 			// Redirect the user to the url

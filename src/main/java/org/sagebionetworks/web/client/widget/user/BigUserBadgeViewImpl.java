@@ -42,7 +42,7 @@ public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadg
 	public void setProfile(final UserProfile profile, String description) {
 		container.clear();
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
-		String name = profile.getDisplayName();
+		String name = DisplayUtils.getDisplayName(profile);
 		ClickHandler clickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

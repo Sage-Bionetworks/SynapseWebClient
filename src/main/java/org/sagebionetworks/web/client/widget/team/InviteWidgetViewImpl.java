@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
@@ -27,6 +28,8 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	private static final int FIELD_WIDTH = 500;
 	
 	private SageImageBundle sageImageBundle;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	
 	private UrlCache urlCache;
 	private InviteWidgetView.Presenter presenter;
 	private AnimationProtector versionAnimation;
@@ -36,9 +39,10 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	private ComboBox<ModelData> peopleCombo;
 	@Inject
 	public InviteWidgetViewImpl(SageImageBundle sageImageBundle,
-			UrlCache urlCache) {
+			UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
 	@Override
@@ -76,7 +80,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			});
 			versionAnimation.setShowConfig(showConfig);
 			
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), null);
+			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
 			peopleCombo.setEmptyText("Enter a user name...");
 			peopleCombo.setWidth(FIELD_WIDTH);
 			peopleCombo.setForceSelection(true);
@@ -98,9 +102,11 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 					if(peopleCombo.getValue() != null) {
 						ModelData selectedModel = peopleCombo.getValue();
 						String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-						String displayName = (String) selectedModel.get(UserGroupSearchBox.KEY_DISPLAY_NAME);
-						Long principalId = (Long.parseLong(principalIdStr));
-						presenter.sendInvitation(principalIdStr, messageArea.getValue(), displayName);
+						String firstName = (String) selectedModel.get(UserGroupSearchBox.KEY_FIRSTNAME);
+						String lastName = (String) selectedModel.get(UserGroupSearchBox.KEY_LASTNAME);
+						String userName = (String) selectedModel.get(UserGroupSearchBox.KEY_USERNAME);
+						
+						presenter.sendInvitation(principalIdStr, messageArea.getValue(), DisplayUtils.getDisplayName(firstName, lastName, userName));
 						//do not clear message, but do clear the target user
 						peopleCombo.clearSelections();
 					}

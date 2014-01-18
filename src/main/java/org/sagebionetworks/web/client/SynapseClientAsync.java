@@ -67,6 +67,8 @@ public interface SynapseClientAsync {
 	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
 	
+	void getTeam(String teamId, AsyncCallback<String> callback);
+	
 	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
 	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
@@ -88,8 +90,6 @@ public interface SynapseClientAsync {
 	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 
 	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
-	
-	public void getAllGroups(AsyncCallback<EntityWrapper> callback);
 	
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
@@ -256,4 +256,6 @@ public interface SynapseClientAsync {
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
 	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
+	
+	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 }
