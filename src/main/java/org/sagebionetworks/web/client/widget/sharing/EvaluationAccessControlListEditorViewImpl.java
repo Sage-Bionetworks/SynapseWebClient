@@ -109,14 +109,13 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		if (!aclEntry.getPrincipal().getIsIndividual())
+		if (!aclEntry.isIndividual())
 			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), 0); // insert groups first
 		else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
 			for (; insertIndex < permissionsStore.getCount(); insertIndex++) {
-				UserGroupHeader item = permissionsStore.getAt(insertIndex).getAclEntry().getPrincipal();
-				if (item.getIsIndividual())
+				if (permissionsStore.getAt(insertIndex).getAclEntry().isIndividual())
 					break;
 			}
 			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), insertIndex); // insert owner
@@ -198,7 +197,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		fieldSet.setWidth(FIELD_WIDTH);
 		
 		// user/group combobox
-		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), publicPrincipalIds);
+		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
 		peopleCombo.setEmptyText("Enter a user or group name...");
 		peopleCombo.setFieldLabel("User/Group");
 		peopleCombo.setForceSelection(true);
@@ -316,7 +315,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	}
 	
 	private Menu createEditAccessMenu(final AclEntry aclEntry) {
-		final Long principalId = Long.parseLong(aclEntry.getPrincipal().getOwnerId());
+		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
 		Menu menu = new Menu();
 		menu.setEnableScrolling(false);
 		MenuItem item;

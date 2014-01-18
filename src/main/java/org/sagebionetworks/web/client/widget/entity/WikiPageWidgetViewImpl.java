@@ -89,6 +89,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private boolean isHistoryWidgetBuilt;
 	private boolean isCurrentVersion;
 	private Long versionInView;
+	private FlowPanel wikiPagePanel;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -179,7 +180,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			FlowPanel noticePanel = createDifferentVersionNotice();
 			add(wrapWidget(noticePanel, "alert alert-"+BootstrapAlertType.WARNING.toString().toLowerCase()+" wikiVersionNotice"));
 		}
-		FlowPanel wikiPagePanel = new FlowPanel();
+		wikiPagePanel = new FlowPanel();
 		//also add the wiki subpages widget, unless explicitly instructed not to in the markdown
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
@@ -336,7 +337,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 
 	private Button createHistoryButton() {
-		Button btn = DisplayUtils.createIconButton("Show Wiki History", DisplayUtils.ButtonType.DEFAULT, null);			
+		final Button btn = DisplayUtils.createIconButton(DisplayConstants.SHOW_WIKI_HISTORY, DisplayUtils.ButtonType.DEFAULT, null);			
 		btn.setStyleName("wikiHistoryButton", true);
 		btn.addClickHandler(new ClickHandler() {
 
@@ -361,12 +362,16 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						};
 						historyWidget.configure(wikiKey, canEdit, actionHandler);
 						isHistoryWidgetBuilt = true;
-						add(wrapWidget(historyWidget.asWidget(), "margin-top-10"));
+						Widget historyWidgetPanel = historyWidget.asWidget();
+						historyWidgetPanel.addStyleName("margin-top-10");
+						wikiPagePanel.add(historyWidgetPanel);
 						layout(true);
+						btn.setText(DisplayConstants.HIDE_WIKI_HISTORY);
 					}
 				} else {
 					// hide history
 					historyWidget.hideHistoryWidget();
+					btn.setText(DisplayConstants.SHOW_WIKI_HISTORY);
 				}
 				isHistoryOpen = !isHistoryOpen;
 			}

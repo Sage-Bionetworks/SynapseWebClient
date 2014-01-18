@@ -24,11 +24,18 @@ public interface RegisterAccountView extends IsWidget {
 	public void showErrorMessage(String message);
 	
 	public void clear();
+	public void markUsernameUnavailable();
+	public void markEmailUnavailable();
+	
 	
 	public interface Presenter {	
 		void goTo(Place place);
 		
-		void registerUser(String email, String firstName, String lastName);
+		void registerUser(String username, String email, String firstName, String lastName);
+		
+		public void checkUsernameAvailable(String username);
+		public void checkEmailAvailable(String email);
+
 	}
 
 	public void showAccountCreationFailed();

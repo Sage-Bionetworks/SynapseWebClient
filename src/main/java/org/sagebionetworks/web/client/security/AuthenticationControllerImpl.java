@@ -97,10 +97,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
 						userSessionData.setIsSSO(isSSO);
-						usdAdapter = userSessionData.writeToJSONObject(usdAdapter);
+						
+						updateUserLoginDataCookie(userSessionData);
 						
 						Date tomorrow = getDayFromNow();
-						cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
 						callback.onSuccess(usdAdapter.toJSONString());
@@ -119,6 +119,23 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});		
 	}
 
+	@Override
+	public void updateCachedProfile(UserProfile updatedProfile){
+		if(currentUser != null) {
+			currentUser.setProfile(updatedProfile);
+			try {
+				updateUserLoginDataCookie(currentUser);
+			} catch (JSONObjectAdapterException e) {
+			}
+		}
+	}
+	
+	private void updateUserLoginDataCookie(UserSessionData userSessionData) throws JSONObjectAdapterException {
+		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
+		Date tomorrow = getDayFromNow();
+		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
+	}
+	
 	@Override
 	public void getTermsOfUse(AsyncCallback<String> callback) {
 		userAccountService.getTermsOfUse(callback);
