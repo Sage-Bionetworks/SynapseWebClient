@@ -126,8 +126,8 @@ public class PasswordResetPresenterTest {
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
-		//verify that place is changed to Home
-		verify(mockPlaceChanger).goTo(any(Home.class));
+		//verify that place is changed to Login place
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 	
 

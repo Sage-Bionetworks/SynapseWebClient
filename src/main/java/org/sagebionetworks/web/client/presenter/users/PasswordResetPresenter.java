@@ -112,14 +112,8 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			public void onSuccess(Void result) {
 				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
-				if (authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse())
-					globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
-				else {
-					//pop up terms of service on re-login
-					authenticationController.logoutUser();
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
-				}
-					
+				authenticationController.logoutUser();
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
 			}
 
 			@Override
