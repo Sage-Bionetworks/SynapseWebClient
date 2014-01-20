@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -87,6 +88,7 @@ public class PasswordResetPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUserSessionData);
+		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -126,11 +128,10 @@ public class PasswordResetPresenterTest {
 		presenter.resetPassword("myPassword");
 		//verify password reset text is shown in the view
 		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
-		//verify that place is changed to Login place
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+		//verify that place is changed to Home
+		verify(mockPlaceChanger).goTo(any(Home.class));
 	}
 	
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testResetPassword2() {
@@ -145,6 +146,63 @@ public class PasswordResetPresenterTest {
 		//verify that place is changed to login place
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResetPassword3() {
+		//if there is a failure to re-login using the available credentials, send to the login page instead
+		resetAll();
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), anyString(), any(AsyncCallback.class));
+		presenter.setPlace(place);
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		presenter.resetPassword("myPassword");
+		//verify password reset text is shown in the view
+		verify(mockView).showInfo(anyString(), eq(DisplayConstants.PASSWORD_RESET_TEXT));
+		//verify that place is changed to login page
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResetPassword4() {
+		//or if the profile is unavailable
+		resetAll();
+		presenter.setPlace(place);
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		currentUserSessionData.setProfile(null);
+		presenter.resetPassword("myPassword");
+		//verify that place is changed to Login
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResetPassword5() {
+		//or if the profile username is not set
+		resetAll();
+		presenter.setPlace(place);
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		currentUserSessionData.getProfile().setUserName(null);
+		presenter.resetPassword("myPassword");
+		//verify that place is changed to Login
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testResetPassword6() {
+		//or if the profile username is a temporary username
+		resetAll();
+		presenter.setPlace(place);
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(any(String.class), any(String.class), any(AsyncCallback.class));
+		currentUserSessionData.getProfile().setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "123");
+		presenter.resetPassword("myPassword");
+		//verify that place is changed to Login
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testServiceFailure() {

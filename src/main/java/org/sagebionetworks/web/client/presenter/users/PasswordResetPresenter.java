@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -112,8 +115,16 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			public void onSuccess(Void result) {
 				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
-				authenticationController.logoutUser();
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
+				Session session = authenticationController.getCurrentUserSessionData().getSession();
+				UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+				if (session.getAcceptsTermsOfUse() && profile != null && profile.getUserName() != null && !DisplayUtils.isTemporaryUsername(profile.getUserName()))
+					//re-login like we do on the Settings page (when changing the password)
+					reloginUser(profile.getUserName(), newPassword);
+				else {
+					//pop up terms of service on re-login
+					authenticationController.logoutUser();
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
+				}
 			}
 
 			@Override
@@ -121,5 +132,20 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 				view.showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
 			}
 		});
+	}
+	
+	public void reloginUser(String username, String newPassword) {
+		// login user as session token has changed
+        authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                	globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
+                }
+                @Override
+                public void onFailure(Throwable caught) {
+                    // if login fails, simple send them to the login page to get a new session
+                    globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+                }
+        });
 	}
 }
