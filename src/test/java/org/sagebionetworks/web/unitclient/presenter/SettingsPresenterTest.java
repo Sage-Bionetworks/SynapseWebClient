@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,8 @@ public class SettingsPresenterTest {
 	UserProfile profile = new UserProfile();
 	String password = "password";
 	String newPassword = "otherpassword";
-	String username = "testuser@test.com";
+	String username = "testuser";
+	String email = "testuser@test.com";
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -76,6 +78,10 @@ public class SettingsPresenterTest {
 		
 		profile.setDisplayName("tester");
 		profile.setEmail(username);
+		profile.setUserName(username);
+		List<String> emails = new ArrayList<String>();
+		emails.add(email);
+		profile.setEmails(emails);
 		testUser.setProfile(profile);
 		testUser.setSession(new Session());
 		testUser.getSession().setSessionToken("token");

@@ -562,6 +562,12 @@ public class DisplayUtils {
 
 	}
 	
+	public static String getPrimaryEmail(UserProfile userProfile) {
+		List<String> emailAddresses = userProfile.getEmails();
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		return emailAddresses.get(0);
+	}
+	
 	public static String getDisplayName(UserProfile profile) {
 		return getDisplayName(profile.getFirstName(), profile.getLastName(), profile.getUserName());
 	}
