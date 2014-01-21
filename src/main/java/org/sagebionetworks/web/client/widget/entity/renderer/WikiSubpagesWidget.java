@@ -12,13 +12,13 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -28,12 +28,9 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -45,9 +42,12 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	private AdapterFactory adapterFactory;
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
-	private Synapse ownerObjectLink;
+	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
+	
+	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
+	private boolean isEmbeddedInOwnerPage;
 	
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory) {
@@ -60,13 +60,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	}	
 	@Override
 	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null);
+		configure(wikiKey, widgetDescriptor, widgetRefreshRequired, null, null, true);
 	}
 
-	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void configure(final WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer, boolean isEmbeddedInOwnerPage) {
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiKey = wikiKey;
+		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
@@ -87,7 +88,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
 								ownerObjectName = theHeader.getName();
-								ownerObjectLink = new Synapse(theHeader.getId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, null);
+								ownerObjectLink = getLinkPlace(theHeader.getId(), wikiKey.getVersion(), null);
 								refreshTableOfContents();
 							}	
 						} catch (JSONObjectAdapterException e) {
@@ -104,6 +105,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			}
 		}
+	}
+	
+	public Place getLinkPlace(String entityId, Long entityVersion, String wikiId) {
+		if (isEmbeddedInOwnerPage)
+			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
+		else
+			return new Wiki(entityId, ObjectType.ENTITY.toString(), wikiId);
 	}
 	
 	public void clearState() {
@@ -128,14 +136,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
 						V2WikiHeader header = (V2WikiHeader) headerEntity;
 						boolean isCurrentPage = header.getId().equals(wikiKey.getWikiPageId());
-						Synapse targetPlace;
+						Place targetPlace;
 						String title;
 						if (header.getParentId() == null) {
 							targetPlace = ownerObjectLink;
 							title = ownerObjectName;
 						}
 						else {
-							targetPlace = new Synapse(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), Synapse.EntityArea.WIKI, header.getId());
+							targetPlace = getLinkPlace(wikiKey.getOwnerObjectId(), wikiKey.getVersion(), header.getId());
 							title = header.getTitle();
 						}
 						
@@ -182,14 +190,14 @@ class TocItem extends BaseTreeModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static int ID = 0;
 	private String text;
-	private Synapse targetPlace;
+	private Place targetPlace;
 	private boolean isCurrentPage;
 	
 	public TocItem() {
 		set("id", ID++);
 	}
 	
-	public TocItem(String text, Synapse targetPlace, boolean isCurrentPage) {
+	public TocItem(String text, Place targetPlace, boolean isCurrentPage) {
 		super();
 		set("id", ID++);
 		this.text = text;
@@ -208,7 +216,7 @@ class TocItem extends BaseTreeModel implements Serializable {
 		}
 	}
 	
-	public Synapse getTargetPlace() {
+	public Place getTargetPlace() {
 		return targetPlace;
 	}
 	

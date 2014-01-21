@@ -11,9 +11,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -78,7 +77,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
 	private WikiAttachments wikiAttachments;
-	private int colWidth;
 	private WikiPageKey wikiKey;
 	private WidgetRegistrar widgetRegistrar;
 	WikiPageWidgetView.Presenter presenter;
@@ -90,6 +88,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private boolean isCurrentVersion;
 	private Long versionInView;
 	private FlowPanel wikiPagePanel;
+	private boolean isEmbeddedInOwnerPage;
 	
 	public interface Callback{
 		public void pageUpdated();
@@ -146,19 +145,19 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void configure(final WikiPage newPage, final WikiPageKey wikiKey,
-			String ownerObjectName, Boolean canEdit, boolean isRootWiki, int colWidth, boolean isDescription, 
-			boolean isCurrentVersion, final Long versionInView) {
+			String ownerObjectName, Boolean canEdit, boolean isRootWiki, boolean isDescription, 
+			boolean isCurrentVersion, final Long versionInView, boolean isEmbeddedInOwnerPage) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
 		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
-		this.colWidth = Math.round(colWidth/2);
 		this.isHistoryOpen = false;
 		this.isHistoryWidgetBuilt = false;
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
+		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		if(!isCurrentVersion) {
 			markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false, versionInView);
@@ -185,12 +184,12 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
 		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
-		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel);
+		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
 		wikiSubpagesPanel.add(widget.asWidget());
 		add(wikiSubpagesPanel);
 		add(wikiPagePanel);
 		
-		wikiPagePanel.add(getBreadCrumbs(colWidth));
+		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
 		String titleString = isRootWiki ? "" : currentPage.getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
@@ -270,7 +269,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		linkToCurrent.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.configure(wikiKey, canEdit, null, true, 24);
+				presenter.configure(wikiKey, canEdit, null, true);
 			}
 		});
 		
@@ -293,7 +292,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		return widgetWrapper;
 	}
 	
-	private Widget getBreadCrumbs(int colWidth) {
+	private Widget getBreadCrumbs() {
 		final SimplePanel breadcrumbsWrapper = new SimplePanel();		
 		if (!isRootWiki) {
 			List<LinkData> links = new ArrayList<LinkData>();
@@ -439,7 +438,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						//update wiki attachments
 						presenter.refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
 					}
-				}, getCloseHandler(titleField, mdField), getManagementHandler(), colWidth);
+				}, getCloseHandler(titleField, mdField), getManagementHandler());
 				form.addStyleName("margin-bottom-40 margin-top-10");
 				add(form);
 				layout(true);

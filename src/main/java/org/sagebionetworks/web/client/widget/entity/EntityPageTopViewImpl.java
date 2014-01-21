@@ -387,7 +387,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, true, null);
 
 		// Preview & Provenance Row
 		row = DisplayUtils.createRowContainer();
@@ -470,7 +470,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki		
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, 24, true, null);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, true, null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
@@ -523,7 +523,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 
 		// Wiki Tab: Wiki
-		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, 24, false, area);
+		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, false, area);
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
 		
@@ -604,7 +604,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		currentTabContainer.layout(true);							
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, int spanWidth, boolean marginTop, final Synapse.EntityArea area) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, boolean marginTop, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
@@ -632,7 +632,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 						}
 					}
 				}
-			}, true, spanWidth);
+			}, true);
 		}
 	}
 	

@@ -122,7 +122,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			boolean showFieldLabel, final boolean isWikiEditor,
 			final WidgetDescriptorUpdatedHandler callback,
 			final CloseHandler saveHandler,
-			final ManagementHandler managementHandler, int colWidth) {
+			final ManagementHandler managementHandler) {
 		this.markdownTextArea = markdownTextArea;
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
