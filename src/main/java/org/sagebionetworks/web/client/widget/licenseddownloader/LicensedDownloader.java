@@ -279,13 +279,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	@Override
 	public Callback getRequestAccessCallback() {
-		List<String> emailAddresses = userProfile.getEmails();
-		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
-		
+		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
 		final String jiraLink = jiraUrlHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
 				DisplayUtils.getDisplayName(userProfile), 
-				emailAddresses.get(0),
+				primaryEmail,
 				entityId, 
 				accessRequirementToDisplay.getId().toString());
 		

@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.server.servlet.openid;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -72,6 +74,15 @@ public class OpenIDUtils {
 			redirectUrl = returnToURL + ":" + errorToken;
 		} else {
 			redirectUrl = OpenIDConsumerUtils.addRequestParameter(returnToURL, "status=" + errorToken);
+			if (e.getMessage() != null && e.getMessage().length() > 0) {
+				//also include the detailed message
+				try {
+					String detailedMessage = URLEncoder.encode(e.getMessage(), "UTF-8");
+					redirectUrl = OpenIDConsumerUtils.addRequestParameter(redirectUrl, "detailedMessage=" + detailedMessage);
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 		return redirectUrl;
 	}
