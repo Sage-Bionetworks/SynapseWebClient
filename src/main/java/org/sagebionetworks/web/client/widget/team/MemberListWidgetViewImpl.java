@@ -154,7 +154,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				leaveButton.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {
-						MessageBox.confirm("Remove Member?", member.getDisplayName() + DisplayConstants.PROMPT_SURE_REMOVE_MEMBER, new Listener<MessageBoxEvent>() {					
+						MessageBox.confirm("Remove Member?", DisplayUtils.getDisplayName(member) + DisplayConstants.PROMPT_SURE_REMOVE_MEMBER, new Listener<MessageBoxEvent>() {					
 							@Override
 							public void handleEvent(MessageBoxEvent be) { 					
 								com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();

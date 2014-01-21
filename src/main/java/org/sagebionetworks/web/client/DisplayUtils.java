@@ -572,6 +572,10 @@ public class DisplayUtils {
 		return getDisplayName(profile.getFirstName(), profile.getLastName(), profile.getUserName());
 	}
 	
+	public static String getDisplayName(UserGroupHeader header) {
+		return DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName());
+	}
+	
 	public static String getDisplayName(String firstName, String lastName, String userName) {
 		StringBuilder sb = new StringBuilder();
 		boolean hasDisplayName = false;
