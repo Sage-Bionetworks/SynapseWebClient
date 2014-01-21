@@ -12,7 +12,9 @@ public class OpenIDUtilsTest {
 	
 	@Test
 	public void testCreateRedirectURLUnknownError() throws Exception {		
-		Exception e = new SynapseException();
+		String exceptionMessage="Testing exception message is returned";
+		String encodedMessage = "Testing+exception+message+is+returned";
+		Exception e = new SynapseException(exceptionMessage);
 		
 		// I. isGWTMode=false
 		
@@ -20,9 +22,14 @@ public class OpenIDUtilsTest {
 		assertEquals("foobar.com?status=OK&sessionToken=123", 
 				OpenIDUtils.createRedirectURL("foobar.com", "123", false));
 		
-		// error
-		assertEquals("foobar.com?status=OpenIDError", 
+		// error with detailed message, then without
+		assertEquals("foobar.com?status=OpenIDError&detailedMessage="+encodedMessage, 
 				OpenIDUtils.createErrorRedirectURL("foobar.com", false, e));
+		assertEquals("foobar.com?status=OpenIDError", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseException()));
+		assertEquals("foobar.com?status=OpenIDError", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseException("")));
+
 		
 		// II. isGWTMode=true
 		

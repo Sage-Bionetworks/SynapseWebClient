@@ -95,8 +95,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		if(authenticationController.isLoggedIn()) {
 			if(authenticationController.getCurrentUserSessionData() != null 
 					&& authenticationController.getCurrentUserSessionData().getProfile() != null
-					&& authenticationController.getCurrentUserSessionData().getProfile().getEmail() != null) {
-				final String username = authenticationController.getCurrentUserSessionData().getProfile().getEmail();
+					&& authenticationController.getCurrentUserSessionData().getProfile().getUserName() != null) {
+				final String username = authenticationController.getCurrentUserSessionData().getProfile().getUserName();
 				authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
 					@Override
 					public void onSuccess(String userSessionJson) {
@@ -145,7 +145,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	@Override
 	public void createSynapsePassword() {
 		if(authenticationController.isLoggedIn()) {
-			userService.sendPasswordResetEmail(authenticationController.getCurrentUserSessionData().getProfile().getEmail(), new AsyncCallback<Void>() {
+			String primaryEmail = DisplayUtils.getPrimaryEmail(authenticationController.getCurrentUserSessionData().getProfile());
+			userService.sendPasswordResetEmail(primaryEmail, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					view.showRequestPasswordEmailSent();

@@ -133,15 +133,37 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
-	public void testSetPlaceSSOLogin() {
+	public void testSetPlaceSSOLogin() throws JSONObjectAdapterException {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		LoginPlace place = new LoginPlace(fakeToken);
 		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));		
 		
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("NotTemporary");
+		setMyProfile(profile);
+
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).loginUserSSO(eq(fakeToken), any(AsyncCallback.class));
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
+	
+	@Test 
+	public void testSetPlaceSSOLoginTempUsername() throws JSONObjectAdapterException {
+		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
+		LoginPlace place = new LoginPlace(fakeToken);
+		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));		
+		
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
+		setMyProfile(profile);
+		
+		loginPresenter.setPlace(place);
+		verify(mockAuthenticationController).loginUserSSO(eq(fakeToken), any(AsyncCallback.class));
+		verify(mockView).showSetUsernameUI();
+	}
+	
 	
 	@Test
 	public void testUpdateProfile() {

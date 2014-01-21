@@ -144,6 +144,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 		cp.add(loginAgain, new MarginData(16, 0, 10, 10));
 		
 		logoutPanel.add(cp);
+		loginView.setVisible(true);
+		changeUsernameView.setVisible(false);
 	}
 
 	@Override

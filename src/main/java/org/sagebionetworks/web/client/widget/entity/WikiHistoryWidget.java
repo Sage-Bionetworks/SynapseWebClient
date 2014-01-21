@@ -110,7 +110,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 								// Store display names along with the associated id in the map
 								List<UserGroupHeader> headers = response.getChildren();
 								for(int i = 0; i < headers.size(); i++) {
-									mapIdToName.put(idsToSearch.get(i), headers.get(i).getDisplayName());
+									mapIdToName.put(idsToSearch.get(i), DisplayUtils.getDisplayName(headers.get(i)));
 								}
 								// Now we're ready to build the history widget
 								view.buildHistoryWidget();
