@@ -298,8 +298,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 						});
 					} else {
 						view.hideLoggingInLoader();
-						// user is logged in. forward to destination
-						forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+						// user is logged in. forward to destination after checking for username
+						setNewUser(authenticationController.getCurrentUserSessionData());
 					}
 				}
 				@Override
