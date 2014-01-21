@@ -48,6 +48,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -389,6 +390,12 @@ public class ProvUtilsTest {
 			
 			@Override
 			public void processWithMathJax(Element element) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void loadCss(String url, Callback<Void, Exception> callback) {
 				// TODO Auto-generated method stub
 				
 			}

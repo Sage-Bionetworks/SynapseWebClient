@@ -8,16 +8,25 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
@@ -328,4 +337,44 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		$wnd.layoutMath(element);
 	}-*/;
 
+	@Override
+	public void loadCss(final String url, final Callback<Void, Exception> callback) {
+		final LinkElement link = Document.get().createLinkElement();
+		link.setRel("stylesheet");
+		link.setHref(url);
+		_nativeAttachToHead(link);
+		
+		// fall back timer
+		final Timer t = new Timer() {
+			@Override
+			public void run() {
+				callback.onSuccess(null);
+			}
+		};
+		_addCssLoadHandler(url, callback);		
+		t.schedule(5000); // failsafe: after 5 seconds assume loaded
+	}
+	
+	/**
+	 * Attach element to head
+	 */
+	protected static native void _nativeAttachToHead(JavaScriptObject scriptElement) /*-{
+	    $doc.getElementsByTagName("head")[0].appendChild(scriptElement);
+	}-*/;
+
+
+	/**
+	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
+	 * @param cssUrl
+	 * @param callback
+	 */
+	private static native void _addCssLoadHandler(String cssUrl, Callback<Void, Exception> callback) /*-{
+		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
+		var img = $doc.createElement('img');		
+		img.onerror = function() {			
+			callback.@com.google.gwt.core.client.Callback::onSuccess(Ljava/lang/Object;)(null);
+		}
+		img.src = cssUrl;
+	}-*/;
+	
 }
