@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
+
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -13,11 +16,13 @@ import com.google.inject.Inject;
 public class ResourceLoaderImpl implements ResourceLoader {
 
 	Set<WebResource> loaded;	
+	SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public ResourceLoaderImpl() {
+	public ResourceLoaderImpl(SynapseJSNIUtils synapseJSNIUtils) {
 		super();		
-		loaded = new HashSet<WebResource>();		
+		loaded = new HashSet<WebResource>();
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}	
 	
 	@Override
@@ -30,20 +35,15 @@ public class ResourceLoaderImpl implements ResourceLoader {
 		final Set<WebResource> downloading = new HashSet<WebResource>(resources);		
 		for(final WebResource resource : resources) {
 			if(!loaded.contains(resource)) {
-				ScriptInjector.fromUrl(resource.getUrl()).setCallback(new Callback<Void, Exception>() {					
-					@Override
-					public void onSuccess(Void result) {
-						loaded.add(resource);
-						downloading.remove(resource);
-						checkDone(loadedCallback, downloading);
-					}					
-					@Override
-					public void onFailure(Exception reason) {
-						// ignore problems
-						downloading.remove(resource);
-						checkDone(loadedCallback, downloading);
-					}
-				}).setWindow(ScriptInjector.TOP_WINDOW).inject();
+				// Attach resources
+				Callback<Void, Exception> callback = getCallback(loadedCallback, downloading, resource);
+				if(resource.getType() == ResourceType.JAVASCRIPT) {
+					// JavaScript
+					ScriptInjector.fromUrl(resource.getUrl()).setCallback(callback).setWindow(ScriptInjector.TOP_WINDOW).inject();
+				} else if(resource.getType() == ResourceType.CSS) {
+					// CSS
+					synapseJSNIUtils.loadCss(resource.getUrl(), callback);
+				}				
 			}
 		}
 		checkDone(loadedCallback, downloading);
@@ -62,6 +62,26 @@ public class ResourceLoaderImpl implements ResourceLoader {
 		if(downloading.size() == 0) {
 			loadedCallback.onSuccess(null);
 		}
+	}
+
+	private Callback<Void, Exception> getCallback(
+			final AsyncCallback<Void> loadedCallback,
+			final Set<WebResource> downloading, final WebResource resource) {
+		Callback<Void, Exception> callback = new Callback<Void, Exception>() {					
+			@Override
+			public void onSuccess(Void result) {
+				loaded.add(resource);
+				downloading.remove(resource);
+				checkDone(loadedCallback, downloading);
+			}					
+			@Override
+			public void onFailure(Exception reason) {
+				// ignore problems
+				downloading.remove(resource);
+				checkDone(loadedCallback, downloading);
+			}
+		};
+		return callback;
 	}
 
 }

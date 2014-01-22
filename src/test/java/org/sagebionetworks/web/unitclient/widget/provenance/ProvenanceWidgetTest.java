@@ -68,6 +68,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -463,6 +464,12 @@ public class ProvenanceWidgetTest {
 			}
 			@Override
 			public void processWithMathJax(Element element) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void loadCss(String url, Callback<Void, Exception> callback) {
 				// TODO Auto-generated method stub
 				
 			}
