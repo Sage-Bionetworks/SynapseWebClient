@@ -157,7 +157,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.refreshEntityAttachments();
 					}
-				}, null, null, 6);
+				}, null, null);
 			}
 		}
 		// Add them to the form

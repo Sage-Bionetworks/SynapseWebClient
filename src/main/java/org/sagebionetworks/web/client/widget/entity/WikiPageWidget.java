@@ -1,20 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -54,7 +49,6 @@ SynapseWidgetPresenter {
 	private WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
-	private int spanWidth;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
 	private String originalMarkdown;
@@ -94,12 +88,11 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
 		originalMarkdown = null;
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-		this.spanWidth = spanWidth;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 		//set up callback
@@ -127,7 +120,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -347,7 +340,7 @@ SynapseWidgetPresenter {
 		view.clear();
 	}
 	private void refresh() {
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
+		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
 	}
 
 	@Override
@@ -381,7 +374,7 @@ SynapseWidgetPresenter {
 							wikiKey.setWikiPageId(currentPage.getId());
 							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, spanWidth, isDescription, isCurrentVersion, versionInView);
+							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
 							onFailure(e);
 						}

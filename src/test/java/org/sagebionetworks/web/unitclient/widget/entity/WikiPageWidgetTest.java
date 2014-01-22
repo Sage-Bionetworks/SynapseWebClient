@@ -107,14 +107,14 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), anyInt(), eq(false), eq(true), any(Long.class));
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), eq(false), eq(true), any(Long.class), eq(true));
 	}
 
 	@Test
 	public void testConfigureNoWikiPage(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		verify(mockView).showNoWikiAvailableUI(false);
 	}
 	
@@ -123,7 +123,7 @@ public class WikiPageWidgetTest {
 		//if page is not embedded in the owner page, and the user can't edit, then it should show a 404
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		WikiPageWidget.Callback mockCallback = Mockito.mock(WikiPageWidget.Callback.class);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, mockCallback, false, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, mockCallback, false);
 		verify(mockView).show404();
 		verify(mockCallback).noWikiFound();
 	}
@@ -131,7 +131,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureWikiForbiddenNotEmbedded(){
 		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, false);
 		verify(mockView).show403();
 	}
 	
@@ -144,7 +144,7 @@ public class WikiPageWidgetTest {
 		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
 		headers.setResults(new ArrayList());
 		when(mockNodeModelCreator.createBatchResults(anyString(), any(Class.class))).thenReturn(headers);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), false, null, true);
 		
 		verify(mockView).show404();
 	}
@@ -152,7 +152,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
@@ -196,7 +196,7 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testCreatePage() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.createPage("a new wiki page with this title");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
@@ -204,7 +204,7 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testCreatePageFailure() throws JSONObjectAdapterException{		
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		presenter.createPage("a new wiki page with this title");
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
@@ -212,21 +212,21 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testCancelClicked(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.cancelClicked();
 		verify(mockGlobalApplicationState).setIsEditing(eq(false));
 	}
 
 	@Test
 	public void testSaveClicked() throws JSONObjectAdapterException{
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.saveClicked("", "");
 		verify(mockGlobalApplicationState).setIsEditing(eq(false));
 	}
 	
 	@Test
 	public void testEditClicked(){
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true, 17);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.editClicked();
 		verify(mockGlobalApplicationState).setIsEditing(eq(true));
 	}
