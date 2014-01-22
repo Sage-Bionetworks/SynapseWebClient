@@ -20,6 +20,7 @@ import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
@@ -351,7 +352,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				callback.onSuccess(null);
 			}
 		};
-		_addCssLoadHandler(url, callback);		
+		
+		Command loadedCommand = new Command() {			
+			@Override
+			public void execute() {
+				callback.onSuccess(null);
+				t.cancel();
+			}
+		};
+		
+		_addCssLoadHandler(url, loadedCommand);		
 		t.schedule(5000); // failsafe: after 5 seconds assume loaded
 	}
 	
@@ -368,11 +378,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * @param cssUrl
 	 * @param callback
 	 */
-	private static native void _addCssLoadHandler(String cssUrl, Callback<Void, Exception> callback) /*-{
+	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
 		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
 		var img = $doc.createElement('img');		
 		img.onerror = function() {			
-			callback.@com.google.gwt.core.client.Callback::onSuccess(Ljava/lang/Object;)(null);
+			command.@com.google.gwt.user.client.Command::execute()();
 		}
 		img.src = cssUrl;
 	}-*/;
