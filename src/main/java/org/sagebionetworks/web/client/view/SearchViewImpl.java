@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.search.Facet;
 import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -26,6 +28,8 @@ import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.core.El;
 import com.extjs.gxt.ui.client.core.XDOM;
@@ -59,7 +63,11 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -114,20 +122,21 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Footer footerWidget;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
 			Footer footerWidget, IconsImageBundle iconsImageBundle,
 			SageImageBundle sageImageBundle, 
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		initWidget(binder.createAndBindUi(this));
-
+		
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		
+		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -153,16 +162,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	@Override
-	public void setSearchResults(SearchResults searchResults, String searchTerm, boolean newQuery) {		
-		// TODO : set searchTerm into search box
+	public void setSearchResults(SearchResults searchResults,
+			String searchTerm, boolean newQuery) {
+		// set searchTerm into search box
 		searchField.setText(searchTerm);
 		facetButtons = new ArrayList<Button>();
 		
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
-		SafeHtml resultsHtml;				
+		Panel searchResultsPanel;				
 		if (hits != null && hits.size() > 0) {
-			resultsHtml = createSearchResults(hits, searchResults.getStart().intValue());			
+			searchResultsPanel = createSearchResults(hits, searchResults.getStart().intValue());			
 
 			// create facet widgets
 			createFacetWidgets(searchResults);			
@@ -171,9 +181,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 			createPagination(searchResults);
 			
 		} else {
-			resultsHtml = new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
+			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
-			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml();
+			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
 		}
 
 		// show existing facets			
@@ -184,7 +194,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
 
 		resultsPanel.clear();
-		resultsPanel.add(new HTML(resultsHtml));
+		resultsPanel.add(searchResultsPanel);
 		loadShowing = false;
 		
 		// scroll user to top of page
@@ -317,16 +327,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 		facetPanel.add(vp);
 	}
 
-	private SafeHtml createSearchResults(List<Hit> hits, int start) {
-		SafeHtmlBuilder resultsBuilder = new SafeHtmlBuilder();
+	private Panel createSearchResults(List<Hit> hits, int start) {
+		FlowPanel resultsPanel = new FlowPanel();
 		int i = start + 1;
 		for(Hit hit : hits) {
 			if(hit.getId() != null) {
-				resultsBuilder.append(getResultHtml(i, hit)); 				
+				resultsPanel.add(getResult(i, hit));
 				i++;
 			}
 		}
-		return resultsBuilder.toSafeHtml();
+		return resultsPanel;
 	}
 
 	@Override
@@ -402,30 +412,59 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	}
 
-	private SafeHtml getResultHtml(int i, Hit hit) {				
-				
+	/**
+	 * stack-27 temporary change (until the index is updated, there may be usernames in the created_by and modified_by values).  Can remove
+	 * @param userId
+	 * @return
+	 */
+	private String getSearchUserId(String userId){
+		String createdBy = userId;
+		if (DisplayUtils.isTemporaryUsername(createdBy)) {
+			createdBy = createdBy.substring(WebConstants.TEMPORARY_USERNAME_PREFIX.length());
+		}
+		return createdBy;
+	}
+	
+	private Panel getResult(int i, Hit hit) {				
+		FlowPanel attributionPanel = new FlowPanel();		
+		
 		ImageResource icon = presenter.getIconForHit(hit);
 		
+		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
+		UserBadge modifiedByBadge = ginInjector.getUserBadgeWidget();
+		modifiedByBadge.configure(getSearchUserId(hit.getModified_by()));
 		
-		SafeHtml attribution = new SafeHtmlBuilder()
-		.appendHtmlConstant("Created by ").appendEscaped(hit.getCreated_by())
-		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", ")
-		.appendHtmlConstant("Updated by ").appendEscaped(hit.getModified_by())
-		.appendHtmlConstant(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)))
-		.toSafeHtml();
-
+		InlineHTML inlineHtml = new InlineHTML("Created by");
+		inlineHtml.addStyleName("hitattribution");
+		attributionPanel.add(inlineHtml);
+		Widget createdByBadgeWidget = createdByBadge.asWidget();
+		createdByBadgeWidget.addStyleName("inline-block margin-left-5 movedown-4");
+		attributionPanel.add(createdByBadgeWidget);
 		
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
+		inlineHtml.addStyleName("hitattribution");
+		
+		attributionPanel.add(inlineHtml);
+		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
+		modifiedByBadgeWidget.addStyleName("inline-block margin-left-5 movedown-4");
+		attributionPanel.add(modifiedByBadgeWidget);
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
+		inlineHtml.addStyleName("hitattribution");
+		
+		attributionPanel.add(inlineHtml);
+		
+		FlowPanel hitPanel = new FlowPanel();
+		hitPanel.addStyleName("serv hit margin-bottom-20");
 		SafeHtmlBuilder resultBuilder = new SafeHtmlBuilder();
-		resultBuilder.appendHtmlConstant("<div class=\"serv hit\">\n") 
-		.appendHtmlConstant("	   <h4>" + i + ". \n");
+		resultBuilder.appendHtmlConstant("	   <h4>" + i + ". \n");
 		if(icon != null) 
 			resultBuilder.appendHtmlConstant(DisplayUtils.getIconHtml(icon));
 		resultBuilder.appendHtmlConstant("         <a class=\"link\" href=\"" + DisplayUtils.getSynapseHistoryToken(hit.getId()) + "\">")
 		.appendEscaped(hit.getName())
 		.appendHtmlConstant("</a>");
 		
-		resultBuilder.appendHtmlConstant("    </h4>\n")
-		.appendHtmlConstant("<p class=\"notopmargin\">");
+		resultBuilder.appendHtmlConstant("    </h4>\n");
 		if(null != hit.getPath()) {
 			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
@@ -434,12 +473,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 			.appendEscaped(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR))
 			.appendHtmlConstant("</span><br>\n");
 		}
-		resultBuilder.appendHtmlConstant("<span class=\"hitattribution\">").append(attribution).appendHtmlConstant("</span></p>\n")					
-		.appendHtmlConstant("</div>\n");
-
-		return resultBuilder.toSafeHtml();
+		hitPanel.add(new HTMLPanel(resultBuilder.toSafeHtml()));
+		hitPanel.add(attributionPanel);
+		
+		return hitPanel;
 	}
-
+	
 	private SafeHtml getPathHtml(EntityPath path) {		
 		List<EntityHeader> headers = path.getPath();
 		SafeHtmlBuilder pathBuilder = new SafeHtmlBuilder();
@@ -592,8 +631,11 @@ public class SearchViewImpl extends Composite implements SearchView {
 			lc = new LayoutContainer();
 			lc.setWidth(188);
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
+			//special case.  if this is the created_by facet, then add a UserBadge
+			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
 			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
-			FlexTable flexTable = new FlexTable();
+			FlowPanel flowPanel = new FlowPanel();
+			//FlexTable flexTable = new FlexTable();
 			int i=0;
 			
 			for(final FacetConstraint constraint : facet.getConstraints()) {
@@ -606,9 +648,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 				if(constraint.getValue().contains(":")) {
 					continue;
 				}
+				FlowPanel valueContainer = new FlowPanel();
 				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
+				if (isCreatedByFacet) {
+					stub = "";
+					UserBadge badge = ginInjector.getUserBadgeWidget();
+					badge.configure(getSearchUserId(constraint.getValue()));
+					Widget widget = badge.asWidget();
+					widget.addStyleName("inline-block margin-right-5 movedown-4");
+					valueContainer.add(widget);
+				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
-				if (!stub.equalsIgnoreCase(constraint.getValue())) {
+				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet) {
 					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, constraint.getValue(), TOOLTIP_POSITION.RIGHT);
 				}
 				
@@ -618,11 +669,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 						Window.scrollTo(0, 0);
 						presenter.addFacet(facet.getName(), constraint.getValue());				
 					}
-				});			
-				flexTable.setWidget(i, 0, a);
+				});	
+				valueContainer.add(a);
+				flowPanel.add(valueContainer);
 				i++;
 			}		
-			lc.add(flexTable);
+			lc.add(flowPanel);
 		}
 		return lc;
 	}
