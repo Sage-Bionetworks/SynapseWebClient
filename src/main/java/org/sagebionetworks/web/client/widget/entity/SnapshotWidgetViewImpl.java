@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.WidgetMenu;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.EntitySearchBox.EntitySelect
 import org.sagebionetworks.web.client.widget.entity.dialog.DeleteConfirmDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog.Callback;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -73,11 +75,13 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 	private LayoutContainer addEditor;
 	private FlexTable groupsTable;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
-	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox, SynapseJSNIUtils synapseJSNIUtils) {
+	public SnapshotWidgetViewImpl(IconsImageBundle iconsImageBundle, EntitySearchBox entitySearchBox, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.entitySearchBox = entitySearchBox;
+		this.ginInjector = ginInjector;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
@@ -259,7 +263,7 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 		// set row in table
 		groupDisplay.setRow(rowIndex, name, downloadLink,
 				display.getVersion(), description,
-				display.getModifienOn(), display.getContact(),
+				display.getModifienOn(), display.getCreatedByPrincipalId(),
 				display.getNote());
 		if(canEdit && showEdit && !readOnly) {
 			ClickHandler editRow = new ClickHandler() {				
@@ -556,13 +560,17 @@ public class SnapshotWidgetViewImpl extends LayoutContainer implements SnapshotW
 
 		public void setRow(int rowIndex, Widget nameLink, Widget downloadLink,
 				SafeHtml version, HTML description, Date date,
-				SafeHtml createdBy, SafeHtml note) {			
+				String createdByPrincipalId, SafeHtml note) {			
 			table.setWidget(rowIndex, HEADER_NAME_IDX, nameLink);
 			table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
 			if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
 			table.setWidget(rowIndex, HEADER_DESC_IDX, description);
 			table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
-			table.setHTML(rowIndex, HEADER_CREATEDBY_IDX, createdBy);
+			
+			//set userbadge widget
+			UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+			createdByBadge.configure(createdByPrincipalId);
+			table.setWidget(rowIndex, HEADER_CREATEDBY_IDX, createdByBadge.asWidget());
 			updateRowNote(rowIndex, note);
 		}
 		
