@@ -118,6 +118,8 @@ public class WebConstants {
 
 	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
 	
+	public static final String DIV_ID_PROFILE_PREFIX = "profile_";
+	
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
     public static final String DIV_ID_LINK_PREFIX = "link-";
 	public static final String DIV_ID_AUTOLINK_PREFIX = "autolink-";

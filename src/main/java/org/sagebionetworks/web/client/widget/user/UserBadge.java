@@ -47,12 +47,25 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void configure(final String principalId) {
 		view.showLoading();
+		UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile profile) {
+				view.setProfile(profile, maxNameLength);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showLoadError(principalId);
+			}
+		});
+	}
+	
+	public static void getUserProfile(String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final AsyncCallback<UserProfile> callback) {
 		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String result) {
 				try {
 					UserProfile profile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
-					view.setProfile(profile, maxNameLength);
+					callback.onSuccess(profile);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -60,7 +73,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showLoadError(principalId);
+				callback.onFailure(caught);
 			}
 		});
 	}
