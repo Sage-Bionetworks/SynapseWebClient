@@ -412,15 +412,28 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	}
 
+	/**
+	 * stack-27 temporary change (until the index is updated, there may be usernames in the created_by and modified_by values).  Can remove
+	 * @param userId
+	 * @return
+	 */
+	private String getSearchUserId(String userId){
+		String createdBy = userId;
+		if (DisplayUtils.isTemporaryUsername(createdBy)) {
+			createdBy = createdBy.substring(WebConstants.TEMPORARY_USERNAME_PREFIX.length());
+		}
+		return createdBy;
+	}
+	
 	private Panel getResult(int i, Hit hit) {				
 		FlowPanel attributionPanel = new FlowPanel();		
 		
 		ImageResource icon = presenter.getIconForHit(hit);
 		
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
-		createdByBadge.configure(hit.getCreated_by());
+		createdByBadge.configure(getSearchUserId(hit.getCreated_by()));
 		UserBadge modifiedByBadge = ginInjector.getUserBadgeWidget();
-		modifiedByBadge.configure(hit.getModified_by());
+		modifiedByBadge.configure(getSearchUserId(hit.getModified_by()));
 		
 		InlineHTML inlineHtml = new InlineHTML("Created by");
 		inlineHtml.addStyleName("hitattribution");
@@ -640,7 +653,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				if (isCreatedByFacet) {
 					stub = "";
 					UserBadge badge = ginInjector.getUserBadgeWidget();
-					badge.configure(constraint.getValue());
+					badge.configure(getSearchUserId(constraint.getValue()));
 					Widget widget = badge.asWidget();
 					widget.addStyleName("inline-block margin-right-5 movedown-4");
 					valueContainer.add(widget);
