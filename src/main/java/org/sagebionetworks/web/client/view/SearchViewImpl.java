@@ -618,6 +618,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			lc = new LayoutContainer();
 			lc.setWidth(188);
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
+			//special case.  if this is the created_by facet, then add a UserBadge
 			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
 			lc.add(new Html("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
 			FlowPanel flowPanel = new FlowPanel();
