@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -55,11 +56,12 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -393,20 +395,32 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin) {
-		// TODO : switch to using the badge	
-//		UserBadge badge;
-//		badge = ginInjector.getUserBadgeWidget();
-//		badge.setMaxNameLength(MAX_DISPLAY_NAME_CHAR);
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayConstants.MODIFIED_BY + " <b>")
-		.appendEscaped(entity.getModifiedBy())
-		.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(entity.getModifiedOn()) + "<br>")
-		.appendHtmlConstant(DisplayConstants.CREATED_BY + " <b>")
-		.appendEscaped(entity.getCreatedBy())
-		.appendHtmlConstant("</b> " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(entity.getCreatedOn()));		
-		HTML html = new HTML(shb.toSafeHtml());
-		if(addTopMargin) html.addStyleName("margin-top-15");
-		return html;
+		FlowPanel attributionPanel = new FlowPanel();
+		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+		createdByBadge.configure(entity.getCreatedBy());
+		
+		UserBadge modifiedByBadge = ginInjector.getUserBadgeWidget();
+		modifiedByBadge.configure(entity.getModifiedBy());
+		
+		
+		InlineHTML inlineHtml = new InlineHTML(DisplayConstants.CREATED_BY);
+		attributionPanel.add(inlineHtml);
+		Widget createdByBadgeWidget = createdByBadge.asWidget();
+		createdByBadgeWidget.addStyleName("inline-block margin-left-5");
+		attributionPanel.add(createdByBadgeWidget);
+		
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getCreatedOn()) + "<br>" + DisplayConstants.MODIFIED_BY);
+		
+		attributionPanel.add(inlineHtml);
+		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
+		modifiedByBadgeWidget.addStyleName("inline-block margin-left-5");
+		attributionPanel.add(modifiedByBadgeWidget);
+		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+		
+		attributionPanel.add(inlineHtml);
+		
+		if(addTopMargin) attributionPanel.addStyleName("margin-top-15");
+		return attributionPanel;
 	}
 
 	private Widget getFilePreview(EntityBundle bundle) {		
