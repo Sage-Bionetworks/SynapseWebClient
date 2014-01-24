@@ -151,7 +151,7 @@ public class MarkdownRegExConstants {
 	 * Recognized example input:
 	 * doi:10.1234
 	 */
-	public static final String LINK_DOI = "(?<=[\\W&&[^:]]|^)(doi:([a-zA-Z_0-9./]+))";
+	public static final String LINK_DOI = "(?<=[\\W&&[^:]]|^)(doi:([-a-zA-Z0-9+&@#/%?=~_|!:,.;]+))";
 	
 	/**
 	 * Recognized example input:
