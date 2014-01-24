@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,6 +61,14 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 				}
 			});
 		}
+	}
+	
+	/**
+	 * When the username is clicked, call this clickhandler instead of the default behavior
+	 * @param clickHandler
+	 */
+	public void setCustomClickHandler(ClickHandler clickHandler) {
+		view.setCustomClickHandler(clickHandler);
 	}
 	
 	public static void getUserProfile(String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final AsyncCallback<UserProfile> callback) {

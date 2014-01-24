@@ -650,10 +650,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 				FlowPanel valueContainer = new FlowPanel();
 				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
+				ClickHandler clickHandler = new ClickHandler() {				
+					@Override
+					public void onClick(ClickEvent event) {
+						Window.scrollTo(0, 0);
+						presenter.addFacet(facet.getName(), constraint.getValue());				
+					}
+				};
 				if (isCreatedByFacet) {
 					stub = "";
 					UserBadge badge = ginInjector.getUserBadgeWidget();
 					badge.configure(getSearchUserId(constraint.getValue()));
+					badge.setCustomClickHandler(clickHandler);
 					Widget widget = badge.asWidget();
 					widget.addStyleName("inline-block margin-right-5 movedown-4");
 					valueContainer.add(widget);
@@ -663,13 +671,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, constraint.getValue(), TOOLTIP_POSITION.RIGHT);
 				}
 				
-				a.addClickHandler(new ClickHandler() {				
-					@Override
-					public void onClick(ClickEvent event) {
-						Window.scrollTo(0, 0);
-						presenter.addFacet(facet.getName(), constraint.getValue());				
-					}
-				});	
+				a.addClickHandler(clickHandler);	
 				valueContainer.add(a);
 				flowPanel.add(valueContainer);
 				i++;
