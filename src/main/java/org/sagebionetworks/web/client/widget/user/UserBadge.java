@@ -46,17 +46,20 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void configure(final String principalId) {
-		view.showLoading();
-		UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile profile) {
-				view.setProfile(profile, maxNameLength);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showLoadError(principalId);
-			}
-		});
+		if (principalId != null && principalId.trim().length() > 0) {
+			view.showLoading();
+			
+			UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile profile) {
+					view.setProfile(profile, maxNameLength);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showLoadError(principalId);
+				}
+			});
+		}
 	}
 	
 	public static void getUserProfile(String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final AsyncCallback<UserProfile> callback) {
