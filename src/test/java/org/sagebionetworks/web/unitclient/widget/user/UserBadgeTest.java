@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,4 +74,15 @@ public class UserBadgeTest {
 		verify(mockView).setProfile(profile, max);		
 	}
 	
+	@Test
+	public void testConfigureNullPrincipalId() throws Exception {
+		userBadge.configure((String)null);
+		verify(mockView, never()).setProfile(any(UserProfile.class), anyInt());
+	}
+	
+	@Test
+	public void testConfigureEmptyPrincipalId() throws Exception {
+		userBadge.configure("");
+		verify(mockView, never()).setProfile(any(UserProfile.class), anyInt());
+	}
 }

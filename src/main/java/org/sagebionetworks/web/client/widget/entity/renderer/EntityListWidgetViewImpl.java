@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 
@@ -14,17 +15,19 @@ public class EntityListWidgetViewImpl extends LayoutContainer implements EntityL
 	private IconsImageBundle iconsImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityListRenderer renderer;
-
+	private PortalGinInjector ginInjector;
+	
 	@Inject
-	public EntityListWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+	public EntityListWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
 	public void configure() {
 		this.removeAll();		
-		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, false);
+		renderer = new EntityListRenderer(iconsImageBundle, synapseJSNIUtils, ginInjector, false);
 		this.add(renderer);
 	}	
 	
