@@ -203,7 +203,7 @@ public class EntityListUtil {
 				downloadUrl, descSafe,
 				SafeHtmlUtils.fromString(version),
 				referencedEntity.getModifiedOn(),
-				referencedEntity.getCreatedBy() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromString(referencedEntity.getCreatedBy()),
+				referencedEntity.getCreatedBy() == null ? "" : referencedEntity.getCreatedBy(),
 				noteSafe);		
 	}
 
@@ -212,7 +212,7 @@ public class EntityListUtil {
 		return new EntityGroupRecordDisplay(
 				"",
 				SafeHtmlUtils.EMPTY_SAFE_HTML,
-				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, "", SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 

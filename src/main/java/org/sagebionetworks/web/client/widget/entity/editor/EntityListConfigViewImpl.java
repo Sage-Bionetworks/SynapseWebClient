@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -35,6 +36,7 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 	private Presenter presenter;
 	IconsImageBundle iconsImageBundle;
 	SynapseJSNIUtils synapseJSNIUtils;
+	PortalGinInjector ginInjector;
 	
 	private LayoutContainer tableContainer; 
 	private Button addEntityButton;
@@ -42,9 +44,10 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 	private EntityFinder entityFinder;
 	
 	@Inject
-	public EntityListConfigViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, EntityFinder entityFinder) {
+	public EntityListConfigViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, EntityFinder entityFinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.ginInjector = ginInjector;
 		this.entityFinder = entityFinder;
 	}
 	
@@ -87,7 +90,7 @@ public class EntityListConfigViewImpl extends LayoutContainer implements EntityL
 	
 	@Override
 	public void configure() {	
-		renderer = new EntityListRenderer(iconsImageBundle,	synapseJSNIUtils, false);
+		renderer = new EntityListRenderer(iconsImageBundle,	synapseJSNIUtils, ginInjector, false);
 		tableContainer.removeAll();
 		tableContainer.add(renderer);
 		tableContainer.layout();

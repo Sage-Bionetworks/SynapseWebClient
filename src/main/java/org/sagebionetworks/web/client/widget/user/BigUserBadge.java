@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -34,24 +33,18 @@ public class BigUserBadge implements BigUserBadgeView.Presenter, SynapseWidgetPr
 	
 	public void configure(final String principalId, final String description) {
 		view.showLoading();
-		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
+		
+		UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					UserProfile profile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
-					String desc = description != null ? description : profile.getCompany();
-					view.setProfile(profile, desc);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(UserProfile profile) {
+				String desc = description != null ? description : profile.getCompany();
+				view.setProfile(profile, desc);
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showLoadError(principalId);
 			}
 		});
-
 	}
 	
 	@SuppressWarnings("unchecked")
