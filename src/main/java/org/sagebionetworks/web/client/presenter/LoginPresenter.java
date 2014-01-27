@@ -147,9 +147,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void setNewUser(UserSessionData newUser) {	
 		//get my profile, and check for a default username
+		view.showLoggingInLoader();
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile result) {
+				view.hideLoggingInLoader();
 				profile = result;
 				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
 					//set your username!
@@ -165,6 +167,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.hideLoggingInLoader();
 				//could not determine
 				forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 			}
@@ -297,7 +300,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							}
 						});
 					} else {
-						view.hideLoggingInLoader();
 						// user is logged in. forward to destination after checking for username
 						setNewUser(authenticationController.getCurrentUserSessionData());
 					}
