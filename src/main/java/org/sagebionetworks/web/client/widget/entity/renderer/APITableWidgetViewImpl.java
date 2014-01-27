@@ -20,8 +20,10 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -132,21 +134,28 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			HTMLPanel panel = new HTMLPanel(builder.toString());
 			add(panel);
 			layout(true);
-			//do not apply sorter if paging (service needs to be involved for a true column sort)
-			if(!tableConfig.isPaging()) {
-				synapseJSNIUtils.tablesorter(elementId);
-			}
 			
 			for (ClickHandler clickHandler : clickHandler2ElementsMap.keySet()) {
 				List<String> elementIds = clickHandler2ElementsMap.get(clickHandler);
 				for (String id : elementIds) {
 					Element e = panel.getElementById(id);
 					String anchorText = e.getAttribute("anchorText");
-					Anchor a = new Anchor(anchorText);
-					a.addClickHandler(clickHandler);
+					Widget a;
+					if (tableConfig.isPaging()) {
+						a = new Anchor(anchorText);
+						((Anchor)a).addClickHandler(clickHandler);
+					} else {
+						a = new InlineHTML(SafeHtmlUtils.htmlEscape(anchorText));
+					}
 					panel.add(a, id);
 				}
 			}
+
+			//do not apply sorter if paging (service needs to be involved for a true column sort)
+			if(!tableConfig.isPaging()) {
+				synapseJSNIUtils.tablesorter(elementId);
+			}
+
 		}
 	}	
 	

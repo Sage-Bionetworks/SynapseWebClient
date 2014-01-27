@@ -99,9 +99,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private void refreshData() {
 		String fullUri = tableConfig.getUri();
 		
-		fullUri = getOrderedByURI(fullUri, tableConfig);
-		
 		if (tableConfig.isPaging()) {
+			//SWC-1133: only modify the URI with Ordered By if we are paging (otherwise, JQuery tablesorter will handle sorting)
+			fullUri = getOrderedByURI(fullUri, tableConfig);
 			fullUri = getPagedURI(fullUri);
 		}
 		
