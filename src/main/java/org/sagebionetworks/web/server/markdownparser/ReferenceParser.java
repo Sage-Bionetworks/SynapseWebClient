@@ -68,7 +68,7 @@ public class ReferenceParser extends BasicMarkdownElementParser {
 			footnoteMarkdown.append("[[" + (i + 1) + "]](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + targetReferenceId + ") ");
 
 			//Assign id to the element so that the reference can link to this footnote
-			footnoteMarkdown.append("<p id=\"" + footnoteId + "\" class=\"inlineWidgetContainer\">" + footnoteText + "</p>");
+			footnoteMarkdown.append("<span id=\"" + footnoteId + "\" class=\"moveup-4\">" + footnoteText + "</span>");
 			footnoteMarkdown.append("<br>");
 		}
 		String parsedFootnotes = runSimpleParsers(footnoteMarkdown.toString(), parsersOnCompletion);
