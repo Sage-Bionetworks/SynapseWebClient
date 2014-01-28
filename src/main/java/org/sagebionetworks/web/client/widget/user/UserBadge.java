@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -66,24 +67,32 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 	}
 	
+	/**
+	 * When the username is clicked, call this clickhandler instead of the default behavior
+	 * @param clickHandler
+	 */
+	public void setCustomClickHandler(ClickHandler clickHandler) {
+		view.setCustomClickHandler(clickHandler);
+	}	
+
 	public static void getUserProfile(final String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
 		String profileString = clientCache.get(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX);
 		if (profileString != null) {
 			parseProfile(profileString, nodeModelCreator, callback);
 		} else {
-			synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
-				@Override
-				public void onSuccess(String result) {
+		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
+			@Override
+			public void onSuccess(String result) {
 					clientCache.put(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX, result);
 					parseProfile(result, nodeModelCreator, callback);
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
+	}
 	}
 	
 	public static void parseProfile(String profileString, NodeModelCreator nodeModelCreator, AsyncCallback<UserProfile> callback) {
