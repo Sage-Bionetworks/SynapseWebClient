@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -27,7 +28,8 @@ public class UserBadgeTest {
 	SynapseClientAsync mockSynapseClient;
 	UserBadgeView mockView;
 	UserBadge userBadge;
-	UserProfile profile;		
+	UserProfile profile;
+	ClientCache mockCache;
 	String principalId = "id1";
 	int max=10;
 	
@@ -40,7 +42,8 @@ public class UserBadgeTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(UserBadgeView.class);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockNodeModelCreator);
+		mockCache = mock(ClientCache.class);
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockNodeModelCreator, mockCache);
 	}
 	
 	@Test
@@ -65,6 +68,19 @@ public class UserBadgeTest {
 		profile.setDisplayName("name");
 		userBadge.configure(principalId);
 		verify(mockView).showLoadError(principalId);
+	}
+	
+	@Test
+	public void testConfigureFromCache() throws Exception {
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		when(mockCache.get(anyString())).thenReturn("user profile json");
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(profile);
+		profile.setDisplayName("name");
+		userBadge.setMaxNameLength(max);
+		userBadge.configure(principalId);
+		verify(mockView).setProfile(profile, max);
+		//did not use the synapse client, used cache instead
+		verify(mockSynapseClient, never()).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 		
 	@Test
