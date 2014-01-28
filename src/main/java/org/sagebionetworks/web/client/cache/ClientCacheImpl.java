@@ -11,8 +11,8 @@ public class ClientCacheImpl implements ClientCache {
 	private HashMap<String, Long> key2ExpireTime;
 	private StorageWrapper storage;
 
-	//default to 20 minutes
-	private static final Long DEFAULT_CACHE_TIME_MS = 1000L*60L*20L;
+	//default to an hour
+	private static final Long DEFAULT_CACHE_TIME_MS = 1000L*60L*60L;
 	
 	@Inject
 	public ClientCacheImpl(StorageWrapper storage) {
@@ -23,11 +23,17 @@ public class ClientCacheImpl implements ClientCache {
 	
 	@Override
 	public String get(String key) {
-		String value = null;
-		if (contains(key)) {
-			value = storage.getItem(key);
+		Long expireTime = key2ExpireTime.get(key);
+		if (storage.isStorageSupported() && expireTime != null) {
+			if (System.currentTimeMillis() < expireTime) {
+				return storage.getItem(key); 
+			} else {
+				//expired, clean up
+				storage.removeItem(key);
+				key2ExpireTime.remove(key);
+			}
 		}
-		return value;
+		return null;
 	}
 
 	@Override
@@ -45,17 +51,6 @@ public class ClientCacheImpl implements ClientCache {
 
 	@Override
 	public boolean contains(String key) {
-		boolean isContained = false;
-		if (storage.isStorageSupported() && key2ExpireTime.containsKey(key)) {
-			Long expireTime = key2ExpireTime.get(key);
-			if (System.currentTimeMillis() < expireTime) {
-				isContained = true;
-			} else {
-				//expired, clean up
-				storage.removeItem(key);
-				key2ExpireTime.remove(key);
-			}
-		}
-		return isContained;
+		return get(key) != null;
 	}
 }

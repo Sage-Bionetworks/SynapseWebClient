@@ -11,7 +11,7 @@ public interface ClientCache {
 	String get(String key);
 	/**
 	 * The implementation uses web storage, and is NOT SECURE.  Do not store sensitive data here.
-	 * The given key/value pair will survive 20 minutes (max)
+	 * The given key/value pair will survive for an hour (max)
 	 * 
 	 * @param key
 	 * @param value
