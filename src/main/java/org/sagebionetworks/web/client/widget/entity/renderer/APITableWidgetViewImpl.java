@@ -22,8 +22,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -88,8 +88,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 					String columnName = iterator.next();
 					String id = elementId + "-header-"+i+"-"+columnName;
 					headerElements.add(id);
-					
-					builder.append("<th class=\"header "+style+"\"><span id=\""+id+"\" anchortext=\""+columnName+"\"></span></th>");
+					builder.append("<th class=\"header "+style+"\" id=\""+id+"\" anchortext=\""+columnName+"\"></th>");
 				}
 				clickHandler2ElementsMap.put(clickHandler, headerElements);
 			}
@@ -140,13 +139,10 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 				for (String id : elementIds) {
 					Element e = panel.getElementById(id);
 					String anchorText = e.getAttribute("anchorText");
-					Widget a;
+					HTML a = new HTML(SafeHtmlUtils.htmlEscape(anchorText));
 					if (tableConfig.isPaging()) {
-						a = new Anchor(anchorText);
-						((Anchor)a).addClickHandler(clickHandler);
-					} else {
-						a = new InlineHTML(SafeHtmlUtils.htmlEscape(anchorText));
-					}
+						a.addClickHandler(clickHandler);
+					} 
 					panel.add(a, id);
 				}
 			}
