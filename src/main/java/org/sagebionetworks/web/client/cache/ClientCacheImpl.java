@@ -46,11 +46,12 @@ public class ClientCacheImpl implements ClientCache {
 	@Override
 	public boolean contains(String key) {
 		boolean isContained = false;
-		if ((storage.isStorageSupported() && key2ExpireTime.containsKey(key))) {
+		if (storage.isStorageSupported() && key2ExpireTime.containsKey(key)) {
 			Long expireTime = key2ExpireTime.get(key);
 			if (System.currentTimeMillis() < expireTime) {
 				isContained = true;
 			} else {
+				//expired, clean up
 				storage.removeItem(key);
 				key2ExpireTime.remove(key);
 			}
