@@ -5,6 +5,8 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.ClientCacheImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -22,12 +24,14 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
 	private Integer maxNameLength;
+	ClientCache clientCache;
 	
 	@Inject
-	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.clientCache = clientCache;
 		view.setPresenter(this);
 	}
 	
@@ -49,7 +53,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		if (principalId != null && principalId.trim().length() > 0) {
 			view.showLoading();
 			
-			UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
+			UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile profile) {
 					view.setProfile(profile, maxNameLength);
@@ -62,23 +66,34 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 	}
 	
-	public static void getUserProfile(String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final AsyncCallback<UserProfile> callback) {
-		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
-			@Override
-			public void onSuccess(String result) {
-				try {
-					UserProfile profile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
-					callback.onSuccess(profile);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
+	public static void getUserProfile(final String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
+		String profileString = clientCache.get(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX);
+		if (profileString != null) {
+			parseProfile(profileString, nodeModelCreator, callback);
+		} else {
+			synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
+				@Override
+				public void onSuccess(String result) {
+					clientCache.put(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX, result);
+					parseProfile(result, nodeModelCreator, callback);
 				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		}
+	}
+	
+	public static void parseProfile(String profileString, NodeModelCreator nodeModelCreator, AsyncCallback<UserProfile> callback) {
+		try {
+			UserProfile profile = nodeModelCreator.createJSONEntity(profileString, UserProfile.class);
+			callback.onSuccess(profile);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+
 	}
 	
 	@SuppressWarnings("unchecked")

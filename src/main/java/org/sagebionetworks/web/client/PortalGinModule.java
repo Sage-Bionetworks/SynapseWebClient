@@ -6,6 +6,10 @@ import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.ClientCacheImpl;
+import org.sagebionetworks.web.client.cache.StorageImpl;
+import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
 import org.sagebionetworks.web.client.factory.EditorFactory;
@@ -333,6 +337,14 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
+		
+		// ClientCache
+		bind(ClientCacheImpl.class).in(Singleton.class);
+		bind(ClientCache.class).to(ClientCacheImpl.class);
+
+		// Storage wrapper
+		bind(StorageImpl.class).in(Singleton.class);
+		bind(StorageWrapper.class).to(StorageImpl.class);
 		
 		/*
 		 * Vanilla Implementation binding

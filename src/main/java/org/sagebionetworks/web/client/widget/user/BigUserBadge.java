@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -14,12 +15,14 @@ public class BigUserBadge implements BigUserBadgeView.Presenter, SynapseWidgetPr
 	private BigUserBadgeView view;
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
+	ClientCache clientCache;
 	
 	@Inject
-	public BigUserBadge(BigUserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public BigUserBadge(BigUserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.clientCache = clientCache;
 		view.setPresenter(this);
 	}
 	
@@ -34,7 +37,7 @@ public class BigUserBadge implements BigUserBadgeView.Presenter, SynapseWidgetPr
 	public void configure(final String principalId, final String description) {
 		view.showLoading();
 		
-		UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, new AsyncCallback<UserProfile>() {
+		UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
 				String desc = description != null ? description : profile.getCompany();
