@@ -49,6 +49,17 @@ public class ClientCacheImplTest {
 	}
 	
 	@Test
+	public void testExpirationContains() {
+		String key = "testkey";
+		String value = "testValue";
+		when(mockStorage.getItem(eq(key))).thenReturn(value);
+		//put something in that is already expired
+		cache.put(key, value, System.currentTimeMillis() - 1L);
+		assertFalse(cache.contains(key));
+		verify(mockStorage).removeItem(eq(key));
+	}
+	
+	@Test
 	public void testNoStorageAvailable() {
 		when(mockStorage.isStorageSupported()).thenReturn(false);
 		String key = "testkey";

@@ -25,13 +25,7 @@ public class ClientCacheImpl implements ClientCache {
 	public String get(String key) {
 		String value = null;
 		if (contains(key)) {
-			Long expireTime = key2ExpireTime.get(key);
-			if (System.currentTimeMillis() < expireTime) {
-				value = storage.getItem(key);
-			} else {
-				storage.removeItem(key);
-				key2ExpireTime.remove(key);
-			}
+			value = storage.getItem(key);
 		}
 		return value;
 	}
@@ -51,6 +45,16 @@ public class ClientCacheImpl implements ClientCache {
 
 	@Override
 	public boolean contains(String key) {
-		return (storage.isStorageSupported() && key2ExpireTime.containsKey(key));
+		boolean isContained = false;
+		if ((storage.isStorageSupported() && key2ExpireTime.containsKey(key))) {
+			Long expireTime = key2ExpireTime.get(key);
+			if (System.currentTimeMillis() < expireTime) {
+				isContained = true;
+			} else {
+				storage.removeItem(key);
+				key2ExpireTime.remove(key);
+			}
+		}
+		return isContained;
 	}
 }

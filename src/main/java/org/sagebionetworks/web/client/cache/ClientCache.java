@@ -10,9 +10,8 @@ public interface ClientCache {
 	 */
 	String get(String key);
 	/**
-	 * The implementation uses sessionStorage, and is NOT SECURE.  Do not store sensitive data here.
-	 * Size only limited by system memory.  
-	 * The given key/value pair will survive as long as the originating window or tab, or 20 minutes (whichever is shorter).
+	 * The implementation uses web storage, and is NOT SECURE.  Do not store sensitive data here.
+	 * The given key/value pair will survive 20 minutes (max)
 	 * 
 	 * @param key
 	 * @param value
