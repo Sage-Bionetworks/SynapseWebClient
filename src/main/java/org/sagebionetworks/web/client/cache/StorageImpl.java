@@ -11,22 +11,28 @@ public class StorageImpl implements StorageWrapper {
 
 	@Override
 	public void clear() {
-		storage.clear();
+		if (isStorageSupported())
+			storage.clear();
 	}
 
 	@Override
 	public String getItem(String key) {
-		return storage.getItem(key);
+		if (isStorageSupported())
+			return storage.getItem(key);
+		else
+			return null;
 	}
 
 	@Override
 	public void removeItem(String key) {
-		storage.removeItem(key);
+		if (isStorageSupported())
+			storage.removeItem(key);
 	}
 
 	@Override
 	public void setItem(String key, String data) {
-		storage.setItem(key, data);
+		if (isStorageSupported())
+			storage.setItem(key, data);
 	}
 	
 	@Override
