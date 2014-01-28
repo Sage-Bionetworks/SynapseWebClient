@@ -69,6 +69,19 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockView).showLoadError(principalId);
 	}
+	
+	@Test
+	public void testConfigureFromCache() throws Exception {
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		when(mockCache.get(anyString())).thenReturn("user profile json");
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(profile);
+		profile.setDisplayName("name");
+		userBadge.setMaxNameLength(max);
+		userBadge.configure(principalId);
+		verify(mockView).setProfile(profile, max);
+		//did not use the synapse client, used cache instead
+		verify(mockSynapseClient, never()).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
 		
 	@Test
 	public void testSetNameLength() {
