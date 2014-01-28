@@ -71,12 +71,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			for (int i = 0; i < renderers.length; i++) {
 				List<String> rendererColumnNames = renderers[i].getColumnNames();
 				final APITableColumnConfig columnConfig = tableConfig.getColumnConfigs().get(i);
-				String style = "";
-				if (COLUMN_SORT_TYPE.DESC == columnConfig.getSort()) {
-					style = "headerSortUp";
-				} else if (COLUMN_SORT_TYPE.ASC == columnConfig.getSort()) {
-					style = "headerSortDown";
-				}
+				
 				ClickHandler clickHandler = new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
@@ -88,7 +83,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 					String columnName = iterator.next();
 					String id = elementId + "-header-"+i+"-"+columnName;
 					headerElements.add(id);
-					builder.append("<th class=\"header "+style+"\" id=\""+id+"\" anchortext=\""+columnName+"\"></th>");
+					builder.append("<th class=\"imageButton\" id=\""+id+"\" anchortext=\""+columnName+"\"></th>");
 				}
 				clickHandler2ElementsMap.put(clickHandler, headerElements);
 			}

@@ -1579,3 +1579,10 @@ a.projectTitle:hover {
 .text-danger-imp {
 	color: #f94e4b !important;
 }
+
+/**Override JQuery table styles **/
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
+    background-color: #FAFAFA !important;
+    background-image: none !important;
+}
+
