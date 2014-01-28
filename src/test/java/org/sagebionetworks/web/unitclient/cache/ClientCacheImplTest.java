@@ -43,8 +43,7 @@ public class ClientCacheImplTest {
 		when(mockStorage.getItem(eq(key))).thenReturn(value);
 		//put something in that is already expired
 		cache.put(key, value, System.currentTimeMillis() - 1L);
-		verify(mockStorage).setItem(eq(key), eq(value));
-		//even though it is in the map, it should not come back because it is expired
+		//it should not come back because it is expired
 		assertNull(cache.get(key));
 		verify(mockStorage).removeItem(eq(key));
 	}

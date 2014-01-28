@@ -5,7 +5,7 @@ import java.util.HashMap;
 import com.google.inject.Inject;
 
 public class ClientCacheImpl implements ClientCache {
-	//cache keys suffixes (to avoid collision)
+	//key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
 	
 	private HashMap<String, Long> key2ExpireTime;
