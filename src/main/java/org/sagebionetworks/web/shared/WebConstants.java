@@ -114,11 +114,9 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
+	public static final String DIV_ID_PREVIEW_SUFFIX = "-preview";
 
-	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
-	
-	public static final String DIV_ID_PROFILE_PREFIX = "profile_";
+	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
 	
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
     public static final String DIV_ID_LINK_PREFIX = "link-";
