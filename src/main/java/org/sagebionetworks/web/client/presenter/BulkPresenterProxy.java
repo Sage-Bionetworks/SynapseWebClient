@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -115,6 +116,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// user's profile page
 					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
 					presenter.setPlace((Challenges)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Help) {
+					HelpPresenter presenter = ginjector.getHelpPresenter();
+					presenter.setPlace((Help)place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Search) {
 					// search results page
