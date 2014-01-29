@@ -204,4 +204,5 @@ public class WebConstants {
 	public static final String CREATE_PROJECT = "CreateProject";
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
+	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
 }
