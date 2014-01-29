@@ -214,7 +214,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 		nameField.setValue(team.getName());
 		nameField.addStyleName("col-md-12 font-size-32 margin-left-10 margin-bottom-10");
 		nameField.setHeight("35px");
-		nameField.setEnabled(false);
 		form.add(DisplayUtils.wrap(nameField));
 		
 		final TextBox descriptionField = new TextBox();
