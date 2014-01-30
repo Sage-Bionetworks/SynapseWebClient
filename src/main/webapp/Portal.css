@@ -688,7 +688,7 @@ a.shortBtn {
 	margin: 1em 3em;
 	padding: 0.5em 1em;
 	background-color: #fcf8f2;
-	border-left: 5px solid #f0ad4e;
+	border-left: 3px solid #f0ad4e;
 }
 
 .markdown blockquote h4, .markdown blockquote h3, .markdown blockquote h2, .markdown blockquote h1 {
