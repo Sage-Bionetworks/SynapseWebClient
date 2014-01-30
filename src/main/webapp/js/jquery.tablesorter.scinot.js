@@ -7,5 +7,7 @@ jQuery.tablesorter.addParser({
 	}, 
 	format: function(s) { 
 	    return jQuery.tablesorter.formatFloat(s);
-	}, type: "numeric" 
+	}, 
+	type: "numeric" 
 });
+
