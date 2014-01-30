@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -68,6 +69,7 @@ import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
+import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -151,6 +153,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityListConfigEditor getEntityListConfigEditor();
 	public ShinySiteConfigEditor getShinySiteConfigEditor();
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
+	public UserTeamConfigEditor getUserTeamConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -188,6 +191,7 @@ public interface PortalGinInjector extends Ginjector {
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	
+	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SynapseTableWidget getSynapseTableWidget();

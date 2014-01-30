@@ -46,6 +46,10 @@ public class WidgetConstants {
 	public static final String USERBADGE_CONTENT_TYPE = "userbadge";
 	public static final String USERBADGE_FRIENDLY_NAME ="User Badge";
 	
+	public static final String USER_TEAM_BADGE_CONTENT_TYPE = "badge";
+	public static final String USER_TEAM_BADGE_FRIENDLY_NAME ="Badge";
+
+	
 	public static final String OLD_JOIN_EVALUATION_CONTENT_TYPE = "joinevaluation";
 	public static final String JOIN_TEAM_CONTENT_TYPE = "jointeam";
 	public static final String JOIN_EVALUATION_FRIENDLY_NAME ="Join Evaluation";
@@ -112,6 +116,9 @@ public class WidgetConstants {
 	public static final String API_TABLE_WIDGET_PAGESIZE_KEY = "pageSize";
 	public static final String ENTITYLIST_WIDGET_LIST_KEY = "list";
 	public static final String USERBADGE_WIDGET_ID_KEY = "id";
+	public static final String USER_TEAM_BADGE_WIDGET_ID_KEY = "id";
+	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
+	
 	public static final String WIDGET_ENTITY_ID_KEY = "entityId";
 	
 	public static final String SHINYSITE_SITE_KEY = "site";	

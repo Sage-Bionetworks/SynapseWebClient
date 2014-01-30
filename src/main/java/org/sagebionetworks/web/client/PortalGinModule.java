@@ -158,6 +158,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -674,6 +676,10 @@ public class PortalGinModule extends AbstractGinModule {
 		//Team renderer
 		bind(TeamBadgeView.class).to(TeamBadgeViewImpl.class);
 		bind(BigTeamBadgeView.class).to(BigTeamBadgeViewImpl.class);
+		
+		
+		bind(UserTeamConfigView.class).to(UserTeamConfigViewImpl.class);
+		
 	}
 
 }
