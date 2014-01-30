@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -258,4 +259,6 @@ public interface SynapseClientAsync {
 	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
+	
+	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 }

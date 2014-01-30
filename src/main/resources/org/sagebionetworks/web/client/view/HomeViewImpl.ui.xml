@@ -49,11 +49,11 @@
 						<h3>How to Use Synapse</h3>
 						<ul class="list arrow-list">
 							<li>
-								<a class="link howToUseLink" href="#!Wiki:syn1669771/ENTITY/54546" target="_blank">Getting Started Guide</a><br/>
+								<a class="link howToUseLink" href="#!Help:GettingStarted" target="_blank">Getting Started Guide</a><br/>
 								A quick start guide to using Synapse
 							</li>
 							<li>
-								<a class="link howToUseLink" href="#!Synapse:syn1669771" target="_blank">Synapse User Guide</a><br/>
+								<a class="link howToUseLink" href="#!Help:UserGuide" target="_blank">Synapse User Guide</a><br/>
 								Using Synapse via the Web and programmatic clients
 							</li>
 							<li>

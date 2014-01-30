@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -72,6 +73,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
 		openAccessPlaces.add(Challenges.class);
+		openAccessPlaces.add(Help.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
 		openAccessPlaces.add(Team.class);
