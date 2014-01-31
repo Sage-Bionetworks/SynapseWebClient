@@ -78,6 +78,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.BUTTON_LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getButtonLinkConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserTeamConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -126,6 +128,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getShinySiteRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.USERBADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserBadgeWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserTeamBadgeWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamWidget();
 		} else if (contentTypeKey.equals(WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
@@ -216,6 +220,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.ENTITYLIST_CONTENT_TYPE, WidgetConstants.ENTITYLIST_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {
