@@ -33,13 +33,12 @@ import com.google.inject.Inject;
 
 public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
-	public static final int DEFAULT_DIALOG_HEIGHT = 280;
+	public static final int DEFAULT_DIALOG_HEIGHT = 240;
 	public static final int DEFAULT_DIALOG_WIDTH = 480;
 	private Presenter presenter;
 	private EvaluationList evaluationList;
 	private SageImageBundle sageImageBundle;
 	private  IconsImageBundle iconsImageBundle;
-	private ComboBox<ComboValue> submitterCombo;
 	private EntityFinder entityFinder;
 	private Dialog window;
 	private boolean showEntityFinder;
@@ -128,11 +127,10 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	}
 	
 	@Override
-	public void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations, List<String> submitterAliases) {
+	public void popupSelector(boolean showEntityFinder, List<Evaluation> evaluations) {
 		window.removeAll();
 		selectedReference = null;
         evaluationList.configure(evaluations);
-        submitterCombo = getSubmitterAliasComboBox(submitterAliases);
         this.showEntityFinder = showEntityFinder;
 	    
         FlowPanel panel = new FlowPanel();
@@ -171,8 +169,6 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         }
         panel.add(new HTML("<h6 class=\"margin-top-10\">Select the challenge(s) below that you would like to submit to:</h6>"));
         panel.add(evaluationList.asWidget());
-        panel.add(new HTML("<h6 class=\"margin-top-10\">Set "+DisplayConstants.SUBMITTER_ALIAS+" to be shown in the public leaderboard:</h6>"));
-        panel.add(submitterCombo);
         window.add(panel);
         window.layout(true);
         window.center();
@@ -199,18 +195,14 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 			public void componentSelected(ButtonEvent ce) {
 				List<Evaluation> evaluations = evaluationList.getSelectedEvaluations();
 				if (evaluations.size() > 0) {
-					if (submitterCombo.isValid()) {
-						if (showEntityFinder) {
-							if (selectedReference == null || selectedReference.getTargetId() == null) {
-								//invalid, return.
-								showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
-								return;
-							}
+					if (showEntityFinder) {
+						if (selectedReference == null || selectedReference.getTargetId() == null) {
+							//invalid, return.
+							showErrorMessage(DisplayConstants.NO_ENTITY_SELECTED);
+							return;
 						}
-						presenter.submitToEvaluations(selectedReference, evaluations, submitterCombo.getRawValue());
-					} else {
-						showErrorMessage(submitterCombo.getErrorMessage());
 					}
+					presenter.submitToEvaluations(selectedReference, evaluations);
 				} else {
 					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}
