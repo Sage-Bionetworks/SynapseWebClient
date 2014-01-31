@@ -196,7 +196,9 @@ public class LoginPresenterTest {
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
 		setMyProfile(profile);
 		loginPresenter.setNewUser(usd);
+		verify(mockView).showLoggingInLoader();
 		verify(mockView).showSetUsernameUI();
+		verify(mockView).hideLoggingInLoader();
 	}
 	
 	@Test
@@ -208,7 +210,20 @@ public class LoginPresenterTest {
 		profile.setUserName("chewbacca");
 		setMyProfile(profile);
 		loginPresenter.setNewUser(usd);
+		verify(mockView).showLoggingInLoader();
 		verify(mockView, never()).showSetUsernameUI();
+		verify(mockView).hideLoggingInLoader();
+		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+	}
+	
+	@Test
+	public void testSetNewUserFailure() throws JSONObjectAdapterException {
+		setPlace();
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		loginPresenter.setNewUser(usd);
+		verify(mockView).showLoggingInLoader();
+		//hides loading UI and continue (go to last place) 
+		verify(mockView).hideLoggingInLoader();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
 	
