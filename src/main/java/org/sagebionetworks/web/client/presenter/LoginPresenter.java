@@ -105,6 +105,18 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			view.showErrorMessage(DisplayConstants.SSO_ERROR_UNKNOWN);
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
+		} else if (LoginPlace.CHANGE_USERNAME.equals(token)) {
+			//get the current profile, and set the view to set username
+			ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile result) {
+					profile = result;
+					view.showSetUsernameUI();
+				}
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				};
+			});
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && !"".equals(token) && token != null) {			
 			loginSSOUser(token);
 		} else {
