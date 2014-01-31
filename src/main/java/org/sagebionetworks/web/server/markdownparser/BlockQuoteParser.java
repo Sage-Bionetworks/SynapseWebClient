@@ -38,7 +38,7 @@ public class BlockQuoteParser extends BasicMarkdownElementParser {
 			if (inBlockQuote){
 				inBlockQuote = false;
 				//finish block quote
-				line.prependElement("</blockquote>");
+				line.prependElement(ServerMarkdownUtils.END_BLOCKQUOTE_TAG);
 			}
 			//no need to modify the markdown
 		}

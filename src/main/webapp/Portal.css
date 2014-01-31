@@ -669,6 +669,7 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
+	font-size: 13px; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
 }
 
 .markdown ol { 
@@ -685,9 +686,14 @@ a.shortBtn {
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
 	margin: 1em 3em;
-	padding: .5em 1em;
-	border-left: 5px solid #fce27c;
-	background-color: #f6ebc1; }
+	padding: 0.5em 1em;
+	background-color: #fcf8f2;
+	border-left: 3px solid #f0ad4e;
+}
+
+.markdown blockquote h4, .markdown blockquote h3, .markdown blockquote h2, .markdown blockquote h1 {
+	color: #f0ad4e;
+}
 
 .markdown code {
 	background-clip: padding-box;
