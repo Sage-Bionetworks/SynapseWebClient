@@ -1,27 +1,27 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -56,7 +56,6 @@ public class EvaluationSubmitterTest {
 	EvaluationSubmitter mockEvaluationSubmitter;
 	FileEntity entity;
 	EntityBundle bundle;
-	String submitterAlias = "MyAlias";
 	List<Evaluation> evaluationList;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
 	AccessRequirementsTransport art;
@@ -99,12 +98,6 @@ public class EvaluationSubmitterTest {
 
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(availableEvaluations);
 		
-		RestResourceList submitterAliases = new RestResourceList();
-		List<String> submitterAliasList = new ArrayList<String>();
-		submitterAliasList.add("Mr. F");
-		submitterAliases.setList(submitterAliasList);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(RestResourceList.class))).thenReturn(submitterAliases);
-		
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
 		entity.setId("file entity test id");
@@ -124,7 +117,7 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluations() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
+		submitter.submitToEvaluations(null, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
@@ -149,7 +142,7 @@ public class EvaluationSubmitterTest {
 
 		List<Evaluation> evals = new ArrayList<Evaluation>();
 		evals.add(new Evaluation());
-		submitter.submitToEvaluations(null, evals, submitterAlias);
+		submitter.submitToEvaluations(null, evals);
 		//Should invoke once directly without terms of use
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		
@@ -168,7 +161,7 @@ public class EvaluationSubmitterTest {
 		requirements.setResults(ars);
 		
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, evaluationList, submitterAlias);
+		submitter.submitToEvaluations(null, evaluationList);
 		
 		//should show terms of use for the requirement, view does not call back so submission should not be created
 		verify(mockView, times(1)).showAccessRequirement(anyString(), any(Callback.class));
@@ -186,7 +179,7 @@ public class EvaluationSubmitterTest {
 		
 		submitter.configure(entity, null);
 		verify(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
-		verify(mockView).popupSelector(anyBoolean(), any(List.class), any(List.class));
+		verify(mockView).popupSelector(anyBoolean(), any(List.class));
 	}
 	
 	@Test
