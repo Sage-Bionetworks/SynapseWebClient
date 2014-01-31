@@ -211,6 +211,26 @@ public class LoginPresenterTest {
 		verify(mockView, never()).showSetUsernameUI();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
+	
+	@Test 
+	public void testSetPlaceChangeUsername()throws JSONObjectAdapterException {
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("222");
+		setMyProfile(profile);
+		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
+		loginPresenter.setPlace(place);
+		verify(mockView).showSetUsernameUI();
+	}
+	
+	@Test 
+	public void testSetPlaceChangeUsernameFailure()throws JSONObjectAdapterException {
+		String exceptionMessage = "unhandled";
+		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
+		loginPresenter.setPlace(place);
+		verify(mockView).showErrorMessage(eq(exceptionMessage));
+	}
 
 //	@Test 
 //	public void testSetPlaceSSOLoginNotSignedToU() {
