@@ -21,7 +21,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -50,6 +52,28 @@ public class LoginViewImpl extends Composite implements LoginView {
 	TextBox username;
 	@UiField
 	SpanElement messageLabel;
+	
+	//terms of service view
+	@UiField
+	HTMLPanel termsOfServiceView;
+	@UiField
+	CheckBox actEthicallyCb;
+	@UiField
+	CheckBox protectPrivacyCb;
+	@UiField
+	CheckBox noHackCb;
+	@UiField
+	CheckBox shareCb;
+	@UiField
+	CheckBox responsibilityCb;
+	@UiField
+	CheckBox lawsCb;
+	@UiField
+	Anchor viewToULink;
+	
+	@UiField
+	Button takePledgeButton;
+	
 
 	
 	private Presenter presenter;
@@ -60,6 +84,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
+	boolean toUInitialized;
 	
 	@Inject
 	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
@@ -84,7 +109,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.setUsername(username.getValue());
 			}
 		});
-
+		toUInitialized = false;
 	}
 
 	@Override
@@ -144,15 +169,15 @@ public class LoginViewImpl extends Composite implements LoginView {
 		cp.add(loginAgain, new MarginData(16, 0, 10, 10));
 		
 		logoutPanel.add(cp);
+		hideViews();
 		loginView.setVisible(true);
-		changeUsernameView.setVisible(false);
 	}
 
 	@Override
 	public void showLogin(String openIdActionUrl, String openIdReturnUrl) {
 		clear();
+		hideViews();
 		loginView.setVisible(true);
-		changeUsernameView.setVisible(false);
 		headerWidget.refresh();
 	  	loginWidget.setOpenIdActionUrl(openIdActionUrl);
 		loginWidget.setOpenIdReturnUrl(openIdReturnUrl);
@@ -194,13 +219,51 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	@Override
-	public void showTermsOfUse(String content, final AcceptTermsOfUseCallback callback) {
-        TermsOfUseHelper.showTermsOfUse(content, callback);
+	public void showTermsOfUse(final String content, final AcceptTermsOfUseCallback callback) {
+		hideViews();
+		//initialize checkboxes
+		actEthicallyCb.setValue(false);
+		protectPrivacyCb.setValue(false);;
+		noHackCb.setValue(false);
+		shareCb.setValue(false);
+		responsibilityCb.setValue(false);
+		lawsCb.setValue(false);
+
+		termsOfServiceView.setVisible(true);
+		//initialize if necessary
+		if (!toUInitialized) {
+			toUInitialized = true;
+			takePledgeButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if(validatePledge()) {
+						callback.accepted();
+					} else {
+						showErrorMessage("To take the pledge, you must first agree to all of the statements.");
+					}
+				}
+			});
+			viewToULink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					TermsOfUseHelper.showTermsOfUse(content, null);
+				}
+			});
+		}
      }
+	
+	private boolean validatePledge() {
+		return actEthicallyCb.getValue() && protectPrivacyCb.getValue() && noHackCb.getValue() && shareCb.getValue() && responsibilityCb.getValue() && lawsCb.getValue();
+	}
+	private void hideViews() {
+		loginView.setVisible(false);
+		changeUsernameView.setVisible(false);
+		termsOfServiceView.setVisible(false);
+	}
 	
 	@Override
 	public void showSetUsernameUI() {
-		loginView.setVisible(false);
+		hideViews();
 		changeUsernameView.setVisible(true);
 	}
 	
