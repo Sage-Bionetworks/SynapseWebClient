@@ -157,7 +157,11 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	}
 	
 	@Override
-	public void setNewUser(UserSessionData newUser) {	
+	public void setNewUser(UserSessionData newUser) {
+		loginSSOUser(newUser.getSession().getSessionToken());
+	}
+	
+	private void checkForTempUsernameAndContinue(){
 		//get my profile, and check for a default username
 		view.showLoggingInLoader();
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
@@ -184,6 +188,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
 			}
 		});
+
 	}
 
 	public void updateProfile(final UserProfile profile) {
@@ -230,6 +235,20 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
 	}
 	
+	public void showTermsOfUse(final AcceptTermsOfUseCallback callback) {
+		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
+			public void onSuccess(String termsOfUseContents) {
+				view.hideLoggingInLoader();
+				view.showTermsOfUse(termsOfUseContents, callback);		
+			}
+			public void onFailure(Throwable t) {
+				if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
+					view.showErrorMessage("An error occurred. Please try logging in again.");
+				view.showLogin(openIdActionUrl, openIdReturnUrl);									
+			}
+		});
+	}
+	
 	private void loginSSOUser(String token) {
 		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 		// parse token
@@ -239,81 +258,67 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 				@Override
 				public void onSuccess(String result) {
-					
-					// Show the ToU dialog if necessary
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-						
-						authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-							public void onSuccess(String termsOfUseContents) {
-								view.hideLoggingInLoader();
-								view.showTermsOfUse(termsOfUseContents, 
-										new AcceptTermsOfUseCallback() {
-											public void accepted() {
-												view.showLoggingInLoader();
-												authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+						showTermsOfUse(new AcceptTermsOfUseCallback() {
+								public void accepted() {
+									view.showLoggingInLoader();
+									authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
 
-													@Override
-													public void onFailure(Throwable caught) {
-														view.showErrorMessage("An error occurred. Please try logging in again.");
-														view.showLogin(openIdActionUrl, openIdReturnUrl);
-													}
+										@Override
+										public void onFailure(Throwable caught) {
+											view.showErrorMessage("An error occurred. Please try logging in again.");
+											view.showLogin(openIdActionUrl, openIdReturnUrl);
+										}
 
-													@Override
-													public void onSuccess(Void result) {
-														// Have to get the UserSessionData again, 
-														// since it won't contain the UserProfile if the terms haven't been signed
-														authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+										@Override
+										public void onSuccess(Void result) {
+											// Have to get the UserSessionData again, 
+											// since it won't contain the UserProfile if the terms haven't been signed
+											authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
 
-															@Override
-															public void onFailure(
-																	Throwable caught) {
-																view.showErrorMessage("An error occurred. Please try logging in again.");
-																view.showLogin(openIdActionUrl, openIdReturnUrl);
-															}
+												@Override
+												public void onFailure(
+														Throwable caught) {
+													view.showErrorMessage("An error occurred. Please try logging in again.");
+													view.showLogin(openIdActionUrl, openIdReturnUrl);
+												}
 
-															@Override
-															public void onSuccess(
-																	String result) {
-																view.hideLoggingInLoader();
-																// All setup complete, so forward the user
-																forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-															}	
-															
-														});
-													}
-													
-												});
-											}
+												@Override
+												public void onSuccess(
+														String result) {
+													view.hideLoggingInLoader();
+													// All setup complete, so forward the user
+													forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+												}	
+												
+											});
+										}
+										
+									});
+								}
 
-											@Override
-											public void rejected() {
-												authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+								@Override
+								public void rejected() {
+									authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
 
-													@Override
-													public void onFailure(Throwable caught) {
-														view.showErrorMessage("An error occurred. Please try logging in again.");
-														view.showLogin(openIdActionUrl, openIdReturnUrl);
-													}
+										@Override
+										public void onFailure(Throwable caught) {
+											view.showErrorMessage("An error occurred. Please try logging in again.");
+											view.showLogin(openIdActionUrl, openIdReturnUrl);
+										}
 
-													@Override
-													public void onSuccess(Void result) {
-														authenticationController.logoutUser();
-														forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-													}
-													
-												});
-											}
-										});		
-							}
-							public void onFailure(Throwable t) {
-								if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
-									view.showErrorMessage("An error occurred. Please try logging in again.");
-								view.showLogin(openIdActionUrl, openIdReturnUrl);									
-							}
-						});
+										@Override
+										public void onSuccess(Void result) {
+											authenticationController.logoutUser();
+											forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+										}
+										
+									});
+								}
+							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-						setNewUser(authenticationController.getCurrentUserSessionData());
+						checkForTempUsernameAndContinue();
 					}
 				}
 				@Override

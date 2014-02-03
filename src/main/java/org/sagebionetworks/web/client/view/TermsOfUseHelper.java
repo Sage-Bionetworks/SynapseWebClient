@@ -30,28 +30,34 @@ public class TermsOfUseHelper {
         window.setScrollMode(Scroll.AUTO);
         window.yesText = "I Agree";
         window.noText = "I Refuse";
-        window.setButtons(Dialog.YESNO);
+        if (callback != null)
+        	window.setButtons(Dialog.YESNO);
+        else
+        	window.setButtons(Dialog.OK);
         window.setHideOnButtonClick(true);
         LayoutContainer lc = new LayoutContainer();
         lc.addStyleName("whiteBackground");
         lc.add(new HTML(SafeHtmlUtils.fromSafeConstant(content)), spacer);
-        // List for the button selection
-        Button saveButton = window.getButtonById(Dialog.YES);
-        saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-            	if (callback!=null) callback.accepted();
-            }
-        });
-        // List for the button selection
-        Button rejectButton = window.getButtonById(Dialog.NO);
-        rejectButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-            	if (callback!=null) callback.rejected();
-            }
-        });
-        window.add(lc);
+        //if there is a callback handler, the send the mouse clicks back
+        if (callback != null) {
+	        // List for the button selection
+	        Button saveButton = window.getButtonById(Dialog.YES);
+	        saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+	            @Override
+	            public void componentSelected(ButtonEvent ce) {
+	            	callback.accepted();
+	            }
+	        });
+	        // List for the button selection
+	        Button rejectButton = window.getButtonById(Dialog.NO);
+	        rejectButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+	            @Override
+	            public void componentSelected(ButtonEvent ce) {
+	            	callback.rejected();
+	            }
+	        });
+        }
+	    window.add(lc);
         // show the window
         window.show();		
 	}
