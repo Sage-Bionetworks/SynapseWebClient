@@ -205,7 +205,7 @@ public class LoginPresenterTest {
 	public void testCheckForTempUsernameAndContinueFailure() throws JSONObjectAdapterException {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		loginPresenter.setNewUser(usd);
+		loginPresenter.checkForTempUsernameAndContinue();
 		verify(mockView).showLoggingInLoader();
 		//hides loading UI and continue (go to last place) 
 		verify(mockView).hideLoggingInLoader();
