@@ -161,7 +161,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		loginSSOUser(newUser.getSession().getSessionToken());
 	}
 	
-	private void checkForTempUsernameAndContinue(){
+	public void checkForTempUsernameAndContinue(){
 		//get my profile, and check for a default username
 		view.showLoggingInLoader();
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {

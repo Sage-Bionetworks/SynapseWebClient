@@ -195,29 +195,14 @@ public class LoginPresenterTest {
 		profile.setOwnerId("1233");
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
 		setMyProfile(profile);
-		loginPresenter.setNewUser(usd);
+		loginPresenter.checkForTempUsernameAndContinue();
 		verify(mockView).showLoggingInLoader();
 		verify(mockView).showSetUsernameUI();
 		verify(mockView).hideLoggingInLoader();
 	}
 	
 	@Test
-	public void testSetNewUser() throws JSONObjectAdapterException {
-		//if the user has a temp username, then it should show the UI to set the username
-		setPlace();
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("chewbacca");
-		setMyProfile(profile);
-		loginPresenter.setNewUser(usd);
-		verify(mockView).showLoggingInLoader();
-		verify(mockView, never()).showSetUsernameUI();
-		verify(mockView).hideLoggingInLoader();
-		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
-	}
-	
-	@Test
-	public void testSetNewUserFailure() throws JSONObjectAdapterException {
+	public void testCheckForTempUsernameAndContinueFailure() throws JSONObjectAdapterException {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		loginPresenter.setNewUser(usd);
