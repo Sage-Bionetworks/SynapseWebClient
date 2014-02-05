@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -487,7 +486,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			//create the principal id set
 			HashSet<String> newPrincipalIdSet = new HashSet<String>();
 			for (ResourceAccess ra : acl.getResourceAccess()) {
-				newPrincipalIdSet.add(ra.getPrincipalId().toString());
+				//SWC-1195: only notify individuals (not teams)
+				UserGroupHeader header = userGroupHeaders.get(ra.getPrincipalId().toString());
+				if (header != null && header.getIsIndividual()) {
+					newPrincipalIdSet.add(ra.getPrincipalId().toString());
+				}
 			}
 			//now remove all of the original entries
 			for (String principalId : originalPrincipalIdSet) {
@@ -500,7 +503,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			
 			if (newPrincipalIdSet.size() > 0) {
 				//now send a message to these users
-				String message = DisplayUtils.getShareMessage(entity.getId(), gwt.getHostPageBaseURL());
+				String message = DisplayUtils.getShareMessage(getDisplayName(getCurrentUserId()), entity.getId(), gwt.getHostPageBaseURL());
 				String subject = entity.getName() + DisplayConstants.SHARED_ON_SYNAPSE_SUBJECT;
 				synapseClient.sendMessage(newPrincipalIdSet, subject, message, new AsyncCallback<String>() {
 					@Override
@@ -516,7 +519,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			}
 		}
 	}
-	
+	public String getDisplayName(String principalId) {
+		//get the user group header for this resource
+		UserGroupHeader header = userGroupHeaders.get(principalId);
+		if (header != null) {
+			return DisplayUtils.getDisplayName(header);
+		}
+		return "(Unknown user)";
+	}
 	/**
 	 * @return the uep associated with the entity
 	 */
