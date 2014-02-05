@@ -22,7 +22,7 @@ public class DisplayConstants {
 
 	public static final String USERNAME_FORMAT_ERROR = "User names can only contain letters, numbers, dots (.), dashes (-) and underscores (_). They must also be at least 3 characters long.";
 	
-	public static final String SHARED_ON_SYNAPSE = "I've shared an item with you on Synapse";
+	public static final String SHARED_ON_SYNAPSE = " has shared an item with you on Synapse";
 	public static final String SHARED_ON_SYNAPSE_SUBJECT = " (shared on Synapse)";
 	public static final String UPDATED_NOTIFICATION_SETTINGS = "Updated Notification Settings";
 	public static final String TURN_OFF_NOTIFICATIONS = "To turn off email notifications, please visit your profile page at ";
