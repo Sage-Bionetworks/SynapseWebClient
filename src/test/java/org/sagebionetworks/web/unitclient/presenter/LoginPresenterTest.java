@@ -214,6 +214,7 @@ public class LoginPresenterTest {
 	
 	@Test 
 	public void testSetPlaceChangeUsername()throws JSONObjectAdapterException {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName("222");
@@ -224,7 +225,21 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
+	public void testSetPlaceChangeAnonymousUsername()throws JSONObjectAdapterException {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("222");
+		setMyProfile(profile);
+		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
+		loginPresenter.setPlace(place);
+		verify(mockView, never()).showSetUsernameUI();
+		verify(mockView).showLogin(anyString(), anyString());
+	}
+	
+	@Test 
 	public void testSetPlaceChangeUsernameFailure()throws JSONObjectAdapterException {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		String exceptionMessage = "unhandled";
 		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);

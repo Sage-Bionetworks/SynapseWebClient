@@ -2069,8 +2069,8 @@ public class DisplayUtils {
 		return label;
 	}
 
-	public static String getShareMessage(String entityId, String hostUrl) {
-		return DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
+	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
 	}
 }
