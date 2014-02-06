@@ -117,7 +117,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showErrorMessage(caught.getMessage());
 				};
 			});
-		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && !"".equals(token) && token != null) {			
+		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
+				!LoginPlace.CHANGE_USERNAME.equals(token) && 
+				!"".equals(token) && 
+				token != null) {			
 			loginSSOUser(token);
 		} else {
 			// standard view

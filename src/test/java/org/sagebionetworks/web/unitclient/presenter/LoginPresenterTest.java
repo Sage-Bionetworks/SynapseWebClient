@@ -249,6 +249,7 @@ public class LoginPresenterTest {
 		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
 		loginPresenter.setPlace(place);
 		verify(mockView, never()).showSetUsernameUI();
+		verify(mockView).showLogin(anyString(), anyString());
 	}
 	
 	@Test 
