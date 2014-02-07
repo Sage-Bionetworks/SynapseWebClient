@@ -107,14 +107,17 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	@Override
 	public void setPlace(Home place) {
 		this.place = place;		
-		view.setPresenter(this);		
+		view.setPresenter(this);
+		
+		checkAcceptToU();
+		
 		view.refresh();
 		
 		// Thing to load regardless of Authentication
 		loadNewsFeed();
 		
 		// Things to load for authenticated users
-		if(authenticationController.isLoggedIn()) {
+		if(showLoggedInDetails()) {
 			loadProjectsAndFavorites();
 		}		
 	}
@@ -185,6 +188,12 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	@Override
 	public boolean showLoggedInDetails() {
 		return authenticationController.isLoggedIn();
+	}
+	
+	public void checkAcceptToU() {
+		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
+			authenticationController.logoutUser();
+		}
 	}
 	
 	public void loadProjectsAndFavorites() {
