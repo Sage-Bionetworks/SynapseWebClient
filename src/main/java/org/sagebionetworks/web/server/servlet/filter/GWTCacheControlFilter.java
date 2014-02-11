@@ -28,9 +28,9 @@ public class GWTCacheControlFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String requestURI = httpRequest.getRequestURI();
 		if (!requestURI.contains(".nocache.")) {
-			long today = new Date().getTime();
+			long now = new Date().getTime();
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			httpResponse.setDateHeader("Expires", today+CACHE_TIME);
+			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
 		filterChain.doFilter(request, response);
 	}
