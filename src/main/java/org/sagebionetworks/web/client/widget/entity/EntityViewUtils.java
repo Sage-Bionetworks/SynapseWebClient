@@ -9,9 +9,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.Text;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -19,7 +16,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class EntityViewUtils {
@@ -29,9 +25,8 @@ public class EntityViewUtils {
 		case OPEN:
 			return DisplayConstants.ANY_USE;
 		case RESTRICTED:
-			return DisplayConstants.RESTRICTED_USE;
 		case CONTROLLED:
-			return DisplayConstants.CONTROLLED_USE;
+			return DisplayConstants.RESTRICTED_USE;
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
@@ -42,9 +37,8 @@ public class EntityViewUtils {
 		case OPEN:
 			return iconsImageBundle.sheildGreen16();
 		case RESTRICTED:
-			return iconsImageBundle.shieldYellow16();
 		case CONTROLLED:
-			return iconsImageBundle.shieldRed16();
+			return iconsImageBundle.shieldYellow16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
@@ -86,7 +80,7 @@ public class EntityViewUtils {
 		String infoHyperlinkText = DisplayConstants.INFO;
 		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
 			if (hasAdministrativeAccess) {
-				infoHyperlinkText=DisplayConstants.MODIFY;
+				infoHyperlinkText=DisplayConstants.LABEL_CREATE;
 			} // else default to 'info', i.e. you can find out details, but can't change anything
 		} else { // CONTROLLED or RESTRICTED data
 			if (hasFulfilledAccessRequirements) {
@@ -121,7 +115,7 @@ public class EntityViewUtils {
 
 			}
 		});
-		Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.FLAG, true);
+		Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.REPORT_ISSUE, true);
 		flagLink.setStyleName("link");
 		flagLink.addClickHandler(new ClickHandler() {			
 			@Override

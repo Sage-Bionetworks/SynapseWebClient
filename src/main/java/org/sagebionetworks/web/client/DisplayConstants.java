@@ -341,7 +341,7 @@ public class DisplayConstants {
 	public static final String READ_ONLY = "READ ONLY";	
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
-	public static final String FLAG = "flag";
+	public static final String REPORT_ISSUE = "report issue";
 	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
 	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
 	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
