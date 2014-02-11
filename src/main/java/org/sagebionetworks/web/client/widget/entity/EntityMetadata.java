@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -158,7 +159,7 @@ public class EntityMetadata implements Presenter {
 
 	@Override
 	public boolean includeRestrictionWidget() {
-		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof Locationable);
+		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder);
 	}
 
 	@Override

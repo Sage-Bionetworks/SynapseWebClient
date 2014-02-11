@@ -120,17 +120,13 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityId(e.getId());
 					
 		dataUseContainer.clear();
-		if(bundle.getPermissions().getCanPublicRead()) {
-			Widget dataUse = createRestrictionWidget();
-			if(dataUse != null) {
-				dataUseContainer.setVisible(true);
-				dataUseContainer.add(dataUse);
-			} else {
-				dataUseContainer.setVisible(false);
-			}		
+		Widget dataUse = createRestrictionWidget();
+		if(dataUse != null) {
+			dataUseContainer.setVisible(true);
+			dataUseContainer.add(dataUse);
 		} else {
 			dataUseContainer.setVisible(false);
-		}
+		}		
 		
 		Long versionNumber = null;
 		if (e instanceof Versionable) {
