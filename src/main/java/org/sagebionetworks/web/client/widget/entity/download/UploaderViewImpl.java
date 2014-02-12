@@ -165,7 +165,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public int getDisplayHeight() {
-		return isEntity ? 455 : 200;
+		return isEntity ? 330 : 200;
 	}
 
 	@Override

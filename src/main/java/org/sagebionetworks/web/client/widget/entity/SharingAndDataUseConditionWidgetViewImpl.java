@@ -8,16 +8,20 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer implements SharingAndDataUseConditionWidgetView {
@@ -48,6 +52,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		this.aclEditor = aclEditor;
 		this.restrictionWidget = restrictionWidget;
 		container = new FlowPanel();
+		container.addStyleName("margin-top-left-10");
 		this.add(container);
 	}
 	
@@ -56,9 +61,22 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		container.clear();
 		
 		//add share settings
-		container.add(new InlineHTML("<h3>"+ DisplayConstants.SHARING_PUBLIC_DESCRIPTION +"</h3>"));
-		publicPrivateBadge.configure(bundle.getEntity());
-		container.add(publicPrivateBadge.asWidget());
+		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.SHARING_PUBLIC_TITLE +"</h5>"));
+		final SimplePanel sharingDescriptionContainer = new SimplePanel();
+		publicPrivateBadge.configure(bundle.getEntity(), new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isPublic) {
+				//add the proper description into the container
+				String description = isPublic ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
+				sharingDescriptionContainer.add(new HTML("<p class=\"nobottommargin\">"+description+"</p>"));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+		Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
+		publicPrivateBadgeWidget.addStyleName("inline-block margin-left-10 moveup-2");
+		container.add(publicPrivateBadgeWidget);
 		
 		if (showChangeLink) {
 			container.add(new InlineHTML("("));
@@ -80,9 +98,10 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			container.add(change);
 			container.add(new InlineHTML(")"));
 		}
+		container.add(sharingDescriptionContainer);
 		
-		container.add(new InlineHTML("<h3>"+ DisplayConstants.DATA_USE_TITLE +"</h3>"));
-		restrictionWidget.configure(bundle, showChangeLink, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+		container.add(new InlineHTML("<br><h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE_TITLE +"</h5>"));
+		restrictionWidget.configure(bundle, showChangeLink, true, false, new com.google.gwt.core.client.Callback<Void, Throwable>() {
 			@Override
 			public void onSuccess(Void result) {
 				presenter.entityUpdated();
@@ -93,7 +112,16 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 				showErrorMessage(reason.getMessage());
 			}
 		});
-		container.add(restrictionWidget.asWidget());		
+		Widget widget = restrictionWidget.asWidget();
+		if (widget != null) {
+			widget.addStyleName("margin-left-10");
+			container.add(widget);
+			//and add description
+			RESTRICTION_LEVEL level = restrictionWidget.getRestrictionLevel();
+			String description = RESTRICTION_LEVEL.OPEN.equals(level) ? DisplayConstants.DATA_USE_UNRESTRICTED_DATA_DESCRIPTION : DisplayConstants.DATA_USE_RESTRICTED_DESCRIPTION;
+			container.add(new HTML("<p>"+description+"</p>"));
+		}
+					
 	}
 	
 	@Override

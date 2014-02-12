@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -98,7 +99,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 		
 		Entity e = bundle.getEntity();
-		restrictionWidget.configure(bundle, true, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+		restrictionWidget.configure(bundle, true, false, true, new com.google.gwt.core.client.Callback<Void, Throwable>() {
 			@Override
 			public void onSuccess(Void result) {
 				presenter.fireEntityUpdatedEvent();
@@ -119,6 +120,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		Widget dataUse = restrictionWidget.asWidget();
 		if(dataUse != null) {
 			dataUseContainer.setVisible(true);
+			dataUseContainer.add(new InlineHTML("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>"));
 			dataUseContainer.add(dataUse);
 		} else {
 			dataUseContainer.setVisible(false);

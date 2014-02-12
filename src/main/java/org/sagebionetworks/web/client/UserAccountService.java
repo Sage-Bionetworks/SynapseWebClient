@@ -30,7 +30,5 @@ public interface UserAccountService extends RemoteService {
 	
 	public String getTermsOfUse();
 	
-	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
-	
 	public String getStorageUsage();
 }

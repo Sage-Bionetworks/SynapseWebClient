@@ -153,22 +153,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
 		if (publicPrincipalIds == null){
-			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
-				@Override
-				public void onSuccess(PublicPrincipalIds result) {
-					publicPrincipalIds = result;
-					initViewPrincipalIds();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						showErrorMessage("Could not find the public group: " + caught.getMessage());
-				}
-			});
+			publicPrincipalIds = DisplayUtils.getPublicAndAuthenticatedGroupPrincipalIds();
 		}
-		else {
-			initViewPrincipalIds();
-		}
+		initViewPrincipalIds();
 			
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {

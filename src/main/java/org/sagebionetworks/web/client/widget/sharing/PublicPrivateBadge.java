@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -40,17 +41,17 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}	
 
 	/**
-	 * Headless version of public/private answer
+	 * Configure public/private badge, return answer if it is public or private in the callback.
 	 * @param entity
 	 * @param callback
 	 */
-	public void isEntityPublic(Entity entity, final AsyncCallback<Boolean> callback) {		
-		configure(entity, new AsyncCallback<PublicPrincipalIds>() {
+	public void configure(Entity entity, final AsyncCallback<Boolean> callback) {
+		this.entity = entity;
+		getAcl(new AsyncCallback<AccessControlList>() {
 			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
+			public void onSuccess(AccessControlList result) {
+				configure(result);
 				callback.onSuccess(isPublic(acl, publicPrincipalIds));
-
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -60,30 +61,11 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public void configure(Entity entity) {
-		//set publicPrincipalIds, and acl
-		final AsyncCallback<PublicPrincipalIds> callback2 = new AsyncCallback<PublicPrincipalIds>() {
-			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
-				view.configure(isPublic(acl, publicPrincipalIds));
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		};
-
-		configure(entity, callback2);
-	}
-	
-	public void configure(Entity entity, final AsyncCallback<PublicPrincipalIds> callback2) {
 		this.entity = entity;
 		AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
-				acl = result;
-				getPublicPrincipalIds(callback2);
+				configure(result);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -93,7 +75,12 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		};
 		
 		getAcl(callback1);
-		
+	}
+	
+	public void configure(AccessControlList acl) {
+		this.acl = acl;
+		publicPrincipalIds = DisplayUtils.getPublicAndAuthenticatedGroupPrincipalIds();
+		view.configure(isPublic(acl, publicPrincipalIds));
 	}
 	
 	/**
@@ -127,16 +114,8 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			});
 	}
 	
-	public void getPublicPrincipalIds(AsyncCallback<PublicPrincipalIds> callback) {
-		userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(callback);
-	}
-	
 	public AccessControlList getAcl() {
 		return acl;
-	}
-	
-	public PublicPrincipalIds getPublicPrincipalIds() {
-		return publicPrincipalIds;
 	}
 	
 	public Widget asWidget() {

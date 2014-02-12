@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -37,7 +38,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private JiraURLHelper jiraURLHelper;
 	private GlobalApplicationState globalApplicationState;
 	private RestrictionWidgetView view;
-	private boolean showChangeLink;
+	private boolean showChangeLink, showIfProject, showFlagLink;
 	
 	@Inject
 	public RestrictionWidget(
@@ -55,9 +56,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.jiraURLHelper = jiraURLHelper;
 	}
 	
-	public void configure(EntityBundle bundle, boolean showChangeLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
+	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
 		this.entityUpdatedCallback = entityUpdatedCallback;
 		this.showChangeLink = showChangeLink;
+		this.showIfProject = showIfProject;
+		this.showFlagLink = showFlagLink;
 		setEntity(bundle);
 	}
 	
@@ -119,7 +122,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 
 	public boolean includeRestrictionWidget() {
-		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder);
+		return (bundle.getEntity() instanceof FileEntity) || (bundle.getEntity() instanceof Locationable) || (bundle.getEntity() instanceof Folder) || (showIfProject && bundle.getEntity() instanceof Project);
 	}
 
 	public String accessRequirementText() {
@@ -206,7 +209,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			}
 			if (!isAnonymous) hasFulfilledAccessRequirements = hasFulfilledAccessRequirements();
 		}
-		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, accessRequirementText, touAcceptanceCallback, requestACTCallback, imposeRestrictionsCallback, loginCallback, restrictionLevel, approvalType, hasFulfilledAccessRequirements);
+		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, accessRequirementText, touAcceptanceCallback, requestACTCallback, imposeRestrictionsCallback, loginCallback, restrictionLevel, approvalType, hasFulfilledAccessRequirements, showFlagLink);
 	}
 	
 	public Callback getImposeRestrictionsCallback() {

@@ -57,7 +57,8 @@ public class EntityViewUtils {
 			final APPROVAL_TYPE approvalType,
 			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			boolean showFlagLink) {
 		
 		
 		ImageResource shieldIcon = getShieldIcon(restrictionLevel, iconsImageBundle);
@@ -65,7 +66,7 @@ public class EntityViewUtils {
 		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-right: 5px;\" class=\"boldText\">"+DisplayConstants.DATA_ACCESS_RESTRICTIONS_TEXT+"</span>" + DisplayUtils.getIconHtml(shieldIcon));
+		shb.appendHtmlConstant(DisplayUtils.getIconHtml(shieldIcon));
 		shb.appendHtmlConstant("<span style=\"margin-left: 3px;\">"+description+"</span>");
 		
 		//form the html
@@ -74,61 +75,63 @@ public class EntityViewUtils {
 		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
 		
 		FlowPanel lc = new FlowPanel();
+		lc.addStyleName("inline-block");
 		
 		lc.add(htmlPanel);
 		
-		String infoHyperlinkText = DisplayConstants.INFO;
-		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
-			if (hasAdministrativeAccess) {
-				infoHyperlinkText=DisplayConstants.CHANGE;
-			} // else default to 'info', i.e. you can find out details, but can't change anything
-		} else { // CONTROLLED or RESTRICTED data
-			if (hasFulfilledAccessRequirements) {
-				// default = 'info', i.e. nothing more to do, you can just find out details
-			} else {
-				infoHyperlinkText = DisplayConstants.GAIN_ACCESS; // note, this applies to 'anonymous' too.  the path leads the user to logging in.
-			}
-		}
-		
-		
-		Anchor aboutLink = new Anchor(infoHyperlinkText);
-		aboutLink.addStyleName("link");
-		
-		DisplayUtils.surroundWidgetWithParens(lc, aboutLink);
-		
-		aboutLink.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				GovernanceDialogHelper.showAccessRequirement(
-						restrictionLevel,
-						approvalType,
-						isAnonymous,
-						hasAdministrativeAccess,
-						hasFulfilledAccessRequirements,
-						iconsImageBundle,
-						accessRequirementText,
-						imposeRestrictionsCallback,
-						touAcceptanceCallback,
-						requestACTCallback,
-						loginCallback,
-						jiraFlagLink);
-
-			}
-		});
-		Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.REPORT_ISSUE, true);
-		flagLink.setStyleName("link");
-		flagLink.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				if (isAnonymous) {
-					GovernanceDialogHelper.showAnonymousFlagDialog(loginCallback, iconsImageBundle);
+		if (showFlagLink) {
+			String infoHyperlinkText = DisplayConstants.INFO;
+			if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
+				if (hasAdministrativeAccess) {
+					infoHyperlinkText=DisplayConstants.CHANGE;
+				} // else default to 'info', i.e. you can find out details, but can't change anything
+			} else { // CONTROLLED or RESTRICTED data
+				if (hasFulfilledAccessRequirements) {
+					// default = 'info', i.e. nothing more to do, you can just find out details
 				} else {
-					GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink, iconsImageBundle);
+					infoHyperlinkText = DisplayConstants.GAIN_ACCESS; // note, this applies to 'anonymous' too.  the path leads the user to logging in.
 				}
 			}
-		});		
-		lc.add(flagLink);
-		DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
+			
+			Anchor aboutLink = new Anchor(infoHyperlinkText);
+			aboutLink.addStyleName("link");
+			
+			DisplayUtils.surroundWidgetWithParens(lc, aboutLink);
+			
+			aboutLink.addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					GovernanceDialogHelper.showAccessRequirement(
+							restrictionLevel,
+							approvalType,
+							isAnonymous,
+							hasAdministrativeAccess,
+							hasFulfilledAccessRequirements,
+							iconsImageBundle,
+							accessRequirementText,
+							imposeRestrictionsCallback,
+							touAcceptanceCallback,
+							requestACTCallback,
+							loginCallback,
+							jiraFlagLink);
+	
+				}
+			});
+			Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.REPORT_ISSUE, true);
+			flagLink.setStyleName("link");
+			flagLink.addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					if (isAnonymous) {
+						GovernanceDialogHelper.showAnonymousFlagDialog(loginCallback, iconsImageBundle);
+					} else {
+						GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink, iconsImageBundle);
+					}
+				}
+			});		
+			lc.add(flagLink);
+			DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
+		}
 	    return lc;
 	}
 

@@ -31,7 +31,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 			 Callback loginCallback,
 			 RESTRICTION_LEVEL restrictionLevel, 
 			 APPROVAL_TYPE approvalType,
-			 boolean hasFulfilledAccessRequirements);
+			 boolean hasFulfilledAccessRequirements,
+			 boolean showFlagLink);
 	
 	/**
 	 * Presenter interface
