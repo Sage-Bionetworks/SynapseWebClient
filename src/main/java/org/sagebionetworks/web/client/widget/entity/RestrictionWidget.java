@@ -181,7 +181,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		boolean hasAdministrativeAccess = false;
 		boolean hasFulfilledAccessRequirements = false;
 		String jiraFlagLink = null;
-		if (!isAnonymous && showChangeLink) {
+		if (!isAnonymous) {
 			hasAdministrativeAccess = hasAdministrativeAccess();
 			jiraFlagLink = getJiraFlagUrl();
 		}
@@ -209,7 +209,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			}
 			if (!isAnonymous) hasFulfilledAccessRequirements = hasFulfilledAccessRequirements();
 		}
-		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, accessRequirementText, touAcceptanceCallback, requestACTCallback, imposeRestrictionsCallback, loginCallback, restrictionLevel, approvalType, hasFulfilledAccessRequirements, showFlagLink);
+		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, accessRequirementText, touAcceptanceCallback, requestACTCallback, imposeRestrictionsCallback, loginCallback, restrictionLevel, approvalType, hasFulfilledAccessRequirements, showFlagLink, showChangeLink);
 	}
 	
 	public Callback getImposeRestrictionsCallback() {

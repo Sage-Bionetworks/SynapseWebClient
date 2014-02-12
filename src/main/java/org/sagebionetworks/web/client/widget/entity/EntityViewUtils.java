@@ -58,7 +58,8 @@ public class EntityViewUtils {
 			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils,
-			boolean showFlagLink) {
+			boolean showFlagLink,
+			boolean showChangeLink) {
 		
 		
 		ImageResource shieldIcon = getShieldIcon(restrictionLevel, iconsImageBundle);
@@ -79,19 +80,13 @@ public class EntityViewUtils {
 		
 		lc.add(htmlPanel);
 		
-		if (showFlagLink) {
-			String infoHyperlinkText = DisplayConstants.INFO;
-			if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
-				if (hasAdministrativeAccess) {
-					infoHyperlinkText=DisplayConstants.CHANGE;
-				} // else default to 'info', i.e. you can find out details, but can't change anything
-			} else { // CONTROLLED or RESTRICTED data
-				if (hasFulfilledAccessRequirements) {
-					// default = 'info', i.e. nothing more to do, you can just find out details
-				} else {
-					infoHyperlinkText = DisplayConstants.GAIN_ACCESS; // note, this applies to 'anonymous' too.  the path leads the user to logging in.
-				}
-			}
+		//show the info link if there are any restrictions, or if we are supposed to show the flag link (to allow people to flag or  admin to "change" the data access level).
+		boolean isChangeLink = restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess;
+		boolean isRestricted = restrictionLevel!=RESTRICTION_LEVEL.OPEN;
+		if ((isChangeLink && showChangeLink) || isRestricted) {
+			String infoHyperlinkText = isChangeLink ? DisplayConstants.CHANGE : DisplayConstants.SHOW_LC;
+			//default to 'show', i.e. you can find out details, but can't change anything
+			//If CONTROLLED or RESTRICTED data:  if the user hasFulfilledAccessRequirements, requirement details will be shown.  If not, user can accept requirements and will gain access to data
 			
 			Anchor aboutLink = new Anchor(infoHyperlinkText);
 			aboutLink.addStyleName("link");
@@ -114,9 +109,10 @@ public class EntityViewUtils {
 							requestACTCallback,
 							loginCallback,
 							jiraFlagLink);
-	
 				}
 			});
+		}
+		if (showFlagLink) {
 			Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.REPORT_ISSUE, true);
 			flagLink.setStyleName("link");
 			flagLink.addClickHandler(new ClickHandler() {			
@@ -132,6 +128,7 @@ public class EntityViewUtils {
 			lc.add(flagLink);
 			DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
 		}
+			
 	    return lc;
 	}
 

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +30,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 			 RESTRICTION_LEVEL restrictionLevel, 
 			 APPROVAL_TYPE approvalType,
 			 boolean hasFulfilledAccessRequirements,
-			 boolean showFlagLink);
+			 boolean showFlagLink,
+			 boolean showChangeLink);
 	
 	/**
 	 * Presenter interface

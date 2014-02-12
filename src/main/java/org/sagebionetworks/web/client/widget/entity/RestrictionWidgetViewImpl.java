@@ -35,7 +35,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			Callback requestACTCallback, Callback imposeRestrictionsCallback,
 			Callback loginCallback, RESTRICTION_LEVEL restrictionLevel,
 			APPROVAL_TYPE approvalType, boolean hasFulfilledAccessRequirements,
-			boolean showFlagLink) {
+			boolean showFlagLink, boolean showChangeLink) {
 		return EntityViewUtils.createRestrictionsWidget(
 				jiraFlagLink,
 				isAnonymous,
@@ -50,7 +50,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				hasFulfilledAccessRequirements,
 				iconsImageBundle,
 				synapseJSNIUtils,
-				showFlagLink);
+				showFlagLink,
+				showChangeLink);
 	}
 	@Override
 	public void open(String url) {

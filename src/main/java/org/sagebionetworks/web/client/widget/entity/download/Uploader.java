@@ -334,7 +334,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep3(view.isNewlyRestricted(), requestList, 1);
+			directUploadStep3(false, requestList, 1);
 		else
 			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}
