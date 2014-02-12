@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -23,6 +24,8 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,6 +42,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private GlobalApplicationState globalApplicationState;
 	private RestrictionWidgetView view;
 	private boolean showChangeLink, showIfProject, showFlagLink;
+	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
 	public RestrictionWidget(
@@ -47,13 +51,15 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			JiraURLHelper jiraURLHelper) {
+			JiraURLHelper jiraURLHelper,
+			IconsImageBundle iconsImageBundle) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
 		this.jiraURLHelper = jiraURLHelper;
+		this.iconsImageBundle = iconsImageBundle;
 	}
 	
 	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
@@ -177,7 +183,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	@Override
 	public Widget asWidget() {
 		if (!includeRestrictionWidget()) return null;
-		boolean isAnonymous = isAnonymous();
+		final boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
 		boolean hasFulfilledAccessRequirements = false;
 		String jiraFlagLink = null;
@@ -185,8 +191,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			hasAdministrativeAccess = hasAdministrativeAccess();
 			jiraFlagLink = getJiraFlagUrl();
 		}
-		RESTRICTION_LEVEL restrictionLevel = getRestrictionLevel();
-		APPROVAL_TYPE approvalType = getApprovalType();
+		final RESTRICTION_LEVEL restrictionLevel = getRestrictionLevel();
+		final APPROVAL_TYPE approvalType = getApprovalType();
 		String accessRequirementText = null;
 		Callback touAcceptanceCallback = null;
 		Callback requestACTCallback = null;
@@ -209,7 +215,56 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			}
 			if (!isAnonymous) hasFulfilledAccessRequirements = hasFulfilledAccessRequirements();
 		}
-		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, accessRequirementText, touAcceptanceCallback, requestACTCallback, imposeRestrictionsCallback, loginCallback, restrictionLevel, approvalType, hasFulfilledAccessRequirements, showFlagLink, showChangeLink);
+		
+		
+		ClickHandler aboutLinkClickHandler = getAboutLinkClickHandler(jiraFlagLink, 
+				 isAnonymous, 
+				 hasAdministrativeAccess,
+				 accessRequirementText,
+				 touAcceptanceCallback,
+				 requestACTCallback,
+				 imposeRestrictionsCallback,
+				 loginCallback,
+				 restrictionLevel, 
+				 approvalType,
+				 hasFulfilledAccessRequirements,
+				 iconsImageBundle);
+
+		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, loginCallback, restrictionLevel, aboutLinkClickHandler, showFlagLink, showChangeLink);
+	}
+	
+	private ClickHandler getAboutLinkClickHandler(
+			 final String jiraFlagLink, 
+			 final boolean isAnonymous, 
+			 final boolean hasAdministrativeAccess,
+			 final String accessRequirementText,
+			 final Callback touAcceptanceCallback,
+			 final Callback requestACTCallback,
+			 final Callback imposeRestrictionsCallback,
+			 final Callback loginCallback,
+			 final RESTRICTION_LEVEL restrictionLevel, 
+			 final APPROVAL_TYPE approvalType,
+			 final boolean hasFulfilledAccessRequirements,
+			 final IconsImageBundle iconsImageBundle) {
+		 
+		return new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					GovernanceDialogHelper.showAccessRequirement(
+							restrictionLevel,
+							approvalType,
+							isAnonymous,
+							hasAdministrativeAccess,
+							hasFulfilledAccessRequirements,
+							iconsImageBundle,
+							accessRequirementText,
+							imposeRestrictionsCallback,
+							touAcceptanceCallback,
+							requestACTCallback,
+							loginCallback,
+							jiraFlagLink);
+				}
+		};
 	}
 	
 	public Callback getImposeRestrictionsCallback() {

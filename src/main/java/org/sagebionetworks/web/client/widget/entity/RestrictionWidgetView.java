@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -18,20 +19,14 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	public void open(String url);
 	
-	public Widget asWidget(
-			 String jiraFlagLink, 
-			 boolean isAnonymous, 
-			 boolean hasAdministrativeAccess,
-			 String accessRequirementText,
-			 Callback touAcceptanceCallback,
-			 Callback requestACTCallback,
-			 Callback imposeRestrictionsCallback,
-			 Callback loginCallback,
-			 RESTRICTION_LEVEL restrictionLevel, 
-			 APPROVAL_TYPE approvalType,
-			 boolean hasFulfilledAccessRequirements,
-			 boolean showFlagLink,
-			 boolean showChangeLink);
+	public Widget asWidget(String jiraFlagLink,
+			boolean isAnonymous, 
+			boolean hasAdministrativeAccess,
+			Callback loginCallback, 
+			RESTRICTION_LEVEL restrictionLevel,
+			ClickHandler aboutLinkClickHandler,
+			boolean showFlagLink, 
+			boolean showChangeLink);
 	
 	/**
 	 * Presenter interface

@@ -48,20 +48,14 @@ public class EntityViewUtils {
 			final String jiraFlagLink, 
 			final boolean isAnonymous, 
 			final boolean hasAdministrativeAccess,
-			final String accessRequirementText,
-			final Callback touAcceptanceCallback,
-			final Callback requestACTCallback,
-			final Callback imposeRestrictionsCallback,
 			final Callback loginCallback,
 			final RESTRICTION_LEVEL restrictionLevel, 
-			final APPROVAL_TYPE approvalType,
-			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils,
+			ClickHandler aboutLinkClickHandler,
 			boolean showFlagLink,
 			boolean showChangeLink) {
-		
-		
+
 		ImageResource shieldIcon = getShieldIcon(restrictionLevel, iconsImageBundle);
 		String description = restrictionDescriptor(restrictionLevel);
 		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
@@ -93,24 +87,7 @@ public class EntityViewUtils {
 			
 			DisplayUtils.surroundWidgetWithParens(lc, aboutLink);
 			
-			aboutLink.addClickHandler(new ClickHandler() {			
-				@Override
-				public void onClick(ClickEvent event) {
-					GovernanceDialogHelper.showAccessRequirement(
-							restrictionLevel,
-							approvalType,
-							isAnonymous,
-							hasAdministrativeAccess,
-							hasFulfilledAccessRequirements,
-							iconsImageBundle,
-							accessRequirementText,
-							imposeRestrictionsCallback,
-							touAcceptanceCallback,
-							requestACTCallback,
-							loginCallback,
-							jiraFlagLink);
-				}
-			});
+			aboutLink.addClickHandler(aboutLinkClickHandler);
 		}
 		if (showFlagLink) {
 			Anchor flagLink = new Anchor(DisplayUtils.getIconHtml(iconsImageBundle.flagSmall16())+DisplayConstants.REPORT_ISSUE, true);
