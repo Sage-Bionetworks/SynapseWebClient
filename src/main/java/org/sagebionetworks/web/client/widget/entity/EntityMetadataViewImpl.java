@@ -5,15 +5,9 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -21,13 +15,9 @@ import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -78,25 +68,21 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField(provided = true)
 	final IconsImageBundle icons;
 
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private AccessControlListEditor accessControlListEditor;
-	private PublicPrivateBadge publicPrivateBadge;
 	AnnotationsWidget annotationsWidget;
+	RestrictionWidget restrictionWidget;
 	
 	@Inject
 	public EntityMetadataViewImpl(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, FavoriteWidget favoriteWidget,
+			FavoriteWidget favoriteWidget,
 			DoiWidget doiWidget,
-			AccessControlListEditor accessControlListEditor,
-			PublicPrivateBadge publicPrivateBadge,
-			AnnotationsWidget annotationsWidget) {
+			AnnotationsWidget annotationsWidget,
+			RestrictionWidget restrictionWidget
+			) {
 		this.icons = iconsImageBundle;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
 		this.doiWidget = doiWidget;
-		this.accessControlListEditor = accessControlListEditor;
-		this.publicPrivateBadge = publicPrivateBadge;
 		this.annotationsWidget = annotationsWidget;
+		this.restrictionWidget = restrictionWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 
 				
@@ -112,6 +98,16 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 		
 		Entity e = bundle.getEntity();
+		restrictionWidget.configure(bundle, true, new com.google.gwt.core.client.Callback<Void, Throwable>() {
+			@Override
+			public void onSuccess(Void result) {
+				presenter.fireEntityUpdatedEvent();
+			}
+			@Override
+			public void onFailure(Throwable reason) {
+				showErrorMessage(reason.getMessage());
+			}
+		});
 		
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(e, DisplayUtils.IconSize.PX24, icons));
 		synapseIconForEntity.applyTo(entityIcon);
@@ -120,7 +116,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		setEntityId(e.getId());
 					
 		dataUseContainer.clear();
-		Widget dataUse = createRestrictionWidget();
+		Widget dataUse = restrictionWidget.asWidget();
 		if(dataUse != null) {
 			dataUseContainer.setVisible(true);
 			dataUseContainer.add(dataUse);
@@ -190,22 +186,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		}
 	}
 	
-	private void configureShareSettings(Anchor link, Entity entity){
-		accessControlListEditor.setResource(entity);
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
-					@Override
-					public void invoke() {
-						presenter.fireEntityUpdatedEvent();
-					}
-				});
-			}
-		});
-				
-	}
-
 	private void clearmeta() {
 		dataUseContainer.clear();
 		doiWidget.clear();
@@ -239,58 +219,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setEntityId(String text) {
 		entityId.setInnerText(text);
 	}
-	
-	private Widget createRestrictionWidget() {
-		if (!presenter.includeRestrictionWidget()) return null;
-		boolean isAnonymous = presenter.isAnonymous();
-		boolean hasAdministrativeAccess = false;
-		boolean hasFulfilledAccessRequirements = false;
-		String jiraFlagLink = null;
-		if (!isAnonymous) {
-			hasAdministrativeAccess = presenter.hasAdministrativeAccess();
-			jiraFlagLink = presenter.getJiraFlagUrl();
-		}
-		RESTRICTION_LEVEL restrictionLevel = presenter.getRestrictionLevel();
-		APPROVAL_TYPE approvalType = presenter.getApprovalType();
-		String accessRequirementText = null;
-		Callback touAcceptanceCallback = null;
-		Callback requestACTCallback = null;
-		Callback imposeRestrictionsCallback = presenter.getImposeRestrictionsCallback();
-		Callback loginCallback = presenter.getLoginCallback();
-		if (approvalType!=APPROVAL_TYPE.NONE) {
-			accessRequirementText = presenter.accessRequirementText();
-			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
-				touAcceptanceCallback = presenter.accessRequirementCallback();
-			} else { // APPROVAL_TYPE.ACT_APPROVAL
-				// get the Jira link for ACT approval
-				if (!isAnonymous) {
-					requestACTCallback = new Callback() {
-						@Override
-						public void invoke() {
-							Window.open(presenter.getJiraRequestAccessUrl(), "_blank", "");
-
-						}
-					};
-				}
-			}
-			if (!isAnonymous) hasFulfilledAccessRequirements = presenter.hasFulfilledAccessRequirements();
-		}
-		return EntityViewUtils.createRestrictionsWidget(
-				jiraFlagLink,
-				isAnonymous,
-				hasAdministrativeAccess,
-				accessRequirementText,
-				touAcceptanceCallback,
-				requestACTCallback,
-				imposeRestrictionsCallback,
-				loginCallback,
-				restrictionLevel,
-				approvalType,
-				hasFulfilledAccessRequirements,
-				icons,
-				synapseJSNIUtils);
-	}
-
 	
 	@Override
 	public void showErrorMessage(String message) {

@@ -463,6 +463,7 @@ public class DisplayConstants {
 	public static final String RESTRICTED_USE = "Restricted Use";
 	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
+	public static final String CHANGE = "change";
 	public static final String INFO = "info";
 	public static final String GAIN_ACCESS = "gain access";
 	public static final String FLAG_DIALOG_PREFIX = 
@@ -484,6 +485,16 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
+
+	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
+
+	public static final String DATA_USE_TITLE = "Data Use Condition";
+	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Folder content can only be used in agreement with data-specific conditions. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Folder content can be used without restriction. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
+	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view this folder.";
+	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view this folder.";
+	
 	
 	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
@@ -501,15 +512,8 @@ public class DisplayConstants {
 	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
 	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'OK' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
-	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
-	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
-	public static final String DATA_USE_BANNER_SUB2 = ", who can use these data?";
-	public static final String DATA_USE_NOTE = 
-		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
-		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
-	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
+	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";

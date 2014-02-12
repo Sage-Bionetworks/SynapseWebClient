@@ -80,7 +80,7 @@ public class EntityViewUtils {
 		String infoHyperlinkText = DisplayConstants.INFO;
 		if (restrictionLevel==RESTRICTION_LEVEL.OPEN) { // OPEN data
 			if (hasAdministrativeAccess) {
-				infoHyperlinkText=DisplayConstants.LABEL_CREATE;
+				infoHyperlinkText=DisplayConstants.CHANGE;
 			} // else default to 'info', i.e. you can find out details, but can't change anything
 		} else { // CONTROLLED or RESTRICTED data
 			if (hasFulfilledAccessRequirements) {

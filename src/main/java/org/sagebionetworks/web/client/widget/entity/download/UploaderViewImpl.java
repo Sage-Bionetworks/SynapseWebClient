@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.EntityViewUtils;
+import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -62,6 +63,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	// initialized in constructor
 	private boolean isInitiallyRestricted;
 	private boolean isEntity;
+	private String parentEntityId;
 	private Radio fileUploadOpenRadio;
 	private Radio fileUploadRestrictedRadio;
 	private Radio linkExternalOpenRadio;
@@ -79,11 +81,17 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
+	SharingAndDataUseConditionWidget sharingDataUseWidget;
+	
 	@Inject
-	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
+	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
+			IconsImageBundle iconsImageBundle, 
+			SageImageBundle sageImageBundle,
+			SharingAndDataUseConditionWidget sharingDataUseWidget) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
+		this.sharingDataUseWidget = sharingDataUseWidget;
 		
 		// initialize graphic elements
 		this.fileUploadOpenRadio = new Radio();
@@ -139,8 +147,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void createUploadForm(boolean isEntity) {
+	public void createUploadForm(boolean isEntity, String parentEntityId) {
 		this.isEntity = isEntity;
+		this.parentEntityId = parentEntityId;
 		initializeControls();
 		if(container == null) { 
 			createUploadContents();
@@ -246,18 +255,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 			configureUploadButton();
 		}
 
-		if (isEntity) {
-			// Data Use message 
-			
-			container.add(new HTML("<h3>"+ DisplayConstants.DATA_USE_BANNER +"</h3>"), new MarginData(25, 10, 5, 10));
-			container.add(new HTML("<div class=\"" + ClientProperties.STYLE_DISPLAY_INLINE + "\"> <span style=\"font-size: 12pt; display: inline; color: #000;\">"
-					+ DisplayConstants.DATA_USE_BANNER_SUB1  + "</span>" 				
-					+ DisplayUtils.getShareSettingsDisplay(true, synapseJSNIUtils) 				
-					+ "<span style=\"font-size: 12pt; display: inline; color: #000;\">" + DisplayConstants.DATA_USE_BANNER_SUB2 + "</span>" 				
-					+"</div>"), new MarginData(0, 10, 0, 10));		
-			container.add(new HTML(DisplayConstants.DATA_USE_NOTE), new MarginData(3, 10, 10, 10));
-			
-			addRadioButtonsToContainer(container, linkExternalOpenRadio, linkExternalRestrictedRadio);
+		if (isEntity && parentEntityId != null) {
+			//add sharing settings and data use conditions (associated to the parent)
+			sharingDataUseWidget.configure(parentEntityId, false, null);
+			container.add(sharingDataUseWidget.asWidget());
 		}
 		
 		ButtonBar bar = new ButtonBar();

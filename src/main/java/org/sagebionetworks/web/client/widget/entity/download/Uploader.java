@@ -133,7 +133,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm(isEntity);
+		this.view.createUploadForm(isEntity, parentEntityId);
 		return this.view.asWidget();
 	}
 
