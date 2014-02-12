@@ -151,10 +151,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.isEntity = isEntity;
 		this.parentEntityId = parentEntityId;
 		initializeControls();
-		if(container == null) { 
-			createUploadContents();
-		}
-	
+		createUploadContents();
+		
 		// reset
 		if (pathField != null)
 			pathField.clear();
@@ -429,7 +427,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		layoutContainer.add(radioButtonPanel, MARGIN);
 	}
 	
-	private static final int PANEL_HEIGHT = 100;
+	private static final int PANEL_HEIGHT = 80;
 	private static final int PANEL_WIDTH = 590;
 	
 	private static final String FILE_UPLOAD_RESTRICTED_PARAM_NAME = "fileUploadRestrictionSetting";
@@ -493,7 +491,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setButtonAlign(HorizontalAlignment.LEFT);		
 		formPanel.setHeight(PANEL_HEIGHT);
 		formPanel.setBorders(false);
-		formPanel.setAutoWidth(true);
+		formPanel.setAutoWidth(false);
+		formPanel.setWidth(PANEL_WIDTH+30);
 		formPanel.setFieldWidth(PANEL_WIDTH-100);
 
 		fileUploadField.setWidth(PANEL_WIDTH-100);

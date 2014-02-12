@@ -2,12 +2,10 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -21,7 +19,6 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private UserAccountServiceAsync userAccountService;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
@@ -30,11 +27,10 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	private AccessControlList acl;
 	
 	@Inject
-	public PublicPrivateBadge(PublicPrivateBadgeView view, UserAccountServiceAsync userAccountService, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.userAccountService = userAccountService;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		view.setPresenter(this);
@@ -46,6 +42,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	 * @param callback
 	 */
 	public void configure(Entity entity, final AsyncCallback<Boolean> callback) {
+		view.clear();
 		this.entity = entity;
 		getAcl(new AsyncCallback<AccessControlList>() {
 			@Override
@@ -61,6 +58,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public void configure(Entity entity) {
+		view.clear();
 		this.entity = entity;
 		AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
 			@Override
@@ -77,7 +75,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		getAcl(callback1);
 	}
 	
-	public void configure(AccessControlList acl) {
+	private void configure(AccessControlList acl) {
 		this.acl = acl;
 		publicPrincipalIds = DisplayUtils.getPublicAndAuthenticatedGroupPrincipalIds();
 		view.configure(isPublic(acl, publicPrincipalIds));
