@@ -41,7 +41,8 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 			 Callback touAcceptanceCallback, 
 			 Callback requestACTCallback,
 			 Callback loginCallback,
-			 String jiraFlagLink);
+			 String jiraFlagLink,
+			 Callback showNextRestrictionCallback);
 	
 	/**
 	 * Presenter interface

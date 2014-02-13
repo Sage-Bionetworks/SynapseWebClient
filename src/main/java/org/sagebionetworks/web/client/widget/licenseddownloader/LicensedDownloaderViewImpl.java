@@ -101,7 +101,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 					termsOfUseCallback, 
 					presenter.getRequestAccessCallback(), 
 					null/*loginCallback*/, 
-					null/*jiraFlagLink*/);
+					null/*jiraFlagLink*/,
+					null /*on hide dialog callback*/);
 		}
 		
 	}

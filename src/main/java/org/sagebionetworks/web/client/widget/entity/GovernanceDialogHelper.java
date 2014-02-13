@@ -9,8 +9,12 @@ import org.sagebionetworks.web.client.view.ProfilePanel;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.Style.Orientation;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -154,7 +158,8 @@ public class GovernanceDialogHelper {
 			final Callback touAcceptanceCallback,
 			final Callback requestACTCallback,
 			final Callback loginCallback,
-			final String jiraFlagLink) {
+			final String jiraFlagLink,
+			final Callback onHideDialogCallback) {
 		if ((restrictionLevel==RESTRICTION_LEVEL.OPEN && approvalType!=APPROVAL_TYPE.NONE) ||
 				(restrictionLevel!=RESTRICTION_LEVEL.OPEN && approvalType==APPROVAL_TYPE.NONE)) 
 			throw new IllegalArgumentException("restrictionLevel="+restrictionLevel+" but approvalType="+approvalType);
@@ -163,6 +168,14 @@ public class GovernanceDialogHelper {
 		boolean imposeRestrictionsAllowed = (restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess);
 		final Dialog dialog = new Dialog();
         configureDialog(dialog);
+		dialog.addListener(Events.Hide, new Listener<BaseEvent>() {
+			public void handleEvent(BaseEvent be) {
+				//window is hiding, invoke callback (if given)
+				if (onHideDialogCallback != null)
+					onHideDialogCallback.invoke();
+			};
+		});
+
         ContentPanel panel = createTextPanel(dialog);
  		// title and icon are based on restriction level, e.g. "Data Use: Restricted"
         dialog.setIcon(AbstractImagePrototype.create(restrictionLevelIcon(restrictionLevel, iconsImageBundle)));

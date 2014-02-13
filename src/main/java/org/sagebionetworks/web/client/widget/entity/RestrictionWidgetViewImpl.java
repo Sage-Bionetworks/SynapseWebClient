@@ -54,13 +54,18 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void showAccessRequirement(RESTRICTION_LEVEL restrictionLevel,
-			APPROVAL_TYPE approvalType, boolean isAnonymous,
+			APPROVAL_TYPE approvalType, 
+			boolean isAnonymous,
 			boolean hasAdministrativeAccess,
 			boolean hasFulfilledAccessRequirements,
-			IconsImageBundle iconsImageBundle, String accessRequirementText,
+			IconsImageBundle iconsImageBundle, 
+			String accessRequirementText,
 			Callback imposeRestrictionsCallback,
-			Callback touAcceptanceCallback, Callback requestACTCallback,
-			Callback loginCallback, String jiraFlagLink) {
+			Callback touAcceptanceCallback, 
+			Callback requestACTCallback,
+			Callback loginCallback, 
+			String jiraFlagLink, 
+			Callback onHideCallback) {
 		GovernanceDialogHelper.showAccessRequirement(
 				restrictionLevel,
 				approvalType,
@@ -73,7 +78,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				touAcceptanceCallback,
 				requestACTCallback,
 				loginCallback,
-				jiraFlagLink);	
+				jiraFlagLink, 
+				onHideCallback);	
 	}
 	
 	@Override

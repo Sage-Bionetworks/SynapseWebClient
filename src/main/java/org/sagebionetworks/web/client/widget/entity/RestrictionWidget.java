@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -43,6 +46,9 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private RestrictionWidgetView view;
 	private boolean showChangeLink, showIfProject, showFlagLink;
 	private IconsImageBundle iconsImageBundle;
+	private HashSet<Long> shownAccessRequirements;
+	private Iterator<AccessRequirement> allArsIterator, unmetArsIterator;
+	private AccessRequirement currentAR;
 	
 	@Inject
 	public RestrictionWidget(
@@ -60,6 +66,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.jiraURLHelper = jiraURLHelper;
 		this.iconsImageBundle = iconsImageBundle;
+		shownAccessRequirements = new HashSet<Long>();
 	}
 	
 	public void configure(EntityBundle bundle, boolean showChangeLink, boolean showIfProject, boolean showFlagLink, com.google.gwt.core.client.Callback<Void, Throwable> entityUpdatedCallback) {
@@ -136,7 +143,22 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	}
 	
 	private AccessRequirement getAccessRequirement() {
-		return GovernanceServiceHelper.selectAccessRequirement(bundle.getAccessRequirements(), bundle.getUnmetAccessRequirements());
+		return currentAR;
+	}
+	
+	public AccessRequirement selectNextAccessRequirement() {
+		AccessRequirement nextAR = null;
+		if (unmetArsIterator.hasNext())
+			nextAR = unmetArsIterator.next();
+		else if (allArsIterator.hasNext())
+			nextAR = allArsIterator.next();
+		return nextAR;
+	}
+	
+	public void resetAccessRequirementCount() {
+		shownAccessRequirements.clear();
+		allArsIterator = bundle.getAccessRequirements().iterator();
+		unmetArsIterator = bundle.getUnmetAccessRequirements().iterator();
 	}
 
 	public Callback accessRequirementCallback() {
@@ -185,67 +207,32 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		if (!includeRestrictionWidget()) return null;
 		final boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
-		boolean hasFulfilledAccessRequirements = false;
+		
 		String jiraFlagLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = hasAdministrativeAccess();
 			jiraFlagLink = getJiraFlagUrl();
 		}
 		final RESTRICTION_LEVEL restrictionLevel = getRestrictionLevel();
-		final APPROVAL_TYPE approvalType = getApprovalType();
-		String accessRequirementText = null;
-		Callback touAcceptanceCallback = null;
-		Callback requestACTCallback = null;
 		Callback imposeRestrictionsCallback = getImposeRestrictionsCallback();
 		Callback loginCallback = getLoginCallback();
-		if (approvalType!=APPROVAL_TYPE.NONE) {
-			accessRequirementText = accessRequirementText();
-			if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
-				touAcceptanceCallback = accessRequirementCallback();
-			} else { // APPROVAL_TYPE.ACT_APPROVAL
-				// get the Jira link for ACT approval
-				if (!isAnonymous) {
-					requestACTCallback = new Callback() {
-						@Override
-						public void invoke() {
-							view.open(getJiraRequestAccessUrl());
-						}
-					};
-				}
-			}
-			if (!isAnonymous) hasFulfilledAccessRequirements = hasFulfilledAccessRequirements();
-		}
-		
 		
 		ClickHandler aboutLinkClickHandler = getAboutLinkClickHandler( 
-				restrictionLevel, 
-				approvalType,
 				isAnonymous, 
 				 hasAdministrativeAccess,
-				 hasFulfilledAccessRequirements,
 				 iconsImageBundle,
-				 accessRequirementText,
 				 imposeRestrictionsCallback,
-				 touAcceptanceCallback,
-				 requestACTCallback,
 				 loginCallback,
-				 jiraFlagLink
-				 );
+				 jiraFlagLink);
 
 		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, loginCallback, restrictionLevel, aboutLinkClickHandler, showFlagLink, showChangeLink);
 	}
 	
 	private ClickHandler getAboutLinkClickHandler(
-			final RESTRICTION_LEVEL restrictionLevel, 
-			final APPROVAL_TYPE approvalType,
 			final boolean isAnonymous,
 			final boolean hasAdministrativeAccess,
-			final boolean hasFulfilledAccessRequirements,
 			final IconsImageBundle iconsImageBundle,
-			final String accessRequirementText,  
 			final Callback imposeRestrictionsCallback, 
-			final Callback touAcceptanceCallback, 
-			final Callback requestACTCallback,
 			final Callback loginCallback,
 			final String jiraFlagLink  
 			 ) {
@@ -253,21 +240,78 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		return new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					view.showAccessRequirement(
-							restrictionLevel,
-							approvalType,
-							isAnonymous,
-							hasAdministrativeAccess,
-							hasFulfilledAccessRequirements,
-							iconsImageBundle,
-							accessRequirementText,
-							imposeRestrictionsCallback,
-							touAcceptanceCallback,
-							requestACTCallback,
-							loginCallback,
-							jiraFlagLink);
+					//will run through all access requirements, unmet first (see selectNextAccessRequirement)
+					resetAccessRequirementCount();
+					showNextAccessRequirement(isAnonymous, hasAdministrativeAccess, iconsImageBundle, imposeRestrictionsCallback, loginCallback, jiraFlagLink);
 				}
 		};
+	}
+	
+	private void showNextAccessRequirement(
+			final boolean isAnonymous,
+			final boolean hasAdministrativeAccess,
+			final IconsImageBundle iconsImageBundle,
+			final Callback imposeRestrictionsCallback, 
+			final Callback loginCallback,
+			final String jiraFlagLink  
+			) {
+		
+		currentAR = selectNextAccessRequirement();
+		//iterate over access requirements until we reach one that we have not yet shown (or there are none left to show).
+		while(currentAR != null && shownAccessRequirements.contains(currentAR.getId())) {
+			currentAR = selectNextAccessRequirement();	
+		}
+		
+		//if there is another access requirement to show, then show it
+		if (currentAR != null) {
+			final RESTRICTION_LEVEL restrictionLevel = GovernanceServiceHelper.getRestrictionLevel(currentAR);
+			final APPROVAL_TYPE approvalType = getApprovalType();
+			shownAccessRequirements.add(currentAR.getId());
+			boolean hasFulfilledAccessRequirements = false;
+			String accessRequirementText = null;
+			Callback touAcceptanceCallback = null;
+			Callback requestACTCallback = null;
+			if (approvalType!=APPROVAL_TYPE.NONE) {
+				accessRequirementText = accessRequirementText();
+				if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
+					touAcceptanceCallback = accessRequirementCallback();
+				} else { // APPROVAL_TYPE.ACT_APPROVAL
+					// get the Jira link for ACT approval
+					if (!isAnonymous) {
+						requestACTCallback = new Callback() {
+							@Override
+							public void invoke() {
+								view.open(getJiraRequestAccessUrl());
+							}
+						};
+					}
+				}
+				if (!isAnonymous) hasFulfilledAccessRequirements = hasFulfilledAccessRequirements();
+			}
+			
+			Callback showNextRestrictionCallback = new Callback() {
+				@Override
+				public void invoke() {
+					showNextAccessRequirement(isAnonymous, hasAdministrativeAccess, iconsImageBundle, imposeRestrictionsCallback, loginCallback, jiraFlagLink);
+				}
+			};
+			
+			view.showAccessRequirement(
+					restrictionLevel,
+					approvalType,
+					isAnonymous,
+					hasAdministrativeAccess,
+					hasFulfilledAccessRequirements,
+					iconsImageBundle,
+					accessRequirementText,
+					imposeRestrictionsCallback,
+					touAcceptanceCallback,
+					requestACTCallback,
+					loginCallback,
+					jiraFlagLink,
+					showNextRestrictionCallback);
+		}
+
 	}
 	
 	public Callback getImposeRestrictionsCallback() {
