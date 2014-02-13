@@ -80,7 +80,9 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		container.add(publicPrivateBadgeWidget);
 		
 		if (showChangeLink) {
-			container.add(new InlineHTML("("));
+			FlowPanel changeLinkContainer = new FlowPanel();
+			changeLinkContainer.addStyleName("inline-block margin-left-5 moveup-2");
+			changeLinkContainer.add(new InlineHTML("("));
 			Anchor change = new Anchor();
 			change.setText(DisplayConstants.CHANGE);
 			change.addStyleName("link");
@@ -96,8 +98,9 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 					});
 				}
 			});
-			container.add(change);
-			container.add(new InlineHTML(")"));
+			changeLinkContainer.add(change);
+			changeLinkContainer.add(new InlineHTML(")"));
+			container.add(changeLinkContainer);
 		}
 		container.add(sharingDescriptionContainer);
 		

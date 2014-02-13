@@ -138,7 +138,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(380, 250);
+		dialog.setSize(420, 250);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setHideOnButtonClick(true);
@@ -152,6 +152,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		panel.setBorders(false);
 		panel.setShadow(false);
 		panel.setBodyBorder(false);
+		panel.setFieldWidth(305);
 
 		final TextField<String> nameField = new TextField<String>();
 				nameField.setFieldLabel(DisplayConstants.LABEL_NAME);
@@ -180,8 +181,10 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		
 		dialog.addListener(Events.Hide, new Listener<BaseEvent>() {
 			public void handleEvent(BaseEvent be) {
-				if (((WindowEvent)be).getButtonClicked() != okButton)
+				//window is hiding.  if it was because of any reason other than the ok button being clicked, then cancel folder creation (delete it)
+				if (be instanceof WindowEvent && ((WindowEvent)be).getButtonClicked() != okButton) {
 					cancelFolderCreation(dialog, nameField, folderEntityId);
+				}
 			};
 		});
 		// Enter key in name field submits
