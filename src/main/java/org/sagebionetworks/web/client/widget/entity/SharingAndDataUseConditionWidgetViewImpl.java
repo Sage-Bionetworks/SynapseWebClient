@@ -72,6 +72,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				showErrorMessage(caught.getMessage());
 			}
 		});
 		Widget publicPrivateBadgeWidget = publicPrivateBadge.asWidget();
