@@ -28,7 +28,6 @@ import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
@@ -96,7 +95,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.springframework.web.client.RestClientException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -161,6 +159,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	private static PublicPrincipalIds publicPrincipalIds = null;
+	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -2077,12 +2077,20 @@ public class DisplayUtils {
 		//alternatively, could use the gwt I18n Messages class client side
 	}
 	
-	public static PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
-		PublicPrincipalIds publicPrincipalIds = new PublicPrincipalIds();
-		publicPrincipalIds.setPublicAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.PUBLIC_GROUP.getPrincipalId());
-		publicPrincipalIds.setAuthenticatedAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.AUTHENTICATED_USERS_GROUP.getPrincipalId());
-		publicPrincipalIds.setAnonymousUserId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.ANONYMOUS_USER.getPrincipalId());
-
-		return publicPrincipalIds;
+	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
+		if (publicPrincipalIds == null) {
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
+				@Override
+				public void onSuccess(PublicPrincipalIds result) {
+					publicPrincipalIds = result;
+					callback.onSuccess(result);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} else
+			callback.onSuccess(publicPrincipalIds);
 	}
 }

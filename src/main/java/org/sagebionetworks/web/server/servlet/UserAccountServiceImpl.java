@@ -2,12 +2,14 @@ package org.sagebionetworks.web.server.servlet;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -29,6 +31,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	private TokenProvider tokenProvider = this;
 	
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	
+	public static PublicPrincipalIds publicPrincipalIds = null;
 	
 	/**
 	 * Injected with Gin
@@ -178,6 +182,32 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this
 				.getThreadLocalRequest());
+	}
+	
+	@Override
+	public PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds() {
+		if (publicPrincipalIds == null) {
+			try {
+				validateService();
+				initPublicAndAuthenticatedPrincipalIds();
+			} catch (Exception e) {
+				throw new RestClientException(e.getMessage());
+			}
+		}
+		return publicPrincipalIds;
+	}
+
+	public static void initPublicAndAuthenticatedPrincipalIds() {
+		try {
+			PublicPrincipalIds results = new PublicPrincipalIds();
+			results.setPublicAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.PUBLIC_GROUP.getPrincipalId());
+			results.setAuthenticatedAclPrincipalId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.AUTHENTICATED_USERS_GROUP.getPrincipalId());
+			results.setAnonymousUserId(AuthorizationConstants.BOOTSTRAP_PRINCIPAL.ANONYMOUS_USER.getPrincipalId());
+			
+			publicPrincipalIds = results;
+		} catch (Exception e) {
+			throw new RestClientException(e.getMessage());
+		}
 	}
 	
 	@Override

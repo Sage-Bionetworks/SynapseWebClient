@@ -51,6 +51,31 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				showFlagLink,
 				showChangeLink);
 	}
+	
+	@Override
+	public void showAccessRequirement(RESTRICTION_LEVEL restrictionLevel,
+			APPROVAL_TYPE approvalType, boolean isAnonymous,
+			boolean hasAdministrativeAccess,
+			boolean hasFulfilledAccessRequirements,
+			IconsImageBundle iconsImageBundle, String accessRequirementText,
+			Callback imposeRestrictionsCallback,
+			Callback touAcceptanceCallback, Callback requestACTCallback,
+			Callback loginCallback, String jiraFlagLink) {
+		GovernanceDialogHelper.showAccessRequirement(
+				restrictionLevel,
+				approvalType,
+				isAnonymous,
+				hasAdministrativeAccess,
+				hasFulfilledAccessRequirements,
+				iconsImageBundle,
+				accessRequirementText,
+				imposeRestrictionsCallback,
+				touAcceptanceCallback,
+				requestACTCallback,
+				loginCallback,
+				jiraFlagLink);	
+	}
+	
 	@Override
 	public void open(String url) {
 		Window.open(url, "_blank", "");	

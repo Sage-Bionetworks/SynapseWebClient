@@ -217,40 +217,43 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		}
 		
 		
-		ClickHandler aboutLinkClickHandler = getAboutLinkClickHandler(jiraFlagLink, 
-				 isAnonymous, 
+		ClickHandler aboutLinkClickHandler = getAboutLinkClickHandler( 
+				restrictionLevel, 
+				approvalType,
+				isAnonymous, 
 				 hasAdministrativeAccess,
+				 hasFulfilledAccessRequirements,
+				 iconsImageBundle,
 				 accessRequirementText,
+				 imposeRestrictionsCallback,
 				 touAcceptanceCallback,
 				 requestACTCallback,
-				 imposeRestrictionsCallback,
 				 loginCallback,
-				 restrictionLevel, 
-				 approvalType,
-				 hasFulfilledAccessRequirements,
-				 iconsImageBundle);
+				 jiraFlagLink
+				 );
 
 		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, loginCallback, restrictionLevel, aboutLinkClickHandler, showFlagLink, showChangeLink);
 	}
 	
 	private ClickHandler getAboutLinkClickHandler(
-			 final String jiraFlagLink, 
-			 final boolean isAnonymous, 
-			 final boolean hasAdministrativeAccess,
-			 final String accessRequirementText,
-			 final Callback touAcceptanceCallback,
-			 final Callback requestACTCallback,
-			 final Callback imposeRestrictionsCallback,
-			 final Callback loginCallback,
-			 final RESTRICTION_LEVEL restrictionLevel, 
-			 final APPROVAL_TYPE approvalType,
-			 final boolean hasFulfilledAccessRequirements,
-			 final IconsImageBundle iconsImageBundle) {
+			final RESTRICTION_LEVEL restrictionLevel, 
+			final APPROVAL_TYPE approvalType,
+			final boolean isAnonymous,
+			final boolean hasAdministrativeAccess,
+			final boolean hasFulfilledAccessRequirements,
+			final IconsImageBundle iconsImageBundle,
+			final String accessRequirementText,  
+			final Callback imposeRestrictionsCallback, 
+			final Callback touAcceptanceCallback, 
+			final Callback requestACTCallback,
+			final Callback loginCallback,
+			final String jiraFlagLink  
+			 ) {
 		 
 		return new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					GovernanceDialogHelper.showAccessRequirement(
+					view.showAccessRequirement(
 							restrictionLevel,
 							approvalType,
 							isAnonymous,

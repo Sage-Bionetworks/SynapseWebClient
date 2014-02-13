@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -22,17 +23,19 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
-	private PublicPrincipalIds publicPrincipalIds;	
+	private PublicPrincipalIds publicPrincipalIds;
+	private UserAccountServiceAsync userAccountService;
 	private Entity entity;
 	private AccessControlList acl;
 	
 	@Inject
-	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.userAccountService = userAccountService;
 		view.setPresenter(this);
 	}	
 
@@ -75,10 +78,20 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		getAcl(callback1);
 	}
 	
-	private void configure(AccessControlList acl) {
+	private void configure(final AccessControlList acl) {
 		this.acl = acl;
-		publicPrincipalIds = DisplayUtils.getPublicAndAuthenticatedGroupPrincipalIds();
-		view.configure(isPublic(acl, publicPrincipalIds));
+		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
+			@Override
+			public void onSuccess(PublicPrincipalIds result) {
+				publicPrincipalIds = result;
+				view.configure(isPublic(acl, publicPrincipalIds));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage("Could not find the public group: " + caught.getMessage());
+			}
+		});
 	}
 	
 	/**

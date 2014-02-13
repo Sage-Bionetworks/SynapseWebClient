@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,6 +28,20 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 			ClickHandler aboutLinkClickHandler,
 			boolean showFlagLink, 
 			boolean showChangeLink);
+	
+	public void showAccessRequirement(
+			 RESTRICTION_LEVEL restrictionLevel, 
+			 APPROVAL_TYPE approvalType,
+			 boolean isAnonymous,
+			 boolean hasAdministrativeAccess,
+			 boolean hasFulfilledAccessRequirements,
+			 IconsImageBundle iconsImageBundle,
+			 String accessRequirementText,  
+			 Callback imposeRestrictionsCallback, 
+			 Callback touAcceptanceCallback, 
+			 Callback requestACTCallback,
+			 Callback loginCallback,
+			 String jiraFlagLink);
 	
 	/**
 	 * Presenter interface

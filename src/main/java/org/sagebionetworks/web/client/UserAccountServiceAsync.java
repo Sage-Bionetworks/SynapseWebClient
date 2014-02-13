@@ -27,5 +27,7 @@ public interface UserAccountServiceAsync {
 	
 	void getTermsOfUse(AsyncCallback<String> callback);
 	
+	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);
+	
 	void getStorageUsage(AsyncCallback<String> callback);
 }
