@@ -22,6 +22,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -125,12 +126,14 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	@Override
 	public void showFolderEditDialog(final String folderEntityId) {
 		SimplePanel sharingAndDataUseContainer = new SimplePanel();
-		sharingAndDataUseWidget.configure(folderEntityId, true, new Callback() {
+		Callback refreshSharingAndDataUseWidget = new Callback() {
 			@Override
 			public void invoke() {
 				//entity was updated by the sharing and data use widget.
+				sharingAndDataUseWidget.setEntity(folderEntityId);
 			}
-		});
+		};
+		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
 		sharingAndDataUseContainer.add(sharingAndDataUseWidget.asWidget());
 
 		final Dialog dialog = new Dialog();
@@ -155,10 +158,11 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		panel.add(nameField);			
 		panel.add(sharingAndDataUseContainer);
 		dialog.getButtonBar().removeAll();
-		final com.extjs.gxt.ui.client.widget.button.Button okButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.OK, new SelectionListener<ButtonEvent>() {
+		final com.extjs.gxt.ui.client.widget.button.Button okButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.OK);
+		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				dialog.hide();
+				dialog.hide(okButton);
 				String nameVal = nameField.getValue();
 				nameField.clear();
 				presenter.updateFolderName(nameVal, folderEntityId);
@@ -176,7 +180,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		
 		dialog.addListener(Events.Hide, new Listener<BaseEvent>() {
 			public void handleEvent(BaseEvent be) {
-				cancelFolderCreation(dialog, nameField, folderEntityId);
+				if (((WindowEvent)be).getButtonClicked() != okButton)
+					cancelFolderCreation(dialog, nameField, folderEntityId);
 			};
 		});
 		// Enter key in name field submits
