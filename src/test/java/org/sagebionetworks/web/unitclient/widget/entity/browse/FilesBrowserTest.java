@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -10,14 +9,10 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -75,28 +70,20 @@ public class FilesBrowserTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateFolder() throws Exception {
-		String name = "folder name";
 		String newId = "syn456";
 		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		
-		filesBrowser.createFolder(name);
-		
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).createOrUpdateEntity(arg.capture(), anyString(), eq(true), any(AsyncCallback.class));
-		JSONObjectAdapter entityJson = new JSONObjectAdapterImpl(arg.getValue());
-		Folder folder = new Folder(entityJson);
-		assertEquals(name, folder.getName());
-		verify(mockView).showInfo(anyString(), anyString());
-		verify(mockView).refreshTreeView(configuredEntityId);
+		filesBrowser.createFolder();
+		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		verify(mockView).showFolderEditDialog(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateFolderFail() throws Exception {
-		String name = "folder name";
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		
-		filesBrowser.createFolder(name);
+		filesBrowser.createFolder();
 		
 		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);

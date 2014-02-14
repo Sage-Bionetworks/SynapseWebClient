@@ -74,10 +74,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.showChangeLink = showChangeLink;
 		this.showIfProject = showIfProject;
 		this.showFlagLink = showFlagLink;
-		setEntity(bundle);
+		setEntityBundle(bundle);
 	}
 	
-	public void setEntity(EntityBundle bundle) {
+	public void setEntityBundle(EntityBundle bundle) {
 		if(bundle == null)  throw new IllegalArgumentException("Entity is required");
 		this.bundle = bundle;
 	}
@@ -159,6 +159,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		shownAccessRequirements.clear();
 		allArsIterator = bundle.getAccessRequirements().iterator();
 		unmetArsIterator = bundle.getUnmetAccessRequirements().iterator();
+		currentAR = selectNextAccessRequirement();
 	}
 
 	public Callback accessRequirementCallback() {
@@ -256,7 +257,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			final String jiraFlagLink  
 			) {
 		
-		currentAR = selectNextAccessRequirement();
 		//iterate over access requirements until we reach one that we have not yet shown (or there are none left to show).
 		while(currentAR != null && shownAccessRequirements.contains(currentAR.getId())) {
 			currentAR = selectNextAccessRequirement();	

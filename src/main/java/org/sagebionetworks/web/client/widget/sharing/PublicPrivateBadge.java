@@ -50,8 +50,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		getAcl(new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
-				configure(result);
-				callback.onSuccess(isPublic(acl, publicPrincipalIds));
+				setAcl(result, callback);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -66,7 +65,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
-				configure(result);
+				setAcl(result, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -78,17 +77,22 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		getAcl(callback1);
 	}
 	
-	private void configure(final AccessControlList acl) {
+	private void setAcl(final AccessControlList acl, final AsyncCallback<Boolean> isPublicCallback) {
 		this.acl = acl;
 		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
 			@Override
 			public void onSuccess(PublicPrincipalIds result) {
 				publicPrincipalIds = result;
-				view.configure(isPublic(acl, publicPrincipalIds));
+				boolean isPublic = isPublic(acl, publicPrincipalIds); 
+				view.configure(isPublic);
+				if (isPublicCallback != null)
+					isPublicCallback.onSuccess(isPublic);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if (isPublicCallback != null)
+					isPublicCallback.onFailure(caught);
+				else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
 					view.showErrorMessage("Could not find the public group: " + caught.getMessage());
 			}
 		});

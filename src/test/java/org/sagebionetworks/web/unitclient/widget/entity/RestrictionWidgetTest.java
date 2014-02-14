@@ -1,16 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -18,13 +11,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -41,42 +32,38 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
-import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
+import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-public class EntityMetadataTest {
+public class RestrictionWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
-	EntityMetadataView mockView;
+	RestrictionWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
 	JSONObjectAdapter jsonObjectAdapter;
 	EntityTypeProvider mockEntityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	JiraURLHelper mockJiraURLHelper;
-	EntityMetadata entityMetadata;
+	RestrictionWidget widget;
 	Versionable vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<String> emailAddresses;
+	IconsImageBundle mockIcons;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		
+		mockIcons = mock(IconsImageBundle.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockView = mock(EntityMetadataView.class);
+		mockView = mock(RestrictionWidgetView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
@@ -95,7 +82,7 @@ public class EntityMetadataTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
 
-		entityMetadata = new EntityMetadata(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockEntityTypeProvider, mockJiraURLHelper);
+		widget = new RestrictionWidget(mockView, mockSynapseClient, mockAuthenticationController, jsonObjectAdapter, mockGlobalApplicationState, mockJiraURLHelper, mockIcons);
 
 		vb = new Data();
 		vb.setId(entityId);
@@ -114,39 +101,39 @@ public class EntityMetadataTest {
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
 		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
-		entityMetadata.setEntityBundle(bundle, 1l);
-
+		widget.setEntityBundle(bundle);
+		widget.resetAccessRequirementCount();
 	}
 	
 	@Test
 	public void testGetJiraFlagUrl() {
 		String flagURLString = "flagURLString";
 		when(mockJiraURLHelper.createFlagIssue(any(String.class),any(String.class),any(String.class))).thenReturn(flagURLString);
-		assertEquals(flagURLString, entityMetadata.getJiraFlagUrl());
+		assertEquals(flagURLString, widget.getJiraFlagUrl());
 	}
 	
 	@Test
 	public void testGetJiraRestrictionUrl() {
 		String restrictionURLString = "restrictionURLString";
 		when(mockJiraURLHelper.createAccessRestrictionIssue(any(String.class),any(String.class),any(String.class))).thenReturn(restrictionURLString);
-		assertEquals(restrictionURLString, entityMetadata.getJiraRestrictionUrl());
+		assertEquals(restrictionURLString, widget.getJiraRestrictionUrl());
 	}
 	
 	@Test
 	public void testGetJiraRequestAccessUrl() {
 		String requestAccessURLString = "requestAccessURLString";
 		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		assertEquals(requestAccessURLString, entityMetadata.getJiraRequestAccessUrl());
+		assertEquals(requestAccessURLString, widget.getJiraRequestAccessUrl());
 	}
 	
 	@Test
 	public void testGetRestrictionLevel() {
-		assertEquals(RESTRICTION_LEVEL.RESTRICTED, entityMetadata.getRestrictionLevel());
+		assertEquals(RESTRICTION_LEVEL.RESTRICTED, widget.getRestrictionLevel());
 	}
 	
 	@Test
 	public void testGetApprovalType() {
-		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, entityMetadata.getApprovalType());
+		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, widget.getApprovalType());
 	}
 	
 }

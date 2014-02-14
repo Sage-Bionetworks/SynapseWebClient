@@ -159,7 +159,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
-	private static PublicPrincipalIds publicPrincipalIds = null;
+	public static PublicPrincipalIds publicPrincipalIds = null;
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
