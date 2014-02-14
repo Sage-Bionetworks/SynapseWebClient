@@ -68,7 +68,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			public void onSuccess(Boolean isPublic) {
 				//add the proper description into the container
 				String description = isPublic ? DisplayConstants.SHARING_PUBLIC_DESCRIPTION : DisplayConstants.SHARING_PRIVATE_DESCRIPTION;
-				sharingDescriptionContainer.add(new HTML("<p class=\"nobottommargin\">"+description+"</p>"));
+				sharingDescriptionContainer.add(new HTML("<p class=\"margin-left-10 nobottommargin\">"+description+"</p>"));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -118,12 +118,12 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		});
 		Widget widget = restrictionWidget.asWidget();
 		if (widget != null) {
-			widget.addStyleName("margin-left-10");
+			widget.addStyleName("margin-top-left-10");
 			container.add(widget);
 			//and add description
 			RESTRICTION_LEVEL level = restrictionWidget.getRestrictionLevel();
 			String description = RESTRICTION_LEVEL.OPEN.equals(level) ? DisplayConstants.DATA_USE_UNRESTRICTED_DATA_DESCRIPTION : DisplayConstants.DATA_USE_RESTRICTED_DESCRIPTION;
-			container.add(new HTML("<p>"+description+"</p>"));
+			container.add(new HTML("<p class=\"margin-left-10 margin-bottom-20\">"+description+"</p>"));
 		}
 					
 	}

@@ -138,7 +138,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(420, 250);
+		dialog.setSize(460, 250);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setHideOnButtonClick(true);
@@ -152,7 +152,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		panel.setBorders(false);
 		panel.setShadow(false);
 		panel.setBodyBorder(false);
-		panel.setFieldWidth(305);
+		panel.setFieldWidth(345);
 
 		final TextField<String> nameField = new TextField<String>();
 				nameField.setFieldLabel(DisplayConstants.LABEL_NAME);

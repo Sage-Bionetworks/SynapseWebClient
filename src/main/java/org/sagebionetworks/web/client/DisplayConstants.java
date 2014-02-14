@@ -489,11 +489,11 @@ public class DisplayConstants {
 	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
 
 	public static final String DATA_USE_TITLE = "Data Use Condition";
-	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Folder content can only be used in agreement with data-specific conditions. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
-	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Folder content can be used without restriction. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Content in this folder can only be used in agreement with data-specific conditions. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Content in this folder can be used without restriction. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
-	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view this folder.";
-	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view this folder.";
+	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
+	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
 	
 	
 	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
