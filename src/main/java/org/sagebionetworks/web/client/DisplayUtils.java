@@ -565,6 +565,34 @@ public class DisplayUtils {
 
 	}
 	
+	
+	public static void showYesNoMessage(
+			String title, 
+			String message, 
+			String iconStyle,
+			int minWidth,
+			final Callback yesCallback, 
+			final Callback noCallback) {
+		MessageBox box = new MessageBox();
+	    box.setButtons(MessageBox.YESNO);
+	    box.setIcon(iconStyle);
+	    box.setTitle(title);
+	    box.addCallback(new Listener<MessageBoxEvent>() {					
+			@Override
+			public void handleEvent(MessageBoxEvent be) { 												
+				Button btn = be.getButtonClicked();
+				if(Dialog.YES.equals(btn.getItemId())) {
+					yesCallback.invoke();
+				} else {
+					noCallback.invoke();
+				}
+			}
+		});
+	    box.setMessage(message);
+	    box.setMinWidth(minWidth);
+	    box.show();
+	}
+	
 	public static String getPrimaryEmail(UserProfile userProfile) {
 		List<String> emailAddresses = userProfile.getEmails();
 		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");

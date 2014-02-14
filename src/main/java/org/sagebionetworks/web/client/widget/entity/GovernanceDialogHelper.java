@@ -237,7 +237,7 @@ public class GovernanceDialogHelper {
     			@Override
     			public void componentSelected(ButtonEvent ce) {loginCallback.invoke();}
             });       
-     	} else {
+     	} else { 
       		if (approvalType==APPROVAL_TYPE.NONE) {
       			if (hasAdministrativeAccess) {
       				// button to add restriction or cancel

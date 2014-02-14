@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -7,6 +8,7 @@ import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
@@ -80,6 +82,19 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				loginCallback,
 				jiraFlagLink, 
 				onHideCallback);	
+	}
+	
+	@Override
+	public void showVerifyDataSensitiveDialog(
+			Callback imposeRestrictionsCallback) {
+		//callback invoked when the NO button is clicked
+		Callback noCallback = new Callback() {
+			@Override
+			public void invoke() {
+				DisplayUtils.showErrorMessage(DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE);
+			}
+		};
+		DisplayUtils.showYesNoMessage("", DisplayConstants.IS_SENSITIVE_DATA_MESSAGE, MessageBox.QUESTION, 360, imposeRestrictionsCallback, noCallback);
 	}
 	
 	@Override

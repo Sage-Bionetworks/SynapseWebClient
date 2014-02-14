@@ -262,7 +262,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			currentAR = selectNextAccessRequirement();	
 		}
 		
-		//if there is another access requirement to show, then show it
+		//if there is another access requirement to show, then show it.
 		if (currentAR != null) {
 			final RESTRICTION_LEVEL restrictionLevel = GovernanceServiceHelper.getRestrictionLevel(currentAR);
 			final APPROVAL_TYPE approvalType = getApprovalType();
@@ -310,8 +310,10 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 					loginCallback,
 					jiraFlagLink,
 					showNextRestrictionCallback);
+		} else if (hasAdministrativeAccess && bundle.getAccessRequirements().isEmpty()) {
+			//there are no access restrictions, and this person has administrative access.  verify data sensitivity, and if try then lockdown
+			view.showVerifyDataSensitiveDialog(imposeRestrictionsCallback);
 		}
-
 	}
 	
 	public Callback getImposeRestrictionsCallback() {

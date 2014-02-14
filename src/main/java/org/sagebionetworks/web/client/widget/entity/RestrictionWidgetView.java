@@ -43,6 +43,11 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 			 Callback loginCallback,
 			 String jiraFlagLink,
 			 Callback showNextRestrictionCallback);
+	/**
+	 * If user indicates that data is sensitive, then view will invoke callback to lockdown the current entity 
+	 * @param imposeRestrictionsCallback
+	 */
+	public void showVerifyDataSensitiveDialog(Callback imposeRestrictionsCallback);
 	
 	/**
 	 * Presenter interface
