@@ -248,7 +248,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		};
 	}
 	
-	private void showNextAccessRequirement(
+	public void showNextAccessRequirement(
 			final boolean isAnonymous,
 			final boolean hasAdministrativeAccess,
 			final IconsImageBundle iconsImageBundle,

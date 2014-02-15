@@ -44,11 +44,8 @@ import com.google.inject.Inject;
 public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowserView {
 
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Uploader uploader;
-	private CookieProvider cookies;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	
 	@Inject
@@ -58,11 +55,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			EntityTreeBrowser entityTreeBrowser, 
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
-		this.cookies = cookies;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.setLayout(new FitLayout());
 	}
@@ -138,7 +132,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 		final Dialog dialog = new Dialog();
 		dialog.setMaximizable(false);
-		dialog.setSize(460, 250);
+		dialog.setSize(460, 260);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setHideOnButtonClick(true);

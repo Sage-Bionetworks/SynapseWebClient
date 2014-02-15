@@ -129,7 +129,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
 			}			
 		});
-		
 	}
 	
 	public void updateFolderName(final Folder folder) {
@@ -143,6 +142,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				}
 				@Override
 				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {			

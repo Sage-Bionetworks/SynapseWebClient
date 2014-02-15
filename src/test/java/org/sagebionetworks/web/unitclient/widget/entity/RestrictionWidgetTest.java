@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +29,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
@@ -135,5 +134,33 @@ public class RestrictionWidgetTest {
 	public void testGetApprovalType() {
 		assertEquals(APPROVAL_TYPE.USER_AGREEMENT, widget.getApprovalType());
 	}
+	
+	@Test
+	public void testShowVerifySensitiveDataDialog() {
+		//set up so that it has no requirements
+		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
+		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
+		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
+		widget.setEntityBundle(bundle);
+		widget.resetAccessRequirementCount();
+		boolean hasAdministrativeAccess = false;
+		Callback emptyCallback = new Callback(){
+			@Override
+			public void invoke() {
+			}
+		};
+		//show nothing if empty and no admin privs (should not get into this state)
+		widget.showNextAccessRequirement(false, hasAdministrativeAccess, mockIconsImageBundle, emptyCallback, emptyCallback, null);
+		verify(mockView, never()).showAccessRequirement(any(RESTRICTION_LEVEL.class), any(APPROVAL_TYPE.class), anyBoolean(), anyBoolean(), anyBoolean(), any(IconsImageBundle.class), anyString(), any(Callback.class), any(Callback.class), any(Callback.class), any(Callback.class), anyString(), any(Callback.class));
+		verify(mockView, never()).showVerifyDataSensitiveDialog(any(Callback.class));
+
+		//should show verification of sensitive data dialog if we have admin privileges
+		hasAdministrativeAccess = true;
+		widget.showNextAccessRequirement(false, hasAdministrativeAccess, mockIconsImageBundle, emptyCallback, emptyCallback, null);
+		verify(mockView, never()).showAccessRequirement(any(RESTRICTION_LEVEL.class), any(APPROVAL_TYPE.class), anyBoolean(), anyBoolean(), anyBoolean(), any(IconsImageBundle.class), anyString(), any(Callback.class), any(Callback.class), any(Callback.class), any(Callback.class), anyString(), any(Callback.class));
+		verify(mockView).showVerifyDataSensitiveDialog(any(Callback.class));
+	}
+	
+	
 	
 }

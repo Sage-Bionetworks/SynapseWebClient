@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.AutoGenFactory;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -87,6 +88,54 @@ public class FilesBrowserTest {
 		
 		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDeleteFolder() throws Exception {
+		String id = "syn456";
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		
+		filesBrowser.deleteFolder(id);
+		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockView).refreshTreeView(anyString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDeleteFolderFail() throws Exception {
+		String id = "syn456";
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		
+		filesBrowser.deleteFolder(id);
+		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testUpdateFolderName() throws Exception {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		Folder f = new Folder();
+		f.setName("raven");
+		filesBrowser.updateFolderName(f);
+		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).refreshTreeView(configuredEntityId);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testUpdateFolderNameFail() throws Exception {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		
+		Folder f = new Folder();
+		f.setName("raven");
+		filesBrowser.updateFolderName(f);
+		
+		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 	}
 }
 
