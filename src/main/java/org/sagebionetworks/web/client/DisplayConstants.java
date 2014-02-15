@@ -694,7 +694,7 @@ public class DisplayConstants {
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
 	
 	public static final String IS_SENSITIVE_DATA_MESSAGE = "Is this sensitive human data that must be protected?";
-	public static final String IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE = "If you still think this data should be restricted, please contact the Synapse Access and Compliance Team (ACT) at act@sagebase.org";
+	public static final String IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE = "Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.\nIf you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org";
 	public static final String FORBIDDEN = "Forbidden";
 	public static final String SET_PASSWORD_EXPIRED = "This set password request has expired. Please make a new request via the login page.";
 	public static final String REQUEST_EXPIRED = "Request Expired";

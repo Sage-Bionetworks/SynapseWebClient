@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
@@ -48,8 +44,8 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 	}
 	
 	public void setEntity(String entityId) {
-		//get entity bundle
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
+		//get entity bundle (only the parts required by the public/private widget and restrictions widget
+		int mask = ENTITY | PERMISSIONS |  ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS ;
 		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundleTransport>() {
 			
 			@Override
