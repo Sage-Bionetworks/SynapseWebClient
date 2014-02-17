@@ -343,8 +343,8 @@ public class DisplayConstants {
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String REPORT_ISSUE = "report issue";
 	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
-	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
-	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
+	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Terms of use:";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Terms of use are set by human privacy regulations or contractual obligations";
 	
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
@@ -488,17 +488,18 @@ public class DisplayConstants {
 
 	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
 
-	public static final String DATA_USE_TITLE = "Data Use Condition";
-	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Content in this folder can only be used in agreement with data-specific conditions. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
-	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Content in this folder can be used without restriction. " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_TITLE = "Terms of Use";
+	
+	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Content in this folder can only be used in agreement with data-specific Terms of Use or IRB approval.  " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Content in this folder do not require data-specific Terms of Use or IRB approval.  " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
 	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
 	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
 	
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Terms of Use for Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on Data Use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on terms of use, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -607,7 +608,7 @@ public class DisplayConstants {
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
-	public static final String ANY_USE = "Any Use";
+	public static final String ANY_USE = "None";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
 	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
