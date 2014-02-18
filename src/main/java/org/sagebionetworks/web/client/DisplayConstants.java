@@ -606,7 +606,6 @@ public class DisplayConstants {
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
-	public static final String ANY_USE = "None";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
 	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
