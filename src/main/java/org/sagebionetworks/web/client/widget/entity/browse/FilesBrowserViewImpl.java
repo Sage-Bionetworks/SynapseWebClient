@@ -139,6 +139,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
 		dialog.setButtons(Dialog.OKCANCEL);
+		dialog.setHeading("New Folder");
 
 		final FormPanel panel = new FormPanel();
 		panel.setHeaderVisible(false);

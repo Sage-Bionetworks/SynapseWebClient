@@ -8,9 +8,18 @@ import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 
-import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
+import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Dialog;
+import com.extjs.gxt.ui.client.widget.button.Button;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -86,15 +95,89 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void showVerifyDataSensitiveDialog(
-			Callback imposeRestrictionsCallback) {
-		//callback invoked when the NO button is clicked
-		Callback noCallback = new Callback() {
+			final Callback imposeRestrictionsCallback) {
+		
+		final Dialog window = new Dialog();
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeaderVisible(true);
+		InlineHTML question = new InlineHTML(DisplayConstants.IS_SENSITIVE_DATA_MESSAGE);
+		question.addStyleName("margin-left-10");
+		window.add(question);
+		final RadioButton yesButton = new RadioButton(Dialog.YES);
+		yesButton.addStyleName("margin-left-5");
+		final RadioButton noButton = new RadioButton(Dialog.NO);
+		noButton.addStyleName("margin-left-5");
+		window.add(yesButton);
+		InlineHTML label = new InlineHTML("Yes");
+		label.addStyleName("margin-left-5");
+		window.add(label);
+		window.add(noButton);
+		label = new InlineHTML("No");
+		label.addStyleName("margin-left-5");
+		window.add(label);
+		
+		
+		window.setSize(430, 100);
+		// configure buttons
+	    window.setButtons(Dialog.OKCANCEL);
+	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+	    window.setHideOnButtonClick(false);
+		window.setResizable(true);
+		
+		//when yes is clicked, hide DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE.  when no is clicked, show DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE
+		final FlowPanel messageContainer = new FlowPanel();
+		messageContainer.addStyleName("margin-top-10 margin-left-15 margin-right-15");
+		final HTML message = new HTML(DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE);
+		
+		window.add(messageContainer);
+		
+		yesButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void invoke() {
-				DisplayUtils.showErrorMessage(DisplayConstants.IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE);
+			public void onClick(ClickEvent event) {
+				noButton.setValue(false);
+				messageContainer.clear();
+				window.setHeight(100);
+				window.layout(true);
 			}
-		};
-		DisplayUtils.showYesNoMessage("", DisplayConstants.IS_SENSITIVE_DATA_MESSAGE, MessageBox.QUESTION, 360, imposeRestrictionsCallback, noCallback);
+		});
+		
+		noButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				yesButton.setValue(false);
+				if (messageContainer.getWidgetCount() == 0) {
+					messageContainer.add(message);
+					window.setHeight(200);
+					window.layout(true);
+				}
+			}
+		});
+		//define button listeners.		
+		final Button okButton = window.getButtonById(Dialog.OK);
+		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				if (yesButton.getValue()) {
+					window.hide();
+					imposeRestrictionsCallback.invoke();
+				} else if (noButton.getValue()) {
+					window.hide();
+				} else {
+					//no selection
+					DisplayUtils.showErrorMessage("You must make a selection before continuing.");
+				}
+			}
+		});
+		
+		Button cancelButton = window.getButtonById(Dialog.CANCEL);
+		cancelButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+		});
+		window.show();
 	}
 	
 	@Override

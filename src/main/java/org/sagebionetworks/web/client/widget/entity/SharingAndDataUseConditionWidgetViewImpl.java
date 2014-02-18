@@ -79,7 +79,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		publicPrivateBadgeWidget.addStyleName("inline-block margin-left-10 moveup-2");
 		container.add(publicPrivateBadgeWidget);
 		
-		if (showChangeLink) {
+		if (showChangeLink && bundle.getPermissions().getCanChangePermissions()) {
 			FlowPanel changeLinkContainer = new FlowPanel();
 			changeLinkContainer.addStyleName("inline-block margin-left-5 moveup-2");
 			changeLinkContainer.add(new InlineHTML("("));

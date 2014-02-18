@@ -343,8 +343,8 @@ public class DisplayConstants {
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
 	public static final String REPORT_ISSUE = "report issue";
 	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
-	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Terms of use:";
-	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Terms of use are set by human privacy regulations or contractual obligations";
+	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Conditions for use:";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Conditions for use are set by human privacy regulations or contractual obligations";
 	
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
@@ -460,7 +460,7 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper	
-	public static final String RESTRICTED_USE = "Restricted Use";
+//	public static final String RESTRICTED_USE = "Restricted Use";
 	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
 	public static final String CHANGE = "change";
@@ -488,18 +488,18 @@ public class DisplayConstants {
 
 	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
 
-	public static final String DATA_USE_TITLE = "Terms of Use";
+	public static final String DATA_USE_TITLE = "Conditions for Use";
 	
-	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Content in this folder can only be used in agreement with data-specific Terms of Use or IRB approval.  " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
-	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Content in this folder do not require data-specific Terms of Use or IRB approval.  " + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Use of the content of this folder requires agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "The content of this folder is available for any use.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
 	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
 	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
 	
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Terms of Use for Human Data in Synapse</a>";
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Conditions for using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on terms of use, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -510,8 +510,6 @@ public class DisplayConstants {
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
-	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
-	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'OK' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
 	
 	public static final String VERSION_INFO_UPDATED = "Updated Version Info";

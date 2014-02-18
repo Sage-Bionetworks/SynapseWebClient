@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
@@ -26,7 +25,7 @@ public class EntityViewUtils {
 			return DisplayConstants.ANY_USE;
 		case RESTRICTED:
 		case CONTROLLED:
-			return DisplayConstants.RESTRICTED_USE;
+			return DisplayConstants.CONTROLLED_USE;
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
@@ -38,7 +37,7 @@ public class EntityViewUtils {
 			return iconsImageBundle.sheildGreen16();
 		case RESTRICTED:
 		case CONTROLLED:
-			return iconsImageBundle.shieldYellow16();
+			return iconsImageBundle.shieldRed16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}

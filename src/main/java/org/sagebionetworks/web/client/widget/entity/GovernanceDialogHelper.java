@@ -140,7 +140,7 @@ public class GovernanceDialogHelper {
 			return iconsImageBundle.sheildGreen16();
 		case RESTRICTED:
 		case CONTROLLED:
-			return iconsImageBundle.shieldYellow16();
+			return iconsImageBundle.shieldRed16();
 		default:
 			throw new IllegalArgumentException(restrictionLevel.toString());
 		}
