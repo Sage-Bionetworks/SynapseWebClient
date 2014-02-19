@@ -233,7 +233,7 @@
 							</div>
 							<div style="margin-top: 15px;">
 								<g:Image resource='{icons.shieldRed16}' /><h5 style="display: inline; margin-left: 3px;">Controlled Use</h5><br/>
-								<g:Image resource='{icons.sheildGreen16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
+								<g:Image resource='{icons.shieldGrey16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
 							</div>
 						</div>				
 					</div>

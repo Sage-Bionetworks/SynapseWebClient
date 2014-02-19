@@ -491,7 +491,7 @@ public class DisplayConstants {
 	public static final String DATA_USE_TITLE = "Conditions for Use";
 	
 	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Use of the content of this folder requires agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
-	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "The content of this folder is available for any use.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Use of the content of this folder does not require agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
 	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
 	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";

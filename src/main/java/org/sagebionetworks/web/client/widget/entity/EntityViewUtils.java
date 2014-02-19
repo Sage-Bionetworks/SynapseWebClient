@@ -34,7 +34,7 @@ public class EntityViewUtils {
 	public static ImageResource getShieldIcon(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
 		case OPEN:
-			return iconsImageBundle.sheildGreen16();
+			return iconsImageBundle.shieldGrey16();
 		case RESTRICTED:
 		case CONTROLLED:
 			return iconsImageBundle.shieldRed16();

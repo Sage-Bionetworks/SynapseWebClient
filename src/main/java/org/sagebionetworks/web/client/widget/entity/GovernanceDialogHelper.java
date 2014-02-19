@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.view.ProfilePanel;
 
 import com.extjs.gxt.ui.client.Style;
@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -137,7 +136,7 @@ public class GovernanceDialogHelper {
 	public static ImageResource restrictionLevelIcon(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
 		case OPEN:
-			return iconsImageBundle.sheildGreen16();
+			return iconsImageBundle.shieldGrey16();
 		case RESTRICTED:
 		case CONTROLLED:
 			return iconsImageBundle.shieldRed16();
