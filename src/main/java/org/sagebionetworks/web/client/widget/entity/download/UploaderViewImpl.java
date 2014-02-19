@@ -386,7 +386,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if (!formPanel.isValid()) {
 					return;
 				}
-			
+				uploadBtn.setEnabled(false);
 				initializeProgress();
 				presenter.handleUpload(fileName);
 			}
