@@ -137,25 +137,19 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.evaluation.getId() == null) throw new IllegalStateException(NULL_EVALUATION_MESSAGE);
 		view.showLoading();
-		if (publicPrincipalIds == null){
-			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
-				@Override
-				public void onSuccess(PublicPrincipalIds result) {
-					if (result != null) {
-						publicPrincipalIds = result;
-						initViewPrincipalIds();
-					}
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						showErrorMessage("Could not find the public group: " + caught.getMessage());
-				}
-			});
-		}
-		else {
-			initViewPrincipalIds();
-		}
+		
+		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
+			@Override
+			public void onSuccess(PublicPrincipalIds result) {
+				publicPrincipalIds = result;
+				initViewPrincipalIds();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					showErrorMessage("Could not find the public group: " + caught.getMessage());
+			}
+		});
 			
 		unsavedChanges = false;
 		final Callback aclSetCallback = new Callback(){

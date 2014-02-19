@@ -220,7 +220,7 @@
 					
 					<!-- DATA USE -->
 					<div class="col-md-3">
-						<h3>Data Use Conditions</h3>
+						<h3>Terms of Use</h3>
 						<div class="well">
 							<p>There are times where human data can only be shared with certain
 								restrictions. Learn what the rules are and how to apply and comply
@@ -233,7 +233,6 @@
 							</div>
 							<div style="margin-top: 15px;">
 								<g:Image resource='{icons.shieldRed16}' /><h5 style="display: inline; margin-left: 3px;">Controlled Use</h5><br/>
-								<g:Image resource='{icons.shieldYellow16}' /><h5 style="display: inline; margin-left: 3px;">Restricted Use</h5><br/>
 								<g:Image resource='{icons.sheildGreen16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
 							</div>
 						</div>				

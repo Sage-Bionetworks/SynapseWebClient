@@ -152,7 +152,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * Private Methods
 	 */	
 	private void configureShareButton(Entity entity, boolean isAdministrator) { 
-		publicPrivateBadge.isEntityPublic(entity, new AsyncCallback<Boolean>() {
+		publicPrivateBadge.configure(entity, new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isPublic) {
 				if(isPublic) {

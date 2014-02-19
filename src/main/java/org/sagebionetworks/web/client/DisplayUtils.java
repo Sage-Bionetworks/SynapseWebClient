@@ -84,6 +84,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -158,6 +159,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	public static PublicPrincipalIds publicPrincipalIds = null;
+	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -2072,5 +2075,22 @@ public class DisplayUtils {
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
 		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
+	}
+	
+	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
+		if (publicPrincipalIds == null) {
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
+				@Override
+				public void onSuccess(PublicPrincipalIds result) {
+					publicPrincipalIds = result;
+					callback.onSuccess(result);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} else
+			callback.onSuccess(publicPrincipalIds);
 	}
 }

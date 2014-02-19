@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PublicPrivateBadgeViewImpl extends SimplePanel implements PublicPrivateBadgeView {
+public class PublicPrivateBadgeViewImpl extends FlowPanel implements PublicPrivateBadgeView {
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -21,7 +21,6 @@ public class PublicPrivateBadgeViewImpl extends SimplePanel implements PublicPri
 	public void configure(boolean isPublic) {
 		this.clear();
 		this.add(DisplayUtils.getShareSettingsDisplay(isPublic, synapseJSNIUtils));
-
 	}	
 	
 	@Override
@@ -43,10 +42,7 @@ public class PublicPrivateBadgeViewImpl extends SimplePanel implements PublicPri
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
-	@Override
-	public void clear() {
-		super.clear();
-	}
+	
 	@Override
 	public void showLoading() {
 	}

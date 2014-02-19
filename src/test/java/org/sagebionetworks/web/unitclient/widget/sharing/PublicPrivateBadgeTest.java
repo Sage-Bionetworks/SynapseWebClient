@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -63,7 +64,7 @@ public class PublicPrivateBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		publicPrivateBadge = new PublicPrivateBadge(mockView, mockUserService, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockAuthenticationController);
+		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockAuthenticationController, mockUserService);
 		acl = new AccessControlList();
 		acl.setResourceAccess(resourceAccessSet);
 		testEntity = new FileEntity();
@@ -73,6 +74,7 @@ public class PublicPrivateBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(new EntityBundleTransport()).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+		DisplayUtils.publicPrincipalIds = null;
 	}
 	
 	@Test

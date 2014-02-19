@@ -99,6 +99,16 @@ public class GovernanceServiceHelper {
 		return ans;
 	}
 	
+	public static RESTRICTION_LEVEL getRestrictionLevel(AccessRequirement ar) {
+		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
+		} else if (ar instanceof ACTAccessRequirement) {
+			ans=RESTRICTION_LEVEL.CONTROLLED;
+		}
+		return ans;
+	}
+	
 	public static String getAccessRequirementText(AccessRequirement ar) {
 		if (ar==null) return "";
 		if (ar instanceof TermsOfUseAccessRequirement) {

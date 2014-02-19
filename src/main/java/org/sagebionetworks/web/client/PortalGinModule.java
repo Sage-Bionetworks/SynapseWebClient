@@ -108,6 +108,10 @@ import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
+import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetView;
+import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetView;
 import org.sagebionetworks.web.client.widget.entity.SnapshotWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizardView;
@@ -680,6 +684,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserTeamConfigView.class).to(UserTeamConfigViewImpl.class);
 		
+		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
+
+		bind(SharingAndDataUseConditionWidgetView.class).to(SharingAndDataUseConditionWidgetViewImpl.class);
 	}
 
 }

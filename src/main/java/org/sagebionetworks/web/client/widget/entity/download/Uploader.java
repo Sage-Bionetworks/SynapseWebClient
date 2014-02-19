@@ -133,7 +133,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm(isEntity);
+		this.view.createUploadForm(isEntity, parentEntityId);
 		return this.view.asWidget();
 	}
 
@@ -334,7 +334,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep3(view.isNewlyRestricted(), requestList, 1);
+			directUploadStep3(false, requestList, 1);
 		else
 			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}

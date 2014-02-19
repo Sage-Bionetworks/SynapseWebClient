@@ -20,37 +20,37 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
-	private UserAccountServiceAsync userAccountService;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
-	private PublicPrincipalIds publicPrincipalIds;	
+	private PublicPrincipalIds publicPrincipalIds;
+	private UserAccountServiceAsync userAccountService;
 	private Entity entity;
 	private AccessControlList acl;
 	
 	@Inject
-	public PublicPrivateBadge(PublicPrivateBadgeView view, UserAccountServiceAsync userAccountService, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController) {
+	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.userAccountService = userAccountService;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.userAccountService = userAccountService;
 		view.setPresenter(this);
 	}	
 
 	/**
-	 * Headless version of public/private answer
+	 * Configure public/private badge, return answer if it is public or private in the callback.
 	 * @param entity
 	 * @param callback
 	 */
-	public void isEntityPublic(Entity entity, final AsyncCallback<Boolean> callback) {		
-		configure(entity, new AsyncCallback<PublicPrincipalIds>() {
+	public void configure(Entity entity, final AsyncCallback<Boolean> callback) {
+		view.clear();
+		this.entity = entity;
+		getAcl(new AsyncCallback<AccessControlList>() {
 			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
-				callback.onSuccess(isPublic(acl, publicPrincipalIds));
-
+			public void onSuccess(AccessControlList result) {
+				setAcl(result, callback);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -60,30 +60,12 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	}
 	
 	public void configure(Entity entity) {
-		//set publicPrincipalIds, and acl
-		final AsyncCallback<PublicPrincipalIds> callback2 = new AsyncCallback<PublicPrincipalIds>() {
-			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
-				view.configure(isPublic(acl, publicPrincipalIds));
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		};
-
-		configure(entity, callback2);
-	}
-	
-	public void configure(Entity entity, final AsyncCallback<PublicPrincipalIds> callback2) {
+		view.clear();
 		this.entity = entity;
 		AsyncCallback<AccessControlList> callback1 = new AsyncCallback<AccessControlList>() {
 			@Override
 			public void onSuccess(AccessControlList result) {
-				acl = result;
-				getPublicPrincipalIds(callback2);
+				setAcl(result, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -93,7 +75,27 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		};
 		
 		getAcl(callback1);
-		
+	}
+	
+	private void setAcl(final AccessControlList acl, final AsyncCallback<Boolean> isPublicCallback) {
+		this.acl = acl;
+		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
+			@Override
+			public void onSuccess(PublicPrincipalIds result) {
+				publicPrincipalIds = result;
+				boolean isPublic = isPublic(acl, publicPrincipalIds); 
+				view.configure(isPublic);
+				if (isPublicCallback != null)
+					isPublicCallback.onSuccess(isPublic);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (isPublicCallback != null)
+					isPublicCallback.onFailure(caught);
+				else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage("Could not find the public group: " + caught.getMessage());
+			}
+		});
 	}
 	
 	/**
@@ -127,16 +129,8 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			});
 	}
 	
-	public void getPublicPrincipalIds(AsyncCallback<PublicPrincipalIds> callback) {
-		userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(callback);
-	}
-	
 	public AccessControlList getAcl() {
 		return acl;
-	}
-	
-	public PublicPrincipalIds getPublicPrincipalIds() {
-		return publicPrincipalIds;
 	}
 	
 	public Widget asWidget() {

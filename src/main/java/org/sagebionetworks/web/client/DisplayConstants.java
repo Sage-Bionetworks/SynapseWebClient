@@ -341,10 +341,10 @@ public class DisplayConstants {
 	public static final String READ_ONLY = "READ ONLY";	
 	public static final String SHOW_LIST_EDITOR = "Show List Editor";
 	public static final String HIDE_LIST_EDITOR = "Hide List Editor";
-	public static final String FLAG = "flag";
+	public static final String REPORT_ISSUE = "report issue";
 	public static final String FLAG_TOOL_TIP = "Click here to learn more about flagging these data for review by the Synapse Access and Compliance Team";
-	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Data use conditions:";
-	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Data use conditions are set by human privacy regulations or contractual obligations";
+	public static final String DATA_ACCESS_RESTRICTIONS_TEXT = "Conditions for use:";
+	public static final String DATA_ACCESS_RESTRICTIONS_TOOLTIP = "Conditions for use are set by human privacy regulations or contractual obligations";
 	
 	public static final String ERROR_NO_FASTPASS = "Could not retrieve the fastpass url.";
 	public static final String ERROR_EXTERNAL_CONTENT_NOT_IN_CACHE = "The requested content is unavailable: ";
@@ -460,9 +460,10 @@ public class DisplayConstants {
 	public static final String ID_BTN_TOOLSMNU = "id_btn_toolsmnu";
 
 	// constants used in GovernanceDialogHelper	
-	public static final String RESTRICTED_USE = "Restricted Use";
+//	public static final String RESTRICTED_USE = "Restricted Use";
 	public static final String CONTROLLED_USE = "Controlled Use";
 	public static final String MODIFY = "modify";
+	public static final String CHANGE = "change";
 	public static final String INFO = "info";
 	public static final String GAIN_ACCESS = "gain access";
 	public static final String FLAG_DIALOG_PREFIX = 
@@ -484,10 +485,21 @@ public class DisplayConstants {
 	public static String RESTRICTED_DATA_DIALOG_TITLE = "Restricted Data";
 	public static String RESTRICTED_DATA_DIALOG_PROMPT = "Access to these data is restricted.";
 	public static String RESTRICTION_FULFILLED_DATA_DIALOG_TITLE = "Access Requirements Fulfilled";
+
+	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
+
+	public static final String DATA_USE_TITLE = "Conditions for Use";
 	
-	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Data Use Restrictions for Human Data in Synapse</a>";
+	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Use of the content of this folder requires agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "The content of this folder is available for any use.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
+	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
+	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
+	
+	
+	public static String SYNAPSE_GUIDELINES_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">Conditions for using Human Data in Synapse</a>";
 	public static String UNRESTRICTED_DESCRIPTION = "This data is currently accessible to all registered Synapse users.  ";
-	public static String GOVERNANCE_REFERENCE = "For more information on Data Use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
+	public static String GOVERNANCE_REFERENCE = "For more information on use conditions, please read the "+SYNAPSE_GUIDELINES_LINK+".";
 	
 	public static String ADMIN_GOVERNANCE_REFERENCE = "You are responsible to ensure your data is shared in compliance with the "+
 	SYNAPSE_GUIDELINES_LINK+" and all applicable laws. ";
@@ -498,18 +510,9 @@ public class DisplayConstants {
 	public static final String TOU_PROMPT = "Access to the data requires that you are a registered Synapse user and agree to the following terms and conditions:";
 	public static final String ACT_PROMPT = "Access to the data requires that you are a registered Synapse user and fulfill the following requirements:";
 	public static final String RESTRICTION_FULFILLED_STATEMENT = "<p class=\"strong\">Access Requirements Fulfilled:  You have access to these data under the following terms:</p>";
-	public static final String RESTRICTION_WARNING_TITLE = "Add Data Restriction";
-	public static final String RESTRICTION_WARNING = "By selecting 'Restricted' or 'Controlled' use when uploading your file, you have indicated that this file contains data that must be protected due to human (or other) data use restrictions. Synapse users will be required to agree to these data use terms (provided by you) before accessing this file. By clicking 'OK' below, you request that the Synapse Access and Compliance Team (ACT) contact you to assign the appropriate use restrictions for this dataset. These data will not be accessible by anyone other than yourself until the appropriate data use terms are associated with the file.<br/><br/>If you don't want data use restrictions applied to this file, please select 'Cancel' below and upload the data selecting 'Any Use'.";
 	public static final String RESTRICTED_DATA_LOGIN_WARNING = "Note:  You must log in to gain access to restricted data.</p>";
-	public static final String DATA_USE_BANNER = "Data Use Restrictions for Public Data";
-	public static final String DATA_USE_BANNER_SUB1 = "If you change Sharing to be ";
-	public static final String DATA_USE_BANNER_SUB2 = ", who can use these data?";
-	public static final String DATA_USE_NOTE = 
-		"You are responsible to ensure your data is used in compliance with the "+SYNAPSE_GUIDELINES_LINK+
-		" and all applicable laws. If/when you make this file public, can its data be used by any registered Synapse user "+
-		"without restriction? If so, then select \"Any Use\", below.  Otherwise select \"Restricted / Controlled\".";
-	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
+	public static final String VERSION_INFO_UPDATED = "Updated Version Info";
 	
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
@@ -545,6 +548,8 @@ public class DisplayConstants {
 	public static final String FILES = "Files";
 	public static final String CHALLENGE_ADMIN = "Challenge Admin";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
+	public static final String ERROR_FOLDER_RENAME_FAILED = "Setting the folder name failed.";
+	public static final String ERROR_FOLDER_DELETE_FAILED = "Folder deletion failed.";
 	public static final String ERROR_FILE_CREATION_FAILED = "File creation failed. Please try again";
 	public static final String PAGES = "Pages";
 	public static final String ADD_PAGE = "Add a new Page";
@@ -601,7 +606,6 @@ public class DisplayConstants {
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
 	public static final String MARKDOWN_API_TABLE_WARNING = "API Table Warning";
 	public static final String ACCESS_WILL_BE = "Access Will Be";
-	public static final String ANY_USE = "Any Use";
 	public static final String SELECT_DATA_USE = "Please select a Data Use Level";
 	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
@@ -686,6 +690,9 @@ public class DisplayConstants {
 	
 	public static final String RESTORING_WIKI_VERSION_WARNING_TITLE = "Restoration Warning";
 	public static final String RESTORING_WIKI_VERSION_WARNING_MESSAGE = "Are you sure you want to replace the current version of this Wiki with this one?";
+	
+	public static final String IS_SENSITIVE_DATA_MESSAGE = "Is this sensitive human data that must be protected?";
+	public static final String IS_SENSITIVE_DATA_CONTACT_ACT_MESSAGE = "Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.\nIf you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org";
 	public static final String FORBIDDEN = "Forbidden";
 	public static final String SET_PASSWORD_EXPIRED = "This set password request has expired. Please make a new request via the login page.";
 	public static final String REQUEST_EXPIRED = "Request Expired";
