@@ -14,31 +14,32 @@ import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 public class FileHandleCell extends AbstractCell<String> {
 
+	
+	
 	boolean canEdit = false;
     /**
      * The HTML templates used to render the cell.
      */
     interface Templates extends SafeHtmlTemplates {
-      /**
-       * The template for this Cell, which includes styles and a value.
-       * 
-       * @param styles the styles to include in the style attribute of the div
-       * @param value the safe value. Since the value type is {@link SafeHtml},
-       *          it will not be escaped before including it in the template.
-       *          Alternatively, you could make the value type String, in which
-       *          case the value would be escaped.
-       * @return a {@link SafeHtml} instance
-       */
-      @SafeHtmlTemplates.Template("<div><img src=\"{0}\" /></div>")
-      SafeHtml cell(String value);
+    	@SafeHtmlTemplates.Template("<a href=\"{0}\" target=\"_blank\"><img class=\"margin-top-5\" src=\"{1}\"  height=\"100%\" width=\"100%\" /><br/>{2}</a>") 
+        SafeHtml previewImageLink(SafeUri fullUri, SafeUri previewUri, SafeHtml download); 
+
+    	@SafeHtmlTemplates.Template("<a href=\"{0}\" target=\"_blank\">{1}</a>") 
+        SafeHtml fileLink(SafeUri fullUri, SafeHtml download);     
     }
 
+    interface Template extends SafeHtmlTemplates { 
+    } 
+    
+    
     /**
      * Create a singleton instance of the templates used to render the cell.
      */
@@ -76,13 +77,13 @@ public class FileHandleCell extends AbstractCell<String> {
         	//doAction(value, valueUpdater);
         	//Window.alert("image clicked for "+ context.getKey());
         } else if(uploadLink.isOrHasChild(Element.as(eventTarget))) {
-        	Window.alert("link clicked for " + context.getKey());
+        	Window.alert("link clicked for " + context.getKey() + ", col:" + context.getColumn());
         }
       }
     }
 
     @Override
-    public void render(final Context context, String value, final SafeHtmlBuilder sb) {
+    public void render(final Context context, final String value, final SafeHtmlBuilder sb) {
     	if(value == null) return;
     	 
     	// TODO: replace fake getFileHandle method with call to synapse client
@@ -91,7 +92,7 @@ public class FileHandleCell extends AbstractCell<String> {
 			public void onSuccess(String result) {
 				// TODO : actually properly create file handles
 				S3FileHandle fileHandle = new S3FileHandle();
-				fileHandle.setFileName("example1.png");
+				//fileHandle.setFileName("logo11w.png");
 				PreviewFileHandle previewFileHandle = new PreviewFileHandle();
 				previewFileHandle.setContentType("image/png"); 
 				renderFileHandle(previewFileHandle, fileHandle, context, sb);
@@ -110,26 +111,29 @@ public class FileHandleCell extends AbstractCell<String> {
     			&& previewFileHandle.getContentType() != null 
     			&& DisplayUtils.isRecognizedImageContentType(previewFileHandle.getContentType())) ? true : false;
     	 
-    	String previewUrl = DisplayUtils.createPreviewFileHandleUrl(previewFileHandle);
-    	String fullUrl = DisplayUtils.createPreviewFileHandleUrl(fileHandle);
-    	String filename = fileHandle.getFileName();
+    	// TODO : get real URLs from file handles
+//    	String previewUrl = DisplayUtils.createPreviewFileHandleUrl(previewFileHandle);
+//    	String fullUrl = DisplayUtils.createPreviewFileHandleUrl(fileHandle);
+    	SafeUri previewUri = UriUtils.fromString("https://www.google.com/images/srpr/logo11w.png");
+    	SafeUri fullUri = UriUtils.fromString("https://www.google.com/images/srpr/logo11w.png");
+    	SafeHtml filename = fileHandle.getFileName() != null ? SafeHtmlUtils.fromString(fileHandle.getFileName()) : SafeHtmlUtils.EMPTY_SAFE_HTML;
     	
     	SafeHtml preview; 
-    	if(fullUrl != null) {
-    		String download = "<span class=\"margin-top-5\" style=\"color:#000; font-size:16px;\"> "+ filename +"</span>";
-    		if(hasPreview) {
-	    		preview = SafeHtmlUtils.fromSafeConstant("<a href=\""+ fullUrl +"\" target=\"_blank\"><img class=\"margin-top-5\" src=\""+ previewUrl +"\" /><br/>"+ download +"</a>");    		
+    	if(fullUri != null) {
+    		SafeHtml download = SafeHtmlUtils.fromSafeConstant("<span class=\"margin-top-5\" style=\"color:#000; font-size:16px;\"> "+ filename.asString() +"</span>");
+    		if(hasPreview) {    			
+	    		preview = templates.previewImageLink(fullUri, previewUri, download);	    				
 	    	} else {
-	    		preview = SafeHtmlUtils.fromSafeConstant("<a href=\""+ fullUrl +"\" target=\"_blank\">"+ download +"</a>");
+	    		preview = templates.fileLink(fullUri, download);
 	    	}
     	} else {
     		preview = SafeHtmlUtils.EMPTY_SAFE_HTML;
     	}
     	
-    	SafeHtmlBuilder shb = new SafeHtmlBuilder();      
-		shb.append(preview);
-		if(canEdit) shb.appendHtmlConstant("<div class=\"margin-top-5\"><a href='#' id='"+ context.getKey() +"'>Upload File</a></div>");      
-		sb.append(shb.toSafeHtml());
+		sb.append(preview);
+		// TODO : open up file uplaoder and replace correct cell value
+		if(canEdit) sb.appendHtmlConstant("<div class=\"margin-top-5\"><a id='"+ context.getKey() +"'>Upload File</a></div>");      
+		
 		
 	}
 
