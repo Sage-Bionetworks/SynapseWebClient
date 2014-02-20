@@ -208,6 +208,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	@Override
 	public void clear() {
+		container.clear();
 	}
 	
 	@Override
