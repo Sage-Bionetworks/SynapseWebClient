@@ -34,7 +34,7 @@ public class EntityViewUtils {
 	public static ImageResource getShieldIcon(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
 		case OPEN:
-			return iconsImageBundle.shieldGrey16();
+			return null;
 		case RESTRICTED:
 		case CONTROLLED:
 			return iconsImageBundle.shieldRed16();
@@ -60,7 +60,8 @@ public class EntityViewUtils {
 		String tooltip = DisplayConstants.DATA_ACCESS_RESTRICTIONS_TOOLTIP;
 		
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(DisplayUtils.getIconHtml(shieldIcon));
+		if (shieldIcon != null)
+			shb.appendHtmlConstant(DisplayUtils.getIconHtml(shieldIcon));
 		shb.appendHtmlConstant("<span style=\"margin-left: 3px;\">"+description+"</span>");
 		
 		//form the html
