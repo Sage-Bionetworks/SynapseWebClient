@@ -320,6 +320,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		return new Callback() {
 			@Override
 			public void invoke() {
+				view.showLoading();
 				synapseClient.createLockAccessRequirement(bundle.getEntity().getId(), new AsyncCallback<EntityWrapper>(){
 					@Override
 					public void onSuccess(EntityWrapper result) {

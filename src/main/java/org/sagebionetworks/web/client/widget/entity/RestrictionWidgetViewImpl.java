@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -27,12 +28,16 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	
 	IconsImageBundle iconsImageBundle;
 	SynapseJSNIUtils synapseJSNIUtils;
+	SageImageBundle sageImageBundle;
 	Presenter presenter;
-	
+	FlowPanel container;
 	@Inject
-	public RestrictionWidgetViewImpl(IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+	public RestrictionWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		container = new FlowPanel();
+		container.addStyleName("inline-block");
 	}
 
 	@Override
@@ -49,8 +54,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 			ClickHandler aboutLinkClickHandler,
 			boolean showFlagLink, 
 			boolean showChangeLink) {
-
-		return EntityViewUtils.createRestrictionsWidget(
+		container.clear();
+		container.add(EntityViewUtils.createRestrictionsWidget(
 				jiraFlagLink,
 				isAnonymous,
 				hasAdministrativeAccess,
@@ -60,7 +65,8 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				synapseJSNIUtils,
 				aboutLinkClickHandler,
 				showFlagLink,
-				showChangeLink);
+				showChangeLink));
+		return container;
 	}
 	
 	@Override
@@ -195,6 +201,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	@Override
 	public void showLoading() {
+		container.clear();
+		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+
 	}
 	
 	@Override
