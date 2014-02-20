@@ -1547,7 +1547,6 @@ public class DisplayUtils {
 			@Override
 			public void onClick(ClickEvent event) {
 				window.removeAll();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(buttonText);
@@ -1564,9 +1563,10 @@ public class DisplayUtils {
 					//is something else that just wants a file handle id
 					isEntity = false;
 				}
-					
+				
 				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
 				window.show();
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 			}
 		});
 		
