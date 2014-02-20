@@ -229,8 +229,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		adminListItem.addClassName("hide");
 		
 		// disable tables completely for now
-		//if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide");
-		tablesListItem.addClassName("hide");
+		if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide");
+		//tablesListItem.addClassName("hide");
 		
 		currentTabContainer.removeAll();
 		wikiTabContainer.removeAll();

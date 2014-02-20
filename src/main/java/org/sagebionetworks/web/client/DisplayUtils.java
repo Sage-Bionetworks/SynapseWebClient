@@ -52,6 +52,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -2072,5 +2073,16 @@ public class DisplayUtils {
 	public static String getShareMessage(String entityId, String hostUrl) {
 		return DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
+	}
+
+	public static String createPreviewFileHandleUrl(
+			PreviewFileHandle previewFileHandle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static String createPreviewFileHandleUrl(S3FileHandle fileHandle) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -19,7 +23,6 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.RowEditor;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -38,6 +41,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -74,15 +78,16 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	private List<org.sagebionetworks.repo.model.table.ColumnModel> columns;
 	FlowPanel addColumnPanel;
 	List<ColumnDetailsPanel> columnPanelOrder;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public SynapseTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle) {
+			IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		
+		this.ginInjector = ginInjector;
 	}
 
 	@Override
@@ -94,9 +99,8 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		
 		// build view
 		store = new ListStore<BaseModelData>();
-		setupQuery(queryString);		
-		buildColumns(columns);
-		setupTable();		
+		setupQuery(queryString);			
+		setupTable(table, canEdit);		
 		setupTableEditorToolbar(columns);
 		queryPanel.setVisible(true);		
 		if(canEdit) {
@@ -159,29 +163,23 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	
 	/**
 	 * Sets up the Table view
+	 * @param table 
+	 * @param canEdit 
 	 */
-	private void setupTable() {
-		// setup table	  
-	    ColumnModel cm = new ColumnModel(columnConfigs);  	 	   
-	    
-	    LayoutContainer lc = new LayoutContainer();  
-	    lc.setLayout(new FitLayout());  
-	  
-	    rowEditor = new RowEditor<BaseModelData>();  
-	    grid = new Grid<BaseModelData>(store, cm);  
-	    if(columns != null && columns.size() > 0) grid.setAutoExpandColumn(columns.get(0).getName());  
-	    grid.setBorders(true);  
-	    //grid.addPlugin(checkColumn);  
-	    grid.addPlugin(rowEditor);  	    
-	    grid.setHeight(250);
-
-	    lc.add(grid);  	 	   
-	    
-	    // store commit/cancel
-//	    store.rejectChanges();  
-//	    store.commitChanges();  
-	    
-	    tableContainer.setWidget(lc);
+	private void setupTable(TableEntity tableEntity, boolean canEdit) {
+		SimpleTableWidget table = ginInjector.getSimpleTableWidget();
+		List<ColumnModel> columns = getColumns();
+				
+		table.configure(tableEntity, columns, "", canEdit);
+		
+		// table list
+//		TableListWidgetView view = new TableListWidgetViewImpl();
+//		TableListWidget listWidget = new TableListWidget(view);
+//		List<TableEntity> tables = createFakeTables();		
+//		listWidget.configure(tables, canEdit);
+		
+		
+	    tableContainer.setWidget(table.asWidget());
 	}
 
 	/**
@@ -215,43 +213,32 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	}
 	
 	/**
-	 * Fills ColumnConfigs for each column model
-	 * @param columns
-	 */
-	private void buildColumns(List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
-		columnConfigs = new ArrayList<ColumnConfig>();  	
-		for(org.sagebionetworks.repo.model.table.ColumnModel col : columns) {
-			columnConfigs.add(ColumnUtils.getColumnConfig(col));
-		}			  	  
-	}
-	
-	/**
 	 * Method that adds an empty row to the table
 	 * @param columns
 	 */
-	private void addRow(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
-		BaseModelData row = new BaseModelData();  
-    	// fill default values
-    	for(org.sagebionetworks.repo.model.table.ColumnModel columnModel : columns) {		    		
-    		if(columnModel.getDefaultValue() != null) {
-    			Object value = null;
-    			if(columnModel.getColumnType() == ColumnType.LONG) {
-    				value = new Long(columnModel.getDefaultValue());
-    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
-    				value = new Double(columnModel.getDefaultValue()); 
-    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
-    				value = columnModel.getDefaultValue().toLowerCase(); 
-    			} else {
-    				value = columnModel.getDefaultValue();
-    			}
-    			row.set(columnModel.getName(), value);
-    		}
-    	}
-    	
-    	// add row
-        rowEditor.stopEditing(false);  
-        store.insert(row, store.getCount());  
-        rowEditor.startEditing(store.indexOf(row), true);
+	private void addRow(final List<ColumnModel> columns) {
+//		BaseModelData row = new BaseModelData();  
+//    	// fill default values
+//    	for(org.sagebionetworks.repo.model.table.ColumnModel columnModel : columns) {		    		
+//    		if(columnModel.getDefaultValue() != null) {
+//    			Object value = null;
+//    			if(columnModel.getColumnType() == ColumnType.LONG) {
+//    				value = new Long(columnModel.getDefaultValue());
+//    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
+//    				value = new Double(columnModel.getDefaultValue()); 
+//    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
+//    				value = columnModel.getDefaultValue().toLowerCase(); 
+//    			} else {
+//    				value = columnModel.getDefaultValue();
+//    			}
+//    			row.set(columnModel.getName(), value);
+//    		}
+//    	}
+//    	
+//    	// add row
+//        rowEditor.stopEditing(false);  
+//        store.insert(row, store.getCount());  
+//        rowEditor.startEditing(store.indexOf(row), true);
         
         // TODO: update presenter with new row. or wait for save on row editor. Depends on table impl
 	}
@@ -626,5 +613,96 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 		return columns;
 	}
 
+	
+	/*
+	 * 
+	 * TEMP
+	 */
+	private List<TableEntity> createFakeTables() {
+		List<TableEntity> tables = new ArrayList<TableEntity>();
+		TableEntity extable;
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 1");
+		extable.setModifiedOn(new Date());
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 2");
+		extable.setModifiedOn(new Date());
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 3");
+		extable.setModifiedOn(new Date());
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 4");
+		extable.setModifiedOn(new Date());
+		tables.add(extable);
+		return tables;
+	}
+
+	private List<ColumnModel> getColumns() {
+		List<ColumnModel> columns = new ArrayList<ColumnModel>();
+		
+		// first name
+		ColumnModel model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("FirstName");
+		model.setName("First Name");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("LastName");
+		model.setName("Last Name");
+		columns.add(model);
+
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.FILEHANDLEID);
+		model.setId("Plot");
+		model.setName("Plot");
+		columns.add(model);		
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("Category");
+		model.setName("Category");
+		model.setEnumValues(Arrays.asList(new String[] {"One", "Two", "Three"}));
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("Address");
+		model.setName("Address");
+		columns.add(model);
+		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.DATE);
+//		model.setId("Birthday");
+//		model.setName("Birthday");
+//		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.BOOLEAN);
+		model.setId("IsAlive");
+		model.setName("IsAlive");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("BMI");
+		model.setName("BMI");
+		columns.add(model);
+
+		
+		return columns;
+	}	
 	
 }

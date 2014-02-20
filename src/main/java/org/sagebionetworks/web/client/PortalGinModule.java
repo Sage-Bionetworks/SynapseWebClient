@@ -224,6 +224,8 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
@@ -615,6 +617,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 		bind(SynapseTableWidgetView.class).to(SynapseTableWidgetViewImpl.class);
+		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
 
 		/*
 		 * Teams Places

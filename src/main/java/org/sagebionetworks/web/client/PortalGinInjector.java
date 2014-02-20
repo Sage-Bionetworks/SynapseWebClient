@@ -63,6 +63,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWid
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
@@ -188,4 +189,5 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SynapseTableWidget getSynapseTableWidget();
+	public SimpleTableWidget getSimpleTableWidget();
 }
