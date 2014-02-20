@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface SynapseTableWidgetView extends IsWidget, SynapseView {
+public interface CompleteTableWidgetView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.

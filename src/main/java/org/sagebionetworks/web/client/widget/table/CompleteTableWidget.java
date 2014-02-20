@@ -22,9 +22,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, WidgetRendererPresenter {
+public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private SynapseTableWidgetView view;
+	private CompleteTableWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private AdapterFactory adapterFactory;
@@ -35,7 +35,7 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	private List<ColumnModel> columns;
 	
 	@Inject
-	public SynapseTableWidget(SynapseTableWidgetView view, 
+	public CompleteTableWidget(CompleteTableWidgetView view, 
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController, 
 			AdapterFactory adapterFactory,

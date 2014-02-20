@@ -12,25 +12,25 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetView;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetView;
 
 
 public class SynapseTableWidgetTest {
 	
-	SynapseTableWidgetView mockView;
+	CompleteTableWidgetView mockView;
 	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	PlaceChanger mockPlaceChanger;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	
-	SynapseTableWidget tableWidget;
+	CompleteTableWidget tableWidget;
 	TableEntity table;
 	
 	@Before
 	public void setup(){		
-		mockView = mock(SynapseTableWidgetView.class);
+		mockView = mock(CompleteTableWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -38,7 +38,7 @@ public class SynapseTableWidgetTest {
 				
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
-		tableWidget = new SynapseTableWidget(mockView, mockSynapseClient, mockAuthenticationController, adapterFactory, mockGlobalApplicationState);
+		tableWidget = new CompleteTableWidget(mockView, mockSynapseClient, mockAuthenticationController, adapterFactory, mockGlobalApplicationState);
 		
 		table = new TableEntity();
 	}

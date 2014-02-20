@@ -27,9 +27,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * configure view
 	 * @param table
 	 * @param columns
-	 * @param queryString
 	 * @param canEdit
 	 */
-	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit);
+	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit);
 	
 }

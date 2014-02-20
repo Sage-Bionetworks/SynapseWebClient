@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;

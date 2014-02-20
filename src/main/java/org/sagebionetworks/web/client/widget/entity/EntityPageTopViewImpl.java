@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -127,7 +127,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
-	private SynapseTableWidget synapseTableWidget;
+	private CompleteTableWidget synapseTableWidget;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	private static final int MAX_DISPLAY_NAME_CHAR = 40;
@@ -149,7 +149,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			WikiPageWidget wikiPageWidget, 
 			PreviewWidget previewWidget, CookieProvider cookies,
 			GlobalApplicationState globalApplicationState,
-			SynapseTableWidget synapseTableWidget) {
+			CompleteTableWidget synapseTableWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;

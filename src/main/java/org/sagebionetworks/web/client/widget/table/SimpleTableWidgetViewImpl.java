@@ -50,7 +50,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit) {	
+	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit) {	
 		this.columns = columns;					
 				
 		buildTable();

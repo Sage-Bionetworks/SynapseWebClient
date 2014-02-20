@@ -28,8 +28,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return view.asWidget();		
 	}
 	
-	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit) {
-		view.configure(table, columns, queryString, canEdit);
+	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit) {
+		view.configure(table, columns, canEdit);
 	}
 
 

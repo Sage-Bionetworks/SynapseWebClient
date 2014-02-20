@@ -47,8 +47,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseTableWidgetViewImpl extends Composite implements SynapseTableWidgetView {
-	public interface Binder extends UiBinder<Widget, SynapseTableWidgetViewImpl> {}
+public class CompleteTableWidgetViewImpl extends Composite implements CompleteTableWidgetView {
+	public interface Binder extends UiBinder<Widget, CompleteTableWidgetViewImpl> {}
 
 	private static int sequence = 0;
 	
@@ -81,7 +81,7 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	PortalGinInjector ginInjector;
 	
 	@Inject
-	public SynapseTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle,
+	public CompleteTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -168,9 +168,9 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 	 */
 	private void setupTable(TableEntity tableEntity, boolean canEdit) {
 		SimpleTableWidget table = ginInjector.getSimpleTableWidget();
-		List<ColumnModel> columns = getColumns();
-				
-		table.configure(tableEntity, columns, "", canEdit);
+		List<ColumnModel> columns = getColumns();				
+		table.configure(tableEntity, columns, canEdit);
+		tableContainer.setWidget(table.asWidget());
 		
 		// table list
 //		TableListWidgetView view = new TableListWidgetViewImpl();
@@ -179,7 +179,6 @@ public class SynapseTableWidgetViewImpl extends Composite implements SynapseTabl
 //		listWidget.configure(tables, canEdit);
 		
 		
-	    tableContainer.setWidget(table.asWidget());
 	}
 
 	/**
