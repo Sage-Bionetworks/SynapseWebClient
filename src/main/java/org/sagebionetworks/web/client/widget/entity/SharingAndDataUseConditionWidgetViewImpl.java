@@ -104,7 +104,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		}
 		container.add(sharingDescriptionContainer);
 		
-		container.add(new InlineHTML("<br><h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE_TITLE +"</h5>"));
+		container.add(new InlineHTML("<br><h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
 		restrictionWidget.configure(bundle, showChangeLink, true, false, new com.google.gwt.core.client.Callback<Void, Throwable>() {
 			@Override
 			public void onSuccess(Void result) {
