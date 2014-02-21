@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -94,10 +92,10 @@ public class FilesBrowserTest {
 	@Test
 	public void testDeleteFolder() throws Exception {
 		String id = "syn456";
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		filesBrowser.deleteFolder(id);
-		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).refreshTreeView(anyString());
 	}
 	
@@ -105,10 +103,10 @@ public class FilesBrowserTest {
 	@Test
 	public void testDeleteFolderFail() throws Exception {
 		String id = "syn456";
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		filesBrowser.deleteFolder(id);
-		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
 	}
