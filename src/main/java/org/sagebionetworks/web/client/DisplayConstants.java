@@ -488,10 +488,8 @@ public class DisplayConstants {
 
 	public static final String SYNAPSE_GUIDELINES_MORE_INFO_LINK = "<a href=\"#!WikiPlace:dataAccessLevelsContent\" class=\"link\" target=\"_blank\">more about data use sharing</a>";
 
-	public static final String DATA_USE_TITLE = "Conditions for Use";
-	
 	public static final String DATA_USE_RESTRICTED_DESCRIPTION = "Use of the content of this folder requires agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
-	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "The content of this folder is available for any use.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
+	public static final String DATA_USE_UNRESTRICTED_DATA_DESCRIPTION = "Use of the content of this folder does not require agreement to additional terms.  "; // + SYNAPSE_GUIDELINES_MORE_INFO_LINK;
 	public static final String SHARING_PUBLIC_TITLE = "Sharing Settings";
 	public static final String SHARING_PUBLIC_DESCRIPTION = "Everyone can view content in this folder.";
 	public static final String SHARING_PRIVATE_DESCRIPTION = "You control who can view content in this folder.";
@@ -517,7 +515,7 @@ public class DisplayConstants {
 	public static final String DEFINE_ACTIVITY = "Please Define Provenance";
 	public static final String HOW_TO_DEFINE_ACTIVITY = "Create Provenance using the Synapse R Client.";
 	public static final String ERROR_NO_LINK_DEFINED = "Warning: No target reference is defined for this link.";
-	public static final String DATA_USE = "Data Use";
+	public static final String DATA_USE = "Conditions For Use";
 	public static final String ACCESS_TO_DATA = "Access to these data is";
 	public static final String PAGE_NOT_FOUND = "Page not found";
 	public static final String PAGE_NOT_FOUND_DESC = "The page you requested was not found, that's all we know.";

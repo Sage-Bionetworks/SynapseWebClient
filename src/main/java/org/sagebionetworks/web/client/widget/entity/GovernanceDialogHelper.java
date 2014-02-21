@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.view.ProfilePanel;
 
 import com.extjs.gxt.ui.client.Style;
@@ -14,7 +14,6 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -137,7 +136,7 @@ public class GovernanceDialogHelper {
 	public static ImageResource restrictionLevelIcon(RESTRICTION_LEVEL restrictionLevel, IconsImageBundle iconsImageBundle) {
 		switch (restrictionLevel) {
 		case OPEN:
-			return iconsImageBundle.sheildGreen16();
+			return null;
 		case RESTRICTED:
 		case CONTROLLED:
 			return iconsImageBundle.shieldRed16();
@@ -178,7 +177,9 @@ public class GovernanceDialogHelper {
 
         ContentPanel panel = createTextPanel(dialog);
  		// title and icon are based on restriction level, e.g. "Data Use: Restricted"
-        dialog.setIcon(AbstractImagePrototype.create(restrictionLevelIcon(restrictionLevel, iconsImageBundle)));
+        ImageResource icon = restrictionLevelIcon(restrictionLevel, iconsImageBundle);
+        if (icon != null)
+        	dialog.setIcon(AbstractImagePrototype.create(icon));
         dialog.setHeading(DisplayConstants.DATA_USE + ": " + EntityViewUtils.restrictionDescriptor(restrictionLevel)); 
 		// next comes the restriction descriptor, e.g. "Access to the data is Restricted." (Bold)
       	panel.addText("<p class=\"strong\">" + DisplayConstants.ACCESS_TO_DATA +" "+EntityViewUtils.restrictionDescriptor(restrictionLevel)+".</p>");
