@@ -19,6 +19,8 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+
+		void tableClicked(TableEntity table);
 				
 	}
 

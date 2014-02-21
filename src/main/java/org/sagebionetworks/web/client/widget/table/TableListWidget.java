@@ -7,12 +7,19 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TableListWidget implements TableListWidgetView.Presenter, WidgetRendererPresenter {
 	
+	public interface ClickHandler {
+		void onClick(TableEntity table);
+	}
+
 	private TableListWidgetView view;
+	
+	private ClickHandler tableClickHandler;
 	
 	@Inject
 	public TableListWidget(TableListWidgetView view) {
@@ -43,6 +50,17 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 			Long wikiVersionInView) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void setOnTableClick(ClickHandler handler) {
+		this.tableClickHandler = handler;
+	}
+
+	@Override
+	public void tableClicked(TableEntity table) {
+		if(tableClickHandler != null) {
+			tableClickHandler.onClick (table);
+		}
 	}
 
 }

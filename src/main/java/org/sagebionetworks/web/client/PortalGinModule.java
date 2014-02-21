@@ -222,12 +222,14 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetView;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetView;
-import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
+import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
@@ -618,6 +620,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
 		bind(CompleteTableWidgetView.class).to(CompleteTableWidgetViewImpl.class);
 		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
+		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 
 		/*
 		 * Teams Places

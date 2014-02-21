@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Analysis;
@@ -14,6 +18,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -43,6 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
+import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -57,10 +63,10 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -127,7 +133,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
-	private CompleteTableWidget synapseTableWidget;
+	private CompleteTableWidget completeTableWidget;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	private static final int MAX_DISPLAY_NAME_CHAR = 40;
@@ -170,7 +176,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.wikiPageWidget = wikiPageWidget;
 		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseTableWidget = synapseTableWidget;
+		this.completeTableWidget = synapseTableWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		initProjectLayout();
 	}
@@ -538,8 +544,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 
 		// Tables Tab
-		synapseTableWidget.configure(ComingSoonViewImpl.getTable()); // TODO temporary
-		tablesTabContainer.add(synapseTableWidget.asWidget());
+		createTableWidget(canEdit);
 		
 		// Admin Tab: evaluations
 		row = DisplayUtils.createRowContainer();
@@ -793,9 +798,67 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			container.setAutoWidth(true);
 			panel.clear();
 			panel.add(container);
-}
+		}
 		return container;
 	}
 
+	private void createTableWidget(boolean canEdit) {
+		FlowPanel container = new FlowPanel();
+		final TableListWidget listWidget = ginInjector.getTableListWidget();		
+		List<TableEntity> tables = createFakeTables();		
+		listWidget.configure(tables, canEdit);
+		final Widget listW = listWidget.asWidget();
+		final Widget tableW = completeTableWidget.asWidget();
+		tableW.setVisible(false);
+		listWidget.setOnTableClick(new TableListWidget.ClickHandler() {			
+			@Override
+			public void onClick(TableEntity table) {
+				completeTableWidget.configure(table);
+				listW.setVisible(false);
+				tableW.setVisible(true);
+				tablesTabContainer.layout(true);
+			}
+		});
+		tablesTabContainer.add(listW);
+		tablesTabContainer.add(tableW);
+	}
+	
+	private List<TableEntity> createFakeTables() {
+		List<String> columns = new ArrayList<String>();
+		columns.addAll(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
+
+		
+		List<TableEntity> tables = new ArrayList<TableEntity>();
+		TableEntity extable;
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 1");
+		extable.setModifiedOn(new Date());
+		extable.setColumnIds(columns);
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 2");
+		extable.setModifiedOn(new Date());
+		extable.setColumnIds(columns);
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 3");
+		extable.setModifiedOn(new Date());
+		extable.setColumnIds(columns);
+		tables.add(extable);
+		
+		extable = new TableEntity();
+		extable.setId("syn1234");
+		extable.setName("Example Table 4");
+		extable.setModifiedOn(new Date());
+		extable.setColumnIds(columns);
+		tables.add(extable);
+		return tables;
+	}
 
 }

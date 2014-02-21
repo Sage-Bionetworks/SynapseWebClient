@@ -54,7 +54,7 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 			entry.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					showInfo("clicked", "view table: " + table.getName());
+					presenter.tableClicked(table);
 				}
 			});
 			listContainer.add(entry);

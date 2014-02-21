@@ -170,15 +170,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		SimpleTableWidget table = ginInjector.getSimpleTableWidget();
 		List<ColumnModel> columns = getColumns();				
 		table.configure(tableEntity, columns, canEdit);
-		tableContainer.setWidget(table.asWidget());
-		
-		// table list
-//		TableListWidgetView view = new TableListWidgetViewImpl();
-//		TableListWidget listWidget = new TableListWidget(view);
-//		List<TableEntity> tables = createFakeTables();		
-//		listWidget.configure(tables, canEdit);
-		
-		
+		tableContainer.setWidget(table.asWidget());				
 	}
 
 	/**
@@ -617,35 +609,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	 * 
 	 * TEMP
 	 */
-	private List<TableEntity> createFakeTables() {
-		List<TableEntity> tables = new ArrayList<TableEntity>();
-		TableEntity extable;
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 1");
-		extable.setModifiedOn(new Date());
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 2");
-		extable.setModifiedOn(new Date());
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 3");
-		extable.setModifiedOn(new Date());
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 4");
-		extable.setModifiedOn(new Date());
-		tables.add(extable);
-		return tables;
-	}
+
 
 	private List<ColumnModel> getColumns() {
 		List<ColumnModel> columns = new ArrayList<ColumnModel>();
