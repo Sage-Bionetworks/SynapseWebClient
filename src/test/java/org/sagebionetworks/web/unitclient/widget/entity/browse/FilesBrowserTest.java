@@ -92,10 +92,12 @@ public class FilesBrowserTest {
 	@Test
 	public void testDeleteFolder() throws Exception {
 		String id = "syn456";
+		boolean skipTrashCan = true;
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
-		filesBrowser.deleteFolder(id);
-		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		filesBrowser.deleteFolder(id, skipTrashCan);
+		verify(mockSynapseClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
 		verify(mockView).refreshTreeView(anyString());
 	}
 	
@@ -105,7 +107,7 @@ public class FilesBrowserTest {
 		String id = "syn456";
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
-		filesBrowser.deleteFolder(id);
+		filesBrowser.deleteFolder(id, true);
 		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);

@@ -36,7 +36,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 
 		void createFolder();
 		void updateFolderName(String newFolderName, String folderEntityId);
-		void deleteFolder(String folderEntityId);
+		void deleteFolder(String folderEntityId, boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
 
 	}
