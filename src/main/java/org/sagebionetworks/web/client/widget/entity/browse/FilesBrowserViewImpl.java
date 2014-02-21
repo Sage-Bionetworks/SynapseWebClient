@@ -201,7 +201,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 	private void cancelFolderCreation(Dialog dialog, TextField<String> nameField, String folderEntityId){
 		nameField.clear();
-		presenter.deleteFolder(folderEntityId);
+		presenter.deleteFolder(folderEntityId, true);
 	}
 	
 	@Override

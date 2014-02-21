@@ -116,8 +116,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 	
 	@Override
-	public void deleteFolder(String folderEntityId) {
-		synapseClient.deleteEntityById(folderEntityId, true, new AsyncCallback<Void>() {
+	public void deleteFolder(String folderEntityId, boolean skipTrashCan) {
+		synapseClient.deleteEntityById(folderEntityId, skipTrashCan, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void na) {
 				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
