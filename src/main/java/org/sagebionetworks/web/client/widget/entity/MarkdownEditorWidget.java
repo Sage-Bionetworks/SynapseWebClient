@@ -473,6 +473,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    		handleInsertWidgetCommand(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, callback);
 	    	};
 		}));
+    	menu.add(getNewCommand(WidgetConstants.VIDEO_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
+	    	};
+		}));
     	menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.YOUTUBE_CONTENT_TYPE, callback);	

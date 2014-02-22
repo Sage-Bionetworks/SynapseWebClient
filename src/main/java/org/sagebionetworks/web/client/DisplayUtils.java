@@ -1788,7 +1788,6 @@ public class DisplayUtils {
 	}
 	
 	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.FIND_ENTITIES);
@@ -1809,6 +1808,7 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 		window.show();
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		entityFinder.refresh();
 	}
 
