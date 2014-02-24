@@ -48,11 +48,11 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		if (view.getMp4Entity() != null)
+		if (!"".equals(view.getMp4Entity()))
 			descriptor.put(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY, view.getMp4Entity());
-		if (view.getOggEntity() != null)
+		if (!"".equals(view.getOggEntity()))
 			descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, view.getOggEntity());
-		if (view.getWebMEntity() != null)
+		if (!"".equals(view.getWebMEntity()))
 			descriptor.put(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY, view.getWebMEntity());
 	}
 	

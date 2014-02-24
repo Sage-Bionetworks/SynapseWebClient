@@ -82,7 +82,7 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 	
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (mp4Entity.getValue() == null && oggEntity.getValue() == null && webmEntity.getValue() == null)
+		if ("".equals(mp4Entity.getValue()) && "".equals(oggEntity.getValue()) && "".equals(webmEntity.getValue()))
 			throw new IllegalArgumentException(DisplayConstants.ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE);
 	}
 
