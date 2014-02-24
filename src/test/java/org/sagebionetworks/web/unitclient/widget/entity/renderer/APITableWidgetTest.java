@@ -197,12 +197,23 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
+	public void testQueryServicePagingURINodeSearch() throws JSONObjectAdapterException {
+		String expectedOffset = "1";
 		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
-		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
 	}
+	
+	@Test
+	public void testQueryServicePagingURISubmissionSearch() throws JSONObjectAdapterException {
+		String expectedOffset = "0";
+		widget.configure(testWikiKey, descriptor, null, null);
+		String testServiceCall = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX+"select+*+from+evaluation_1234";
+		String pagedURI = widget.getPagedURI(testServiceCall);
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
+	}
+
 	
 	@Test
 	public void testCurrentUserVariable() throws JSONObjectAdapterException {
