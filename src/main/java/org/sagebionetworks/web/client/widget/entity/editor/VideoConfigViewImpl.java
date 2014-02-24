@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
@@ -36,7 +37,9 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 		mp4Entity = new TextBox();
 		oggEntity = new TextBox();
 		webmEntity = new TextBox();
-		add(new HTML("<h5 class=\"margin-top-left-10\">The browser viewing the video will use the first format that it recognizes.</h5>"));
+		add(new HTML("<h5 class=\"margin-top-left-10\">The browser viewing the video will use the first format that it recognizes. "+
+				"<small>(<a class=\"link\" target=\"_blank\" href=\""+ClientProperties.VIDEO_HTML5_BROWSER_LINK+"\">more information</a>)</small></h5>"));
+		
 		add(initTextBox(mp4Entity, "Find MP4", "MPEG 4 files with H264 video codec and AAC audio codec"));
 		add(initTextBox(oggEntity, "Find Ogg", "Ogg files with Theora video codec and Vorbis audio codec"));
 		add(initTextBox(webmEntity, "Find WebM", "WebM files with VP8 video codec and Vorbis audio codec"));
