@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.query.QueryTableResults;
 import org.sagebionetworks.repo.model.query.Row;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -250,8 +251,12 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	
 	public String getPagedURI(String uri) {
 		//special case for query service
-		if (isQueryService(uri)) {
-			return uri + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+1);
+		boolean isSubmissionQueryService = isSubmissionQueryService(uri);
+		boolean isNodeQueryService = isNodeQueryService(uri);
+		if (isSubmissionQueryService || isNodeQueryService) {
+			//the node query service's first element is at index 1! (submission query service first element is at index 0)
+			Long firstIndex = isSubmissionQueryService ? ServiceConstants.DEFAULT_PAGINATION_OFFSET : ServiceConstants.DEFAULT_PAGINATION_OFFSET_NO_OFFSET_EQUALS_ONE;
+			return uri + "+limit+"+tableConfig.getPageSize()+"+offset+"+(tableConfig.getOffset()+firstIndex);
 		} else {
 			String firstCharacter = uri.contains("?") ? "&" : "?";
 			return uri + firstCharacter + "limit="+tableConfig.getPageSize()+"&offset="+tableConfig.getOffset();	
@@ -285,7 +290,15 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	public static boolean isQueryService(String uri) {
-		return uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX) || uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX);
+		return isNodeQueryService(uri) || isSubmissionQueryService(uri);
+	}
+	
+	public static boolean isNodeQueryService(String uri) {
+		return uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX);
+	}
+	
+	public static boolean isSubmissionQueryService(String uri) {
+		return uri.startsWith(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX);
 	}
 	
 	/**
