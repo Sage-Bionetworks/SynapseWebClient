@@ -80,6 +80,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getButtonLinkConfigEditor();
 		} else if (contentTypeKey.equals(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamConfigEditor();
+		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVideoConfigEditor();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -140,6 +142,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getTutorialWidgetRenderer();
 		} else if (contentTypeKey.equals(WidgetConstants.WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(WidgetConstants.NO_AUTO_WIKI_SUBPAGES)) {
 			presenter = ginInjector.getEmptyWidget();
+		} else if (contentTypeKey.equals(WidgetConstants.VIDEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVideoWidget();
 		} //TODO: add other widget descriptors to this mapping as they become available
 		
 		if (presenter != null)
@@ -221,6 +225,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(WidgetConstants.SHINYSITE_CONTENT_TYPE, WidgetConstants.SHINYSITE_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE, WidgetConstants.TUTORIAL_WIZARD_FRIENDLY_NAME);
 		registerWidget(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, WidgetConstants.USER_TEAM_BADGE_FRIENDLY_NAME);
+		registerWidget(WidgetConstants.VIDEO_CONTENT_TYPE, WidgetConstants.VIDEO_FRIENDLY_NAME);
 	}
 	
 	public static String getWidgetMarkdown(String contentType, Map<String, String> widgetDescriptor, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException {

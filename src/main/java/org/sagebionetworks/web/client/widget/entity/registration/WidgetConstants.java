@@ -19,6 +19,10 @@ public class WidgetConstants {
 	public static final String IMAGE_CONTENT_TYPE = "image";
 	public static final String IMAGE_FRIENDLY_NAME ="Image";
 	
+	public static final String VIDEO_CONTENT_TYPE = "video";
+	public static final String VIDEO_FRIENDLY_NAME ="Video";
+
+	
 	public static final String ATTACHMENT_PREVIEW_CONTENT_TYPE = "previewattachment";
 	public static final String ATTACHMENT_PREVIEW_FRIENDLY_NAME ="Attachment";
 	
@@ -78,6 +82,13 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
+	
+	public static final String VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY = "mp4SynapseId";
+	public static final String VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY = "oggSynapseId";
+	public static final String VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY = "webmSynapseId";
+	public static final String VIDEO_WIDGET_WIDTH_KEY = "width";
+	public static final String VIDEO_WIDGET_HEIGHT_KEY = "height";
+	
 	public static final String JOIN_WIDGET_EVALUATION_ID_KEY = "evaluationId";
 	public static final String JOIN_WIDGET_TEAM_ID_KEY = "teamId";
 	public static final String UNAVAILABLE_MESSAGE = "unavailableMessage";

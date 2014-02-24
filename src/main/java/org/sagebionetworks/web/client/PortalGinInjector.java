@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -61,6 +62,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
@@ -154,6 +156,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ShinySiteConfigEditor getShinySiteConfigEditor();
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	public UserTeamConfigEditor getUserTeamConfigEditor();
+	public VideoConfigEditor getVideoConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -174,8 +177,8 @@ public interface PortalGinInjector extends Ginjector {
 	public JoinTeamWidget getJoinTeamWidget();
 	public SubmitToEvaluationWidget getEvaluationSubmissionWidget();
 	public EmptyWidget getEmptyWidget();
-	
 	public ButtonLinkWidget getButtonLinkWidget();
+	public VideoWidget getVideoWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();

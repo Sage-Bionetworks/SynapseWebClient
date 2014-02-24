@@ -9,6 +9,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class ClientProperties {
 
+	public static final String VIDEO_HTML5_BROWSER_LINK = "http://en.wikipedia.org/wiki/HTML5_video#Browser_support";
+	
 	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
 	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
