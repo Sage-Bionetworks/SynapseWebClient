@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -968,6 +969,10 @@ public class DisplayUtils {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
+		} else if(TableEntity.class.getName().equals(className)) {
+			// TableEntity
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1722,7 +1727,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project || entity instanceof TableEntity); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {

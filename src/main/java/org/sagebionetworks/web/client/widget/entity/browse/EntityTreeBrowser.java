@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -119,7 +121,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { 
-						new WhereCondition("parentId", WhereOperator.EQUALS, entityId)
+						new WhereCondition("parentId", WhereOperator.EQUALS, entityId),
+						new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.NOT_EQUALS, TableEntity.class.getName())
 						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override

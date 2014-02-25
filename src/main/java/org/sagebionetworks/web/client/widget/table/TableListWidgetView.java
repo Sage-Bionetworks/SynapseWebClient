@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -20,11 +21,13 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 
-		void tableClicked(TableEntity table);
+		void createTableEntity(String name);
 				
 	}
 
-	public void configure(List<TableEntity> tables, boolean canEdit);
+	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable);
+
+	public void showLoadingError();
 	
 	
 }

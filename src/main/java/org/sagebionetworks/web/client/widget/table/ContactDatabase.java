@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,9 @@ public class ContactDatabase {
     }
   }
 
+  private static final String[] DRUG1_NAMES = { "5155877", "digitoxigenin", "dosulepin", "alverine", "anisomycin", "astemizole", "atovaquone" };
+  private static final String[] DRUG2_NAMES = { "Emetine", "GW 8510", "MG 132" };
+  
   
   private static final String[] FEMALE_FIRST_NAMES = {
       "Mary", "Patricia", "Linda", "Barbara", "Elizabeth", "Jennifer", "Maria", "Susan",
@@ -150,7 +154,8 @@ public class ContactDatabase {
   private ContactDatabase() {
 
     // Generate initial data.
-    generateContacts(250);
+    //generateContacts(250);
+    generateContacts(4);
   }
 
   /**
@@ -184,11 +189,13 @@ public class ContactDatabase {
   public void generateContacts(int count) {
     List<TableModel> contacts = dataProvider.getList();
     for (int i = 0; i < count; i++) {
-      contacts.add(createTableModel());
+      //contacts.add(createTableModel());
+    	contacts.addAll(createDrugModels(nextValue(DRUG1_NAMES), nextValue(DRUG2_NAMES)));
     }
   }
 
-  public ListDataProvider<TableModel> getDataProvider() {
+
+public ListDataProvider<TableModel> getDataProvider() {
     return dataProvider;
   }
 
@@ -280,6 +287,29 @@ public class ContactDatabase {
     return contact;
   }
 
+  private Collection<? extends TableModel> createDrugModels(String drug1, String drug2) {
+	  List<TableModel> rows = new ArrayList<TableModel>();
+
+	  for(double drug2conc : new Double[] { 0.266, 0.133, 0.066, 0.033 }) {
+		  for(double drug1conc : new Double[] { 7.0, 3.5, 1.75, 0.875 }) {
+			  TableModel model = new TableModel();
+			  model.put("cellLine", "MCF7");
+			  model.put("Drug1", drug1);
+			  model.put("Drug1_Conc", String.valueOf(drug1conc));
+			  model.put("Drug1_InhibitionMean", String.valueOf(Random.nextDouble()));
+			  model.put("Drug1_InhibitionStdev", String.valueOf(Random.nextDouble()));
+			  model.put("Drug2", drug2);
+			  model.put("Drug2_Conc", String.valueOf(drug2conc));
+			  model.put("Drug2_InhibitionMean", String.valueOf(Random.nextDouble()));
+			  model.put("Drug2_InhibitionStdev", String.valueOf(Random.nextDouble()));
+			  rows.add(model);		  
+		  }
+	  }
+	  
+	  return rows;
+  }
+
+  
   /**
    * Get the next random value from an array.
    * 

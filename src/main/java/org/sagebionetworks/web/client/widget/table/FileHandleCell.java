@@ -92,7 +92,7 @@ public class FileHandleCell extends AbstractCell<String> {
 			public void onSuccess(String result) {
 				// TODO : actually properly create file handles
 				S3FileHandle fileHandle = new S3FileHandle();
-				//fileHandle.setFileName("logo11w.png");
+				fileHandle.setFileName("logo11w.png");
 				PreviewFileHandle previewFileHandle = new PreviewFileHandle();
 				previewFileHandle.setContentType("image/png"); 
 				renderFileHandle(previewFileHandle, fileHandle, context, sb);

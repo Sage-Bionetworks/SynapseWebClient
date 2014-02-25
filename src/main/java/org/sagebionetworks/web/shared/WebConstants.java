@@ -186,5 +186,7 @@ public class WebConstants {
 	
 
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
+
+	public static final String CONCRETE_TYPE_KEY = "concreteType";
 	
 }

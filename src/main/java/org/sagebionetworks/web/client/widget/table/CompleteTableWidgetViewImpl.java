@@ -609,60 +609,117 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	 * 
 	 * TEMP
 	 */
-
+ 
 
 	private List<ColumnModel> getColumns() {
 		List<ColumnModel> columns = new ArrayList<ColumnModel>();
-		
-		// first name
-		ColumnModel model = new ColumnModel();
-		model.setColumnType(ColumnType.STRING);
-		model.setId("FirstName");
-		model.setName("First Name");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.STRING);
-		model.setId("LastName");
-		model.setName("Last Name");
-		columns.add(model);
+
+		ColumnModel model;
 
 		model = new ColumnModel();
-		model.setColumnType(ColumnType.FILEHANDLEID);
-		model.setId("Plot");
-		model.setName("Plot");
-		columns.add(model);		
-		
-		model = new ColumnModel();
 		model.setColumnType(ColumnType.STRING);
-		model.setId("Category");
-		model.setName("Category");
-		model.setEnumValues(Arrays.asList(new String[] {"One", "Two", "Three"}));
+		model.setId("cellLine");
+		model.setName("cellLine");
 		columns.add(model);
 		
 		model = new ColumnModel();
 		model.setColumnType(ColumnType.STRING);
-		model.setId("Address");
-		model.setName("Address");
-		columns.add(model);
-		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.DATE);
-//		model.setId("Birthday");
-//		model.setName("Birthday");
-//		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.BOOLEAN);
-		model.setId("IsAlive");
-		model.setName("IsAlive");
+		model.setId("Drug1");
+		model.setName("Drug1");
 		columns.add(model);
 		
 		model = new ColumnModel();
 		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("BMI");
-		model.setName("BMI");
+		model.setId("Drug1_Conc");
+		model.setName("Drug1_Conc");
 		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug1_InhibitionMean");
+		model.setName("Drug1_InhibitionMean");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug1_InhibitionStdev");
+		model.setName("Drug1_InhibitionStdev");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("Drug2");
+		model.setName("Drug2");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_Conc");
+		model.setName("Drug2_Conc");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_InhibitionMean");
+		model.setName("Drug2_InhibitionMean");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_InhibitionStdev");
+		model.setName("Drug2_InhibitionStdev");
+		columns.add(model);
+		
+		
+//		// first name
+//		ColumnModel model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("FirstName");
+//		model.setName("First Name");
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("LastName");
+//		model.setName("Last Name");
+//		columns.add(model);
+//
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.FILEHANDLEID);
+//		model.setId("Plot");
+//		model.setName("Plot");
+//		columns.add(model);		
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("Category");
+//		model.setName("Category");
+//		model.setEnumValues(Arrays.asList(new String[] {"One", "Two", "Three"}));
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("Address");
+//		model.setName("Address");
+//		columns.add(model);
+//		
+////		model = new ColumnModel();
+////		model.setColumnType(ColumnType.DATE);
+////		model.setId("Birthday");
+////		model.setName("Birthday");
+////		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.BOOLEAN);
+//		model.setId("IsAlive");
+//		model.setName("IsAlive");
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.DOUBLE);
+//		model.setId("BMI");
+//		model.setName("BMI");
+//		columns.add(model);
 
 		
 		return columns;

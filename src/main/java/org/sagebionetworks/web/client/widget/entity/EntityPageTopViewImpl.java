@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
@@ -65,6 +67,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -262,6 +265,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		} else if (bundle.getEntity() instanceof Summary) {
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber);
 		    if (currentArea == null) currentArea = EntityArea.FILES;
+		} else if(bundle.getEntity() instanceof TableEntity) {
+			renderTableEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, projectHeader);
 		} else {
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId, projectHeader);
@@ -273,6 +278,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		fullWidthContainer.layout(true);
 		topFullWidthContainer.layout(true);
 	}
+
 
 	private void fillProjectLink(final EntityHeader projectHeader) {
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
@@ -544,7 +550,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 
 		// Tables Tab
-		createTableWidget(canEdit);
+		tablesTabContainer.add(createTableListWidget(bundle.getEntity().getId(), canEdit));
+		tablesTabContainer.add(createBottomPadding());
 		
 		// Admin Tab: evaluations
 		row = DisplayUtils.createRowContainer();
@@ -672,6 +679,53 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 
+	private void renderTableEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, EntityHeader projectHeader) {
+		// tab container
+		fullWidthContainer.add(currentTabContainer);		
+		setTabSelected(EntityArea.TABLES, false); 
+		
+		// ** LEFT/RIGHT
+		LayoutContainer row;
+		row = DisplayUtils.createRowContainer();
+		LayoutContainer left = new LayoutContainer();
+		left.addStyleName("col-md-8");
+		LayoutContainer right = new LayoutContainer();
+		right.addStyleName("col-md-4");
+		row.add(left);
+		row.add(right);
+		tablesTabContainer.add(row);		
+
+		// add breadcrumbs
+		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));		
+		// TODO: Add table name?
+		// Entity Metadata
+		entityMetadata.setEntityBundle(bundle, versionNumber);
+		left.add(entityMetadata.asWidget());
+		// ActionMenu
+		right.add(actionMenu.asWidget(bundle, isAdministrator, canEdit, null));
+				
+		// Wiki
+		String wikiPageId = null; // TODO : pull from entity
+		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, true, null);
+
+		// Table
+		CompleteTableWidget tableWidget = ginInjector.getCompleteTableWidget();
+		tableWidget.configure((TableEntity) bundle.getEntity());
+		Widget tableW = tableWidget.asWidget();
+		tableW.addStyleName("margin-top-15");
+		tablesTabContainer.add(tableW);
+		
+		// TODO (maybe):
+//		// Programmatic Clients
+//		tablesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
+
+		// Created By/Modified By
+		tablesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
+		// Padding Bottom
+		tablesTabContainer.add(createBottomPadding());		
+	}
+
+	
 	private Widget createProvenanceWidget(EntityBundle bundle, boolean fullWidth) {
 		final LayoutContainer lc = new LayoutContainer();
 		lc.setAutoWidth(true);
@@ -802,63 +856,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return container;
 	}
 
-	private void createTableWidget(boolean canEdit) {
-		FlowPanel container = new FlowPanel();
+	private Widget createTableListWidget(String parentId, boolean canEdit) {		
 		final TableListWidget listWidget = ginInjector.getTableListWidget();		
-		List<TableEntity> tables = createFakeTables();		
-		listWidget.configure(tables, canEdit);
-		final Widget listW = listWidget.asWidget();
-		final Widget tableW = completeTableWidget.asWidget();
-		tableW.setVisible(false);
-		listWidget.setOnTableClick(new TableListWidget.ClickHandler() {			
-			@Override
-			public void onClick(TableEntity table) {
-				completeTableWidget.configure(table);
-				listW.setVisible(false);
-				tableW.setVisible(true);
-				tablesTabContainer.layout(true);
-			}
-		});
-		tablesTabContainer.add(listW);
-		tablesTabContainer.add(tableW);
+		listWidget.configure(parentId, canEdit, true);
+		return listWidget.asWidget();		
 	}
 	
-	private List<TableEntity> createFakeTables() {
-		List<String> columns = new ArrayList<String>();
-		columns.addAll(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
-
-		
-		List<TableEntity> tables = new ArrayList<TableEntity>();
-		TableEntity extable;
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 1");
-		extable.setModifiedOn(new Date());
-		extable.setColumnIds(columns);
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 2");
-		extable.setModifiedOn(new Date());
-		extable.setColumnIds(columns);
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 3");
-		extable.setModifiedOn(new Date());
-		extable.setColumnIds(columns);
-		tables.add(extable);
-		
-		extable = new TableEntity();
-		extable.setId("syn1234");
-		extable.setName("Example Table 4");
-		extable.setModifiedOn(new Date());
-		extable.setColumnIds(columns);
-		tables.add(extable);
-		return tables;
-	}
-
 }

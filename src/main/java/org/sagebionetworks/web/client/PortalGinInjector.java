@@ -189,7 +189,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
-	public CompleteTableWidget getSynapseTableWidget();
+	public CompleteTableWidget getCompleteTableWidget();
 	public SimpleTableWidget getSimpleTableWidget();
 	public TableListWidget getTableListWidget();
 }
