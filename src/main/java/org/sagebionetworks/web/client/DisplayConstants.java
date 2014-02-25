@@ -362,7 +362,7 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
 	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
-	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
+	
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
 	public static final String CODE_EXECUTION = "Code Execution";
 	public static final String MANUAL = "Manual";

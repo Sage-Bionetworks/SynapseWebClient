@@ -114,19 +114,6 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	public static final String DIV_ID_PREVIEW_SUFFIX = "-preview";
-
-	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
-	
-	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
-    public static final String DIV_ID_LINK_PREFIX = "link-";
-	public static final String DIV_ID_AUTOLINK_PREFIX = "autolink-";
-	public static final String DIV_ID_IMAGE_PREFIX = "image-";
-	public static final String DIV_ID_CODE_SPAN_PREFIX = "codespan-";
-	public static final String DIV_ID_WIDGET_SYNTAX_PREFIX = "widgetsyntax-";
-	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
-	
-	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
 	
