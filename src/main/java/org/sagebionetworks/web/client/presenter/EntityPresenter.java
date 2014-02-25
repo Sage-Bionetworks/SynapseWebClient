@@ -133,7 +133,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					} 					
 					EntityHeader projectHeader = DisplayUtils.getProjectHeader(new EntityPath(adapterFactory.createNew(transport.getEntityPathJson()))); 					
 					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					//if(area == null && bundle.getEntity() instanceof TableEntity) area = EntityArea.TABLES;
 					view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					

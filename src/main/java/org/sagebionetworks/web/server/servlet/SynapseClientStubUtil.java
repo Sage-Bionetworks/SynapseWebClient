@@ -1,63 +1,63 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.util.logging.Logger;
-
-import org.mockito.Mockito;
-import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+//import java.util.logging.Logger;
+//
+//import org.mockito.Mockito;
+//import org.sagebionetworks.client.SynapseClient;
+//import org.sagebionetworks.repo.model.UserProfile;
+//import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 
 public class SynapseClientStubUtil {
-
-	private static Logger logger = Logger.getLogger(SynapseClientStubUtil.class.getName());
-	
-	private static final String token = "SESSION_TOKEN";
-	
-	private static TokenProvider tokenProvider;
-	private static ServiceUrlProvider urlProvider;
-	private static UserProfile userProfile;
-	private static EntityFactory entityFactory = new EntityFactory();
-	
-	static {
-		tokenProvider = new TokenProvider() {
-			
-			@Override
-			public String getSessionToken() {
-				return token;
-			}
-		};
-		
-		urlProvider = new ServiceUrlProvider();
-		
-		userProfile = new UserProfile();
-		userProfile.setEmail("jd@sagebase.org");
-		userProfile.setEtag("1");
-		userProfile.setFirstName("John");
-		userProfile.setLastName("Doe");
-		userProfile.setUserName("John Doe");
-		userProfile.setOwnerId("3");
-	}
-	
-	public static SynapseClient createSynapseClient() {
-		// Create a new syanpse
-		SynapseClient syn = Mockito.mock(SynapseClient.class);
-		
-		try {
-			//configure(syn);
-		} catch (Exception e) {
-			logger.warning(e.getMessage());			
-		}
-		
-		syn.setSessionToken(tokenProvider.getSessionToken());
-		syn.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		syn.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		return syn;
-	}
-	
-	public static TokenProvider getTokenProvider() {
-		return tokenProvider;
-	}
+//
+//	private static Logger logger = Logger.getLogger(SynapseClientStubUtil.class.getName());
+//	
+//	private static final String token = "SESSION_TOKEN";
+//	
+//	private static TokenProvider tokenProvider;
+//	private static ServiceUrlProvider urlProvider;
+//	private static UserProfile userProfile;
+//	private static EntityFactory entityFactory = new EntityFactory();
+//	
+//	static {
+//		tokenProvider = new TokenProvider() {
+//			
+//			@Override
+//			public String getSessionToken() {
+//				return token;
+//			}
+//		};
+//		
+//		urlProvider = new ServiceUrlProvider();
+//		
+//		userProfile = new UserProfile();
+//		userProfile.setEmail("jd@sagebase.org");
+//		userProfile.setEtag("1");
+//		userProfile.setFirstName("John");
+//		userProfile.setLastName("Doe");
+//		userProfile.setUserName("John Doe");
+//		userProfile.setOwnerId("3");
+//	}
+//	
+//	public static SynapseClient createSynapseClient() {
+//		// Create a new syanpse
+//		SynapseClient syn = Mockito.mock(SynapseClient.class);
+//		
+//		try {
+//			//configure(syn);
+//		} catch (Exception e) {
+//			logger.warning(e.getMessage());			
+//		}
+//		
+//		syn.setSessionToken(tokenProvider.getSessionToken());
+//		syn.setRepositoryEndpoint(urlProvider
+//				.getRepositoryServiceUrl());
+//		syn.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+//		return syn;
+//	}
+//	
+//	public static TokenProvider getTokenProvider() {
+//		return tokenProvider;
+//	}
 
 	/*
 	 * Private Methods

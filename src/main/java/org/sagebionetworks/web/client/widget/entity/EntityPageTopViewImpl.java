@@ -213,11 +213,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				if(isProject && !presenter.isPlaceChangeForArea(targetTab)) {
 					setTabSelected(targetTab, true);					
 				} else {	
-					boolean overrideCache = false;
-					if(currentArea == EntityArea.FILES && targetTab == EntityArea.FILES) 
-						overrideCache = true;
 					// return to cached location
-					presenter.gotoProjectArea(targetTab, overrideCache); 
+					presenter.gotoProjectArea(targetTab, currentArea); 
 				}
 				currentArea = targetTab;
 			}

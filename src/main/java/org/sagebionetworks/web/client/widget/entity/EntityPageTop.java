@@ -118,7 +118,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
     	
     	// record last table state
-    	if(area == EntityArea.TABLES && bundle.getEntity() instanceof TableEntity) {
+    	if(bundle.getEntity() instanceof TableEntity) {
     		EntityHeader lastTableAreaEntity = new EntityHeader();
     		lastTableAreaEntity.setId(entityId);
     		projectAreaState.setLastTableAreaEntity(lastTableAreaEntity);
@@ -129,9 +129,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     		projectAreaState.setLastWikiSubToken(null);
     	}
     	
-    	// clear out file state if we go back to root
+    	// clear out file or table state if we go back to root
     	if(area == EntityArea.FILES && isProject) {
     		projectAreaState.setLastFileAreaEntity(null);
+    	}
+
+    	// clear out table state if we go back to root
+    	if(area == EntityArea.TABLES && isProject) {
+    		projectAreaState.setLastTableAreaEntity(null);
     	}
 	}
     
@@ -206,10 +211,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void gotoProjectArea(EntityArea area, boolean overrideCache) {
+	public void gotoProjectArea(EntityArea area, EntityArea currentArea) {
 		String entityId = projectHeader.getId();
 		String areaToken = null;
 		Long versionNumber = null;
+		
+		boolean overrideCache = false;
+		// return to root for file and tables
+		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
+				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
+			overrideCache = true;
+		
 		if(!overrideCache) {
 			if(area == EntityArea.WIKI) {
 				areaToken = projectAreaState.getLastWikiSubToken();
@@ -244,6 +256,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				return true;							
 			}
 		} else if(targetTab == EntityArea.TABLES) {
+			// tables area clicked in non-project entity requires goto root of tables
+			// tables area clicked with last-table-state requires goto
 			if(!isProject || projectAreaState.getLastTableAreaEntity() != null)
 				return true;
 		}
