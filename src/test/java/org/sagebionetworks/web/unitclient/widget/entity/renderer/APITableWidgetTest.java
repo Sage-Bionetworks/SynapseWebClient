@@ -25,6 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -204,12 +205,23 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
+	public void testQueryServicePagingURINodeSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NO_OFFSET_EQUALS_ONE;
 		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
-		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
 	}
+	
+	@Test
+	public void testQueryServicePagingURISubmissionSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NEW;
+		widget.configure(testWikiKey, descriptor, null, null);
+		String testServiceCall = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX+"select+*+from+evaluation_1234";
+		String pagedURI = widget.getPagedURI(testServiceCall);
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
+	}
+
 	
 	@Test
 	public void testCurrentUserVariable() throws JSONObjectAdapterException {
