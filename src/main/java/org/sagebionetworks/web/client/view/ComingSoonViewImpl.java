@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -15,11 +16,9 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;

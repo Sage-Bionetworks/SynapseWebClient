@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -22,16 +20,13 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;

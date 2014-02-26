@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -24,7 +25,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHa
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;

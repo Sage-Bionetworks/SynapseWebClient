@@ -290,6 +290,13 @@
 			<version>${synapse.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>markdown</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
