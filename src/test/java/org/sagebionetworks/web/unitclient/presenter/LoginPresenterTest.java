@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+
 import javax.validation.constraints.AssertTrue;
 
 import org.junit.Assert;
@@ -35,6 +37,7 @@ import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -61,6 +64,7 @@ public class LoginPresenterTest {
 	AcceptsOneWidget mockPanel;
 	EventBus mockEventBus;
 	UserSessionData usd;
+	ArrayList<MembershipInvitationBundle> openInvitations;
 	
 	@Before
 	public void setup(){
@@ -88,6 +92,9 @@ public class LoginPresenterTest {
 		verify(mockView).setPresenter(loginPresenter);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		openInvitations = new ArrayList<MembershipInvitationBundle>();
+		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
+
 	}	
 	
 	private void setPlace() {
@@ -206,7 +213,7 @@ public class LoginPresenterTest {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		loginPresenter.checkForTempUsernameAndContinue();
-		verify(mockView).showLoggingInLoader();
+		verify(mockView, times(2)).showLoggingInLoader();
 		//hides loading UI and continue (go to last place) 
 		verify(mockView).hideLoggingInLoader();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
@@ -247,6 +254,25 @@ public class LoginPresenterTest {
 		verify(mockView).showErrorMessage(eq(exceptionMessage));
 	}
 
+	@Test
+	public void testOpenInvitations() throws JSONObjectAdapterException {
+		//this person has an open team invitation
+		openInvitations.add(new MembershipInvitationBundle());
+		
+		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
+		LoginPlace place = new LoginPlace(fakeToken);
+		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));		
+		
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("valid-username");
+		setMyProfile(profile);
+		
+		loginPresenter.setPlace(place);
+		verify(mockAuthenticationController).loginUserSSO(eq(fakeToken), any(AsyncCallback.class));
+		verify(mockView).showOpenTeamInvitationsUI(eq(openInvitations));
+	}
+	
 //	@Test 
 //	public void testSetPlaceSSOLoginNotSignedToU() {
 //		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";

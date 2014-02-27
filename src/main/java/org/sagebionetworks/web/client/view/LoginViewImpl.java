@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -7,11 +9,14 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -25,6 +30,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -70,10 +76,17 @@ public class LoginViewImpl extends Composite implements LoginView {
 	CheckBox lawsCb;
 	@UiField
 	Anchor viewToULink;
-	
 	@UiField
 	Button takePledgeButton;
 	
+	//open team invitations view
+	@UiField
+	HTMLPanel openInvitesView;
+	@UiField
+	Button continueToPlaceButton;
+	@UiField
+	FlowPanel openInvitesPanel;
+
 
 	
 	private Presenter presenter;
@@ -85,17 +98,20 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	boolean toUInitialized;
+	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	
 	@Inject
 	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
+			SageImageBundle sageImageBundle, LoginWidget loginWidget, 
+			OpenTeamInvitationsWidget openTeamInvitesWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -109,6 +125,15 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.setUsername(username.getValue());
 			}
 		});
+		openInvitesPanel.add(openTeamInvitesWidget.asWidget());
+		continueToPlaceButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goToLastPlace();
+			}
+		});
+
+		
 		toUInitialized = false;
 	}
 
@@ -259,12 +284,27 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginView.setVisible(false);
 		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
+		openInvitesView.setVisible(false);
 	}
 	
 	@Override
 	public void showSetUsernameUI() {
 		hideViews();
 		changeUsernameView.setVisible(true);
+	}
+	
+	@Override
+	public void showOpenTeamInvitationsUI(List<MembershipInvitationBundle> invitations) {
+		hideViews();
+		Callback reConfigureCallback = new Callback() {
+			@Override
+			public void invoke() {
+				//invoked after accepting a team request
+				presenter.checkForTeamInvitesAndContinue();
+			}
+		};
+		openTeamInvitesWidget.configure(reConfigureCallback, invitations);
+		openInvitesView.setVisible(true);
 	}
 	
 	@Override

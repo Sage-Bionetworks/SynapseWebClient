@@ -70,6 +70,16 @@
 						<g:Button ui:field="takePledgeButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Take the pledge, I do"/>
 					</div>
 				</g:HTMLPanel>
+				<g:HTMLPanel ui:field="openInvitesView" visible="false">
+					<!-- openInvitesView -->				
+					<div class="row">				
+						<div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
+							<g:FlowPanel ui:field="openInvitesPanel" />
+							<g:Button ui:field="continueToPlaceButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Continue Login"/>
+						</div>
+					</div>
+					<br/>
+				</g:HTMLPanel>
 				
         		</div> <!-- close class="container" -->
 

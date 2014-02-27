@@ -183,17 +183,17 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testIsNoOpenInvites() {
-		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		AsyncCallback mockCallback = mock(AsyncCallback.class);
 		homePresenter.isOpenTeamInvites(mockCallback);
-		verify(mockCallback).invoke(eq(false));
+		verify(mockCallback).onSuccess(eq(false));
 	}
 	
 	@Test
 	public void testIsOpenInvites() {
 		openInvitations.add(new MembershipInvitationBundle());
-		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		AsyncCallback mockCallback = mock(AsyncCallback.class);
 		homePresenter.isOpenTeamInvites(mockCallback);
-		verify(mockCallback).invoke(eq(true));
+		verify(mockCallback).onSuccess(eq(true));
 	}
 	
 	@Test
