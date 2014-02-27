@@ -290,6 +290,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showSetUsernameUI() {
 		hideViews();
+		username.setValue("");
 		changeUsernameView.setVisible(true);
 	}
 	
