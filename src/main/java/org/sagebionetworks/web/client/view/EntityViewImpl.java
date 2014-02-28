@@ -8,15 +8,18 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -41,20 +44,23 @@ public class EntityViewImpl extends Composite implements EntityView {
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private Footer footerWidget;
-		
+	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	
 	@Inject
 	public EntityViewImpl(
 			EntityViewImplUiBinder binder,
 			Header headerWidget,
 			Footer footerWidget,
 			EntityPageTop entityPageTop,
-			SageImageBundle sageImageBundle) {		
+			SageImageBundle sageImageBundle, 
+			OpenTeamInvitationsWidget openTeamInvitesWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.sageImageBundle = sageImageBundle;
+		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -129,7 +135,22 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void show403() {
 		entityPageTop.clearState();
-		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get403Html()));
+		FlowPanel panel = new FlowPanel();
+		panel.add(new HTML(DisplayUtils.get403Html()));
+		//also add the open team invitations widget (accepting may gain access to this project)
+		Callback callback = new Callback() {
+			@Override
+			public void invoke() {
+				//when team is updated, refresh to see if we can now access
+				presenter.refresh();
+			}
+		};
+		openTeamInvitesWidget.configure(callback);
+		Widget openTeamInvites = openTeamInvitesWidget.asWidget();
+		openTeamInvites.addStyleName("margin-top-100 margin-left-10 margin-bottom-10 margin-right-10");
+		panel.add(openTeamInvites);
+		entityPageTopPanel.setWidget(panel);
+		
 	}
 
 }

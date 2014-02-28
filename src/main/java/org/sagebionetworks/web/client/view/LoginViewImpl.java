@@ -79,17 +79,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	
-	//open team invitations view
-	@UiField
-	HTMLPanel openInvitesView;
-	@UiField
-	Button continueToPlaceButton;
-	@UiField
-	FlowPanel openInvitesPanel;
-
-
-	
-	private Presenter presenter;
+		private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
@@ -98,20 +88,18 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	boolean toUInitialized;
-	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	
 	
 	@Inject
 	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget, 
-			OpenTeamInvitationsWidget openTeamInvitesWidget) {
+			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -125,14 +113,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.setUsername(username.getValue());
 			}
 		});
-		openInvitesPanel.add(openTeamInvitesWidget.asWidget());
-		continueToPlaceButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goToLastPlace();
-			}
-		});
-
 		
 		toUInitialized = false;
 	}
@@ -284,7 +264,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginView.setVisible(false);
 		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
-		openInvitesView.setVisible(false);
 	}
 	
 	@Override
@@ -292,20 +271,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		hideViews();
 		username.setValue("");
 		changeUsernameView.setVisible(true);
-	}
-	
-	@Override
-	public void showOpenTeamInvitationsUI(List<MembershipInvitationBundle> invitations) {
-		hideViews();
-		Callback reConfigureCallback = new Callback() {
-			@Override
-			public void invoke() {
-				//invoked after accepting a team request
-				presenter.checkForTeamInvitesAndContinue();
-			}
-		};
-		openTeamInvitesWidget.configure(reConfigureCallback, invitations);
-		openInvitesView.setVisible(true);
 	}
 	
 	@Override

@@ -250,7 +250,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			callback.onSuccess(false);
 			return;
 		}
-		HomePresenter.getOpenInvitations(synapseClient, authenticationController, new AsyncCallback<List<MembershipInvitationBundle>>() {
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
 			@Override
 			public void onSuccess(List<MembershipInvitationBundle> result) {
 				callback.onSuccess(result.size() > 0);
@@ -262,12 +262,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});		
 	}
-	
 
-	public static void getOpenInvitations(SynapseClientAsync synapseClient, AuthenticationController authenticationController, AsyncCallback<List<MembershipInvitationBundle>> callback) {
-		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), callback);		
-	}
-	
 	public void getChallengeProjectIds(final List<Team> myTeams) {
 		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
 			@Override

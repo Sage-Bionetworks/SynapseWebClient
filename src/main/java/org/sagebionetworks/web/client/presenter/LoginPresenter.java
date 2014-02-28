@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -22,7 +20,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -167,23 +164,21 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile result) {
+				view.hideLoggingInLoader();
 				profile = result;
 				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-					//set your username!
-					//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
-					//for now, just give it a try. 
-					view.hideLoggingInLoader();
+					//set your username
 					view.showSetUsernameUI();
 				}
 				else {
-					checkForTeamInvitesAndContinue();
+					goToLastPlace();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				checkForTeamInvitesAndContinue();
+				goToLastPlace();
 			}
 		});
 
@@ -199,7 +194,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully updated your username", "");
 					authenticationController.updateCachedProfile(profile);
-					checkForTeamInvitesAndContinue();
+					goToLastPlace();
 				}
 				
 				@Override
@@ -210,26 +205,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
-	}
-	
-	@Override
-	public void checkForTeamInvitesAndContinue(){
-		view.showLoggingInLoader();
-		HomePresenter.getOpenInvitations(synapseClient, authenticationController, new AsyncCallback<List<MembershipInvitationBundle>>() {
-			@Override
-			public void onSuccess(List<MembershipInvitationBundle> invitations) {
-				view.hideLoggingInLoader();
-				if (invitations.size() > 0) {
-					view.showOpenTeamInvitationsUI(invitations);
-				} else {
-					goToLastPlace();
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.hideLoggingInLoader();
-				goToLastPlace();
-			}});
 	}
 	
 	@Override
@@ -245,6 +220,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void goToLastPlace() {
+		view.hideLoggingInLoader();
 		Place forwardPlace = globalApplicationState.getLastPlace();
 		if(forwardPlace == null) {
 			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
@@ -309,7 +285,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												public void onSuccess(
 														String result) {
 													// All setup complete, so forward the user
-													checkForTeamInvitesAndContinue();
+													goToLastPlace();
 												}	
 												
 											});
