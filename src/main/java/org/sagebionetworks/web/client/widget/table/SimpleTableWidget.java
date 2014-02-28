@@ -50,51 +50,58 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	}
 	
 	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {		
-		// Convert Query to QuerySpecification 
-		synapseClient.getTableQuerySpecification(queryString, new AsyncCallback<String>() {			
+		// Execute Query String		
+		synapseClient.executeTableQuery(queryString, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String querySpecificationJson) {				
-				QuerySpecification querySpec = getFakeQuerySpecification(); // TODO : create querySpec with querySpecificationJson
-				// TODO : extract pagination information fomr QuerySpecification, if any
-				final Integer offset = null;
-				final Integer limit = null;										
-				
-				// Execute Query String		
-				synapseClient.executeTableQuery(queryString, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String rowSetJson) {
-						try {
-							RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
-							// make column lookup
-							final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
-							for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
+			public void onSuccess(String rowSetJson) {
+				try {
+					RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
+					// make column lookup
+					final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
+					for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
 
-							// Determine column type and which columns to send to view from query results
-							List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
-							for(String resultColumnId : rowset.getHeaders()) {
-								ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
-								if(col != null) displayColumns.add(col);
-							}
-							
-							// send to view
-							view.configure(displayColumns, rowset, canEdit, offset, limit);
-						} catch (JSONObjectAdapterException e1) {
-							view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-						}																		
+					// Determine column type and which columns to send to view from query results
+					List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
+					for(String resultColumnId : rowset.getHeaders()) {
+						ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
+						if(col != null) displayColumns.add(col);
 					}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-					}
-				});	
+					// TODO : extract pagination information fomr QuerySpecification, if any
+					final Integer offset = null;
+					final Integer limit = null;										
+					
+					// send to view
+					view.configure(displayColumns, rowset, canEdit, offset, limit);
+				} catch (JSONObjectAdapterException e1) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}																		
 			}
-		
+
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
 			}
-		}); 		
+		});	
+
+		
+		
+//		// Convert Query to QuerySpecification 
+//		synapseClient.getTableQuerySpecification(queryString, new AsyncCallback<String>() {			
+//			@Override
+//			public void onSuccess(String querySpecificationJson) {				
+//				QuerySpecification querySpec = getFakeQuerySpecification(); // TODO : create querySpec with querySpecificationJson
+//				// TODO : extract pagination information fomr QuerySpecification, if any
+//				final Integer offset = null;
+//				final Integer limit = null;										
+//				
+//			}
+//		
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+//			}
+//		}); 		
 	}
 
 
@@ -121,8 +128,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return null;
 	}
 
-	private DerivedColumnModel createDerivedColumn(
-			String resultColumnId) {
+	private DerivedColumnModel createDerivedColumn(String resultColumnId) {
 		DerivedColumnModel derivedCol = new DerivedColumnModel();
 		derivedCol.setId(resultColumnId);
 		derivedCol.setName(resultColumnId);
