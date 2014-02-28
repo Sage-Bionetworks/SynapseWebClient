@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 
 public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	
-	public static final int DEFAULT_DIALOG_HEIGHT = 270;
+	public static final int DEFAULT_DIALOG_HEIGHT = 310;
 	public static final int DEFAULT_DIALOG_WIDTH = 480;
 	private Presenter presenter;
 	private EvaluationList evaluationList;
@@ -40,7 +40,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private boolean showEntityFinder;
 	private Reference selectedReference;
 	private HTML selectedText;
-	private TextField<String> submissionName;
+	private TextField<String> submissionName, teamName;
 	
 	@Inject
 	public EvaluationSubmitterViewImpl(EntityFinder entityFinder, EvaluationList evaluationList, SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
@@ -131,6 +131,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         this.showEntityFinder = showEntityFinder;
 	    submissionName = new TextField<String>();
 	    submissionName.setWidth(400);
+	    teamName = new TextField<String>();
+	    teamName.setWidth(400);
+	    
         FlowPanel panel = new FlowPanel();
         panel.addStyleName("margin-left-10");
         if (showEntityFinder) {
@@ -169,6 +172,9 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
         panel.add(evaluationList.asWidget());
         panel.add(new HTML("<h6 class=\"margin-top-10\">Submission name (optional):</h6>"));
         panel.add(submissionName);
+        panel.add(new HTML("<h6 class=\"margin-top-10\">Team name (optional):</h6>"));
+        panel.add(teamName);
+
         window.add(panel);
         window.layout(true);
         window.center();
@@ -202,7 +208,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 							return;
 						}
 					}
-					presenter.submitToEvaluations(selectedReference, submissionName.getValue(), evaluations);
+					presenter.submitToEvaluations(selectedReference, submissionName.getValue(), teamName.getValue(), evaluations);
 				} else {
 					showErrorMessage(DisplayConstants.NO_EVALUATION_SELECTED);
 				}

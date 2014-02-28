@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -119,7 +120,7 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluations() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, null, evaluationList);
+		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
@@ -134,11 +135,12 @@ public class EvaluationSubmitterTest {
 	}
 	
 	@Test
-	public void testSubmitToEvaluationsWithSubmissionName() throws RestServiceException, JSONObjectAdapterException{
+	public void testSubmitToEvaluationsWithSubmissionNameAndTeamName() throws RestServiceException, JSONObjectAdapterException{
 		String submissionName = "my custom submission name";
+		String teamName = "my custom team name";
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, submissionName, evaluationList);
+		submitter.submitToEvaluations(null, submissionName, teamName, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -146,6 +148,7 @@ public class EvaluationSubmitterTest {
 		String submissionJson = captor.getValue();
 		Submission submission = EntityFactory.createEntityFromJSONString(submissionJson, Submission.class);
 		assertEquals(submissionName, submission.getName());
+		assertEquals(teamName, submission.getSubmitterAlias());
 	}
 	
 	@Test
@@ -159,7 +162,7 @@ public class EvaluationSubmitterTest {
 
 		List<Evaluation> evals = new ArrayList<Evaluation>();
 		evals.add(new Evaluation());
-		submitter.submitToEvaluations(null, null, evals);
+		submitter.submitToEvaluations((Reference)null, null, null, evals);
 		//Should invoke once directly without terms of use
 		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
 		
@@ -178,7 +181,7 @@ public class EvaluationSubmitterTest {
 		requirements.setResults(ars);
 		
 		submitter.configure(entity, null);
-		submitter.submitToEvaluations(null, null, evaluationList);
+		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		
 		//should show terms of use for the requirement, view does not call back so submission should not be created
 		verify(mockView, times(1)).showAccessRequirement(anyString(), any(Callback.class));
