@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -68,15 +69,15 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		searchService.searchEntities("entity", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 			@Override
 			public void onSuccess(List<String> result) {
-				List<EntityHeader> headers = new ArrayList<EntityHeader>();
+				configuredTables = new ArrayList<EntityHeader>();
 				for(String entityHeaderJson : result) {
 					try {
-						headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
+						configuredTables.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
-				}
-				view.configure(headers, canEdit, showAddTable);
+				}				
+				view.configure(configuredTables, canEdit, showAddTable);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -125,7 +126,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 			newTable.setName(name);
 			newTable.setParentId(projectOwnerId);			
 			newTable.setEntityType(TableEntity.class.getName());
-			newTable.setColumnIds(Arrays.asList(new String[] {"173"}));
 			json = newTable.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(json, null, true, new AsyncCallback<String>() {
 				@Override
@@ -149,6 +149,26 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
+	}
+
+	@Override
+	public void getTableDetails(EntityHeader table, final AsyncCallback<TableEntity> callback) {
+		synapseClient.getEntity(table.getId(), new AsyncCallback<EntityWrapper>() {
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					TableEntity tableEntity = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
+					callback.onSuccess(tableEntity);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
 	}
 	
 }

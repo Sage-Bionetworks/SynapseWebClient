@@ -377,7 +377,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row.add(right);
 		filesTabContainer.add(row);		
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));
+		left.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES, false));
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
 			left.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
@@ -467,7 +467,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row.add(right);
 		filesTabContainer.add(row);		
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));
+		left.add(breadcrumb.asWidget(bundle.getPath(), null, false));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 		// Entity Metadata
@@ -693,7 +693,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tablesTabContainer.add(row);		
 
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath(), true, false));		
+		left.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.TABLES, false));		
 		// TODO: Add table name?
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);

@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -50,13 +52,18 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	
 	public void configure(final TableEntity table) {
 		this.table = table;		
-		synapseClient.getColumnModelBatch(table.getColumnIds(), new AsyncCallback<String>() {
+		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(List<String> result) {
 				try {
-					BatchResults<ColumnModel> columnsBatch = new BatchResults<ColumnModel>(ColumnModel.class);
-					columnsBatch.initializeFromJSONObject(adapterFactory.createNew(result));
-					columns = columnsBatch.getResults();
+					columns = new ArrayList<ColumnModel>();
+					for(String colStr : result) {
+						columns.add(new ColumnModel(adapterFactory.createNew(colStr)));
+					}
+					
+					// TODO : remove this
+					columns = getTestColumns();
+					
 					view.configure(table, columns, queryString, true);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -133,16 +140,25 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	private void updateTableEntity() {
 		try {
 			String entityJson = table.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.updateEntity(entityJson, new AsyncCallback<EntityWrapper>() {
+			synapseClient.createOrUpdateEntity(entityJson, null, false, new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(EntityWrapper result) {
-					TableEntity newTable;
-					try {						
-						newTable = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-						configure(newTable);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
+				public void onSuccess(String result) {
+					synapseClient.getEntity(table.getId(), new AsyncCallback<EntityWrapper>() {
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							try {						
+								table = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
+								configure(table);
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}							
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);							
+						}
+					});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -154,5 +170,124 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 			view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
 		}
 	}
+
 	
+	/*
+	 * Temp
+	 */
+	private List<ColumnModel> getTestColumns() {
+		List<ColumnModel> columns = new ArrayList<ColumnModel>();
+
+		ColumnModel model;
+
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("cellline");
+		model.setName("cellline");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("Drug1");
+		model.setName("Drug1");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug1_Conc");
+		model.setName("Drug1_Conc");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug1_InhibitionMean");
+		model.setName("Drug1_InhibitionMean");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug1_InhibitionStdev");
+		model.setName("Drug1_InhibitionStdev");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.STRING);
+		model.setId("Drug2");
+		model.setName("Drug2");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_Conc");
+		model.setName("Drug2_Conc");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_InhibitionMean");
+		model.setName("Drug2_InhibitionMean");
+		columns.add(model);
+		
+		model = new ColumnModel();
+		model.setColumnType(ColumnType.DOUBLE);
+		model.setId("Drug2_InhibitionStdev");
+		model.setName("Drug2_InhibitionStdev");
+		columns.add(model);
+		
+		
+//		// first name
+//		ColumnModel model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("FirstName");
+//		model.setName("First Name");
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("LastName");
+//		model.setName("Last Name");
+//		columns.add(model);
+//
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.FILEHANDLEID);
+//		model.setId("Plot");
+//		model.setName("Plot");
+//		columns.add(model);		
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("Category");
+//		model.setName("Category");
+//		model.setEnumValues(Arrays.asList(new String[] {"One", "Two", "Three"}));
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.STRING);
+//		model.setId("Address");
+//		model.setName("Address");
+//		columns.add(model);
+//		
+////		model = new ColumnModel();
+////		model.setColumnType(ColumnType.DATE);
+////		model.setId("Birthday");
+////		model.setName("Birthday");
+////		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.BOOLEAN);
+//		model.setId("IsAlive");
+//		model.setName("IsAlive");
+//		columns.add(model);
+//		
+//		model = new ColumnModel();
+//		model.setColumnType(ColumnType.DOUBLE);
+//		model.setId("BMI");
+//		model.setName("BMI");
+//		columns.add(model);
+
+		
+		return columns;
+	}
+
+		
 }

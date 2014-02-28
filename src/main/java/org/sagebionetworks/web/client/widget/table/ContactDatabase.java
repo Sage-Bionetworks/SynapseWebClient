@@ -293,7 +293,7 @@ public ListDataProvider<TableModel> getDataProvider() {
 	  for(double drug2conc : new Double[] { 0.266, 0.133, 0.066, 0.033 }) {
 		  for(double drug1conc : new Double[] { 7.0, 3.5, 1.75, 0.875 }) {
 			  TableModel model = new TableModel();
-			  model.put("cellLine", "MCF7");
+			  model.put("cellline", "MCF7");
 			  model.put("Drug1", drug1);
 			  model.put("Drug1_Conc", String.valueOf(drug1conc));
 			  model.put("Drug1_InhibitionMean", String.valueOf(Random.nextDouble()));

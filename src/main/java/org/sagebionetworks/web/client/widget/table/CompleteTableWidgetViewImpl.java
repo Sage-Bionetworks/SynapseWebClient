@@ -99,13 +99,15 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		
 		// build view
 		store = new ListStore<BaseModelData>();
-		setupQuery(queryString);			
-		setupTable(table, canEdit);		
-		setupTableEditorToolbar(columns);
+		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
+
+		setupTableEditorToolbar(columns);
 		if(canEdit) {
 			buttonToolbar.setVisible(true);
 		}
+ 
+		setupTable(table, columns, queryString, canEdit);		
 	}
 	
 
@@ -142,7 +144,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	/*
 	 * Private Methods
 	 */	
-	private void setupQuery(String queryString) {
+	private void setupQueryBox(String queryString) {
 		// setup query
 		Button queryBtn = DisplayUtils.createButton(DisplayConstants.QUERY);
 		queryBtn.addStyleName("btn-block");
@@ -163,13 +165,13 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	
 	/**
 	 * Sets up the Table view
+	 * @param columns
 	 * @param table 
 	 * @param canEdit 
 	 */
-	private void setupTable(TableEntity tableEntity, boolean canEdit) {
-		SimpleTableWidget table = ginInjector.getSimpleTableWidget();
-		List<ColumnModel> columns = getColumns();				
-		table.configure(tableEntity, columns, canEdit);
+	private void setupTable(TableEntity tableEntity, List<ColumnModel> columns, String queryString, boolean canEdit) {
+		SimpleTableWidget table = ginInjector.getSimpleTableWidget();		
+		table.configure(tableEntity.getId(), columns, queryString, canEdit);
 		tableContainer.setWidget(table.asWidget());				
 	}
 
@@ -283,8 +285,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 				@Override
 				public void onClick(ClickEvent event) {
 					MessageBox.confirm("Confirm", DisplayConstants.CONFIRM_DELETE_COLUMN + col.getName(), new Listener<MessageBoxEvent>() {
-						public void handleEvent(MessageBoxEvent ce) {
-							presenter.updateColumnOrder(extractColumns());
+						public void handleEvent(MessageBoxEvent ce) {							
 							com.extjs.gxt.ui.client.widget.button.Button btn = ce.getButtonClicked();	
 							if (btn.getText().equals("Yes")) {
 								columnPanel.addStyleName("fade");
@@ -294,7 +295,9 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 									public void run() {
 										allColumnsPanel.remove(columnPanel);
 										columnPanelOrder.remove(columnPanel);
-										// presenter.update
+										
+										// update table entity
+										presenter.updateColumnOrder(extractColumns());
 										
 										// update ends, if needed
 										int size = columnPanelOrder.size();
@@ -373,18 +376,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		form.add(inputLabel);		
 		form.add(createColumnTypeRadio(col));		
 		form.add(columnTypeError);
-		
-
-		// Display Name
-		inputLabel = new HTML(DisplayConstants.DISPLAY_NAME + " (" + DisplayConstants.OPTIONAL + "): ");
-		inputLabel.addStyleName("margin-top-15 boldText");
-		final TextBox displayName = new TextBox();
-		// TODO : fill in display name if available from model in future
-		displayName.addStyleName("form-control");
-		DisplayUtils.setPlaceholder(displayName, DisplayConstants.DISPLAY_NAME);
-		form.add(inputLabel);
-		form.add(displayName);
-				
+						
 		// Default Value	
 		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
@@ -603,126 +595,4 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		}		
 		return columns;
 	}
-
-	
-	/*
-	 * 
-	 * TEMP
-	 */
- 
-
-	private List<ColumnModel> getColumns() {
-		List<ColumnModel> columns = new ArrayList<ColumnModel>();
-
-		ColumnModel model;
-
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.STRING);
-		model.setId("cellLine");
-		model.setName("cellLine");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.STRING);
-		model.setId("Drug1");
-		model.setName("Drug1");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug1_Conc");
-		model.setName("Drug1_Conc");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug1_InhibitionMean");
-		model.setName("Drug1_InhibitionMean");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug1_InhibitionStdev");
-		model.setName("Drug1_InhibitionStdev");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.STRING);
-		model.setId("Drug2");
-		model.setName("Drug2");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug2_Conc");
-		model.setName("Drug2_Conc");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug2_InhibitionMean");
-		model.setName("Drug2_InhibitionMean");
-		columns.add(model);
-		
-		model = new ColumnModel();
-		model.setColumnType(ColumnType.DOUBLE);
-		model.setId("Drug2_InhibitionStdev");
-		model.setName("Drug2_InhibitionStdev");
-		columns.add(model);
-		
-		
-//		// first name
-//		ColumnModel model = new ColumnModel();
-//		model.setColumnType(ColumnType.STRING);
-//		model.setId("FirstName");
-//		model.setName("First Name");
-//		columns.add(model);
-//		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.STRING);
-//		model.setId("LastName");
-//		model.setName("Last Name");
-//		columns.add(model);
-//
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.FILEHANDLEID);
-//		model.setId("Plot");
-//		model.setName("Plot");
-//		columns.add(model);		
-//		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.STRING);
-//		model.setId("Category");
-//		model.setName("Category");
-//		model.setEnumValues(Arrays.asList(new String[] {"One", "Two", "Three"}));
-//		columns.add(model);
-//		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.STRING);
-//		model.setId("Address");
-//		model.setName("Address");
-//		columns.add(model);
-//		
-////		model = new ColumnModel();
-////		model.setColumnType(ColumnType.DATE);
-////		model.setId("Birthday");
-////		model.setName("Birthday");
-////		columns.add(model);
-//		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.BOOLEAN);
-//		model.setId("IsAlive");
-//		model.setName("IsAlive");
-//		columns.add(model);
-//		
-//		model = new ColumnModel();
-//		model.setColumnType(ColumnType.DOUBLE);
-//		model.setId("BMI");
-//		model.setName("BMI");
-//		columns.add(model);
-
-		
-		return columns;
-	}	
-	
 }

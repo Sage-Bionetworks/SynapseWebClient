@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface TableListWidgetView extends IsWidget, SynapseView {
@@ -22,6 +23,8 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	public interface Presenter {
 
 		void createTableEntity(String name);
+
+		void getTableDetails(EntityHeader table, AsyncCallback<TableEntity> asyncCallback);
 				
 	}
 

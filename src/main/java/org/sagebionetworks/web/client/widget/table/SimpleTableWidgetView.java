@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,8 +27,11 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * configure view
 	 * @param table
 	 * @param columns
+	 * @param rowset 
 	 * @param canEdit
+	 * @param limit 
+	 * @param offset 
 	 */
-	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit);
+	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, Integer offset, Integer limit);
 	
 }

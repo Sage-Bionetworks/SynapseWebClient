@@ -311,11 +311,16 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getAPIKey() throws RestServiceException;
 	
-	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException;
+	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
 
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
+	
+	public String getTableQuerySpecification(String query) throws RestServiceException;
+	
+	public String executeTableQuery(String query) throws RestServiceException;
+	
 }

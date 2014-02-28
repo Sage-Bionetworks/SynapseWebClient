@@ -1,7 +1,6 @@
 
 package org.sagebionetworks.web.client;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -251,11 +250,15 @@ public interface SynapseClientAsync {
 
 	void getAPIKey(AsyncCallback<String> callback);
 
-	void getColumnModelBatch(List<String> columnIds, AsyncCallback<String> asyncCallback);
+	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
 
 	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
 	
 	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
+
+	void getTableQuerySpecification(String query, AsyncCallback<String> callback);
+
+	void executeTableQuery(String query, AsyncCallback<String> callback);
 }

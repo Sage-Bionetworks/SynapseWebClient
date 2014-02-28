@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -50,7 +51,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit) {	
+	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, Integer offset, Integer limit) {	
 		this.columns = columns;					
 				
 		buildTable();

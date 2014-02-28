@@ -57,7 +57,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.UserGroup;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -86,7 +85,8 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -102,6 +102,12 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.table.query.model.FromClause;
+import org.sagebionetworks.table.query.model.QuerySpecification;
+import org.sagebionetworks.table.query.model.SelectList;
+import org.sagebionetworks.table.query.model.SetQuantifier;
+import org.sagebionetworks.table.query.model.TableExpression;
+import org.sagebionetworks.table.query.model.TableReference;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -2470,51 +2476,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	
 	@Override
-	public String getColumnModelBatch(List<String> columnIds) throws RestServiceException {
+	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			// TODO : connect to Java Client
-			BatchResults<ColumnModel> results = new BatchResults<ColumnModel>();
-			
-			ColumnModel cm1 = new ColumnModel();
-			cm1.setId("1");
-			cm1.setName("stringCol");
-			cm1.setColumnType(ColumnType.STRING);
-			cm1.setDefaultValue("DefaultValue");
-			
-			ColumnModel cm2 = new ColumnModel();
-			cm2.setId("2");
-			cm2.setName("stringColEnum");
-			cm2.setColumnType(ColumnType.STRING);			
-			cm2.setEnumValues(Arrays.asList(new String[]{ "Level A", "Level B", "Level C" }));
-			
-			ColumnModel cm3 = new ColumnModel();
-			cm3.setId("3");
-			cm3.setName("doubleCol");
-			cm3.setColumnType(ColumnType.DOUBLE);
-			cm3.setDefaultValue("0.0");
-			
-			ColumnModel cm4 = new ColumnModel();
-			cm4.setId("4");
-			cm4.setName("longCol");
-			cm4.setColumnType(ColumnType.LONG);
-			cm4.setDefaultValue("0");
-			
-			ColumnModel cm5 = new ColumnModel();
-			cm5.setId("5");
-			cm5.setName("booleanCol");
-			cm5.setColumnType(ColumnType.BOOLEAN);
-			cm5.setDefaultValue("FALSE");
-			
-			ColumnModel cm6 = new ColumnModel();
-			cm6.setId("6");
-			cm6.setName("FileHandleCol");
-			cm6.setColumnType(ColumnType.FILEHANDLEID);			
-			
-			results.setResults(Arrays.asList(new ColumnModel[] { cm1, cm2, cm3, cm4, cm5, cm6 }));
-			return EntityFactory.createJSONStringForEntity(results);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
+			List<ColumnModel> columns = synapseClient.getColumnModelsForTableEntity(tableEntityId);
+			List<String> stringList = new ArrayList<String>();
+			for(ColumnModel col : columns) {
+				stringList.add(col.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			}
+			return stringList;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -2550,5 +2522,35 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+
+	@Override
+	public String getTableQuerySpecification(String query) throws RestServiceException {
+		// TODO : pass through to javaclient when available
+		return null;
+	}
+
+	@Override
+	public String executeTableQuery(String query) throws RestServiceException {
+		// TODO : pass through to javaclient when available
+		RowSet rs = new RowSet();
+		rs.setHeaders(Arrays.asList(new String[] { "175", "avg(field)", "176.md5" }));
+		rs.setEtag("1234");
+		rs.setTableId("syn123");
+		
+		List<Row> rows = new ArrayList<Row>();
+		Row row = new Row();
+		row.setRowId(1L);
+		row.setVersionNumber(1L);
+		row.setValues(Arrays.asList(new String[] {"175value", "avg1.234", "176md5-273189372891739812"}));
+		rs.setRows(rows);
+		String json = null;
+		try {
+			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (JSONObjectAdapterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
 	}
 }

@@ -26,7 +26,7 @@ public interface CompleteTableWidgetView extends IsWidget, SynapseView {
 		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
 
 		void updateColumnOrder(List<String> columnIds);
-				
+
 	}
 
 	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit);

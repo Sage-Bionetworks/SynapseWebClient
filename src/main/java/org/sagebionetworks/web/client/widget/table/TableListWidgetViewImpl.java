@@ -22,6 +22,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -71,31 +72,39 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 		
 		FlowPanel tableListContainer = new FlowPanel();
 		tableListContainer.addStyleName("list-group margin-top-15");
-		for(final EntityHeader table : tables) {
-			String nRows = String.valueOf(Random.nextInt(10000));
-			String storageSize = String.valueOf(Random.nextInt(999)) + " Kb";
-			
-			//String modifiedOn = DATE_FORMAT.format(table.getModifiedOn());
+		for(final EntityHeader table : tables) {			
 			String modifiedOn = "date";
-			String entryHtml = "<h4 class=\"list-group-item-heading\">"
+			final String entryHtml = "<h4 class=\"list-group-item-heading\">"
 							    + AbstractImagePrototype.create(tableEntityIcon).getHTML() 
 								+ "<span class=\"movedown-2\"> " + SafeHtmlUtils.fromString(table.getName()).asString() + "</span>" 
-								+"</h4>"
-								+ "<p class=\"list-group-item-text\">" + ROWS + ": " + nRows 
-								+ " | " + STORAGE + ": " + storageSize
-								+ " | " + LAST_UPDATED + ": " + modifiedOn
-								+ "</p>";
+								+"</h4>";
 			SafeHtml safe = SafeHtmlUtils.fromTrustedString(entryHtml);
-			Anchor entry = new Anchor();
+			final Anchor entry = new Anchor();
 			entry.addStyleName("list-group-item");
 			entry.setHTML(entryHtml);
 			entry.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(table.getId(), null, EntityArea.TABLES, null));
+					globalApplicationState.getPlaceChanger().goTo(new Synapse(table.getId()));
 				}
 			});
 			tableListContainer.add(entry);
+			
+			// async load table details
+			presenter.getTableDetails(table, new AsyncCallback<TableEntity>() {
+				@Override
+				public void onSuccess(TableEntity tableEntity) {
+					String completeEntry = entryHtml + "<p class=\"list-group-item-text\">"
+//					+ ROWS + ": " + nRows + " | " 
+//					+ STORAGE + ": " + storageSize + " | " 
+					+ LAST_UPDATED + ": " + tableEntity.getModifiedBy() + " " + DATE_FORMAT.format(tableEntity.getModifiedOn())
+					+ "</p>";
+					entry.setHTML(SafeHtmlUtils.fromTrustedString(completeEntry));					
+				}
+				@Override
+				public void onFailure(Throwable caught) { }
+			});
+
 		}
 		panel.add(tableListContainer);
 	}
