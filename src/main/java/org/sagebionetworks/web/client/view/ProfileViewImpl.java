@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -211,7 +212,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 						//refresh the view after accepting/ignoring
 						presenter.redirectToViewProfile();
 					}
-				});
+				}, (CallbackP)null);
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
 				

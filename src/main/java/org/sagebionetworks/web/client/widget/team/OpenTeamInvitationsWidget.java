@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -42,7 +43,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		this.nodeModelCreator = nodeModelCreator;
 	}
 
-	public void configure(final Callback teamUpdatedCallback) {
+	public void configure(final Callback teamUpdatedCallback, final CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback) {
 		view.clear();
 		//using the current user, ask for all of the open invitations extended to this user.
 		if (authenticationController.isLoggedIn()) {
@@ -50,6 +51,8 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
 				@Override
 				public void onSuccess(List<MembershipInvitationBundle> result) {
+					if (openTeamInvitationsCallback != null)
+						openTeamInvitationsCallback.invoke(result);
 					configure(teamUpdatedCallback, result);
 				}
 				
