@@ -22,6 +22,8 @@ public class DisplayConstants {
 
 	public static final String USERNAME_FORMAT_ERROR = "User names can only contain letters, numbers, dots (.), dashes (-) and underscores (_). They must also be at least 3 characters long.";
 	
+	public static final String ACCESS_DEPENDENT_ON_TEAM = "Access could be dependent upon membership in one of the following Teams";
+	
 	public static final String SHARED_ON_SYNAPSE = " has shared an item with you on Synapse";
 	public static final String SHARED_ON_SYNAPSE_SUBJECT = " (shared on Synapse)";
 	public static final String UPDATED_NOTIFICATION_SETTINGS = "Updated Notification Settings";

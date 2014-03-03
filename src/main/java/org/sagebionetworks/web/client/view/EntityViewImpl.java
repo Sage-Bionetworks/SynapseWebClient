@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -156,8 +157,8 @@ public class EntityViewImpl extends Composite implements EntityView {
 			public void invoke(List<MembershipInvitationBundle> invites) {
 				//if there are any, then also add the title text to the panel
 				if (invites != null && invites.size() > 0) {
-					HTML message = new HTML("<h4>Access could be dependent upon membership in one of the following Teams</h4>");
-					message.addStyleName("margin-top-100 margin-left-10");
+					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");
+					message.addStyleName("margin-top-100 margin-left-15");
 					invitesPanel.setWidget(message);
 				}
 			}
