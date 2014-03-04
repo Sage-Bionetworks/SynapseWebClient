@@ -1903,7 +1903,7 @@ public class DisplayUtils {
 			int endPos = startPos + selectionLength;
 			
 			if (eolPos < endPos)
-				throw new IllegalArgumentException("This command only supports single line operations.\nPlease select text within a single line and try again.");
+				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
 			
 			String selectedText = text.substring(startPos, endPos);
 			if (isDefined(selectedText)) {
@@ -1920,7 +1920,7 @@ public class DisplayUtils {
 			}
 			
 		}
-		throw new IllegalArgumentException("Please make a valid selection and try again.");
+		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
 	
 	private static boolean isDefined(String testString) {
