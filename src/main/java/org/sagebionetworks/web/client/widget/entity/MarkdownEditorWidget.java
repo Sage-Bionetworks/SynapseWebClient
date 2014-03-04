@@ -70,7 +70,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
 	private boolean isWikiEditor;
-	private Image editWidgetButton;
+	private com.google.gwt.user.client.ui.Button editWidgetButton;
 	private WidgetDescriptorUpdatedHandler callback;
 	private WidgetSelectionState widgetSelectionState;
 	private ResourceLoader resourceLoader;
@@ -131,9 +131,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
+		mdCommands.setSpacing(2);
 		mdCommands.addStyleName("view header-inner-commands-container");
-
-		editWidgetButton = getNewCommand("Edit Widget", iconsImageBundle.editGrey16(),new ClickHandler() {
+		editWidgetButton = getNewCommand("Edit Widget", "glyphicon-pencil",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				handleEditWidgetCommand();
@@ -261,20 +261,27 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		
 		
 		//Formatting Guide
-		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT);
-		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
-		formatLink.setWidth(120);
-		mdCommands.add(formatLink);
-		mdCommands.add(insertButton);
-		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		com.google.gwt.user.client.ui.Button formatLink = getNewCommand(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT, null, "glyphicon-question-sign", new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				//pop up format guide
 				showFormattingGuideDialog();
 			}
 		});
+		mdCommands.add(formatLink);
+		mdCommands.add(insertButton);
 		
-		Image image = getNewCommand("Insert Image", iconsImageBundle.imagePlus16(),new ClickHandler() {
+		//basic commands
+		com.google.gwt.user.client.ui.Button boldCommand = getNewCommand(null, "glyphicon-bold", getBasicCommandClickHandler("**"));
+		mdCommands.add(boldCommand);
+
+		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand(null, "glyphicon-italic", getBasicCommandClickHandler("_"));
+		mdCommands.add(italicCommand);
+		
+//		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand(null, "glyphicon-text_strike", getBasicCommandClickHandler("--"));
+//		mdCommands.add(strikeCommand);
+
+		com.google.gwt.user.client.ui.Button image = getNewCommand("Insert Image", "glyphicon-picture",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
@@ -282,23 +289,32 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(image);
 		
+		com.google.gwt.user.client.ui.Button video = getNewCommand("Insert Video", "glyphicon-facetime-video",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
+			}
+		}); 
+		mdCommands.add(video);
+		
 		if (isWikiEditor) {
-			Image attachment = getNewCommand("Insert Attachment", iconsImageBundle.attachment16(),new ClickHandler() {
+			com.google.gwt.user.client.ui.Button attachment = getNewCommand("Insert Attachment", "glyphicon-paperclip",new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
 				}
 			}); 
+
 			mdCommands.add(attachment);
 		}
 
-		
-		Image link = getNewCommand("Insert Link", iconsImageBundle.link16(),new ClickHandler() {
+		com.google.gwt.user.client.ui.Button link = getNewCommand("Insert Link", "glyphicon-link",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				handleInsertWidgetCommand( WidgetConstants.LINK_CONTENT_TYPE, callback);
 			}
 		}); 
+
 		mdCommands.add(link);
 		
 	}
@@ -330,12 +346,29 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}
 	}
 	
+	private ClickHandler getBasicCommandClickHandler(final String markdown) {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int selectionLength = markdownTextArea.getSelectionLength();
+				if (selectionLength > 0) {
+					String text = markdownTextArea.getText();
+					int currentPos = markdownTextArea.getCursorPos();
+					String selectedText = markdownTextArea.getSelectedText();
+					int endPos = currentPos + selectionLength;
+					String newMarkdownText = text.substring(0, currentPos) + markdown + selectedText + markdown + text.substring(endPos);
+					markdownTextArea.setText(newMarkdownText);
+				}
+			}
+		};
+	}
+	
 	public void updateEditWidget(){
-		editWidgetButton.setResource(iconsImageBundle.editGrey16());
+		editWidgetButton.setEnabled(false);
 		DisplayUtils.updateWidgetSelectionState(widgetSelectionState, markdownTextArea.getText(), markdownTextArea.getCursorPos());
 		 
 		if (widgetSelectionState.isWidgetSelected()) {
-			editWidgetButton.setResource(iconsImageBundle.edit16());
+			editWidgetButton.setEnabled(true);
 		}
 	}
 	
@@ -567,6 +600,26 @@ public class MarkdownEditorWidget extends LayoutContainer {
         }
 		
 		DisplayUtils.updateTextArea(markdownTextArea, newValue.toString());
+	}
+
+	/**
+	 * Create an extra small default icon button
+	 * @param tooltipText
+	 * @param glyphIconClass
+	 * @param clickHandler
+	 * @return
+	 */
+	public com.google.gwt.user.client.ui.Button getNewCommand(String tooltipText, String glyphIconClass, ClickHandler clickHandler){
+		return getNewCommand("", tooltipText, glyphIconClass, clickHandler);
+	}
+	
+	public com.google.gwt.user.client.ui.Button getNewCommand(String title, String tooltipText, String glyphIconClass, ClickHandler clickHandler){
+		com.google.gwt.user.client.ui.Button command = DisplayUtils.createIconButton(title, ButtonType.DEFAULT, glyphIconClass + " margin-bottom-5");
+		command.addStyleName("btn-xs");
+		command.addClickHandler(clickHandler);
+		if (tooltipText != null)
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		return command;
 	}
 
 	
