@@ -369,7 +369,12 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		int selectionLength = markdownTextArea.getSelectionLength();
 		String text = markdownTextArea.getText();
 		int currentPos = markdownTextArea.getCursorPos();
-		markdownTextArea.setText(DisplayUtils.surroundText(text, markdown, currentPos, selectionLength));
+		try {
+			String newText = DisplayUtils.surroundText(text, markdown, currentPos, selectionLength);
+			markdownTextArea.setText(newText);
+		} catch (IllegalArgumentException e) {
+			showErrorMessage(e.getMessage());
+		}
 	}
 	
 	public void updateEditWidget(){

@@ -1894,15 +1894,17 @@ public class DisplayUtils {
 	 * @param selectionLength
 	 * @return
 	 */
-	public static String surroundText(String text, String markdown, int startPos, int selectionLength) {
+	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
 		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
 			int markdownLength = markdown.length();
 			int eolPos = text.indexOf('\n', startPos);
 			if (eolPos < 0)
 				eolPos = text.length();
-			int endSelectionPos = startPos + selectionLength;
+			int endPos = startPos + selectionLength;
 			
-			int endPos = Math.min(eolPos, endSelectionPos);
+			if (eolPos < endPos)
+				throw new IllegalArgumentException("This command only supports single line operations.\nPlease select text within a single line and try again.");
+			
 			String selectedText = text.substring(startPos, endPos);
 			if (isDefined(selectedText)) {
 				//check to see if this text is already surrounded by the markdown.
@@ -1916,9 +1918,9 @@ public class DisplayUtils {
 				}
 				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
 			}
-				
+			
 		}
-		return text;
+		throw new IllegalArgumentException("Please make a valid selection and try again.");
 	}
 	
 	private static boolean isDefined(String testString) {
