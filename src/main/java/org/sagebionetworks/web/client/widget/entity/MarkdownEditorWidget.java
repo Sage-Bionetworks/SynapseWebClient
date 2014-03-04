@@ -141,7 +141,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(editWidgetButton);
 		
-		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
+		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.glyphCirclePlus12()));
+		insertButton.addStyleName("whiteBackgroundGxt");
 		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu(callback));
 		FormData descriptionLabelFormData = new FormData();
@@ -273,30 +274,16 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		
 		//basic commands
 		com.google.gwt.user.client.ui.Button boldCommand = getNewCommand(null, "glyphicon-bold", getBasicCommandClickHandler("**"));
+		boldCommand.addStyleName("margin-left-10");
 		mdCommands.add(boldCommand);
 
 		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand(null, "glyphicon-italic", getBasicCommandClickHandler("_"));
+		italicCommand.addStyleName("margin-right-10");
 		mdCommands.add(italicCommand);
 		
 //		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand(null, "glyphicon-text_strike", getBasicCommandClickHandler("--"));
 //		mdCommands.add(strikeCommand);
 
-		com.google.gwt.user.client.ui.Button image = getNewCommand("Insert Image", "glyphicon-picture",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
-			}
-		}); 
-		mdCommands.add(image);
-		
-		com.google.gwt.user.client.ui.Button video = getNewCommand("Insert Video", "glyphicon-facetime-video",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
-			}
-		}); 
-		mdCommands.add(video);
-		
 		if (isWikiEditor) {
 			com.google.gwt.user.client.ui.Button attachment = getNewCommand("Insert Attachment", "glyphicon-paperclip",new ClickHandler() {
 				@Override
@@ -307,6 +294,22 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 			mdCommands.add(attachment);
 		}
+
+		com.google.gwt.user.client.ui.Button image = getNewCommand("Insert Image", "glyphicon-camera",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
+			}
+		});
+		mdCommands.add(image);
+		
+		com.google.gwt.user.client.ui.Button video = getNewCommand("Insert Video", "glyphicon-facetime-video",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
+			}
+		}); 
+		mdCommands.add(video);
 
 		com.google.gwt.user.client.ui.Button link = getNewCommand("Insert Link", "glyphicon-link",new ClickHandler() {
 			@Override
@@ -351,14 +354,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			@Override
 			public void onClick(ClickEvent event) {
 				int selectionLength = markdownTextArea.getSelectionLength();
-				if (selectionLength > 0) {
-					String text = markdownTextArea.getText();
-					int currentPos = markdownTextArea.getCursorPos();
-					String selectedText = markdownTextArea.getSelectedText();
-					int endPos = currentPos + selectionLength;
-					String newMarkdownText = text.substring(0, currentPos) + markdown + selectedText + markdown + text.substring(endPos);
-					markdownTextArea.setText(newMarkdownText);
-				}
+				String text = markdownTextArea.getText();
+				int currentPos = markdownTextArea.getCursorPos();
+				markdownTextArea.setText(DisplayUtils.surroundText(text, markdown, currentPos, selectionLength));
 			}
 		};
 	}

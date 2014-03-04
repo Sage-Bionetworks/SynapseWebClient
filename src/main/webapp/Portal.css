@@ -941,7 +941,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .whiteBackground {
 	background-color: #fff;
+}
+
+.whiteBackgroundGxt em {
+	background-color: #fff !important;
 }	
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;

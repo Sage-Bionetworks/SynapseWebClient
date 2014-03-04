@@ -234,6 +234,46 @@ public class DisplayUtilsTest {
 		//old user who has set the username
 		assertEquals("Strong Bad (SBEmail)", DisplayUtils.getDisplayName(fName, lName, userName));
 	}
+	
+	@Test
+	public void testSurroundText() {
+		String text = "This is the test markdown\nthat will be used.";
+		String markdown = "*";
+		
+		//basic case, "test" selected, text should be surrounded with markdown
+		int startPos = text.indexOf("test");
+		int selectionLength = "test".length();
+		String result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals("This is the *test* markdown\nthat will be used.", result);
+		
+		//nothing selected, no change to text
+		selectionLength = 0;
+		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals(text, result);
+		
+		//selection goes past newline.  should apply to first line
+		selectionLength = "test markdown\nthat".length();
+		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals("This is the *test markdown*\nthat will be used.", result);
+		
+		//selection goes past end of string.  should apply until the end of string
+		startPos = text.indexOf("used");
+		selectionLength = 100;
+		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals("This is the test markdown\nthat will be *used.*", result);
+		
+		//invalid start position.  should not change input text
+		startPos = -1;
+		selectionLength = 2;
+		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals(text, result);
+		
+		//invalid selection length.  should not change input text
+		startPos = 0;
+		selectionLength = -1;
+		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
+		assertEquals(text, result);
+	}
 }
 
 

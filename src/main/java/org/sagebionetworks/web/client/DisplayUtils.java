@@ -1886,6 +1886,33 @@ public class DisplayUtils {
 		}
 	}
 	
+	/**
+	 * Surround the selectedText with the given markdown
+	 * @param text
+	 * @param markdown
+	 * @param startPos
+	 * @param selectionLength
+	 * @return
+	 */
+	public static String surroundText(String text, String markdown, int startPos, int selectionLength) {
+		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
+			int eolPos = text.indexOf('\n', startPos);
+			if (eolPos < 0)
+				eolPos = text.length();
+			int endSelectionPos = startPos + selectionLength;
+			
+			int endPos = Math.min(eolPos, endSelectionPos);
+			String selectedText = text.substring(startPos, endPos);
+			if (isDefined(selectedText))
+				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
+		}
+		return text;
+	}
+	
+	private static boolean isDefined(String testString) {
+		return testString != null && testString.trim().length() > 0;
+	}
+	
 	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
 		// Add a new annotation
 		if(ANNOTATION_TYPE.STRING == type){
