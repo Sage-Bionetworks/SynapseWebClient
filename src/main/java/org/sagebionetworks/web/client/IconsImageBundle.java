@@ -140,8 +140,8 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/glyphicons_circle_plus-12.png")
 	ImageResource glyphCirclePlus12();
 
-	@Source("images/icons/glyphicons_text_strike-12.png")
-	ImageResource glyphTextStrike12();
+	@Source("images/icons/glyphicons_text_strike-16.png")
+	ImageResource glyphTextStrike16();
 
 	
 	@Source("images/icons/google-16.png")

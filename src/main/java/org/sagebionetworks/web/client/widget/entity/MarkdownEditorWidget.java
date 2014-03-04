@@ -281,7 +281,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		mdCommands.add(italicCommand);
 		
 		//strike out icon is available in the free icon package, but isn't available directly from bootstrap
-		Button strikeCommand = new Button("", AbstractImagePrototype.create(iconsImageBundle.glyphTextStrike12()));
+		Button strikeCommand = new Button("", AbstractImagePrototype.create(iconsImageBundle.glyphTextStrike16()));
 		strikeCommand.addStyleName("whiteBackgroundGxt margin-right-10");
 		strikeCommand.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
