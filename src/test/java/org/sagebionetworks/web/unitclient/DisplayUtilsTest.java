@@ -273,6 +273,33 @@ public class DisplayUtilsTest {
 		selectionLength = -1;
 		result = DisplayUtils.surroundText(text, markdown, startPos, selectionLength);
 		assertEquals(text, result);
+		
+		//now tests for stripping off existing markdown
+		String textWithMarkdown = "This is the **test** markdown\nthat will be used.";
+		markdown = "**";
+		startPos = textWithMarkdown.indexOf("test");
+		selectionLength = "test".length();
+		result = DisplayUtils.surroundText(textWithMarkdown, markdown, startPos, selectionLength);
+		assertEquals(text, result);
+		
+		//test before has the markdown, but not after
+		selectionLength = "test".length() + 4;
+		result = DisplayUtils.surroundText(textWithMarkdown, markdown, startPos, selectionLength);
+		assertEquals("This is the ****test** m**arkdown\nthat will be used.", result);
+		
+		//test after has the markdown, but not before
+		startPos = startPos - 6;
+		selectionLength = "test".length() + 6;
+		result = DisplayUtils.surroundText(textWithMarkdown, markdown, startPos, selectionLength);
+		assertEquals("This is **the **test**** markdown\nthat will be used.", result);
+
+		//test end of text with markdown
+		textWithMarkdown = "end of the text has **markdown**";
+		startPos = textWithMarkdown.indexOf("markdown");
+		selectionLength = "markdown".length();
+		result = DisplayUtils.surroundText(textWithMarkdown, markdown, startPos, selectionLength);
+		assertEquals("end of the text has markdown", result);
+
 	}
 }
 
