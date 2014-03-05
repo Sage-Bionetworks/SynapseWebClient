@@ -24,11 +24,17 @@
 .header-inner-commands-container {
 	border-radius: 0.2em;
 }
-
-
 .header-inner-commands-container td {
 	padding: 3px 7px 3px 7px;
 }
+
+.markdown-editor-commands-container {
+	border-radius: 0.2em;
+}
+.markdown-editor-commands-container td {
+	padding: 3px 0px 3px 3px;
+}
+
 
 .header-username-picture-container {
 	border: solid #ccc;
@@ -941,7 +947,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .whiteBackground {
 	background-color: #fff;
+}
+
+.whiteBackgroundGxt em, .whiteBackgroundGxt button {
+	background-color: #fff !important;
 }	
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;

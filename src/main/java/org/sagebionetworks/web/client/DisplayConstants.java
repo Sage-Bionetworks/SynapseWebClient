@@ -42,6 +42,8 @@ public class DisplayConstants {
 	public static final String EDIT_CODE_TEXT = "Edit the step's details by altering the fields below and then clicking the Save button. To cancel, click the Close button.";;
 	public static final String EDIT_ANNOTATIONS_TEXT = "Edit Annotations for this object. You can add new annotations by using the form fields at the bottom.";
 	
+	public static final String SINGLE_LINE_COMMAND_MESSAGE = "This command only supports single line operations.\nPlease select text within a single line and try again.";
+	
 	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
 	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
 	
@@ -571,6 +573,7 @@ public class DisplayConstants {
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
+	public static final String INVALID_SELECTION = "Please make a valid selection and try again.";
 	public static final String CLOSE = "Close";
 	public static final String DISPLAY_HEIGHT = "Display Height";
 	public static final String DEFAULT = "Default";

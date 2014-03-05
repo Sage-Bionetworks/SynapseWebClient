@@ -1886,6 +1886,47 @@ public class DisplayUtils {
 		}
 	}
 	
+	/**
+	 * Surround the selectedText with the given markdown.  Or, if the selected text is already surrounded by the markdown, then remove it.
+	 * @param text
+	 * @param markdown
+	 * @param startPos
+	 * @param selectionLength
+	 * @return
+	 */
+	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
+		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
+			int markdownLength = markdown.length();
+			int eolPos = text.indexOf('\n', startPos);
+			if (eolPos < 0)
+				eolPos = text.length();
+			int endPos = startPos + selectionLength;
+			
+			if (eolPos < endPos)
+				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
+			
+			String selectedText = text.substring(startPos, endPos);
+			if (isDefined(selectedText)) {
+				//check to see if this text is already surrounded by the markdown.
+				int beforeSelectedTextPos = startPos - markdownLength;
+				int afterSelectedTextPos = endPos + markdownLength;
+				if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+					if (markdown.equals(text.substring(beforeSelectedTextPos, startPos)) && markdown.equals(text.substring(endPos, afterSelectedTextPos))) {
+						//strip off markdown instead
+						return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
+					}
+				}
+				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
+			}
+			
+		}
+		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
+	}
+	
+	private static boolean isDefined(String testString) {
+		return testString != null && testString.trim().length() > 0;
+	}
+	
 	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
 		// Add a new annotation
 		if(ANNOTATION_TYPE.STRING == type){
