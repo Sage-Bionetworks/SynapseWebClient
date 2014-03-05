@@ -1567,7 +1567,25 @@ a.projectTitle:hover {
   padding-left: 30px;
   font-size: 90%;
 }
-
+.bs-sidebar .nav .nav .nav > li > a {
+  padding-left: 40px;
+  font-size: 80%;
+}
+.bs-sidebar .nav .nav .nav .nav > li > a {
+  padding-left: 50px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav > li > a {
+  padding-left: 60px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 70px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 80px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 90px;
+}
 /*===========*/
 
 .largeIconButton {
