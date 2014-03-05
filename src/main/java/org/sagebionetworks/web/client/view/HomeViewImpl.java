@@ -407,6 +407,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new TeamSearch(""));
 			}
 		});
+		
+		myTeamsContainer.add(openTeamInvitesPanel);
 		LayoutContainer headerRow = DisplayUtils.createRowContainer();
 		HTML myTeamsHeader = new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_TEAMS + "</h3>"));
 		myTeamsHeader.addStyleName("col-md-6");
@@ -419,7 +421,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		Widget teamListWidget = teamsListWidget.asWidget();
 		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min");
 		myTeamsContainer.add(teamListWidget);
-		myTeamsContainer.add(openTeamInvitesPanel);
 		return myTeamsContainer;
 	}
 	@Override

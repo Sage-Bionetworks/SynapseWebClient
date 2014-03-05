@@ -41,9 +41,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
-	private CookieProvider cookies;
-	private GWTWrapper gwtWrapper;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseClientAsync synapseClient;
@@ -55,9 +52,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator = nodeModelCreator;
-		this.cookies = cookies;
-		this.gwtWrapper = gwtWrapper;
 		this.synapseJSNIUtils=synapseJSNIUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseClient = synapseClient;
@@ -173,22 +167,18 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				view.hideLoggingInLoader();
 				profile = result;
 				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-					//set your username!
-					//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
-					//for now, just give it a try. 
+					//set your username
 					view.showSetUsernameUI();
 				}
 				else {
-					// Allow the user to proceed.		
-					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+					goToLastPlace();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.hideLoggingInLoader();
 				//could not determine
-				forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+				goToLastPlace();
 			}
 		});
 
@@ -204,7 +194,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully updated your username", "");
 					authenticationController.updateCachedProfile(profile);
-					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+					goToLastPlace();
 				}
 				
 				@Override
@@ -228,15 +218,20 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	/*
-	 * Private Methods
-	 */
-	private void forwardToPlaceAfterLogin(Place forwardPlace) {
+	@Override
+	public void goToLastPlace() {
+		view.hideLoggingInLoader();
+		Place forwardPlace = globalApplicationState.getLastPlace();
 		if(forwardPlace == null) {
 			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
+		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
 	}
+	
+	/*
+	 * Private Methods
+	 */
+	
 	
 	public void showTermsOfUse(final AcceptTermsOfUseCallback callback) {
 		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
@@ -289,9 +284,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												@Override
 												public void onSuccess(
 														String result) {
-													view.hideLoggingInLoader();
 													// All setup complete, so forward the user
-													forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+													goToLastPlace();
 												}	
 												
 											});
@@ -313,7 +307,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										@Override
 										public void onSuccess(Void result) {
 											authenticationController.logoutUser();
-											forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+											goToLastPlace();
 										}
 										
 									});

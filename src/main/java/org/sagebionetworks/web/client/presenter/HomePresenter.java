@@ -211,13 +211,16 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 		
 		view.showOpenTeamInvitesMessage(false);
-		isOpenTeamInvites(new CallbackP<Boolean>() {
+		isOpenTeamInvites(new AsyncCallback<Boolean>() {
 			@Override
-			public void invoke(Boolean b) {
+			public void onSuccess(Boolean b) {
 				view.showOpenTeamInvitesMessage(b);
 			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//do nothing
+			}
 		});
-		
 		
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
@@ -242,21 +245,24 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
-	
-	public void isOpenTeamInvites(final CallbackP<Boolean> callback) {
+	public void isOpenTeamInvites(final AsyncCallback<Boolean> callback) {
+		if (!authenticationController.isLoggedIn()) { 
+			callback.onSuccess(false);
+			return;
+		}
 		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
 			@Override
 			public void onSuccess(List<MembershipInvitationBundle> result) {
-				callback.invoke(result.size() > 0);
+				callback.onSuccess(result.size() > 0);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				//do nothing
+				onFailure(caught);
 			}
 		});		
 	}
-	
+
 	public void getChallengeProjectIds(final List<Team> myTeams) {
 		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
 			@Override
