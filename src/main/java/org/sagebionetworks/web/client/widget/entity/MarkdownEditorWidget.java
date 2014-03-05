@@ -278,18 +278,19 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		mdCommands.add(boldCommand);
 
 		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand(null, "glyphicon-italic", getBasicCommandClickHandler("_"));
+		italicCommand.addStyleName("margin-right-10");
 		mdCommands.add(italicCommand);
 		
-		//strike out icon is available in the free icon package, but isn't available directly from bootstrap
-		Button strikeCommand = new Button("", AbstractImagePrototype.create(iconsImageBundle.glyphTextStrike16()));
-		strikeCommand.addStyleName("whiteBackgroundGxt margin-right-10");
-		strikeCommand.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				handleBasicCommand("--");
-			}
-		});
-		mdCommands.add(strikeCommand);
+//		//strike out icon is available in the free icon package, but isn't available directly from bootstrap
+//		Button strikeCommand = new Button("", AbstractImagePrototype.create(iconsImageBundle.glyphTextStrike16()));
+//		strikeCommand.addStyleName("whiteBackgroundGxt margin-right-10");
+//		strikeCommand.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//			@Override
+//			public void componentSelected(ButtonEvent ce) {
+//				handleBasicCommand("--");
+//			}
+//		});
+//		mdCommands.add(strikeCommand);
 
 		if (isWikiEditor) {
 			com.google.gwt.user.client.ui.Button attachment = getNewCommand("Insert Attachment", "glyphicon-paperclip",new ClickHandler() {
