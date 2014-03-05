@@ -132,7 +132,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setSpacing(2);
-		mdCommands.addStyleName("view header-inner-commands-container");
+		mdCommands.addStyleName("view markdown-editor-commands-container");
 		editWidgetButton = getNewCommand("Edit Widget", "glyphicon-pencil",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -24,11 +24,17 @@
 .header-inner-commands-container {
 	border-radius: 0.2em;
 }
-
-
 .header-inner-commands-container td {
+	padding: 3px 7px 3px 7px;
+}
+
+.markdown-editor-commands-container {
+	border-radius: 0.2em;
+}
+.markdown-editor-commands-container td {
 	padding: 3px 0px 3px 3px;
 }
+
 
 .header-username-picture-container {
 	border: solid #ccc;
