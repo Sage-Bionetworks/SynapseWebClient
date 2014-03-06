@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,7 +10,6 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -43,7 +41,7 @@ public class EvaluationSubmitter implements Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
-	private String submissionEntityId, submitterAlias;
+	private String submissionEntityId, submissionName, teamName;
 	private Long submissionEntityVersion;
 	
 	@Inject
@@ -92,14 +90,7 @@ public class EvaluationSubmitter implements Presenter {
 						view.showErrorMessage(DisplayConstants.NOT_PARTICIPATING_IN_ANY_EVALUATIONS);
 					} 
 					else {
-						List<String> submitterAliases = new ArrayList<String>();
-						//add the default team name (if set in the profile and not already in the list)
-						UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-						String teamName = sessionData.getProfile().getTeamName();
-						if (teamName != null && teamName.length() > 0 && !submitterAliases.contains(teamName)) {
-							submitterAliases.add(teamName);
-						}
-						view.popupSelector(submissionEntity == null, evaluations, submitterAliases);
+						view.popupSelector(submissionEntity == null, evaluations);
 					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
@@ -116,9 +107,8 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void submitToEvaluations(Reference selectedReference, List<Evaluation> evaluations, String submitterAlias) {
+	public void submitToEvaluations(Reference selectedReference, String submissionName, String teamName, List<Evaluation> evaluations) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
-		this.submitterAlias = submitterAlias; 
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
 			submissionEntityId = submissionEntity.getId();
@@ -129,6 +119,8 @@ public class EvaluationSubmitter implements Presenter {
 			submissionEntityId = selectedReference.getTargetId();
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
+		this.submissionName = submissionName;
+		this.teamName = teamName;
 		
 		 //Check access requirements for evaluations before moving on with submission
 		 try {
@@ -167,7 +159,7 @@ public class EvaluationSubmitter implements Presenter {
 							checkForUnmetRequirements(evalIndex+1, evaluations);
 						} else {
 							//we have gone through all unmet access requirements for all evaluations.
-							lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations, submitterAlias);
+							lookupEtagAndCreateSubmission(submissionEntityId, submissionEntityVersion, evaluations);
 						}
 					}
 				} catch(Throwable e) {
@@ -211,7 +203,7 @@ public class EvaluationSubmitter implements Presenter {
 				jsonObjectAdapter);
 	}
 	
-	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations, final String submitterAlias) {
+	public void lookupEtagAndCreateSubmission(final String id, final Long ver, final List<Evaluation> evaluations) {
 		//look up entity for the current etag
 		synapseClient.getEntity(id, new AsyncCallback<EntityWrapper>() {
 			public void onSuccess(EntityWrapper result) {
@@ -229,7 +221,7 @@ public class EvaluationSubmitter implements Presenter {
 						return;
 					}
 					view.hideWindow();
-					submitToEvaluations(id, v, entity.getEtag(), evaluations, submitterAlias);
+					submitToEvaluations(id, v, entity.getEtag(), evaluations);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -243,13 +235,17 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<Evaluation> evaluations, String submitterAlias) {
+	public void submitToEvaluations(String entityId, Long versionNumber, String etag, List<Evaluation> evaluations) {
 		//set up shared values across all submissions
 		Submission newSubmission = new Submission();
 		newSubmission.setEntityId(entityId);
-		newSubmission.setSubmitterAlias(submitterAlias);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		newSubmission.setVersionNumber(versionNumber);
+		if (submissionName != null && submissionName.trim().length() > 0)
+			newSubmission.setName(submissionName);
+		if (teamName != null && teamName.trim().length() > 0)
+			newSubmission.setSubmitterAlias(teamName);
+
 		if (evaluations.size() > 0)
 			submitToEvaluations(newSubmission, etag, evaluations, 0);
 	}

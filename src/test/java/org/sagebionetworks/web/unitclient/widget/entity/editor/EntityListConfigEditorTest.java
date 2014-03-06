@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
@@ -27,7 +28,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;

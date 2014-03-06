@@ -11,15 +11,20 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class DisplayUtilsTest {
+	
+	private String textWithoutMarkdown = "This is the test markdown\nthat will be used.";
+	private String textWithMarkdown = "This is the **test** markdown\nthat will be used.";
+	private String markdownDelimiter = "*";
+	private String markdownDelimiter2 = "**";
 	
 	@Test
 	public void testGetMimeType(){
@@ -233,6 +238,95 @@ public class DisplayUtilsTest {
 		
 		//old user who has set the username
 		assertEquals("Strong Bad (SBEmail)", DisplayUtils.getDisplayName(fName, lName, userName));
+	}
+	
+	@Test
+	public void testSurroundText() {
+		//basic case, "test" selected, text should be surrounded with markdown
+		int startPos = textWithoutMarkdown.indexOf("test");
+		int selectionLength = "test".length();
+		String result = DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		assertEquals("This is the *test* markdown\nthat will be used.", result);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextNoSelection() {
+		//basic case, "test" selected, text should be surrounded with markdown
+		int startPos = textWithoutMarkdown.indexOf("test");
+		int selectionLength = 0;
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextPastNewline() {
+		int startPos = textWithoutMarkdown.indexOf("test");
+		int selectionLength = "test markdown\nthat".length();
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+		
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextPastEndOfLine() {
+		int startPos = textWithoutMarkdown.indexOf("test");
+		int selectionLength = "test markdown\nthat".length();
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextPastEndOfText() {
+		//selection goes past end of string.
+		int startPos = textWithoutMarkdown.indexOf("used");
+		int selectionLength = 100;
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextInvalidStart() {
+		int startPos = -1;
+		int selectionLength = 2;
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSurroundTextInvalidSelectionLength() {
+		int startPos = 0;
+		int selectionLength = -1;
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+	}
+	
+	@Test
+	public void testSurroundTextStripMarkdownTest1() {
+		int startPos = textWithMarkdown.indexOf("test");
+		int selectionLength = "test".length();
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		assertEquals(textWithoutMarkdown, result);
+	}
+
+	@Test
+	public void testSurroundTextStripMarkdownTest2() {
+		//before the selection has the markdown, but after the selection does not
+		int startPos = textWithMarkdown.indexOf("test");
+		int selectionLength = "test".length() + 4;
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		assertEquals("This is the ****test** m**arkdown\nthat will be used.", result);
+	}
+
+	@Test
+	public void testSurroundTextStripMarkdownTest3() {
+		//after the selection has the markdown, but before the selection does not
+		int startPos = textWithMarkdown.indexOf("test") - 6;
+		int selectionLength = "test".length() + 6;
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		assertEquals("This is **the **test**** markdown\nthat will be used.", result);
+	}
+	
+	@Test
+	public void testSurroundTextStripMarkdownTest4() {
+		//test end of text with markdown
+		String textWithMarkdown = "end of the text has **markdown**";
+		int startPos = textWithMarkdown.indexOf("markdown");
+		int selectionLength = "markdown".length();
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		assertEquals("end of the text has markdown", result);
 	}
 }
 

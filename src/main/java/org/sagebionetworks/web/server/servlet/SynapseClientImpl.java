@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +31,7 @@ import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
+import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -112,7 +114,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
-import org.sagebionetworks.web.server.SynapseMarkdownProcessor;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -121,6 +122,7 @@ import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -631,6 +633,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			synapseClient.deleteEntityById(entityId);			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
+	public void deleteEntityById(String entityId, Boolean skipTrashCan)
+			throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.deleteEntityById(entityId, skipTrashCan);			
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
@@ -2523,6 +2536,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+<<<<<<< HEAD
 
 	@Override
 	public String getTableQuerySpecification(String query) throws RestServiceException {
@@ -2552,5 +2566,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			e.printStackTrace();
 		}
 		return json;
+=======
+	
+	@Override
+	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
+			throws RestServiceException {
+		HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
+		
+		pageName2WikiKeyMap.put(WebConstants.USER_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.GETTING_STARTED, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.CREATE_PROJECT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+		
+		return pageName2WikiKeyMap;
+>>>>>>> 71b39c90198b1cc84bfbd36ae6f45ecc800c59d9
 	}
 }

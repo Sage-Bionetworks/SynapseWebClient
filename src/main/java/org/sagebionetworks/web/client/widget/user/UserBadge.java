@@ -2,16 +2,19 @@ package org.sagebionetworks.web.client.widget.user;
 
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.cache.ClientCacheImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,12 +25,14 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	SynapseClientAsync synapseClient;
 	NodeModelCreator nodeModelCreator;
 	private Integer maxNameLength;
+	ClientCache clientCache;
 	
 	@Inject
-	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
+		this.clientCache = clientCache;
 		view.setPresenter(this);
 	}
 	
@@ -46,23 +51,58 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void configure(final String principalId) {
-		view.showLoading();
+		if (principalId != null && principalId.trim().length() > 0) {
+			view.showLoading();
+			
+			UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile profile) {
+					view.setProfile(profile, maxNameLength);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showLoadError(principalId);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * When the username is clicked, call this clickhandler instead of the default behavior
+	 * @param clickHandler
+	 */
+	public void setCustomClickHandler(ClickHandler clickHandler) {
+		view.setCustomClickHandler(clickHandler);
+	}	
+
+	public static void getUserProfile(final String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
+		String profileString = clientCache.get(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX);
+		if (profileString != null) {
+			parseProfile(profileString, nodeModelCreator, callback);
+		} else {
 		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String result) {
-				try {
-					UserProfile profile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
-					view.setProfile(profile, maxNameLength);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
+					clientCache.put(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX, result);
+					parseProfile(result, nodeModelCreator, callback);
 				}
-			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showLoadError(principalId);
+				callback.onFailure(caught);
 			}
 		});
+	}
+	}
+	
+	public static void parseProfile(String profileString, NodeModelCreator nodeModelCreator, AsyncCallback<UserProfile> callback) {
+		try {
+			UserProfile profile = nodeModelCreator.createJSONEntity(profileString, UserProfile.class);
+			callback.onSuccess(profile);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+
 	}
 	
 	@SuppressWarnings("unchecked")

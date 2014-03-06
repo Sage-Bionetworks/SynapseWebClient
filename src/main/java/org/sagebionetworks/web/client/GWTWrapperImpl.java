@@ -42,5 +42,5 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public String getHostPrefix() {
 		return com.google.gwt.user.client.Window.Location.getProtocol()+"//"+com.google.gwt.user.client.Window.Location.getHost();
 	}
-
+	
 }

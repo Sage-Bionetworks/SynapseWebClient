@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 

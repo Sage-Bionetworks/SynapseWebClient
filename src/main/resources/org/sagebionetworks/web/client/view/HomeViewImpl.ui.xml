@@ -49,11 +49,11 @@
 						<h3>How to Use Synapse</h3>
 						<ul class="list arrow-list">
 							<li>
-								<a class="link howToUseLink" href="#!Wiki:syn1669771/ENTITY/54546" target="_blank">Getting Started Guide</a><br/>
+								<a class="link howToUseLink" href="#!Help:GettingStarted" target="_blank">Getting Started Guide</a><br/>
 								A quick start guide to using Synapse
 							</li>
 							<li>
-								<a class="link howToUseLink" href="#!Synapse:syn1669771" target="_blank">Synapse User Guide</a><br/>
+								<a class="link howToUseLink" href="#!Help:UserGuide" target="_blank">Synapse User Guide</a><br/>
 								Using Synapse via the Web and programmatic clients
 							</li>
 							<li>
@@ -220,7 +220,7 @@
 					
 					<!-- DATA USE -->
 					<div class="col-md-3">
-						<h3>Data Use Conditions</h3>
+						<h3>Terms of Use</h3>
 						<div class="well">
 							<p>There are times where human data can only be shared with certain
 								restrictions. Learn what the rules are and how to apply and comply
@@ -230,11 +230,6 @@
 									<a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the
 										Rules for Sharing And Using Human Data</a>
 								</h4>
-							</div>
-							<div style="margin-top: 15px;">
-								<g:Image resource='{icons.shieldRed16}' /><h5 style="display: inline; margin-left: 3px;">Controlled Use</h5><br/>
-								<g:Image resource='{icons.shieldYellow16}' /><h5 style="display: inline; margin-left: 3px;">Restricted Use</h5><br/>
-								<g:Image resource='{icons.sheildGreen16}' /><h5 style="display: inline; margin-left: 3px;">Open Use</h5><br/>
 							</div>
 						</div>				
 					</div>

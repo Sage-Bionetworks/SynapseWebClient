@@ -41,9 +41,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
-	private NodeModelCreator nodeModelCreator;
-	private CookieProvider cookies;
-	private GWTWrapper gwtWrapper;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseClientAsync synapseClient;
@@ -55,9 +52,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator = nodeModelCreator;
-		this.cookies = cookies;
-		this.gwtWrapper = gwtWrapper;
 		this.synapseJSNIUtils=synapseJSNIUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseClient = synapseClient;
@@ -105,7 +99,22 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 			view.showErrorMessage(DisplayConstants.SSO_ERROR_UNKNOWN);
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
-		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && !"".equals(token) && token != null) {			
+		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
+			//get the current profile, and set the view to set username
+			ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
+				@Override
+				public void onSuccess(UserProfile result) {
+					profile = result;
+					view.showSetUsernameUI();
+				}
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				};
+			});
+		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
+				!LoginPlace.CHANGE_USERNAME.equals(token) && 
+				!"".equals(token) && 
+				token != null) {			
 			loginSSOUser(token);
 		} else {
 			// standard view
@@ -145,30 +154,34 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	}
 	
 	@Override
-	public void setNewUser(UserSessionData newUser) {	
+	public void setNewUser(UserSessionData newUser) {
+		loginSSOUser(newUser.getSession().getSessionToken());
+	}
+	
+	public void checkForTempUsernameAndContinue(){
 		//get my profile, and check for a default username
+		view.showLoggingInLoader();
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile result) {
+				view.hideLoggingInLoader();
 				profile = result;
 				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-					//set your username!
-					//TODO: do exact match query to new service to see if alias is already taken when the service is ready.
-					//for now, just give it a try. 
+					//set your username
 					view.showSetUsernameUI();
 				}
 				else {
-					// Allow the user to proceed.		
-					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+					goToLastPlace();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+				goToLastPlace();
 			}
 		});
+
 	}
 
 	public void updateProfile(final UserProfile profile) {
@@ -181,7 +194,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully updated your username", "");
 					authenticationController.updateCachedProfile(profile);
-					forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
+					goToLastPlace();
 				}
 				
 				@Override
@@ -205,14 +218,33 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	/*
-	 * Private Methods
-	 */
-	private void forwardToPlaceAfterLogin(Place forwardPlace) {
+	@Override
+	public void goToLastPlace() {
+		view.hideLoggingInLoader();
+		Place forwardPlace = globalApplicationState.getLastPlace();
 		if(forwardPlace == null) {
 			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));	
+		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
+	}
+	
+	/*
+	 * Private Methods
+	 */
+	
+	
+	public void showTermsOfUse(final AcceptTermsOfUseCallback callback) {
+		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
+			public void onSuccess(String termsOfUseContents) {
+				view.hideLoggingInLoader();
+				view.showTermsOfUse(termsOfUseContents, callback);		
+			}
+			public void onFailure(Throwable t) {
+				if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
+					view.showErrorMessage("An error occurred. Please try logging in again.");
+				view.showLogin(openIdActionUrl, openIdReturnUrl);									
+			}
+		});
 	}
 	
 	private void loginSSOUser(String token) {
@@ -224,82 +256,66 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
 				@Override
 				public void onSuccess(String result) {
-					
-					// Show the ToU dialog if necessary
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-						
-						authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-							public void onSuccess(String termsOfUseContents) {
-								view.hideLoggingInLoader();
-								view.showTermsOfUse(termsOfUseContents, 
-										new AcceptTermsOfUseCallback() {
-											public void accepted() {
-												view.showLoggingInLoader();
-												authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+						showTermsOfUse(new AcceptTermsOfUseCallback() {
+								public void accepted() {
+									view.showLoggingInLoader();
+									authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
 
-													@Override
-													public void onFailure(Throwable caught) {
-														view.showErrorMessage("An error occurred. Please try logging in again.");
-														view.showLogin(openIdActionUrl, openIdReturnUrl);
-													}
+										@Override
+										public void onFailure(Throwable caught) {
+											view.showErrorMessage("An error occurred. Please try logging in again.");
+											view.showLogin(openIdActionUrl, openIdReturnUrl);
+										}
 
-													@Override
-													public void onSuccess(Void result) {
-														// Have to get the UserSessionData again, 
-														// since it won't contain the UserProfile if the terms haven't been signed
-														authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+										@Override
+										public void onSuccess(Void result) {
+											// Have to get the UserSessionData again, 
+											// since it won't contain the UserProfile if the terms haven't been signed
+											authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
 
-															@Override
-															public void onFailure(
-																	Throwable caught) {
-																view.showErrorMessage("An error occurred. Please try logging in again.");
-																view.showLogin(openIdActionUrl, openIdReturnUrl);
-															}
+												@Override
+												public void onFailure(
+														Throwable caught) {
+													view.showErrorMessage("An error occurred. Please try logging in again.");
+													view.showLogin(openIdActionUrl, openIdReturnUrl);
+												}
 
-															@Override
-															public void onSuccess(
-																	String result) {
-																view.hideLoggingInLoader();
-																// All setup complete, so forward the user
-																forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-															}	
-															
-														});
-													}
-													
-												});
-											}
+												@Override
+												public void onSuccess(
+														String result) {
+													// All setup complete, so forward the user
+													goToLastPlace();
+												}	
+												
+											});
+										}
+										
+									});
+								}
 
-											@Override
-											public void rejected() {
-												authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
+								@Override
+								public void rejected() {
+									authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
 
-													@Override
-													public void onFailure(Throwable caught) {
-														view.showErrorMessage("An error occurred. Please try logging in again.");
-														view.showLogin(openIdActionUrl, openIdReturnUrl);
-													}
+										@Override
+										public void onFailure(Throwable caught) {
+											view.showErrorMessage("An error occurred. Please try logging in again.");
+											view.showLogin(openIdActionUrl, openIdReturnUrl);
+										}
 
-													@Override
-													public void onSuccess(Void result) {
-														authenticationController.logoutUser();
-														forwardToPlaceAfterLogin(globalApplicationState.getLastPlace());
-													}
-													
-												});
-											}
-										});		
-							}
-							public void onFailure(Throwable t) {
-								if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
-									view.showErrorMessage("An error occurred. Please try logging in again.");
-								view.showLogin(openIdActionUrl, openIdReturnUrl);									
-							}
-						});
+										@Override
+										public void onSuccess(Void result) {
+											authenticationController.logoutUser();
+											goToLastPlace();
+										}
+										
+									});
+								}
+							});		
 					} else {
-						view.hideLoggingInLoader();
 						// user is logged in. forward to destination after checking for username
-						setNewUser(authenticationController.getCurrentUserSessionData());
+						checkForTempUsernameAndContinue();
 					}
 				}
 				@Override

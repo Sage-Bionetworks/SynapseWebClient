@@ -221,7 +221,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		}
 		else {
 			//clear href, if there is one
-			entityLink.setHref(null);
+			entityLink.setHref((String)null);
 			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
@@ -81,11 +82,11 @@ import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -160,6 +161,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
 
+	public static PublicPrincipalIds publicPrincipalIds = null;
+	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -1550,7 +1553,6 @@ public class DisplayUtils {
 			@Override
 			public void onClick(ClickEvent event) {
 				window.removeAll();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
 				window.setHeading(buttonText);
@@ -1567,9 +1569,10 @@ public class DisplayUtils {
 					//is something else that just wants a file handle id
 					isEntity = false;
 				}
-					
+				
 				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
 				window.show();
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 			}
 		});
 		
@@ -1791,7 +1794,6 @@ public class DisplayUtils {
 	}
 	
 	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.FIND_ENTITIES);
@@ -1812,6 +1814,7 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 		window.show();
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		entityFinder.refresh();
 	}
 
@@ -1887,6 +1890,47 @@ public class DisplayUtils {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Surround the selectedText with the given markdown.  Or, if the selected text is already surrounded by the markdown, then remove it.
+	 * @param text
+	 * @param markdown
+	 * @param startPos
+	 * @param selectionLength
+	 * @return
+	 */
+	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
+		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
+			int markdownLength = markdown.length();
+			int eolPos = text.indexOf('\n', startPos);
+			if (eolPos < 0)
+				eolPos = text.length();
+			int endPos = startPos + selectionLength;
+			
+			if (eolPos < endPos)
+				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
+			
+			String selectedText = text.substring(startPos, endPos);
+			if (isDefined(selectedText)) {
+				//check to see if this text is already surrounded by the markdown.
+				int beforeSelectedTextPos = startPos - markdownLength;
+				int afterSelectedTextPos = endPos + markdownLength;
+				if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+					if (markdown.equals(text.substring(beforeSelectedTextPos, startPos)) && markdown.equals(text.substring(endPos, afterSelectedTextPos))) {
+						//strip off markdown instead
+						return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
+					}
+				}
+				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
+			}
+			
+		}
+		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
+	}
+	
+	private static boolean isDefined(String testString) {
+		return testString != null && testString.trim().length() > 0;
 	}
 	
 	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
@@ -2075,8 +2119,8 @@ public class DisplayUtils {
 		return label;
 	}
 
-	public static String getShareMessage(String entityId, String hostUrl) {
-		return DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
+	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
 	}
 
@@ -2089,5 +2133,26 @@ public class DisplayUtils {
 	public static String createPreviewFileHandleUrl(S3FileHandle fileHandle) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
+		if (publicPrincipalIds == null) {
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
+				@Override
+				public void onSuccess(PublicPrincipalIds result) {
+					publicPrincipalIds = result;
+					callback.onSuccess(result);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} else
+			callback.onSuccess(publicPrincipalIds);
+	}
+	
+	public static String getPreviewSuffix(Boolean isPreview) {
+		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
 }

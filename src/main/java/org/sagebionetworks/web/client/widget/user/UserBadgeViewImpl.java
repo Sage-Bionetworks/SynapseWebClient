@@ -27,6 +27,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	HorizontalPanel container;
+	ClickHandler customClickHandler;
 	
 	@Inject
 	public UserBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -37,13 +38,16 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		
+		customClickHandler = null;
 		container = new HorizontalPanel();
+		container.addStyleName("nobordertable-imp");
 		this.add(container);
 	}
 	
 	@Override
 	public void setProfile(final UserProfile profile, Integer maxNameLength) {
 		container.clear();
+		
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		
 		if(profile != null) {
@@ -58,7 +62,10 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				userAnchor.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+						if (customClickHandler == null) 
+							globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+						else
+							customClickHandler.onClick(event);
 					}
 				});
 				nameWidget = userAnchor;
@@ -94,6 +101,8 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		
 	}
 
+	
+	
 	@Override
 	public void showLoadError(String principalId) {
 		container.clear();
@@ -118,15 +127,17 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		
 	}
 
-	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
 	}
-
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;		
+	}
+
+	@Override
+	public void setCustomClickHandler(ClickHandler clickHandler) {
+		customClickHandler = clickHandler;
 	}
 
 

@@ -76,6 +76,7 @@ public class AccessControlListEditorTest {
 	private static final long ADMIN_ID = 2L;
 	private static final long USER_ID = 3L;
 	private static final long USER2_ID = 4L;
+	private static final long TEAM_ID = 5L;
 	private static final Long TEST_PUBLIC_PRINCIPAL_ID = 789l;
 	private static final Long TEST_AUTHENTICATED_PRINCIPAL_ID = 123l;
 	private static final Long TEST_ANONYMOUS_USER_PRINCIPAL_ID = 422l;
@@ -218,6 +219,13 @@ public class AccessControlListEditorTest {
 		user2Header.setIsIndividual(true);
 		children.add(user2Header);
 		
+		// add a team
+		UserGroupHeader teamHeader = new UserGroupHeader();
+		teamHeader.setOwnerId(new Long(TEAM_ID).toString());
+		teamHeader.setIsIndividual(false);
+		children.add(teamHeader);
+				
+		
 		// add the public group
 		UserGroupHeader publicHeader = new UserGroupHeader();
 		publicHeader.setOwnerId(new Long(TEST_PUBLIC_PRINCIPAL_ID).toString());
@@ -276,6 +284,11 @@ public class AccessControlListEditorTest {
 		ra.setPrincipalId(USER2_ID);
 		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
 		localACL.getResourceAccess().add(ra);
+		ra = new ResourceAccess();
+		ra.setPrincipalId(TEAM_ID);
+		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+		localACL.getResourceAccess().add(ra);
+		
 		EntityWrapper expectedEntityWrapper = new EntityWrapper(
 				localACL.writeToJSONObject(adapterFactory.createNew()).toJSONString(),
 				AccessControlList.class.getName());
@@ -288,6 +301,7 @@ public class AccessControlListEditorTest {
 		// update
 		acle.asWidget();
 		acle.setAccess(USER2_ID, PermissionLevel.CAN_VIEW);
+		acle.setAccess(TEAM_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		verify(mockPushToSynapseCallback).onSuccess(any(EntityWrapper.class));
 		
@@ -307,13 +321,13 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(5)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
 		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
 		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), any(AsyncCallback.class));
 		Set recipientSet = recipientSetCaptor.getValue();
-		//should try to send a notification message to a single recipient principal id, USER2_ID
+		//should try to send a notification message to a single recipient principal id, USER2_ID.  Verify team is not notified
 		assertEquals(1, recipientSet.size());
 		assertTrue(recipientSet.contains(Long.toString(USER2_ID)));
 

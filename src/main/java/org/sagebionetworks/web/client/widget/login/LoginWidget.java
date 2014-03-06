@@ -61,68 +61,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 					}
 				}
 				final UserSessionData userSessionData = toBeParsed;
-				
-				if (!userSessionData.getSession().getAcceptsTermsOfUse()) {
-					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-						public void onSuccess(String termsOfUseContent) {
-							view.showTermsOfUse(termsOfUseContent, 
-									new AcceptTermsOfUseCallback() {
-										public void accepted() {
-											authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
-
-												@Override
-												public void onFailure(Throwable caught) {
-													view.showError("An error occurred. Please try logging in again.");
-												}
-
-												@Override
-												public void onSuccess(Void result) {
-													// Have to get the UserSessionData again, 
-													// since it won't contain the UserProfile if the terms haven't been signed
-													authenticationController.loginUserSSO(userSessionData.getSession().getSessionToken(), new AsyncCallback<String>() {
-
-														@Override
-														public void onFailure(
-																Throwable caught) {
-															view.showError("An error occurred. Please try logging in again.");
-														}
-
-														@Override
-														public void onSuccess(
-																String result) {
-															// All setup complete
-															fireUserChange(userSessionData);
-														}	
-														
-													});
-												}
-												
-											});
-										}
-										public void rejected() {
-											authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
-
-												@Override
-												public void onFailure(Throwable caught) {
-													view.showError("An error occurred. Please try logging in again.");
-												}
-
-												@Override
-												public void onSuccess(Void result) {
-													authenticationController.logoutUser();
-												}
-												
-											});
-										}
-									});							
-						}
-						public void onFailure(Throwable t) {
-							view.showTermsOfUseDownloadFailed();							
-						}
-					});
-				} else {
-					fireUserChange(userSessionData);
-				}
+				fireUserChange(userSessionData);
 			}
 
 			@Override

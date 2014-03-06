@@ -14,9 +14,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;

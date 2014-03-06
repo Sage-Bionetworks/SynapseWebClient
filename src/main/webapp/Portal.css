@@ -24,11 +24,17 @@
 .header-inner-commands-container {
 	border-radius: 0.2em;
 }
-
-
 .header-inner-commands-container td {
 	padding: 3px 7px 3px 7px;
 }
+
+.markdown-editor-commands-container {
+	border-radius: 0.2em;
+}
+.markdown-editor-commands-container td {
+	padding: 3px 0px 3px 3px;
+}
+
 
 .header-username-picture-container {
 	border: solid #ccc;
@@ -97,6 +103,15 @@
 	width: 100px;
 	color: #939598;
 	font-size: 11px;
+}
+
+.nobordertable-imp td {
+  border: 0px !important;
+  padding: 0px;
+}
+.nobordertable-imp th {
+  border: 0px !important;
+  padding: 0px;
 }
 
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
@@ -551,7 +566,9 @@ a.shortBtn {
 .margin-right-15 {
 	margin-right: 15px;
 }
-
+.margin-left-2 {
+	margin-left: 2px;
+}
 .margin-left-5 {
 	margin-left: 5px;
 }
@@ -572,6 +589,9 @@ a.shortBtn {
 }
 .margin-top-15 {
 	margin-top: 15px;
+}
+.margin-top-100 {
+	margin-top: 100px;
 }
 
 .margin-left-180 {
@@ -660,6 +680,7 @@ a.shortBtn {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
+	font-size: 13px; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
 }
 
 .markdown ol { 
@@ -676,9 +697,14 @@ a.shortBtn {
 .markdown a, a:hover, a:visited {}
 .markdown blockquote {
 	margin: 1em 3em;
-	padding: .5em 1em;
-	border-left: 5px solid #fce27c;
-	background-color: #f6ebc1; }
+	padding: 0.5em 1em;
+	background-color: #fcf8f2;
+	border-left: 3px solid #f0ad4e;
+}
+
+.markdown blockquote h4, .markdown blockquote h3, .markdown blockquote h2, .markdown blockquote h1 {
+	color: #f0ad4e;
+}
 
 .markdown code {
 	background-clip: padding-box;
@@ -924,7 +950,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .whiteBackground {
 	background-color: #fff;
+}
+
+.whiteBackgroundGxt em, .whiteBackgroundGxt button {
+	background-color: #fff !important;
 }	
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;
@@ -1152,14 +1183,31 @@ ol.lowerroman {
 	top: -5px;
 }
 
+.moveup-4 {
+	position: relative;
+	top: -4px;
+}
+
+.moveup-2 {
+	position: relative;
+	top: -2px;
+}
+
+
 .movedown-1 {
 	position: relative;
 	top: 1px;
 }
 
+<<<<<<< HEAD
 .movedown-2 {
 	position: relative;
 	top: 2px;
+=======
+.movedown-4 {
+	position: relative;
+	top: 4px;
+>>>>>>> 71b39c90198b1cc84bfbd36ae6f45ecc800c59d9
 }
 
 
@@ -1564,3 +1612,10 @@ a.projectTitle:hover {
 .text-danger-imp {
 	color: #f94e4b !important;
 }
+
+/**Override JQuery table styles **/
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp, table.tablesorter thead tr .header  {
+    background-color: #FAFAFA !important;
+    background-image: none !important;
+}
+

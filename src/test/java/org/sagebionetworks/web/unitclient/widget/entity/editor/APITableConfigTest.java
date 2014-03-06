@@ -1,19 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
+
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 
 public class APITableConfigTest {
 		

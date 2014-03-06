@@ -16,9 +16,9 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>27.0-18-g0d2ccd7</synapse.version>
+		<synapse.version>32.0-10-gafbace8</synapse.version>
 
-		<gwtVersion>2.4.0</gwtVersion>
+		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
 		<xstream.version>1.3.1</xstream.version>
@@ -175,7 +175,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>2.5.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -201,7 +201,7 @@
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
-			        <extraJvmArgs>-Xmx896M -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
+			        <extraJvmArgs>-Xmx1024m -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
@@ -295,6 +295,13 @@
 			<version>${synapse.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>markdown</artifactId>
+			<version>2014-02-26-7c98132-3</version>
+		</dependency>
+		
+		
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>

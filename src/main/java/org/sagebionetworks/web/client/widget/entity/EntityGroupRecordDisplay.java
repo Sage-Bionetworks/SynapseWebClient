@@ -12,7 +12,7 @@ public class EntityGroupRecordDisplay {
 	private SafeHtml description;
 	private SafeHtml version;
 	private Date modifienOn;
-	private SafeHtml contact;
+	private String createdByPrincipalId;
 	private SafeHtml note;	
 		
 	public EntityGroupRecordDisplay() {
@@ -21,7 +21,7 @@ public class EntityGroupRecordDisplay {
 	
 	public EntityGroupRecordDisplay(String entityId, SafeHtml name, String nameLinkUrl,
 			String downloadUrl, SafeHtml description, SafeHtml version,
-			Date modifienOn, SafeHtml contact, SafeHtml note) {
+			Date modifienOn, String createdByPrincipalId, SafeHtml note) {
 		super();
 		this.entityId = entityId;
 		this.name = name;
@@ -30,7 +30,7 @@ public class EntityGroupRecordDisplay {
 		this.description = description;
 		this.version = version;
 		this.modifienOn = modifienOn;
-		this.contact = contact;
+		this.createdByPrincipalId = createdByPrincipalId;
 		this.note = note;
 	}
 
@@ -90,12 +90,12 @@ public class EntityGroupRecordDisplay {
 		this.modifienOn = modifienOn;
 	}
 
-	public SafeHtml getContact() {
-		return contact;
+	public String getCreatedByPrincipalId() {
+		return createdByPrincipalId;
 	}
-
-	public void setContact(SafeHtml contact) {
-		this.contact = contact;
+	
+	public void setCreatedByPrincipalId(String createdByPrincipalId) {
+		this.createdByPrincipalId = createdByPrincipalId;
 	}
 
 	public SafeHtml getNote() {

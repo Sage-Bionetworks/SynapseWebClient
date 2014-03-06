@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 
 public class VersionTimer implements SynapseView {
 
-	private static final int CHECK_VERSIONS_INTERVAL_MS = 300000; //5 minutes
+	private static final int CHECK_VERSIONS_INTERVAL_MS = 1000*60*10; //10 minutes
 	Timer timer;
 	GlobalApplicationState globalApplicationState;
 	SynapseClientAsync synapseClient;

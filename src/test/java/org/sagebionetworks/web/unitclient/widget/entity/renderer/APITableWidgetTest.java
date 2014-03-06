@@ -1,7 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static junit.framework.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -30,7 +39,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
@@ -197,12 +205,23 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
+	public void testQueryServicePagingURINodeSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NO_OFFSET_EQUALS_ONE;
 		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
-		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
 	}
+	
+	@Test
+	public void testQueryServicePagingURISubmissionSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NEW;
+		widget.configure(testWikiKey, descriptor, null, null);
+		String testServiceCall = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX+"select+*+from+evaluation_1234";
+		String pagedURI = widget.getPagedURI(testServiceCall);
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
+	}
+
 	
 	@Test
 	public void testCurrentUserVariable() throws JSONObjectAdapterException {

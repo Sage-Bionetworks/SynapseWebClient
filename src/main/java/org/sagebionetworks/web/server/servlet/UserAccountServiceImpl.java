@@ -23,8 +23,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	
 	public static final long serialVersionUID = 498269726L;
 	
-	public static PublicPrincipalIds publicPrincipalIds = null;
-
 	/**
 	 * Injected with Gin
 	 */
@@ -33,6 +31,8 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	private TokenProvider tokenProvider = this;
 	
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	
+	public static PublicPrincipalIds publicPrincipalIds = null;
 	
 	/**
 	 * Injected with Gin
@@ -196,7 +196,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 		return publicPrincipalIds;
 	}
-	
+
 	public static void initPublicAndAuthenticatedPrincipalIds() {
 		try {
 			PublicPrincipalIds results = new PublicPrincipalIds();
@@ -209,7 +209,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw new RestClientException(e.getMessage());
 		}
 	}
-
+	
 	@Override
 	public String getStorageUsage() {
 		validateService();

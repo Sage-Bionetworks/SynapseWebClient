@@ -207,7 +207,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		}
 		else {
 			//clear href, if there is one
-			entityLink.setHref(null);
+			entityLink.setHref((String)null);
 			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

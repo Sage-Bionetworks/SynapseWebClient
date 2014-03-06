@@ -18,6 +18,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -72,6 +74,7 @@ public class HomePresenterTest {
 	
 	RSSFeed testFeed = null;
 	String testTeamId = "42";
+	UserSessionData testSessionData;
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
@@ -136,6 +139,13 @@ public class HomePresenterTest {
 				mockCookies);
 		verify(mockView).setPresenter(homePresenter);
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		testSessionData = new UserSessionData();
+		Session testSession = new Session();
+		testSession.setAcceptsTermsOfUse(true);
+		testSessionData.setSession(testSession);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
 	}	
 	
 	@Test
@@ -173,17 +183,17 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testIsNoOpenInvites() {
-		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		AsyncCallback mockCallback = mock(AsyncCallback.class);
 		homePresenter.isOpenTeamInvites(mockCallback);
-		verify(mockCallback).invoke(eq(false));
+		verify(mockCallback).onSuccess(eq(false));
 	}
 	
 	@Test
 	public void testIsOpenInvites() {
 		openInvitations.add(new MembershipInvitationBundle());
-		CallbackP<Boolean> mockCallback = mock(CallbackP.class);
+		AsyncCallback mockCallback = mock(AsyncCallback.class);
 		homePresenter.isOpenTeamInvites(mockCallback);
-		verify(mockCallback).invoke(eq(true));
+		verify(mockCallback).onSuccess(eq(true));
 	}
 	
 	@Test
@@ -266,5 +276,32 @@ public class HomePresenterTest {
 		verify(mockRequestBuilder, times(1)).configure(any(RequestBuilder.Method.class), anyString());
 	}
 	
+	@Test
+	public void testCheckAcceptToUAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		homePresenter.checkAcceptToU();
+		//should not ask for the session information, or try to log you out
+		verify(mockAuthenticationController, never()).getCurrentUserSessionData();
+		verify(mockAuthenticationController, never()).logoutUser();
+	}
+
+	@Test
+	public void testCheckAcceptToULoggedInToUSigned() {
+		homePresenter.checkAcceptToU();
+		verify(mockAuthenticationController).getCurrentUserSessionData();
+		//should not log you out
+		verify(mockAuthenticationController, never()).logoutUser();
+	}
+	
+	@Test
+	public void testCheckAcceptToULoggedInToUUnsigned() {
+		testSessionData.getSession().setAcceptsTermsOfUse(false);
+		homePresenter.checkAcceptToU();
+		
+		verify(mockAuthenticationController).getCurrentUserSessionData();
+		//should automatically log you out
+		verify(mockAuthenticationController).logoutUser();
+	}
+
 
 }

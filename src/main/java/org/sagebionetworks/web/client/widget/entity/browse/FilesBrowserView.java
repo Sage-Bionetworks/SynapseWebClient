@@ -27,13 +27,16 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 
 	public void refreshTreeView(String entityId);
 	
+	public void showFolderEditDialog(String folderEntityId);
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 
-		void createFolder(String name);
-
+		void createFolder();
+		void updateFolderName(String newFolderName, String folderEntityId);
+		void deleteFolder(String folderEntityId, boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
 
 	}

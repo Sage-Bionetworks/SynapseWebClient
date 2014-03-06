@@ -2,6 +2,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -59,6 +60,8 @@ public interface SynapseClientAsync {
 	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<List<String>> callback);
 	
 	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
+	
+	void deleteEntityById(String entityId, Boolean skipTrashCan, AsyncCallback<Void> callback);
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
@@ -261,4 +264,7 @@ public interface SynapseClientAsync {
 	void getTableQuerySpecification(String query, AsyncCallback<String> callback);
 
 	void executeTableQuery(String query, AsyncCallback<String> callback);
+	
+	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
+
 }

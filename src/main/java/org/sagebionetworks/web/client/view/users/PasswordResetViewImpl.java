@@ -54,7 +54,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
-
+	TextField<String> newPassword, newPasswordConfirm;
+	
 	@Inject
 	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
@@ -135,14 +136,14 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	     layout.setLabelWidth(100);  
 	     resetFormPanel.setLayout(layout);  
 	   
-	     final TextField<String> newPassword = new TextField<String>();  
+	     newPassword = new TextField<String>();  
 	     newPassword.setFieldLabel("New Password");  
 	     newPassword.setAllowBlank(false);
 	     newPassword.setPassword(true);
 	     newPassword.setId(DisplayConstants.ID_INP_NEWPASSWORD);
 	     resetFormPanel.add(newPassword, formData);  
 	   
-	     final TextField<String> newPasswordConfirm = new TextField<String>();  
+	     newPasswordConfirm = new TextField<String>();  
 	     newPasswordConfirm.setFieldLabel("Confirm Password");  
 	     newPasswordConfirm.setAllowBlank(false);
 	     newPasswordConfirm.setPassword(true);
@@ -192,6 +193,11 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		loadingPanel.setVisible(false);
 		contentHtml.setInnerHTML("");
 		contentPanel.clear();
+		if (newPassword != null)
+			newPassword.clear();
+		if (newPasswordConfirm != null)
+			newPasswordConfirm.clear();
+
 	}
 
 	@Override

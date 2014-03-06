@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +33,9 @@ public interface SynapseClient extends RemoteService {
 	public String getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
 	public void deleteEntityById(String entityId) throws RestServiceException;
-
+	
+	public void deleteEntityById(String entityId, Boolean skipTrashCan) throws RestServiceException;
+	
 	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public EntityWrapper getEntityPath(String entityId) throws RestServiceException;
@@ -323,4 +326,6 @@ public interface SynapseClient extends RemoteService {
 	
 	public String executeTableQuery(String query) throws RestServiceException;
 	
+	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
+
 }
