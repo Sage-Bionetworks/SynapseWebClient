@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,17 +8,9 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.table.query.model.FromClause;
-import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SelectList;
-import org.sagebionetworks.table.query.model.SetQuantifier;
-import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.model.TableReference;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -140,13 +131,13 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	/*
 	 * Temp
 	 */
-	private QuerySpecification getFakeQuerySpecification() {
-		SetQuantifier setQuantifier = SetQuantifier.ALL;
-		SelectList selectList = new SelectList("*", null);
-		FromClause fromClause = new FromClause(new TableReference("syn123"));
-		TableExpression tableExpression = new TableExpression(fromClause);
-		QuerySpecification qs = new QuerySpecification(setQuantifier, selectList, tableExpression);
-		return qs;
-	}
+//	private QuerySpecification getFakeQuerySpecification() {
+//		SetQuantifier setQuantifier = SetQuantifier.ALL;
+//		SelectList selectList = new SelectList("*", null);
+//		FromClause fromClause = new FromClause(new TableReference("syn123"));
+//		TableExpression tableExpression = new TableExpression(fromClause);
+//		QuerySpecification qs = new QuerySpecification(setQuantifier, selectList, tableExpression);
+//		return qs;
+//	}
 
 }
