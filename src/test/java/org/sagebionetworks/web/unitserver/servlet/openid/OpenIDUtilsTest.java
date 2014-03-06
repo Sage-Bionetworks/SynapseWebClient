@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
 
 public class OpenIDUtilsTest {
@@ -14,7 +15,7 @@ public class OpenIDUtilsTest {
 	public void testCreateRedirectURLUnknownError() throws Exception {		
 		String exceptionMessage="Testing exception message is returned";
 		String encodedMessage = "Testing+exception+message+is+returned";
-		Exception e = new SynapseException(exceptionMessage);
+		Exception e = new SynapseServerException(404, exceptionMessage);
 		
 		// I. isGWTMode=false
 		
@@ -26,9 +27,9 @@ public class OpenIDUtilsTest {
 		assertEquals("foobar.com?status=OpenIDError&detailedMessage="+encodedMessage, 
 				OpenIDUtils.createErrorRedirectURL("foobar.com", false, e));
 		assertEquals("foobar.com?status=OpenIDError", 
-				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseException()));
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseServerException(404)));
 		assertEquals("foobar.com?status=OpenIDError", 
-				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseException("")));
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseServerException(404, "")));
 
 		
 		// II. isGWTMode=true
