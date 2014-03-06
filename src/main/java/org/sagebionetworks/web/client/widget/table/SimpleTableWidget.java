@@ -12,9 +12,11 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.TableQueryUtilServiceAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.table.QueryDetails;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,12 +27,14 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private SimpleTableWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
+	private TableQueryUtilServiceAsync tableQueryUtilService;
 	
 	@Inject
-	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
+	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, TableQueryUtilServiceAsync tableQueryUtilService) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.tableQueryUtilService = tableQueryUtilService;
 		view.setPresenter(this);
 	}	
 	    
@@ -46,24 +50,30 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			@Override
 			public void onSuccess(String rowSetJson) {
 				try {
-					RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
+					final RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
 					// make column lookup
 					final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 					for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
 
 					// Determine column type and which columns to send to view from query results
-					List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
+					final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
 					for(String resultColumnId : rowset.getHeaders()) {
 						ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
 						if(col != null) displayColumns.add(col);
 					}
 
-					// TODO : extract pagination information fomr QuerySpecification, if any
-					final Integer offset = null;
-					final Integer limit = null;										
-					
-					// send to view
-					view.configure(displayColumns, rowset, canEdit, offset, limit);
+					tableQueryUtilService.getQueryDetails(queryString, new AsyncCallback<QueryDetails>() {
+						@Override
+						public void onSuccess(QueryDetails queryDetails) {
+							
+							// send to view
+							view.configure(displayColumns, rowset, canEdit, queryDetails);
+						}
+						@Override
+						public void onFailure(Throwable arg0) {
+							view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+						}
+					});
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}																		
@@ -74,25 +84,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
 			}
 		});	
-
-		
-		
-//		// Convert Query to QuerySpecification 
-//		synapseClient.getTableQuerySpecification(queryString, new AsyncCallback<String>() {			
-//			@Override
-//			public void onSuccess(String querySpecificationJson) {				
-//				QuerySpecification querySpec = getFakeQuerySpecification(); // TODO : create querySpec with querySpecificationJson
-//				// TODO : extract pagination information fomr QuerySpecification, if any
-//				final Integer offset = null;
-//				final Integer limit = null;										
-//				
-//			}
-//		
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-//			}
-//		}); 		
 	}
 
 
@@ -126,18 +117,5 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
 	}
-
-	
-	/*
-	 * Temp
-	 */
-//	private QuerySpecification getFakeQuerySpecification() {
-//		SetQuantifier setQuantifier = SetQuantifier.ALL;
-//		SelectList selectList = new SelectList("*", null);
-//		FromClause fromClause = new FromClause(new TableReference("syn123"));
-//		TableExpression tableExpression = new TableExpression(fromClause);
-//		QuerySpecification qs = new QuerySpecification(setQuantifier, selectList, tableExpression);
-//		return qs;
-//	}
 
 }

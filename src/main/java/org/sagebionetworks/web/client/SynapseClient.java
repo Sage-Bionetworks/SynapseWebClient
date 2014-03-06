@@ -321,9 +321,7 @@ public interface SynapseClient extends RemoteService {
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
-	
-	public String getTableQuerySpecification(String query) throws RestServiceException;
-	
+		
 	public String executeTableQuery(String query) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 

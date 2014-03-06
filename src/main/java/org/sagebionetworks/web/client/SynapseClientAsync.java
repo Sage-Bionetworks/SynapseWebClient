@@ -261,8 +261,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void getTableQuerySpecification(String query, AsyncCallback<String> callback);
-
 	void executeTableQuery(String query, AsyncCallback<String> callback);
 	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);

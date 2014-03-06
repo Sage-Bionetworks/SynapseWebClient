@@ -2536,19 +2536,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-<<<<<<< HEAD
-
-	@Override
-	public String getTableQuerySpecification(String query) throws RestServiceException {
-		// TODO : pass through to javaclient when available
-		return null;
-	}
 
 	@Override
 	public String executeTableQuery(String query) throws RestServiceException {
 		// TODO : pass through to javaclient when available
 		RowSet rs = new RowSet();
-		rs.setHeaders(Arrays.asList(new String[] { "175", "avg(field)", "176.md5" }));
+		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
 		rs.setEtag("1234");
 		rs.setTableId("syn123");
 		
@@ -2556,7 +2549,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Row row = new Row();
 		row.setRowId(1L);
 		row.setVersionNumber(1L);
-		row.setValues(Arrays.asList(new String[] {"175value", "avg1.234", "176md5-273189372891739812"}));
+		row.setValues(Arrays.asList(new String[] {"173value", "174value", "avg1.234", "176md5-273189372891739812"}));
 		rs.setRows(rows);
 		String json = null;
 		try {
@@ -2566,7 +2559,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			e.printStackTrace();
 		}
 		return json;
-=======
+	}
 	
 	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
@@ -2581,6 +2574,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 		
 		return pageName2WikiKeyMap;
->>>>>>> 71b39c90198b1cc84bfbd36ae6f45ecc800c59d9
 	}
 }

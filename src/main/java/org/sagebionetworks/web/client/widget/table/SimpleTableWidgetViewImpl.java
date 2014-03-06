@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.table.QueryDetails;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
@@ -51,11 +52,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, Integer offset, Integer limit) {	
+	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, QueryDetails queryDetails) {	
 		this.columns = columns;					
 				
 		buildTable();
 		buildColumns(columns, canEdit);
+		
+		
 		
 		// TODO : REMOVE THIS
 		// Add the CellList to the adapter in the database.

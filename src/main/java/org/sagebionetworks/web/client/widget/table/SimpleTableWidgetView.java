@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.shared.table.QueryDetails;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -32,6 +33,6 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param limit 
 	 * @param offset 
 	 */
-	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, Integer offset, Integer limit);
+	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, QueryDetails queryDetails);
 	
 }

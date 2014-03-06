@@ -94,8 +94,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	public void configure(TableEntity table, List<org.sagebionetworks.repo.model.table.ColumnModel> columns, String queryString, boolean canEdit) {
 		this.columns = columns;
 		
-		// TODO : remove
-		columns = getTestColumns();
+		//columns = getTestColumns(); // TODO : remove
 		
 		// clear out old view
 		columnEditorBuilt = false;
@@ -609,7 +608,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 
 		model = new ColumnModel();
 		model.setColumnType(ColumnType.STRING);
-		model.setId("cellline");
+		model.setId("175");
 		model.setName("cellline");
 		columns.add(model);
 		
