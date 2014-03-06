@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -158,6 +159,10 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		widgetDescriptorPresenter.updateDescriptorFromView();
 	}
 	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return widgetDescriptorPresenter.getNewFileHandleIds();
+	}
 	
 	@Override
 	public void showBaseParams(boolean visible) {

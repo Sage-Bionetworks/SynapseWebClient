@@ -435,8 +435,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
-						//update wiki attachments
-						presenter.refreshWikiAttachments(titleField.getValue(), mdField.getValue(), null);
+						presenter.addFileHandles(event.getNewFileHandleIds());
 					}
 				}, getCloseHandler(titleField, mdField), getManagementHandler());
 				form.addStyleName("margin-bottom-40 margin-top-10");

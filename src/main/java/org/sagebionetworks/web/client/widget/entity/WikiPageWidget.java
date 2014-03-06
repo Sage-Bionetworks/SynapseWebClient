@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
@@ -51,7 +52,6 @@ SynapseWidgetPresenter {
 	private AdapterFactory adapterFactory;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
-	private String originalMarkdown;
 	boolean isDescription = false;
 	private boolean isCurrentVersion;
 	private Long versionInView;
@@ -89,7 +89,6 @@ SynapseWidgetPresenter {
 	}
 	
 	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
-		originalMarkdown = null;
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
@@ -118,7 +117,6 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
@@ -152,37 +150,6 @@ SynapseWidgetPresenter {
 		});
 	}
 	
-	@Override
-	public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback) {
-		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				try {
-					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-					if (originalMarkdown != null && !originalMarkdown.equals(currentPage.getMarkdown())) {
-						//markdown changed by another process.  please refresh to see the most current version of the wiki
-						view.showErrorMessage(DisplayConstants.ERROR_WIKI_MODIFIED);
-						return;
-					}
-					currentPage.setMarkdown(updatedMarkdown);
-					if (updatedTitle != null && updatedTitle.length() > 0)
-						currentPage.setTitle(updatedTitle);
-					view.updateWikiPage(currentPage);
-					if (pageUpdatedCallback != null)
-						pageUpdatedCallback.pageUpdated();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}	
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
-			}
-		});	
-	}
-
 	public void setOwnerObjectName(final OwnerObjectNameCallback callback) {
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -232,34 +199,26 @@ SynapseWidgetPresenter {
 	public void saveClicked(String title, String md) 
 	{
 		setIsEditing(false);
-		//before saving, we need to update the page first (widgets may have added/removed file handles from the list, like ImageConfigEditor)
-		refreshWikiAttachments(title, md, new Callback() {
-			@Override
-			public void pageUpdated() {
-				//after page attachments have been refreshed, send the update
-				JSONObjectAdapter json = jsonObjectAdapter.createNew();
-				try {
-					currentPage.writeToJSONObject(json);
-					synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String result) {
-							//showDefaultViewWithWiki();
-							refresh();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-								view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		JSONObjectAdapter json = jsonObjectAdapter.createNew();
+		try {
+			currentPage.setTitle(title);
+			currentPage.setMarkdown(md);
+			currentPage.writeToJSONObject(json);
+			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					//showDefaultViewWithWiki();
+					refresh();
 				}
-			}
-			@Override
-			public void noWikiFound() {
-			}
-		});
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
 	}
 	
 	@Override
@@ -372,7 +331,6 @@ SynapseWidgetPresenter {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							originalMarkdown = currentPage.getMarkdown();
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
@@ -381,11 +339,22 @@ SynapseWidgetPresenter {
 					}
 					
 				});
-				
 			}
 		});
 	}
 
+	@Override
+    public void addFileHandles(List<String> fileHandleIds) {
+		//update file handle ids if set
+        if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	        HashSet<String> fileHandleIdsSet = new HashSet<String>();
+	        fileHandleIdsSet.addAll(currentPage.getAttachmentFileHandleIds());
+	        fileHandleIdsSet.addAll(fileHandleIds);
+	        currentPage.getAttachmentFileHandleIds().clear();
+	        currentPage.getAttachmentFileHandleIds().addAll(fileHandleIdsSet);
+        }
+	}
+	
 	@Override
 	public void restoreClicked(final Long wikiVersion) {
 		// User has confirmed. Restore and refresh the page to see the update.

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -44,4 +45,10 @@ public interface WidgetEditorPresenter extends SynapseWidgetPresenter {
 	 * @return
 	 */
 	public String getTextToInsert();
+	
+	/**
+	 * used when the editor needs to create new wiki attachment file handles (like the image editor)
+	 * @return
+	 */
+	public List<String> getNewFileHandleIds();
 }

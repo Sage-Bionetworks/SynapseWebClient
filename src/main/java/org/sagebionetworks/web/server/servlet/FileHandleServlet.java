@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,6 +37,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -209,12 +211,44 @@ public class FileHandleServlet extends HttpServlet {
 				response.sendRedirect(resolvedUrl.toString());	
 		}
 	}
+
+	public static FileHandle uploadFile(SynapseClient client, HttpServletRequest request) throws FileUploadException, IOException, SynapseException {
+		FileHandle newFileHandle = null;
+		ServletFileUpload upload = new ServletFileUpload();
+		FileItemIterator iter = upload.getItemIterator(request);
+		while (iter.hasNext()) {
+			FileItemStream item = iter.next();
+			String name = item.getFieldName();
+			InputStream stream = item.openStream();
+			String fileName = item.getName();
+			if (fileName.contains("\\")){
+				fileName = fileName.substring(fileName.lastIndexOf("\\")+1);
+			}
+            File tempDir = Files.createTempDir();
+			File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
+
+			ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
+			try{
+				// Now upload the file
+				String contentType = item.getContentType();
+				if (SynapseClientImpl.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
+					//see if we can make a better guess based on the file stream
+					contentType = SynapseClientImpl.guessContentTypeFromStream(temp);
+					//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
+				}
+				client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+				newFileHandle = client.createFileHandle(temp, contentType);
+			}finally{
+				// Unconditionally delete the tmp file
+				temp.delete();
+			}
+		}
+		return newFileHandle;
+	}
 	
 	@Override
 	public void doPost(final HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		ServletFileUpload upload = new ServletFileUpload();
-		FileHandle newFileHandle = null;
 		// Before we do anything make sure we can get the users token
 		String token = getSessionToken(request);
 		if (token == null) {
@@ -223,37 +257,10 @@ public class FileHandleServlet extends HttpServlet {
 		}
 
 		try {
-			// Connect to synapse
+			//Connect to synapse
 			SynapseClient client = createNewClient(token);
-			FileItemIterator iter = upload.getItemIterator(request);
 			String entityId = null;
-			while (iter.hasNext()) {
-				FileItemStream item = iter.next();
-				String name = item.getFieldName();
-				InputStream stream = item.openStream();
-				String fileName = item.getName();
-				if (fileName.contains("\\")){
-					fileName = fileName.substring(fileName.lastIndexOf("\\")+1);
-				}
-                File tempDir = Files.createTempDir();
-				File temp = new File(tempDir.getAbsolutePath() + File.separator + fileName);
-
-				ServiceUtils.writeToFile(temp, stream, Long.MAX_VALUE);
-				try{
-					// Now upload the file
-					String contentType = item.getContentType();
-					if (SynapseClientImpl.APPLICATION_OCTET_STREAM.equals(contentType.toLowerCase())){
-						//see if we can make a better guess based on the file stream
-						contentType = SynapseClientImpl.guessContentTypeFromStream(temp);
-						//some source code files still register as application/octet-stream, but the preview manager in the backend should recognize those specific file extensions
-					}
-					client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
-					newFileHandle = client.createFileHandle(temp, contentType);
-				}finally{
-					// Unconditionally delete the tmp file
-					temp.delete();
-				}
-			}
+			FileHandle newFileHandle = uploadFile(client, request);
 
 			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
 			if (newFileHandle != null) {
@@ -295,33 +302,39 @@ public class FileHandleServlet extends HttpServlet {
 				}
 			}
 			
-			UploadResult result = new UploadResult();
-			if (entityId != null)
-				result.setMessage(entityId);
-			else
-				result.setMessage("File upload successful");
-			
-			result.setUploadStatus(UploadStatus.SUCCESS);
-//			if (results != null)
-//				result.setFileHandleResults(results);
-			String out = EntityFactory.createJSONStringForEntity(result);
-			response.setStatus(HttpServletResponse.SC_CREATED);
+			fillResponseWithSuccess(response, entityId);
+		} catch (Exception e) {
+			fillResponseWithFailure(response, e);
+			return;
+		}
+	}
+	
+	public static void fillResponseWithSuccess(HttpServletResponse response, String id) throws JSONObjectAdapterException, UnsupportedEncodingException, IOException {
+		UploadResult result = new UploadResult();
+		if (id != null)
+			result.setMessage(id);
+		else
+			result.setMessage("File upload successful");
+		
+		result.setUploadStatus(UploadStatus.SUCCESS);
+		String out = EntityFactory.createJSONStringForEntity(result);
+		response.setStatus(HttpServletResponse.SC_CREATED);
+		response.getOutputStream().write(out.getBytes("UTF-8"));
+		response.getOutputStream().flush();
+	}
+	
+	public static void fillResponseWithFailure(HttpServletResponse response, Exception e) throws UnsupportedEncodingException, IOException {
+		UploadResult result = new UploadResult();
+		result.setMessage(e.getMessage());
+		result.setUploadStatus(UploadStatus.FAILED);
+		String out;
+		try {
+			out = EntityFactory.createJSONStringForEntity(result);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getOutputStream().write(out.getBytes("UTF-8"));
 			response.getOutputStream().flush();
-		} catch (Exception e) {
-			UploadResult result = new UploadResult();
-			result.setMessage(e.getMessage());
-			result.setUploadStatus(UploadStatus.FAILED);
-			String out;
-			try {
-				out = EntityFactory.createJSONStringForEntity(result);
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				response.getOutputStream().write(out.getBytes("UTF-8"));
-				response.getOutputStream().flush();
-			} catch (JSONObjectAdapterException e1) {
-				throw new RuntimeException(e1);
-			}
-			return;
+		} catch (JSONObjectAdapterException e1) {
+			throw new RuntimeException(e1);
 		}
 	}
 	
@@ -375,7 +388,7 @@ public class FileHandleServlet extends HttpServlet {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	public void setForbiddenMessage(HttpServletResponse response)
+	public static void setForbiddenMessage(HttpServletResponse response)
 			throws IOException, UnsupportedEncodingException {
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		response.getOutputStream().write(

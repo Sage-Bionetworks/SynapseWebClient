@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
@@ -54,6 +55,11 @@ public class TabbedTableConfigEditor implements TabbedTableConfigView.Presenter,
 		//here is the main function of this editor.  replace all tabs with '|'
 		String data = view.getTableContents();
 		return data.replaceAll("\t", "|");
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
 	}
 	
 	/*

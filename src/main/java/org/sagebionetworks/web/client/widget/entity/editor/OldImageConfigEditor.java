@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -62,6 +63,13 @@ public class OldImageConfigEditor implements OldImageConfigView.Presenter, Widge
 		return view.getAdditionalWidth();
 	}
 	
+	/**
+	 * widget creates entity AttachmentData objects, not file handles
+	 */
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

@@ -16,7 +16,8 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2014-03-06-1038-7fe1a60</synapse.version>
+		<synapse.version>develop-SNAPSHOT</synapse.version>
+
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -200,7 +201,7 @@
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
-			        <extraJvmArgs>-Xmx1024m -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
+			        <extraJvmArgs>-Xmx1024M -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
@@ -292,9 +293,8 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2014-03-06-f8e872d-4</version>
+			<version>develop-SNAPSHOT</version>
 		</dependency>
-		
 		
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>

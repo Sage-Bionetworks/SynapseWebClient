@@ -19,6 +19,7 @@ import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
+import org.sagebionetworks.web.server.servlet.SimpleFileHandleServlet;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -109,6 +110,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/filehandle").with(FileHandleServlet.class);
+		
+		//SimpleFileHandle upload (no entity creation or wiki page update)
+		bind(SimpleFileHandleServlet.class).in(Singleton.class);
+		serve("/Portal/simplefilehandle").with(SimpleFileHandleServlet.class);
+
 		
 		// User Profile Attachment (photo)
 		bind(UserProfileAttachmentServlet.class).in(Singleton.class);

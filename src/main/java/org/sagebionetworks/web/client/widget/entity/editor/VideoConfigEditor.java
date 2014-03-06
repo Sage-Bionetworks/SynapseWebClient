@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -68,6 +69,14 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	/**
+	 * TODO: add tab to attach video files to the wiki 
+	 */
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 	

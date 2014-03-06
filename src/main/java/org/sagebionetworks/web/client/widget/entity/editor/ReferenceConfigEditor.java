@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -55,6 +56,11 @@ public class ReferenceConfigEditor implements ReferenceConfigView.Presenter, Wid
 
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 }
