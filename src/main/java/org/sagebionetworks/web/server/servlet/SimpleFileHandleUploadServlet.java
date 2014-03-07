@@ -25,7 +25,7 @@ import com.google.inject.Inject;
  * @author jay
  *
  */
-public class SimpleFileHandleServlet extends HttpServlet {
+public class SimpleFileHandleUploadServlet extends HttpServlet {
 
 	private static Logger logger = Logger.getLogger(FileUpload.class.getName());
 	private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class SimpleFileHandleServlet extends HttpServlet {
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
 		public String getSessionToken() {
-			return UserDataProvider.getThreadLocalUserToken(SimpleFileHandleServlet.perThreadRequest.get());
+			return UserDataProvider.getThreadLocalUserToken(SimpleFileHandleUploadServlet.perThreadRequest.get());
 		}
 	};
 
@@ -76,7 +76,7 @@ public class SimpleFileHandleServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
 			throws ServletException, IOException {
-		SimpleFileHandleServlet.perThreadRequest.set(arg0);
+		SimpleFileHandleUploadServlet.perThreadRequest.set(arg0);
 		super.service(arg0, arg1);
 	}
 

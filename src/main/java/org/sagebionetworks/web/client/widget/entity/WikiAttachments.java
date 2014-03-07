@@ -27,11 +27,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 
 	private WikiAttachmentsView view;
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
-	private JSONObjectAdapter jsonObjectAdapter;
-	private WikiPage wikiPage;
 	private WikiPageKey wikiKey;
 	private List<FileHandle> allFileHandles;
 	private Callback callback;
@@ -43,21 +39,15 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 	
 	@Inject
 	public WikiAttachments(WikiAttachmentsView view, SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			JSONObjectAdapter jsonObjectAdapter,NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, WikiPage wikiPage, Callback callback) {
-		this.wikiPage = wikiPage;
 		this.wikiKey = wikiKey;
 		if (callback == null) {
 			this.callback = new Callback() {
@@ -78,7 +68,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				try {
 					FileHandleResults fileHandleResults = nodeModelCreator.createJSONEntity(results, FileHandleResults.class);
 					allFileHandles = fileHandleResults.getList();
-					updateView();
+					view.configure(wikiKey, getWorkingSet(allFileHandles));
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -91,7 +81,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 		});
 	}
 	
-	private void updateView(){
+	private List<FileHandle> getWorkingSet(List<FileHandle> allFileHandles){
 		//only include non-preview file handles
 		List<FileHandle> workingSet = new ArrayList<FileHandle>();
 		for (FileHandle fileHandle : allFileHandles) {
@@ -99,8 +89,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				workingSet.add(fileHandle);
 			}
 		}
-		
-		view.configure(wikiKey, workingSet);
+		return workingSet;
 	}
 	
 	@Override
@@ -122,7 +111,7 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 			for (FileHandle fileHandle : attachmentsToDelete) {
 				fileHandleIds.add(fileHandle.getId());
 			}
-			updateView();
+			view.configure(wikiKey, getWorkingSet(allFileHandles));
 			if (fileHandleIds.size() > 0)
 				callback.attachmentsToDelete(fileName, fileHandleIds);
 		} else {

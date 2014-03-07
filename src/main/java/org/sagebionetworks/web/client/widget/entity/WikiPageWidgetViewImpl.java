@@ -88,7 +88,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private Long versionInView;
 	private FlowPanel wikiPagePanel;
 	private boolean isEmbeddedInOwnerPage;
-	
+	private boolean isAttachmentsWidgetConfigured;
 	public interface Callback{
 		public void pageUpdated();
 	}
@@ -156,6 +156,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.isCurrentVersion = isCurrentVersion;
 		this.versionInView = versionInView;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
+		isAttachmentsWidgetConfigured = false;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		if(!isCurrentVersion) {
 			markdownWidget.setMarkdown(markdown, wikiKey, true, false, versionInView);
@@ -477,36 +478,39 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		return new ManagementHandler() {
 			@Override
 			public void attachmentsClicked() {
-				wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
-					@Override
-					public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
-						//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
-						//delete previews, and image references
-						presenter.removeFileHandles(fileHandleIds);
-						Map<String, String> descriptor = new HashMap<String, String>();
-						descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-						try {
-							String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
-							markdownEditorWidget.deleteMarkdown(imageMD);
-							//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
-							String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-							markdownEditorWidget.deleteMarkdown(previewMD);
-						} catch (JSONObjectAdapterException e) {
+				if (!isAttachmentsWidgetConfigured) {
+					isAttachmentsWidgetConfigured = true;
+					wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
+						@Override
+						public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
+							//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
+							//delete previews, and image references
+							presenter.removeFileHandles(fileHandleIds);
+							Map<String, String> descriptor = new HashMap<String, String>();
+							descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+							try {
+								String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
+								markdownEditorWidget.deleteMarkdown(imageMD);
+								//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
+								String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+								markdownEditorWidget.deleteMarkdown(previewMD);
+							} catch (JSONObjectAdapterException e) {
+							}
 						}
-					}
-					
-					@Override
-					public void attachmentClicked(String fileName) {
-						//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
-						Map<String, String> descriptor = new HashMap<String, String>();
-						descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-						try {
-							String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-							markdownEditorWidget.insertMarkdown(previewMD);
-						} catch (JSONObjectAdapterException e) {
-						}						
-					}
-				});
+						
+						@Override
+						public void attachmentClicked(String fileName) {
+							//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
+							Map<String, String> descriptor = new HashMap<String, String>();
+							descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+							try {
+								String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+								markdownEditorWidget.insertMarkdown(previewMD);
+							} catch (JSONObjectAdapterException e) {
+							}						
+						}
+					});
+				}
 				showDialog(wikiAttachments);
 			}
 			@Override
