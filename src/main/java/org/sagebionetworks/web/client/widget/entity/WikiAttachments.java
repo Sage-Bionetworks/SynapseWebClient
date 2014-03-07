@@ -123,7 +123,8 @@ public class WikiAttachments implements WikiAttachmentsView.Presenter,
 				fileHandleIds.add(fileHandle.getId());
 			}
 			updateView();
-			callback.attachmentsToDelete(fileName, fileHandleIds);
+			if (fileHandleIds.size() > 0)
+				callback.attachmentsToDelete(fileName, fileHandleIds);
 		} else {
 			view.showErrorMessage(DisplayConstants.ERROR_DELETING_ATTACHMENT);
 		}

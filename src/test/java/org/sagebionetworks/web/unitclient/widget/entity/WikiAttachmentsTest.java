@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -44,7 +45,8 @@ public class WikiAttachmentsTest {
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
 	JSONObjectAdapter mockJSONObjectAdapter;
-	
+	String testFileName ="a file";
+	String testFileId = "13";
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -64,6 +66,10 @@ public class WikiAttachmentsTest {
 		testHandle.setId("12");
 		List<FileHandle> handles = new ArrayList<FileHandle>();
 		handles.add(testHandle);
+		FileHandle testHandle2 = new S3FileHandle();
+		testHandle2.setFileName(testFileName);
+		testHandle2.setId(testFileId);
+		handles.add(testHandle2);
 		testResults.setList(handles);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(FileHandleResults.class))).thenReturn(testResults);
 		
@@ -88,8 +94,9 @@ public class WikiAttachmentsTest {
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
-		presenter.deleteAttachment("a file");
-		verify(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		WikiAttachments.Callback callback = Mockito.mock(WikiAttachments.Callback.class);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), callback);
+		presenter.deleteAttachment(testFileName);
+		verify(callback).attachmentsToDelete(eq(testFileName), eq(Arrays.asList(testFileId)));
 	}
 }
