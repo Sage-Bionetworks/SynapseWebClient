@@ -137,8 +137,8 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/globe-green-32.png")
 	ImageResource globe32();	
 	
-	@Source("images/icons/glyphicons_circle_plus-12.png")
-	ImageResource glyphCirclePlus12();
+	@Source("images/icons/glyphicons_circle_plus-16.png")
+	ImageResource glyphCirclePlus16();
 	
 	@Source("images/icons/google-16.png")
 	ImageResource google16();	

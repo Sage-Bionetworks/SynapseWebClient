@@ -141,7 +141,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(editWidgetButton);
 		
-		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.glyphCirclePlus12()));
+		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.glyphCirclePlus16()));
+		
 		insertButton.addStyleName("whiteBackgroundGxt");
 		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu(callback));
