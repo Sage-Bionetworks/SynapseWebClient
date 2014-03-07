@@ -72,7 +72,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	private LayoutContainer commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
-	private WikiPage currentPage;
 	private Breadcrumb breadcrumb;
 	private boolean isRootWiki;
 	private String ownerObjectName; //used for linking back to the owner object
@@ -144,14 +143,13 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	@Override
-	public void configure(final WikiPage newPage, final WikiPageKey wikiKey,
+	public void configure(String markdown, final WikiPageKey wikiKey,
 			String ownerObjectName, Boolean canEdit, boolean isRootWiki, boolean isDescription, 
 			boolean isCurrentVersion, final Long versionInView, boolean isEmbeddedInOwnerPage) {
 		this.wikiKey = wikiKey;
 		this.canEdit = canEdit;
 		this.isDescription = isDescription;
 		this.ownerObjectName = ownerObjectName;
-		this.currentPage = newPage;
 		this.isRootWiki = isRootWiki;
 		this.isHistoryOpen = false;
 		this.isHistoryWidgetBuilt = false;
@@ -160,16 +158,11 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		if(!isCurrentVersion) {
-			markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false, versionInView);
+			markdownWidget.setMarkdown(markdown, wikiKey, true, false, versionInView);
 		} else {
-			markdownWidget.setMarkdown(newPage.getMarkdown(), wikiKey, true, false, null);
+			markdownWidget.setMarkdown(markdown, wikiKey, true, false, null);
 		}
 		showDefaultViewWithWiki();
-	}
-	
-	@Override
-	public void updateWikiPage(WikiPage newPage){
-		currentPage = newPage;
 	}
 	
 	private void showDefaultViewWithWiki() {
@@ -191,7 +184,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
-		String titleString = isRootWiki ? "" : currentPage.getTitle();
+		String titleString = isRootWiki ? "" : presenter.getWikiPage().getTitle();
 		topBarWrapper.add(new HTMLPanel("<h2 style=\"margin-bottom:0px;\">"+titleString+"</h2>"));
 		wikiPagePanel.add(topBarWrapper);
 		
@@ -214,7 +207,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		HTML modifiedText = new HTML(shb.toSafeHtml());
 		
 		shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getModifiedOn()));
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getModifiedOn()));
 		HTML modifiedOnText = new HTML(shb.toSafeHtml());
 		
 		shb = new SafeHtmlBuilder();
@@ -222,14 +215,14 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		HTML createdText = new HTML(shb.toSafeHtml());
 		
 		shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(currentPage.getCreatedOn()));		
+		shb.appendHtmlConstant(" " + DisplayConstants.ON + " " + DisplayUtils.converDataToPrettyString(presenter.getWikiPage().getCreatedOn()));		
 		HTML createdOnText = new HTML(shb.toSafeHtml());
 		
 		UserBadge modifiedBy = ginInjector.getUserBadgeWidget();
-		modifiedBy.configure(currentPage.getModifiedBy());
+		modifiedBy.configure(presenter.getWikiPage().getModifiedBy());
 		
 		UserBadge createdBy = ginInjector.getUserBadgeWidget();
-		createdBy.configure(currentPage.getCreatedBy());
+		createdBy.configure(presenter.getWikiPage().getCreatedBy());
 		
 		HorizontalPanel modifiedPanel = new HorizontalPanel();
 		modifiedPanel.add(modifiedText);
@@ -303,7 +296,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 			} else {
 				Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
-				breadcrumbsWrapper.add(breadcrumb.asWidget(links, currentPage.getTitle()));
+				breadcrumbsWrapper.add(breadcrumb.asWidget(links, presenter.getWikiPage().getTitle()));
 			}
 			
 			layout(true);
@@ -419,14 +412,14 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
 				final TextArea mdField = new TextArea();
-				mdField.setValue(currentPage.getMarkdown());
+				mdField.setValue(presenter.getWikiPage().getMarkdown());
 				mdField.addStyleName("markdownEditor");
 				mdField.setHeight("400px");
 				
 				LayoutContainer form = new LayoutContainer();
 				final TextBox titleField = new TextBox();
 				if (!isRootWiki) {
-					titleField.setValue(currentPage.getTitle());
+					titleField.setValue(presenter.getWikiPage().getTitle());
 					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
 					titleField.setHeight("35px");					
 					form.add(titleField);
@@ -484,11 +477,12 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		return new ManagementHandler() {
 			@Override
 			public void attachmentsClicked() {
-				wikiAttachments.configure(wikiKey, currentPage, new WikiAttachments.Callback() {
+				wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
 					@Override
-					public void attachmentDeleted(String fileName) {
+					public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
 						//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
 						//delete previews, and image references
+						presenter.removeFileHandles(fileHandleIds);
 						Map<String, String> descriptor = new HashMap<String, String>();
 						descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
 						try {

@@ -118,7 +118,7 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -332,7 +332,7 @@ SynapseWidgetPresenter {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
 						} catch (Exception e) {
 							onFailure(e);
 						}
@@ -344,6 +344,11 @@ SynapseWidgetPresenter {
 	}
 
 	@Override
+	public WikiPage getWikiPage() {
+		return currentPage;
+	}
+	
+	@Override
     public void addFileHandles(List<String> fileHandleIds) {
 		//update file handle ids if set
         if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
@@ -354,6 +359,14 @@ SynapseWidgetPresenter {
 	        currentPage.getAttachmentFileHandleIds().addAll(fileHandleIdsSet);
         }
 	}
+	
+	@Override
+	public void removeFileHandles(List<String> fileHandleIds) {
+	    if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	    	currentPage.getAttachmentFileHandleIds().removeAll(fileHandleIds);
+	    }	
+	}
+	
 	
 	@Override
 	public void restoreClicked(final Long wikiVersion) {
