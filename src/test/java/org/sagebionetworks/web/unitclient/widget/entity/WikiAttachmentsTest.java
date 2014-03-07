@@ -13,18 +13,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
@@ -40,22 +35,15 @@ public class WikiAttachmentsTest {
 
 	WikiAttachments presenter;
 	WikiAttachmentsView mockView;
-	GlobalApplicationState mockGlobalAppState;
 	SynapseClientAsync mockSynapseClient;
-	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
-	JSONObjectAdapter mockJSONObjectAdapter;
 	String testFileName ="a file";
 	String testFileId = "13";
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockGlobalAppState = Mockito.mock(GlobalApplicationState.class);
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockNodeModelCreator = Mockito.mock(NodeModelCreator.class);
-		mockJSONObjectAdapter = Mockito.mock(JSONObjectAdapter.class);
 		mockView = Mockito.mock(WikiAttachmentsView.class);
-		when(mockJSONObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -76,7 +64,7 @@ public class WikiAttachmentsTest {
 		WikiPage testPage = new WikiPage();
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(WikiPage.class))).thenReturn(testPage);
 		// setup the entity editor with 
-		presenter = new WikiAttachments(mockView, mockSynapseClient, mockGlobalAppState, mockAuthenticationController, mockJSONObjectAdapter, mockNodeModelCreator);
+		presenter = new WikiAttachments(mockView, mockSynapseClient, mockNodeModelCreator);
 	}
 
 	@Test
