@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -26,10 +25,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
+import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -37,14 +38,8 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -266,21 +261,9 @@ public class FileHandleServlet extends HttpServlet {
 			if (newFileHandle != null) {
 				entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
-				String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
-				String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 				FileEntity fileEntity = null;
 				
-				if (ownerId != null && ownerType != null) {
-					ObjectType type = ObjectType.valueOf(ownerType);
-					String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
-					WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-					WikiPage page = client.getV2WikiPageAsV1(properKey);
-					List<String> fileHandleIds = page.getAttachmentFileHandleIds();
-					if (!fileHandleIds.contains(newFileHandle.getId()))
-						fileHandleIds.add(newFileHandle.getId());
-					client.updateV2WikiPageWithV1(ownerId, type, page);
-				}
-				else if (isCreateEntity) {
+				if (isCreateEntity) {
 					//create the file entity
 					String parentEntityId = request.getParameter(WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
 					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), client);
