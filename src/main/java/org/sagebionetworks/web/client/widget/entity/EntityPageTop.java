@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -103,8 +104,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     		projectAreaState.setProjectId(projectHeader.getId());
     	}
     	
-    	// For non-project entities, record them as the last file area place 
-    	if(!projectHeader.getId().equals(entityId)) {
+    	// For non-project file entities, record them as the last file area place 
+    	if(!projectHeader.getId().equals(entityId) && area == EntityArea.FILES) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
     		lastFileAreaEntity.setId(entityId);
     		lastFileAreaEntity.setVersionNumber(versionNumber);
@@ -116,14 +117,26 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     		projectAreaState.setLastWikiSubToken(areaToken);
     	}
     	
+    	// record last table state
+    	if(bundle.getEntity() instanceof TableEntity) {
+    		EntityHeader lastTableAreaEntity = new EntityHeader();
+    		lastTableAreaEntity.setId(entityId);
+    		projectAreaState.setLastTableAreaEntity(lastTableAreaEntity);
+    	}
+    	
     	// default area is the base wiki page if we are navigating to the project
     	if(area == null && isProject) {
     		projectAreaState.setLastWikiSubToken(null);
     	}
     	
-    	// clear out file state if we go back to root
+    	// clear out file or table state if we go back to root
     	if(area == EntityArea.FILES && isProject) {
     		projectAreaState.setLastFileAreaEntity(null);
+    	}
+
+    	// clear out table state if we go back to root
+    	if(area == EntityArea.TABLES && isProject) {
+    		projectAreaState.setLastTableAreaEntity(null);
     	}
 	}
     
@@ -198,17 +211,26 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void gotoProjectArea(EntityArea area, boolean overrideCache) {
+	public void gotoProjectArea(EntityArea area, EntityArea currentArea) {
 		String entityId = projectHeader.getId();
 		String areaToken = null;
 		Long versionNumber = null;
+		
+		boolean overrideCache = false;
+		// return to root for file and tables
+		if((currentArea == EntityArea.FILES && area == EntityArea.FILES) 
+				|| (bundle.getEntity() instanceof TableEntity && area == EntityArea.TABLES))
+			overrideCache = true;
+		
 		if(!overrideCache) {
 			if(area == EntityArea.WIKI) {
 				areaToken = projectAreaState.getLastWikiSubToken();
 			} else if(area == EntityArea.FILES && projectAreaState.getLastFileAreaEntity() != null) {
 				entityId = projectAreaState.getLastFileAreaEntity().getId();
 				versionNumber = projectAreaState.getLastFileAreaEntity().getVersionNumber();
-			} 
+			} else if(area == EntityArea.TABLES && projectAreaState.getLastTableAreaEntity() != null) {
+				entityId = projectAreaState.getLastTableAreaEntity().getId();
+			}
 		}
 
 		if(!entityId.equals(projectHeader.getId())) area = null; // don't specify area in place for non-project entities
@@ -233,6 +255,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				// wiki area with defined subtoken requires goto (can not guarantee that subpage is loaded loaded)
 				return true;							
 			}
+		} else if(targetTab == EntityArea.TABLES) {
+			// tables area clicked in non-project entity requires goto root of tables
+			// tables area clicked with last-table-state requires goto
+			if(!isProject || projectAreaState.getLastTableAreaEntity() != null)
+				return true;
 		}
 		return false;		
 	}

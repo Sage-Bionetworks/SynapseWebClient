@@ -139,7 +139,7 @@ public class EntityPageTopTest {
 	@Test 
 	public void testProjectWithFilesState() {
 		// create some state for files tab
-		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.FILES, null);
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// go back to project wiki
@@ -147,7 +147,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// click files to test state
-		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.WIKI);
 		gotoPlace = captureGoTo();
 		assertNull(gotoPlace.getArea()); // should not specify area for sub entity
 		assertEquals(entityId, gotoPlace.getEntityId());
@@ -169,7 +169,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click wiki to test
-		pageTop.gotoProjectArea(EntityArea.WIKI, false);
+		pageTop.gotoProjectArea(EntityArea.WIKI, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.WIKI, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());
@@ -192,7 +192,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click wiki to test back to wiki root
-		pageTop.gotoProjectArea(EntityArea.WIKI, false);
+		pageTop.gotoProjectArea(EntityArea.WIKI, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.WIKI, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());		
@@ -216,7 +216,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click wiki to test back to wiki root
-		pageTop.gotoProjectArea(null, false);
+		pageTop.gotoProjectArea(null, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertNull(gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());		
@@ -245,7 +245,7 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// click files to test
-		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.WIKI);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea());
 		assertEquals(newProjectId, gotoPlace.getEntityId());
@@ -272,7 +272,7 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// click files to test that there is no files tab state
-		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.WIKI);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea()); 
 		assertEquals(projectId, gotoPlace.getEntityId());
@@ -298,7 +298,7 @@ public class EntityPageTopTest {
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click on wiki tab
-		pageTop.gotoProjectArea(EntityArea.WIKI, false);
+		pageTop.gotoProjectArea(EntityArea.WIKI, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.WIKI, gotoPlace.getArea()); 
 		assertEquals(projectId, gotoPlace.getEntityId());
@@ -314,7 +314,7 @@ public class EntityPageTopTest {
 		// now delete entity 
 		pageTop.entityDeleted(new EntityDeletedEvent(entityId));
 		// goto files tab and check that entity is gone from the state and we are at project root
-		pageTop.gotoProjectArea(EntityArea.FILES, false);
+		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());

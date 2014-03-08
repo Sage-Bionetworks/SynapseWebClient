@@ -182,6 +182,8 @@ public class WebConstants {
 	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
 	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
+
+	public static final String CONCRETE_TYPE_KEY = "concreteType";
 	
 	
 	public static final String USER_GUIDE = "UserGuide";

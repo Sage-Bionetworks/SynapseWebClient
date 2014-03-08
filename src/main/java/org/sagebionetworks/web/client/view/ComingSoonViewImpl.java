@@ -114,17 +114,5 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	    provenanceWidget.setHeight(800);	
 	    entityView.setWidget(provenanceWidget.asWidget());
 	}
-
-	public static TableEntity getTable() {
-		TableEntity table = new TableEntity();
-		table.setId("12345");
-		table.setName("Example Table");
-		table.setCreatedBy("2337773");
-		List<String> columns = new ArrayList<String>();
-		columns.addAll(Arrays.asList(new String[] {"1","2","3","4","5","6"}));
-		table.setColumnIds(columns);
-		return table;
-	}
-
 	
 }

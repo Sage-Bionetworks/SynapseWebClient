@@ -704,6 +704,11 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ACCOUNT_NUMBER = "Synapse Account Number";
 	public static final String LOGIN_READ_ONLY_MODE = "Synapse is currently in READ ONLY mode. You can browse during this time but not login or modify.";
 	public static final String LOGIN_DOWN_MODE = "Synapse is currently DOWN. Please try back soon.";
+	public static final String ADD_TABLE = "Add Table";
+	public static final String TABLE_CREATION_FAILED = "Table creation failed.";
+	public static final String TABLE_NAME = "Table Name";
+	public static final String TABLE_CREATED = "Table Created";
+	public static final String ERROR_LOADING_QUERY_PLEASE_RETRY = "An error occured trying to load your query. Please reload the page and try again";
 
 }
 

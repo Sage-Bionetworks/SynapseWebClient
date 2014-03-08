@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -30,6 +31,7 @@ public class EntityBrowserUtils {
 			
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
 			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getCurrentUserPrincipalId()));
+			where.add(new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.NOT_EQUALS, TableEntity.class.getName()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

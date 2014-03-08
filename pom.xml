@@ -272,7 +272,12 @@
 			<artifactId>auth-util</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
-		<!-- Provides the S3 log sweeper -->
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>lib-table-query</artifactId>
+			<version>${synapse.version}</version>
+		</dependency>
+				<!-- Provides the S3 log sweeper -->
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-logging</artifactId>
@@ -553,6 +558,12 @@
 		        <artifactId>apache-mime4j</artifactId>
 		        <version>0.6.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.5</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 
 	<distributionManagement>

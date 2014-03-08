@@ -1,10 +1,12 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -22,9 +24,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, WidgetRendererPresenter {
+public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private SynapseTableWidgetView view;
+	private CompleteTableWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private AdapterFactory adapterFactory;
@@ -35,7 +37,7 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	private List<ColumnModel> columns;
 	
 	@Inject
-	public SynapseTableWidget(SynapseTableWidgetView view, 
+	public CompleteTableWidget(CompleteTableWidgetView view, 
 			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController, 
 			AdapterFactory adapterFactory,
@@ -50,13 +52,15 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	
 	public void configure(final TableEntity table) {
 		this.table = table;		
-		synapseClient.getColumnModelBatch(table.getColumnIds(), new AsyncCallback<String>() {
+		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(List<String> result) {
 				try {
-					BatchResults<ColumnModel> columnsBatch = new BatchResults<ColumnModel>(ColumnModel.class);
-					columnsBatch.initializeFromJSONObject(adapterFactory.createNew(result));
-					columns = columnsBatch.getResults();
+					columns = new ArrayList<ColumnModel>();
+					for(String colStr : result) {
+						columns.add(new ColumnModel(adapterFactory.createNew(colStr)));
+					}
+										
 					view.configure(table, columns, queryString, true);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -133,16 +137,25 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 	private void updateTableEntity() {
 		try {
 			String entityJson = table.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.updateEntity(entityJson, new AsyncCallback<EntityWrapper>() {
+			synapseClient.createOrUpdateEntity(entityJson, null, false, new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(EntityWrapper result) {
-					TableEntity newTable;
-					try {						
-						newTable = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-						configure(newTable);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
+				public void onSuccess(String result) {
+					synapseClient.getEntity(table.getId(), new AsyncCallback<EntityWrapper>() {
+						@Override
+						public void onSuccess(EntityWrapper result) {
+							try {						
+								table = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
+								configure(table);
+							} catch (JSONObjectAdapterException e) {
+								onFailure(e);
+							}							
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);							
+						}
+					});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -154,5 +167,5 @@ public class SynapseTableWidget implements SynapseTableWidgetView.Presenter, Wid
 			view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
 		}
 	}
-	
+		
 }

@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface SynapseTableWidgetView extends IsWidget, SynapseView {
+public interface CompleteTableWidgetView extends IsWidget, SynapseView {
 
 	/**
 	 * Set the presenter.
@@ -26,7 +26,7 @@ public interface SynapseTableWidgetView extends IsWidget, SynapseView {
 		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
 
 		void updateColumnOrder(List<String> columnIds);
-				
+
 	}
 
 	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit);

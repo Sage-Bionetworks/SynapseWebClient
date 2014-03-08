@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
@@ -116,14 +117,14 @@ public class BreadcrumbTest {
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityPath.class))).thenReturn(null); // null model return
-		breadcrumb.asWidget((EntityPath)null, true, false);
+		breadcrumb.asWidget((EntityPath)null, EntityArea.FILES, false);
 		verify(mockView).setLinksList(any(List.class));
 		
 		// success test
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(entityWrapper.getEntityJson(), EntityPath.class)).thenReturn(entityPath);
-		breadcrumb.asWidget(entityPath, true, false);
+		breadcrumb.asWidget(entityPath, EntityArea.FILES, false);
 		verify(mockView).setLinksList(any(List.class));				
 	}
 	

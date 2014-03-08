@@ -1,36 +1,14 @@
 package org.sagebionetworks.web.server.servlet;
 
-
-//import java.util.ArrayList;
-//import java.util.Date;
-//import java.util.List;
 //import java.util.logging.Logger;
-//import static org.mockito.Mockito.*;
-//
 //
 //import org.mockito.Mockito;
-//import org.sagebionetworks.client.Synapse;
-//import org.sagebionetworks.client.exceptions.SynapseException;
-//import org.sagebionetworks.repo.model.AccessControlList;
-//import org.sagebionetworks.repo.model.AccessRequirement;
-//import org.sagebionetworks.repo.model.Annotations;
-//import org.sagebionetworks.repo.model.Data;
-//import org.sagebionetworks.repo.model.Entity;
-//import org.sagebionetworks.repo.model.EntityBundle;
-//import org.sagebionetworks.repo.model.EntityHeader;
-//import org.sagebionetworks.repo.model.EntityPath;
-//import org.sagebionetworks.repo.model.PaginatedResults;
+//import org.sagebionetworks.client.SynapseClient;
 //import org.sagebionetworks.repo.model.UserProfile;
-//import org.sagebionetworks.repo.model.UserSessionData;
-//import org.sagebionetworks.repo.model.VersionInfo;
-//import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-//import org.sagebionetworks.repo.model.search.Hit;
-//import org.sagebionetworks.repo.model.search.SearchResults;
-//import org.sagebionetworks.repo.model.search.query.SearchQuery;
 //import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 
 public class SynapseClientStubUtil {
-
+//
 //	private static Logger logger = Logger.getLogger(SynapseClientStubUtil.class.getName());
 //	
 //	private static final String token = "SESSION_TOKEN";
@@ -60,12 +38,12 @@ public class SynapseClientStubUtil {
 //		userProfile.setOwnerId("3");
 //	}
 //	
-//	public static Synapse createSynapseClient() {
+//	public static SynapseClient createSynapseClient() {
 //		// Create a new syanpse
-//		Synapse syn = Mockito.mock(Synapse.class);
+//		SynapseClient syn = Mockito.mock(SynapseClient.class);
 //		
 //		try {
-//			configure(syn);
+//			//configure(syn);
 //		} catch (Exception e) {
 //			logger.warning(e.getMessage());			
 //		}
@@ -80,10 +58,10 @@ public class SynapseClientStubUtil {
 //	public static TokenProvider getTokenProvider() {
 //		return tokenProvider;
 //	}
-//
-//	/*
-//	 * Private Methods
-//	 */
+
+	/*
+	 * Private Methods
+	 */
 //	private static void configure(Synapse syn) throws Exception {
 //		configureLogin(syn);		
 //		configureSearchResults(syn);
@@ -199,7 +177,7 @@ public class SynapseClientStubUtil {
 //		EntityPath path = new EntityPath();
 //		bundle.setPath(path);
 //		PaginatedResults<EntityHeader> refby = new PaginatedResults<EntityHeader>();
-//		bundle.setReferencedBy(refby.getResults());
+//		bundle.setReferencedBy(refby);
 //		bundle.setHasChildren(false);
 //		AccessControlList acl = new AccessControlList();
 //		bundle.setAccessControlList(acl);
