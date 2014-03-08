@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 import com.extjs.gxt.ui.client.widget.Dialog;
 
@@ -53,6 +54,11 @@ public class LinkConfigEditor implements LinkConfigView.Presenter, WidgetEditorP
 	@Override
 	public String getTextToInsert() {
 		return "["+view.getName()+"]("+view.getLinkUrl()+")";
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
 	}
 	
 	/*

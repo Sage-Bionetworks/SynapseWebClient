@@ -155,5 +155,8 @@ public class EntityListConfigEditor implements EntityListConfigView.Presenter, W
 		return record;
 	}
 
-
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
+	}
 }

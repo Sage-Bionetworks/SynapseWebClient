@@ -7,23 +7,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachmentsView;
@@ -39,21 +35,15 @@ public class WikiAttachmentsTest {
 
 	WikiAttachments presenter;
 	WikiAttachmentsView mockView;
-	GlobalApplicationState mockGlobalAppState;
 	SynapseClientAsync mockSynapseClient;
-	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
-	JSONObjectAdapter mockJSONObjectAdapter;
-	
+	String testFileName ="a file";
+	String testFileId = "13";
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockGlobalAppState = Mockito.mock(GlobalApplicationState.class);
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockNodeModelCreator = Mockito.mock(NodeModelCreator.class);
-		mockJSONObjectAdapter = Mockito.mock(JSONObjectAdapter.class);
 		mockView = Mockito.mock(WikiAttachmentsView.class);
-		when(mockJSONObjectAdapter.createNew()).thenReturn(new JSONObjectAdapterImpl());
 		
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getV2WikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).updateV2WikiPage(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -64,13 +54,17 @@ public class WikiAttachmentsTest {
 		testHandle.setId("12");
 		List<FileHandle> handles = new ArrayList<FileHandle>();
 		handles.add(testHandle);
+		FileHandle testHandle2 = new S3FileHandle();
+		testHandle2.setFileName(testFileName);
+		testHandle2.setId(testFileId);
+		handles.add(testHandle2);
 		testResults.setList(handles);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(FileHandleResults.class))).thenReturn(testResults);
 		
 		WikiPage testPage = new WikiPage();
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(WikiPage.class))).thenReturn(testPage);
 		// setup the entity editor with 
-		presenter = new WikiAttachments(mockView, mockSynapseClient, mockGlobalAppState, mockAuthenticationController, mockJSONObjectAdapter, mockNodeModelCreator);
+		presenter = new WikiAttachments(mockView, mockSynapseClient, mockNodeModelCreator);
 	}
 
 	@Test
@@ -88,8 +82,9 @@ public class WikiAttachmentsTest {
 	
 	@Test
 	public void testDelete(){
-		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), null);
-		presenter.deleteAttachment("a file");
-		verify(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		WikiAttachments.Callback callback = Mockito.mock(WikiAttachments.Callback.class);
+		presenter.configure(new WikiPageKey("syn1234",ObjectType.ENTITY.toString(),""), new WikiPage(), callback);
+		presenter.deleteAttachment(testFileName);
+		verify(callback).attachmentsToDelete(eq(testFileName), eq(Arrays.asList(testFileId)));
 	}
 }

@@ -16,12 +16,12 @@ public interface AttachmentConfigView extends IsWidget, WidgetEditorView {
 	
 	public String getUploadedFileHandleName();
 	public void setUploadedFileHandleName(String fileHandleName);
-	
 	public void configure(WikiPageKey wikiKey, Dialog window);
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void addFileHandleId(String fileHandleId);
 	}
 }

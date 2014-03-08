@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -53,6 +54,11 @@ public class BookmarkConfigEditor implements BookmarkConfigView.Presenter, Widge
 	@Override
 	public String getTextToInsert() {
 		return "[" + view.getLinkText() + "](" + WidgetConstants.BOOKMARK_LINK_IDENTIFIER + ":" + view.getBookmarkId() + ")\n${" + WidgetConstants.BOOKMARK_TARGET_CONTENT_TYPE + "?" + WidgetConstants.BOOKMARK_KEY + "=" + view.getBookmarkId() + "}";
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
 	}
 
 }

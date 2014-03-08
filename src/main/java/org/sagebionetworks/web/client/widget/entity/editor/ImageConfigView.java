@@ -40,5 +40,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void addFileHandleId(String fileHandleId);
 	}
 }

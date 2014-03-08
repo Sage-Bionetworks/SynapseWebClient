@@ -82,6 +82,11 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 		return null;
 	}
 	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
+	}
+	
 	/*
 	 * Private Methods
 	 */

@@ -105,6 +105,10 @@ public class APITableConfigEditor implements APITableConfigView.Presenter, Widge
 		}
 	}
 	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

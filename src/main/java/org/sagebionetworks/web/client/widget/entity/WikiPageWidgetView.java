@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
@@ -25,17 +24,18 @@ public interface WikiPageWidgetView extends IsWidget, SynapseView {
 		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean isEmbeddedInOwnerPage);
 		public void createPage(String name);
 		public void deleteButtonClicked();
-		public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback);
 		public void saveClicked(String title, String md);
 		public void cancelClicked();
 		public void editClicked();
 		public void previewClicked(final Long versionToPreview, Long currentVersion);
 		public void restoreClicked(final Long wikiVersion);
+		public void addFileHandles(List<String> fileHandleIds);
+		public void removeFileHandles(List<String> fileHandleIds);
+		public WikiPage getWikiPage();
 	}
 	
-	public void configure(WikiPage newPage, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isDescription, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
+	public void configure(String markdown, WikiPageKey wikiKey, String ownerObjectName, Boolean canEdit, boolean isRootPage, boolean isDescription, boolean isCurrentVersion, Long versionInView, boolean isEmbeddedInOwnerPage);
 	public void showNoWikiAvailableUI(boolean isDescription);
 	public void show404();
 	public void show403();
-	public void updateWikiPage(WikiPage newPage);
 }
