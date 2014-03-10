@@ -54,7 +54,7 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 	@Override
 	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable) {
 		panel.clear();
-		if(showAddTable) {
+		if(canEdit && showAddTable) {
 			Button addTable = DisplayUtils.createIconButton(DisplayConstants.ADD_TABLE, ButtonType.DEFAULT, "glyphicon-plus");
 			addTable.addClickHandler(new ClickHandler() {			
 				@Override

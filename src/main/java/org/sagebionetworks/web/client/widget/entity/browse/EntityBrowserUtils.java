@@ -31,7 +31,6 @@ public class EntityBrowserUtils {
 			
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
 			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getCurrentUserPrincipalId()));
-			where.add(new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.NOT_EQUALS, TableEntity.class.getName()));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {

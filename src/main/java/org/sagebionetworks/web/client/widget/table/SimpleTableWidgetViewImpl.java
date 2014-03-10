@@ -1,13 +1,15 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
@@ -17,20 +19,26 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
+import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.MultiSelectionModel;
+import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
 public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableWidgetView {
 	public interface Binder extends UiBinder<Widget, SimpleTableWidgetViewImpl> {	}
-
+	
 	@UiField
 	SimplePanel tableContainer;
 	@UiField
@@ -43,37 +51,77 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SelectionModel<TableModel> selectionModel;
 	ContactDatabase database;
 	Presenter presenter;
-
+	Map<Column,ColumnModel> columnToModel;
+	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder) {
+		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		tableContainer.addStyleName("tableMinWidth");
 	}
 	
 	@Override
-	public void configure(List<ColumnModel> columns, RowSet rowset, boolean canEdit, QueryDetails queryDetails) {	
+	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, QueryDetails queryDetails) {		
 		this.columns = columns;					
+		columnToModel.clear();
 				
 		buildTable();
 		buildColumns(columns, canEdit);
 		
-		
+	    cellTable.setRowCount(totalRowCount, true); // TODO : do this asynchronously from the view?
+	    if(queryDetails.getOffset() != null && queryDetails.getLimit() != null) {	    	
+	    	cellTable.setVisibleRange(queryDetails.getOffset(), queryDetails.getOffset() + queryDetails.getLimit());
+	    } else {
+	    	cellTable.setVisibleRange(0, totalRowCount);
+	    }	    
+	    
+	    // setup DataProvider for pagination/sorting
+	    AsyncDataProvider<TableModel> dataProvider = new AsyncDataProvider<TableModel>() {
+	      @Override
+	      protected void onRangeChanged(HasData<TableModel> display) {
+	        final Range range = display.getVisibleRange();
+
+	        // extract sorted column
+	        String sortedColumnId = null;
+	        QueryDetails.SortDirection sortDirection = null;
+	        ColumnSortList sortList = cellTable.getColumnSortList();
+	        if(sortList.size() > 0 && sortList.get(0).getColumn() != null) {
+	        	ColumnSortInfo columnSortInfo = sortList.get(0);
+	        	ColumnModel model = columnToModel.get(columnSortInfo.getColumn());
+	        	if(model != null) {
+	        		sortedColumnId = model.getId();	        	
+	        		sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
+	        	}
+	        }
+        	
+	        int offset = range.getStart();
+	        int limit = range.getLength();
+	        
+	        
+	        // TODO: call presenter for new data range
+	        presenter.alterQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection));
+	        List<TableModel> returnedData = null;
+	        cellTable.setRowData(range.getStart(), returnedData);
+	      }
+	    };
+
+	    // Connect the list to the data provider.
+	    dataProvider.addDataDisplay(cellTable);
+ 
+	    // Add a ColumnSortEvent.AsyncHandler to connect sorting to the
+	    // AsyncDataPRrovider.
+	    AsyncHandler columnSortHandler = new AsyncHandler(cellTable);
+	    cellTable.addColumnSortHandler(columnSortHandler);
+
+	    // Add Row Data
+	    
 		
 		// TODO : REMOVE THIS
 		// Add the CellList to the adapter in the database.
-		database = ContactDatabase.get();
-		database.addDataDisplay(cellTable);
+//		database = ContactDatabase.get();
+//		database.addDataDisplay(cellTable);
 	}
-
-	
-//	public void setSelected(boolean isSelected) {
-//		int start = pager.getPageStart();
-//		int size = pager.getPageSize();
-//		HasRows pag = pager.getDisplay();
-//		pag.
-//		
-//	}
 	
 	private void buildTable() {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
@@ -128,6 +176,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		for(ColumnModel model : columns) {
 			Column<TableModel, ?> column = ColumnUtils.getColumn(model, sortHandler, canEdit);
 			cellTable.addColumn(column, model.getName());
+			columnToModel.put(column, model);
+			
 			// TODO : just have a fixed width for each column and let table scroll horizontally?
 			if(model.getColumnType() == ColumnType.BOOLEAN) {
 				cellTable.setColumnWidth(column, 100, Unit.PX);

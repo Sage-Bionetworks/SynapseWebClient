@@ -16,6 +16,18 @@ public class QueryDetails implements IsSerializable {
 	private Integer limit;
 	private String sortedColumnId;
 	private SortDirection sortDirection;
+		
+	public QueryDetails() {		
+	}
+	
+	public QueryDetails(Integer offset, Integer limit, String sortedColumnId,
+			SortDirection sortDirection) {
+		super();
+		this.offset = offset;
+		this.limit = limit;
+		this.sortedColumnId = sortedColumnId;
+		this.sortDirection = sortDirection;
+	}
 	
 	public Integer getOffset() {
 		return offset;

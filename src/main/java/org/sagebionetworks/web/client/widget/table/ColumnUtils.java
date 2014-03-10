@@ -192,6 +192,7 @@ public class ColumnUtils {
 			return object.get(col.getId());
 		}
 	};
+	
 	return column;
 		
 	}	

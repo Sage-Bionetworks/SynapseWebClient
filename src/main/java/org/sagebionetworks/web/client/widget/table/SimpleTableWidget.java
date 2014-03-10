@@ -66,8 +66,11 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						@Override
 						public void onSuccess(QueryDetails queryDetails) {
 							
+							// TODO : get total row count for query
+							int totalRowCount = 100;
+							
 							// send to view
-							view.configure(displayColumns, rowset, canEdit, queryDetails);
+							view.configure(displayColumns, rowset, totalRowCount, canEdit, queryDetails);
 						}
 						@Override
 						public void onFailure(Throwable arg0) {
