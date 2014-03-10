@@ -289,12 +289,14 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		endTag = startTag;
 		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand("Strikeout", "", getBasicCommandClickHandler(startTag, endTag, true));
 		strikeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("strike")));
+		strikeCommand.addStyleName("font-size-15");
 		mdCommands.add(strikeCommand);
 
 		startTag = "\n```\n";
 		endTag = startTag;
 		com.google.gwt.user.client.ui.Button codeCommand = getNewCommand("Code block. Optionally specify the language for syntax highlighting.", "", getBasicCommandClickHandler(startTag, endTag, true));
 		codeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("code")));
+		codeCommand.addStyleName("font-size-15");
 		mdCommands.add(codeCommand);
 		
 		startTag = "$$\\(";
@@ -319,7 +321,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		
 		Button headingButton = new Button("H");
 		DisplayUtils.addToolTip(headingButton, "Heading");
-		headingButton.addStyleName("whiteBackgroundGxt boldText font-size-15");
+		headingButton.addStyleName("whiteBackgroundGxt boldText");
 		headingButton.setWidth(30);
 		headingButton.setMenu(createHeadingMenu());
 		headingButton.addStyleName("margin-right-10");
@@ -686,7 +688,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	
 	public com.google.gwt.user.client.ui.Button getNewCommand(String title, String tooltipText, String glyphIconClass, ClickHandler clickHandler){
 		com.google.gwt.user.client.ui.Button command = DisplayUtils.createIconButton(title, ButtonType.DEFAULT, glyphIconClass + " margin-bottom-5");
-		command.addStyleName("btn-xs font-size-15");
+		command.addStyleName("btn-xs");
 		command.addClickHandler(clickHandler);
 		if (tooltipText != null)
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
