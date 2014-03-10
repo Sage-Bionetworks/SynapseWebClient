@@ -489,7 +489,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private Menu createHeadingMenu() {
 	    Menu menu = new Menu();
 	    menu.setEnableScrolling(false);
-	    for (int i = 1; i <= 7; i++) {
+	    for (int i = 1; i < 7; i++) {
 	    	StringBuilder hashes = new StringBuilder();
 	    	for (int j = 0; j < i; j++) {
 				hashes.append("#");
