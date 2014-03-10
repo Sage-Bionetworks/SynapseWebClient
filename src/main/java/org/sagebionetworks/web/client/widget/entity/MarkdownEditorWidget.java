@@ -294,9 +294,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 		startTag = "\n```\n";
 		endTag = startTag;
-		com.google.gwt.user.client.ui.Button codeCommand = getNewCommand("Code block. Optionally specify the language for syntax highlighting.", "", getBasicCommandClickHandler(startTag, endTag, true));
-		codeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("code")));
-		codeCommand.addStyleName("font-size-15");
+		com.google.gwt.user.client.ui.Button codeCommand = getNewCommand("Code Block", "Optionally specify the language for syntax highlighting.", "", getBasicCommandClickHandler(startTag, endTag, true));
 		mdCommands.add(codeCommand);
 		
 		startTag = "$$\\(";
@@ -319,10 +317,10 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		superscript.addStyleName("font-size-15");
 		mdCommands.add(superscript);
 		
-		Button headingButton = new Button("H");
+		Button headingButton = new Button("Heading");
 		DisplayUtils.addToolTip(headingButton, "Heading");
 		headingButton.addStyleName("whiteBackgroundGxt boldText");
-		headingButton.setWidth(30);
+		headingButton.setWidth(60);
 		headingButton.setMenu(createHeadingMenu());
 		headingButton.addStyleName("margin-right-10");
 		mdCommands.add(headingButton);
@@ -496,7 +494,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    	for (int j = 0; j < i; j++) {
 				hashes.append("#");
 			}
-	    	addHeadingMenuItem(menu, "H"+i, "\n" + hashes.toString());	
+	    	addHeadingMenuItem(menu, "<H"+i+">Heading "+i+"</H"+i+">", "\n" + hashes.toString());	
 		}
 
 	    return menu;
