@@ -1905,29 +1905,32 @@ public class DisplayUtils {
 	 * @param selectionLength
 	 * @return
 	 */
-	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
-			int markdownLength = markdown.length();
+	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
+		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(startTag)) {
+			if (endTag == null) 
+				endTag = "";
+			int startTagLength = startTag.length();
+			int endTagLength = endTag.length();
 			int eolPos = text.indexOf('\n', startPos);
 			if (eolPos < 0)
 				eolPos = text.length();
 			int endPos = startPos + selectionLength;
 			
-			if (eolPos < endPos)
+			if (eolPos < endPos && !isMultiline)
 				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
 			
 			String selectedText = text.substring(startPos, endPos);
 			if (isDefined(selectedText)) {
 				//check to see if this text is already surrounded by the markdown.
-				int beforeSelectedTextPos = startPos - markdownLength;
-				int afterSelectedTextPos = endPos + markdownLength;
+				int beforeSelectedTextPos = startPos - startTagLength;
+				int afterSelectedTextPos = endPos + endTagLength;
 				if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
-					if (markdown.equals(text.substring(beforeSelectedTextPos, startPos)) && markdown.equals(text.substring(endPos, afterSelectedTextPos))) {
+					if (startTag.equals(text.substring(beforeSelectedTextPos, startPos)) && endTag.equals(text.substring(endPos, afterSelectedTextPos))) {
 						//strip off markdown instead
 						return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
 					}
 				}
-				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
+				return text.substring(0, startPos) + startTag + selectedText + endTag + text.substring(endPos);
 			}
 			
 		}
@@ -2052,6 +2055,10 @@ public class DisplayUtils {
 	
 	public static String getIcon(String iconClass) {
 		return "<span class=\"glyphicon " + iconClass + "\"></span>";
+	}
+	
+	public static String getFontelloIcon(String iconClass) {
+		return "<span class=\"icon-" + iconClass + "\"></span>";
 	}
 
 	public static EntityHeader getProjectHeader(EntityPath entityPath) {
