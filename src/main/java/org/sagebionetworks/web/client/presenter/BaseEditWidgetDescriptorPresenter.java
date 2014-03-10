@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -59,12 +60,14 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	@Override
 	public void apply() {
 		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
+		//ask for the new file handles that the editor added (if any)
+		List<String> newFileHandleIds = view.getNewFileHandleIds();
 		try {
 			view.updateDescriptorFromView();
 			String textToInsert = view.getTextToInsert();
 			if (textToInsert != null) {
 				//this is it!
-				fireUpdatedEvent(textToInsert);
+				fireUpdatedEvent(textToInsert, newFileHandleIds);
 				view.hide();
 				return;
 			}
@@ -74,16 +77,17 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 			return;
 		}
 		try {
-			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar));
+			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar), newFileHandleIds);
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 		view.hide();
 	}
 	
-	public void fireUpdatedEvent(String valueToInsert) {
+	public void fireUpdatedEvent(String valueToInsert, List<String> newFileHandleIds) {
 		//fire event that contains a value to insert into the description
 		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
+		event.setNewFileHandleIds(newFileHandleIds);
 		event.setInsertValue(valueToInsert);
 		fireUpdatedEvent(event);
 	}

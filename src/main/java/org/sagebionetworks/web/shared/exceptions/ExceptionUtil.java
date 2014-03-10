@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.shared.exceptions;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.SynapseServiceException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
-import org.sagebionetworks.client.exceptions.SynapseUserException;
 
 public class ExceptionUtil {
 
@@ -30,14 +30,15 @@ public class ExceptionUtil {
 			return new NotFoundException(ex.getMessage());
 		} else if(ex instanceof SynapseUnauthorizedException) {
 			return new UnauthorizedException(ex.getMessage());
-		} else if(ex instanceof SynapseUserException && ex.getMessage().contains("(409)")) {
-			return new ConflictException(ex.getMessage());
-		} else if(ex instanceof SynapseServiceException) {
-			if(ex.getMessage().contains("READ_ONLY")) return new ReadOnlyModeException(ex.getMessage());
-			else if(ex.getMessage().contains("Synapse is down")) return new SynapseDownException(ex.getMessage());
-			else return new UnknownErrorException(ex.getMessage());
-		} else { 
-			return new UnknownErrorException(ex.getMessage());
+		} else if (ex instanceof SynapseServerException) {
+			SynapseServerException sse = (SynapseServerException)ex;
+			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
+				return new ConflictException(ex.getMessage());
+			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
+				if(ex.getMessage().contains("READ_ONLY")) return new ReadOnlyModeException(ex.getMessage());
+				else if(ex.getMessage().contains("Synapse is down")) return new SynapseDownException(ex.getMessage());				
+			}
 		}
+		return new UnknownErrorException(ex.getMessage());
 	}
 }

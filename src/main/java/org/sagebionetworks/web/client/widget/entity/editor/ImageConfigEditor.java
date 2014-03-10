@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -14,6 +16,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	
 	private ImageConfigView view;
 	private Map<String, String> descriptor;
+	private List<String> fileHandleIds;
 	
 	@Inject
 	public ImageConfigEditor(ImageConfigView view) {
@@ -25,6 +28,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
+		fileHandleIds = new ArrayList<String>();
 		view.configure(wikiKey, window);
 		//and try to prepopulate with values from the map.  if it fails, ignore
 		try {
@@ -80,6 +84,15 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		return view.getAdditionalWidth();
 	}
 	
+	@Override
+	public void addFileHandleId(String fileHandleId) {
+		fileHandleIds.add(fileHandleId);
+	}
+
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return fileHandleIds;
+	}
 	/*
 	 * Private Methods
 	 */

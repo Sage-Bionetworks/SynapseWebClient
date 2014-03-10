@@ -725,6 +725,11 @@ public class DisplayUtils {
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
 
+	public static String getLoginPlaceHistoryToken(String token) {
+		LoginPlace place = new LoginPlace(token);
+		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -798,15 +803,11 @@ public class DisplayUtils {
 	 * Private methods
 	 */
 	private static String getPlaceString(Class<Synapse> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
 	
 	private static String getWikiPlaceString(Class<Wiki> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
 	
 	public static LayoutContainer wrap(Widget widget) {
@@ -822,19 +823,23 @@ public class DisplayUtils {
 		return lc;
 	}
 	private static String getTeamPlaceString(Class<Team> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
+
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
-	
+
+	private static String getLoginPlaceString(Class<LoginPlace> place) {
+		return getPlaceString(place.getName());		
+	}
+
 	
 	private static String getSearchPlaceString(Class<Search> place) {
-		String fullPlaceName = place.getName();		
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPlaceString(String fullPlaceName) {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}

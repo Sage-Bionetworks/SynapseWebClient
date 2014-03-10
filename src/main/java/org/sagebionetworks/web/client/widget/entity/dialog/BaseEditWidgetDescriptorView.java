@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
@@ -32,6 +33,8 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 * @return
 	 */
 	public String getTextToInsert();
+	
+	public List<String> getNewFileHandleIds();
 	
 	public void showBaseParams(boolean visible);
 	

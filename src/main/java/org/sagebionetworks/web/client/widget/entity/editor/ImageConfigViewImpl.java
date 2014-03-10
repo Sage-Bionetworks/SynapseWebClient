@@ -241,11 +241,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
-				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
-				wikiIdParam;
+		String baseURl = GWT.getModuleBaseURL()+"simplefilehandle";
 		
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed
@@ -282,6 +278,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 						//enable the ok button
 						window.getButtonById(Dialog.OK).enable();
+						presenter.addFileHandleId(result.getMessage());
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}
