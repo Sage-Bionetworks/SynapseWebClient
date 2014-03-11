@@ -481,7 +481,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		row.add(right);
 		filesTabContainer.add(row);		
 		// add breadcrumbs
-		left.add(breadcrumb.asWidget(bundle.getPath(), null, false));
+		left.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES, false));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 		// Entity Metadata
