@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -39,14 +38,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -287,7 +284,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 
 		startTag = "--";
 		endTag = startTag;
-		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand("Strikeout", "", getBasicCommandClickHandler(startTag, endTag, true));
+		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand("Strikeout", "", getBasicCommandClickHandler(startTag, endTag, false));
 		strikeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("strike")));
 		strikeCommand.addStyleName("font-size-15");
 		mdCommands.add(strikeCommand);
@@ -305,14 +302,14 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		
 		startTag = "~";
 		endTag = startTag;
-		com.google.gwt.user.client.ui.Button subscript = getNewCommand("", "Subscript", "", getBasicCommandClickHandler(startTag, endTag, true));
+		com.google.gwt.user.client.ui.Button subscript = getNewCommand("", "Subscript", "", getBasicCommandClickHandler(startTag, endTag, false));
 		subscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("subscript")));
 		subscript.addStyleName("font-size-15");
 		mdCommands.add(subscript);
 		
 		startTag = "^";
 		endTag = startTag;
-		com.google.gwt.user.client.ui.Button superscript = getNewCommand("", "Superscript", "", getBasicCommandClickHandler(startTag, endTag, true));
+		com.google.gwt.user.client.ui.Button superscript = getNewCommand("", "Superscript", "", getBasicCommandClickHandler(startTag, endTag, false));
 		superscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("superscript")));
 		superscript.addStyleName("font-size-15");
 		mdCommands.add(superscript);
