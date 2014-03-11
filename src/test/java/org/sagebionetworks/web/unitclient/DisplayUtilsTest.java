@@ -245,7 +245,7 @@ public class DisplayUtilsTest {
 		//basic case, "test" selected, text should be surrounded with markdown
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = "test".length();
-		String result = DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 		assertEquals("This is the *test* markdown\nthat will be used.", result);
 	}
 	
@@ -254,21 +254,28 @@ public class DisplayUtilsTest {
 		//basic case, "test" selected, text should be surrounded with markdown
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = 0;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testSurroundTextPastNewline() {
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = "test markdown\nthat".length();
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
+	}
+	
+	@Test
+	public void testSurroundTextPastNewlineSupportMultiline() {
+		int startPos = textWithoutMarkdown.indexOf("test");
+		int selectionLength = "test markdown\nthat".length();
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, true, startPos, selectionLength);
 	}
 		
 	@Test (expected=IllegalArgumentException.class)
 	public void testSurroundTextPastEndOfLine() {
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = "test markdown\nthat".length();
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
 
 	@Test (expected=IllegalArgumentException.class)
@@ -276,28 +283,28 @@ public class DisplayUtilsTest {
 		//selection goes past end of string.
 		int startPos = textWithoutMarkdown.indexOf("used");
 		int selectionLength = 100;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
 
 	@Test (expected=IllegalArgumentException.class)
 	public void testSurroundTextInvalidStart() {
 		int startPos = -1;
 		int selectionLength = 2;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testSurroundTextInvalidSelectionLength() {
 		int startPos = 0;
 		int selectionLength = -1;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
 	
 	@Test
 	public void testSurroundTextStripMarkdownTest1() {
 		int startPos = textWithMarkdown.indexOf("test");
 		int selectionLength = "test".length();
-		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, markdownDelimiter2, false, startPos, selectionLength);
 		assertEquals(textWithoutMarkdown, result);
 	}
 
@@ -306,7 +313,7 @@ public class DisplayUtilsTest {
 		//before the selection has the markdown, but after the selection does not
 		int startPos = textWithMarkdown.indexOf("test");
 		int selectionLength = "test".length() + 4;
-		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, markdownDelimiter2, false, startPos, selectionLength);
 		assertEquals("This is the ****test** m**arkdown\nthat will be used.", result);
 	}
 
@@ -315,7 +322,7 @@ public class DisplayUtilsTest {
 		//after the selection has the markdown, but before the selection does not
 		int startPos = textWithMarkdown.indexOf("test") - 6;
 		int selectionLength = "test".length() + 6;
-		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, markdownDelimiter2, false, startPos, selectionLength);
 		assertEquals("This is **the **test**** markdown\nthat will be used.", result);
 	}
 	
@@ -325,8 +332,27 @@ public class DisplayUtilsTest {
 		String textWithMarkdown = "end of the text has **markdown**";
 		int startPos = textWithMarkdown.indexOf("markdown");
 		int selectionLength = "markdown".length();
-		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, markdownDelimiter2, false, startPos, selectionLength);
 		assertEquals("end of the text has markdown", result);
+	}
+	
+	@Test
+	public void testHeading() {
+		String textWithoutMarkdown = "The new header is Section 1";
+		int startPos = textWithoutMarkdown.indexOf("Section");
+		int selectionLength = "Section 1".length();
+		String result = DisplayUtils.surroundText(textWithoutMarkdown, "\n#", "", false, startPos, selectionLength);
+		assertEquals("The new header is \n#Section 1", result);
+	}
+	
+	@Test
+	public void testCodeBlock() {
+		String text = "String text = \"foo\";\nString text2 = \"bar\"";
+		int startPos = 0;
+		int selectionLength = text.length();
+		String markdownDelimiter = "\n```\n";
+		String result = DisplayUtils.surroundText(text, markdownDelimiter, markdownDelimiter, true, startPos, selectionLength);
+		assertEquals(markdownDelimiter+text+markdownDelimiter, result);
 	}
 }
 
