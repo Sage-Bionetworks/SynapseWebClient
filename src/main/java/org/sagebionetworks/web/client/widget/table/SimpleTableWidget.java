@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,6 +29,10 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private TableQueryUtilServiceAsync tableQueryUtilService;
+	private String tableEntityId;
+	private List<ColumnModel> tableColumns;
+	private String currentQuery;
+	private boolean canEdit;
 	
 	@Inject
 	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, TableQueryUtilServiceAsync tableQueryUtilService) {
@@ -44,13 +49,43 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return view.asWidget();		
 	}
 	
-	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {		
+	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {
+		this.tableEntityId = tableEntityId;
+		this.tableColumns = tableColumns;
+		this.currentQuery = queryString;
+		this.canEdit = canEdit;
+		
+		executeQuery(queryString, null);	
+	}
+
+	@Override
+	public void configure(WikiPageKey wikiKey,
+			Map<String, String> widgetDescriptor,
+			Callback widgetRefreshRequired, Long wikiVersionInView) {
+		throw new RuntimeException("NYI");
+	}
+
+	@Override
+	public void alterCurrentQuery(QueryDetails alterDetails) {
+		executeQuery(currentQuery, alterDetails);
+	}
+
+	@Override
+	public void query(String query) {
+		executeQuery(query, null);
+	}
+	
+	
+	/*
+	 * Private Methods
+	 */
+	private void executeQuery(final String queryString, QueryDetails modifyingQueryDetails) {
 		// Execute Query String		
-		synapseClient.executeTableQuery(queryString, new AsyncCallback<String>() {
+		synapseClient.executeTableQuery(queryString, modifyingQueryDetails, new AsyncCallback<QueryResult>() {
 			@Override
-			public void onSuccess(String rowSetJson) {
+			public void onSuccess(QueryResult queryResult) {
 				try {
-					final RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
+					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
 					// make column lookup
 					final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 					for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
@@ -62,21 +97,11 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						if(col != null) displayColumns.add(col);
 					}
 
-					tableQueryUtilService.getQueryDetails(queryString, new AsyncCallback<QueryDetails>() {
-						@Override
-						public void onSuccess(QueryDetails queryDetails) {
-							
-							// TODO : get total row count for query
-							int totalRowCount = 100;
-							
-							// send to view
-							view.configure(displayColumns, rowset, totalRowCount, canEdit, queryDetails);
-						}
-						@Override
-						public void onFailure(Throwable arg0) {
-							view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-						}
-					});
+					// TODO : get total row count for query
+					int totalRowCount = 100;
+					
+					// send to view
+					view.configure(displayColumns, rowset, totalRowCount, canEdit, queryString, queryResult.getQueryDetails());
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}																		
@@ -86,20 +111,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
 			}
-		});	
+		});
 	}
-
-
-	@Override
-	public void configure(WikiPageKey wikiKey,
-			Map<String, String> widgetDescriptor,
-			Callback widgetRefreshRequired, Long wikiVersionInView) {
-		throw new RuntimeException("NYI");
-	}
-
-	/*
-	 * Private Methods
-	 */
+	
 	private ColumnModel wrapDerivedColumnIfNeeded(final Map<String, ColumnModel> idToCol, String resultColumnId) {
 		// test for strait column id, otherwise it is a derived column
 		try {				

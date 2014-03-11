@@ -13,6 +13,16 @@
   </ui:style>
 
   <g:HTMLPanel>
+	<g:HTMLPanel ui:field="queryPanel" visible="false" styleName="margin-top-15">
+		<div class="row">
+			<div class="col-xs-8 col-sm-10 col-md-10">
+				<g:TextBox ui:field="queryField" styleName="form-control" />
+			</div>
+			<g:SimplePanel ui:field="queryButtonContainer"
+				styleName="col-xs-4 col-sm-2 col-md-2" />
+		</div>
+	</g:HTMLPanel>
+
     <table cellspacing='0' cellpadding='0' style='width:100%;'>
       <tr>
         <td

@@ -22,7 +22,9 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 
-		void alterQuery(QueryDetails alterDetails);
+		void alterCurrentQuery(QueryDetails alterDetails);
+
+		void query(String query);
 				
 	}
 	
@@ -35,6 +37,6 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param limit 
 	 * @param offset 
 	 */
-	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, QueryDetails queryDetails);
+	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
 	
 }

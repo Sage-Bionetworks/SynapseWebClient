@@ -7,6 +7,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
@@ -14,6 +15,8 @@ import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,8 +28,11 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -38,7 +44,13 @@ import com.google.inject.Inject;
 
 public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableWidgetView {
 	public interface Binder extends UiBinder<Widget, SimpleTableWidgetViewImpl> {	}
-	
+
+	@UiField
+	HTMLPanel queryPanel;
+	@UiField
+	TextBox queryField;
+	@UiField
+	SimplePanel queryButtonContainer;
 	@UiField
 	SimplePanel tableContainer;
 	@UiField
@@ -62,10 +74,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, QueryDetails queryDetails) {		
+	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails) {		
 		this.columns = columns;					
 		columnToModel.clear();
 				
+		setupQueryBox(queryString);			
+		queryPanel.setVisible(true);		
 		buildTable();
 		buildColumns(columns, canEdit);
 		
@@ -100,7 +114,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	        
 	        
 	        // TODO: call presenter for new data range
-	        presenter.alterQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection));
+	        presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection));
 	        List<TableModel> returnedData = null;
 	        cellTable.setRowData(range.getStart(), returnedData);
 	      }
@@ -216,4 +230,23 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		this.presenter = presenter;
 	}
 
+	
+	/*
+	 * Private Methods
+	 */
+	private void setupQueryBox(String queryString) {
+		// setup query
+		Button queryBtn = DisplayUtils.createButton(DisplayConstants.QUERY);
+		queryBtn.addStyleName("btn-block");
+		queryBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.query(queryField.getValue());
+			}
+		});
+		queryButtonContainer.setWidget(queryBtn);
+		queryField.setValue(queryString);
+	}
+
+	
 }

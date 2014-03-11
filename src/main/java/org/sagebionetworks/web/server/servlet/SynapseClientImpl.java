@@ -104,12 +104,17 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.table.query.model.FromClause;
+import org.sagebionetworks.table.query.ParseException;
+import org.sagebionetworks.table.query.TableQueryParser;
+import org.sagebionetworks.table.query.model.OrderByClause;
+import org.sagebionetworks.table.query.model.OrderingSpecification;
+import org.sagebionetworks.table.query.model.Pagination;
 import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SelectList;
-import org.sagebionetworks.table.query.model.SetQuantifier;
+import org.sagebionetworks.table.query.model.SortKey;
+import org.sagebionetworks.table.query.model.SortSpecification;
+import org.sagebionetworks.table.query.model.SortSpecificationList;
 import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.model.TableReference;
+import org.sagebionetworks.table.query.util.SqlElementUntils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -127,6 +132,9 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -2538,8 +2546,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String executeTableQuery(String query) throws RestServiceException {
-		// TODO : pass through to javaclient when available
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails) throws RestServiceException {		
+		// modify query with QueryDetails if requested
+		String executedQuery;
+		if(modifyingQueryDetails != null) executedQuery = ServiceUtils.modifyQuery(query, modifyingQueryDetails);
+		else executedQuery = query;		
+		
+		//Extract QueryDetails from executed Query		
+		QueryDetails queryDetails = ServiceUtils.extractQueryDetails(executedQuery);
+				
+		// TODO : pass through to javaclient when available		
 		RowSet rs = new RowSet();
 		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
 		rs.setEtag("1234");
@@ -2557,8 +2573,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		return json;
+		}		
+		
+		return new QueryResult(json, executedQuery, queryDetails);
 	}
 	
 	@Override
