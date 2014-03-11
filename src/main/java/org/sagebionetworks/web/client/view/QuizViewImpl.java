@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 
 import com.extjs.gxt.ui.client.widget.Window;
-import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -136,11 +136,12 @@ public class QuizViewImpl extends Composite implements QuizView {
     }
 	private FlowPanel addQuestion(String questionNumber, final String question, List<String> answers) {
 		FlowPanel questionContainer = new FlowPanel();
-		questionContainer.add(new HTMLPanel("<p>"+question+"</p>"));
+		questionContainer.addStyleName("margin-bottom-40 margin-left-15");
+		questionContainer.add(new HTMLPanel("<h5 class=\"inline-block\"><small>"+questionNumber+". </small>"+question+"</small></h5>"));
 		//now add possible answers
 		for (final String answer : answers) {
 			SimplePanel answerContainer = new SimplePanel();
-			answerContainer.addStyleName("radio");
+			answerContainer.addStyleName("radio margin-left-15");
 			RadioButton answerButton = new RadioButton("question-"+questionNumber, answer);
 			answerButton.addClickHandler(new ClickHandler() {
 				@Override
@@ -149,6 +150,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 				}
 			});
 			answerContainer.add(answerButton);
+			questionContainer.add(answerContainer);
 		}
 		return questionContainer;
 	}

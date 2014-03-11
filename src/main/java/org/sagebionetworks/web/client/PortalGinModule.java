@@ -446,6 +446,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 		
 		// QuizView
+		bind(QuizViewImpl.class).in(Singleton.class);
 		bind(QuizView.class).to(QuizViewImpl.class);		
 		
 		/*
