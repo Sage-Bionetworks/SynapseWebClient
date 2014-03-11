@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.sagebionetworks.web.client.SynapseView;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface RegisterAccountView extends IsWidget {
+public interface RegisterAccountView extends IsWidget, SynapseView {
 	
 	/**
 	 * Set this view's presenter

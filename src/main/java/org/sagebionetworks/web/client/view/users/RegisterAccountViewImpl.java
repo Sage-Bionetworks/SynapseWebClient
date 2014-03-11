@@ -245,5 +245,15 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			registerButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.mailArrow16()));
 		}
 	}
+
+
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showLoading() {
+	}
 	
 }
