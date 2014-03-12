@@ -217,7 +217,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public APITableColumnRenderer[] createRenderers(String[] columnNamesArray, APITableConfig tableConfig, PortalGinInjector ginInjector) {
 		//if column configs were not passed in, then use default
 		if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
-			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray));
+			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray, tableConfig));
 		}
 		
 		APITableColumnRenderer[] renderers = new APITableColumnRenderer[tableConfig.getColumnConfigs().size()];
@@ -380,7 +380,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 	}
 	
-	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray) {
+	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray, APITableConfig tableConfig) {
 		List<APITableColumnConfig> defaultConfigs = new ArrayList<APITableColumnConfig>();
 		//create a config for each column
 		for (int i = 0; i < columnNamesArray.length; i++) {
@@ -393,7 +393,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			Set<String> inputColumnSet = new HashSet<String>();
 			inputColumnSet.add(currentColumnName);
 			newConfig.setInputColumnNames(inputColumnSet);
-			newConfig.setRendererFriendlyName(guessRendererFriendlyName(displayColumnName));
+			newConfig.setRendererFriendlyName(guessRendererFriendlyName(displayColumnName, tableConfig));
 			defaultConfigs.add(newConfig);
 		}
 				
@@ -405,7 +405,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 * @param columnName
 	 * @return
 	 */
-	public String guessRendererFriendlyName(String columnName) {
+	public String guessRendererFriendlyName(String columnName, APITableConfig tableConfig) {
 		String defaultRendererName =  WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
 		String lowerCaseColumnName = columnName.toLowerCase();
 		if (userColumnNames.contains(lowerCaseColumnName)) {
