@@ -137,9 +137,9 @@ public class EntityPageTopTest {
 	}
 
 	@Test 
-	public void testProjectWithFilesState() {
-		// create some state for files tab
-		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.FILES, null);
+	public void testProjectWithFilesStateNoArea_SWC_1240() {
+		// create some state for a file entity but not explicitly setting the Files area
+		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// go back to project wiki

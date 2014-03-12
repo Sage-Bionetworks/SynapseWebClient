@@ -89,6 +89,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
      * @param bundle
      */
     public void configure(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
+    	// reset state for newly visited project
+    	boolean isNewProject = projectHeader.getId().equals(projectAreaState.getProjectId());
+    	if(!isNewProject) {
+    		projectAreaState = new ProjectAreaState();
+    		projectAreaState.setProjectId(projectHeader.getId());
+    	}
+    	
     	this.bundle = bundle;
     	this.versionNumber = versionNumber;
     	this.projectHeader = projectHeader;
@@ -96,16 +103,11 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	this.areaToken = areaToken;
     	
     	String entityId = bundle.getEntity().getId();
-    	boolean isNewProject = projectHeader.getId().equals(projectAreaState.getProjectId());
+    	boolean isTable = bundle.getEntity() instanceof TableEntity;
     	boolean isProject = entityId.equals(projectAreaState.getProjectId());
-    	// reset state for newly visited project
-    	if(!isNewProject) {
-    		projectAreaState = new ProjectAreaState();
-    		projectAreaState.setProjectId(projectHeader.getId());
-    	}
     	
-    	// For non-project file entities, record them as the last file area place 
-    	if(!projectHeader.getId().equals(entityId) && area == EntityArea.FILES) {
+    	// For non-project file-tab entities, record them as the last file area place 
+    	if(!isProject && !isTable && area != EntityArea.WIKI) {
     		EntityHeader lastFileAreaEntity = new EntityHeader();
     		lastFileAreaEntity.setId(entityId);
     		lastFileAreaEntity.setVersionNumber(versionNumber);
@@ -118,7 +120,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	}
     	
     	// record last table state
-    	if(bundle.getEntity() instanceof TableEntity) {
+    	if(isTable) {
     		EntityHeader lastTableAreaEntity = new EntityHeader();
     		lastTableAreaEntity.setId(entityId);
     		projectAreaState.setLastTableAreaEntity(lastTableAreaEntity);
