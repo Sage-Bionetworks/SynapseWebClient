@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -49,15 +50,15 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public static Set<String> dateColumnNames = new HashSet<String>();
 	public static Set<String> synapseIdColumnNames = new HashSet<String>();
 	static {
-		userColumnNames.add("createdbyprincipalid");
-		userColumnNames.add("modifiedbyprincipalid");
-		userColumnNames.add("userid");
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID);
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID);
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_USER_ID);
 
-		dateColumnNames.add("createdon");
-		dateColumnNames.add("modifiedon");
+		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_ON);
+		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_ON);
 		
-		synapseIdColumnNames.add("entityid");
-		synapseIdColumnNames.add("parentid");
+		synapseIdColumnNames.add(WebConstants.DEFAULT_COL_NAME_ENTITY_ID);
+		synapseIdColumnNames.add(WebConstants.DEFAULT_COL_NAME_PARENT_ID);
 	}
 	
 	@Inject
@@ -416,7 +417,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			} else if (dateColumnNames.contains(lowerCaseColumnName)) {
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
 			} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
-					(isNodeQueryService(tableConfig.getUri()) && "id".equals(lowerCaseColumnName))) {
+					(isNodeQueryService(tableConfig.getUri()) && WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName))) {
 				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
 			}
 		}
