@@ -119,10 +119,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
+		// NOTE: this is fragile, but there doesn't seem to be a way around querying by nodeType. 
+		// a query on concreteType!=org...TableEntity eliminates nodes who do not have concreteType defined
+		final String TABLE_ENTITY_NODE_TYPE_ID = "17"; 
+		
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { 
 						new WhereCondition("parentId", WhereOperator.EQUALS, entityId),
-						new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.NOT_EQUALS, TableEntity.class.getName())
+						new WhereCondition(WebConstants.NODE_TYPE_KEY, WhereOperator.NOT_EQUALS, "17")
 						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
