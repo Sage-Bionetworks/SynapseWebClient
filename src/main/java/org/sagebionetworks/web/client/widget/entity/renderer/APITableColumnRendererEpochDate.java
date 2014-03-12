@@ -47,7 +47,8 @@ public class APITableColumnRendererEpochDate implements APITableColumnRenderer {
 		for (Iterator iterator2 = colValues.iterator(); iterator2
 				.hasNext();) {
 			String colValue = (String) iterator2.next();
-			Date date = new Date(Long.parseLong(colValue));
+			//parse as a double, and cast to long (truncate toward zero)
+			Date date = new Date((long)Double.parseDouble(colValue));
 			outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
 		}
 		outputColumnData.put(outputColumnName, outputValues);

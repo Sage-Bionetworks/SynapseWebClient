@@ -59,8 +59,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 		}
 		
 		for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
-			String userId = (String) iterator.next();
-			userId2html.put(userId, emptyString);
+			userId2html.put(getUserId((String)iterator.next()), emptyString);
 		}
 		List<String> uniqueUserIds = new ArrayList<String>();
 		uniqueUserIds.addAll(userId2html.keySet());
@@ -96,7 +95,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 								//iterate through input user ids to create output list
 								List<String> out = new ArrayList<String>();
 								for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
-									String userId = (String) iterator.next();
+									String userId = getUserId((String)iterator.next());
 									String html = userId2html.get(userId);
 									if (html != null && html.length() > 0)
 										out.add(html);
@@ -123,6 +122,13 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	public String getUserId(String inputUserId) {
+		//user ids are returned as doubles from the query for some reason
+		Double userId = Double.parseDouble(inputUserId);
+		return String.valueOf(userId.longValue());
+
 	}
 	
 	
