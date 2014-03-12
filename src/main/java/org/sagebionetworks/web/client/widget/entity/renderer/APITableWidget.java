@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.json.client.JSONException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -246,11 +247,21 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return columnNamesArray;
 	}
 	
-	private String getColumnValue(JSONObjectAdapter row, String key) throws JSONObjectAdapterException {
+	public static String getColumnValue(JSONObjectAdapter row, String key) throws JSONObjectAdapterException {
 		String value = "";
 		if (row.has(key)) {
 			try {
-				Object objValue = row.get(key);
+				Object objValue;
+				//try to parse it as a String, then as a Long, then fall back to get object
+				try {
+					objValue = row.getString(key);
+				} catch (JSONObjectAdapterException e) {
+					try {
+						objValue = row.getLong(key);
+					} catch (JSONObjectAdapterException e1) {
+						objValue = row.get(key);
+					}
+				}
 				if (objValue != null)
 					value = objValue.toString();
 			} catch (JSONObjectAdapterException e) {

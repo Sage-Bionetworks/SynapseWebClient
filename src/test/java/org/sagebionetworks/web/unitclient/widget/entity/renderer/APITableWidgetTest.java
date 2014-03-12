@@ -386,5 +386,60 @@ public class APITableWidgetTest {
 		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
 	}
 	
+	@Test 
+	public void testGetColumnValueKeyMissing() throws JSONObjectAdapterException {
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(false);
+		assertEquals("", APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueString() throws JSONObjectAdapterException {
+		String testValue = "test";
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenReturn(testValue);
+		assertEquals(testValue, APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueLong() throws JSONObjectAdapterException {
+		Long testValue = 10L;
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenReturn(testValue);
+		assertEquals(testValue.toString(), APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueDouble() throws JSONObjectAdapterException {
+		Double testValue = 10.5;
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenThrow(new JSONObjectAdapterException("invalid long"));
+		when(row.get(anyString())).thenReturn(testValue);
+		assertEquals(testValue.toString(), APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueArray() throws JSONObjectAdapterException {
+		String val1 = "a";
+		String val2 = "b";
+		JSONArrayAdapter valueArray = mock(JSONArrayAdapter.class);
+		when(valueArray.length()).thenReturn(2);
+		when(valueArray.get(0)).thenReturn(val1);
+		when(valueArray.get(1)).thenReturn(val2);
+		
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenThrow(new JSONObjectAdapterException("invalid long"));
+		when(row.get(anyString())).thenThrow(new JSONObjectAdapterException("invalid json object"));
+		when(row.getJSONArray(anyString())).thenReturn(valueArray);
+		
+		assertEquals("a,b", APITableWidget.getColumnValue(row, "key"));
+	}
 	
 }
