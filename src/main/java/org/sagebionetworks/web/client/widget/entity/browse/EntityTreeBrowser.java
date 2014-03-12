@@ -126,7 +126,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { 
 						new WhereCondition("parentId", WhereOperator.EQUALS, entityId),
-						new WhereCondition(WebConstants.NODE_TYPE_KEY, WhereOperator.NOT_EQUALS, "17")
+						new WhereCondition(WebConstants.NODE_TYPE_KEY, WhereOperator.NOT_EQUALS, TABLE_ENTITY_NODE_TYPE_ID)
 						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
