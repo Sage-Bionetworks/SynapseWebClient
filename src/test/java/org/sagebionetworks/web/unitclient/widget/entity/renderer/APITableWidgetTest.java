@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -44,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -355,6 +354,36 @@ public class APITableWidgetTest {
 		outputUri = widget.getOrderedByURI(inputUri, tableConfig).toLowerCase();
 		assertFalse(outputUri.contains("order+by+"));
 		assertFalse(outputUri.contains("desc"));
+	}
+	
+	@Test
+	public void testFixDisplayColumnName() {
+		assertEquals("id", widget.fixDisplayColumnName("project.id"));
+		assertEquals("Annotation", widget.fixDisplayColumnName("data.Annotation"));
+		assertEquals("date", widget.fixDisplayColumnName("date"));
+		assertNull(widget.fixDisplayColumnName(null));
+	}
+	
+	@Test
+	public void testGuessRendererFriendlyName() {
+		APITableConfig tableConfig = getTableConfig();
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(null, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName("foo", tableConfig));
+		//case should not matter
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_USER_ID.toUpperCase(), tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_USER_ID.toLowerCase(), tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_CREATED_ON, tableConfig));
+		
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ENTITY_ID, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_PARENT_ID, tableConfig));
+		
+		//next, check "id".  If node query service, assume it's a synapse id.  Otherwise, do not render in a special way.
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
+		tableConfig.setUri(ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project");
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
+		tableConfig.setUri(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_123");
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
 	}
 	
 	

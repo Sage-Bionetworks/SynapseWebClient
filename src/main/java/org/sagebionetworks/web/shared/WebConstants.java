@@ -192,4 +192,15 @@ public class WebConstants {
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	
+	//APITableWidget default column names
+	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
+	public static final String DEFAULT_COL_NAME_ENTITY_ID = "entityid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_ON = "modifiedon";
+	public static final String DEFAULT_COL_NAME_CREATED_ON = "createdon";
+	public static final String DEFAULT_COL_NAME_USER_ID = "userid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
+	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
+	public static final String DEFAULT_COL_NAME_ID = "id";
+	
 }

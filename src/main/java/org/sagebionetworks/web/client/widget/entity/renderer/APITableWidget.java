@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +45,21 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	private APITableConfig tableConfig;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	
+	public static Set<String> userColumnNames = new HashSet<String>();
+	public static Set<String> dateColumnNames = new HashSet<String>();
+	public static Set<String> synapseIdColumnNames = new HashSet<String>();
+	static {
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID);
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID);
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_USER_ID);
 
+		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_ON);
+		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_ON);
+		
+		synapseIdColumnNames.add(WebConstants.DEFAULT_COL_NAME_ENTITY_ID);
+		synapseIdColumnNames.add(WebConstants.DEFAULT_COL_NAME_PARENT_ID);
+	}
 	
 	@Inject
 	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
@@ -56,7 +71,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.ginInjector = ginInjector;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
+		this.authenticationController = authenticationController;		
 	}
 	
 	@Override
@@ -77,8 +92,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		else
 			view.showError(DisplayConstants.API_TABLE_MISSING_URI);
 	}
-	
-	
 	
 	@Override
 	public void pageBack() {
@@ -183,6 +196,15 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		});
 	}
 	
+	public String fixDisplayColumnName(String colName) {
+		if (colName == null)
+			return colName;
+		int dotIndex = colName.indexOf('.');
+		if (dotIndex > -1)
+			return colName.substring(dotIndex+1);
+		else return colName;
+	}
+	
 	public Map<String, List<String>> createColumnDataMap(Iterator<String> iterator) {
 		//initialize column data
 		Map<String, List<String>> columnData = new HashMap<String, List<String>>();
@@ -198,7 +220,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public APITableColumnRenderer[] createRenderers(String[] columnNamesArray, APITableConfig tableConfig, PortalGinInjector ginInjector) {
 		//if column configs were not passed in, then use default
 		if (tableConfig.getColumnConfigs() == null || tableConfig.getColumnConfigs().size() == 0) {
-			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray));
+			tableConfig.setColumnConfigs(getDefaultColumnConfigs(columnNamesArray, tableConfig));
 		}
 		
 		APITableColumnRenderer[] renderers = new APITableColumnRenderer[tableConfig.getColumnConfigs().size()];
@@ -361,20 +383,45 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		}
 	}
 	
-	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray) {
+	private List<APITableColumnConfig> getDefaultColumnConfigs(String[] columnNamesArray, APITableConfig tableConfig) {
 		List<APITableColumnConfig> defaultConfigs = new ArrayList<APITableColumnConfig>();
 		//create a config for each column
 		for (int i = 0; i < columnNamesArray.length; i++) {
 			APITableColumnConfig newConfig = new APITableColumnConfig();
-			newConfig.setDisplayColumnName(columnNamesArray[i]);
+			String currentColumnName = columnNamesArray[i];
+			String displayColumnName = currentColumnName;
+			if (isNodeQueryService(tableConfig.getUri()))
+				displayColumnName = fixDisplayColumnName(currentColumnName);
+			newConfig.setDisplayColumnName(displayColumnName);
 			Set<String> inputColumnSet = new HashSet<String>();
-			inputColumnSet.add(columnNamesArray[i]);
+			inputColumnSet.add(currentColumnName);
 			newConfig.setInputColumnNames(inputColumnSet);
-			newConfig.setRendererFriendlyName(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
+			newConfig.setRendererFriendlyName(guessRendererFriendlyName(displayColumnName, tableConfig));
 			defaultConfigs.add(newConfig);
 		}
 				
 		return defaultConfigs;
+	}
+	
+	/**
+	 * make a best guess as to what the renderer type should be
+	 * @param columnName
+	 * @return
+	 */
+	public String guessRendererFriendlyName(String columnName, APITableConfig tableConfig) {
+		String defaultRendererName =  WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
+		if (columnName != null) {
+			String lowerCaseColumnName = columnName.toLowerCase();
+			if (userColumnNames.contains(lowerCaseColumnName)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID;
+			} else if (dateColumnNames.contains(lowerCaseColumnName)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
+			} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
+					(isNodeQueryService(tableConfig.getUri()) && WebConstants.DEFAULT_COL_NAME_ID.equals(lowerCaseColumnName))) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
+			}
+		}
+		return defaultRendererName;
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Dialog;
