@@ -196,6 +196,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	public String fixDisplayColumnName(String colName) {
+		if (colName == null)
+			return colName;
 		int dotIndex = colName.indexOf('.');
 		if (dotIndex > -1)
 			return colName.substring(dotIndex+1);
@@ -407,14 +409,16 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	 */
 	public String guessRendererFriendlyName(String columnName, APITableConfig tableConfig) {
 		String defaultRendererName =  WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE;
-		String lowerCaseColumnName = columnName.toLowerCase();
-		if (userColumnNames.contains(lowerCaseColumnName)) {
-			defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID;
-		} else if (dateColumnNames.contains(lowerCaseColumnName)) {
-			defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
-		} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
-				(isNodeQueryService(tableConfig.getUri()) && "id".equals(lowerCaseColumnName))) {
-			defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
+		if (columnName != null) {
+			String lowerCaseColumnName = columnName.toLowerCase();
+			if (userColumnNames.contains(lowerCaseColumnName)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID;
+			} else if (dateColumnNames.contains(lowerCaseColumnName)) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE;
+			} else if (synapseIdColumnNames.contains(lowerCaseColumnName) || 
+					(isNodeQueryService(tableConfig.getUri()) && "id".equals(lowerCaseColumnName))) {
+				defaultRendererName = WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID;
+			}
 		}
 		return defaultRendererName;
 	}
