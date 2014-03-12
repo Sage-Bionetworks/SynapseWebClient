@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -2167,4 +2168,5 @@ public class DisplayUtils {
 	public static String getPreviewSuffix(Boolean isPreview) {
 		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
+
 }
