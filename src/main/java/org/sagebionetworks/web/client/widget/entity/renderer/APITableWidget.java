@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,7 +203,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	public static void fixColumnNames(Map<String, List<String>> columnData) {
-		Set<String> initialKeySet = new HashSet<String>();
+		Set<String> initialKeySet = new LinkedHashSet<String>();
 		initialKeySet.addAll(columnData.keySet());
 		for (String key : initialKeySet) {
 			List<String> columnValues = columnData.remove(key);
@@ -220,7 +222,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	
 	public Map<String, List<String>> createColumnDataMap(Iterator<String> iterator) {
 		//initialize column data
-		Map<String, List<String>> columnData = new HashMap<String, List<String>>();
+		Map<String, List<String>> columnData = new LinkedHashMap<String, List<String>>();
 		if (iterator != null) {
 			//initialize the column data lists
 			for (; iterator.hasNext();) {
