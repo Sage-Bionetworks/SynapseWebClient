@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -148,6 +149,11 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// Team Search page
 					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
 					presenter.setPlace((TeamSearch)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Quiz) {
+					// Test page
+					QuizPresenter presenter = ginjector.getQuizPresenter();
+					presenter.setPlace((Quiz)place);
 					presenter.start(panel, eventBus);
 				} else {
 					// Log that we have an unknown place but send the user to the default

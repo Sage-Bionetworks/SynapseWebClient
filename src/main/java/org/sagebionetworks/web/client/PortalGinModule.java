@@ -64,6 +64,8 @@ import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.client.view.TeamSearchViewImpl;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
+import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -443,6 +445,9 @@ public class PortalGinModule extends AbstractGinModule {
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 		
+		// QuizView
+		bind(QuizViewImpl.class).in(Singleton.class);
+		bind(QuizView.class).to(QuizViewImpl.class);		
 		
 		/*
 		 * Factories

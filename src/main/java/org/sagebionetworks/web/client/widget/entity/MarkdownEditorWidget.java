@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -39,14 +38,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -274,25 +271,57 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		mdCommands.add(insertButton);
 		
 		//basic commands
-		com.google.gwt.user.client.ui.Button boldCommand = getNewCommand(null, "glyphicon-bold", getBasicCommandClickHandler("**"));
+		String startTag = "**";
+		String endTag = startTag;
+		com.google.gwt.user.client.ui.Button boldCommand = getNewCommand("Bold", "glyphicon-bold", getBasicCommandClickHandler(startTag, endTag, false));
 		boldCommand.addStyleName("margin-left-10");
 		mdCommands.add(boldCommand);
 
-		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand(null, "glyphicon-italic", getBasicCommandClickHandler("_"));
-		italicCommand.addStyleName("margin-right-10");
+		startTag = "_";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand("Italicize", "glyphicon-italic",  getBasicCommandClickHandler(startTag, endTag, false));
 		mdCommands.add(italicCommand);
-		
-//		//strike out icon is available in the free icon package, but isn't available directly from bootstrap
-//		Button strikeCommand = new Button("", AbstractImagePrototype.create(iconsImageBundle.glyphTextStrike16()));
-//		strikeCommand.addStyleName("whiteBackgroundGxt margin-right-10");
-//		strikeCommand.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				handleBasicCommand("--");
-//			}
-//		});
-//		mdCommands.add(strikeCommand);
 
+		startTag = "--";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand("Strikeout", "", getBasicCommandClickHandler(startTag, endTag, false));
+		strikeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("strike")));
+		strikeCommand.addStyleName("font-size-15");
+		mdCommands.add(strikeCommand);
+
+		startTag = "\n```\n";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button codeCommand = getNewCommand("Code Block", "Optionally specify the language for syntax highlighting.", "", getBasicCommandClickHandler(startTag, endTag, true));
+		mdCommands.add(codeCommand);
+		
+		startTag = "$$\\(";
+		endTag = "\\)$$";
+		com.google.gwt.user.client.ui.Button mathCommand = getNewCommand("TeX", "LaTeX math equation.", "", getBasicCommandClickHandler(startTag, endTag, false));
+		mdCommands.add(mathCommand);
+		
+		
+		startTag = "~";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button subscript = getNewCommand("", "Subscript", "", getBasicCommandClickHandler(startTag, endTag, false));
+		subscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("subscript")));
+		subscript.addStyleName("font-size-15");
+		mdCommands.add(subscript);
+		
+		startTag = "^";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button superscript = getNewCommand("", "Superscript", "", getBasicCommandClickHandler(startTag, endTag, false));
+		superscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("superscript")));
+		superscript.addStyleName("font-size-15");
+		mdCommands.add(superscript);
+		
+		Button headingButton = new Button("Heading");
+		DisplayUtils.addToolTip(headingButton, "Heading");
+		headingButton.addStyleName("whiteBackgroundGxt boldText");
+		headingButton.setWidth(60);
+		headingButton.setMenu(createHeadingMenu());
+		headingButton.addStyleName("margin-right-10");
+		mdCommands.add(headingButton);
+		
 		if (isWikiEditor) {
 			com.google.gwt.user.client.ui.Button attachment = getNewCommand("Insert Attachment", "glyphicon-paperclip",new ClickHandler() {
 				@Override
@@ -358,21 +387,21 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}
 	}
 	
-	private ClickHandler getBasicCommandClickHandler(final String markdown) {
+	private ClickHandler getBasicCommandClickHandler(final String startTag, final String endTag, final boolean isMultiline) {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				handleBasicCommand(markdown);
+				handleBasicCommand(startTag, endTag, isMultiline);
 			}
 		};
 	}
 	
-	private void handleBasicCommand(String markdown) {
+	private void handleBasicCommand(String startTag, String endTag, boolean isMultiline) {
 		int selectionLength = markdownTextArea.getSelectionLength();
 		String text = markdownTextArea.getText();
 		int currentPos = markdownTextArea.getCursorPos();
 		try {
-			String newText = DisplayUtils.surroundText(text, markdown, currentPos, selectionLength);
+			String newText = DisplayUtils.surroundText(text, startTag, endTag, isMultiline, currentPos, selectionLength);
 			markdownTextArea.setText(newText);
 		} catch (IllegalArgumentException e) {
 			showErrorMessage(e.getMessage());
@@ -454,6 +483,29 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    window.show();		
 	}
 
+	private Menu createHeadingMenu() {
+	    Menu menu = new Menu();
+	    menu.setEnableScrolling(false);
+	    for (int i = 1; i < 7; i++) {
+	    	StringBuilder hashes = new StringBuilder();
+	    	for (int j = 0; j < i; j++) {
+				hashes.append("#");
+			}
+	    	addHeadingMenuItem(menu, "<H"+i+">Heading "+i+"</H"+i+">", "\n" + hashes.toString());	
+		}
+
+	    return menu;
+	}
+	
+	private void addHeadingMenuItem(Menu menu, String text, final String startTag) {
+		menu.add(getNewCommand(text, new SelectionListener<ComponentEvent>() {
+			@Override
+			public void componentSelected(ComponentEvent ce) {
+				handleBasicCommand(startTag, "", false);
+			};
+		}));
+	}
+	
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
 	    menu.setEnableScrolling(false);
@@ -635,16 +687,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		command.addClickHandler(clickHandler);
 		if (tooltipText != null)
 			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
-		return command;
-	}
-
-	
-	public Image getNewCommand(String tooltipText, ImageResource image, ClickHandler clickHandler){
-		Image command = new Image(image);
-		command.addStyleName("imageButton");
-		command.addClickHandler(clickHandler);
-		if (tooltipText != null)
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		command.setHeight("22px");
 		return command;
 	}
 	

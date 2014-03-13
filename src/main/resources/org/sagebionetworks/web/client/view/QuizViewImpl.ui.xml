@@ -1,0 +1,37 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		div.center {   
+			margin-left: auto;   
+			margin-right: auto;   
+			width: 8em;
+			padding:15px; 
+		}
+	</ui:style>
+	<g:HTMLPanel>
+        <div class="color-line"></div>
+        <div class="clear"></div>
+		<g:SimplePanel ui:field="header" />
+        <div class="separator margin-top-10-imp"></div>
+    	<div class="container margin-top-15"> 		
+			<g:HTMLPanel>
+				<div class="row">				
+					<div class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10" title="Quiz">
+						<form>
+						    <g:FlowPanel ui:field="testContainer">
+						    </g:FlowPanel>
+		   				</form>
+					</div>
+					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+					    <g:Button ui:field="submitButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Submit"/>
+					</div>
+				</div>
+			</g:HTMLPanel>
+		</div> <!-- close class="container" -->
+<!-- start footer -->
+		<div class="clear"></div>
+		<g:SimplePanel ui:field="footer" />
+<!-- end footer -->
+	</g:HTMLPanel>
+</ui:UiBinder> 

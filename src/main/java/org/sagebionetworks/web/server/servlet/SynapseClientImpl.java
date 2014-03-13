@@ -2257,24 +2257,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Evaluation> returnResults = new PaginatedResults<Evaluation>();
-			List<Evaluation> returnList = new ArrayList<Evaluation>();
-			if (targetEvaluationIds.size() > 0) {
-				Set<String> targetEvalIdsCopy = new HashSet<String>();
-				targetEvalIdsCopy.addAll(targetEvaluationIds);
-				PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
-				//filter down to the target evaluation ids
-				for (Evaluation evaluation : results.getResults()) {
-					if (targetEvalIdsCopy.contains(evaluation.getId())) {
-						targetEvalIdsCopy.remove(evaluation.getId());
-						returnList.add(evaluation);
-					}
-				}
-			}
-			returnResults.setResults(returnList);
-			returnResults.setTotalNumberOfResults(returnList.size());
-			//filter results down to the targetEvaluationIds
-			JSONObjectAdapter evaluationsJson = returnResults.writeToJSONObject(adapterFactory.createNew());
+			List<String> targetEvaluationIdsList = new ArrayList<String>();
+			targetEvaluationIdsList.addAll(targetEvaluationIds);
+			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT, targetEvaluationIdsList);
+			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
