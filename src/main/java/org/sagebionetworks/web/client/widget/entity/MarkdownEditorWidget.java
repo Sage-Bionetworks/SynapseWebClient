@@ -374,6 +374,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		try {
 			String newText = DisplayUtils.surroundText(text, markdown, currentPos, selectionLength);
 			markdownTextArea.setText(newText);
+			markdownTextArea.setCursorPos(currentPos+markdown.length());
+			markdownTextArea.setFocus(true);
 		} catch (IllegalArgumentException e) {
 			showErrorMessage(e.getMessage());
 		}
