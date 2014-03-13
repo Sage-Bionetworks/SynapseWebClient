@@ -358,10 +358,10 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testFixDisplayColumnName() {
-		assertEquals("id", widget.fixDisplayColumnName("project.id"));
-		assertEquals("Annotation", widget.fixDisplayColumnName("data.Annotation"));
-		assertEquals("date", widget.fixDisplayColumnName("date"));
-		assertNull(widget.fixDisplayColumnName(null));
+		assertEquals("id", widget.removeFirstToken("project.id"));
+		assertEquals("Annotation", widget.removeFirstToken("data.Annotation"));
+		assertEquals("date", widget.removeFirstToken("date"));
+		assertNull(widget.removeFirstToken(null));
 	}
 	
 	@Test

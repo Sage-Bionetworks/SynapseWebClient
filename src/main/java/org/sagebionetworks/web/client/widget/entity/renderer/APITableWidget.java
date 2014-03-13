@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.json.client.JSONException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -177,6 +176,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 					}
 					
 					if (columnData != null) {
+						//if node query, remove the object type from the column names (ie remove "project." from "project.id")
+						if(isNodeQueryService(tableConfig.getUri())) {
+							fixColumnNames(columnData);
+						}
 						//define the column names
 						String[] columnNamesArray = getColumnNamesArray(columnData.keySet());
 						//create renderers
@@ -197,7 +200,16 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		});
 	}
 	
-	public String fixDisplayColumnName(String colName) {
+	public static void fixColumnNames(Map<String, List<String>> columnData) {
+		Set<String> initialKeySet = new HashSet<String>();
+		initialKeySet.addAll(columnData.keySet());
+		for (String key : initialKeySet) {
+			List<String> columnValues = columnData.remove(key);
+			columnData.put(removeFirstToken(key), columnValues);
+		}
+	}
+	
+	public static String removeFirstToken(String colName) {
 		if (colName == null)
 			return colName;
 		int dotIndex = colName.indexOf('.');
@@ -401,8 +413,6 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			APITableColumnConfig newConfig = new APITableColumnConfig();
 			String currentColumnName = columnNamesArray[i];
 			String displayColumnName = currentColumnName;
-			if (isNodeQueryService(tableConfig.getUri()))
-				displayColumnName = fixDisplayColumnName(currentColumnName);
 			newConfig.setDisplayColumnName(displayColumnName);
 			Set<String> inputColumnSet = new HashSet<String>();
 			inputColumnSet.add(currentColumnName);
@@ -491,6 +501,14 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return config.getInputColumnNames().iterator().next();
 	}
 	
+	public static List<String> getColumnValues(String inputColumnName, Map<String, List<String>> columnData) {
+		List<String> colValues = columnData.get(inputColumnName);
+		if (colValues == null) {
+			//try to find using the fixed column value
+			colValues = columnData.get(removeFirstToken(inputColumnName));
+		}
+		return colValues;
+	}
 		/*
 	 * Private Methods
 	 */
