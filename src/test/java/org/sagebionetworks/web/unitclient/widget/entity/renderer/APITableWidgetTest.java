@@ -255,6 +255,22 @@ public class APITableWidgetTest {
 		testSet.add(col2Name);
 		return testSet;
 	}
+	private List<String> getTestColumnValues(String columnName) {
+		List<String> testColumnValues = new ArrayList<String>();
+		for (int i = 0; i < 10; i++) {
+			testColumnValues.add(columnName + " data item " + i);
+		}
+		return testColumnValues;
+	}
+	
+	private Map<String, List<String>> getTestColumnData(List<String> columnNames) {
+		Map<String, List<String>> colData = new HashMap<String, List<String>>();
+		for (String colName : columnNames) {
+			colData.put(colName, getTestColumnValues(colName));
+		}
+		return colData;
+	}
+
 	
 	@Test
 	public void testCreateColumnDataMap() throws JSONObjectAdapterException {
@@ -357,11 +373,11 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testFixDisplayColumnName() {
-		assertEquals("id", widget.fixDisplayColumnName("project.id"));
-		assertEquals("Annotation", widget.fixDisplayColumnName("data.Annotation"));
-		assertEquals("date", widget.fixDisplayColumnName("date"));
-		assertNull(widget.fixDisplayColumnName(null));
+	public void testRemoveFirstToken() {
+		assertEquals("id", APITableWidget.removeFirstToken("project.id"));
+		assertEquals("Annotation", APITableWidget.removeFirstToken("data.Annotation"));
+		assertEquals("date", APITableWidget.removeFirstToken("date"));
+		assertNull(APITableWidget.removeFirstToken(null));
 	}
 	
 	@Test
@@ -442,4 +458,34 @@ public class APITableWidgetTest {
 		assertEquals("a,b", APITableWidget.getColumnValue(row, "key"));
 	}
 	
+	@Test
+	public void testFixColumnNames() {
+		String column1 = "project.id";  
+		String column2 = "name";
+		List<String> colNames = new ArrayList<String>();
+		colNames.add(column1);
+		colNames.add(column2);
+		Map<String, List<String>> columnData = getTestColumnData(colNames);
+		
+		APITableWidget.fixColumnNames(columnData);
+		
+		//no longer contains project.id, but does contain id
+		assertFalse(columnData.containsKey(column1));
+		assertTrue(columnData.containsKey("id"));
+		//still contains name
+		assertTrue(columnData.containsKey(column2));
+	}
+	
+	@Test
+	public void testGetColumnValues() {
+		String column1 = "id";  
+		List<String> colNames = new ArrayList<String>();
+		colNames.add(column1);
+		Map<String, List<String>> columnData = getTestColumnData(colNames);
+		
+		assertNotNull(APITableWidget.getColumnValues(column1, columnData));
+		//previous table column definitions will be looking for the type. This should also work
+		assertNotNull(APITableWidget.getColumnValues("project."+column1, columnData));
+		assertNull(APITableWidget.getColumnValues("absent", columnData));
+	}
 }
