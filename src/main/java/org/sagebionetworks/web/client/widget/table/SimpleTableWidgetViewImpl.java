@@ -85,7 +85,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 	    cellTable.setRowCount(totalRowCount, true); // TODO : do this asynchronously from the view?
 	    if(queryDetails.getOffset() != null && queryDetails.getLimit() != null) {	    	
-	    	cellTable.setVisibleRange(queryDetails.getOffset(), queryDetails.getOffset() + queryDetails.getLimit());
+	    	cellTable.setVisibleRange(queryDetails.getOffset().intValue(), queryDetails.getOffset().intValue() + queryDetails.getLimit().intValue());
 	    } else {
 	    	cellTable.setVisibleRange(0, totalRowCount);
 	    }	    
@@ -109,9 +109,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	        	}
 	        }
         	
-	        int offset = range.getStart();
-	        int limit = range.getLength();
-	        
+	        Long offset = new Long(range.getStart());
+	        Long limit = new Long(range.getLength());	        
 	        
 	        // TODO: call presenter for new data range
 	        presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection));

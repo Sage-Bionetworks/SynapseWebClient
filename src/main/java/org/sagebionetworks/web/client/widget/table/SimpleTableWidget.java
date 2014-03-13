@@ -12,7 +12,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.TableQueryUtilServiceAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -28,18 +27,16 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private SimpleTableWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
-	private TableQueryUtilServiceAsync tableQueryUtilService;
 	private String tableEntityId;
 	private List<ColumnModel> tableColumns;
 	private String currentQuery;
 	private boolean canEdit;
 	
 	@Inject
-	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, TableQueryUtilServiceAsync tableQueryUtilService) {
+	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
-		this.tableQueryUtilService = tableQueryUtilService;
 		view.setPresenter(this);
 	}	
 	    
