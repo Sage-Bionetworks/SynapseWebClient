@@ -249,12 +249,13 @@ public class DisplayUtilsTest {
 		assertEquals("This is the *test* markdown\nthat will be used.", result);
 	}
 	
-	@Test (expected=IllegalArgumentException.class)
+	@Test
 	public void testSurroundTextNoSelection() {
-		//basic case, "test" selected, text should be surrounded with markdown
+		//if no text is selected, then it should place the markdown around the current cursor position
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = 0;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, startPos, selectionLength);
+		assertEquals("This is the **test markdown\nthat will be used.", result);
 	}
 	
 	@Test (expected=IllegalArgumentException.class)

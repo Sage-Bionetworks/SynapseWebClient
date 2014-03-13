@@ -1907,7 +1907,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
+		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
 			int markdownLength = markdown.length();
 			int eolPos = text.indexOf('\n', startPos);
 			if (eolPos < 0)
@@ -1918,19 +1918,16 @@ public class DisplayUtils {
 				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
 			
 			String selectedText = text.substring(startPos, endPos);
-			if (isDefined(selectedText)) {
-				//check to see if this text is already surrounded by the markdown.
-				int beforeSelectedTextPos = startPos - markdownLength;
-				int afterSelectedTextPos = endPos + markdownLength;
-				if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
-					if (markdown.equals(text.substring(beforeSelectedTextPos, startPos)) && markdown.equals(text.substring(endPos, afterSelectedTextPos))) {
-						//strip off markdown instead
-						return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
-					}
+			//check to see if this text is already surrounded by the markdown.
+			int beforeSelectedTextPos = startPos - markdownLength;
+			int afterSelectedTextPos = endPos + markdownLength;
+			if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+				if (markdown.equals(text.substring(beforeSelectedTextPos, startPos)) && markdown.equals(text.substring(endPos, afterSelectedTextPos))) {
+					//strip off markdown instead
+					return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
 				}
-				return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
 			}
-			
+			return text.substring(0, startPos) + markdown + selectedText + markdown + text.substring(endPos);
 		}
 		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
