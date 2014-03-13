@@ -524,7 +524,11 @@ a.shortBtn {
 	height: auto !important;
 	height:	50px;
 }
-	
+
+.min-height-500 {
+	min-height: 500px;
+}
+
 .profile-image-40px {
 	width: 40px;	
 }
