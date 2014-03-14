@@ -403,6 +403,8 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		try {
 			String newText = DisplayUtils.surroundText(text, startTag, endTag, isMultiline, currentPos, selectionLength);
 			markdownTextArea.setText(newText);
+			markdownTextArea.setCursorPos(currentPos+startTag.length());
+			markdownTextArea.setFocus(true);
 		} catch (IllegalArgumentException e) {
 			showErrorMessage(e.getMessage());
 		}
