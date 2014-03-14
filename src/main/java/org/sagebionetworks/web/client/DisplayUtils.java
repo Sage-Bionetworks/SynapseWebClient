@@ -1907,7 +1907,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String surroundText(String text, String markdown, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos < text.length()-1 && isDefined(markdown)) {
+		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(markdown)) {
 			int markdownLength = markdown.length();
 			int eolPos = text.indexOf('\n', startPos);
 			if (eolPos < 0)
