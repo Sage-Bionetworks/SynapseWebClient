@@ -281,6 +281,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		LayoutContainer favsAndTeams = new LayoutContainer();
 		favsAndTeams.setStyleName("col-md-4");
+		favsAndTeams.add(openTeamInvitesPanel);
 		favsAndTeams.add(getFavoritesContainer());
 		favsAndTeams.add(getTeamsContainer());
 		favsAndTeams.add(createCreateTeamsContainer());
@@ -408,7 +409,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 		
-		myTeamsContainer.add(openTeamInvitesPanel);
 		LayoutContainer headerRow = DisplayUtils.createRowContainer();
 		HTML myTeamsHeader = new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_TEAMS + "</h3>"));
 		myTeamsHeader.addStyleName("col-md-6");

@@ -1907,11 +1907,12 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > 0 && startPos >= 0 && startPos < text.length()-1 && isDefined(startTag)) {
+		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
 			if (endTag == null) 
 				endTag = "";
 			int startTagLength = startTag.length();
 			int endTagLength = endTag.length();
+
 			int eolPos = text.indexOf('\n', startPos);
 			if (eolPos < 0)
 				eolPos = text.length();
@@ -1921,19 +1922,16 @@ public class DisplayUtils {
 				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
 			
 			String selectedText = text.substring(startPos, endPos);
-			if (isDefined(selectedText)) {
-				//check to see if this text is already surrounded by the markdown.
-				int beforeSelectedTextPos = startPos - startTagLength;
-				int afterSelectedTextPos = endPos + endTagLength;
-				if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+			//check to see if this text is already surrounded by the markdown.
+			int beforeSelectedTextPos = startPos - startTagLength;
+			int afterSelectedTextPos = endPos + endTagLength;
+			if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
 					if (startTag.equals(text.substring(beforeSelectedTextPos, startPos)) && endTag.equals(text.substring(endPos, afterSelectedTextPos))) {
-						//strip off markdown instead
-						return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
-					}
+					//strip off markdown instead
+					return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
 				}
-				return text.substring(0, startPos) + startTag + selectedText + endTag + text.substring(endPos);
 			}
-			
+			return text.substring(0, startPos) + startTag + selectedText + endTag + text.substring(endPos);
 		}
 		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
@@ -2057,7 +2055,7 @@ public class DisplayUtils {
 	public static String getIcon(String iconClass) {
 		return "<span class=\"glyphicon " + iconClass + "\"></span>";
 	}
-	
+
 	public static String getFontelloIcon(String iconClass) {
 		return "<span class=\"icon-" + iconClass + "\"></span>";
 	}

@@ -249,12 +249,13 @@ public class DisplayUtilsTest {
 		assertEquals("This is the *test* markdown\nthat will be used.", result);
 	}
 	
-	@Test (expected=IllegalArgumentException.class)
+	@Test
 	public void testSurroundTextNoSelection() {
-		//basic case, "test" selected, text should be surrounded with markdown
+		//if no text is selected, then it should place the markdown around the current cursor position
 		int startPos = textWithoutMarkdown.indexOf("test");
 		int selectionLength = 0;
-		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
+		String result = DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, true, startPos, selectionLength);
+		assertEquals("This is the **test markdown\nthat will be used.", result);
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
@@ -263,7 +264,7 @@ public class DisplayUtilsTest {
 		int selectionLength = "test markdown\nthat".length();
 		DisplayUtils.surroundText(textWithoutMarkdown, markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 	}
-	
+		
 	@Test
 	public void testSurroundTextPastNewlineSupportMultiline() {
 		int startPos = textWithoutMarkdown.indexOf("test");
@@ -343,8 +344,8 @@ public class DisplayUtilsTest {
 		int selectionLength = "Section 1".length();
 		String result = DisplayUtils.surroundText(textWithoutMarkdown, "\n#", "", false, startPos, selectionLength);
 		assertEquals("The new header is \n#Section 1", result);
-	}
-	
+}
+
 	@Test
 	public void testCodeBlock() {
 		String text = "String text = \"foo\";\nString text2 = \"bar\"";
