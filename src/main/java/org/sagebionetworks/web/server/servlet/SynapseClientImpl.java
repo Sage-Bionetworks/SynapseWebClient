@@ -28,6 +28,7 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseTableUnavilableException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
@@ -131,6 +132,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
@@ -2532,7 +2534,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails) throws RestServiceException {		
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {		
+		if(query == null) throw new BadRequestException("query must be defined");
+		
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		// modify query with QueryDetails if requested
 		String executedQuery;
 		if(modifyingQueryDetails != null) executedQuery = ServiceUtils.modifyQuery(query, modifyingQueryDetails);
@@ -2540,10 +2545,47 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		//Extract QueryDetails from executed Query		
 		QueryDetails queryDetails = ServiceUtils.extractQueryDetails(executedQuery);
-				
-		// TODO : pass through to javaclient when available		
+			
+		// Get total row count if requested
+		Integer totalRowCount = null;
+		if(includeTotalRowCount) {
+			try {
+				RowSet countSet = synapseClient.queryTableEntity(executedQuery, true, true);
+//				RowSet countSet = getFakeCountSet();
+				if (countSet != null && countSet.getRows() != null
+						&& countSet.getRows().size() > 0
+						&& countSet.getRows().get(0).getValues() != null
+						&& countSet.getRows().get(0).getValues().size() > 0) {					
+					totalRowCount = Integer.parseInt(countSet.getRows().get(0).getValues().get(0));							
+				}
+			} catch (SynapseException e) {
+				logError(e.getMessage());
+				throw ExceptionUtil.convertSynapseException(e);
+			} catch (NumberFormatException e) { 
+				// do nothing 				
+			}
+		}
+		
+		// Execute Query		
+		String json = null;
+		try {
+			RowSet rs = synapseClient.queryTableEntity(executedQuery);
+//			RowSet rs = getFakeRowSet(queryDetails.getLimit().intValue(), queryDetails.getOffset().intValue());
+			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseTableUnavilableException e) {
+			throw new TableUnavilableException(e.getMessage());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());		
+		}
+		
+		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
+	}
+
+	private RowSet getFakeCountSet() throws SynapseException, SynapseTableUnavilableException {
 		RowSet rs = new RowSet();
-		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
+		rs.setHeaders(Arrays.asList(new String[] { "COUNT(*)" }));
 		rs.setEtag("1234");
 		rs.setTableId("syn123");
 		
@@ -2551,17 +2593,29 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		Row row = new Row();
 		row.setRowId(1L);
 		row.setVersionNumber(1L);
-		row.setValues(Arrays.asList(new String[] {"173value", "174value", "avg1.234", "176md5-273189372891739812"}));
+		row.setValues(Arrays.asList(new String[] {"999"}));
+		rows.add(row);
 		rs.setRows(rows);
-		String json = null;
-		try {
-			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		} catch (JSONObjectAdapterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+		return rs;
+	}
+
+	private RowSet getFakeRowSet(int limit, int offset) throws SynapseException, SynapseTableUnavilableException {
+		RowSet rs = new RowSet();
+		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
+		rs.setEtag("1234");
+		rs.setTableId("syn123");
 		
-		return new QueryResult(json, executedQuery, queryDetails);
+		List<Row> rows = new ArrayList<Row>();		
+		Row row;
+		for(int i=0; i<limit; i++) {
+			row = new Row();
+			row.setRowId(new Long(i));
+			row.setVersionNumber(1L); 
+			row.setValues(Arrays.asList(new String[] {String.valueOf(offset + i), "174value", "avg1.234", "176md5-273189372891739812"}));
+			rows.add(row);
+		}
+		rs.setRows(rows);
+		return rs;
 	}
 	
 	@Override

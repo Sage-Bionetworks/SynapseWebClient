@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface SimpleTableWidgetView extends IsWidget, SynapseView {
@@ -17,12 +18,14 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
+	public void setQuery(String query);
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 
-		void alterCurrentQuery(QueryDetails alterDetails);
+		void alterCurrentQuery(QueryDetails alterDetails, AsyncCallback<RowSet> asyncCallback);
 
 		void query(String query);
 				
@@ -37,6 +40,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param limit 
 	 * @param offset 
 	 */
-	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
+	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
 	
+	
+	public void updateData(RowSet rowset, QueryDetails queryDetails);
 }

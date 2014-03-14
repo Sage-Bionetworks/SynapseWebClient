@@ -1,14 +1,17 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -28,8 +31,10 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -44,7 +49,7 @@ import com.google.inject.Inject;
 
 public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableWidgetView {
 	public interface Binder extends UiBinder<Widget, SimpleTableWidgetViewImpl> {	}
-
+	
 	@UiField
 	HTMLPanel queryPanel;
 	@UiField
@@ -54,8 +59,11 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@UiField
 	SimplePanel tableContainer;
 	@UiField
+	SimplePanel tableLoading;
+	@UiField
 	SimplePanel pagerContainer;
 
+	SageImageBundle sageImageBundle;
 	CellTable<TableModel> cellTable;
 	SimplePager pager;
 	private List<ColumnModel> columns;
@@ -64,60 +72,102 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	ContactDatabase database;
 	Presenter presenter;
 	Map<Column,ColumnModel> columnToModel;
+	AsyncDataProvider<TableModel> dataProvider;
+	RowSet initialLoad = null;
+	QueryDetails initialDetails = null;		
 	
 	@Inject
-	public SimpleTableWidgetViewImpl(final Binder uiBinder) {
+	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle) {
 		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
+
+		this.sageImageBundle = sageImageBundle;
+		tableLoading.add(getLoadingWidget());
 		
 		tableContainer.addStyleName("tableMinWidth");
+		
+	    // setup DataProvider for pagination/sorting
+		dataProvider = new AsyncDataProvider<TableModel>() {
+			@Override
+			protected void onRangeChanged(HasData<TableModel> display) {
+				// skip query if table was just built
+				if (initialLoad != null) {
+					updateData(new Range(initialDetails.getOffset().intValue(), initialDetails.getLimit().intValue()), initialLoad);
+					initialLoad = null;
+					initialDetails = null;
+					return;
+				}
+
+				// extract sorted column
+				String sortedColumnId = null;
+				QueryDetails.SortDirection sortDirection = null;
+				ColumnSortList sortList = cellTable.getColumnSortList();
+				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
+					ColumnSortInfo columnSortInfo = sortList.get(0);
+					ColumnModel model = columnToModel.get(columnSortInfo
+							.getColumn());
+					if (model != null) {
+						sortedColumnId = model.getId();
+						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
+					}
+				}
+
+				final Range range = display.getVisibleRange();
+				Long offset = new Long(range.getStart());
+				Long limit = new Long(range.getLength());
+
+				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
+					@Override
+					public void onSuccess(RowSet rowData) {
+						updateData(range, rowData);
+					}
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+					}
+				});
+			}
+	      
+			private void updateData(final Range range, RowSet rowData) {
+				// convert to Table Model (map)
+				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
+			        List<TableModel> returnedData = new ArrayList<TableModel>();
+			        for(Row row : rowData.getRows()) {
+			        	TableModel model = new TableModel();
+			        	for(int i=0; i<rowData.getHeaders().size(); i++) {				        		
+			        		model.put(rowData.getHeaders().get(i), row.getValues().get(i));
+			        	}
+			        	returnedData.add(model);
+			        }
+			        updateRowData(range.getStart(), returnedData);
+			        hideLoading();
+				}
+			}
+
+	    };
+
 	}
 	
 	@Override
-	public void configure(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails) {		
-		this.columns = columns;					
+	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails) {		
+		this.columns = columns;				
+		this.initialLoad = rowset;
+		this.initialDetails = queryDetails;
 		columnToModel.clear();
 				
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
-		buildTable();
+		buildTable(queryDetails.getLimit().intValue());
 		buildColumns(columns, canEdit);
 		
-	    cellTable.setRowCount(totalRowCount, true); // TODO : do this asynchronously from the view?
+	    cellTable.setRowCount(totalRowCount, true);
 	    if(queryDetails.getOffset() != null && queryDetails.getLimit() != null) {	    	
 	    	cellTable.setVisibleRange(queryDetails.getOffset().intValue(), queryDetails.getOffset().intValue() + queryDetails.getLimit().intValue());
 	    } else {
 	    	cellTable.setVisibleRange(0, totalRowCount);
 	    }	    
 	    
-	    // setup DataProvider for pagination/sorting
-	    AsyncDataProvider<TableModel> dataProvider = new AsyncDataProvider<TableModel>() {
-	      @Override
-	      protected void onRangeChanged(HasData<TableModel> display) {
-	        final Range range = display.getVisibleRange();
-
-	        // extract sorted column
-	        String sortedColumnId = null;
-	        QueryDetails.SortDirection sortDirection = null;
-	        ColumnSortList sortList = cellTable.getColumnSortList();
-	        if(sortList.size() > 0 && sortList.get(0).getColumn() != null) {
-	        	ColumnSortInfo columnSortInfo = sortList.get(0);
-	        	ColumnModel model = columnToModel.get(columnSortInfo.getColumn());
-	        	if(model != null) {
-	        		sortedColumnId = model.getId();	        	
-	        		sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
-	        	}
-	        }
-        	
-	        Long offset = new Long(range.getStart());
-	        Long limit = new Long(range.getLength());	        
-	        
-	        // TODO: call presenter for new data range
-	        presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection));
-	        List<TableModel> returnedData = null;
-	        cellTable.setRowData(range.getStart(), returnedData);
-	      }
-	    };
 
 	    // Connect the list to the data provider.
 	    dataProvider.addDataDisplay(cellTable);
@@ -126,21 +176,84 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    // AsyncDataPRrovider.
 	    AsyncHandler columnSortHandler = new AsyncHandler(cellTable);
 	    cellTable.addColumnSortHandler(columnSortHandler);
-
-	    // Add Row Data
 	    
-		
-		// TODO : REMOVE THIS
-		// Add the CellList to the adapter in the database.
-//		database = ContactDatabase.get();
-//		database.addDataDisplay(cellTable);
+	    hideLoading();
 	}
 	
-	private void buildTable() {
+	@Override
+	public void updateData(RowSet rowset, QueryDetails queryDetails) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
+	public void setQuery(String query) {
+		queryField.setValue(query);
+	}
+
+	
+	/*
+	 * SynapseView methods
+	 */
+	@Override
+	public void showInfo(String title, String message) {
+		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
+	}
+
+	@Override
+	public void showLoading() {
+		queryField.setEnabled(false);
+		tableContainer.setVisible(false);
+		pagerContainer.setVisible(false);
+		tableLoading.setVisible(true);
+	}
+	
+	@Override
+	public void clear() {
+	}
+
+	@Override
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
+	}
+
+	
+	/*
+	 * Private Methods
+	 */
+	private void hideLoading() {
+		tableLoading.setVisible(false);
+		tableContainer.setVisible(true);
+		pagerContainer.setVisible(true);
+		queryField.setEnabled(true);
+	}
+	
+	private void setupQueryBox(String queryString) {
+		// setup query
+		Button queryBtn = DisplayUtils.createButton(DisplayConstants.QUERY);
+		queryBtn.addStyleName("btn-block");
+		queryBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.query(queryField.getValue());
+			}
+		});
+		queryButtonContainer.setWidget(queryBtn);
+		queryField.setValue(queryString);
+	}
+	
+	private void buildTable(int pageSize) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setWidth("100%", true);
-		cellTable.setPageSize(15);
+		cellTable.setPageSize(pageSize);
 		cellTable.addStyleName("cellTable");
+		cellTable.setLoadingIndicator(getLoadingWidget());
 		tableContainer.setWidget(cellTable);
 
 		// Do not refresh the headers and footers every time the data is
@@ -202,50 +315,11 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}
 	}
 
-	
-	/*
-	 * SynapseView methods
-	 */
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	private HTML getLoadingWidget() {
+//		HTML widget =  new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.EXECUTING_QUERY));
+		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
+		widget.addStyleName("margin-top-15 center");
+		return widget;
 	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showLoading() {
-	}
-	
-	@Override
-	public void clear() {
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-	
-	/*
-	 * Private Methods
-	 */
-	private void setupQueryBox(String queryString) {
-		// setup query
-		Button queryBtn = DisplayUtils.createButton(DisplayConstants.QUERY);
-		queryBtn.addStyleName("btn-block");
-		queryBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.query(queryField.getValue());
-			}
-		});
-		queryButtonContainer.setWidget(queryBtn);
-		queryField.setValue(queryString);
-	}
-
 	
 }

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.HasDirection.Direction;
 
 
 public class DisplayConstants {
@@ -709,6 +710,7 @@ public class DisplayConstants {
 	public static final String TABLE_NAME = "Table Name";
 	public static final String TABLE_CREATED = "Table Created";
 	public static final String ERROR_LOADING_QUERY_PLEASE_RETRY = "An error occured trying to load your query. Please reload the page and try again";
+	public static final String EXECUTING_QUERY = "Executing Query";
 
 }
 
