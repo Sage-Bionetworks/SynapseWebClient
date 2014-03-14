@@ -1907,7 +1907,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos < text.length()-1 && isDefined(startTag)) {
+		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
 			if (endTag == null) 
 				endTag = "";
 			int startTagLength = startTag.length();
