@@ -329,6 +329,15 @@ public class DisplayUtilsTest {
 		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
 		assertEquals("end of the text has markdown", result);
 	}
+	
+	@Test
+	public void testSurroundTextMarkdownEndOfText() {
+		String textWithMarkdown = "end";
+		int startPos = textWithMarkdown.length();
+		int selectionLength = 0;
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, startPos, selectionLength);
+		assertEquals(textWithMarkdown+markdownDelimiter2+markdownDelimiter2, result);
+	}
 }
 
 
