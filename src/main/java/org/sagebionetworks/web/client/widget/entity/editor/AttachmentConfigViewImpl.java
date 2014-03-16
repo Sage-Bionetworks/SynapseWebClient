@@ -66,11 +66,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		removeAll();
-		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
-		String baseURl = GWT.getModuleBaseURL()+"filehandle?" +
-				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
-				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + 
-				wikiIdParam;
+		String baseURl = GWT.getModuleBaseURL()+"simplefilehandle";
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
 		window.getButtonById(Dialog.OK).disable();
@@ -83,6 +79,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.checkGreen16()) +" "+ DisplayConstants.UPLOAD_SUCCESSFUL_STATUS_TEXT));
 						//enable the ok button
 						window.getButtonById(Dialog.OK).enable();
+						presenter.addFileHandleId(result.getMessage());
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}

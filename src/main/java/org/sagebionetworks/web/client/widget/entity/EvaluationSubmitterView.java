@@ -19,6 +19,6 @@ public interface EvaluationSubmitterView extends SynapseView {
 			final Callback touAcceptanceCallback);
 	public interface Presenter {
 		//view sends back the selected entity, selected evaluation Ids (will not be empty)
-		void submitToEvaluations(Reference selectedEntity, List<Evaluation> evaluationIds);
+		void submitToEvaluations(Reference selectedEntity, String submissionName, String teamName, List<Evaluation> evaluationIds);
 	}
 }

@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.sagebionetworks.web.client.widget.WidgetEditorView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.extjs.gxt.ui.client.widget.Dialog;
+import com.google.gwt.user.client.ui.IsWidget;
 public interface ImageConfigView extends IsWidget, WidgetEditorView {
 
 	/**
@@ -41,5 +40,6 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void addFileHandleId(String fileHandleId);
 	}
 }

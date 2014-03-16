@@ -1,7 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static junit.framework.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -30,12 +37,12 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -197,12 +204,23 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testQueryServicePagingURI() throws JSONObjectAdapterException {
+	public void testQueryServicePagingURINodeSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NO_OFFSET_EQUALS_ONE;
 		widget.configure(testWikiKey, descriptor, null, null);
 		String testServiceCall = ClientProperties.QUERY_SERVICE_PREFIX+"select+*+from+project";
 		String pagedURI = widget.getPagedURI(testServiceCall);
-		assertEquals(testServiceCall + "+limit+10+offset+1", pagedURI.toLowerCase());
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
 	}
+	
+	@Test
+	public void testQueryServicePagingURISubmissionSearch() throws JSONObjectAdapterException {
+		String expectedOffset = ServiceConstants.DEFAULT_PAGINATION_OFFSET_PARAM_NEW;
+		widget.configure(testWikiKey, descriptor, null, null);
+		String testServiceCall = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX+"select+*+from+evaluation_1234";
+		String pagedURI = widget.getPagedURI(testServiceCall);
+		assertEquals(testServiceCall + "+limit+10+offset+"+expectedOffset, pagedURI.toLowerCase());
+	}
+
 	
 	@Test
 	public void testCurrentUserVariable() throws JSONObjectAdapterException {
@@ -237,6 +255,22 @@ public class APITableWidgetTest {
 		testSet.add(col2Name);
 		return testSet;
 	}
+	private List<String> getTestColumnValues(String columnName) {
+		List<String> testColumnValues = new ArrayList<String>();
+		for (int i = 0; i < 10; i++) {
+			testColumnValues.add(columnName + " data item " + i);
+		}
+		return testColumnValues;
+	}
+	
+	private Map<String, List<String>> getTestColumnData(List<String> columnNames) {
+		Map<String, List<String>> colData = new HashMap<String, List<String>>();
+		for (String colName : columnNames) {
+			colData.put(colName, getTestColumnValues(colName));
+		}
+		return colData;
+	}
+
 	
 	@Test
 	public void testCreateColumnDataMap() throws JSONObjectAdapterException {
@@ -338,5 +372,120 @@ public class APITableWidgetTest {
 		assertFalse(outputUri.contains("desc"));
 	}
 	
+	@Test
+	public void testRemoveFirstToken() {
+		assertEquals("id", APITableWidget.removeFirstToken("project.id"));
+		assertEquals("Annotation", APITableWidget.removeFirstToken("data.Annotation"));
+		assertEquals("date", APITableWidget.removeFirstToken("date"));
+		assertNull(APITableWidget.removeFirstToken(null));
+	}
 	
+	@Test
+	public void testGuessRendererFriendlyName() {
+		APITableConfig tableConfig = getTableConfig();
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(null, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName("foo", tableConfig));
+		//case should not matter
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_USER_ID.toUpperCase(), tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_USER_ID.toLowerCase(), tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_CREATED_ON, tableConfig));
+		
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ENTITY_ID, tableConfig));
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_PARENT_ID, tableConfig));
+		
+		//next, check "id".  If node query service, assume it's a synapse id.  Otherwise, do not render in a special way.
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
+		tableConfig.setUri(ClientProperties.QUERY_SERVICE_PREFIX + "select+*+from+project");
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
+		tableConfig.setUri(ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_123");
+		assertEquals(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE, widget.guessRendererFriendlyName(WebConstants.DEFAULT_COL_NAME_ID, tableConfig));
+	}
+	
+	@Test 
+	public void testGetColumnValueKeyMissing() throws JSONObjectAdapterException {
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(false);
+		assertEquals("", APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueString() throws JSONObjectAdapterException {
+		String testValue = "test";
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenReturn(testValue);
+		assertEquals(testValue, APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueLong() throws JSONObjectAdapterException {
+		Long testValue = 10L;
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenReturn(testValue);
+		assertEquals(testValue.toString(), APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueDouble() throws JSONObjectAdapterException {
+		Double testValue = 10.5;
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenThrow(new JSONObjectAdapterException("invalid long"));
+		when(row.get(anyString())).thenReturn(testValue);
+		assertEquals(testValue.toString(), APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test 
+	public void testGetColumnValueArray() throws JSONObjectAdapterException {
+		String val1 = "a";
+		String val2 = "b";
+		JSONArrayAdapter valueArray = mock(JSONArrayAdapter.class);
+		when(valueArray.length()).thenReturn(2);
+		when(valueArray.get(0)).thenReturn(val1);
+		when(valueArray.get(1)).thenReturn(val2);
+		
+		JSONObjectAdapter row = mock(JSONObjectAdapter.class);
+		when(row.has(anyString())).thenReturn(true);
+		when(row.getString(anyString())).thenThrow(new JSONObjectAdapterException("invalid string"));
+		when(row.getLong(anyString())).thenThrow(new JSONObjectAdapterException("invalid long"));
+		when(row.get(anyString())).thenThrow(new JSONObjectAdapterException("invalid json object"));
+		when(row.getJSONArray(anyString())).thenReturn(valueArray);
+		
+		assertEquals("a,b", APITableWidget.getColumnValue(row, "key"));
+	}
+	
+	@Test
+	public void testFixColumnNames() {
+		String column1 = "project.id";  
+		String column2 = "name";
+		List<String> colNames = new ArrayList<String>();
+		colNames.add(column1);
+		colNames.add(column2);
+		Map<String, List<String>> columnData = getTestColumnData(colNames);
+		
+		APITableWidget.fixColumnNames(columnData);
+		
+		//no longer contains project.id, but does contain id
+		assertFalse(columnData.containsKey(column1));
+		assertTrue(columnData.containsKey("id"));
+		//still contains name
+		assertTrue(columnData.containsKey(column2));
+	}
+	
+	@Test
+	public void testGetColumnValues() {
+		String column1 = "id";  
+		List<String> colNames = new ArrayList<String>();
+		colNames.add(column1);
+		Map<String, List<String>> columnData = getTestColumnData(colNames);
+		
+		assertNotNull(APITableWidget.getColumnValues(column1, columnData));
+		//previous table column definitions will be looking for the type. This should also work
+		assertNotNull(APITableWidget.getColumnValues("project."+column1, columnData));
+		assertNull(APITableWidget.getColumnValues("absent", columnData));
+	}
 }

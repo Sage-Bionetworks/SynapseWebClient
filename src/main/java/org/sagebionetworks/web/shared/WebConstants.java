@@ -114,19 +114,6 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	public static final String DIV_ID_PREVIEW_SUFFIX = "-preview";
-
-	public static final String DIV_ID_WIDGET_PREFIX = "widget-";
-	
-	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
-    public static final String DIV_ID_LINK_PREFIX = "link-";
-	public static final String DIV_ID_AUTOLINK_PREFIX = "autolink-";
-	public static final String DIV_ID_IMAGE_PREFIX = "image-";
-	public static final String DIV_ID_CODE_SPAN_PREFIX = "codespan-";
-	public static final String DIV_ID_WIDGET_SYNTAX_PREFIX = "widgetsyntax-";
-	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
-	
-	public static final String REFERENCE_ID_WIDGET_PREFIX = "wikiReference";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
 	
@@ -195,6 +182,9 @@ public class WebConstants {
 	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
 	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
+
+	public static final String CONCRETE_TYPE_KEY = "concreteType";
+	public static final String NODE_TYPE_KEY = "nodeType";
 	
 	
 	public static final String USER_GUIDE = "UserGuide";
@@ -203,4 +193,15 @@ public class WebConstants {
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	
+	//APITableWidget default column names
+	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
+	public static final String DEFAULT_COL_NAME_ENTITY_ID = "entityid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_ON = "modifiedon";
+	public static final String DEFAULT_COL_NAME_CREATED_ON = "createdon";
+	public static final String DEFAULT_COL_NAME_USER_ID = "userid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
+	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
+	public static final String DEFAULT_COL_NAME_ID = "id";
+	
 }

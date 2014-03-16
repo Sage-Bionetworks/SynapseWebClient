@@ -64,6 +64,8 @@ import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.client.view.TeamSearchViewImpl;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
+import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -164,6 +166,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -198,6 +202,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationW
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
@@ -234,10 +240,14 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetView;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
 import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetView;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
+import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
@@ -435,6 +445,9 @@ public class PortalGinModule extends AbstractGinModule {
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 		
+		// QuizView
+		bind(QuizViewImpl.class).in(Singleton.class);
+		bind(QuizView.class).to(QuizViewImpl.class);		
 		
 		/*
 		 * Factories
@@ -598,6 +611,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityListConfigView.class).to(EntityListConfigViewImpl.class);
 		bind(ShinySiteConfigView.class).to(ShinySiteConfigViewImpl.class);
 		bind(ButtonLinkConfigView.class).to(ButtonLinkConfigViewImpl.class);
+		bind(VideoConfigView.class).to(VideoConfigViewImpl.class);
 		
 		// UI Widget Renderers
 		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
@@ -614,6 +628,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
 		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
+		bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
+		
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
@@ -639,7 +655,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
-		bind(SynapseTableWidgetView.class).to(SynapseTableWidgetViewImpl.class);
+		bind(CompleteTableWidgetView.class).to(CompleteTableWidgetViewImpl.class);
+		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
+		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 
 		/*
 		 * Teams Places

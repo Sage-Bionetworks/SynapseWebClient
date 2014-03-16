@@ -22,6 +22,8 @@ public class DisplayConstants {
 
 	public static final String USERNAME_FORMAT_ERROR = "User names can only contain letters, numbers, dots (.), dashes (-) and underscores (_). They must also be at least 3 characters long.";
 	
+	public static final String ACCESS_DEPENDENT_ON_TEAM = "Access could be dependent upon membership in one of the following Teams";
+	
 	public static final String SHARED_ON_SYNAPSE = " has shared an item with you on Synapse";
 	public static final String SHARED_ON_SYNAPSE_SUBJECT = " (shared on Synapse)";
 	public static final String UPDATED_NOTIFICATION_SETTINGS = "Updated Notification Settings";
@@ -41,6 +43,8 @@ public class DisplayConstants {
 	public static final String CREATE_CODE_TEXT = "Please fill out the initial descriptive fields for the step you would like to create.";
 	public static final String EDIT_CODE_TEXT = "Edit the step's details by altering the fields below and then clicking the Save button. To cancel, click the Close button.";;
 	public static final String EDIT_ANNOTATIONS_TEXT = "Edit Annotations for this object. You can add new annotations by using the form fields at the bottom.";
+	
+	public static final String SINGLE_LINE_COMMAND_MESSAGE = "This command only supports single line operations.\nPlease select text within a single line and try again.";
 	
 	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
 	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
@@ -362,7 +366,7 @@ public class DisplayConstants {
 	public static final String ENTITY_DESCRIPTION_TIPS_TEXT = "Formatting Guide";
 	public static final String ENTITY_DESCRIPTION_HIDE_WIDGETS_TEXT = "Hide Widget Manager";
 	public static final String ENTITY_DESCRIPTION_SHOW_WIDGETS_TEXT = "Show Widget Manager";
-	public static final String ENTITY_DESCRIPTION_ATTACHMENT_PREFIX = "Attachment/entity/";
+	
 	public static final String ENTITY_STORAGE_NOT_FOUND_ERROR = "Unable to determine the usage associated with entity id: ";
 	public static final String CODE_EXECUTION = "Code Execution";
 	public static final String MANUAL = "Manual";
@@ -571,6 +575,7 @@ public class DisplayConstants {
 	public static final String CURRENT = "Current";
 	public static final String CURRENTLY_SELCTED = "Currently Selected";
 	public static final String PLEASE_MAKE_SELECTION = "Please make a selection";
+	public static final String INVALID_SELECTION = "Please make a valid selection and try again.";
 	public static final String CLOSE = "Close";
 	public static final String DISPLAY_HEIGHT = "Display Height";
 	public static final String DEFAULT = "Default";
@@ -578,6 +583,7 @@ public class DisplayConstants {
 	public static final String IMAGE_FILE_ENTITY = "Image File Entity";
 	public static final String FIND_IMAGE_ENTITY = "Find Image File Entity";
 	public static final String ERROR_ENTER_AT_LEAST_ONE_ENTITY = "Please enter at least one entity";
+	public static final String ERROR_ENTER_AT_LEAST_ONE_VIDEO_FILE = "Please set at least one video file format";
 	public static final String FIND_ENTITIES = "Find Entities";
 	public static final String FIND_ENTITY = "Find Entity";
 	
@@ -698,6 +704,11 @@ public class DisplayConstants {
 	public static final String SYNAPSE_ACCOUNT_NUMBER = "Synapse Account Number";
 	public static final String LOGIN_READ_ONLY_MODE = "Synapse is currently in READ ONLY mode. You can browse during this time but not login or modify.";
 	public static final String LOGIN_DOWN_MODE = "Synapse is currently DOWN. Please try back soon.";
+	public static final String ADD_TABLE = "Add Table";
+	public static final String TABLE_CREATION_FAILED = "Table creation failed.";
+	public static final String TABLE_NAME = "Table Name";
+	public static final String TABLE_CREATED = "Table Created";
+	public static final String ERROR_LOADING_QUERY_PLEASE_RETRY = "An error occured trying to load your query. Please reload the page and try again";
 
 }
 

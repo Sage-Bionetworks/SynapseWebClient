@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.TableQueryUtilService;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
@@ -19,9 +20,11 @@ import org.sagebionetworks.web.server.servlet.NcboSearchService;
 import org.sagebionetworks.web.server.servlet.ProjectServiceImpl;
 import org.sagebionetworks.web.server.servlet.RssServiceImpl;
 import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
+import org.sagebionetworks.web.server.servlet.SimpleFileHandleUploadServlet;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.server.servlet.TableQueryUtilServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
@@ -77,6 +80,10 @@ public class PortalServletModule extends ServletModule {
 		bind(LayoutServiceImpl.class).in(Singleton.class);
 		serve("/Portal/layout").with(LayoutServiceImpl.class);
 			
+		// setup the TableQueryUtilServcie service
+		bind(TableQueryUtilServiceImpl.class).in(Singleton.class);
+		serve("/Portal/tablequeryutil").with(TableQueryUtilServiceImpl.class);
+
 		
 		// Setup the License service mapping
 		bind(LicenseServiceImpl.class).in(Singleton.class);
@@ -97,7 +104,7 @@ public class PortalServletModule extends ServletModule {
 		// setup the Simple Search servlet
 		bind(SimpleSearchService.class).in(Singleton.class);
 		serve("/Portal/simplesearch").with(SimpleSearchService.class);
-		
+				
 		// setup GWTupload
 		bind(FileUpload.class).in(Singleton.class);
 		serve("/Portal/upload").with(FileUpload.class);
@@ -109,6 +116,11 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileHandleServlet.class).in(Singleton.class);
 		serve("/Portal/filehandle").with(FileHandleServlet.class);
+		
+		//SimpleFileHandle upload (no entity creation or wiki page update)
+		bind(SimpleFileHandleUploadServlet.class).in(Singleton.class);
+		serve("/Portal/simplefilehandle").with(SimpleFileHandleUploadServlet.class);
+
 		
 		// User Profile Attachment (photo)
 		bind(UserProfileAttachmentServlet.class).in(Singleton.class);

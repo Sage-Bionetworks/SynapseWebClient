@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -7,11 +9,14 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -25,6 +30,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -70,13 +76,10 @@ public class LoginViewImpl extends Composite implements LoginView {
 	CheckBox lawsCb;
 	@UiField
 	Anchor viewToULink;
-	
 	@UiField
 	Button takePledgeButton;
 	
-
-	
-	private Presenter presenter;
+		private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
@@ -85,6 +88,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
 	boolean toUInitialized;
+	
 	
 	@Inject
 	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
@@ -109,6 +113,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.setUsername(username.getValue());
 			}
 		});
+		
 		toUInitialized = false;
 	}
 
@@ -264,6 +269,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void showSetUsernameUI() {
 		hideViews();
+		username.setValue("");
 		changeUsernameView.setVisible(true);
 	}
 	

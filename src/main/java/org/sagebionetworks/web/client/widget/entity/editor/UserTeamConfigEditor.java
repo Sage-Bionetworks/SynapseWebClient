@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.extjs.gxt.ui.client.widget.Dialog;
 public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, WidgetEditorPresenter {
 	
 	private UserTeamConfigView view;
@@ -58,6 +58,11 @@ public class UserTeamConfigEditor implements UserTeamConfigView.Presenter, Widge
 	
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 	

@@ -24,11 +24,17 @@
 .header-inner-commands-container {
 	border-radius: 0.2em;
 }
-
-
 .header-inner-commands-container td {
 	padding: 3px 7px 3px 7px;
 }
+
+.markdown-editor-commands-container {
+	border-radius: 0.2em;
+}
+.markdown-editor-commands-container td {
+	padding: 3px 0px 3px 3px;
+}
+
 
 .header-username-picture-container {
 	border: solid #ccc;
@@ -518,7 +524,11 @@ a.shortBtn {
 	height: auto !important;
 	height:	50px;
 }
-	
+
+.min-height-500 {
+	min-height: 500px;
+}
+
 .profile-image-40px {
 	width: 40px;	
 }
@@ -583,6 +593,9 @@ a.shortBtn {
 }
 .margin-top-15 {
 	margin-top: 15px;
+}
+.margin-top-100 {
+	margin-top: 100px;
 }
 
 .margin-left-180 {
@@ -747,6 +760,9 @@ a.shortBtn {
 	font-family: Yanone Kaffeesatz;
 }
 
+.font-size-15 {
+	font-size: 15px;
+}
 
 .vertical-align-bottom {
 	vertical-align: bottom;
@@ -941,7 +957,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .whiteBackground {
 	background-color: #fff;
+}
+
+.whiteBackgroundGxt em, .whiteBackgroundGxt button {
+	background-color: #fff !important;
 }	
+
 .sidebarMenu { 
 	font-weight: bold; 	
     -o-transition:.2s;
@@ -1082,6 +1103,10 @@ ol.lowerroman {
 	font-size: 0.8em;
 }
 
+.smallestText {
+	font-size: 0.4em;
+}
+
 .biggerText {
 	font-size: 1.2em;
 }
@@ -1183,6 +1208,11 @@ ol.lowerroman {
 .movedown-1 {
 	position: relative;
 	top: 1px;
+}
+
+.movedown-2 {
+	position: relative;
+	top: 2px;
 }
 
 .movedown-4 {
@@ -1567,7 +1597,25 @@ a.projectTitle:hover {
   padding-left: 30px;
   font-size: 90%;
 }
-
+.bs-sidebar .nav .nav .nav > li > a {
+  padding-left: 40px;
+  font-size: 80%;
+}
+.bs-sidebar .nav .nav .nav .nav > li > a {
+  padding-left: 50px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav > li > a {
+  padding-left: 60px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 70px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 80px;
+}
+.bs-sidebar .nav .nav .nav .nav .nav .nav .nav .nav > li > a {
+  padding-left: 90px;
+}
 /*===========*/
 
 .largeIconButton {

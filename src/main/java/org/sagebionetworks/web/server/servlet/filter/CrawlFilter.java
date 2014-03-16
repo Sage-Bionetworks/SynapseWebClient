@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.server.servlet.filter;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,15 +23,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.jsoup.Jsoup;
+import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -159,7 +161,19 @@ public class CrawlFilter implements Filter {
 		String name = escapeHtml(entity.getName());
 		String description = escapeHtml(entity.getDescription());
 		String markdown = null;
-		String createdBy = escapeHtml(entity.getCreatedBy());
+		String createdBy = null;
+		try{
+			String userProfileJson = synapseClient.getUserProfile(entity.getCreatedBy());
+			UserProfile profile = EntityFactory.createEntityFromJSONString(userProfileJson, UserProfile.class);
+			StringBuilder createdByBuilder = new StringBuilder();
+			if (profile.getFirstName() != null)
+				createdByBuilder.append(profile.getFirstName() + " ");
+			if (profile.getLastName() != null)
+				createdByBuilder.append(profile.getLastName() + " ");
+			createdByBuilder.append(profile.getUserName());
+
+			createdBy = createdByBuilder.toString();
+		}  catch (Exception e) {}
 		try{
 			String wikiPageJson = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
@@ -177,6 +191,12 @@ public class CrawlFilter implements Filter {
 		if (createdBy != null)
 			html.append("Created By " + createdBy + "<br />");
 		if (markdown != null)
+			try {
+				String wikiHtml = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, false, "");
+				//extract plain text from wiki html
+				markdown = Jsoup.parse(wikiHtml).text();
+			} catch (IOException e) {
+			}
 			html.append(markdown + "<br />");
 		html.append("<br />");
 		for (String key : annotations.getStringAnnotations().keySet()) {
@@ -193,11 +213,12 @@ public class CrawlFilter implements Filter {
 		}
 		
 		//and ask for all descendents
-		String childListJson = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
-		EntityIdList childList = EntityFactory.createEntityFromJSONString(childListJson, EntityIdList.class);
-		for (EntityId childId : childList.getIdList()) {
-			html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
-		}
+		try {
+			String childListJson = synapseClient.getDescendants(entityId, Integer.MAX_VALUE, null);
+			EntityIdList childList = EntityFactory.createEntityFromJSONString(childListJson, EntityIdList.class);
+			for (EntityId childId : childList.getIdList()) {
+				html.append("<a href=\"#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
+			}} catch(Exception e) {};
 		html.append("</body></html>");
 		return html.toString();
 	}

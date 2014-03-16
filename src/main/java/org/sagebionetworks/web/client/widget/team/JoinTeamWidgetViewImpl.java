@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdated
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;

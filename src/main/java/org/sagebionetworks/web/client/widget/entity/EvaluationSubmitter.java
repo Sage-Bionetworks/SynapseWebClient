@@ -41,7 +41,7 @@ public class EvaluationSubmitter implements Presenter {
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private Entity submissionEntity;
-	private String submissionEntityId;
+	private String submissionEntityId, submissionName, teamName;
 	private Long submissionEntityVersion;
 	
 	@Inject
@@ -107,7 +107,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 		
 	@Override
-	public void submitToEvaluations(Reference selectedReference, List<Evaluation> evaluations) {
+	public void submitToEvaluations(Reference selectedReference, String submissionName, String teamName, List<Evaluation> evaluations) {
 		//in any case look up the entity (to make sure we have the most recent version, for the current etag
 		submissionEntityVersion = null;
 		if (submissionEntity != null) {
@@ -119,6 +119,8 @@ public class EvaluationSubmitter implements Presenter {
 			submissionEntityId = selectedReference.getTargetId();
 			submissionEntityVersion = selectedReference.getTargetVersionNumber();
 		}
+		this.submissionName = submissionName;
+		this.teamName = teamName;
 		
 		 //Check access requirements for evaluations before moving on with submission
 		 try {
@@ -239,6 +241,11 @@ public class EvaluationSubmitter implements Presenter {
 		newSubmission.setEntityId(entityId);
 		newSubmission.setUserId(authenticationController.getCurrentUserPrincipalId());
 		newSubmission.setVersionNumber(versionNumber);
+		if (submissionName != null && submissionName.trim().length() > 0)
+			newSubmission.setName(submissionName);
+		if (teamName != null && teamName.trim().length() > 0)
+			newSubmission.setSubmitterAlias(teamName);
+
 		if (evaluations.size() > 0)
 			submitToEvaluations(newSubmission, etag, evaluations, 0);
 	}

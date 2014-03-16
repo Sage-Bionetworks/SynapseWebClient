@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
@@ -38,6 +39,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -52,6 +54,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -79,7 +83,6 @@ import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -723,6 +726,11 @@ public class DisplayUtils {
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
 
+	public static String getLoginPlaceHistoryToken(String token) {
+		LoginPlace place = new LoginPlace(token);
+		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -796,15 +804,11 @@ public class DisplayUtils {
 	 * Private methods
 	 */
 	private static String getPlaceString(Class<Synapse> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
 	
 	private static String getWikiPlaceString(Class<Wiki> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
 	
 	public static LayoutContainer wrap(Widget widget) {
@@ -820,19 +824,23 @@ public class DisplayUtils {
 		return lc;
 	}
 	private static String getTeamPlaceString(Class<Team> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
+
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
-	
+
+	private static String getLoginPlaceString(Class<LoginPlace> place) {
+		return getPlaceString(place.getName());		
+	}
+
 	
 	private static String getSearchPlaceString(Class<Search> place) {
-		String fullPlaceName = place.getName();		
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPlaceString(String fullPlaceName) {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}
@@ -970,6 +978,10 @@ public class DisplayUtils {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
+		} else if(TableEntity.class.getName().equals(className)) {
+			// TableEntity
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -1724,7 +1736,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project || entity instanceof TableEntity); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {
@@ -1788,7 +1800,6 @@ public class DisplayUtils {
 	}
 	
 	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.FIND_ENTITIES);
@@ -1809,6 +1820,7 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 		window.show();
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		entityFinder.refresh();
 	}
 
@@ -1884,6 +1896,48 @@ public class DisplayUtils {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Surround the selectedText with the given markdown.  Or, if the selected text is already surrounded by the markdown, then remove it.
+	 * @param text
+	 * @param markdown
+	 * @param startPos
+	 * @param selectionLength
+	 * @return
+	 */
+	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
+		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
+			if (endTag == null) 
+				endTag = "";
+			int startTagLength = startTag.length();
+			int endTagLength = endTag.length();
+
+			int eolPos = text.indexOf('\n', startPos);
+			if (eolPos < 0)
+				eolPos = text.length();
+			int endPos = startPos + selectionLength;
+			
+			if (eolPos < endPos && !isMultiline)
+				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
+			
+			String selectedText = text.substring(startPos, endPos);
+			//check to see if this text is already surrounded by the markdown.
+			int beforeSelectedTextPos = startPos - startTagLength;
+			int afterSelectedTextPos = endPos + endTagLength;
+			if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+					if (startTag.equals(text.substring(beforeSelectedTextPos, startPos)) && endTag.equals(text.substring(endPos, afterSelectedTextPos))) {
+					//strip off markdown instead
+					return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
+				}
+			}
+			return text.substring(0, startPos) + startTag + selectedText + endTag + text.substring(endPos);
+		}
+		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
+	}
+	
+	private static boolean isDefined(String testString) {
+		return testString != null && testString.trim().length() > 0;
 	}
 	
 	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
@@ -2002,6 +2056,10 @@ public class DisplayUtils {
 		return "<span class=\"glyphicon " + iconClass + "\"></span>";
 	}
 
+	public static String getFontelloIcon(String iconClass) {
+		return "<span class=\"icon-" + iconClass + "\"></span>";
+	}
+
 	public static EntityHeader getProjectHeader(EntityPath entityPath) {
 		if(entityPath == null) return null;
 		for(EntityHeader eh : entityPath.getPath()) {
@@ -2076,6 +2134,17 @@ public class DisplayUtils {
 		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
 		//alternatively, could use the gwt I18n Messages class client side
 	}
+
+	public static String createPreviewFileHandleUrl(
+			PreviewFileHandle previewFileHandle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static String createPreviewFileHandleUrl(S3FileHandle fileHandle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
 		if (publicPrincipalIds == null) {
@@ -2093,4 +2162,9 @@ public class DisplayUtils {
 		} else
 			callback.onSuccess(publicPrincipalIds);
 	}
+	
+	public static String getPreviewSuffix(Boolean isPreview) {
+		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
+	}
+
 }

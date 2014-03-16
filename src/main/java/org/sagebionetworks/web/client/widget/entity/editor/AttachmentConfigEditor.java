@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import com.extjs.gxt.ui.client.widget.Dialog;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -14,7 +16,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	
 	private AttachmentConfigView view;
 	private Map<String, String> descriptor;
-	
+	private List<String> fileHandleIds;
 	@Inject
 	public AttachmentConfigEditor(AttachmentConfigView view) {
 		this.view = view;
@@ -25,6 +27,7 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
+		fileHandleIds = new ArrayList<String>();
 		view.configure(wikiKey, window);
 		try {
 			//try to set the image widget file name
@@ -65,6 +68,15 @@ public class AttachmentConfigEditor implements AttachmentConfigView.Presenter, W
 		return view.getAdditionalWidth();
 	}
 	
+	@Override
+	public void addFileHandleId(String fileHandleId) {
+		fileHandleIds.add(fileHandleId);
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return fileHandleIds;
+	}
 	/*
 	 * Private Methods
 	 */

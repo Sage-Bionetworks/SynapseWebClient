@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -67,6 +66,10 @@ public class WikiPageWidgetTest {
 	WikiPage testPage;
 	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	
+	String fileHandleId1 = "44";
+	String fileHandleId2 = "45";
+
+	
 	@Before
 	public void before() throws Exception{
 		mockView = mock(WikiPageWidgetView.class);
@@ -93,7 +96,13 @@ public class WikiPageWidgetTest {
 		testPage.setId("wikiPageId");
 		testPage.setMarkdown("my test markdown");
 		testPage.setTitle("My Test Wiki Title");
+		List<String> fileHandleIds = new ArrayList<String>();
+		//our page has two file handles already
+		fileHandleIds.add(fileHandleId1);
+		fileHandleIds.add(fileHandleId2);
+		testPage.setAttachmentFileHandleIds(fileHandleIds);
 		
+
 		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -108,7 +117,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
-		verify(mockView).configure(any(WikiPage.class), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), eq(false), eq(true), any(Long.class), eq(true));
+		verify(mockView).configure(anyString(), any(WikiPageKey.class), anyString(), anyBoolean(), anyBoolean(), eq(false), eq(true), any(Long.class), eq(true));
 	}
 
 	@Test
@@ -157,41 +166,34 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
-	public void testRefreshWikiAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{		
-		String newTitle = "new wiki page title";
-		String newMarkdown = "new wiki page markdown";
-		presenter.refreshWikiAttachments(newTitle, newMarkdown, new WikiPageWidget.Callback() {
-			@Override
-			public void pageUpdated() {
-			}
-			@Override
-			public void noWikiFound() {
-			}
-		});
-		verify(mockView).updateWikiPage(testPage);
-        assertEquals(newTitle, testPage.getTitle());
-        assertEquals(newMarkdown, testPage.getMarkdown());
+	public void testAddAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{		
+		String fileHandleId3 = "46";
 		
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		
+		List<String> newFileHandles = new ArrayList<String>();
+		newFileHandles.add(fileHandleId2);
+		newFileHandles.add(fileHandleId3);
+		presenter.addFileHandles(newFileHandles);
+		
+		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
+		//should be unique values only, so there should be 3
+		assertTrue(currentFileHandleIds.size() == 3);
+		assertTrue(currentFileHandleIds.contains(fileHandleId1));
+		assertTrue(currentFileHandleIds.contains(fileHandleId2));
+		assertTrue(currentFileHandleIds.contains(fileHandleId3));
 	}
 
 	@Test
-	public void testRefreshWikiAttachmentsFailure() throws IOException, RestServiceException{
-		String newTitle = "new wiki page title";
-		String newMarkdown = "new wiki page markdown";
-		AsyncMockStubber.callFailureWith(new RuntimeException("an error")).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		presenter.refreshWikiAttachments(newTitle, newMarkdown, new WikiPageWidget.Callback() {
-			@Override
-			public void pageUpdated() {
-			}
-			@Override
-			public void noWikiFound() {
-			}
-		});
-
-		verify(mockView).showErrorMessage(anyString());
-		//verify testpage was not updated
-		assertFalse(newTitle.equals(testPage.getTitle()));
-		assertFalse(newMarkdown.equals(testPage.getMarkdown()));
+	public void testDeleteAttachments() throws IOException, RestServiceException, JSONObjectAdapterException{
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		List<String> deleteHandleIds = new ArrayList<String>();
+		deleteHandleIds.add(fileHandleId2);
+		
+		presenter.removeFileHandles(deleteHandleIds);
+		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
+		assertTrue(currentFileHandleIds.size() == 1);
+		assertTrue(currentFileHandleIds.contains(fileHandleId1));
 	}
 	
 	@Test

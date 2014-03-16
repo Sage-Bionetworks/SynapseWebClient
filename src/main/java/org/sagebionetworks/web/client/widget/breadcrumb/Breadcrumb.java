@@ -61,7 +61,7 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 	 * @param entity
 	 * @return
 	 */
-	public Widget asWidget(EntityPath entityPath, boolean useFilesAreaOnProject, boolean showHome) {
+	public Widget asWidget(EntityPath entityPath, EntityArea optionalArea, boolean showHome) {
 		view.setPresenter(this);
 		// exchange root for home
 		List<LinkData> links = new ArrayList<LinkData>();
@@ -76,10 +76,14 @@ public class Breadcrumb implements BreadcrumbView.Presenter,
 					String name = element.getName();
 					Synapse place = new Synapse(element.getId());
 					ImageResource icon = DisplayUtils.getSynapseIconForEntityClassName(element.getType(), IconSize.PX16, iconsImageBundle);
-					// show files root
-					if(useFilesAreaOnProject && Project.class.getName().equals(element.getType())) {
+					if(optionalArea == EntityArea.FILES && Project.class.getName().equals(element.getType())) {
+						// show files as root
 						name = DisplayConstants.FILES;
 						place.setArea(EntityArea.FILES);					
+					} else  if(optionalArea == EntityArea.TABLES && Project.class.getName().equals(element.getType())) {
+						// show tables as root
+						name = DisplayConstants.TABLES;
+						place.setArea(EntityArea.TABLES);					
 					}
 					links.add(new LinkData(name, icon, place));
 				}

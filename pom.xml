@@ -16,8 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
-		<synapse.version>2014-02-20-1003-bc977dc</synapse.version>
-
+ 		<synapse.version>2014-03-12-1049-a1de7d7</synapse.version>
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -201,7 +200,7 @@
 			        <compileReport>true</compileReport>
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
-			        <extraJvmArgs>-Xmx1024M -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
+			        <extraJvmArgs>-Xmx1024m -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
@@ -273,7 +272,12 @@
 			<artifactId>auth-util</artifactId>
 			<version>${synapse.version}</version>
 		</dependency>
-		<!-- Provides the S3 log sweeper -->
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>lib-table-query</artifactId>
+			<version>${synapse.version}</version>
+		</dependency>
+				<!-- Provides the S3 log sweeper -->
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-logging</artifactId>
@@ -290,6 +294,13 @@
 			<version>${synapse.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.sagebionetworks</groupId>
+			<artifactId>markdown</artifactId>
+			<version>2014-03-06-f8e872d-4</version>
+		</dependency>
+		
+		
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -547,6 +558,12 @@
 		        <artifactId>apache-mime4j</artifactId>
 		        <version>0.6.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.5</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 
 	<distributionManagement>

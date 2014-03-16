@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
+import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
@@ -41,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -61,11 +63,14 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.SynapseTableWidget;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
+import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
+import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -126,6 +131,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public TeamPresenter getTeamPresenter();
 	
+	public QuizPresenter getQuizPresenter();
+	
 	public TeamSearchPresenter getTeamSearchPresenter();
 	
 	public EventBus getEventBus();
@@ -154,6 +161,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ShinySiteConfigEditor getShinySiteConfigEditor();
 	public ButtonLinkConfigEditor getButtonLinkConfigEditor();
 	public UserTeamConfigEditor getUserTeamConfigEditor();
+	public VideoConfigEditor getVideoConfigEditor();
 	
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
@@ -174,8 +182,8 @@ public interface PortalGinInjector extends Ginjector {
 	public JoinTeamWidget getJoinTeamWidget();
 	public SubmitToEvaluationWidget getEvaluationSubmissionWidget();
 	public EmptyWidget getEmptyWidget();
-	
 	public ButtonLinkWidget getButtonLinkWidget();
+	public VideoWidget getVideoWidget();
 	
 	//////API Table Column Renderers
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
@@ -194,5 +202,7 @@ public interface PortalGinInjector extends Ginjector {
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
-	public SynapseTableWidget getSynapseTableWidget();
+	public CompleteTableWidget getCompleteTableWidget();
+	public SimpleTableWidget getSimpleTableWidget();
+	public TableListWidget getTableListWidget();
 }

@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -17,12 +17,10 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -40,14 +38,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -71,7 +67,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	private HTML descriptionFormatInfo;
 	private WikiPageKey wikiKey;
 	private boolean isWikiEditor;
-	private Image editWidgetButton;
+	private com.google.gwt.user.client.ui.Button editWidgetButton;
 	private WidgetDescriptorUpdatedHandler callback;
 	private WidgetSelectionState widgetSelectionState;
 	private ResourceLoader resourceLoader;
@@ -132,9 +128,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		descriptionFormatInfo = new HTML(formattingTipsHtml);
 		//Toolbar
 		HorizontalPanel mdCommands = new HorizontalPanel();
-		mdCommands.addStyleName("view header-inner-commands-container");
-
-		editWidgetButton = getNewCommand("Edit Widget", iconsImageBundle.editGrey16(),new ClickHandler() {
+		mdCommands.setSpacing(2);
+		mdCommands.addStyleName("view markdown-editor-commands-container");
+		editWidgetButton = getNewCommand("Edit Widget", "glyphicon-pencil",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				handleEditWidgetCommand();
@@ -142,7 +138,9 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}); 
 		mdCommands.add(editWidgetButton);
 		
-		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.addSquareGrey16()));
+		Button insertButton = new Button("Insert", AbstractImagePrototype.create(iconsImageBundle.glyphCirclePlus16()));
+		
+		insertButton.addStyleName("whiteBackgroundGxt");
 		insertButton.setWidth(55);
 		insertButton.setMenu(createWidgetMenu(callback));
 		FormData descriptionLabelFormData = new FormData();
@@ -262,44 +260,102 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		
 		
 		//Formatting Guide
-		final Button formatLink = new Button(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT);
-		formatLink.setIcon(AbstractImagePrototype.create(iconsImageBundle.slideInfo16()));
-		formatLink.setWidth(120);
-		mdCommands.add(formatLink);
-		mdCommands.add(insertButton);
-		formatLink.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		com.google.gwt.user.client.ui.Button formatLink = getNewCommand(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT, null, "glyphicon-question-sign", new ClickHandler() {
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				//pop up format guide
 				showFormattingGuideDialog();
 			}
 		});
+		mdCommands.add(formatLink);
+		mdCommands.add(insertButton);
 		
-		Image image = getNewCommand("Insert Image", iconsImageBundle.imagePlus16(),new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
-			}
-		}); 
-		mdCommands.add(image);
+		//basic commands
+		String startTag = "**";
+		String endTag = startTag;
+		com.google.gwt.user.client.ui.Button boldCommand = getNewCommand("Bold", "glyphicon-bold", getBasicCommandClickHandler(startTag, endTag, false));
+		boldCommand.addStyleName("margin-left-10");
+		mdCommands.add(boldCommand);
+
+		startTag = "_";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button italicCommand = getNewCommand("Italicize", "glyphicon-italic",  getBasicCommandClickHandler(startTag, endTag, false));
+		mdCommands.add(italicCommand);
+
+		startTag = "--";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button strikeCommand = getNewCommand("Strikeout", "", getBasicCommandClickHandler(startTag, endTag, false));
+		strikeCommand.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("strike")));
+		strikeCommand.addStyleName("font-size-15");
+		mdCommands.add(strikeCommand);
+
+		startTag = "\n```\n";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button codeCommand = getNewCommand("Code Block", "Optionally specify the language for syntax highlighting.", "", getBasicCommandClickHandler(startTag, endTag, true));
+		mdCommands.add(codeCommand);
+		
+		startTag = "$$\\(";
+		endTag = "\\)$$";
+		com.google.gwt.user.client.ui.Button mathCommand = getNewCommand("TeX", "LaTeX math equation.", "", getBasicCommandClickHandler(startTag, endTag, false));
+		mdCommands.add(mathCommand);
+		
+		
+		startTag = "~";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button subscript = getNewCommand("", "Subscript", "", getBasicCommandClickHandler(startTag, endTag, false));
+		subscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("subscript")));
+		subscript.addStyleName("font-size-15");
+		mdCommands.add(subscript);
+		
+		startTag = "^";
+		endTag = startTag;
+		com.google.gwt.user.client.ui.Button superscript = getNewCommand("", "Superscript", "", getBasicCommandClickHandler(startTag, endTag, false));
+		superscript.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("superscript")));
+		superscript.addStyleName("font-size-15");
+		mdCommands.add(superscript);
+		
+		Button headingButton = new Button("Heading");
+		DisplayUtils.addToolTip(headingButton, "Heading");
+		headingButton.addStyleName("whiteBackgroundGxt boldText");
+		headingButton.setWidth(60);
+		headingButton.setMenu(createHeadingMenu());
+		headingButton.addStyleName("margin-right-10");
+		mdCommands.add(headingButton);
 		
 		if (isWikiEditor) {
-			Image attachment = getNewCommand("Insert Attachment", iconsImageBundle.attachment16(),new ClickHandler() {
+			com.google.gwt.user.client.ui.Button attachment = getNewCommand("Insert Attachment", "glyphicon-paperclip",new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					handleInsertWidgetCommand(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, callback);
 				}
 			}); 
+
 			mdCommands.add(attachment);
 		}
 
+		com.google.gwt.user.client.ui.Button image = getNewCommand("Insert Image", "glyphicon-camera",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.IMAGE_CONTENT_TYPE, callback);
+			}
+		});
+		mdCommands.add(image);
 		
-		Image link = getNewCommand("Insert Link", iconsImageBundle.link16(),new ClickHandler() {
+		com.google.gwt.user.client.ui.Button video = getNewCommand("Insert Video", "glyphicon-facetime-video",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
+			}
+		}); 
+		mdCommands.add(video);
+
+		com.google.gwt.user.client.ui.Button link = getNewCommand("Insert Link", "glyphicon-link",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				handleInsertWidgetCommand( WidgetConstants.LINK_CONTENT_TYPE, callback);
 			}
 		}); 
+
 		mdCommands.add(link);
 		
 	}
@@ -331,12 +387,35 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		}
 	}
 	
+	private ClickHandler getBasicCommandClickHandler(final String startTag, final String endTag, final boolean isMultiline) {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				handleBasicCommand(startTag, endTag, isMultiline);
+			}
+		};
+	}
+	
+	private void handleBasicCommand(String startTag, String endTag, boolean isMultiline) {
+		int selectionLength = markdownTextArea.getSelectionLength();
+		String text = markdownTextArea.getText();
+		int currentPos = markdownTextArea.getCursorPos();
+		try {
+			String newText = DisplayUtils.surroundText(text, startTag, endTag, isMultiline, currentPos, selectionLength);
+			markdownTextArea.setText(newText);
+			markdownTextArea.setCursorPos(currentPos+startTag.length());
+			markdownTextArea.setFocus(true);
+		} catch (IllegalArgumentException e) {
+			showErrorMessage(e.getMessage());
+		}
+	}
+	
 	public void updateEditWidget(){
-		editWidgetButton.setResource(iconsImageBundle.editGrey16());
+		editWidgetButton.setEnabled(false);
 		DisplayUtils.updateWidgetSelectionState(widgetSelectionState, markdownTextArea.getText(), markdownTextArea.getCursorPos());
 		 
 		if (widgetSelectionState.isWidgetSelected()) {
-			editWidgetButton.setResource(iconsImageBundle.edit16());
+			editWidgetButton.setEnabled(true);
 		}
 	}
 	
@@ -406,6 +485,29 @@ public class MarkdownEditorWidget extends LayoutContainer {
 	    window.show();		
 	}
 
+	private Menu createHeadingMenu() {
+	    Menu menu = new Menu();
+	    menu.setEnableScrolling(false);
+	    for (int i = 1; i < 7; i++) {
+	    	StringBuilder hashes = new StringBuilder();
+	    	for (int j = 0; j < i; j++) {
+				hashes.append("#");
+			}
+	    	addHeadingMenuItem(menu, "<H"+i+">Heading "+i+"</H"+i+">", "\n" + hashes.toString());	
+		}
+
+	    return menu;
+	}
+	
+	private void addHeadingMenuItem(Menu menu, String text, final String startTag) {
+		menu.add(getNewCommand(text, new SelectionListener<ComponentEvent>() {
+			@Override
+			public void componentSelected(ComponentEvent ce) {
+				handleBasicCommand(startTag, "", false);
+			};
+		}));
+	}
+	
 	private Menu createWidgetMenu(final WidgetDescriptorUpdatedHandler callback) {
 	    Menu menu = new Menu();
 	    menu.setEnableScrolling(false);
@@ -471,6 +573,11 @@ public class MarkdownEditorWidget extends LayoutContainer {
     	menu.add(getNewCommand("User/Team", new SelectionListener<ComponentEvent>() {
 	    	public void componentSelected(ComponentEvent ce) {
 	    		handleInsertWidgetCommand(WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE, callback);
+	    	};
+		}));
+    	menu.add(getNewCommand(WidgetConstants.VIDEO_FRIENDLY_NAME, new SelectionListener<ComponentEvent>() {
+	    	public void componentSelected(ComponentEvent ce) {
+	    		handleInsertWidgetCommand(WidgetConstants.VIDEO_CONTENT_TYPE, callback);
 	    	};
 		}));
     	menu.add(getNewCommand("YouTube Video", new SelectionListener<ComponentEvent>() {
@@ -565,12 +672,24 @@ public class MarkdownEditorWidget extends LayoutContainer {
 		DisplayUtils.updateTextArea(markdownTextArea, newValue.toString());
 	}
 
+	/**
+	 * Create an extra small default icon button
+	 * @param tooltipText
+	 * @param glyphIconClass
+	 * @param clickHandler
+	 * @return
+	 */
+	public com.google.gwt.user.client.ui.Button getNewCommand(String tooltipText, String glyphIconClass, ClickHandler clickHandler){
+		return getNewCommand("", tooltipText, glyphIconClass, clickHandler);
+	}
 	
-	public Image getNewCommand(String tooltipText, ImageResource image, ClickHandler clickHandler){
-		Image command = new Image(image);
-		command.addStyleName("imageButton");
+	public com.google.gwt.user.client.ui.Button getNewCommand(String title, String tooltipText, String glyphIconClass, ClickHandler clickHandler){
+		com.google.gwt.user.client.ui.Button command = DisplayUtils.createIconButton(title, ButtonType.DEFAULT, glyphIconClass + " margin-bottom-5");
+		command.addStyleName("btn-xs");
 		command.addClickHandler(clickHandler);
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		if (tooltipText != null)
+			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		command.setHeight("22px");
 		return command;
 	}
 	

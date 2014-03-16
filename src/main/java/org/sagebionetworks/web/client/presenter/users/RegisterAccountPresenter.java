@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter.users;
 
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -113,7 +114,8 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
 				} else {
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), false, view))
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
 				}
 				view.showAccountCreationFailed();
 			}

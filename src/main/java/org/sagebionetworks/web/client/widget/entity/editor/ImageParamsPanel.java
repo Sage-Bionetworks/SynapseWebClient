@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;

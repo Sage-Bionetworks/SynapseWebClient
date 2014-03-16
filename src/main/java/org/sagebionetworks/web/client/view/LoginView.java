@@ -26,10 +26,10 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	public void showUsernameInvalid();
 	public void showUsernameTaken();
-
+	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
-		
+		void goToLastPlace();
 		void setNewUser(UserSessionData newUser);
 		
 		void setUsername(String newUsername);

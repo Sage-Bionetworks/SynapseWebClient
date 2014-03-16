@@ -12,7 +12,9 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -198,7 +200,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile);
+			updateViewProfile(profile, isOwner);
 			viewProfilePanel.add(profileWidget);
 			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
@@ -211,7 +213,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 						//refresh the view after accepting/ignoring
 						presenter.redirectToViewProfile();
 					}
-				});
+				}, (CallbackP)null);
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
 				
@@ -298,7 +300,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else return s;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile) {
+	 private void updateViewProfile(UserProfile profile, boolean isOwner) {
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -312,7 +314,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		 builder.appendHtmlConstant("<h2>");
 		 builder.appendEscapedLines(name);
+		 
+		 //add a change username link if owner
+		 if (isOwner) {
+			 builder.appendHtmlConstant("<small class=\"smallestText\"> (<a class=\"link\" href=\""+DisplayUtils.getLoginPlaceHistoryToken(LoginPlace.CHANGE_USERNAME)+"\">change username</a>)</small>");	 
+		 }
+		 
 		 builder.appendHtmlConstant("</h2>");
+		 
 		 if (position.length()>0 || company.length()>0) {
 			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
 			 String atString = position.length()>0 && company.length()>0 ? " at " : "";

@@ -7,6 +7,7 @@ public class ProjectAreaState {
 	private String projectId;
 	private String lastWikiSubToken;
 	private EntityHeader lastFileAreaEntity;
+	private EntityHeader lastTableAreaEntity;
 
 	public String getProjectId() {
 		return projectId;
@@ -32,12 +33,26 @@ public class ProjectAreaState {
 		this.lastFileAreaEntity = lastFileEntity;
 	}
 
+	public EntityHeader getLastTableAreaEntity() {
+		return lastTableAreaEntity;
+	}
+
+	public void setLastTableAreaEntity(EntityHeader lastTableAreaEntity) {
+		this.lastTableAreaEntity = lastTableAreaEntity;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((lastFileAreaEntity == null) ? 0 : lastFileAreaEntity.hashCode());
+		result = prime
+				* result
+				+ ((lastFileAreaEntity == null) ? 0 : lastFileAreaEntity
+						.hashCode());
+		result = prime
+				* result
+				+ ((lastTableAreaEntity == null) ? 0 : lastTableAreaEntity
+						.hashCode());
 		result = prime
 				* result
 				+ ((lastWikiSubToken == null) ? 0 : lastWikiSubToken.hashCode());
@@ -60,6 +75,11 @@ public class ProjectAreaState {
 				return false;
 		} else if (!lastFileAreaEntity.equals(other.lastFileAreaEntity))
 			return false;
+		if (lastTableAreaEntity == null) {
+			if (other.lastTableAreaEntity != null)
+				return false;
+		} else if (!lastTableAreaEntity.equals(other.lastTableAreaEntity))
+			return false;
 		if (lastWikiSubToken == null) {
 			if (other.lastWikiSubToken != null)
 				return false;
@@ -72,12 +92,13 @@ public class ProjectAreaState {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "ProjectAreaState [projectId=" + projectId
 				+ ", lastWikiSubToken=" + lastWikiSubToken
-				+ ", lastFileEntity=" + lastFileAreaEntity + "]";
+				+ ", lastFileAreaEntity=" + lastFileAreaEntity
+				+ ", lastTableAreaEntity=" + lastTableAreaEntity + "]";
 	}
 	
 }

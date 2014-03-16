@@ -1,30 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
-import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.client.widget.user.UserBadgeView;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**

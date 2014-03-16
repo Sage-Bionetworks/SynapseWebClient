@@ -6,6 +6,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,13 +16,16 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -33,6 +38,8 @@ public class BaseEditWidgetDescriptorPresenterTest {
 	ExampleEntity entity;
 	Map<String, String> descriptor1;
 	AttachmentData attachment1, attachment2;
+	WidgetDescriptorUpdatedHandler mockDescriptorUpdatedHandler;
+	ArgumentCaptor<WidgetDescriptorUpdatedEvent> descriptorUpdateEventCaptor;
 	
 	@Before
 	public void setup() throws Exception {
@@ -61,6 +68,9 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		descriptor1 = new HashMap<String, String>();
 		descriptor1.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, "myVideoId");
 		when(mockWidgetRegistrar.getFriendlyTypeName(eq(WidgetConstants.YOUTUBE_CONTENT_TYPE))).thenReturn(WidgetConstants.YOUTUBE_FRIENDLY_NAME);
+		mockDescriptorUpdatedHandler = mock(WidgetDescriptorUpdatedHandler.class); 
+		presenter.addWidgetDescriptorUpdatedHandler(mockDescriptorUpdatedHandler);
+		descriptorUpdateEventCaptor = ArgumentCaptor.forClass(WidgetDescriptorUpdatedEvent.class);
 	}
 
 	@Test
@@ -84,16 +94,22 @@ public class BaseEditWidgetDescriptorPresenterTest {
 		presenter.editNew(new WikiPageKey(entity.getId(), null, null), WidgetConstants.YOUTUBE_CONTENT_TYPE, true);
 	}
 
-	
 	@Test
-	public void testApplySimpleInsert() throws Exception {
+	public void testApplySimpleInsertAndAddFileHandles() throws Exception {
 		//in this case, the descriptor is telling us that we should simply insert some text into the description, and nothing more (examples are external images, and links)
 		String myInsertText = "[](some markdown)";
 		when(mockView.getTextToInsert()).thenReturn(myInsertText);
+		List<String> fileHandleIds = new ArrayList<String>();
+		fileHandleIds.add("123");
+		fileHandleIds.add("4");
+		when(mockView.getNewFileHandleIds()).thenReturn(fileHandleIds);
 		presenter.apply();
 		verify(mockView).hide();
 		//it should always update the entity attachments
 		verify(mockView).updateDescriptorFromView();
+		verify(mockDescriptorUpdatedHandler).onUpdate(descriptorUpdateEventCaptor.capture());
+		assertEquals(myInsertText, descriptorUpdateEventCaptor.getValue().getInsertValue());
+		assertEquals(fileHandleIds, descriptorUpdateEventCaptor.getValue().getNewFileHandleIds());
 	}
 	
 	@Test

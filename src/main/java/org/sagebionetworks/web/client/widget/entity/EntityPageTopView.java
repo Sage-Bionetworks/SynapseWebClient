@@ -43,9 +43,9 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		/**
 		 * Changes places to the specified are of the Parent Project
 		 * @param area
-		 * @param overrideCache 
+		 * @param currentArea 
 		 */
-		void gotoProjectArea(Synapse.EntityArea area, boolean overrideCache);
+		void gotoProjectArea(Synapse.EntityArea area, EntityArea currentArea);
 		
 		/**
 		 * Changes the current active area
