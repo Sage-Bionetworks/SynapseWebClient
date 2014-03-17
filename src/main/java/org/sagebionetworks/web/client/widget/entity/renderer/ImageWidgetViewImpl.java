@@ -5,7 +5,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -26,17 +28,23 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GlobalApplicationState globalApplicationState;
+	private ClientCache clientCache;
 	private static final int MAX_IMAGE_WIDTH = 940;
+	//if image fails to load from the given source, it will try to load from the cache (this is for the case when the image has been uploaded, but the wiki has not yet been saved)
+	private boolean hasTriedCache;
+	
 	@Inject
-	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState) {
+	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState, ClientCache clientCache) {
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.globalApplicationState = globalApplicationState;
+		this.clientCache = clientCache;
 	}
 
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
 			final String scale, String alignment, final String synapseId, final boolean isLoggedIn, Long wikiVersion) {
 		this.removeAll();
+		hasTriedCache = false;
 		// Add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		
 		final String url;
@@ -80,6 +88,14 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		image.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
+				if (!hasTriedCache) {
+					hasTriedCache = true;
+					String newUrl = clientCache.get(fileName+WebConstants.TEMP_IMAGE_ATTACHMENT_SUFFIX);
+					if (newUrl != null && newUrl.length() > 0) {
+						image.setUrl(newUrl);
+						return;
+					}
+				}
 				if (synapseId != null) {
 					if (!isLoggedIn) 
 						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "You may need to log in to gain access to this image content (" + synapseId+")");

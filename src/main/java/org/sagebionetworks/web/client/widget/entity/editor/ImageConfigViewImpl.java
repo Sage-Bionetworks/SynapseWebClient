@@ -8,6 +8,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.UploadFormPanel;
@@ -51,6 +53,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	private Presenter presenter;
 	SageImageBundle sageImageBundle;
 	EntityFinder entityFinder;
+	ClientCache clientCache;
+	SynapseJSNIUtils synapseJSNIUtils;
 	private UploadFormPanel uploadPanel;
 	private IconsImageBundle iconsImageBundle;
 	private TextField<String> urlField, nameField, entityField;
@@ -63,10 +67,12 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	TabPanel tabPanel;
 	@Inject
-	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder) {
+	public ImageConfigViewImpl(IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, EntityFinder entityFinder, ClientCache clientCache, SynapseJSNIUtils synapseJSNIUtils) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.entityFinder = entityFinder;
+		this.clientCache = clientCache;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	
 	@Override
@@ -270,6 +276,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 		uploadPanel = AddAttachmentDialog.getUploadFormPanel(baseURl, sageImageBundle, DisplayConstants.ATTACH_IMAGE_DIALOG_BUTTON_TEXT, 25, new AddAttachmentDialog.Callback() {
 			@Override
 			public void onSaveAttachment(UploadResult result) {
+				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 				if(result != null){
 					if (uploadStatusPanel != null)
 						uploadTab.remove(uploadStatusPanel);
@@ -279,6 +286,8 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 						//enable the ok button
 						window.getButtonById(Dialog.OK).enable();
 						presenter.addFileHandleId(result.getMessage());
+						//add the local file to the client cache.  May need to fall back to the local reference in the preview (if handle has not yet been saved to the wiki)
+						clientCache.put(uploadedFileHandleName+WebConstants.TEMP_IMAGE_ATTACHMENT_SUFFIX, synapseJSNIUtils.getFileUrl(AddAttachmentDialog.ATTACHMENT_FILE_FIELD_ID));
 					}else{
 						uploadStatusPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.error16()) +" "+ result.getMessage()));
 					}
@@ -286,7 +295,6 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 					uploadTab.add(uploadStatusPanel);
 					layout(true);
 				}
-				uploadedFileHandleName = uploadPanel.getFileUploadField().getValue();
 			}
 		}, null);
 		
