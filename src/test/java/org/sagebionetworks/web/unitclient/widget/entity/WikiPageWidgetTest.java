@@ -106,6 +106,8 @@ public class WikiPageWidgetTest {
 		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -224,6 +226,15 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.saveClicked("", "");
 		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
+	
+	@Test
+	public void testSaveFailure() throws JSONObjectAdapterException{
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		presenter.saveClicked("", "");
+		
+		verify(mockGlobalApplicationState, Mockito.times(0)).setIsEditing(anyBoolean());
 	}
 	
 	@Test

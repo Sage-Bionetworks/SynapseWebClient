@@ -198,7 +198,6 @@ SynapseWidgetPresenter {
 	@Override
 	public void saveClicked(String title, String md) 
 	{
-		setIsEditing(false);
 		JSONObjectAdapter json = jsonObjectAdapter.createNew();
 		try {
 			currentPage.setTitle(title);
@@ -207,13 +206,15 @@ SynapseWidgetPresenter {
 			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					//showDefaultViewWithWiki();
+					//we have successfully saved, so we are no longer editing
+					setIsEditing(false);
+					//now refresh the page
 					refresh();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+						view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
