@@ -474,6 +474,13 @@ a.shortBtn {
 	float: right;
 }
 
+.autoheight {
+	height: auto;
+}
+
+.autowidth {
+	width: auto;
+}
 
 .clearleft {
 	clear:left;	
