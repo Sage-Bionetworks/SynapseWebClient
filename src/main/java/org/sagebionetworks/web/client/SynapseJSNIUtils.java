@@ -51,6 +51,7 @@ public interface SynapseJSNIUtils {
 	
 	public String getContentType(String fileFieldId);
 	
+	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, MD5Callback callback);
 	public double getFileSize(String fileFieldId);
 

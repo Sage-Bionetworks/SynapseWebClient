@@ -15,19 +15,13 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.event.dom.client.ErrorEvent;
-import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
@@ -300,6 +294,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
        $wnd.loadNext();
 	}-*/;
 
+	/**
+	 * Get the url to a local file blob.
+	 */
+	@Override
+	public String getFileUrl(String fileFieldId) {
+		return _getFileUrl(fileFieldId);
+	}
+	private final static native String _getFileUrl(String fileFieldId) /*-{
+		try {
+			var fileToUploadElement = $doc.getElementById(fileFieldId);
+			var file = fileToUploadElement.files[0];
+			return URL.createObjectURL(file);
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	@Override
 	public void uploadUrlToGenomeSpace(String url) {
