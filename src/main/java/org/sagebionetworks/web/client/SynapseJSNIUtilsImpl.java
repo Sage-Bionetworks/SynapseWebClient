@@ -302,9 +302,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return _getFileUrl(fileFieldId);
 	}
 	private final static native String _getFileUrl(String fileFieldId) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[0];
-		return URL.createObjectURL(file);
+		try {
+			var fileToUploadElement = $doc.getElementById(fileFieldId);
+			var file = fileToUploadElement.files[0];
+			return URL.createObjectURL(file);
+		}catch(err) {
+			return null;
+		}
 	}-*/;
 
 	@Override
