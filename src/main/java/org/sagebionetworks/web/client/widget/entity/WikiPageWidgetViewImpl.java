@@ -114,7 +114,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.widgetRegistrar = widgetRegistrar;
 		this.historyWidget = historyWidget;
 		this.ginInjector = ginInjector;
-		addStyleName("min-height-500");
 	}
 	
 	@Override
