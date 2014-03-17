@@ -33,7 +33,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
  * 
  */
 public class AddAttachmentDialog {
-	
+	public static final String ATTACHMENT_FILE_FIELD_ID = "attachmentFileToUpload";
 	public interface Callback {
 		/**
 		 * When the user selects save this will be called.
@@ -128,6 +128,7 @@ public class AddAttachmentDialog {
 				final String fullPath = file.getValue();
 				final int lastIndex = fullPath.lastIndexOf('\\');
 				final String fileName = fullPath.substring(lastIndex + 1);
+				file.getFileInput().setId(ATTACHMENT_FILE_FIELD_ID);
 				file.setValue(fileName);
 				// Now enable for submission
 				btn.enable();

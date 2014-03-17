@@ -7,11 +7,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cache.ClientCacheImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -76,14 +76,14 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}	
 
 	public static void getUserProfile(final String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
-		String profileString = clientCache.get(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX);
+		String profileString = clientCache.get(principalId + WebConstants.USER_PROFILE_SUFFIX);
 		if (profileString != null) {
 			parseProfile(profileString, nodeModelCreator, callback);
 		} else {
 		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String result) {
-					clientCache.put(principalId + ClientCacheImpl.USER_PROFILE_SUFFIX, result);
+					clientCache.put(principalId + WebConstants.USER_PROFILE_SUFFIX, result);
 					parseProfile(result, nodeModelCreator, callback);
 				}
 			
