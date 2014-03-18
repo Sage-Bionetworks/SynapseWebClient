@@ -1860,7 +1860,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public Boolean isTrustedUser(String userId) throws RestServiceException {
 		//TODO: is this user a member of the bootstrapped group
 //		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRUSTED_USER_GROUP.getPrincipalId());
-		return isTeamMember(userId, 3320305L); //3320305 is the "Alpha Trusted Users" team on prod
+		return isTeamMember(userId, 3319561L); //3320305 is the "Alpha Trusted Users" team on prod
 	}
 	
 	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {

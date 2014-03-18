@@ -33,7 +33,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
-	CookieProvider cookies;
 	boolean canEdit = false;
 	
 	@Inject
@@ -42,8 +41,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController,
-			CookieProvider cookies) {
+			AuthenticationController authenticationController) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -51,7 +49,6 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -112,7 +109,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrustedUser(authenticationController, synapseClient, cookies, trustedUserCallback);
+		Uploader.checkIsTrustedUser(authenticationController, synapseClient, trustedUserCallback);
 	}
 	
 	@Override
@@ -131,7 +128,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrustedUser(authenticationController, synapseClient, cookies, trustedUserCallback);
+		Uploader.checkIsTrustedUser(authenticationController, synapseClient, trustedUserCallback);
 	}
 	
 	public void createFolder() {
