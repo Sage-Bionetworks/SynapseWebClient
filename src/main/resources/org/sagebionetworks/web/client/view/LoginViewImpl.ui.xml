@@ -70,6 +70,21 @@
 						<g:Button ui:field="takePledgeButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Take the pledge, I do"/>
 					</div>
 				</g:HTMLPanel>
+				<g:HTMLPanel ui:field="quizInfoView" visible="false">
+					<!-- quizInfoView -->				
+					<div class="well col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+						<h2>Trusted User</h2>
+						<div class="signin-panel panel panel-body margin-top-15">
+			   				<h4 class="form-signin-heading margin-bottom-10"><span ui:field="quizInfoLabel" /></h4><blockquote class="padding-left-10 margin-bottom-40"><span ui:field="moreQuizInfoLabel" /></blockquote>
+			   				<div class="checkbox inline-block margin-left-10">
+			   					<g:CheckBox ui:field="ignoreQuizCb" text="Do not show me this again"/>
+			   				</div>
+							<g:Button ui:field="gotoQuizButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Become A Trusted User"/>
+							<g:Button ui:field="ignoreQuizButton" styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right" text="Decline"/>
+						</div>						
+					</div>
+					<br/>
+				</g:HTMLPanel>
 				
         		</div> <!-- close class="container" -->
 

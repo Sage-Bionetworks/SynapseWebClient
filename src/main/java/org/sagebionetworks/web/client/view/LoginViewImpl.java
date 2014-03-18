@@ -1,22 +1,19 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
-import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -30,7 +27,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -79,6 +75,21 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	
+	//quiz info view
+	@UiField
+	HTMLPanel quizInfoView;
+	@UiField
+	SpanElement quizInfoLabel;
+	@UiField
+	SpanElement moreQuizInfoLabel;
+	@UiField
+	CheckBox ignoreQuizCb;
+	@UiField
+	Button ignoreQuizButton;
+	@UiField
+	Button gotoQuizButton;
+
+	
 		private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
@@ -114,6 +125,22 @@ public class LoginViewImpl extends Composite implements LoginView {
 			}
 		});
 		
+		quizInfoLabel.setInnerHTML(DisplayConstants.QUIZ_INFO);
+		moreQuizInfoLabel.setInnerHTML(DisplayConstants.QUIZ_MORE_INFO);
+		gotoQuizButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.setIgnoreQuiz(ignoreQuizCb.getValue());
+				presenter.goTo(new Help(WebConstants.TRUSTED_USER_TUTORIAL));
+			}
+		});
+		ignoreQuizButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.setIgnoreQuiz(ignoreQuizCb.getValue());
+				presenter.goToLastPlace();
+			}
+		});
 		toUInitialized = false;
 	}
 
@@ -264,6 +291,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginView.setVisible(false);
 		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
+		quizInfoView.setVisible(false);
 	}
 	
 	@Override
@@ -271,6 +299,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 		hideViews();
 		username.setValue("");
 		changeUsernameView.setVisible(true);
+	}
+	
+	@Override
+	public void showQuizInfoUI() {
+		hideViews();
+		ignoreQuizCb.setValue(false);
+		quizInfoView.setVisible(true);
 	}
 	
 	@Override
@@ -283,5 +318,4 @@ public class LoginViewImpl extends Composite implements LoginView {
 		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
 		clear();
 	}
-
 }

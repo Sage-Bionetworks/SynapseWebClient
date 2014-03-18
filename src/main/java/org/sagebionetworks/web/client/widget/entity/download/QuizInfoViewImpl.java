@@ -22,7 +22,7 @@ public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
 	private void initializeUI() {
 		clear();
 		addStyleName("whiteBackground padding-left-10 padding-right-15 padding-top-15");
-		HTML html = new HTML("<h5>Synapse requires you to fully understand the rules for sharing and using restricted data before you are allowed to create content in the system.<br><br><small>But don't worry, becoming a trusted user is easy!</small></h5>");
+		HTML html = new HTML("<h5>"+DisplayConstants.QUIZ_INFO+"<br><br><small>"+DisplayConstants.QUIZ_NOT_TO_WORRY+"</small></h5>");
 		html.addStyleName("margin-bottom-40");
 		add(html);
 		FlowPanel buttonContainer = new FlowPanel();

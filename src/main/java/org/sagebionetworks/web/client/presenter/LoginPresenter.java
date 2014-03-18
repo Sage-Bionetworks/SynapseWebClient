@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -45,6 +46,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
+	private CookieProvider cookies;
 	private UserProfile profile;
 	
 	@Inject
@@ -56,6 +58,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	} 
 
@@ -171,17 +174,45 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showSetUsernameUI();
 				}
 				else {
-					goToLastPlace();
+					checkForTrustedUser();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				goToLastPlace();
+				checkForTrustedUser();
 			}
 		});
-
+	}
+	
+	public void checkForTrustedUser(){
+		view.showLoggingInLoader();
+		if (!DisplayUtils.isIgnoreQuiz(cookies)) {
+			Uploader.checkIsTrustedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean isTrusted) {
+					if (!isTrusted) {
+						view.hideLoggingInLoader();
+						view.showQuizInfoUI();
+					} else {
+						goToLastPlace();
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					goToLastPlace();
+				}
+			});
+		} else {
+			//don't check, user previously indicated to ignore quiz
+			goToLastPlace();
+		}
+	}
+	
+	@Override
+	public void setIgnoreQuiz(boolean ignoreQuiz) {
+		DisplayUtils.setIgnoreQuiz(ignoreQuiz, cookies);
 	}
 
 	public void updateProfile(final UserProfile profile) {
