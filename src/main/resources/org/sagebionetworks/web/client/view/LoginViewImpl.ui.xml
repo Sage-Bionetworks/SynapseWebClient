@@ -79,8 +79,8 @@
 			   				<div class="checkbox inline-block margin-left-10">
 			   					<g:CheckBox ui:field="ignoreQuizCb" text="Do not show me this again"/>
 			   				</div>
-							<g:Button ui:field="gotoQuizButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Become A Trusted User"/>
 							<g:Button ui:field="ignoreQuizButton" styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right" text="Decline"/>
+							<g:Button ui:field="gotoQuizButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Become A Trusted User"/>
 						</div>						
 					</div>
 					<br/>
