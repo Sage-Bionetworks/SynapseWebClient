@@ -1798,7 +1798,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-
 	public String getTeamMembershipState(String currentUserId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1857,6 +1856,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	@Override
+	public Boolean isTrustedUser(String userId) throws RestServiceException {
+		//TODO: is a member of the bootstrapped group
+//		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRUSTED_USER_GROUP.getPrincipalId());
+		return isTeamMember(userId, 3319561L); //3320305 is the "Alpha Trusted Users" team on prod
+	}
+	
+	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
+		Boolean isMember = null;
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(groupPrincipalId.toString(), userId);
+			isMember = membershipStatus.getIsMember(); 
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		return isMember;
+	}
 	
 	@Override
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {

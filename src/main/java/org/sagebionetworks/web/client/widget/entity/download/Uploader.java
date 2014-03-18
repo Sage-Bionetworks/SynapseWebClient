@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -14,13 +13,12 @@ import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -36,7 +34,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -44,6 +41,7 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -70,21 +68,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
-	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private AdapterFactory adapterFactory;
-	private AutoGenFactory autogenFactory;
 	private boolean isDirectUploading;
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
-	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
+	private GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
 	NumberFormat percentFormat;
@@ -92,28 +87,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Uploader(
 			UploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
-			AuthenticationController authenticationController, 
-			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
-			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
-			AdapterFactory adapterFactory, 
-			AutoGenFactory autogenFactory,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController
 			) {
 	
 		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
-		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.adapterFactory = adapterFactory;
-		this.autogenFactory = autogenFactory;
 		this.gwt = gwt;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -134,9 +123,31 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
+		checkIsTrustedUser();
 		return this.view.asWidget();
 	}
 
+	/**
+	 * If user is in the trusted user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
+	 */
+	public void checkIsTrustedUser() {
+		//sanity check
+		if (authenticationController.isLoggedIn()) {
+			synapseClient.isTrustedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean isTrusted) {
+					if (isTrusted)
+						view.showUploaderUI();
+					else
+						view.showQuizUI();
+				}
+				@Override
+				public void onFailure(Throwable t) {
+					view.showErrorMessage(t.getMessage());
+				}
+			});
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
@@ -466,6 +477,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 	}
 	
+	@Override
+	public void goTo(Place place) {
+		globalApplicationState.getPlaceChanger().goTo(place);
+	}
+
 	public void setFileEntityFileHandle(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
 		try {
 			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
