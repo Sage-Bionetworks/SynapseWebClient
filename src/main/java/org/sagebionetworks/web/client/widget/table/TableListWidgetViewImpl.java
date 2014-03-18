@@ -40,6 +40,7 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 	FlowPanel panel;
 	GlobalApplicationState globalApplicationState;
 	ImageResource tableEntityIcon;
+	FlowPanel tableListContainer;
 	
 	@Inject
 	public TableListWidgetViewImpl(GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle) {
@@ -48,12 +49,13 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 		add(panel);
 		
 		tableEntityIcon = DisplayUtils.getSynapseIconForEntityClassName(TableEntity.class.getName(), IconSize.PX24, iconsImageBundle);		
-		
+		tableListContainer = new FlowPanel();
+		panel.add(tableListContainer);		
 	}
 
 	@Override
 	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable) {
-		panel.clear();
+		tableListContainer.clear();
 		if(canEdit && showAddTable) {
 			Button addTable = DisplayUtils.createIconButton(DisplayConstants.ADD_TABLE, ButtonType.DEFAULT, "glyphicon-plus");
 			addTable.addClickHandler(new ClickHandler() {			
@@ -70,43 +72,46 @@ public class TableListWidgetViewImpl extends FlowPanel implements TableListWidge
 			panel.add(addTable);				
 		}
 		
-		FlowPanel tableListContainer = new FlowPanel();
 		tableListContainer.addStyleName("list-group margin-top-15");
 		for(final EntityHeader table : tables) {			
-			String modifiedOn = "date";
-			final String entryHtml = "<h4 class=\"list-group-item-heading\">"
-							    + AbstractImagePrototype.create(tableEntityIcon).getHTML() 
-								+ "<span class=\"movedown-2\"> " + SafeHtmlUtils.fromString(table.getName()).asString() + "</span>" 
-								+"</h4>";
-			SafeHtml safe = SafeHtmlUtils.fromTrustedString(entryHtml);
-			final Anchor entry = new Anchor();
-			entry.addStyleName("list-group-item");
-			entry.setHTML(entryHtml);
-			entry.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(table.getId()));
-				}
-			});
-			tableListContainer.add(entry);
-			
-			// async load table details
-			presenter.getTableDetails(table, new AsyncCallback<TableEntity>() {
-				@Override
-				public void onSuccess(TableEntity tableEntity) {
-					String completeEntry = entryHtml + "<p class=\"list-group-item-text\">"
+			addTable(table);
+		}
+	}
+
+	@Override
+	public void addTable(final EntityHeader table) {
+		if(table.getId() == null || table.getName() == null) return;
+		String modifiedOn = "date";				
+		final String entryHtml = "<h4 class=\"list-group-item-heading\">"
+						    + AbstractImagePrototype.create(tableEntityIcon).getHTML() 
+							+ "<span class=\"movedown-2\"> " + SafeHtmlUtils.fromString(table.getName()).asString() + "</span>" 
+							+"</h4>";
+		SafeHtml safe = SafeHtmlUtils.fromTrustedString(entryHtml);
+		final Anchor entry = new Anchor();
+		entry.addStyleName("list-group-item");
+		entry.setHTML(entryHtml);
+		entry.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(table.getId()));
+			}
+		});
+		tableListContainer.add(entry);
+		
+		// async load table details
+		presenter.getTableDetails(table, new AsyncCallback<TableEntity>() {
+			@Override
+			public void onSuccess(TableEntity tableEntity) {
+				String completeEntry = entryHtml + "<p class=\"list-group-item-text\">"
 //					+ ROWS + ": " + nRows + " | " 
 //					+ STORAGE + ": " + storageSize + " | " 
-					+ LAST_UPDATED + ": " + tableEntity.getModifiedBy() + " " + DATE_FORMAT.format(tableEntity.getModifiedOn())
-					+ "</p>";
-					entry.setHTML(SafeHtmlUtils.fromTrustedString(completeEntry));					
-				}
-				@Override
-				public void onFailure(Throwable caught) { }
-			});
-
-		}
-		panel.add(tableListContainer);
+				+ LAST_UPDATED + ": " + tableEntity.getModifiedBy() + " " + DATE_FORMAT.format(tableEntity.getModifiedOn())
+				+ "</p>";
+				entry.setHTML(SafeHtmlUtils.fromTrustedString(completeEntry));					
+			}
+			@Override
+			public void onFailure(Throwable caught) { }
+		});
 	}
 	
 	@Override
