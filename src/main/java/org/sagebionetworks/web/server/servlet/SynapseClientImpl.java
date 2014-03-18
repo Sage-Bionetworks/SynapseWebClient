@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -90,6 +91,8 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableState;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -2533,8 +2536,27 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	private static long sequence = 0; 
+	
 	@Override
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {		
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {
+// TODO : eventually remove. keeping around for demo.
+//		TableStatus st = new TableStatus();
+//		st.setState(TableState.PROCESSING);
+//		st.setStartedOn(new Date());
+//		st.setChangedOn(new Date());
+//		st.setErrorDetails("Error details");
+//		st.setErrorMessage("error Message");
+//		sequence += 10;
+//		st.setProgresssCurrent(sequence);
+//		st.setProgresssTotal(100L);
+//		st.setProgresssMessage("Progress message");
+//		try {
+//			throw new TableUnavilableException(st.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+//		} catch (JSONObjectAdapterException e1) {
+//			e1.printStackTrace();
+//		}
+		
 		if(query == null) throw new BadRequestException("query must be defined");
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2558,6 +2580,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						&& countSet.getRows().get(0).getValues().size() > 0) {					
 					totalRowCount = Integer.parseInt(countSet.getRows().get(0).getValues().get(0));							
 				}
+			} catch (SynapseTableUnavilableException e) {
+				handleTableUnavailableException(e);
 			} catch (SynapseException e) {
 				logError(e.getMessage());
 				throw ExceptionUtil.convertSynapseException(e);
@@ -2573,7 +2597,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 //			RowSet rs = getFakeRowSet(queryDetails.getLimit().intValue(), queryDetails.getOffset().intValue());
 			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		} catch (SynapseTableUnavilableException e) {
-			throw new TableUnavilableException(e.getMessage());
+			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -2583,39 +2607,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
 	}
 
-	private RowSet getFakeCountSet() throws SynapseException, SynapseTableUnavilableException {
-		RowSet rs = new RowSet();
-		rs.setHeaders(Arrays.asList(new String[] { "COUNT(*)" }));
-		rs.setEtag("1234");
-		rs.setTableId("syn123");
-		
-		List<Row> rows = new ArrayList<Row>();
-		Row row = new Row();
-		row.setRowId(1L);
-		row.setVersionNumber(1L);
-		row.setValues(Arrays.asList(new String[] {"999"}));
-		rows.add(row);
-		rs.setRows(rows);
-		return rs;
-	}
-
-	private RowSet getFakeRowSet(int limit, int offset) throws SynapseException, SynapseTableUnavilableException {
-		RowSet rs = new RowSet();
-		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
-		rs.setEtag("1234");
-		rs.setTableId("syn123");
-		
-		List<Row> rows = new ArrayList<Row>();		
-		Row row;
-		for(int i=0; i<limit; i++) {
-			row = new Row();
-			row.setRowId(new Long(i));
-			row.setVersionNumber(1L); 
-			row.setValues(Arrays.asList(new String[] {String.valueOf(offset + i), "174value", "avg1.234", "176md5-273189372891739812"}));
-			rows.add(row);
+	private void handleTableUnavailableException(
+			SynapseTableUnavilableException e) throws TableUnavilableException {
+		try {
+			throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		} catch (JSONObjectAdapterException e1) {
+			throw new TableUnavilableException(e.getMessage());
 		}
-		rs.setRows(rows);
-		return rs;
 	}
 	
 	@Override

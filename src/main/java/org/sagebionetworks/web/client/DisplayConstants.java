@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.HasDirection.Direction;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 
 public class DisplayConstants {
@@ -711,6 +712,11 @@ public class DisplayConstants {
 	public static final String TABLE_CREATED = "Table Created";
 	public static final String ERROR_LOADING_QUERY_PLEASE_RETRY = "An error occured trying to load your query. Please reload the page and try again";
 	public static final String EXECUTING_QUERY = "Executing Query";
+	public static final String TABLE_UNAVAILABLE = "Table Unavailable";
+	public static final String TABLE_UNAVAILABLE_GENERIC = "This table is not currently available for query. Please try again later.";
+	public static final String TABLE_PROCESSING_DESCRIPTION = "This table is processing an update. To avoid displaying stale data, query is temporarily unavailable until the processing has completed.";
+	public static final String TRY_NOW = "Try Now";
+	public static final String WAITING = "Waiting";
 
 }
 

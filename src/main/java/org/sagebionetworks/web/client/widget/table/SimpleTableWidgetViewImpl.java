@@ -9,9 +9,12 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableState;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -20,6 +23,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,9 +37,11 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -62,6 +70,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SimplePanel tableLoading;
 	@UiField
 	SimplePanel pagerContainer;
+	@UiField
+	SimplePanel errorMessage;
 
 	SageImageBundle sageImageBundle;
 	CellTable<TableModel> cellTable;
@@ -74,7 +84,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	Map<Column,ColumnModel> columnToModel;
 	AsyncDataProvider<TableModel> dataProvider;
 	RowSet initialLoad = null;
-	QueryDetails initialDetails = null;		
+	QueryDetails initialDetails = null;	
+	int timerRemainingSec;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle) {
@@ -115,7 +126,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				final Range range = display.getVisibleRange();
 				Long offset = new Long(range.getStart());
 				Long limit = new Long(range.getLength());
-
+				
 				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
 					@Override
 					public void onSuccess(RowSet rowData) {
@@ -181,13 +192,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void updateData(RowSet rowset, QueryDetails queryDetails) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	@Override
 	public void setQuery(String query) {
 		queryField.setValue(query);
 	}
@@ -212,6 +216,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		tableContainer.setVisible(false);
 		pagerContainer.setVisible(false);
 		tableLoading.setVisible(true);
+		errorMessage.setVisible(false);
 	}
 	
 	@Override
@@ -223,6 +228,73 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		this.presenter = presenter;
 	}
 
+	@Override
+	public void showTableUnavailable(TableStatus status, Integer percentComplete) {
+		hideLoading();
+		tableContainer.setVisible(false);
+		pagerContainer.setVisible(false);
+		
+		FlowPanel jumbo = new FlowPanel();
+		jumbo.addStyleName("jumbotron");
+		
+		String tableUnavailableHeading = "<h1>" + DisplayConstants.TABLE_UNAVAILABLE + "</h1>";
+		if(status != null && status.getState() != null) {
+			String stateStr = "<strong>"+ status.getState() +"</strong>";
+			if(status.getState() == TableState.PROCESSING) {
+				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ stateStr +": "+ DisplayConstants.TABLE_PROCESSING_DESCRIPTION +"</p>"));
+				if(percentComplete != null) {
+					HTML progress = new HTML();
+					progress.setHTML("<div class=\"progress-bar progress-bar-success\" role=\"progressbar\" aria-valuenow=\""+ percentComplete +"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: "+percentComplete+"%\">"+percentComplete+"% Complete</div>");
+					progress.addStyleName("progress progress-striped active");
+					jumbo.add(progress);
+				}
+				
+				FlowPanel tryAgain = new FlowPanel();
+				
+				timerRemainingSec = 10;
+				final HTML timerLabel = new HTML(getWaitingString(timerRemainingSec));
+				final Timer timer = new Timer() {					
+					@Override
+					public void run() {
+						timerRemainingSec--;
+						if(timerRemainingSec <= 0) {
+							cancel();
+							presenter.retryCurrentQuery();
+							return;
+						}
+						timerLabel.setHTML(getWaitingString(timerRemainingSec));
+					}
+				};
+				timer.scheduleRepeating(1000);
+
+				Button btn = DisplayUtils.createButton(DisplayConstants.TRY_NOW, ButtonType.DEFAULT);
+				btn.addStyleName("btn-lg left");
+				btn.addClickHandler(new ClickHandler() {					
+					@Override
+					public void onClick(ClickEvent event) {
+						timer.cancel();
+						presenter.retryCurrentQuery();
+					}
+				});
+				tryAgain.add(btn);
+				tryAgain.add(timerLabel);				
+				jumbo.add(tryAgain);
+			} else if(status.getState() == TableState.PROCESSING_FAILED) {
+				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ stateStr +": "+ DisplayConstants.ERROR_GENERIC_NOTIFY +"</p>"));
+			} else {
+				// not handling EFFECTIVE_SCHEMA or other new states
+				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+			}
+		} else {
+			jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+		}
+		
+		
+		errorMessage.clear();
+		errorMessage.setWidget(jumbo);
+		errorMessage.setVisible(true);
+	}
+	
 	
 	/*
 	 * Private Methods
@@ -241,12 +313,27 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.query(queryField.getValue());
+				runQuery();
 			}
 		});
+		
 		queryButtonContainer.setWidget(queryBtn);
 		queryField.setValue(queryString);
+		queryField.addKeyDownHandler(new KeyDownHandler() {				
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+					runQuery();
+	            }					
+			}
+		});				
 	}
+
+	private void runQuery() {
+		queryField.setEnabled(false);
+		presenter.query(queryField.getValue());
+	}
+
 	
 	private void buildTable(int pageSize) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
@@ -320,6 +407,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
 		widget.addStyleName("margin-top-15 center");
 		return widget;
+	}
+
+	private String getWaitingString(int remainingSec) {
+		return "&nbsp;" + DisplayConstants.WAITING + " " + remainingSec + "s...";
 	}
 	
 }

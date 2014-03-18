@@ -125,7 +125,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		try {
 			newTable.setName(name);
 			newTable.setParentId(projectOwnerId);
-			newTable.setColumnIds(Arrays.asList(new String[]{"175"}));
 			newTable.setEntityType(TableEntity.class.getName());
 			json = newTable.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(json, null, true, new AsyncCallback<String>() {

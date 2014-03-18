@@ -8,14 +8,15 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.view.RowData;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
@@ -36,6 +37,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private String currentQuery;
 	private Integer currentTotalRowCount;
 	private boolean canEdit;
+	private Long startProgress;
 	
 	@Inject
 	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
@@ -56,6 +58,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		this.tableColumns = tableColumns;
 		this.currentQuery = queryString == null ? getDefaultQuery(tableEntityId) : queryString;
 		this.canEdit = canEdit;
+		this.startProgress = null;
 	
 		view.showLoading();
 		executeQuery(currentQuery, null, null);	
@@ -84,6 +87,12 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		executeQuery(query, null, null);
 	}
 	
+	@Override
+	public void retryCurrentQuery() {
+		view.showLoading();
+		executeQuery(currentQuery, null, null);
+	}
+
 	
 	/*
 	 * Private Methods
@@ -104,7 +113,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						view.setQuery(currentQuery);
 					} else {
 						// new query
-						currentTotalRowCount = queryResult.getTotalRowCount();
+						currentTotalRowCount = queryResult.getTotalRowCount();						
 																
 						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
@@ -126,8 +135,21 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 
 			@Override
 			public void onFailure(Throwable caught) {
-				if(updateCallback != null) updateCallback.onFailure(caught);
-				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+				if(caught instanceof TableUnavilableException) {
+					Integer progress = null;
+					TableStatus status = null;
+					try {
+						status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
+						if(startProgress == null) startProgress = status.getProgresssCurrent();					
+						if(startProgress != null) progress = new Long(100*(status.getProgresssCurrent().longValue() - startProgress.longValue()) / status.getProgresssTotal().longValue()).intValue();
+						if(progress > 100) progress = 100;
+					} catch (JSONObjectAdapterException e) {
+					}
+					view.showTableUnavailable(status, progress);
+				} else {
+					if(updateCallback != null) updateCallback.onFailure(caught);
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+				}
 			}
 		});
 	}
@@ -152,5 +174,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
 	}
+
 
 }

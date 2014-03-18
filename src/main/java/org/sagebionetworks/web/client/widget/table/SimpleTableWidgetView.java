@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 
@@ -28,6 +29,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void alterCurrentQuery(QueryDetails alterDetails, AsyncCallback<RowSet> asyncCallback);
 
 		void query(String query);
+
+		void retryCurrentQuery();
 				
 	}
 	
@@ -42,6 +45,5 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 */
 	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
 	
-	
-	public void updateData(RowSet rowset, QueryDetails queryDetails);
+	public void showTableUnavailable(TableStatus status, Integer percentComplete);
 }

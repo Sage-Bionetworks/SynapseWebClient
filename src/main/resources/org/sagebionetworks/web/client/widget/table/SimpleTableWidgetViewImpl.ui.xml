@@ -37,5 +37,6 @@
       </tr>
     </table>
     <g:SimplePanel ui:field="tableLoading" visible="false" styleName="margin-top-15"/>
+    <g:SimplePanel ui:field="errorMessage" visible="false" styleName="margin-top-15"/>
   </g:HTMLPanel>
 </ui:UiBinder>
