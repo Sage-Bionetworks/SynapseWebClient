@@ -17,12 +17,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -41,7 +42,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -68,6 +68,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
+	private CookieProvider cookies;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
@@ -78,7 +79,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
-	private GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
@@ -91,8 +91,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
-			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController
+			AuthenticationController authenticationController,
+			CookieProvider cookies
 			) {
 	
 		this.view = view;		
@@ -101,8 +101,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
-		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -123,29 +123,36 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		checkIsTrustedUser();
+		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isTrusted) {
+				if (isTrusted)
+					view.showUploaderUI();
+				else
+					view.showQuizUI();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		checkIsTrustedUser(authenticationController, synapseClient, cookies, trustedUserCallback);
 		return this.view.asWidget();
 	}
 
 	/**
 	 * If user is in the trusted user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
 	 */
-	public void checkIsTrustedUser() {
-		//sanity check
-		if (authenticationController.isLoggedIn()) {
-			synapseClient.isTrustedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean isTrusted) {
-					if (isTrusted)
-						view.showUploaderUI();
-					else
-						view.showQuizUI();
-				}
-				@Override
-				public void onFailure(Throwable t) {
-					view.showErrorMessage(t.getMessage());
-				}
-			});
+	public static void checkIsTrustedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, CookieProvider cookies, AsyncCallback<Boolean> callback) {
+		//TODO: remove for release
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			//sanity check
+			if (authenticationController.isLoggedIn()) {
+				synapseClient.isTrustedUser(authenticationController.getCurrentUserPrincipalId(), callback);
+			}
+		} else {
+			//if not in alpha mode, always return true
+			callback.onSuccess(true);
 		}
 	}
 	
@@ -477,11 +484,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 	}
 	
-	@Override
-	public void goTo(Place place) {
-		globalApplicationState.getPlaceChanger().goTo(place);
-	}
-
 	public void setFileEntityFileHandle(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
 		try {
 			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {

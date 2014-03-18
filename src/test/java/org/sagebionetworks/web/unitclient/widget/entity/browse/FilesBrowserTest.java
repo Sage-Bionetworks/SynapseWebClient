@@ -15,6 +15,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -28,6 +29,7 @@ public class FilesBrowserTest {
 	FilesBrowserView mockView;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
+	CookieProvider mockCookies;
 	AdapterFactory adapterFactory;
 	AutoGenFactory autoGenFactory;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -43,11 +45,12 @@ public class FilesBrowserTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockCookies = mock(CookieProvider.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
 				mockNodeModelCreator, adapterFactory, autoGenFactory,
-				mockGlobalApplicationState, mockAuthenticationController);
+				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
 		verify(mockView).setPresenter(filesBrowser);
 		filesBrowser.configure(configuredEntityId);
 		reset(mockView);

@@ -52,8 +52,6 @@ public interface UploaderView extends IsWidget, SynapseView {
 		 * Called when cancel is clicked in the view
 		 */
 		void cancelClicked();
-		
-		public void goTo(Place place);
 	}
 
 	public void setShowCancelButton(boolean showCancel);

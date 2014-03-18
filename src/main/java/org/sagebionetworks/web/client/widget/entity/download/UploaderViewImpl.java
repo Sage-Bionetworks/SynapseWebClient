@@ -3,11 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -32,9 +31,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,7 +39,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
 
 	private boolean showCancelButton = true;
-	private FlowPanel quizInfoPanel;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final int BUTTON_HEIGHT_PX = 25;
@@ -71,16 +66,25 @@ public class UploaderViewImpl extends LayoutContainer implements
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
+	QuizInfoWidget untrustedUploader;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle,
-			SharingAndDataUseConditionWidget sharingDataUseWidget) {
+			SharingAndDataUseConditionWidget sharingDataUseWidget, 
+			QuizInfoWidget quizInfoWidget) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
+		this.untrustedUploader = quizInfoWidget;
+		quizInfoWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				presenter.cancelClicked();	
+			}
+		});
 		
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
@@ -136,7 +140,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.isEntity = isEntity;
 		this.parentEntityId = parentEntityId;
 		initializeControls();
-		setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
+		
+		setSize(PANEL_WIDTH, PANEL_HEIGHT);
 		createUploadContents();
 		
 		// reset
@@ -144,8 +149,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 			pathField.clear();
 		if (nameField != null)
 			nameField.clear();
-		
-		createQuizContents();
 	}
 
 	
@@ -189,38 +192,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	/*
 	 * Private Methods
 	 */	
-	private void createQuizContents() {
-		if (quizInfoPanel == null) {
-			quizInfoPanel = new FlowPanel();
-			quizInfoPanel.addStyleName("margin-10");
-		}
-		quizInfoPanel.clear();
-		quizInfoPanel.add(new HTML("<p>Synapse requires you to fully understand the rules for sharing and using restricted data before you are allowed to upload content into the system</p><h5>But don't worry, becoming a trusted user is easy!</h5>"));
-		FlowPanel buttonContainer = new FlowPanel();
-		
-		com.google.gwt.user.client.ui.Button okButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
-		okButton.addStyleName("right margin-left-5");
-		buttonContainer.add(okButton);
-		okButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new Quiz("DataUse"));
-			}
-		});
-		
-		com.google.gwt.user.client.ui.Button cancel = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL, ButtonType.DEFAULT);
-		cancel.addStyleName("right");
-		buttonContainer.add(cancel);
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.cancelClicked();
-			}
-		});
-		quizInfoPanel.add(buttonContainer);
-	}
-	
-	
 	private void createUploadContents() {
 		if (container == null)
 			this.container = new LayoutContainer();
@@ -306,7 +277,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void showQuizUI() {
 		removeAll();
-		add(quizInfoPanel);
+		add(untrustedUploader.asWidget());
 		layout(true);
 	}
 
@@ -352,7 +323,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 		
 	private static final int PANEL_HEIGHT = 100;
-	private static final int PANEL_WIDTH = 590;
+	private static final int PANEL_WIDTH = 790;
 	
 	
 	private Widget createUploadPanel() {
@@ -365,10 +336,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setHeight(PANEL_HEIGHT);
 		formPanel.setBorders(false);
 		formPanel.setAutoWidth(false);
-		formPanel.setWidth(PANEL_WIDTH+30);
-		formPanel.setFieldWidth(PANEL_WIDTH-100);
+		formPanel.setWidth(PANEL_WIDTH-170);
+		formPanel.setFieldWidth(PANEL_WIDTH-300);
 
-		fileUploadField.setWidth(PANEL_WIDTH-100);
+		fileUploadField.setWidth(PANEL_WIDTH-300);
 		fileUploadField.setAllowBlank(false);
 		fileUploadField.setName("file");
 		fileUploadField.setFieldLabel("File");
@@ -388,7 +359,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		configureUploadButton(); // upload tab first by default
 		
-		progressBar.setWidth(PANEL_WIDTH - 30);
+		progressBar.setWidth(PANEL_WIDTH - 230);
 								
 		formPanel.layout(true);
 		
@@ -405,9 +376,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
 		externalLinkFormPanel.setBorders(false);
-		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
+		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-350);
 		externalLinkFormPanel.setAutoWidth(false);
-		externalLinkFormPanel.setWidth(PANEL_WIDTH+30);
+		externalLinkFormPanel.setWidth(PANEL_WIDTH-270);
 		pathField.setFieldLabel("URL");
 		pathField.addListener(Events.KeyPress, new Listener<BaseEvent>() {
 			@Override

@@ -9,11 +9,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,6 +33,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	CookieProvider cookies;
 	boolean canEdit = false;
 	
 	@Inject
@@ -39,7 +42,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -47,6 +51,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -91,8 +96,44 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}
 
+	@Override
+	public void uploadButtonClicked() {
+		//is this a trusted user?
+		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isTrusted) {
+				if (isTrusted)
+					view.showUploadDialog(configuredEntityId);
+				else
+					view.showQuizInfoDialog();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		Uploader.checkIsTrustedUser(authenticationController, synapseClient, cookies, trustedUserCallback);
+	}
 	
 	@Override
+	public void addFolderClicked() {
+		//is this a trusted user?
+		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isTrusted) {
+				if (isTrusted)
+					createFolder();
+				else
+					view.showQuizInfoDialog();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		Uploader.checkIsTrustedUser(authenticationController, synapseClient, cookies, trustedUserCallback);
+	}
+	
 	public void createFolder() {
 		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
 		String entityJson;

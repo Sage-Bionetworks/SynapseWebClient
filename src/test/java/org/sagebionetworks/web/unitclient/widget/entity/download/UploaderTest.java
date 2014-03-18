@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -57,6 +58,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class UploaderTest {
 	
 	UploaderView view;
+	CookieProvider cookies;
 	AuthenticationController authenticationController; 
 	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
@@ -85,6 +87,7 @@ public class UploaderTest {
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
 		autogenFactory=mock(AutoGenFactory.class);
 		gwt = mock(GWTWrapper.class);
+		cookies = mock(CookieProvider.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
@@ -124,9 +127,9 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
-				authenticationController, entityTypeProvider, synapseClient,
-				jiraURLHelper, jsonObjectAdapter, synapseJsniUtils,
-				adapterFactory, autogenFactory, gwt);
+				synapseClient,
+				jsonObjectAdapter, synapseJsniUtils,
+				gwt, authenticationController, cookies);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);

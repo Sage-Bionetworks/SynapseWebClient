@@ -151,6 +151,7 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String BUTTON_CONTINUE = "Continue";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_NO_DOWNLOADS = "There are no downloads available.";
 	public static final String TEXT_UNAUTH_DOWNLOADS = "Please login or sign the End User License Agreement to see downloads.";
