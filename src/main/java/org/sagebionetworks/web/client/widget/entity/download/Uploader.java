@@ -119,10 +119,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<Boolean> trainedUserCallback = new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(Boolean isTrusted) {
-				if (isTrusted)
+			public void onSuccess(Boolean isTrained) {
+				if (isTrained)
 					view.showUploaderUI();
 				else
 					view.showQuizUI();
@@ -132,17 +132,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		checkIsTrustedUser(authenticationController, synapseClient, trustedUserCallback);
+		checkIsTrainedUser(authenticationController, synapseClient, trainedUserCallback);
 		return this.view.asWidget();
 	}
 
 	/**
-	 * If user is in the trusted user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
+	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
 	 */
-	public static void checkIsTrustedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
+	public static void checkIsTrainedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
 		//sanity check
 		if (authenticationController.isLoggedIn()) {
-			synapseClient.isTrustedUser(authenticationController.getCurrentUserPrincipalId(), callback);
+			synapseClient.isTrainedUser(authenticationController.getCurrentUserPrincipalId(), callback);
 		}
 	}
 	

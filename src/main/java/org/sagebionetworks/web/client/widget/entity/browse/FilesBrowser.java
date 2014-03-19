@@ -95,11 +95,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		//is this a trusted user?
-		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+		//is this a trained user?
+		AsyncCallback<Boolean> trainedUserCallback = new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(Boolean isTrusted) {
-				if (isTrusted)
+			public void onSuccess(Boolean isTrained) {
+				if (isTrained)
 					view.showUploadDialog(configuredEntityId);
 				else
 					view.showQuizInfoDialog();
@@ -109,12 +109,12 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrustedUser(authenticationController, synapseClient, trustedUserCallback);
+		Uploader.checkIsTrainedUser(authenticationController, synapseClient, trainedUserCallback);
 	}
 	
 	@Override
 	public void addFolderClicked() {
-		//is this a trusted user?
+		//is this a trained user?
 		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isTrusted) {
@@ -128,7 +128,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrustedUser(authenticationController, synapseClient, trustedUserCallback);
+		Uploader.checkIsTrainedUser(authenticationController, synapseClient, trustedUserCallback);
 	}
 	
 	public void createFolder() {

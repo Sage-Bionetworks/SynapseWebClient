@@ -129,7 +129,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		dialog.setModal(true);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
-		dialog.setHeading("Trusted User Info");
+		dialog.setHeading("Training");
 
 		quizInfoWidget.configure(new Callback() {
 			@Override
