@@ -196,7 +196,7 @@ public class WebConstants {
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
-	public static final String USER_TRAINING_TUTORIAL = "Training";
+	public static final String USER_CERTIFICATION_TUTORIAL = "Certification";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";

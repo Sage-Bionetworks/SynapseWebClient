@@ -174,22 +174,22 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showSetUsernameUI();
 				}
 				else {
-					checkForTrainedUser();
+					checkForCertifiedUser();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				checkForTrainedUser();
+				checkForCertifiedUser();
 			}
 		});
 	}
 	
-	public void checkForTrainedUser(){
+	public void checkForCertifiedUser(){
 		view.showLoggingInLoader();
 		if (!DisplayUtils.isIgnoreQuiz(cookies)) {
-			Uploader.checkIsTrainedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
+			Uploader.checkIsCertifiedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
 				@Override
 				public void onSuccess(Boolean isTrusted) {
 					if (!isTrusted) {

@@ -36,14 +36,14 @@ public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
 				presenter.buttonClicked();
 			}
 		});
-		com.google.gwt.user.client.ui.Button okButton = DisplayUtils.createButton(DisplayConstants.START_TRAINING, ButtonType.PRIMARY);
+		com.google.gwt.user.client.ui.Button okButton = DisplayUtils.createButton(DisplayConstants.BECOME_CERTIFIED, ButtonType.PRIMARY);
 		okButton.addStyleName("right");
 		buttonContainer.add(okButton);
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.buttonClicked();
-				presenter.goTo(new Help(WebConstants.USER_TRAINING_TUTORIAL));
+				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
 		

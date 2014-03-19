@@ -119,7 +119,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		AsyncCallback<Boolean> trainedUserCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isTrained) {
 				if (isTrained)
@@ -132,17 +132,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		checkIsTrainedUser(authenticationController, synapseClient, trainedUserCallback);
+		checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
 		return this.view.asWidget();
 	}
 
 	/**
 	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
 	 */
-	public static void checkIsTrainedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
+	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
 		//sanity check
 		if (authenticationController.isLoggedIn()) {
-			synapseClient.isTrainedUser(authenticationController.getCurrentUserPrincipalId(), callback);
+			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
 		}
 	}
 	

@@ -1857,7 +1857,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Boolean isTrainedUser(String userId) throws RestServiceException {
+	public Boolean isCertifiedUser(String userId) throws RestServiceException {
 		//TODO: is this user a member of the bootstrapped group
 //		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
 		return isTeamMember(userId, 3320305L); //3320305 is the "Alpha Trained Users" team on prod
@@ -2569,7 +2569,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.USER_TRAINING_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
 		
 		return pageName2WikiKeyMap;
 	}

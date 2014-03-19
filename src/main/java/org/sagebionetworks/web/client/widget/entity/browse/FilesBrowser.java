@@ -95,8 +95,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		//is this a trained user?
-		AsyncCallback<Boolean> trainedUserCallback = new AsyncCallback<Boolean>() {
+		//is this a certified user?
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isTrained) {
 				if (isTrained)
@@ -109,13 +109,13 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrainedUser(authenticationController, synapseClient, trainedUserCallback);
+		Uploader.checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
 	}
 	
 	@Override
 	public void addFolderClicked() {
-		//is this a trained user?
-		AsyncCallback<Boolean> trustedUserCallback = new AsyncCallback<Boolean>() {
+		//is this a certified user?
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isTrusted) {
 				if (isTrusted)
@@ -128,7 +128,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsTrainedUser(authenticationController, synapseClient, trustedUserCallback);
+		Uploader.checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
 	}
 	
 	public void createFolder() {
