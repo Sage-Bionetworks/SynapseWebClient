@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
@@ -146,6 +147,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					} catch (JSONObjectAdapterException e) {
 					}
 					view.showTableUnavailable(status, progress);
+				} else if(caught instanceof BadRequestException) {
+						QueryProblem problem = TableUtils.parseQueryProblem(caught.getMessage());
+						view.showQueryProblem(problem, caught.getMessage());
 				} else {
 					if(updateCallback != null) updateCallback.onFailure(caught);
 					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);

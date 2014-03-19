@@ -46,4 +46,6 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
 	
 	public void showTableUnavailable(TableStatus status, Integer percentComplete);
+
+	public void showQueryProblem(QueryProblem problem, String message);
 }

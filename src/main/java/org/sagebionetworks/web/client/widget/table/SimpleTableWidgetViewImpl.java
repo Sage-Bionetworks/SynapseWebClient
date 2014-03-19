@@ -13,13 +13,14 @@ import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,6 +45,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,12 +58,18 @@ import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
 public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableWidgetView {
+	private static final String HAS_ERROR_HAS_FEEDBACK = "has-error has-feedback";
+
 	public interface Binder extends UiBinder<Widget, SimpleTableWidgetViewImpl> {	}
 	
 	@UiField
 	HTMLPanel queryPanel;
 	@UiField
 	TextBox queryField;
+	@UiField
+	DivElement queryFieldContainer;
+	@UiField
+	Label queryFeedback;
 	@UiField
 	SimplePanel queryButtonContainer;
 	@UiField
@@ -207,6 +215,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	@Override
 	public void showErrorMessage(String message) {
+		hideLoading();
 		DisplayUtils.showErrorMessage(message);
 	}
 
@@ -217,6 +226,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		pagerContainer.setVisible(false);
 		tableLoading.setVisible(true);
 		errorMessage.setVisible(false);
+		queryFeedback.setVisible(false);
 	}
 	
 	@Override
@@ -294,7 +304,18 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		errorMessage.setWidget(jumbo);
 		errorMessage.setVisible(true);
 	}
-	
+
+	@Override
+	public void showQueryProblem(QueryProblem problem, String message) {
+		hideLoading();
+		if(problem == QueryProblem.UNRECOGNIZED_COLUMN) 
+			queryFeedback.setText("Unrecognized column: " + message);
+		else 
+			queryFeedback.setText("Query Error: " + message);
+		queryFeedback.setVisible(true);
+		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
+	}
+
 	
 	/*
 	 * Private Methods
@@ -319,6 +340,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 		queryButtonContainer.setWidget(queryBtn);
 		queryField.setValue(queryString);
+		queryField.getElement().setId("inputError2");
 		queryField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -330,6 +352,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 
 	private void runQuery() {
+		queryFieldContainer.removeClassName(HAS_ERROR_HAS_FEEDBACK);
 		queryField.setEnabled(false);
 		presenter.query(queryField.getValue());
 	}
@@ -387,7 +410,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 		// Table's columns
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = ColumnUtils.getColumn(model, sortHandler, canEdit);
+			Column<TableModel, ?> column = TableUtils.getColumn(model, sortHandler, canEdit);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			

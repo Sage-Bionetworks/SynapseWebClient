@@ -22,7 +22,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.Window;
 
-public class ColumnUtils {
+public class TableUtils {
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
@@ -64,6 +64,18 @@ public class ColumnUtils {
 		} 
 	}
 
+	public static QueryProblem parseQueryProblem(String message) {
+		if(message.contains("blah")) {
+			return QueryProblem.UNRECOGNIZED_COLUMN;
+		} else {
+			return QueryProblem.UNKNOWN;
+		}
+	}
+	
+	
+	/*
+	 * Private Methods
+	 */
 	private static Column<TableModel, String> configComboString(final ColumnModel col, boolean canEdit) {
 		if(col.getEnumValues() == null) return null;
 		SelectionCell comboCell = new SelectionCell(col.getEnumValues());
@@ -230,5 +242,5 @@ public class ColumnUtils {
 				
 		return column;
 	}	
-	
+
 }
