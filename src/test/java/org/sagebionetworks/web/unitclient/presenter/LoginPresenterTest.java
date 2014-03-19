@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -89,7 +92,7 @@ public class LoginPresenterTest {
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
-		
+		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_IGNORE_QUIZ_COOKIE_KEY))).thenReturn("true");
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 
 	}	
@@ -210,7 +213,7 @@ public class LoginPresenterTest {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		loginPresenter.checkForTempUsernameAndContinue();
-		verify(mockView).showLoggingInLoader();
+		verify(mockView, times(2)).showLoggingInLoader();
 		//hides loading UI and continue (go to last place) 
 		verify(mockView).hideLoggingInLoader();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
