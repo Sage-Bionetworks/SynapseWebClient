@@ -348,7 +348,8 @@ public class DisplayUtils {
 	 */
 	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
 		//send exception to the javascript console
-		displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
+		if (displayUtilsLogger != null && ex != null)
+			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
 		if(ex instanceof ReadOnlyModeException) {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
