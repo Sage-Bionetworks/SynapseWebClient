@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -132,7 +136,20 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			//quick check to see if it's valid.
 			if (isValidUsername(newUsername)) {
 				profile.setUserName(newUsername);
-				updateProfile(profile);
+				
+				AsyncCallback profileUpdatedCallback = new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showInfo("Successfully updated your username", "");
+						goToLastPlace();
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showUsernameTaken();
+					}
+				};
+				updateProfile(profile, profileUpdatedCallback);
 			} else {
 				//invalid username
 				view.showUsernameInvalid();
@@ -188,7 +205,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	public void checkForCertifiedUser(){
 		view.showLoggingInLoader();
-		if (!DisplayUtils.isIgnoreQuiz(cookies)) {
+		if (!isIgnoreQuizReminder()) {
 			Uploader.checkIsCertifiedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
 				@Override
 				public void onSuccess(Boolean isTrusted) {
@@ -210,12 +227,47 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 	
-	@Override
-	public void setIgnoreQuiz(boolean ignoreQuiz) {
-		DisplayUtils.setIgnoreQuiz(ignoreQuiz, cookies);
+	public boolean isIgnoreQuizReminder() {
+		if (profile != null && profile.getNotificationSettings() != null) {
+			//TODO:
+//			List suppressionList = profile.getNotificationSettings().getReminderSuppressionList();
+//			return suppressionList.contains(SUPPRESS_CERTIFICATION_REMINDER);
+			return false;
+		} else
+			return false;
 	}
 
-	public void updateProfile(final UserProfile profile) {
+	
+	@Override
+	public void setIgnoreQuiz(boolean ignoreQuiz) {
+		if (ignoreQuiz) {
+			//suppress reminder
+			//update profile
+			if (profile.getNotificationSettings() == null)
+				profile.setNotificationSettings(new Settings());
+			Settings notificationSettings = profile.getNotificationSettings();
+			//TODO
+//			if (notificationSettings.getReminderSuppressionList() == null)
+//				notificationSettings.setReminderSuppressionList(new ArrayList<>());
+//			List<> reminderSuppressionList = notificationSettings.getReminderSuppressionList();
+//			reminderSuppressionList.add(CERTIFICATION_REMINDER);
+			
+			AsyncCallback profileUpdatedCallback = new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					view.showInfo("Successfully updated your reminder setting", "");
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			};
+			updateProfile(profile, profileUpdatedCallback);	
+		}
+	}
+
+	public void updateProfile(final UserProfile profile, final AsyncCallback<Void> callback) {
 		try { 
 			JSONObjectAdapter adapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
 			String userProfileJson = adapter.toJSONString();
@@ -223,14 +275,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your username", "");
+					callback.onSuccess(result);
 					authenticationController.updateCachedProfile(profile);
-					goToLastPlace();
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showUsernameTaken();
+					callback.onFailure(caught);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

@@ -1612,14 +1612,6 @@ public class DisplayUtils {
 		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
-	public static boolean isIgnoreQuiz(CookieProvider cookies) {
-		return isInCookies(DisplayUtils.SYNAPSE_IGNORE_QUIZ_COOKIE_KEY, cookies);
-	}
-
-	public static void setIgnoreQuiz(boolean ignoreQuiz, CookieProvider cookies) {
-		setInCookies(ignoreQuiz, DisplayUtils.SYNAPSE_IGNORE_QUIZ_COOKIE_KEY, cookies);
-	}
-	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
 	public static final String SYNAPSE_IGNORE_QUIZ_COOKIE_KEY = "org.sagebionetworks.datause.ignore.quiz";
 
