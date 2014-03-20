@@ -39,11 +39,9 @@ public class StorageImpl implements StorageWrapper {
 			try {
 				storage.setItem(key, data);
 			} catch (Throwable e) {
-				//failed to set the item in the cache.
-				storageLogger.log(Level.SEVERE, "Failure to set item in the cache: " + e.getMessage());
+				storageLogger.log(Level.SEVERE, "Failed to set item in the cache", e);
 			}
 		}
-			
 	}
 	
 	@Override
