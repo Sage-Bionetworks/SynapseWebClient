@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -59,6 +61,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -161,7 +164,7 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-
+	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
@@ -338,12 +341,14 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Handles the exception. Resturn true if the user has been alerted to the exception already
+	 * Handles the exception. Returns true if the user has been alerted to the exception already
 	 * @param ex
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
 	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+		//send exception to the javascript console
+		displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
 		if(ex instanceof ReadOnlyModeException) {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
