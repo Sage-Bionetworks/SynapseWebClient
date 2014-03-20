@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.cache;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.gwt.storage.client.Storage;
 
 public class StorageImpl implements StorageWrapper {
 
-	private static Logger storageLogger = Logger.getLogger(StorageImpl.class.getName());
 	private Storage storage;
 	public StorageImpl() {
 		storage = Storage.getSessionStorageIfSupported();
@@ -39,7 +35,7 @@ public class StorageImpl implements StorageWrapper {
 			try {
 				storage.setItem(key, data);
 			} catch (Throwable e) {
-				storageLogger.log(Level.SEVERE, "Failed to set item in the cache: " + e.getMessage());
+				//unlikely
 			}
 		}
 	}
