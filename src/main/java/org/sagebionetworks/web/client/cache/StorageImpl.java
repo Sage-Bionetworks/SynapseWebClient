@@ -31,8 +31,13 @@ public class StorageImpl implements StorageWrapper {
 
 	@Override
 	public void setItem(String key, String data) {
-		if (isStorageSupported())
-			storage.setItem(key, data);
+		if (isStorageSupported()) {
+			try {
+				storage.setItem(key, data);
+			} catch (Throwable e) {
+				//unlikely
+			}
+		}
 	}
 	
 	@Override
