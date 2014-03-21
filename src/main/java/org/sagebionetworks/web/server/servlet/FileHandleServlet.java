@@ -184,7 +184,6 @@ public class FileHandleServlet extends HttpServlet {
 					resolvedUrl = client.getTeamIcon(teamId, false);
 				} catch (SynapseException e) {
 					return;
-					//throw new ServletException(e);
 				}
 			}
 			
