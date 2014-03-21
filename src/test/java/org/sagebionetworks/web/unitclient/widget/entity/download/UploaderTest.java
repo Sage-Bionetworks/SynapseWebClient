@@ -58,7 +58,6 @@ public class UploaderTest {
 	
 	UploaderView view;
 	AuthenticationController authenticationController; 
-	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
@@ -79,7 +78,6 @@ public class UploaderTest {
 	public void before() throws Exception {
 		view = mock(UploaderView.class);
 		authenticationController = mock(AuthenticationController.class); 
-		entityTypeProvider=mock(EntityTypeProvider.class);
 		synapseClient=mock(SynapseClientAsync.class);
 		jiraURLHelper=mock(JiraURLHelper.class);
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
@@ -124,7 +122,7 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
-				authenticationController, entityTypeProvider, synapseClient,
+				authenticationController, synapseClient,
 				jiraURLHelper, jsonObjectAdapter, synapseJsniUtils,
 				adapterFactory, autogenFactory, gwt);
 		uploader.addCancelHandler(cancelHandler);

@@ -8,7 +8,6 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -38,7 +37,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Inject
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
 			AuthenticationController authenticationController,
-			EntityTypeProvider entityTypeProvider,
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter, 
