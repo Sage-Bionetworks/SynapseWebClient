@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.ResourceEncoder;
 import org.sagebionetworks.ResourceUtils;
-import org.sagebionetworks.repo.model.RegisterConstants;
+import org.sagebionetworks.web.client.RegisterConstants;
 
 /**
  * Load the register from the classpath.

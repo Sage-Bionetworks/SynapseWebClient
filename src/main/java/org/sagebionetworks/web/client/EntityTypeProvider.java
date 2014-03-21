@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.registry.EntityRegistry;
 import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 import org.sagebionetworks.schema.ObjectSchema;
