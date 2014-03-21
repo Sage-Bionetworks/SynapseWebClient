@@ -116,94 +116,97 @@ public class FileHandleServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String token = getSessionToken(request);
-		SynapseClient client = createNewClient(token);
-		boolean isProxy = false;
-		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
-		if (proxy != null)
-			isProxy = Boolean.parseBoolean(proxy);
-		
-		String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
-		
-		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
-		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
-		
-		String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
-		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
-		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
-		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
-		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
-		URL resolvedUrl = null;
-		if (redirectUrlString != null) {
-			//simple redirect
-			resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
-		}
-		
-		if (ownerId != null && ownerType != null) {
-			ObjectType type = ObjectType.valueOf(ownerType);
-			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
-			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-			String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
+		try {
+			String token = getSessionToken(request);
+			SynapseClient client = createNewClient(token);
+			boolean isProxy = false;
+			String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
+			if (proxy != null)
+				isProxy = Boolean.parseBoolean(proxy);
 			
-			// Redirect the user to the url
-			// If we're rendering a version of a wiki page, 
-			// we must get the URL for the attachment from that version of the wiki
-			if(wikiVersion != null) {
-				if(isPreview) {
-					resolvedUrl = client.getVersionOfV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName, new Long(wikiVersion));
-				} else {
-					resolvedUrl = client.getVersionOfV2WikiAttachmentTemporaryUrl(properKey, fileName, new Long(wikiVersion));
-				}
-			} else {
-				if(isPreview) {
-					resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
-				} else {
-					resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
-				}
+			String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
+			
+			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+			String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
+			
+			String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
+			String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
+			String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
+			Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
+			String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
+			URL resolvedUrl = null;
+			if (redirectUrlString != null) {
+				//simple redirect
+				resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
 			}
-			//Done
-		}
-		else if (entityId != null) {
-			if (entityVersion == null) {
-				if (isPreview)
-					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
-				else
-					resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
-			}
+			
+			if (ownerId != null && ownerType != null) {
+				ObjectType type = ObjectType.valueOf(ownerType);
+				String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
+				WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
+				String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
 				
-			else {
-				Long versionNumber = Long.parseLong(entityVersion);
-				if (isPreview)
-					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
-				else
-					resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
-			}
-		} else if (teamId != null) {
-			try {
-				resolvedUrl = client.getTeamIcon(teamId, false);
-			} catch (SynapseException e) {
-				return;
-				//throw new ServletException(e);
-			}
-		}
-		
-		if (resolvedUrl != null){
-			if (isProxy) {
-				//do the get
-				HttpGet httpGet = new HttpGet(resolvedUrl.toString());
-				//copy headers
-				Enumeration<?> headerValues = request.getHeaders("Cookie");
-				while (headerValues.hasMoreElements()) {
-					String headerValue = (String) headerValues.nextElement();
-					httpGet.addHeader("Cookie", headerValue);
+				// Redirect the user to the url
+				// If we're rendering a version of a wiki page, 
+				// we must get the URL for the attachment from that version of the wiki
+				if(wikiVersion != null) {
+					if(isPreview) {
+						resolvedUrl = client.getVersionOfV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName, new Long(wikiVersion));
+					} else {
+						resolvedUrl = client.getVersionOfV2WikiAttachmentTemporaryUrl(properKey, fileName, new Long(wikiVersion));
+					}
+				} else {
+					if(isPreview) {
+						resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
+					} else {
+						resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
+					}
 				}
-				HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
-				HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
-				if (responseEntity != null) {
-					responseEntity.writeTo(response.getOutputStream());
+				//Done
+			}
+			else if (entityId != null) {
+				if (entityVersion == null) {
+					if (isPreview)
+						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
+					else
+						resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
 				}
-			}else
-				response.sendRedirect(resolvedUrl.toString());	
+					
+				else {
+					Long versionNumber = Long.parseLong(entityVersion);
+					if (isPreview)
+						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
+					else
+						resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+				}
+			} else if (teamId != null) {
+				try {
+					resolvedUrl = client.getTeamIcon(teamId, false);
+				} catch (SynapseException e) {
+					return;
+				}
+			}
+			
+			if (resolvedUrl != null){
+				if (isProxy) {
+					//do the get
+					HttpGet httpGet = new HttpGet(resolvedUrl.toString());
+					//copy headers
+					Enumeration<?> headerValues = request.getHeaders("Cookie");
+					while (headerValues.hasMoreElements()) {
+						String headerValue = (String) headerValues.nextElement();
+						httpGet.addHeader("Cookie", headerValue);
+					}
+					HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
+					HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
+					if (responseEntity != null) {
+						responseEntity.writeTo(response.getOutputStream());
+					}
+				}else
+					response.sendRedirect(resolvedUrl.toString());	
+			}
+		} catch (SynapseException e) {
+			throw new ServletException(e);
 		}
 	}
 
@@ -274,7 +277,7 @@ public class FileHandleServlet extends HttpServlet {
 					fileEntity = (FileEntity) client.getEntityById(entityId);
 					//update data file handle id
 					fileEntity.setDataFileHandleId(newFileHandle.getId());
-					fileEntity = client.putEntity(fileEntity);
+					fileEntity = (FileEntity)client.putEntity(fileEntity);
 				}
 				
 				if (fileEntity != null) {
@@ -327,7 +330,7 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity.setEntityType(FileEntity.class.getName());
 		//set data file handle id before creation
 		fileEntity.setDataFileHandleId(fileHandleId);
-		fileEntity = client.createEntity(fileEntity);
+		fileEntity = (FileEntity)client.createEntity(fileEntity);
 		return fileEntity;
 	}
 	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client, boolean setNameAsFileName) throws SynapseException {
@@ -336,7 +339,7 @@ public class FileHandleServlet extends HttpServlet {
 			try{
 				//and try to set the name to the filename
 				fileEntity.setName(newFileHandle.getFileName());
-				fileEntity = client.putEntity(fileEntity);
+				fileEntity = (FileEntity)client.putEntity(fileEntity);
 			} catch(Throwable t){
 				fileEntity.setName(originalFileEntityName);
 			};
