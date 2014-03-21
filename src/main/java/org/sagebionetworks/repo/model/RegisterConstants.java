@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client;
+package org.sagebionetworks.repo.model;
 
 import com.google.gwt.i18n.client.Constants;
 

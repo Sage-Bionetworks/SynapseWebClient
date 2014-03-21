@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.RegisterConstants;
 import org.sagebionetworks.repo.model.registry.EntityRegistry;
 import org.sagebionetworks.repo.model.registry.EntityTypeMetadata;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -23,7 +24,6 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.RegisterConstants;
 import org.sagebionetworks.web.shared.EntityType;
 
 public class EntityTypeProviderTest {
