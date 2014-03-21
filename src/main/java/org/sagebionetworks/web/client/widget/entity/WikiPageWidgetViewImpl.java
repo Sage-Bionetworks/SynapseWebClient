@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -63,7 +62,7 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageWidgetView {
+public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
 
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
@@ -119,27 +118,24 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	
 	@Override
 	public void show404() {
-		removeAll(true);
+		clear();
 		add(new HTML(DisplayUtils.get404Html()));
-		layout(true);
 	}
 	
 	@Override
 	public void show403() {
-		removeAll(true);
+		clear();
 		add(new HTML(DisplayUtils.get403Html()));
-		layout(true);
 	}
 	
 	@Override
 	public void showNoWikiAvailableUI(boolean isDescription) {
-		removeAll(true);
+		clear();
 		this.isDescription = isDescription;
 		SimplePanel createWikiButtonWrapper = new SimplePanel();		
 		Button insertBtn = createInsertOrAddPageButton(true);		
 		createWikiButtonWrapper.add(insertBtn);
 		add(createWikiButtonWrapper);
-		layout(true);
 	}
 	
 	@Override
@@ -157,7 +153,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		this.versionInView = versionInView;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
 		isAttachmentsWidgetConfigured = false;
-		String ownerHistoryToken = DisplayUtils.getSynapseHistoryToken(wikiKey.getOwnerObjectId());
 		if(!isCurrentVersion) {
 			markdownWidget.setMarkdown(markdown, wikiKey, true, false, versionInView);
 		} else {
@@ -167,7 +162,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	}
 	
 	private void showDefaultViewWithWiki() {
-		removeAll(true);
+		clear();
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			FlowPanel noticePanel = createDifferentVersionNotice();
@@ -198,7 +193,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 		
 		FlowPanel modifiedCreatedSection = createdModifiedCreatedSection();
 		wikiPagePanel.add(wrapWidget(modifiedCreatedSection, "margin-top-10 clearleft"));
-		layout(true);
 	}
 	
 	private FlowPanel createdModifiedCreatedSection() {
@@ -299,8 +293,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				links.add(new LinkData(ownerObjectName, ownerObjectPlace));
 				breadcrumbsWrapper.add(breadcrumb.asWidget(links, presenter.getWikiPage().getTitle()));
 			}
-			
-			layout(true);
 			//TODO: support other object types.  
 		}
 		return breadcrumbsWrapper;
@@ -358,7 +350,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 						Widget historyWidgetPanel = historyWidget.asWidget();
 						historyWidgetPanel.addStyleName("margin-top-10");
 						wikiPagePanel.add(historyWidgetPanel);
-						layout(true);
 						btn.setText(DisplayConstants.HIDE_WIKI_HISTORY);
 					}
 				} else {
@@ -408,7 +399,7 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 					historyWidget.hideHistoryWidget();
 				}
 				//change to edit mode
-				removeAll(true);
+				clear();
 				//inform presenter that edit was clicked
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
@@ -434,7 +425,6 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 				}, getCloseHandler(titleField, mdField), getManagementHandler());
 				form.addStyleName("margin-bottom-40 margin-top-10");
 				add(form);
-				layout(true);
 			}
 		});
 
@@ -590,9 +580,4 @@ public class WikiPageWidgetViewImpl extends LayoutContainer implements WikiPageW
 	@Override
 	public void showLoading() {
 	}
-	
-	@Override
-	public void clear() {
-		removeAll(true);
-	}		
 }

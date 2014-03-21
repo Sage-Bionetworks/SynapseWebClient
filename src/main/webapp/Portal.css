@@ -474,6 +474,13 @@ a.shortBtn {
 	float: right;
 }
 
+.autoheight {
+	height: auto;
+}
+
+.autowidth {
+	width: auto;
+}
 
 .clearleft {
 	clear:left;	
@@ -524,7 +531,7 @@ a.shortBtn {
 	height: auto !important;
 	height:	50px;
 }
-	
+
 .profile-image-40px {
 	width: 40px;	
 }

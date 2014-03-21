@@ -399,6 +399,11 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
+			
+			@Override
+			public String getFileUrl(String fileFieldId) {
+				return null;
+			}
 		};
 	}
 

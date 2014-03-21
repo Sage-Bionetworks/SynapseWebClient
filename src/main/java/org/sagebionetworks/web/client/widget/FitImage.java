@@ -23,8 +23,10 @@ public class FitImage extends Image {
 	                int originalWidth = getOffsetWidth();
 	                if (originalHeight > originalWidth) {
 	                    setHeight(maxHeight + "px");
+	                    addStyleName("autowidth");
 	                } else {
 	                    setWidth(maxWidth + "px");
+	                    addStyleName("autoheight");
 	                }
 	                setVisible(true);
 	            }
