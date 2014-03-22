@@ -19,7 +19,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -75,7 +74,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private Entity entity;
 	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
-	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AdapterFactory adapterFactory;
 	private AutoGenFactory autogenFactory;
@@ -93,7 +91,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			UploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
 			AuthenticationController authenticationController, 
-			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter,
@@ -106,7 +103,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
 		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
