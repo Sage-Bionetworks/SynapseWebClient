@@ -33,7 +33,6 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	GlobalApplicationState globalApplicationState;
 	
 	private TableEntity table;
-	private String queryString = "select *";
 	private List<ColumnModel> columns;
 	
 	@Inject
@@ -49,8 +48,12 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}	
-	
+
 	public void configure(final TableEntity table) {
+		configure(table, null);
+	}
+	
+	public void configure(final TableEntity table, final String query) {
 		this.table = table;		
 		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
@@ -61,7 +64,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 						columns.add(new ColumnModel(adapterFactory.createNew(colStr)));
 					}
 										
-					view.configure(table, columns, queryString, true);
+					view.configure(table, columns, query, true);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -75,6 +78,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
+		throw new RuntimeException("nyi");
 	}
 
     
@@ -82,13 +86,6 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();		
-	}
-
-	@Override
-	public void query(String query) {
-		this.queryString = query;
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseTableUnavilableException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
@@ -89,6 +91,8 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableState;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -104,6 +108,17 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.table.query.ParseException;
+import org.sagebionetworks.table.query.TableQueryParser;
+import org.sagebionetworks.table.query.model.OrderByClause;
+import org.sagebionetworks.table.query.model.OrderingSpecification;
+import org.sagebionetworks.table.query.model.Pagination;
+import org.sagebionetworks.table.query.model.QuerySpecification;
+import org.sagebionetworks.table.query.model.SortKey;
+import org.sagebionetworks.table.query.model.SortSpecification;
+import org.sagebionetworks.table.query.model.SortSpecificationList;
+import org.sagebionetworks.table.query.model.TableExpression;
+import org.sagebionetworks.table.query.util.SqlElementUntils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -120,7 +135,11 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
@@ -2517,28 +2536,84 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	private static long sequence = 0; 
+	
 	@Override
-	public String executeTableQuery(String query) throws RestServiceException {
-		// TODO : pass through to javaclient when available
-		RowSet rs = new RowSet();
-		rs.setHeaders(Arrays.asList(new String[] { "173", "174", "avg(field)", "176.md5" }));
-		rs.setEtag("1234");
-		rs.setTableId("syn123");
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {
+// TODO : eventually remove. keeping around for demo.
+//		TableStatus st = new TableStatus();
+//		st.setState(TableState.PROCESSING);
+//		st.setStartedOn(new Date());
+//		st.setChangedOn(new Date());
+//		st.setErrorDetails("Error details");
+//		st.setErrorMessage("error Message");
+//		sequence += 10;
+//		st.setProgresssCurrent(sequence);
+//		st.setProgresssTotal(100L);
+//		st.setProgresssMessage("Progress message");
+//		try {
+//			throw new TableUnavilableException(st.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+//		} catch (JSONObjectAdapterException e1) {
+//			e1.printStackTrace();
+//		}
 		
-		List<Row> rows = new ArrayList<Row>();
-		Row row = new Row();
-		row.setRowId(1L);
-		row.setVersionNumber(1L);
-		row.setValues(Arrays.asList(new String[] {"173value", "174value", "avg1.234", "176md5-273189372891739812"}));
-		rs.setRows(rows);
+		if(query == null) throw new BadRequestException("query must be defined");
+		
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		// modify query with QueryDetails if requested
+		String executedQuery;
+		if(modifyingQueryDetails != null) executedQuery = ServiceUtils.modifyQuery(query, modifyingQueryDetails);
+		else executedQuery = query;		
+		
+		//Extract QueryDetails from executed Query		
+		QueryDetails queryDetails = ServiceUtils.extractQueryDetails(executedQuery);
+			
+		// Get total row count if requested
+		Integer totalRowCount = null;
+		if(includeTotalRowCount) {
+			try {
+				RowSet countSet = synapseClient.queryTableEntity(executedQuery, true, true);
+//				RowSet countSet = getFakeCountSet();
+				if (countSet != null && countSet.getRows() != null
+						&& countSet.getRows().size() > 0
+						&& countSet.getRows().get(0).getValues() != null
+						&& countSet.getRows().get(0).getValues().size() > 0) {					
+					totalRowCount = Integer.parseInt(countSet.getRows().get(0).getValues().get(0));							
+				}
+			} catch (SynapseTableUnavilableException e) {
+				handleTableUnavailableException(e);
+			} catch (SynapseException e) {
+				logError(e.getMessage());
+				throw ExceptionUtil.convertSynapseException(e);
+			} catch (NumberFormatException e) { 
+				// do nothing 				
+			}
+		}
+		
+		// Execute Query		
 		String json = null;
 		try {
+			RowSet rs = synapseClient.queryTableEntity(executedQuery);
+//			RowSet rs = getFakeRowSet(queryDetails.getLimit().intValue(), queryDetails.getOffset().intValue());
 			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseTableUnavilableException e) {
+			handleTableUnavailableException(e);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new UnknownErrorException(e.getMessage());		
 		}
-		return json;
+		
+		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
+	}
+
+	private void handleTableUnavailableException(
+			SynapseTableUnavilableException e) throws TableUnavilableException {
+		try {
+			throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		} catch (JSONObjectAdapterException e1) {
+			throw new TableUnavilableException(e.getMessage());
+		}
 	}
 	
 	@Override

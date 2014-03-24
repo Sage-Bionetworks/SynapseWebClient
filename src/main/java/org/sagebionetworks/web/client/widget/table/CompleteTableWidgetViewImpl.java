@@ -52,16 +52,10 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 
 	private static int sequence = 0;
 	
-	@UiField
-	HTMLPanel queryPanel;
 	@UiField 
 	HTMLPanel tablePanel;
 	@UiField
 	SimplePanel tableContainer;	
-	@UiField
-	TextBox queryField;
-	@UiField
-	SimplePanel queryButtonContainer;
 	@UiField
 	HTMLPanel buttonToolbar;
 	@UiField
@@ -101,8 +95,6 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		
 		// build view
 		store = new ListStore<BaseModelData>();
-		setupQueryBox(queryString);			
-		queryPanel.setVisible(true);		
 
 		setupTableEditorToolbar(columns);
 		if(canEdit) {
@@ -146,19 +138,6 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	/*
 	 * Private Methods
 	 */	
-	private void setupQueryBox(String queryString) {
-		// setup query
-		Button queryBtn = DisplayUtils.createButton(DisplayConstants.QUERY);
-		queryBtn.addStyleName("btn-block");
-		queryBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.query(queryField.getValue());
-			}
-		});
-		queryButtonContainer.setWidget(queryBtn);
-		queryField.setValue(queryString);
-	}
 	
 	/* ================
 	 * Table Methods
@@ -434,7 +413,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
 		for(final ColumnType type : ColumnType.values()) {			
-			String radioLabel = ColumnUtils.getColumnDisplayName(type);
+			String radioLabel = TableUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			
 				@Override
