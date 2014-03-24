@@ -31,6 +31,8 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable);
 
 	public void showLoadingError();
+
+	public void addTable(EntityHeader table);
 	
 	
 }

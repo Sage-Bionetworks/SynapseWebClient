@@ -21,8 +21,6 @@ public interface CompleteTableWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 
-		void query(String query);
-
 		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
 
 		void updateColumnOrder(List<String> columnIds);

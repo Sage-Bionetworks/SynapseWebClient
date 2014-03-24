@@ -115,7 +115,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 	}
 
 	@Override
-	public void createTableEntity(String name) {
+	public void createTableEntity(final String name) {
 		if(projectOwnerId == null) {
 			view.showErrorMessage("Can not create Table outside of project context.");
 			return;
@@ -124,21 +124,18 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		String json;
 		try {
 			newTable.setName(name);
-			newTable.setParentId(projectOwnerId);			
+			newTable.setParentId(projectOwnerId);
 			newTable.setEntityType(TableEntity.class.getName());
 			json = newTable.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(json, null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
+					// add shell header to view instead of query
+					EntityHeader header = new EntityHeader();
+					header.setId(result);
+					header.setName(name);
+					view.addTable(header);
 					view.showInfo(DisplayConstants.TABLE_CREATED, "");
-					// Query service is not consistent immedately
-					Timer t = new Timer() {						
-						@Override
-						public void run() {
-							configure(projectOwnerId, canEdit, showAddTable);
-						}
-					};
-					t.schedule(1500);
 				}
 				@Override
 				public void onFailure(Throwable caught) {

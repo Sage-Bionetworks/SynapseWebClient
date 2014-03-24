@@ -8,15 +8,18 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.TableQueryUtilServiceAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,17 +27,24 @@ import com.google.inject.Inject;
 
 public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, WidgetRendererPresenter {
 	
+	private final static Integer DEFAULT_PAGE_SIZE = 50; 
+	private final static Integer DEFAULT_OFFSET = 0; 
+	
 	private SimpleTableWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
-	private TableQueryUtilServiceAsync tableQueryUtilService;
+	private String tableEntityId;
+	private List<ColumnModel> tableColumns;
+	private String currentQuery;
+	private Integer currentTotalRowCount;
+	private boolean canEdit;
+	private Long startProgress;
 	
 	@Inject
-	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, TableQueryUtilServiceAsync tableQueryUtilService) {
+	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
-		this.tableQueryUtilService = tableQueryUtilService;
 		view.setPresenter(this);
 	}	
 	    
@@ -44,48 +54,20 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return view.asWidget();		
 	}
 	
-	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {		
-		// Execute Query String		
-		synapseClient.executeTableQuery(queryString, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String rowSetJson) {
-				try {
-					final RowSet rowset = new RowSet(adapterFactory.createNew(rowSetJson));
-					// make column lookup
-					final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
-					for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
-
-					// Determine column type and which columns to send to view from query results
-					final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
-					for(String resultColumnId : rowset.getHeaders()) {
-						ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
-						if(col != null) displayColumns.add(col);
-					}
-
-					tableQueryUtilService.getQueryDetails(queryString, new AsyncCallback<QueryDetails>() {
-						@Override
-						public void onSuccess(QueryDetails queryDetails) {
-							
-							// send to view
-							view.configure(displayColumns, rowset, canEdit, queryDetails);
-						}
-						@Override
-						public void onFailure(Throwable arg0) {
-							view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-						}
-					});
-				} catch (JSONObjectAdapterException e1) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}																		
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-			}
-		});	
+	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {
+		this.tableEntityId = tableEntityId;
+		this.tableColumns = tableColumns;
+		this.currentQuery = queryString == null ? getDefaultQuery(tableEntityId) : queryString;
+		this.canEdit = canEdit;
+		this.startProgress = null;
+	
+		view.showLoading();
+		executeQuery(currentQuery, null, null);	
 	}
 
+	private String getDefaultQuery(String tableEntityId) {
+		return "SELECT * FROM " + tableEntityId + " LIMIT " + DEFAULT_PAGE_SIZE + " OFFSET " + DEFAULT_OFFSET;
+	}
 
 	@Override
 	public void configure(WikiPageKey wikiKey,
@@ -94,9 +76,88 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		throw new RuntimeException("NYI");
 	}
 
+	@Override
+	public void alterCurrentQuery(QueryDetails alterDetails, AsyncCallback<RowSet> callback) {
+		executeQuery(currentQuery, alterDetails, callback);
+	}
+
+	@Override
+	public void query(String query) {
+		view.showLoading();
+		this.currentQuery = query;
+		executeQuery(query, null, null);
+	}
+	
+	@Override
+	public void retryCurrentQuery() {
+		view.showLoading();
+		executeQuery(currentQuery, null, null);
+	}
+
+	
 	/*
 	 * Private Methods
 	 */
+	private void executeQuery(final String queryString, QueryDetails modifyingQueryDetails, final AsyncCallback<RowSet> updateCallback) {
+		final boolean getTotalRowCount = updateCallback == null;
+		// Execute Query String		
+		synapseClient.executeTableQuery(queryString, modifyingQueryDetails, getTotalRowCount, new AsyncCallback<QueryResult>() {
+			@Override
+			public void onSuccess(QueryResult queryResult) {
+				try {
+					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
+					currentQuery = queryResult.getExecutedQuery();
+
+					if(updateCallback != null) {
+						// update query
+						updateCallback.onSuccess(rowset);
+						view.setQuery(currentQuery);
+					} else {
+						// new query
+						currentTotalRowCount = queryResult.getTotalRowCount();						
+																
+						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
+						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
+
+						// Determine column type and which columns to send to view from query result headers
+						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
+						for(String resultColumnId : rowset.getHeaders()) {
+							ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
+							if(col != null) displayColumns.add(col);
+						}
+						
+						// send to view
+						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, queryString, queryResult.getQueryDetails());						
+					}
+				} catch (JSONObjectAdapterException e1) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}																		
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof TableUnavilableException) {
+					Integer progress = null;
+					TableStatus status = null;
+					try {
+						status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
+						if(startProgress == null) startProgress = status.getProgresssCurrent();					
+						if(startProgress != null) progress = new Long(100*(status.getProgresssCurrent().longValue() - startProgress.longValue()) / status.getProgresssTotal().longValue()).intValue();
+						if(progress > 100) progress = 100;
+					} catch (JSONObjectAdapterException e) {
+					}
+					view.showTableUnavailable(status, progress);
+				} else if(caught instanceof BadRequestException) {
+						QueryProblem problem = TableUtils.parseQueryProblem(caught.getMessage());
+						view.showQueryProblem(problem, caught.getMessage());
+				} else {
+					if(updateCallback != null) updateCallback.onFailure(caught);
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+				}
+			}
+		});
+	}
+	
 	private ColumnModel wrapDerivedColumnIfNeeded(final Map<String, ColumnModel> idToCol, String resultColumnId) {
 		// test for strait column id, otherwise it is a derived column
 		try {				
@@ -117,5 +178,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
 	}
+
 
 }
