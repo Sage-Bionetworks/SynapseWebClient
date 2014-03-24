@@ -258,7 +258,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				onFailure(caught);
+				callback.onFailure(caught);
 			}
 		});		
 	}
