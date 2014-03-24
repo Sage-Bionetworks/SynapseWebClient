@@ -235,10 +235,17 @@ public class ServiceUtils {
 			}
 			
 			// pagination
-			String limit = modifyingQd.getLimit() != null ? modifyingQd.getLimit().toString() : null;
-			String offset = modifyingQd.getOffset() != null ? modifyingQd.getOffset().toString() : null;
-			
 			TableExpression table = spec.getTableExpression();
+			String existingLimit = null;
+			String exitingOffset = null;
+			if(table.getPagination() != null) {
+				if(table.getPagination().getLimit() != null) existingLimit = String.valueOf(table.getPagination().getLimit());
+				if(table.getPagination().getOffset() != null) exitingOffset = String.valueOf(table.getPagination().getOffset());
+			}
+				
+			String limit = modifyingQd.getLimit() != null ? modifyingQd.getLimit().toString() : existingLimit;
+			String offset = modifyingQd.getOffset() != null ? modifyingQd.getOffset().toString() : exitingOffset;
+			
 			Pagination pagination = (limit != null || offset != null) ? new Pagination(limit, offset) : table.getPagination();
 			OrderByClause orderByClause = newOrderByClause != null ? newOrderByClause : table.getOrderByClause();
 			

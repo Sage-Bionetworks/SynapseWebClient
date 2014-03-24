@@ -292,17 +292,20 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			} else if(status.getState() == TableState.PROCESSING_FAILED) {
 				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ stateStr +": "+ DisplayConstants.ERROR_GENERIC_NOTIFY +"</p>"));
 			} else {
-				// not handling EFFECTIVE_SCHEMA or other new states
-				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+				handleGeneric(jumbo, tableUnavailableHeading);
 			}
 		} else {
-			jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+			handleGeneric(jumbo, tableUnavailableHeading);
 		}
 		
 		
 		errorMessage.clear();
 		errorMessage.setWidget(jumbo);
 		errorMessage.setVisible(true);
+	}
+
+	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
+		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
 	}
 
 	@Override
@@ -426,7 +429,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 
 	private HTML getLoadingWidget() {
-//		HTML widget =  new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.EXECUTING_QUERY));
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
 		widget.addStyleName("margin-top-15 center");
 		return widget;

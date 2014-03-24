@@ -133,6 +133,7 @@ public class ServiceUtilsTest {
 		assertEquals("SELECT * FROM syn123 LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery(query, new QueryDetails(6L, 5L, null, null)));
 		assertEquals("SELECT * FROM syn123 ORDER BY foo ASC LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery(query, new QueryDetails(6L, 5L, "foo", SortDirection.ASC)));
 		
+		assertEquals("SELECT * FROM syn123 LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery("SELECT * FROM syn123 LIMIT 5", new QueryDetails(6L, null, null, null)));
 	}
 	
 	@Test
