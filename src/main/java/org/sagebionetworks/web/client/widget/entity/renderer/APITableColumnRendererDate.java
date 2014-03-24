@@ -45,14 +45,19 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 			return;
 		}
 		List<String> outputValues = new ArrayList<String>();
-		
+		//assume dates are long values.  if parse exception occurs, then switch to standard formatter parsing (and don't try to parse as long again)
+		boolean isMsFromEpoch = true;
 		for (Iterator iterator2 = colValues.iterator(); iterator2
 				.hasNext();) {
 			String colValue = (String) iterator2.next();
 			Date date = null;
 			try {
-				date = new Date(Long.parseLong(colValue));
+				if (isMsFromEpoch)
+					date = new Date(Long.parseLong(colValue));
+				else
+					date = standardFormatter.parse(colValue);	
 			} catch (NumberFormatException e) {
+				isMsFromEpoch = false;
 				date = standardFormatter.parse(colValue);
 			}
 			outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
