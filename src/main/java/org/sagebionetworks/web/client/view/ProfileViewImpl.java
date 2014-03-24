@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -313,7 +314,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		 if (isCertified)
-			 builder.appendHtmlConstant(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
+			 builder.appendHtmlConstant("<a href=\"" + DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL) + "\">"+DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22") + "</a>");
 		 builder.appendHtmlConstant("<h2 class=\"inline-block\">");
 		 builder.appendEscapedLines(name);
 		 

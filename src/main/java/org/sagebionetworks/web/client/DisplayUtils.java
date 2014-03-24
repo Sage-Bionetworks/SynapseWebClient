@@ -68,6 +68,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
@@ -736,6 +737,11 @@ public class DisplayUtils {
 		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
 	}
 
+	public static String getHelpPlaceHistoryToken(String token) {
+		Help place = new Help(token);
+		return "#!" + getHelpPlaceString(Help.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -839,7 +845,9 @@ public class DisplayUtils {
 	private static String getLoginPlaceString(Class<LoginPlace> place) {
 		return getPlaceString(place.getName());		
 	}
-
+	private static String getHelpPlaceString(Class<Help> place) {
+		return getPlaceString(place.getName());		
+	}
 	
 	private static String getSearchPlaceString(Class<Search> place) {
 		return getPlaceString(place.getName());		
