@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 
 public class APITableColumnRendererDate implements APITableColumnRenderer {
 
-	private DateTimeFormat formatter;
+	private DateTimeFormat standardFormatter;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
@@ -26,7 +26,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 	@Inject
 	public APITableColumnRendererDate(SynapseJSNIUtils synapseJSNIUtils) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		formatter = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+		standardFormatter = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	}
 	
 	@Override
@@ -49,7 +49,12 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 		for (Iterator iterator2 = colValues.iterator(); iterator2
 				.hasNext();) {
 			String colValue = (String) iterator2.next();
-			Date date = formatter.parse(colValue);
+			Date date = null;
+			try {
+				date = new Date(Long.parseLong(colValue));
+			} catch (NumberFormatException e) {
+				date = standardFormatter.parse(colValue);
+			}
 			outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
 		}
 		outputColumnData.put(outputColumnName, outputValues);
