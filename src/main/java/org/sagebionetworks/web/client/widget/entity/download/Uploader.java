@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -14,7 +13,6 @@ import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -24,6 +22,7 @@ import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -35,7 +34,6 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -69,20 +67,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private AdapterFactory adapterFactory;
-	private AutoGenFactory autogenFactory;
 	private boolean isDirectUploading;
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
-	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
+	AuthenticationController authenticationController;
 	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
 	NumberFormat percentFormat;
@@ -90,26 +85,20 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Uploader(
 			UploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
-			AuthenticationController authenticationController, 
 			SynapseClientAsync synapseClient,
-			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
-			AdapterFactory adapterFactory, 
-			AutoGenFactory autogenFactory,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			AuthenticationController authenticationController
 			) {
 	
 		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.adapterFactory = adapterFactory;
-		this.autogenFactory = autogenFactory;
 		this.gwt = gwt;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -130,9 +119,32 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isTrained) {
+				if (isTrained)
+					view.showUploaderUI();
+				else
+					view.showQuizUI();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
 		return this.view.asWidget();
 	}
 
+	/**
+	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
+	 */
+	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
+		//sanity check
+		if (authenticationController.isLoggedIn()) {
+			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
