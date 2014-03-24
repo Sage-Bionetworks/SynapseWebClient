@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.factory;
 
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
-import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEpochDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
@@ -28,9 +27,6 @@ public class TableColumnRendererFactoryImpl implements TableColumnRendererFactor
 	private Provider<APITableColumnRendererSynapseID> apiTableColumnRendererSynapseIDProvider;
 	@Inject
 	private Provider<APITableColumnRendererEntityIdAnnotations> apiTableColumnRendererEntityIdAnnotationsProvider;
-	@Inject
-	private Provider<APITableColumnRendererEpochDate> apiTableColumnRendererEpochDateProvider;
-	
 	
 	@Override
 	public APITableColumnRendererNone getAPITableColumnRendererNone() {
@@ -57,9 +53,4 @@ public class TableColumnRendererFactoryImpl implements TableColumnRendererFactor
 		return apiTableColumnRendererEntityIdAnnotationsProvider.get();
 	}
 	
-	@Override
-	public APITableColumnRendererEpochDate getAPITableColumnRendererEpochDate() {
-		return apiTableColumnRendererEpochDateProvider.get();
-	}
-
 }

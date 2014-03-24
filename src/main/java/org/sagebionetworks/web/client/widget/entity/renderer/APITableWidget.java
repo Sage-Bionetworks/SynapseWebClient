@@ -456,10 +456,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		APITableColumnRenderer renderer;
 		if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID))
 			renderer = ginInjector.getAPITableColumnRendererUserId();
-		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE))
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE) || friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE))
 			renderer = ginInjector.getAPITableColumnRendererDate();
-		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE))
-			renderer = ginInjector.getAPITableColumnRendererEpochDate();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID))
 			renderer = ginInjector.getAPITableColumnRendererSynapseID();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))
