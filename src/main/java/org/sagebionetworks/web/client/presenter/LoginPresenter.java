@@ -137,7 +137,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			if (isValidUsername(newUsername)) {
 				profile.setUserName(newUsername);
 				
-				AsyncCallback profileUpdatedCallback = new AsyncCallback<Void>() {
+				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
 						view.showInfo("Successfully updated your username", "");
@@ -252,7 +252,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 //			List<> reminderSuppressionList = notificationSettings.getReminderSuppressionList();
 //			reminderSuppressionList.add(CERTIFICATION_REMINDER);
 			
-			AsyncCallback profileUpdatedCallback = new AsyncCallback<Void>() {
+			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					view.showInfo("Successfully updated your reminder setting", "");

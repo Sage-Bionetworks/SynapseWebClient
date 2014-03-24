@@ -92,8 +92,9 @@ public class LoginPresenterTest {
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
-		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_IGNORE_QUIZ_COOKIE_KEY))).thenReturn("true");
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(),  any(AsyncCallback.class));
 
 	}	
 	
@@ -177,10 +178,11 @@ public class LoginPresenterTest {
 		setPlace();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		loginPresenter.updateProfile(profile);
+		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
+		loginPresenter.updateProfile(profile, mockCallback);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+		verify(mockCallback).onSuccess(any(Void.class));
 	}
 	
 	@Test
@@ -189,9 +191,10 @@ public class LoginPresenterTest {
 		setPlace();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		loginPresenter.updateProfile(profile);
+		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
+		loginPresenter.updateProfile(profile, mockCallback);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockView).showUsernameTaken();
+		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 	
 	@Test

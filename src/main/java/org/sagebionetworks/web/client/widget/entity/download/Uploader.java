@@ -143,6 +143,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//sanity check
 		if (authenticationController.isLoggedIn()) {
 			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
+		} else {
+			callback.onSuccess(false);
 		}
 	}
 	
