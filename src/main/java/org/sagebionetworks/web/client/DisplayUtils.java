@@ -1407,9 +1407,13 @@ public class DisplayUtils {
 
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
-    	var window = $wnd.open(url, name, features);
-    	return window;
-		}-*/;
+    	try {
+	    	var window = $wnd.open(url, name, features);
+	    	return window;
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
     	window.location = target;
