@@ -142,7 +142,10 @@ public class SearchParameters implements IsSerializable{
 		SearchParameters other = (SearchParameters) obj;
 		if (ascending != other.ascending)
 			return false;
-		if (fromType != other.fromType)
+		if (fromType == null) {
+			if (other.fromType != null)
+				return false;
+		} else if (!fromType.equals(other.fromType))
 			return false;
 		if (limit != other.limit)
 			return false;
@@ -164,6 +167,14 @@ public class SearchParameters implements IsSerializable{
 		} else if (!where.equals(other.where))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "SearchParameters [selectColumns=" + selectColumns
+				+ ", fromType=" + fromType + ", offset=" + offset + ", limit="
+				+ limit + ", sort=" + sort + ", ascending=" + ascending
+				+ ", where=" + where + "]";
 	}
 
 
