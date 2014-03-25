@@ -37,7 +37,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.view.setPresenter(this);
 	}
@@ -67,8 +66,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void submitAnswers(Object questionsAndSelectedAnswers) {
 		//TODO: submit question/answer combinations for approval
-		//then go to the last place
-		goToLastPlace();
+		view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	@Override
