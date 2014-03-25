@@ -25,6 +25,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
 	private EventBus bus;
+	public static boolean showSuccess = true;
 	
 	@Inject
 	public QuizPresenter(QuizView view,  
@@ -66,7 +67,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void submitAnswers(Object questionsAndSelectedAnswers) {
 		//TODO: submit question/answer combinations for approval
-		view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
+		if (showSuccess) {
+			showSuccess = false;
+			view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
+		} else { 
+			showSuccess = true;
+			view.showFailure();
+		}
 	}
 
 	@Override

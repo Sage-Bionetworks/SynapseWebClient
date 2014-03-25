@@ -45,7 +45,15 @@
 			<g:HTMLPanel ui:field="failureContainer">
 				<div class="row">
 				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-				        <h2 class="center">Failure message goes here</h2>
+				        <div class="panel panel-danger">
+					      <div class="panel-heading">
+							<h3 class="panel-title">Try again</h3>
+					      </div>
+					      <div class="panel-body">
+								<p>All questions must be answered correctly in order to be granted certification.</p>
+								<p>Please review the tutorial, and try again.</p>
+					      </div>
+					    </div>
 				    </div>
 					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 					    <g:Button ui:field="tutorialButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Back to the Tutorial"/>

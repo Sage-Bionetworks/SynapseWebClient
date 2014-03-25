@@ -181,6 +181,12 @@ public class QuizViewImpl extends Composite implements QuizView {
 		successContainer.setVisible(true);
 	}
 	
+	@Override
+	public void showFailure() {
+		hideAll();
+		failureContainer.setVisible(true);
+	}
+
 	private FlowPanel addQuestion(String questionNumber, final String question, List<String> answers) {
 		FlowPanel questionContainer = new FlowPanel();
 		questionContainer.addStyleName("margin-bottom-40 margin-left-15");

@@ -13,6 +13,7 @@ public interface QuizView extends IsWidget, SynapseView {
 	
 	void showTest(Object questionsAndAnswers);
 	void showSuccess(UserProfile profile);
+	void showFailure();
 	void hideLoading();
 	
 	public interface Presenter extends SynapsePresenter {
