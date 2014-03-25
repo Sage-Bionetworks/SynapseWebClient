@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.shared.exceptions;
 
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;

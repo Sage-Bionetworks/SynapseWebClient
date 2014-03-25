@@ -6,6 +6,8 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -21,8 +23,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.jsoup.Jsoup;
 import org.sagebionetworks.markdown.SynapseMarkdownProcessor;
 import org.sagebionetworks.repo.model.Annotations;
@@ -258,14 +258,14 @@ public class CrawlFilter implements Filter {
 	
 	public String rewriteQueryString(String uglyUrl) {
 		try {
-			String decoded = URIUtil.decode(uglyUrl, "UTF-8");
+			String decoded = URLDecoder.decode(uglyUrl, "UTF-8");
 			// dev mode
 			String result = decoded.replace("gwt", "?gwt");
 			result = result.replace("&"+ESCAPED_FRAGMENT, "#!");
 			result = result.replace("?"+ESCAPED_FRAGMENT, "#!");
 			result = result.replace(ESCAPED_FRAGMENT, "#!");
 			return result;
-		} catch (URIException e) {
+		} catch (UnsupportedEncodingException e) {
 			return "";
 		}
 	}
