@@ -30,6 +30,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -251,9 +252,26 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5());
+		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5(), null);
+		
+		// Success Test: External file
+		resetMocks();			
+		
+		ExternalFileHandle externalFileHandle = new ExternalFileHandle();
+		externalFileHandle.setFileName("myExternalFileName.png");
+		externalFileHandle.setId(fileHandleId);
+		externalFileHandle.setExternalURL("http://getbootstrap.com/javascript/");
+		
+		fileHandles = new ArrayList<FileHandle>();
+		fileHandles.add(externalFileHandle);
+		((FileEntity)entityBundle.getEntity()).setDataFileHandleId(fileHandleId);
+		entityBundle.setFileHandles(fileHandles);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		licensedDownloader.loadDownloadUrl(entityBundle);
+		verify(mockView).showDownloadsLoading();		
+		verify(mockView).setDownloadLocation(externalFileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), null, externalFileHandle.getExternalURL());
 	}
-
+	
 
 	@Test
 	public void testAsWidget(){
