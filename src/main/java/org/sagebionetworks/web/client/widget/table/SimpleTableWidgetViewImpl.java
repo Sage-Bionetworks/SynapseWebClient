@@ -152,18 +152,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				// convert to Table Model (map)
 				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
 			        List<TableModel> returnedData = new ArrayList<TableModel>();
-			        for(Row row : rowData.getRows()) {
-			        	TableModel model = new TableModel();
-			        	for(int i=0; i<rowData.getHeaders().size(); i++) {				        		
-			        		model.put(rowData.getHeaders().get(i), row.getValues().get(i));
-			        	}
-			        	returnedData.add(model);
+			        for(Row row : rowData.getRows()) {			        				        	
+			        	returnedData.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
 			        }
 			        updateRowData(range.getStart(), returnedData);
 			        hideLoading();
 				}
 			}
-
 	    };
 
 	}
@@ -412,8 +407,14 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}		
 		
 		// Table's columns
+		RowUpdater rowUpdater = new RowUpdater() {			
+			@Override
+			public void updateRow(TableModel row, AsyncCallback<Void> callback) {
+				presenter.updateRow(row, callback);			
+			}
+		};
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableUtils.getColumn(model, sortHandler, canEdit);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			

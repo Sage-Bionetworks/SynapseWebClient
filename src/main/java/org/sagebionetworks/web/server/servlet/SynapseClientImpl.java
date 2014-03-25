@@ -90,6 +90,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.repo.model.table.TableStatus;
@@ -2573,7 +2574,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		if(includeTotalRowCount) {
 			try {
 				RowSet countSet = synapseClient.queryTableEntity(executedQuery, true, true);
-//				RowSet countSet = getFakeCountSet();
 				if (countSet != null && countSet.getRows() != null
 						&& countSet.getRows().size() > 0
 						&& countSet.getRows().get(0).getValues() != null
@@ -2594,8 +2594,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String json = null;
 		try {
 			RowSet rs = synapseClient.queryTableEntity(executedQuery);
-//			RowSet rs = getFakeRowSet(queryDetails.getLimit().intValue(), queryDetails.getOffset().intValue());
-			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		} catch (SynapseTableUnavilableException e) {
 			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
@@ -2617,6 +2616,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
+	public String sendRowsToTable(String rowSet) throws RestServiceException {
+		if(rowSet != null) throw new BadRequestException("blah");
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RowSet toAppend = new RowSet(adapterFactory.createNew(rowSet));
+			RowReferenceSet refSet = synapseClient.appendRowsToTable(toAppend);
+			return refSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	
+	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
 			throws RestServiceException {
 		HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
@@ -2630,4 +2645,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		return pageName2WikiKeyMap;
 	}
+	
 }

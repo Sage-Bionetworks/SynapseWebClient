@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -36,7 +38,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private String tableEntityId;
 	private List<ColumnModel> tableColumns;
 	private String currentQuery;
+	private List<String> currentHeaders;
 	private Integer currentTotalRowCount;
+	private String currentEtag;
 	private boolean canEdit;
 	private Long startProgress;
 	
@@ -94,6 +98,34 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		executeQuery(currentQuery, null, null);
 	}
 
+	@Override
+	public void updateRow(TableModel rowModel, final AsyncCallback<Void> callback) {		
+		if(rowModel.getId() != null) {
+			Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);			
+			RowSet rowSet = new RowSet();
+			rowSet.setTableId(tableEntityId);
+			rowSet.setEtag(currentEtag);
+			rowSet.setHeaders(currentHeaders);
+			rowSet.setRows(Arrays.asList(new Row[] { row }));
+			try {
+				synapseClient.sendRowsToTable(rowSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String result) {
+						callback.onSuccess(null);
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(DisplayConstants.ROW_UPDATE_FAILED);
+						callback.onFailure(caught);
+					}
+				});
+			} catch (JSONObjectAdapterException e) {
+				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				callback.onFailure(e);
+			}
+		}
+	}
+
 	
 	/*
 	 * Private Methods
@@ -105,8 +137,10 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			@Override
 			public void onSuccess(QueryResult queryResult) {
 				try {
+					// for both new and update queries
 					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
 					currentQuery = queryResult.getExecutedQuery();
+					currentEtag = rowset.getEtag();
 
 					if(updateCallback != null) {
 						// update query
@@ -114,8 +148,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						view.setQuery(currentQuery);
 					} else {
 						// new query
-						currentTotalRowCount = queryResult.getTotalRowCount();						
-																
+						currentTotalRowCount = queryResult.getTotalRowCount();
+						currentHeaders = rowset.getHeaders();
+						
 						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
 
@@ -178,6 +213,5 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
 	}
-
 
 }

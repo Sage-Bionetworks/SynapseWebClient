@@ -413,7 +413,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
 		for(final ColumnType type : ColumnType.values()) {			
-			String radioLabel = TableUtils.getColumnDisplayName(type);
+			String radioLabel = TableViewUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			
 				@Override

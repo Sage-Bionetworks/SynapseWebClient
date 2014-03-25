@@ -51,5 +51,5 @@ public class TableModel implements Comparable<TableModel> {
 	public void put(String key, String value) {
 		map.put(key, value);
 	}
-
+	
 }

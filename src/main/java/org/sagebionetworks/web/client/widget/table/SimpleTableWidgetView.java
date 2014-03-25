@@ -31,6 +31,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void query(String query);
 
 		void retryCurrentQuery();
+
+		void updateRow(TableModel row, AsyncCallback<Void> callback);
 				
 	}
 	
