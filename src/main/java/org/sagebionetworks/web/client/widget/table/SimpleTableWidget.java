@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -99,33 +100,55 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	}
 
 	@Override
-	public void updateRow(TableModel rowModel, final AsyncCallback<Void> callback) {		
+	public void updateRow(TableModel rowModel, final AsyncCallback<RowReferenceSet> callback) {		
 		if(rowModel.getId() != null) {
 			Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);			
-			RowSet rowSet = new RowSet();
-			rowSet.setTableId(tableEntityId);
-			rowSet.setEtag(currentEtag);
-			rowSet.setHeaders(currentHeaders);
-			rowSet.setRows(Arrays.asList(new Row[] { row }));
-			try {
-				synapseClient.sendRowsToTable(rowSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String result) {
-						callback.onSuccess(null);
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage(DisplayConstants.ROW_UPDATE_FAILED);
-						callback.onFailure(caught);
-					}
-				});
-			} catch (JSONObjectAdapterException e) {
-				view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				callback.onFailure(e);
-			}
+			sendRowToTable(row, currentEtag, currentHeaders, callback);
 		}
 	}
 
+	@Override
+	public void addRow() {
+    	// fill default values
+		List<String> values = new ArrayList<String>();
+		final List<String> headers = new ArrayList<String>();
+    	for(ColumnModel columnModel : tableColumns) {	
+    		headers.add(columnModel.getId());
+    		String value = null;
+    		if(columnModel.getDefaultValue() != null) {
+    			if(columnModel.getColumnType() == ColumnType.LONG) {
+    				value = columnModel.getDefaultValue();
+    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
+    				value = columnModel.getDefaultValue(); 
+    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
+    				value = columnModel.getDefaultValue().toLowerCase(); 
+    			} else {
+    				value = columnModel.getDefaultValue();
+    			}
+    		}
+    		values.add(value);
+    	}    	
+    	
+    	// add row to table
+		final Row row = new Row();
+		row.setValues(values);		
+//		sendRowToTable(row, null, headers, new AsyncCallback<RowReferenceSet>() {
+//    		@Override
+//    		public void onSuccess(RowReferenceSet result) {
+//    			// pull out row Id from reference set, convert to model and send to view
+//    			if(result != null && result.getRows() != null && result.getRows().size() > 0  && result.getRows().get(0) != null) {    				
+//    				row.setRowId(result.getRows().get(0).getRowId());    				
+//    				view.insertNewRow(TableUtils.convertRowToModel(headers, row));
+//    			} else {
+//    				onFailure(null);
+//    			}
+//    		}
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//			}
+//		});
+	}
 	
 	/*
 	 * Private Methods
@@ -212,6 +235,36 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		derivedCol.setName(resultColumnId);
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
+	}
+
+	private void sendRowToTable(Row row, String etag, List<String> headers, final AsyncCallback<RowReferenceSet> callback) {
+		RowSet rowSet = new RowSet();
+		rowSet.setTableId(tableEntityId);
+		rowSet.setEtag(etag);
+		rowSet.setHeaders(headers);
+		rowSet.setRows(Arrays.asList(new Row[] { row }));
+		try {
+			synapseClient.sendRowsToTable(rowSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					RowReferenceSet rrs = null;
+					try {
+						rrs = new RowReferenceSet(adapterFactory.createNew(result));
+					} catch (JSONObjectAdapterException e) {
+						e.printStackTrace();
+					}
+					callback.onSuccess(rrs);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ROW_UPDATE_FAILED);
+					callback.onFailure(caught);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			callback.onFailure(e);
+		}
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.repo.model.table.TableStatus;
@@ -95,6 +96,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
 	
+	List<TableModel> currentPage;
+	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle) {
 		columnToModel = new HashMap<Column, ColumnModel>();
@@ -147,15 +150,15 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					}
 				});
 			}
-	      
+			
 			private void updateData(final Range range, RowSet rowData) {
 				// convert to Table Model (map)
 				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
-			        List<TableModel> returnedData = new ArrayList<TableModel>();
+			        currentPage = new ArrayList<TableModel>();
 			        for(Row row : rowData.getRows()) {			        				        	
-			        	returnedData.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
+			        	currentPage.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
 			        }
-			        updateRowData(range.getStart(), returnedData);
+			        updateRowData(range.getStart(), currentPage);
 			        hideLoading();
 				}
 			}
@@ -299,10 +302,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		errorMessage.setVisible(true);
 	}
 
-	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
-		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
-	}
-
 	@Override
 	public void showQueryProblem(QueryProblem problem, String message) {
 		hideLoading();
@@ -314,6 +313,11 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}
 
+	@Override
+	public void insertNewRow(TableModel model) {
+		currentPage.add(0, model);
+		cellTable.setRowData(currentPage);
+	}
 	
 	/*
 	 * Private Methods
@@ -354,7 +358,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryField.setEnabled(false);
 		presenter.query(queryField.getValue());
 	}
-
 	
 	private void buildTable(int pageSize) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
@@ -409,8 +412,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		// Table's columns
 		RowUpdater rowUpdater = new RowUpdater() {			
 			@Override
-			public void updateRow(TableModel row, AsyncCallback<Void> callback) {
+			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
 				presenter.updateRow(row, callback);			
+				
 			}
 		};
 		for(ColumnModel model : columns) {
@@ -438,5 +442,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private String getWaitingString(int remainingSec) {
 		return "&nbsp;" + DisplayConstants.WAITING + " " + remainingSec + "s...";
 	}
-	
+
+	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
+		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+	}
+
 }

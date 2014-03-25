@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.SynapseView;
@@ -32,8 +33,9 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 
 		void retryCurrentQuery();
 
-		void updateRow(TableModel row, AsyncCallback<Void> callback);
-				
+		void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback);
+		
+		void addRow();
 	}
 	
 	/**
@@ -50,4 +52,6 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	public void showTableUnavailable(TableStatus status, Integer percentComplete);
 
 	public void showQueryProblem(QueryProblem problem, String message);
+
+	public void insertNewRow(TableModel model);
 }

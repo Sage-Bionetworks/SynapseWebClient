@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
@@ -89,9 +90,9 @@ public class TableViewUtils {
 							object.put(col.getId(), enumVal);
 						}
 					}
-					rowUpdater.updateRow(object, new AsyncCallback<Void>() {								
+					rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 						@Override
-						public void onSuccess(Void result) { }
+						public void onSuccess(RowReferenceSet result) { }
 						
 						@Override
 						public void onFailure(Throwable caught) {
@@ -129,9 +130,9 @@ public class TableViewUtils {
 								final String value) {
 							final String original = object.get(col.getId());
 							object.put(col.getId(), value);
-							rowUpdater.updateRow(object, new AsyncCallback<Void>() {								
+							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
-								public void onSuccess(Void result) { }
+								public void onSuccess(RowReferenceSet result) { }
 								
 								@Override
 								public void onFailure(Throwable caught) {
@@ -179,9 +180,9 @@ public class TableViewUtils {
 								}
 								// save value after validation
 								object.put(col.getId(), value);
-								rowUpdater.updateRow(object, new AsyncCallback<Void>() {								
+								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 									@Override
-									public void onSuccess(Void result) { }
+									public void onSuccess(RowReferenceSet result) { }
 									
 									@Override
 									public void onFailure(Throwable caught) {
@@ -217,9 +218,9 @@ public class TableViewUtils {
 				} else {
 					object.put(col.getId(), FALSE);
 				}			
-				rowUpdater.updateRow(object, new AsyncCallback<Void>() {								
+				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
-					public void onSuccess(Void result) { }
+					public void onSuccess(RowReferenceSet result) { }
 					
 					@Override
 					public void onFailure(Throwable caught) {
@@ -271,9 +272,9 @@ public class TableViewUtils {
 						public void update(int index, final TableModel object, Date value) {					
 							final String original = object.get(col.getId()); 
 							object.put(col.getId(), String.valueOf(value.getTime()));
-							rowUpdater.updateRow(object, new AsyncCallback<Void>() {								
+							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
-								public void onSuccess(Void result) { }
+								public void onSuccess(RowReferenceSet result) { }
 								
 								@Override
 								public void onFailure(Throwable caught) {

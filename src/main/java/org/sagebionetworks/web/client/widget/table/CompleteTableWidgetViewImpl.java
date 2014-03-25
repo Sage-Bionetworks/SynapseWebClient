@@ -73,6 +73,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	FlowPanel addColumnPanel;
 	List<ColumnDetailsPanel> columnPanelOrder;
 	PortalGinInjector ginInjector;
+	SimpleTableWidget table;
 	
 	@Inject
 	public CompleteTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle,
@@ -151,7 +152,7 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 	 * @param canEdit 
 	 */
 	private void setupTable(TableEntity tableEntity, List<ColumnModel> columns, String queryString, boolean canEdit) {
-		SimpleTableWidget table = ginInjector.getSimpleTableWidget();		
+		table = ginInjector.getSimpleTableWidget();		
 		table.configure(tableEntity.getId(), columns, queryString, canEdit);
 		tableContainer.setWidget(table.asWidget());				
 	}
@@ -178,45 +179,13 @@ public class CompleteTableWidgetViewImpl extends Composite implements CompleteTa
 		addRowBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-		    	addRow(columns);  
+		    	table.addRow();  
 			}
 		});
 		
 		buttonToolbar.add(showColumnsBtn);		
 		buttonToolbar.add(addRowBtn);
 	}
-	
-	/**
-	 * Method that adds an empty row to the table
-	 * @param columns
-	 */
-	private void addRow(final List<ColumnModel> columns) {
-//		BaseModelData row = new BaseModelData();  
-//    	// fill default values
-//    	for(org.sagebionetworks.repo.model.table.ColumnModel columnModel : columns) {		    		
-//    		if(columnModel.getDefaultValue() != null) {
-//    			Object value = null;
-//    			if(columnModel.getColumnType() == ColumnType.LONG) {
-//    				value = new Long(columnModel.getDefaultValue());
-//    			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
-//    				value = new Double(columnModel.getDefaultValue()); 
-//    			} else if(columnModel.getColumnType() == ColumnType.BOOLEAN) {
-//    				value = columnModel.getDefaultValue().toLowerCase(); 
-//    			} else {
-//    				value = columnModel.getDefaultValue();
-//    			}
-//    			row.set(columnModel.getName(), value);
-//    		}
-//    	}
-//    	
-//    	// add row
-//        rowEditor.stopEditing(false);  
-//        store.insert(row, store.getCount());  
-//        rowEditor.startEditing(store.indexOf(row), true);
-        
-        // TODO: update presenter with new row. or wait for save on row editor. Depends on table impl
-	}
-
 	
 	
 	/* ================
