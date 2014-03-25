@@ -2617,7 +2617,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String sendRowsToTable(String rowSet) throws RestServiceException {
-		if(rowSet != null) throw new BadRequestException("blah");
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RowSet toAppend = new RowSet(adapterFactory.createNew(rowSet));

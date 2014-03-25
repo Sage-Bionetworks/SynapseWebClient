@@ -83,7 +83,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	SageImageBundle sageImageBundle;
 	CellTable<TableModel> cellTable;
-	SimplePager pager;
+	MySimplePager pager;
 	private List<ColumnModel> columns;
 	ListHandler<TableModel> sortHandler;
 	SelectionModel<TableModel> selectionModel;
@@ -376,7 +376,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		// Create a Pager to control the table.
 		SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
-		pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+		pager = new MySimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 		pager.setDisplay(cellTable);
 		pagerContainer.setWidget(pager);
 
