@@ -132,22 +132,22 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
     	// add row to table
 		final Row row = new Row();
 		row.setValues(values);		
-//		sendRowToTable(row, null, headers, new AsyncCallback<RowReferenceSet>() {
-//    		@Override
-//    		public void onSuccess(RowReferenceSet result) {
-//    			// pull out row Id from reference set, convert to model and send to view
-//    			if(result != null && result.getRows() != null && result.getRows().size() > 0  && result.getRows().get(0) != null) {    				
-//    				row.setRowId(result.getRows().get(0).getRowId());    				
-//    				view.insertNewRow(TableUtils.convertRowToModel(headers, row));
-//    			} else {
-//    				onFailure(null);
-//    			}
-//    		}
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//			}
-//		});
+		sendRowToTable(row, null, headers, new AsyncCallback<RowReferenceSet>() {
+    		@Override
+    		public void onSuccess(RowReferenceSet result) {
+    			// pull out row Id from reference set, convert to model and send to view
+    			if(result != null && result.getRows() != null && result.getRows().size() > 0  && result.getRows().get(0) != null) {    				
+    				row.setRowId(result.getRows().get(0).getRowId());    				
+    				view.insertNewRow(TableUtils.convertRowToModel(headers, row));
+    			} else {
+    				onFailure(null);
+    			}
+    		}
+
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
 	}
 	
 	/*
