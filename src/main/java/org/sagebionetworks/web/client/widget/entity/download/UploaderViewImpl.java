@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -66,7 +65,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	LayoutContainer container;
 	IconsImageBundle iconsImageBundle;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
-	QuizInfoWidget untrustedUploader;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
@@ -78,14 +76,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
-		this.untrustedUploader = quizInfoWidget;
-		quizInfoWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				presenter.cancelClicked();	
-			}
-		});
-		
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
@@ -273,14 +263,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		add(container);
 		layout(true);
 	}
-	
-	@Override
-	public void showQuizUI() {
-		removeAll();
-		add(untrustedUploader.asWidget());
-		layout(true);
-	}
-
 	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {

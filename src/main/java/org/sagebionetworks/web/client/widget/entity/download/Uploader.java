@@ -118,20 +118,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean isCertified) {
-				if (isCertified)
-					view.showUploaderUI();
-				else
-					view.showQuizUI();
-			}
-			@Override
-			public void onFailure(Throwable t) {
-				view.showErrorMessage(t.getMessage());
-			}
-		};
-		checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
+		view.showUploaderUI();
 		return this.view.asWidget();
 	}
 

@@ -18,13 +18,12 @@ public class DisplayConstants {
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	
 	//quiz
-	public static final String QUIZ_INFO = "Synapse requires you to fully understand the rules for sharing and using data with specific use conditions before you are allowed to create content in the system.";
-	public static final String QUIZ_MORE_INFO = "<p>The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse. </p>" +
-			"<p>Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse. Certified Synapse users are allowed to upload content and access Client API.</p>" +
-			"<p>Individuals wishing to gain the certification must:" +
-			"<ul><li> Study the tutorial materials</li><li>Complete a brief examination</li></ul></p>";
-	
-	public static final String QUIZ_NOT_TO_WORRY = "But don't worry, certification is easy!";
+	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
+	public static final String QUIZ_MORE_INFO = 
+			"<blockquote class=\"margin-bottom-40\"><div class=\"margin-top-left-10\">Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse.</div>" +
+			"<div class=\"margin-top-left-10\">Certified Synapse users are allowed to upload content and access Client API.</div>" +
+			"<div class=\"margin-top-left-10\">Individuals wishing to gain the certification must:" +
+			"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> Study the tutorial materials</li><li>Complete a brief examination</li></ul></div></blockquote>";
 	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
@@ -162,6 +161,7 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String REMIND_ME_LATER = "Remind me later";
 	public static final String BUTTON_CONTINUE = "Continue";
 	public static final String BECOME_CERTIFIED = "Become Certified";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";

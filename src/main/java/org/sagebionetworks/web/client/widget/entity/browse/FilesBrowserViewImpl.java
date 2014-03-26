@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -121,20 +122,21 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	}
 	
 	@Override
-	public void showQuizInfoDialog() {
+	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
 		final Window dialog = new Window();
 		dialog.setMaximizable(false);
-		dialog.setSize(440, 250);
+		dialog.setSize(550, 320);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
 		dialog.setHeading("Certification");
 
-		quizInfoWidget.configure(new Callback() {
+		quizInfoWidget.configure(new CallbackP<Boolean>() {
 			@Override
-			public void invoke() {
+			public void invoke(Boolean tutorialClicked) {
 				dialog.hide();
+				callback.invoke(tutorialClicked);
 			}
 		});
 		dialog.add(quizInfoWidget.asWidget());

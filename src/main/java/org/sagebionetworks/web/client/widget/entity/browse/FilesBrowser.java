@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -101,7 +103,13 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				if (isCertified)
 					view.showUploadDialog(configuredEntityId);
 				else
-					view.showQuizInfoDialog();
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								view.showUploadDialog(configuredEntityId);
+						}
+					});
 			}
 			@Override
 			public void onFailure(Throwable t) {
@@ -120,7 +128,13 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				if (isCertified)
 					createFolder();
 				else
-					view.showQuizInfoDialog();
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								createFolder();
+						}
+					});
 			}
 			@Override
 			public void onFailure(Throwable t) {

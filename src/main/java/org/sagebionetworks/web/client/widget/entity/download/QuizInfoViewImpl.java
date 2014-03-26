@@ -22,18 +22,18 @@ public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
 	private void initializeUI() {
 		clear();
 		addStyleName("whiteBackground padding-left-10 padding-right-15 padding-top-15");
-		HTML html = new HTML("<h5>"+DisplayConstants.QUIZ_INFO+"<br><br><small>"+DisplayConstants.QUIZ_NOT_TO_WORRY+"</small></h5>");
-		html.addStyleName("margin-bottom-40");
+		HTML html = new HTML("<h5>"+DisplayConstants.QUIZ_INFO+"</h5>" + DisplayConstants.QUIZ_MORE_INFO);
+		html.addStyleName("margin-bottom-40 margin-top-left-10 margin-right-10");
 		add(html);
 		FlowPanel buttonContainer = new FlowPanel();
 		
-		com.google.gwt.user.client.ui.Button cancel = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL, ButtonType.DEFAULT);
+		com.google.gwt.user.client.ui.Button cancel = DisplayUtils.createButton(DisplayConstants.REMIND_ME_LATER, ButtonType.DEFAULT);
 		cancel.addStyleName("right margin-left-10");
 		buttonContainer.add(cancel);
 		cancel.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.buttonClicked();
+				presenter.cancelClicked();
 			}
 		});
 		com.google.gwt.user.client.ui.Button okButton = DisplayUtils.createButton(DisplayConstants.BECOME_CERTIFIED, ButtonType.PRIMARY);
@@ -42,7 +42,7 @@ public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.buttonClicked();
+				presenter.continueClicked();
 				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});

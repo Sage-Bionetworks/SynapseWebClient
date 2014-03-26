@@ -14,6 +14,7 @@ public interface QuizInfoWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		void goTo(Place place);
-		void buttonClicked();
+		void continueClicked();
+		void cancelClicked();
 	}
 }
