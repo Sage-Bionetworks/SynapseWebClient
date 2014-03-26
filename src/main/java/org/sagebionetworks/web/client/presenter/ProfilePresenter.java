@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdated
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -233,16 +234,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							ownerProfile = profile;
 						profileForm.configure(profile, profileUpdatedCallback);
 						
-						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
+						AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								view.showErrorMessage(caught.getMessage());
 							}
 							@Override
 							public void onSuccess(List<Team> teams) {
-								view.updateView(profile, teams, editable, isOwner, profileForm.asWidget());		
+								getIsCertifiedAndUpdateView(profile, teams, editable, isOwner);
 							}
-						});
+						};
+						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, teamCallback);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}    				
@@ -252,6 +254,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);    					    				
 				}
 			});
+	}
+	
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean editable, final boolean isOwner) {
+		synapseClient.isCertifiedUser(profile.getOwnerId(), new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isCertified) {
+				view.updateView(profile, teams, editable, isOwner, isCertified, profileForm.asWidget());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	@Override

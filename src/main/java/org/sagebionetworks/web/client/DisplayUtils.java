@@ -41,7 +41,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -69,6 +68,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
@@ -737,6 +737,11 @@ public class DisplayUtils {
 		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
 	}
 
+	public static String getHelpPlaceHistoryToken(String token) {
+		Help place = new Help(token);
+		return "#!" + getHelpPlaceString(Help.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -840,7 +845,9 @@ public class DisplayUtils {
 	private static String getLoginPlaceString(Class<LoginPlace> place) {
 		return getPlaceString(place.getName());		
 	}
-
+	private static String getHelpPlaceString(Class<Help> place) {
+		return getPlaceString(place.getName());		
+	}
 	
 	private static String getSearchPlaceString(Class<Search> place) {
 		return getPlaceString(place.getName());		
@@ -1616,20 +1623,30 @@ public class DisplayUtils {
 	}
 
 	public static boolean isInTestWebsite(CookieProvider cookies) {
-		return cookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY) != null;
+		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 
 	public static void setTestWebsite(boolean testWebsite, CookieProvider cookies) {
-		if (testWebsite && !isInTestWebsite(cookies)) {
-			//set the cookie
-			cookies.setCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, "true");
-		} else{
-			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
-		}
+		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
+	
+	public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
+		return cookies.getCookie(cookieKey) != null;
+	}
 
+	public static void setInCookies(boolean value, String cookieKey, CookieProvider cookies) {
+		if (value && !isInCookies(cookieKey, cookies)) {
+			//set the cookie
+			cookies.setCookie(cookieKey, "true");
+		} else{
+			cookies.removeCookie(cookieKey);
+		}
+	}
+
+		
+	
 	/**
 	 * Create the URL to a version of a wiki's attachments.
 	 * @param baseFileHandleUrl

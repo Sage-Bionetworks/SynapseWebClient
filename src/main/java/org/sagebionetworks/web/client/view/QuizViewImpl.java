@@ -5,14 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.Window;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -32,11 +37,27 @@ public class QuizViewImpl extends Composite implements QuizView {
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
+
+	@UiField
+	HTMLPanel quizContainer;
 	@UiField
 	FlowPanel testContainer;
-	
 	@UiField
 	Button submitButton;
+	
+	@UiField
+	HTMLPanel successContainer;
+	@UiField
+	Button continueButton;
+	@UiField
+	HeadingElement userNameCertificate;
+	
+	@UiField
+	HTMLPanel failureContainer;
+	@UiField
+	Button tutorialButton;
+
+	
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -63,6 +84,22 @@ public class QuizViewImpl extends Composite implements QuizView {
 		footer.add(footerWidget.asWidget());
 		isSubmitInitialized = false;
 		userAnswers = new HashMap<String, String>();
+		
+		tutorialButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
+			}
+		});
+		
+		continueButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goToLastPlace();
+			}
+		});
+
+
 	}
 
 	@Override
@@ -106,6 +143,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@Override
 	public void showTest(Object questionsAndAnswers) {
+		hideAll();
 		//clear old questions
 		clear();
 		
@@ -133,7 +171,22 @@ public class QuizViewImpl extends Composite implements QuizView {
 				}
 			});
 		}
+		quizContainer.setVisible(true);
     }
+	
+	@Override
+	public void showSuccess(UserProfile profile) {
+		hideAll();
+		userNameCertificate.setInnerHTML(DisplayUtils.getDisplayName(profile));
+		successContainer.setVisible(true);
+	}
+	
+	@Override
+	public void showFailure() {
+		hideAll();
+		failureContainer.setVisible(true);
+	}
+
 	private FlowPanel addQuestion(String questionNumber, final String question, List<String> answers) {
 		FlowPanel questionContainer = new FlowPanel();
 		questionContainer.addStyleName("margin-bottom-40 margin-left-15");
@@ -153,6 +206,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 			questionContainer.add(answerContainer);
 		}
 		return questionContainer;
+	}
+	
+	
+	private void hideAll() {
+		quizContainer.setVisible(false);
+		successContainer.setVisible(false);
+		failureContainer.setVisible(false);
 	}
 
 	@Override

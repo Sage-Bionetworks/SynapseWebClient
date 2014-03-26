@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -184,7 +185,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, boolean isCertified, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -200,7 +201,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, isOwner);
+			updateViewProfile(profile, isCertified, isOwner);
 			viewProfilePanel.add(profileWidget);
 			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
@@ -300,7 +301,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else return s;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, boolean isCertified, boolean isOwner) {
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -312,7 +313,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 builder.appendHtmlConstant("<h2>");
+		 if (isCertified)
+			 builder.appendHtmlConstant("<a href=\"" + DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL) + "\">"+DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22") + "</a>");
+		 builder.appendHtmlConstant("<h2 class=\"inline-block\">");
 		 builder.appendEscapedLines(name);
 		 
 		 //add a change username link if owner

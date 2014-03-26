@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface UploaderView extends IsWidget, SynapseView {
@@ -54,5 +55,6 @@ public interface UploaderView extends IsWidget, SynapseView {
 	}
 
 	public void setShowCancelButton(boolean showCancel);
-	
+	public void showUploaderUI();
+	public void showQuizUI();
 }

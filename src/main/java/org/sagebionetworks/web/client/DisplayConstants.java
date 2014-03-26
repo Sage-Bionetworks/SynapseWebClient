@@ -17,6 +17,11 @@ public class DisplayConstants {
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	
+	//quiz
+	public static final String QUIZ_INFO = "Synapse requires you to fully understand the rules for sharing and using data with specific use conditions before you are allowed to create content in the system.";
+	public static final String QUIZ_MORE_INFO = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies interdum nisi, nec volutpat quam vehicula sed. Fusce tincidunt nunc ut dapibus suscipit. Sed adipiscing ipsum sed sem porta, non luctus urna euismod. Duis ut augue eu felis commodo adipiscing nec id diam. Ut metus orci, pharetra eu congue vel, aliquet in orci. Nullam elit felis, aliquet ac hendrerit nec, varius sed urna. Nam ultricies lobortis velit, at congue massa faucibus sit amet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin malesuada erat justo, at tempus augue vestibulum pharetra. Mauris nec cursus augue, eu tincidunt velit. Aliquam nunc diam, ornare vitae dolor at, luctus elementum nisi. Nullam scelerisque nisl sed rhoncus cursus.";
+	public static final String QUIZ_NOT_TO_WORRY = "But don't worry, certification is easy!";
+	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
 	public static final String FOLLOW_ANALYSIS_HTML = "Following an analysis project allows you to be notified when the analysis has new comments or additional steps.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
@@ -153,6 +158,8 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String BUTTON_CONTINUE = "Continue";
+	public static final String BECOME_CERTIFIED = "Become Certified";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_NO_DOWNLOADS = "There are no downloads available.";
 	public static final String TEXT_UNAUTH_DOWNLOADS = "Please login or sign the End User License Agreement to see downloads.";
