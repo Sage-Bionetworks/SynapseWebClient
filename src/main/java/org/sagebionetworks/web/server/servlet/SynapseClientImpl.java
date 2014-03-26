@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -140,6 +142,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	SimpleDateFormat certificateDateFormatter = new SimpleDateFormat("MMMMM d, yyyy");
 	
 	/**
 	 * Injected with Gin
@@ -1869,7 +1872,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public String getCertificationDate(String userId) throws RestServiceException {
 		//if so, when did this user pass the certification test
-		String dateJoined = "TODO: set certified date using new service";
+		String dateJoined = "TODO: " + certificateDateFormatter.format(new Date());
 		return dateJoined;
 	}
 	
