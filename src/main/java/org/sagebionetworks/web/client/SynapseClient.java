@@ -11,6 +11,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -276,7 +277,7 @@ public interface SynapseClient extends RemoteService {
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
 	
-	public Boolean isCertifiedUser(String userId) throws RestServiceException;
+	public GroupMembershipState isCertifiedUser(String userId) throws RestServiceException;
 	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	

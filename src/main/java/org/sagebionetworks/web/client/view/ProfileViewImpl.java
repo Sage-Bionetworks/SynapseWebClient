@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -23,6 +22,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -43,6 +43,8 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -96,7 +98,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
-	private Html profileWidget;
+	private FlowPanel profileWidget;
 	private Image defaultProfilePicture;
 	private Html profilePictureHtml;
 	
@@ -185,7 +187,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, boolean isCertified, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, GroupMembershipState groupState, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -201,7 +203,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, isCertified, isOwner);
+			updateViewProfile(profile, groupState, isOwner);
 			viewProfilePanel.add(profileWidget);
 			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
@@ -286,7 +288,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	 private void createViewProfile() {
-		 profileWidget = new Html();
+		 profileWidget = new FlowPanel();
 		 profilePictureHtml = new Html();
 		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
 	 }
@@ -301,7 +303,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else return s;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, boolean isCertified, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, GroupMembershipState groupState, boolean isOwner) {
+		 profileWidget.clear();
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -313,8 +316,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 if (isCertified)
-			 builder.appendHtmlConstant("<a href=\"" + DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL) + "\">"+DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22") + "</a>");
+		 if (groupState.getIsMember()) {
+			 Anchor tutorialLink = new Anchor();
+			 tutorialLink.setHTML(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
+			 tutorialLink.setHref(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL));
+			 DisplayUtils.addToolTip(tutorialLink, groupState.getJoinDate());
+			 profileWidget.add(tutorialLink);
+		 }
+			 
 		 builder.appendHtmlConstant("<h2 class=\"inline-block\">");
 		 builder.appendEscapedLines(name);
 		 
@@ -325,6 +334,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 builder.appendHtmlConstant("</h2>");
 		 
+		 HTML headlineHtml = new HTML(builder.toSafeHtml());
+		 headlineHtml.addStyleName("inline-block");
+		 profileWidget.add(headlineHtml);
+		 
+		 builder = new SafeHtmlBuilder();
 		 if (position.length()>0 || company.length()>0) {
 			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
 			 String atString = position.length()>0 && company.length()>0 ? " at " : "";
@@ -358,8 +372,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 // Account number
 		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
-
-		 profileWidget.setHtml(builder.toSafeHtml().asString());
+		 HTML profileHtml = new HTML(builder.toSafeHtml());
+		 profileWidget.add(profileHtml);
 		 
 		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 			 profilePictureContainer.add(profilePictureHtml);

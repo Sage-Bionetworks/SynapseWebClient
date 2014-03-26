@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -119,10 +120,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
 			@Override
-			public void onSuccess(Boolean isTrained) {
-				if (isTrained)
+			public void onSuccess(GroupMembershipState groupState) {
+				if (groupState.getIsMember())
 					view.showUploaderUI();
 				else
 					view.showQuizUI();
@@ -139,12 +140,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	/**
 	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
 	 */
-	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
+	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<GroupMembershipState> callback) {
 		//sanity check
 		if (authenticationController.isLoggedIn()) {
 			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
 		} else {
-			callback.onSuccess(false);
+			callback.onSuccess(new GroupMembershipState(false, null));
 		}
 	}
 	

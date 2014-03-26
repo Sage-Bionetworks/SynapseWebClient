@@ -127,6 +127,7 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -1876,10 +1877,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Boolean isCertifiedUser(String userId) throws RestServiceException {
+	public GroupMembershipState isCertifiedUser(String userId) throws RestServiceException {
 		//TODO: is this user a member of the bootstrapped group
 //		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
-		return isTeamMember(userId, 3318979L); //3320305 is the "Alpha Trained Users" team on prod
+		Boolean isCertified = isTeamMember(userId, 3318979L);
+		String dateJoined = null;
+		//if so, when were they added?
+		if (isCertified)
+			dateJoined = getDateJoined(userId, 3318979L);
+		
+		GroupMembershipState state = new GroupMembershipState(isCertified, dateJoined);
+		
+		return state;
 	}
 	
 	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
@@ -1892,6 +1901,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 		return isMember;
+	}
+	
+	public String getDateJoined(String userId, Long groupPrincipalId) throws RestServiceException {
+		String dateJoined = "TODO: set certified date using new service";
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			dateJoined = synapseClient.getDateJoined(userId, groupPrincipalId);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+		return dateJoined;
 	}
 	
 	@Override

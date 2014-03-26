@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.message.Settings;
@@ -25,6 +22,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -206,10 +204,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void checkForCertifiedUser(){
 		view.showLoggingInLoader();
 		if (!isIgnoreQuizReminder()) {
-			Uploader.checkIsCertifiedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
+			Uploader.checkIsCertifiedUser(authenticationController, synapseClient, new AsyncCallback<GroupMembershipState>() {
 				@Override
-				public void onSuccess(Boolean isTrusted) {
-					if (!isTrusted) {
+				public void onSuccess(GroupMembershipState groupState) {
+					if (!groupState.getIsMember()) {
 						view.hideLoggingInLoader();
 						view.showQuizInfoUI();
 					} else {

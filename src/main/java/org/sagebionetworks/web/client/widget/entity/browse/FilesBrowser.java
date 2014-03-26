@@ -9,7 +9,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -17,6 +16,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.GroupMembershipState;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -96,10 +96,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Override
 	public void uploadButtonClicked() {
 		//is this a certified user?
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
 			@Override
-			public void onSuccess(Boolean isTrained) {
-				if (isTrained)
+			public void onSuccess(GroupMembershipState groupState) {
+				if (groupState.getIsMember())
 					view.showUploadDialog(configuredEntityId);
 				else
 					view.showQuizInfoDialog();
@@ -115,10 +115,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Override
 	public void addFolderClicked() {
 		//is this a certified user?
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
 			@Override
-			public void onSuccess(Boolean isTrusted) {
-				if (isTrusted)
+			public void onSuccess(GroupMembershipState groupState) {
+				if (groupState.getIsMember())
 					createFolder();
 				else
 					view.showQuizInfoDialog();
