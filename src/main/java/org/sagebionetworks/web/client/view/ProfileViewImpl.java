@@ -17,12 +17,12 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -61,6 +61,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel updateUserInfoPanel;
+	@UiField
+	SimplePanel certificatePanel;
 	@UiField
 	SimplePanel updateWithLinkedInPanel;
 	@UiField
@@ -109,6 +111,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
+	private CertificateWidget certificateWidget;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -121,7 +124,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			CookieProvider cookies) {		
+			CookieProvider cookies,
+			CertificateWidget certificateWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.iconsImageBundle = icons;
@@ -133,11 +137,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.cookies = cookies;
+		this.certificateWidget = certificateWidget;
+		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-		
+		certificatePanel.setWidget(certificateWidget.asWidget());
 		createViewProfile();
 		linkedInPanelForViewProfile = createLinkedInPanel();
 		linkedInPanelForEditProfile = createLinkedInPanel();
@@ -187,7 +193,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, GroupMembershipState groupState, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, boolean isCertified, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -203,7 +209,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, groupState, isOwner);
+			updateViewProfile(profile, isCertified, isOwner);
 			viewProfilePanel.add(profileWidget);
 			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
@@ -303,7 +309,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else return s;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, GroupMembershipState groupState, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, boolean isCertified, boolean isOwner) {
 		 profileWidget.clear();
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
@@ -316,12 +322,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 if (groupState.getIsMember()) {
+		 if (isCertified) {
 			 Anchor tutorialLink = new Anchor();
 			 tutorialLink.setHTML(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
-			 tutorialLink.setHref(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL));
-			 DisplayUtils.addToolTip(tutorialLink, groupState.getJoinDate());
-			 profileWidget.add(tutorialLink);
+			 certificateWidget.setProfile(profile);
+			 tutorialLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					clear();
+					certificatePanel.setVisible(true);
+				}
+			});
+			 
+			profileWidget.add(tutorialLink);
 		 }
 			 
 		 builder.appendHtmlConstant("<h2 class=\"inline-block\">");
@@ -447,5 +460,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		profilePictureContainer.removeAll();
 		pictureCanvasContainer.setVisible(false);
 		notificationsPanel.setVisible(false);
+		certificatePanel.setVisible(false);
 	}
 }

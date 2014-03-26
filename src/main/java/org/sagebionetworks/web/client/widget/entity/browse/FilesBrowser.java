@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -96,10 +95,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Override
 	public void uploadButtonClicked() {
 		//is this a certified user?
-		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(GroupMembershipState groupState) {
-				if (groupState.getIsMember())
+			public void onSuccess(Boolean isCertified) {
+				if (isCertified)
 					view.showUploadDialog(configuredEntityId);
 				else
 					view.showQuizInfoDialog();
@@ -115,10 +114,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Override
 	public void addFolderClicked() {
 		//is this a certified user?
-		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(GroupMembershipState groupState) {
-				if (groupState.getIsMember())
+			public void onSuccess(Boolean isCertified) {
+				if (isCertified)
 					createFolder();
 				else
 					view.showQuizInfoDialog();

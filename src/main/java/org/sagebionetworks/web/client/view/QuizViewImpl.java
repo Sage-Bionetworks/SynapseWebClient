@@ -10,14 +10,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.Window;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -46,11 +45,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	Button submitButton;
 	
 	@UiField
-	HTMLPanel successContainer;
-	@UiField
-	Button continueButton;
-	@UiField
-	HeadingElement userNameCertificate;
+	SimplePanel successContainer;
 	
 	@UiField
 	HTMLPanel failureContainer;
@@ -62,6 +57,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
+	private CertificateWidget certificateWidget;
 	private Window loadingWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -73,15 +69,19 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Inject
 	public QuizViewImpl(Binder uiBinder, IconsImageBundle icons,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
+			SageImageBundle sageImageBundle, LoginWidget loginWidget, 
+			CertificateWidget certificateWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.certificateWidget = certificateWidget;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		successContainer.setWidget(certificateWidget.asWidget());
+		
 		isSubmitInitialized = false;
 		userAnswers = new HashMap<String, String>();
 		
@@ -91,15 +91,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
-		
-		continueButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goToLastPlace();
-			}
-		});
-
-
 	}
 
 	@Override
@@ -177,7 +168,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void showSuccess(UserProfile profile) {
 		hideAll();
-		userNameCertificate.setInnerHTML(DisplayUtils.getDisplayName(profile));
+		certificateWidget.setProfile(profile);
 		successContainer.setVisible(true);
 	}
 	

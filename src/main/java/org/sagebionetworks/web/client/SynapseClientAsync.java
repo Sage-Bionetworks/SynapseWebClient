@@ -9,7 +9,6 @@ import java.util.Set;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -197,7 +196,8 @@ public interface SynapseClientAsync {
 	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
 	/////////////////
 	
-	void isCertifiedUser(String userId, AsyncCallback<GroupMembershipState> callback);
+	void isCertifiedUser(String userId, AsyncCallback<Boolean> callback);
+	void getCertificationDate(String userId, AsyncCallback<String> callback);
 	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 

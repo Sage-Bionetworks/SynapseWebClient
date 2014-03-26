@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -36,7 +35,6 @@ import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -120,10 +118,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
 		this.view.createUploadForm(isEntity, parentEntityId);
-		AsyncCallback<GroupMembershipState> userCertifiedCallback = new AsyncCallback<GroupMembershipState>() {
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(GroupMembershipState groupState) {
-				if (groupState.getIsMember())
+			public void onSuccess(Boolean isCertified) {
+				if (isCertified)
 					view.showUploaderUI();
 				else
 					view.showQuizUI();
@@ -140,12 +138,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	/**
 	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
 	 */
-	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<GroupMembershipState> callback) {
+	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
 		//sanity check
 		if (authenticationController.isLoggedIn()) {
 			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
 		} else {
-			callback.onSuccess(new GroupMembershipState(false, null));
+			callback.onSuccess(false);
 		}
 	}
 	

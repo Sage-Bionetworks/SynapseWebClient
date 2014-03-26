@@ -10,10 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,10 +87,7 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.TableState;
-import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -108,17 +103,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.table.query.model.OrderByClause;
-import org.sagebionetworks.table.query.model.OrderingSpecification;
-import org.sagebionetworks.table.query.model.Pagination;
-import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SortKey;
-import org.sagebionetworks.table.query.model.SortSpecification;
-import org.sagebionetworks.table.query.model.SortSpecificationList;
-import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.util.SqlElementUntils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -127,7 +111,6 @@ import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
@@ -139,7 +122,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -1877,18 +1859,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public GroupMembershipState isCertifiedUser(String userId) throws RestServiceException {
+	public Boolean isCertifiedUser(String userId) throws RestServiceException {
 		//TODO: is this user a member of the bootstrapped group
 //		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
 		Boolean isCertified = isTeamMember(userId, 3318979L);
-		String dateJoined = null;
-		//if so, when were they added?
-		if (isCertified)
-			dateJoined = getDateJoined(userId, 3318979L);
-		
-		GroupMembershipState state = new GroupMembershipState(isCertified, dateJoined);
-		
-		return state;
+		return isCertified;
+	}
+	
+	@Override
+	public String getCertificationDate(String userId) throws RestServiceException {
+		//if so, when did this user pass the certification test
+		String dateJoined = "TODO: set certified date using new service";
+		return dateJoined;
 	}
 	
 	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
@@ -1901,17 +1883,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 		return isMember;
-	}
-	
-	public String getDateJoined(String userId, Long groupPrincipalId) throws RestServiceException {
-		String dateJoined = "TODO: set certified date using new service";
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			dateJoined = synapseClient.getDateJoined(userId, groupPrincipalId);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
-		return dateJoined;
 	}
 	
 	@Override

@@ -19,7 +19,11 @@ public class DisplayConstants {
 	
 	//quiz
 	public static final String QUIZ_INFO = "Synapse requires you to fully understand the rules for sharing and using data with specific use conditions before you are allowed to create content in the system.";
-	public static final String QUIZ_MORE_INFO = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ultricies interdum nisi, nec volutpat quam vehicula sed. Fusce tincidunt nunc ut dapibus suscipit. Sed adipiscing ipsum sed sem porta, non luctus urna euismod. Duis ut augue eu felis commodo adipiscing nec id diam. Ut metus orci, pharetra eu congue vel, aliquet in orci. Nullam elit felis, aliquet ac hendrerit nec, varius sed urna. Nam ultricies lobortis velit, at congue massa faucibus sit amet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin malesuada erat justo, at tempus augue vestibulum pharetra. Mauris nec cursus augue, eu tincidunt velit. Aliquam nunc diam, ornare vitae dolor at, luctus elementum nisi. Nullam scelerisque nisl sed rhoncus cursus.";
+	public static final String QUIZ_MORE_INFO = "<p>The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse. </p>" +
+			"<p>Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse. Certified Synapse users are allowed to upload content and access Client API.</p>" +
+			"<p>Individuals wishing to gain the certification must:" +
+			"<ul><li> Study the tutorial materials</li><li>Complete a brief examination</li></ul></p>";
+	
 	public static final String QUIZ_NOT_TO_WORRY = "But don't worry, certification is easy!";
 	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  

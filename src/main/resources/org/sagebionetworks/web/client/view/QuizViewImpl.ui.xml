@@ -28,19 +28,8 @@
 					</div>
 				</div>
 			</g:HTMLPanel>
-			<g:HTMLPanel ui:field="successContainer">
-				<div class="row">
-				    <div class="double-border col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-				        <h3 class="center margin-top-100">This qualification is hereby granted to:</h3>
-				        <h3 ui:field="userNameCertificate" class="margin-top-30 certificate-cursive-font font-size-90 center"></h3>
-				        <h3 class="margin-top-30 center">For passing the Synapse Certification Test</h3>
-				        <div class="margin-top-30 margin-bottom-100 center"> <span class="glyphicon glyphicon-certificate font-size-90"></span> </div>
-				    </div>
-					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-					    <g:Button ui:field="continueButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Continue"/>
-					</div>
-				</div>
-			</g:HTMLPanel>
+			<g:SimplePanel ui:field="successContainer">
+			</g:SimplePanel>
 			
 			<g:HTMLPanel ui:field="failureContainer">
 				<div class="row">

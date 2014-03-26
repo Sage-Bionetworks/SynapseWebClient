@@ -24,9 +24,7 @@ import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdated
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.GroupMembershipState;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -258,10 +256,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean editable, final boolean isOwner) {
-		synapseClient.isCertifiedUser(profile.getOwnerId(), new AsyncCallback<GroupMembershipState>() {
+		synapseClient.isCertifiedUser(profile.getOwnerId(), new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(GroupMembershipState groupState) {
-				view.updateView(profile, teams, editable, isOwner, groupState, profileForm.asWidget());
+			public void onSuccess(Boolean isCertified) {
+				view.updateView(profile, teams, editable, isOwner, isCertified, profileForm.asWidget());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
