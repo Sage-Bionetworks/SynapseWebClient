@@ -9,6 +9,8 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
@@ -44,24 +46,24 @@ public class TableViewUtils {
 		return columnToDisplayName.containsKey(type) ? columnToDisplayName.get(type) : "Unknown Type";
 	}
 	
-	public static Column<TableModel, ?> getColumn(ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable) {
+	public static Column<TableModel, ?> getColumn(ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
 		if(col.getColumnType() == ColumnType.STRING) {
 			if(!canEdit || col.getEnumValues() == null || col.getEnumValues().size() == 0) {				
-			    return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable); // Simple text field    				
+			    return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable, view); // Simple text field    				
 			} else {				  
-			    return configComboString(col, canEdit, rowUpdater, cellTable); // Enum combo box  
+			    return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box  
 			}
 		} else if(col.getColumnType() == ColumnType.DOUBLE) {
-			return configNumberField(col, sortHandler, true, canEdit, rowUpdater, cellTable);   
+			return configNumberField(col, sortHandler, true, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.LONG) {
-			return configNumberField(col, sortHandler, false, canEdit, rowUpdater, cellTable);   
+			return configNumberField(col, sortHandler, false, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.BOOLEAN) {			
-			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable); 
-			else return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable);			
+			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable, view); 
+			else return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable, view);			
 		} else if(col.getColumnType() == ColumnType.FILEHANDLEID) {
-			return configFileHandle(col, canEdit, rowUpdater, cellTable);  
+			return configFileHandle(col, canEdit, rowUpdater, cellTable, view);  
 //		} else if(col.getColumnType() == ColumnType.DATE) {
-//			return configDateColumn(col, sortHandler, canEdit, rowUpdater, cellTable);
+//			return configDateColumn(col, sortHandler, canEdit, rowUpdater, cellTable, view);
 		} else {
 			return null;
 		} 
@@ -71,7 +73,7 @@ public class TableViewUtils {
 	/*
 	 * Private Methods
 	 */
-	private static Column<TableModel, String> configComboString(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable) {
+	private static Column<TableModel, String> configComboString(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		if(col.getEnumValues() == null) return null;
 		final SelectionCell comboCell = new SelectionCell(col.getEnumValues());
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
@@ -92,7 +94,9 @@ public class TableViewUtils {
 					}
 					rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 						@Override
-						public void onSuccess(RowReferenceSet result) { }
+						public void onSuccess(RowReferenceSet result) { 
+							checkForTempRowId(object, result, view);
+						}
 						
 						@Override
 						public void onFailure(Throwable caught) {
@@ -107,7 +111,7 @@ public class TableViewUtils {
 		return column;
 	}
 
-	private static Column<TableModel, String> configSimpleText(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable) {
+	private static Column<TableModel, String> configSimpleText(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		final AbstractCell<String> cell = canEdit ? new EditTextCell() : new TextCell();
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
@@ -132,8 +136,10 @@ public class TableViewUtils {
 							object.put(col.getId(), value);
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
-								public void onSuccess(RowReferenceSet result) { }
-								
+								public void onSuccess(RowReferenceSet result) {
+									checkForTempRowId(object, result, view);
+								}
+
 								@Override
 								public void onFailure(Throwable caught) {
 									object.put(col.getId(), original);
@@ -147,7 +153,7 @@ public class TableViewUtils {
 		return column;
 	}
 
-	private static Column<TableModel, String> configNumberField(final ColumnModel col, ListHandler<TableModel> sortHandler, final boolean isDouble, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable) {
+	private static Column<TableModel, String> configNumberField(final ColumnModel col, ListHandler<TableModel> sortHandler, final boolean isDouble, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		final AbstractCell<String> cell = canEdit ? new EditTextCell() : new TextCell();
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
@@ -182,7 +188,9 @@ public class TableViewUtils {
 								object.put(col.getId(), value);
 								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 									@Override
-									public void onSuccess(RowReferenceSet result) { }
+									public void onSuccess(RowReferenceSet result) { 
+										checkForTempRowId(object, result, view);
+									}
 									
 									@Override
 									public void onFailure(Throwable caught) {
@@ -201,7 +209,7 @@ public class TableViewUtils {
 		return column;
 	}
 
-	private static Column<TableModel, String> configBooleanCombo(final ColumnModel col, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable) {
+	private static Column<TableModel, String> configBooleanCombo(final ColumnModel col, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		final SelectionCell comboCell = new SelectionCell(Arrays.asList(new String[] { TRUE, FALSE }));
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
@@ -220,7 +228,9 @@ public class TableViewUtils {
 				}			
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
-					public void onSuccess(RowReferenceSet result) { }
+					public void onSuccess(RowReferenceSet result) {
+						checkForTempRowId(object, result, view);
+					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
@@ -234,7 +244,7 @@ public class TableViewUtils {
 		return column;
 	}
 	
-	private static Column<TableModel, ?> configFileHandle(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable) {		
+	private static Column<TableModel, ?> configFileHandle(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {		
 	Column<TableModel, String> column = new Column<TableModel, String>(new FileHandleCell(canEdit)) {
 		@Override
 		public String getValue(TableModel object) {
@@ -246,7 +256,7 @@ public class TableViewUtils {
 		
 	}	
 	
-	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable) {		
+	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {		
 		final AbstractCell<Date> cell = canEdit ? new DatePickerCell(DATE_FORMAT) : new DateCell(DATE_FORMAT);
 		Column<TableModel, Date> column = new Column<TableModel, Date>(cell) {
 			@Override
@@ -274,7 +284,9 @@ public class TableViewUtils {
 							object.put(col.getId(), String.valueOf(value.getTime()));
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
-								public void onSuccess(RowReferenceSet result) { }
+								public void onSuccess(RowReferenceSet result) { 
+									checkForTempRowId(object, result, view);
+								}
 								
 								@Override
 								public void onFailure(Throwable caught) {
@@ -290,5 +302,29 @@ public class TableViewUtils {
 		return column;
 	}	
 
+	/**
+	 * Check if the TableModel has a temporary id and if so replace with first row in the RowReferenceSet
+	 * This is for new Rows added to the view after their first cell update. Future updates need to reference the actual rowId
+	 * created in the first update otherwise duplicate rows will result.
+	 * @param object
+	 * @param result
+	 * @param view
+	 */
+	private static void checkForTempRowId(final TableModel object, RowReferenceSet result, SynapseView view) {
+		// set rowId if this was a UI added row
+		if(object.getId().startsWith(TableModel.TEMP_ID_PREFIX)) {										
+			if (result != null
+					&& result.getRows() != null
+					&& result.getRows().size() > 0
+					&& result.getRows().get(0) != null
+					&& result.getRows().get(0).getRowId() != null) {
+				object.setId(result.getRows().get(0).getRowId().toString());
+			} else {
+				// page reload should fix any row id/view sync issues
+				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		}
+	}
+	
 	
 }

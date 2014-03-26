@@ -101,19 +101,18 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 
 	@Override
 	public void updateRow(TableModel rowModel, final AsyncCallback<RowReferenceSet> callback) {		
-		if(rowModel.getId() != null) {
-			Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);			
-			sendRowToTable(row, currentEtag, currentHeaders, callback);
-		}
+		Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);		
+		// rows with temporary ids are new rows
+		if(row != null && row.getRowId() != null && row.getRowId().toString().startsWith(TableModel.TEMP_ID_PREFIX)) 
+			row.setRowId(null); 
+		sendRowToTable(row, currentEtag, currentHeaders, callback);
 	}
 
 	@Override
 	public void addRow() {
     	// fill default values
-		List<String> values = new ArrayList<String>();
-		final List<String> headers = new ArrayList<String>();
+		TableModel model = new TableModel(); // with temp id
     	for(ColumnModel columnModel : tableColumns) {	
-    		headers.add(columnModel.getId());
     		String value = null;
     		if(columnModel.getDefaultValue() != null) {
     			if(columnModel.getColumnType() == ColumnType.LONG) {
@@ -126,28 +125,11 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
     				value = columnModel.getDefaultValue();
     			}
     		}
-    		values.add(value);
+    		model.put(columnModel.getId(), value);
     	}    	
     	
-    	// add row to table
-		final Row row = new Row();
-		row.setValues(values);		
-		sendRowToTable(row, null, headers, new AsyncCallback<RowReferenceSet>() {
-    		@Override
-    		public void onSuccess(RowReferenceSet result) {
-    			// pull out row Id from reference set, convert to model and send to view
-    			if(result != null && result.getRows() != null && result.getRows().size() > 0  && result.getRows().get(0) != null) {    				
-    				row.setRowId(result.getRows().get(0).getRowId());    				
-    				view.insertNewRow(TableUtils.convertRowToModel(headers, row));
-    			} else {
-    				onFailure(null);
-    			}
-    		}
-
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-		});
+    	// add row to view
+		view.insertNewRow(model);
 	}
 	
 	/*
@@ -250,6 +232,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					RowReferenceSet rrs = null;
 					try {
 						rrs = new RowReferenceSet(adapterFactory.createNew(result));
+						currentEtag = rrs.getEtag();
 					} catch (JSONObjectAdapterException e) {
 						e.printStackTrace();
 					}

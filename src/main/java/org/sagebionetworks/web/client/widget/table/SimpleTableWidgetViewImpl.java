@@ -95,6 +95,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	RowSet initialLoad = null;
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
+	TableModel newRow = null;
 	
 	List<TableModel> currentPage;
 	
@@ -120,6 +121,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					return;
 				}
 
+				// skip query if a new row was inserted
+				if(newRow != null) {
+					newRow = null;
+					return;
+				}
+				
 				// extract sorted column
 				String sortedColumnId = null;
 				QueryDetails.SortDirection sortDirection = null;
@@ -202,10 +209,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryField.setValue(query);
 	}
 
-	
-	/*
-	 * SynapseView methods
-	 */
+	@Override
+	public void insertNewRow(TableModel model) {
+		newRow = model;
+		currentPage.add(0, model);
+		cellTable.setRowData(currentPage); // causes onRangeChange event
+	}
+
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -312,12 +322,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryFeedback.setVisible(true);
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}
-
-	@Override
-	public void insertNewRow(TableModel model) {
-		currentPage.add(0, model);
-		cellTable.setRowData(currentPage);
-	}
 	
 	/*
 	 * Private Methods
@@ -418,7 +422,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			}
 		};
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			

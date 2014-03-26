@@ -28,7 +28,10 @@ public class TableUtils {
 	public static Row convertModelToRow(List<String> headers, TableModel model) {
 		if(headers == null || model == null) return null;		
 		Row row = new Row();
-		Long id = model.getId() != null ? Long.parseLong(model.getId()) : null;
+		Long id = null;
+		try {		
+			id = model.getId() != null ? Long.parseLong(model.getId()) : null;
+		} catch (NumberFormatException e) { /* temp TableModel id */ }
 		row.setRowId(id);
 		List<String> values = new ArrayList<String>();		
 		for(String col : headers) {
