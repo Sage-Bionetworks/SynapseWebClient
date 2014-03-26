@@ -278,6 +278,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public Boolean isCertifiedUser(String userId) throws RestServiceException;
 	public String getCertificationDate(String userId) throws RestServiceException;
+	public String getCertificationQuestionnaire() throws RestServiceException;
+	public Boolean submitCertificationQuestionnaireResponse(String questionnaireResponseJson) throws RestServiceException; 
 	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	

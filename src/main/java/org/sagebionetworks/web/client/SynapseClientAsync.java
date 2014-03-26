@@ -198,6 +198,8 @@ public interface SynapseClientAsync {
 	
 	void isCertifiedUser(String userId, AsyncCallback<Boolean> callback);
 	void getCertificationDate(String userId, AsyncCallback<String> callback);
+	void getCertificationQuestionnaire(AsyncCallback<String> callback);
+	void submitCertificationQuestionnaireResponse(String questionnaireResponseJson, AsyncCallback<Boolean> callback);
 	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
