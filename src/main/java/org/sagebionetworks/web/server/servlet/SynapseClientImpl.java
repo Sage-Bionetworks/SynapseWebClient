@@ -1882,8 +1882,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return dateJoined;
 	}
 	
-
-	
 	@Override
 	public String getCertificationQuestionnaire() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1920,7 +1918,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
  		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-		
 	}
 	
 	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
