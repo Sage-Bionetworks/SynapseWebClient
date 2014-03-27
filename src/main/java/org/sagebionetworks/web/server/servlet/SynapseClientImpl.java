@@ -1908,7 +1908,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		questionOptions.add(q1);
 		
 		q1 = new MultichoiceQuestion();
-		q1.setExclusive(true);
+		q1.setExclusive(false);
 		q1.setQuestionIndex(1L);
 		q1.setPrompt("What... is the air-speed velocity of an unladen finch?");
 		answers = new ArrayList<MultichoiceAnswer>();

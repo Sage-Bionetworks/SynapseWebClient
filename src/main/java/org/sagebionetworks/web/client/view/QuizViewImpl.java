@@ -203,14 +203,19 @@ public class QuizViewImpl extends Composite implements QuizView {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
 					SimplePanel answerContainer = new SimplePanel();
 					answerContainer.addStyleName("checkbox margin-left-15");
-					CheckBox checkbox= new CheckBox(answer.getPrompt());
+					final CheckBox checkbox= new CheckBox(answer.getPrompt());
 					checkbox.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
 							//not exclusive, include all possible answer indexes
 							List<Long> answers = getAnswerIndexes(multichoiceQuestion.getQuestionIndex());
-							if (!answers.contains(answer.getAnswerIndex()))
-								answers.add(answer.getAnswerIndex());
+							if (checkbox.getValue()) {
+								if (!answers.contains(answer.getAnswerIndex()))
+									answers.add(answer.getAnswerIndex());	
+							} else {
+								answers.remove(answer.getAnswerIndex());
+							}
+							
 						}
 					});
 					answerContainer.add(checkbox);

@@ -148,7 +148,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	
 	public void getQuestionaire() {
 		synapseClient.getCertificationQuestionnaire(new AsyncCallback<String>() {
-			
 			@Override
 			public void onSuccess(String questionnaireJson) {
 				try {
