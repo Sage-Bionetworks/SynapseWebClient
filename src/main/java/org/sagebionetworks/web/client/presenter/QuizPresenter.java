@@ -16,9 +16,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -27,8 +27,6 @@ import org.sagebionetworks.web.client.view.QuizView;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
-import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -40,10 +38,9 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
-	private CookieProvider cookies;
 	private AdapterFactory adapterFactory;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private EventBus bus;
+	private GWTWrapper gwt;
 	private List<Question> quiz;
 	
 	@Inject
@@ -53,22 +50,21 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
 			JSONObjectAdapter jsonObjectAdapter,
-			CookieProvider cookies){
+			GWTWrapper gwt){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.cookies = cookies;
 		this.adapterFactory = adapterFactory;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.gwt = gwt;
 		this.view.setPresenter(this);
 	}
 	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		panel.setWidget(this.view.asWidget());
-		this.bus = eventBus;
 	}
 
 	
@@ -84,7 +80,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		if(forwardPlace == null) {
 			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
+		goTo(forwardPlace);
 	}
 	
 	@Override
@@ -156,8 +152,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 					//create a quiz
 					for (QuestionVariety qv : questionnaire.getQuestions()) {
 						List<Question> possibleQuestions = qv.getQuestionOptions();
-						//nextInt(upperbound) selects a value of x where 0 <= x < upperbound
-						quiz.add(possibleQuestions.get(Random.nextInt(possibleQuestions.size())));
+						quiz.add(possibleQuestions.get(gwt.getRandomNextInt(possibleQuestions.size())));
 					}
 					view.showQuiz(quiz);
 				} catch (JSONObjectAdapterException e) {

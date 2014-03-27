@@ -1882,55 +1882,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return dateJoined;
 	}
 	
-	private MultichoiceAnswer getAnswer(long answerIndex, String prompt) {
-		MultichoiceAnswer a = new MultichoiceAnswer();
-		a.setAnswerIndex(answerIndex);
-		a.setPrompt(prompt);
-		return a;
-	}
-	
-	private Questionnaire mockQuestionnaire() {
-		
-		Questionnaire questionnaire = new Questionnaire();
-		List<QuestionVariety> questionVarieties = new ArrayList<QuestionVariety>();
-		QuestionVariety qv = new QuestionVariety();
-		List<Question> questionOptions = new ArrayList<Question>();
-		MultichoiceQuestion q1 = new MultichoiceQuestion();
-		q1.setExclusive(true);
-		q1.setQuestionIndex(0L);
-		q1.setPrompt("What... is the air-speed velocity of an unladen swallow?");
-		List<MultichoiceAnswer> answers = new ArrayList<MultichoiceAnswer>();
-		long answerIndex = 0L;
-		answers.add(getAnswer(answerIndex++, "42 m/s"));
-		answers.add(getAnswer(answerIndex++, "African or European?"));
-		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
-		q1.setAnswers(answers);
-		questionOptions.add(q1);
-		
-		q1 = new MultichoiceQuestion();
-		q1.setExclusive(false);
-		q1.setQuestionIndex(1L);
-		q1.setPrompt("What... is the air-speed velocity of an unladen finch?");
-		answers = new ArrayList<MultichoiceAnswer>();
-		answerIndex = 0L;
-		answers.add(getAnswer(answerIndex++, "18 m/s"));
-		answers.add(getAnswer(answerIndex++, "This is silly"));
-		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
-		q1.setAnswers(answers);
-		questionOptions.add(q1);
-		
-		qv.setQuestionOptions(questionOptions);
-		questionVarieties.add(qv);
-		questionnaire.setQuestions(questionVarieties);
-		return questionnaire;
-	}
+
 	
 	@Override
 	public String getCertificationQuestionnaire() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//Questionnaire questionnaire = synapseClient.getCertificationQuestionnaire();
-			Questionnaire questionnaire = mockQuestionnaire();
+			Questionnaire questionnaire = SynapseClientStubUtil.mockQuestionnaire();
 			JSONObjectAdapter questionnaireJson = questionnaire.writeToJSONObject(adapterFactory.createNew());
 			return questionnaireJson.toJSONString();
 //		} catch (SynapseException e) {

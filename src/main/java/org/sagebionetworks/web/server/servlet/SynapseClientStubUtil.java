@@ -1,5 +1,14 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
+import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
+
 //import java.util.logging.Logger;
 //
 //import org.mockito.Mockito;
@@ -188,4 +197,47 @@ public class SynapseClientStubUtil {
 //		return bundle;
 //	}
 
+	
+	public static MultichoiceAnswer getAnswer(long answerIndex, String prompt) {
+		MultichoiceAnswer a = new MultichoiceAnswer();
+		a.setAnswerIndex(answerIndex);
+		a.setPrompt(prompt);
+		return a;
+	}
+	
+	public static Questionnaire mockQuestionnaire() {
+		//the mock questionnaire has 2 varieties of a single question.  One will be randomly selected client-side.  One is exclusive, one is not.
+		Questionnaire questionnaire = new Questionnaire();
+		List<QuestionVariety> questionVarieties = new ArrayList<QuestionVariety>();
+		QuestionVariety qv = new QuestionVariety();
+		List<Question> questionOptions = new ArrayList<Question>();
+		MultichoiceQuestion q1 = new MultichoiceQuestion();
+		q1.setExclusive(true);
+		q1.setQuestionIndex(0L);
+		q1.setPrompt("What... is the air-speed velocity of an unladen swallow?");
+		List<MultichoiceAnswer> answers = new ArrayList<MultichoiceAnswer>();
+		long answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "42 m/s"));
+		answers.add(getAnswer(answerIndex++, "African or European?"));
+		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(false);
+		q1.setQuestionIndex(1L);
+		q1.setPrompt("What... is the air-speed velocity of an unladen finch?");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "18 m/s"));
+		answers.add(getAnswer(answerIndex++, "This is silly"));
+		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		questionnaire.setQuestions(questionVarieties);
+		return questionnaire;
+	}
 }
