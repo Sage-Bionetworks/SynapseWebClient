@@ -34,6 +34,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	
 	private TableEntity table;
 	private List<ColumnModel> columns;
+	private boolean canEdit = false;
 	
 	@Inject
 	public CompleteTableWidget(CompleteTableWidgetView view, 
@@ -49,12 +50,13 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 		view.setPresenter(this);
 	}	
 
-	public void configure(final TableEntity table) {
-		configure(table, null);
+	public void configure(final TableEntity table, boolean canEdit) {
+		configure(table, null, canEdit);
 	}
 	
-	public void configure(final TableEntity table, final String query) {
+	public void configure(final TableEntity table, final String query, final boolean canEdit) {
 		this.table = table;		
+		this.canEdit = canEdit;
 		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
 			public void onSuccess(List<String> result) {
@@ -64,7 +66,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 						columns.add(new ColumnModel(adapterFactory.createNew(colStr)));
 					}
 										
-					view.configure(table, columns, query, true);
+					view.configure(table, columns, query, canEdit);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -142,7 +144,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 						public void onSuccess(EntityWrapper result) {
 							try {						
 								table = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-								configure(table);
+								configure(table, canEdit);
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}							

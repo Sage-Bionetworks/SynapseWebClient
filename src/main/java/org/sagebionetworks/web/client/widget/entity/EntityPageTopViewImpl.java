@@ -721,7 +721,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Table
 		CompleteTableWidget tableWidget = ginInjector.getCompleteTableWidget();
-		tableWidget.configure((TableEntity) bundle.getEntity());
+		tableWidget.configure((TableEntity) bundle.getEntity(), canEdit);
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
