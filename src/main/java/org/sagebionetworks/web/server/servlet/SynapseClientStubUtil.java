@@ -208,6 +208,7 @@ public class SynapseClientStubUtil {
 	public static Questionnaire mockQuestionnaire() {
 		//the mock questionnaire has 2 varieties of a single question.  One will be randomly selected client-side.  One is exclusive, one is not.
 		Questionnaire questionnaire = new Questionnaire();
+		questionnaire.setHeader("Certification");
 		List<QuestionVariety> questionVarieties = new ArrayList<QuestionVariety>();
 		QuestionVariety qv = new QuestionVariety();
 		List<Question> questionOptions = new ArrayList<Question>();

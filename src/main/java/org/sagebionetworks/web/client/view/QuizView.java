@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface QuizView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter loginPresenter);	
-	void showQuiz(List<Question> questions);
+	void showQuiz(String quizHeader, List<Question> questions);
 	void showSuccess(UserProfile profile);
 	void showFailure();
 	void hideLoading();

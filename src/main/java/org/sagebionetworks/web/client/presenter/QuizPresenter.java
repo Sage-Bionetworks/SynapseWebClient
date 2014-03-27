@@ -154,7 +154,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 						List<Question> possibleQuestions = qv.getQuestionOptions();
 						quiz.add(possibleQuestions.get(gwt.getRandomNextInt(possibleQuestions.size())));
 					}
-					view.showQuiz(quiz);
+					view.showQuiz(questionnaire.getHeader(), quiz);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}

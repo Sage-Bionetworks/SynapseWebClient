@@ -17,7 +17,7 @@
     	<div class="container margin-top-15"> 		
 			<g:HTMLPanel ui:field="quizContainer" visible="false">
 				<div class="row">				
-					<div class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10" title="Quiz">
+					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 						<form>
 						    <g:FlowPanel ui:field="testContainer">
 						    </g:FlowPanel>

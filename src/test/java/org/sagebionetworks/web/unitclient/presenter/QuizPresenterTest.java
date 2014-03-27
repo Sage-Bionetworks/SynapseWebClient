@@ -72,7 +72,7 @@ public class QuizPresenterTest {
 		presenter.getQuestionaire();
 		verify(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
 		ArgumentCaptor<List> arg = ArgumentCaptor.forClass(List.class);
-		verify(mockView).showQuiz(arg.capture());
+		verify(mockView).showQuiz(anyString(), arg.capture());
 		//mock quiz has 2 variants of a single question, verify that a single question is passed to the view
 		assertEquals(1, arg.getValue().size());
 	}

@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.Window;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -44,6 +45,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@UiField
 	HTMLPanel quizContainer;
+	
+	@UiField
+	DivElement quizHighlightBox;
+	
 	@UiField
 	FlowPanel testContainer;
 	@UiField
@@ -138,8 +143,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 	
 	@Override
-	public void showQuiz(List<Question> quiz) {
+	public void showQuiz(String quizHeader, List<Question> quiz) {
 		hideAll();
+		quizHighlightBox.setAttribute("title", quizHeader);
 		//clear old questions
 		clear();
 		int questionNumber = 1;
