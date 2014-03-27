@@ -22,6 +22,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -178,7 +179,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		if (question instanceof MultichoiceQuestion) {
 			final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion)question;
 			questionContainer.addStyleName("margin-bottom-40 margin-left-15");
-			questionContainer.add(new HTMLPanel("<h5 class=\"inline-block\"><small>"+questionNumber+". </small>"+question.getPrompt()+"</small></h5>"));
+			questionContainer.add(new HTMLPanel("<h5 class=\"inline-block\"><small>"+questionNumber+". </small>"+SimpleHtmlSanitizer.sanitizeHtml(question.getPrompt()).asString()+"</small></h5>"));
 			//now add possible answers
 			
 			boolean isRadioButton = multichoiceQuestion.getExclusive();
@@ -186,7 +187,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
 					SimplePanel answerContainer = new SimplePanel();
 					answerContainer.addStyleName("radio margin-left-15");
-					RadioButton answerButton = new RadioButton("question-"+question.getQuestionIndex(), answer.getPrompt());
+					RadioButton answerButton = new RadioButton("question-"+question.getQuestionIndex());
+					answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answer.getPrompt()));
 					answerButton.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
@@ -203,7 +205,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
 					SimplePanel answerContainer = new SimplePanel();
 					answerContainer.addStyleName("checkbox margin-left-15");
-					final CheckBox checkbox= new CheckBox(answer.getPrompt());
+					final CheckBox checkbox= new CheckBox();
+					checkbox.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answer.getPrompt()));
 					checkbox.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
