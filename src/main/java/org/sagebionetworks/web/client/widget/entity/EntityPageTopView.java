@@ -2,15 +2,14 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityPageTopView extends IsWidget, SynapseView {
@@ -64,6 +63,14 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 		boolean isPlaceChangeForArea(EntityArea targetTab);
 
 		void entityDeleted(EntityDeletedEvent event);
+
+		void setTableQuery(String newQuery);
+
+		void setTableRow(TableRowHeader rowHeader);
+		
+		TableRowHeader getTableRowHeader();
+
+		String getTableQuery();
 
 				
 	}

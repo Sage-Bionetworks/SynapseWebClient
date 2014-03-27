@@ -16,8 +16,10 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
@@ -44,6 +46,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private String currentEtag;
 	private boolean canEdit;
 	private Long startProgress;
+	private QueryChangeHandler queryChangeHandler;
+	private boolean isFirstDefault = false;
 	
 	@Inject
 	public SimpleTableWidget(SimpleTableWidgetView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory) {
@@ -59,15 +63,33 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return view.asWidget();		
 	}
 	
-	public void configure(String tableEntityId, final List<ColumnModel> tableColumns, final String queryString, final boolean canEdit) {
+	public void configure(String tableEntityId, List<ColumnModel> tableColumns, boolean canEdit, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
+		configure(tableEntityId, tableColumns, canEdit, null, rowHeader, queryChangeHandler);
+	}
+	
+	public void configure(String tableEntityId, List<ColumnModel> tableColumns, boolean canEdit, String queryString, QueryChangeHandler queryChangeHandler) {
+		configure(tableEntityId, tableColumns, canEdit, queryString, null, queryChangeHandler);
+	}
+	
+	private void configure(String tableEntityId, List<ColumnModel> tableColumns, boolean canEdit, String queryString, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
+		if(rowHeader != null) view.showInfo("RowHeader", "row: "+ rowHeader.getRowId() + ", version: "+ rowHeader.getVersion()); // TODO : Remove this
+		
 		this.tableEntityId = tableEntityId;
 		this.tableColumns = tableColumns;
-		this.currentQuery = queryString == null ? getDefaultQuery(tableEntityId) : queryString;
+		if(queryString == null) {
+			isFirstDefault = true;
+			this.currentQuery = getDefaultQuery(tableEntityId);	
+		} else {
+			this.currentQuery = queryString;
+		}
+		
 		this.canEdit = canEdit;
+		this.queryChangeHandler = queryChangeHandler;
 		this.startProgress = null;
 	
 		view.showLoading();
-		executeQuery(currentQuery, null, null);	
+		executeQuery(currentQuery, null, null);
+		
 	}
 
 	private String getDefaultQuery(String tableEntityId) {
@@ -146,6 +168,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
 					currentQuery = queryResult.getExecutedQuery();
 					currentEtag = rowset.getEtag();
+					if(!isFirstDefault && queryChangeHandler != null) queryChangeHandler.onQueryChange(currentQuery);
+					else isFirstDefault = false;
 
 					if(updateCallback != null) {
 						// update query

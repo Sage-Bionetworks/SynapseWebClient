@@ -62,6 +62,9 @@ public class Synapse extends Place{
 				return;
 			} else if(toProcess.contains(TABLES_DELIMITER)) {
 				area = Synapse.EntityArea.TABLES;
+				String[] parts = toProcess.split(TABLES_DELIMITER);
+				if(parts.length == 2)
+					areaToken = parts[1]; 
 				return;
 			}
 		} else {

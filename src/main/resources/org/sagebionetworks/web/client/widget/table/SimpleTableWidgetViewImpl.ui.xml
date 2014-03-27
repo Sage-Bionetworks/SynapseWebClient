@@ -15,7 +15,7 @@
   <g:HTMLPanel>
 	<g:HTMLPanel ui:field="queryPanel" visible="false" styleName="margin-top-15">
 		<div class="row">
-			<div class="form-group col-xs-8 col-sm-10 col-md-10" ui:field="queryFieldContainer">
+			<div class="col-xs-8 col-sm-10 col-md-10" ui:field="queryFieldContainer">
 				<g:TextBox ui:field="queryField" styleName="form-control" />
 				<g:Label ui:field="queryFeedback" styleName="control-label"></g:Label>
 			</div>
@@ -26,8 +26,7 @@
 	
     <table cellspacing='0' cellpadding='0' style='width:100%;'>
       <tr>
-        <td
-          valign='top'>
+        <td valign='top'>
           <g:SimplePanel ui:field="tableContainer" styleName="margin-top-15"/>
         </td>
       </tr>

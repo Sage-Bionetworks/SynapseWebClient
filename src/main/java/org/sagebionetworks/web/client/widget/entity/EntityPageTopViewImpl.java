@@ -47,10 +47,13 @@ import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEdi
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
+import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -265,7 +268,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		    renderSummaryEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber);
 		    if (currentArea == null) currentArea = EntityArea.FILES;
 		} else if(bundle.getEntity() instanceof TableEntity) {
-			renderTableEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, projectHeader);
+			renderTableEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, projectHeader, areaToken);
 		} else {
 			// default entity view
 			renderFileEntity(bundle, entityTypeDisplay, isAdministrator, canEdit, versionNumber, wikiPageId, projectHeader);
@@ -690,7 +693,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 
-	private void renderTableEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, EntityHeader projectHeader) {
+	private void renderTableEntity(EntityBundle bundle, String entityTypeDisplay, boolean isAdministrator, boolean canEdit, EntityHeader projectHeader, String areaToken) {
 		// tab container
 		fullWidthContainer.add(currentTabContainer);		
 		setTabSelected(EntityArea.TABLES, false); 
@@ -721,7 +724,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		// Table
 		CompleteTableWidget tableWidget = ginInjector.getCompleteTableWidget();
-		tableWidget.configure((TableEntity) bundle.getEntity(), canEdit);
+		QueryChangeHandler qch = new QueryChangeHandler() {			
+			@Override
+			public void onQueryChange(String newQuery) {
+				presenter.setTableQuery(newQuery);				
+			}
+		};		
+		TableRowHeader rowHeader = presenter.getTableRowHeader();
+		if(rowHeader != null) {
+			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, rowHeader, qch);									
+		} else {
+			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);						
+		}
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
