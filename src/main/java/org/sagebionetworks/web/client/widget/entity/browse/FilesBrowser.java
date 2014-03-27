@@ -13,10 +13,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -116,7 +114,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
+		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	@Override
@@ -141,7 +139,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		Uploader.checkIsCertifiedUser(authenticationController, synapseClient, userCertifiedCallback);
+		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	public void createFolder() {

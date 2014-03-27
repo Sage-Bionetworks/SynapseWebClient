@@ -203,7 +203,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void checkForCertifiedUser(){
 		view.showLoggingInLoader();
 		if (!isIgnoreQuizReminder()) {
-			Uploader.checkIsCertifiedUser(authenticationController, synapseClient, new AsyncCallback<Boolean>() {
+			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
 				@Override
 				public void onSuccess(Boolean isCertified) {
 					if (!isCertified) {

@@ -122,18 +122,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return this.view.asWidget();
 	}
 
-	/**
-	 * If user is in the trained user group, then it will show the uploader ui.  Otherwise, it will show the quiz info UI
-	 */
-	public static void checkIsCertifiedUser(AuthenticationController authenticationController, SynapseClientAsync synapseClient, AsyncCallback<Boolean> callback) {
-		//sanity check
-		if (authenticationController.isLoggedIn()) {
-			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), callback);
-		} else {
-			callback.onSuccess(false);
-		}
-	}
-	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
