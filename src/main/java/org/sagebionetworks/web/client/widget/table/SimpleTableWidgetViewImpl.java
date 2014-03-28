@@ -110,66 +110,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		tableContainer.addStyleName("tableMinWidth");
 		
 	    // setup DataProvider for pagination/sorting
-		dataProvider = new AsyncDataProvider<TableModel>() {
-			@Override
-			protected void onRangeChanged(HasData<TableModel> display) {
-				// skip query if table was just built
-				if (initialLoad != null) {
-					updateData(new Range(initialDetails.getOffset().intValue(), initialDetails.getLimit().intValue()), initialLoad);
-					initialLoad = null;
-					initialDetails = null;
-					return;
-				}
-
-				// skip query if a new row was inserted
-				if(newRow != null) {
-					newRow = null;
-					return;
-				}
-				
-				// extract sorted column
-				String sortedColumnId = null;
-				QueryDetails.SortDirection sortDirection = null;
-				ColumnSortList sortList = cellTable.getColumnSortList();
-				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
-					ColumnSortInfo columnSortInfo = sortList.get(0);
-					ColumnModel model = columnToModel.get(columnSortInfo
-							.getColumn());
-					if (model != null) {
-						sortedColumnId = model.getId();
-						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
-					}
-				}
-
-				final Range range = display.getVisibleRange();
-				Long offset = new Long(range.getStart());
-				Long limit = new Long(range.getLength());
-				
-				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
-					@Override
-					public void onSuccess(RowSet rowData) {
-						updateData(range, rowData);
-					}
-	
-					@Override
-					public void onFailure(Throwable caught) {
-						showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-					}
-				});
-			}
-			
-			private void updateData(final Range range, RowSet rowData) {
-				// convert to Table Model (map)
-				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
-			        currentPage = new ArrayList<TableModel>();
-			        for(Row row : rowData.getRows()) {			        				        	
-			        	currentPage.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
-			        }
-			        updateRowData(range.getStart(), currentPage);
-			        hideLoading();
-				}
-			}
-	    };
+		dataProvider = createAsyncDataProvider();
 
 	}
 	
@@ -437,6 +378,70 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}
 	}
 
+	private AsyncDataProvider<TableModel> createAsyncDataProvider() {
+		return new AsyncDataProvider<TableModel>() {
+			@Override
+			protected void onRangeChanged(HasData<TableModel> display) {
+				// skip query if table was just built
+				if (initialLoad != null) {
+					updateData(new Range(initialDetails.getOffset().intValue(), initialDetails.getLimit().intValue()), initialLoad);
+					initialLoad = null;
+					initialDetails = null;
+					return;
+				}
+
+				// skip query if a new row was inserted
+				if(newRow != null) {
+					newRow = null;
+					return;
+				}
+				
+				// extract sorted column
+				String sortedColumnId = null;
+				QueryDetails.SortDirection sortDirection = null;
+				ColumnSortList sortList = cellTable.getColumnSortList();
+				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
+					ColumnSortInfo columnSortInfo = sortList.get(0);
+					ColumnModel model = columnToModel.get(columnSortInfo
+							.getColumn());
+					if (model != null) {
+						sortedColumnId = model.getName();
+						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
+					}
+				}
+
+				final Range range = display.getVisibleRange();
+				Long offset = new Long(range.getStart());
+				Long limit = new Long(range.getLength());
+				
+				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
+					@Override
+					public void onSuccess(RowSet rowData) {
+						updateData(range, rowData);
+					}
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+					}
+				});
+			}
+			
+			private void updateData(final Range range, RowSet rowData) {
+				// convert to Table Model (map)
+				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
+			        currentPage = new ArrayList<TableModel>();
+			        for(Row row : rowData.getRows()) {			        				        	
+			        	currentPage.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
+			        }
+			        updateRowData(range.getStart(), currentPage);
+			        hideLoading();
+				}
+			}
+	    };
+	}
+
+	
 	private HTML getLoadingWidget() {
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
 		widget.addStyleName("margin-top-15 center");

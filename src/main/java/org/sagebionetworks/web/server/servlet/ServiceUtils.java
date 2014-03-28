@@ -188,7 +188,7 @@ public class ServiceUtils {
 						&& sortSpec.getSortKey().getColumnReference().getNameLHS() != null
 						&& sortSpec.getSortKey().getColumnReference().getNameLHS().getIdentifier() != null
 						&& sortSpec.getSortKey().getColumnReference().getNameLHS().getIdentifier().getActualIdentifier() != null) {					
-					details.setSortedColumnId(sortSpec.getSortKey().getColumnReference().getNameLHS().getIdentifier().getActualIdentifier().getRegularIdentifier());
+					details.setSortedColumnName(sortSpec.getSortKey().getColumnReference().getNameLHS().getIdentifier().getActualIdentifier().getRegularIdentifier());
 				}
 				if(sortSpec.getOrderingSpecification() != null) {
 					if(sortSpec.getOrderingSpecification() == OrderingSpecification.ASC) 
@@ -226,10 +226,10 @@ public class ServiceUtils {
 			
 			// order by
 			OrderByClause newOrderByClause = null;
-			if(modifyingQd.getSortedColumnId() != null && modifyingQd.getSortDirection() != null) {
+			if(modifyingQd.getSortedColumnName() != null && modifyingQd.getSortDirection() != null) {
 				OrderingSpecification orderingSpec = modifyingQd.getSortDirection() == SortDirection.ASC ? OrderingSpecification.ASC : OrderingSpecification.DESC; 
 				List<SortSpecification> sortList = new ArrayList<SortSpecification>();
-				sortList.add(new SortSpecification(new SortKey(SqlElementUntils.createColumnReference(modifyingQd.getSortedColumnId())), orderingSpec));
+				sortList.add(new SortSpecification(new SortKey(SqlElementUntils.createColumnReference(modifyingQd.getSortedColumnName())), orderingSpec));
 				SortSpecificationList sortSpecList = new SortSpecificationList(sortList);
 				newOrderByClause = new OrderByClause(sortSpecList);					
 			}
