@@ -56,9 +56,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private AreaChangeHandler areaChangedHandler;
 	private ProjectAreaState projectAreaState;
 	
-	private static final String TABLE_QUERY_PREFIX = "query/";
-	private static final String TABLE_ROW_PREFIX = "row/";
-	private static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
+	public static final String TABLE_QUERY_PREFIX = "query/";
+	public static final String TABLE_ROW_PREFIX = "row/";
+	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -304,20 +304,17 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public TableRowHeader getTableRowHeader() {		
 		if(areaToken != null && areaToken.startsWith(TABLE_ROW_PREFIX)) {
 			TableRowHeader rowHeader = new TableRowHeader();
-			String [] parts = areaToken.split(TABLE_ROW_PREFIX);
-			if(parts.length == 2) {
-				String rowHeaderStr = parts[1];
-				if(rowHeaderStr.contains(TABLE_ROW_VERSION_DELIMITER)) {					
-					String[] versionParts = rowHeaderStr.split(TABLE_ROW_VERSION_DELIMITER);
-					if(versionParts.length == 2) {
-						rowHeader.setRowId(versionParts[0]);
-						rowHeader.setVersion(versionParts[1]);
-					} else {
-						return null; // malformed
-					}
+			String rowHeaderStr = areaToken.substring(TABLE_ROW_PREFIX.length(), areaToken.length());
+			if(rowHeaderStr.contains(TABLE_ROW_VERSION_DELIMITER)) {					
+				String[] versionParts = rowHeaderStr.split(TABLE_ROW_VERSION_DELIMITER);
+				if(versionParts.length == 2) {
+					rowHeader.setRowId(versionParts[0]);
+					rowHeader.setVersion(versionParts[1]);
 				} else {
-					rowHeader.setRowId(rowHeaderStr);					
+					return null; // malformed
 				}
+			} else {
+				rowHeader.setRowId(rowHeaderStr);					
 			}
 			return rowHeader;
 		}
@@ -327,9 +324,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public String getTableQuery() {
 		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
-			String[] parts = areaToken.split(TABLE_QUERY_PREFIX);
-			if(parts.length == 2) 
-				return parts[1];
+			return areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
 		}
 		return null;
 	}
