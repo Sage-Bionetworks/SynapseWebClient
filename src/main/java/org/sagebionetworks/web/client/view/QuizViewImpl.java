@@ -137,6 +137,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void clear() {
+		hideAll();
 		testContainer.clear();
 		questionIndex2AnswerIndices.clear();
 		hideLoading();
