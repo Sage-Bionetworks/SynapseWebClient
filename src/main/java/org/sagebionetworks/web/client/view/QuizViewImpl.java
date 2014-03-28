@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -74,7 +75,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
 	Map<Long, List<Long>> questionIndex2AnswerIndices; 
-	
+	private int currentQuestionCount;
 	
 	@Inject
 	public QuizViewImpl(Binder uiBinder, IconsImageBundle icons,
@@ -149,6 +150,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		quizHighlightBox.setAttribute("title", quizHeader);
 		//clear old questions
 		clear();
+		currentQuestionCount = quiz.size();
 		int questionNumber = 1;
 		for (Question question : quiz) {
 			testContainer.add(addQuestion(questionNumber++, question));
@@ -161,7 +163,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 				@Override
 				public void onClick(ClickEvent event) {
 					//gather answers and pass them back to the presenter
-					presenter.submitAnswers(questionIndex2AnswerIndices);
+					if (questionIndex2AnswerIndices.keySet().size() < currentQuestionCount) {
+						showErrorMessage(DisplayConstants.ERROR_ALL_QUESTIONS_REQUIRED);
+					} else
+						presenter.submitAnswers(questionIndex2AnswerIndices);
 				}
 			});
 		}
