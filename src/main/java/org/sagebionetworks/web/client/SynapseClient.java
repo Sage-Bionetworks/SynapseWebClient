@@ -324,6 +324,8 @@ public interface SynapseClient extends RemoteService {
 		
 	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException;
 	
+	public String sendRowsToTable(String rowSet) throws RestServiceException;
+	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
 }

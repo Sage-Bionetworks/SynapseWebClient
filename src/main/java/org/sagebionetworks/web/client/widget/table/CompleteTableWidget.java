@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -34,6 +35,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 	
 	private TableEntity table;
 	private List<ColumnModel> columns;
+	private boolean canEdit = false;
 	
 	@Inject
 	public CompleteTableWidget(CompleteTableWidgetView view, 
@@ -49,12 +51,21 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 		view.setPresenter(this);
 	}	
 
-	public void configure(final TableEntity table) {
-		configure(table, null);
+	public void configure(TableEntity table, boolean canEdit) {
+		configure(table, canEdit, null, null, null);
 	}
 	
-	public void configure(final TableEntity table, final String query) {
+	public void configure(TableEntity table, boolean canEdit, String query, QueryChangeHandler queryChangeHandler) {
+		configure(table, canEdit, query, null, queryChangeHandler);
+	}
+	
+	public void configure(TableEntity table, final boolean canEdit, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
+		configure(table, canEdit, null, rowHeader, queryChangeHandler);
+	}
+	
+	private void configure(final TableEntity table, final boolean canEdit, final String query, final TableRowHeader rowHeader, final QueryChangeHandler queryChangeHandler) {
 		this.table = table;		
+		this.canEdit = canEdit;
 		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
 			public void onSuccess(List<String> result) {
@@ -63,8 +74,8 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 					for(String colStr : result) {
 						columns.add(new ColumnModel(adapterFactory.createNew(colStr)));
 					}
-										
-					view.configure(table, columns, query, true);
+					
+					view.configure(table, columns, canEdit, query, rowHeader, queryChangeHandler);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -74,7 +85,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 			}
 		});			
 	}
-	
+		
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
@@ -142,7 +153,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 						public void onSuccess(EntityWrapper result) {
 							try {						
 								table = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-								configure(table);
+								configure(table, canEdit);
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}							

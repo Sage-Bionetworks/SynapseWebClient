@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,6 +48,8 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.EventBus;
@@ -78,7 +82,9 @@ public class EntityPageTopTest {
 	ArgumentCaptor<Synapse> capture;
 	Synapse gotoPlace;
 	EntityBundle projectBundle;
-	Project projectEntity = new Project();
+	Project projectEntity = new Project();		
+	AreaChangeHandler areaChangeHandler;	
+
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -97,6 +103,8 @@ public class EntityPageTopTest {
 		mockEventBus = mock(EventBus.class);
 		mockJiraURLHelper = mock(JiraURLHelper.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
+		areaChangeHandler = mock(AreaChangeHandler.class);
+		
 		pageTop = new EntityPageTop(mockView, mockSynapseClient,
 				mockNodeModelCreator, mockAuthenticationController,
 				mockSchemaCache,
@@ -104,6 +112,7 @@ public class EntityPageTopTest {
 				mockIconsImageBundle, 
 				mockWidgetRegistrar, 
 				mockGlobalApplicationState, mockEventBus, new JSONObjectAdapterImpl());
+		pageTop.setAreaChangeHandler(areaChangeHandler);
 		
 		// Setup the the entity
 		entity = new ExampleEntity();
@@ -326,6 +335,96 @@ public class EntityPageTopTest {
 		EntityDeletedEvent event = new EntityDeletedEvent(id);
 		pageTop.entityDeleted(event);		
 	}
+
+	@Test 
+	public void testSetArea() {
+		String areaToken = "token";
+		pageTop.setArea(EntityArea.FILES, areaToken);
+		verify(areaChangeHandler).areaChanged(EntityArea.FILES, areaToken);
+	}
+	
+	@Test
+	public void testSetTableQuery() {
+		String query = "query";
+		pageTop.setTableQuery(query);		
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(query));		
+	}
+	
+	@Test
+	public void testSetTableRow() {
+		String rowId="9999";
+		TableRowHeader header = new TableRowHeader(rowId, null);
+		pageTop.setTableRow(header);		
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(rowId));		
+	}
+	
+	@Test
+	public void testSetTableRowVersion() {
+		String rowId="9999";
+		String version="8888";
+		TableRowHeader header = new TableRowHeader(rowId, version);
+		pageTop.setTableRow(header);		
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(rowId));		
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(version));
+	}
+	
+	@Test
+	public void testGetTableRowHeader() {
+		String rowAreaToken;
+		TableRowHeader rh;
+
+		rowAreaToken = null;
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, rowAreaToken);		
+		rh = pageTop.getTableRowHeader();
+		assertNull(rh);
+
+		rowAreaToken = "something else";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, rowAreaToken);		
+		rh = pageTop.getTableRowHeader();
+		assertNull(rh);
+		
+		rowAreaToken = "row/9999";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, rowAreaToken);		
+		rh = pageTop.getTableRowHeader();
+		assertEquals("9999", rh.getRowId());
+		assertNull(rh.getVersion());
+		
+		rowAreaToken = "row/9999/rowversion/8888";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, rowAreaToken);		
+		rh = pageTop.getTableRowHeader();
+		assertEquals("9999", rh.getRowId());
+		assertEquals("8888", rh.getVersion());
+		
+	}
+	
+	@Test
+	public void testGetTableQuery() {
+		String queryAreaToken;
+		String query;
+
+		queryAreaToken = null;
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
+		query = pageTop.getTableQuery();
+		assertNull(query);
+		
+		queryAreaToken = "something else";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
+		query = pageTop.getTableQuery();
+		assertNull(query);
+
+		queryAreaToken = "query/SELECT * FROM syn123 LIMIT 1";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
+		query = pageTop.getTableQuery();
+		assertEquals("SELECT * FROM syn123 LIMIT 1", query);
+		
+		queryAreaToken = "query/SELECT 'query/' FROM syn123 LIMIT 1";
+		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
+		query = pageTop.getTableQuery();
+		assertEquals("SELECT 'query/' FROM syn123 LIMIT 1", query);
+		
+	}
+	
+	
 	
 	/*
 	 * Private Methods

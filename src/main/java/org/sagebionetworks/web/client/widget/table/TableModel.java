@@ -6,6 +6,9 @@ import java.util.Map;
 import com.google.gwt.view.client.ProvidesKey;
 
 public class TableModel implements Comparable<TableModel> {
+	
+	public static final String TEMP_ID_PREFIX = "__tm";
+	
 	// The key provider that provides the unique ID of a contact.
 	public static final ProvidesKey<TableModel> KEY_PROVIDER = new ProvidesKey<TableModel>() {
 		@Override
@@ -19,10 +22,10 @@ public class TableModel implements Comparable<TableModel> {
 	private Map<String, String> map;
 
 	/**
-	 * Construct TableModel with default id
+	 * Construct TableModel with default (temp) id
 	 */
 	public TableModel() {
-		this("tm" + String.valueOf(++sequence));
+		this(TEMP_ID_PREFIX + String.valueOf(++sequence));
 	}
 
 	/**
@@ -34,6 +37,14 @@ public class TableModel implements Comparable<TableModel> {
 		map = new HashMap<String, String>();
 	}
 
+	/**
+	 * This should only be used to set the id for a new row that has finally acquired a rowId from the system
+	 * @param id
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -51,5 +62,5 @@ public class TableModel implements Comparable<TableModel> {
 	public void put(String key, String value) {
 		map.put(key, value);
 	}
-
+	
 }

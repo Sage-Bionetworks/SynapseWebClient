@@ -14,18 +14,18 @@ public class QueryDetails implements IsSerializable {
 	
 	private Long offset;
 	private Long limit;
-	private String sortedColumnId;
+	private String sortedColumnName;
 	private SortDirection sortDirection;
 		
 	public QueryDetails() {		
 	}
 	
-	public QueryDetails(Long offset, Long limit, String sortedColumnId,
+	public QueryDetails(Long offset, Long limit, String sortedColumnName,
 			SortDirection sortDirection) {
 		super();
 		this.offset = offset;
 		this.limit = limit;
-		this.sortedColumnId = sortedColumnId;
+		this.sortedColumnName = sortedColumnName;
 		this.sortDirection = sortDirection;
 	}
 
@@ -45,12 +45,12 @@ public class QueryDetails implements IsSerializable {
 		this.limit = limit;
 	}
 
-	public String getSortedColumnId() {
-		return sortedColumnId;
+	public String getSortedColumnName() {
+		return sortedColumnName;
 	}
 
-	public void setSortedColumnId(String sortedColumnId) {
-		this.sortedColumnId = sortedColumnId;
+	public void setSortedColumnName(String sortedColumnName) {
+		this.sortedColumnName = sortedColumnName;
 	}
 
 	public SortDirection getSortDirection() {
@@ -70,7 +70,7 @@ public class QueryDetails implements IsSerializable {
 		result = prime * result
 				+ ((sortDirection == null) ? 0 : sortDirection.hashCode());
 		result = prime * result
-				+ ((sortedColumnId == null) ? 0 : sortedColumnId.hashCode());
+				+ ((sortedColumnName == null) ? 0 : sortedColumnName.hashCode());
 		return result;
 	}
 
@@ -95,10 +95,10 @@ public class QueryDetails implements IsSerializable {
 			return false;
 		if (sortDirection != other.sortDirection)
 			return false;
-		if (sortedColumnId == null) {
-			if (other.sortedColumnId != null)
+		if (sortedColumnName == null) {
+			if (other.sortedColumnName != null)
 				return false;
-		} else if (!sortedColumnId.equals(other.sortedColumnId))
+		} else if (!sortedColumnName.equals(other.sortedColumnName))
 			return false;
 		return true;
 	}
@@ -106,7 +106,7 @@ public class QueryDetails implements IsSerializable {
 	@Override
 	public String toString() {
 		return "QueryDetails [offset=" + offset + ", limit=" + limit
-				+ ", sortedColumnId=" + sortedColumnId + ", sortDirection="
+				+ ", sortedColumnName=" + sortedColumnName + ", sortDirection="
 				+ sortDirection + "]";
 	}
 	

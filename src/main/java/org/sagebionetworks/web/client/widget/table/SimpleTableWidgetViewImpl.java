@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.repo.model.table.TableStatus;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -39,6 +41,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -83,7 +86,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	SageImageBundle sageImageBundle;
 	CellTable<TableModel> cellTable;
-	SimplePager pager;
+	MySimplePager pager;
 	private List<ColumnModel> columns;
 	ListHandler<TableModel> sortHandler;
 	SelectionModel<TableModel> selectionModel;
@@ -94,9 +97,16 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	RowSet initialLoad = null;
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
+	TableModel newRow = null;
+	SynapseJSNIUtils jsniUtils;
+	
+	List<TableModel> currentPage;
 	
 	@Inject
-	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle) {
+	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
+		this.sageImageBundle = sageImageBundle;
+		this.jsniUtils = jsniUtils;
+		
 		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -106,65 +116,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		tableContainer.addStyleName("tableMinWidth");
 		
 	    // setup DataProvider for pagination/sorting
-		dataProvider = new AsyncDataProvider<TableModel>() {
-			@Override
-			protected void onRangeChanged(HasData<TableModel> display) {
-				// skip query if table was just built
-				if (initialLoad != null) {
-					updateData(new Range(initialDetails.getOffset().intValue(), initialDetails.getLimit().intValue()), initialLoad);
-					initialLoad = null;
-					initialDetails = null;
-					return;
-				}
-
-				// extract sorted column
-				String sortedColumnId = null;
-				QueryDetails.SortDirection sortDirection = null;
-				ColumnSortList sortList = cellTable.getColumnSortList();
-				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
-					ColumnSortInfo columnSortInfo = sortList.get(0);
-					ColumnModel model = columnToModel.get(columnSortInfo
-							.getColumn());
-					if (model != null) {
-						sortedColumnId = model.getId();
-						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
-					}
-				}
-
-				final Range range = display.getVisibleRange();
-				Long offset = new Long(range.getStart());
-				Long limit = new Long(range.getLength());
-				
-				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
-					@Override
-					public void onSuccess(RowSet rowData) {
-						updateData(range, rowData);
-					}
-	
-					@Override
-					public void onFailure(Throwable caught) {
-						showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-					}
-				});
-			}
-	      
-			private void updateData(final Range range, RowSet rowData) {
-				// convert to Table Model (map)
-				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
-			        List<TableModel> returnedData = new ArrayList<TableModel>();
-			        for(Row row : rowData.getRows()) {
-			        	TableModel model = new TableModel();
-			        	for(int i=0; i<rowData.getHeaders().size(); i++) {				        		
-			        		model.put(rowData.getHeaders().get(i), row.getValues().get(i));
-			        	}
-			        	returnedData.add(model);
-			        }
-			        updateRowData(range.getStart(), returnedData);
-			        hideLoading();
-				}
-			}
-
-	    };
+		dataProvider = createAsyncDataProvider();
 
 	}
 	
@@ -204,10 +156,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryField.setValue(query);
 	}
 
-	
-	/*
-	 * SynapseView methods
-	 */
+	@Override
+	public void insertNewRow(TableModel model) {
+		newRow = model;
+		currentPage.add(0, model);
+		cellTable.setRowData(currentPage); // causes onRangeChange event
+	}
+
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -304,21 +259,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		errorMessage.setVisible(true);
 	}
 
-	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
-		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
-	}
-
 	@Override
-	public void showQueryProblem(QueryProblem problem, String message) {
+	public void showQueryProblem(String message) {
 		hideLoading();
-		if(problem == QueryProblem.UNRECOGNIZED_COLUMN) 
-			queryFeedback.setText("Unrecognized column: " + message);
-		else 
-			queryFeedback.setText("Query Error: " + message);
+		queryFeedback.setText("Query Error - : " + message);
 		queryFeedback.setVisible(true);
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}
-
 	
 	/*
 	 * Private Methods
@@ -359,7 +306,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		queryField.setEnabled(false);
 		presenter.query(queryField.getValue());
 	}
-
 	
 	private void buildTable(int pageSize) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
@@ -381,7 +327,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		// Create a Pager to control the table.
 		SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
-		pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+		pager = new MySimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 		pager.setDisplay(cellTable);
 		pagerContainer.setWidget(pager);
 
@@ -412,8 +358,20 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}		
 		
 		// Table's columns
+		RowUpdater rowUpdater = new RowUpdater() {			
+			@Override
+			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
+				presenter.updateRow(row, callback);			
+				
+			}
+		};
+		
+		// attempt to get view width
+		int windowWidth = Window.getClientWidth();
+		
+		
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableUtils.getColumn(model, sortHandler, canEdit);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			
@@ -428,6 +386,70 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}
 	}
 
+	private AsyncDataProvider<TableModel> createAsyncDataProvider() {
+		return new AsyncDataProvider<TableModel>() {
+			@Override
+			protected void onRangeChanged(HasData<TableModel> display) {
+				// skip query if table was just built
+				if (initialLoad != null) {
+					updateData(new Range(initialDetails.getOffset().intValue(), initialDetails.getLimit().intValue()), initialLoad);
+					initialLoad = null;
+					initialDetails = null;
+					return;
+				}
+
+				// skip query if a new row was inserted
+				if(newRow != null) {
+					newRow = null;
+					return;
+				}
+				
+				// extract sorted column
+				String sortedColumnName = null;
+				QueryDetails.SortDirection sortDirection = null;
+				ColumnSortList sortList = cellTable.getColumnSortList();
+				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
+					ColumnSortInfo columnSortInfo = sortList.get(0);
+					ColumnModel model = columnToModel.get(columnSortInfo
+							.getColumn());
+					if (model != null) {
+						sortedColumnName = model.getName();
+						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
+					}
+				}
+
+				final Range range = display.getVisibleRange();
+				Long offset = new Long(range.getStart());
+				Long limit = new Long(range.getLength());
+				
+				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnName, sortDirection), new AsyncCallback<RowSet>() {
+					@Override
+					public void onSuccess(RowSet rowData) {
+						updateData(range, rowData);
+					}
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+					}
+				});
+			}
+			
+			private void updateData(final Range range, RowSet rowData) {
+				// convert to Table Model (map)
+				if(rowData != null && rowData.getHeaders() != null && rowData.getHeaders().size() > 0) {
+			        currentPage = new ArrayList<TableModel>();
+			        for(Row row : rowData.getRows()) {			        				        	
+			        	currentPage.add(TableUtils.convertRowToModel(rowData.getHeaders(), row));
+			        }
+			        updateRowData(range.getStart(), currentPage);
+			        hideLoading();
+				}
+			}
+	    };
+	}
+
+	
 	private HTML getLoadingWidget() {
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
 		widget.addStyleName("margin-top-15 center");
@@ -437,5 +459,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private String getWaitingString(int remainingSec) {
 		return "&nbsp;" + DisplayConstants.WAITING + " " + remainingSec + "s...";
 	}
-	
+
+	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
+		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+	}
+
 }

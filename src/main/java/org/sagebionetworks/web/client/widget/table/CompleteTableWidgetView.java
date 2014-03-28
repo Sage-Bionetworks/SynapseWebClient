@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -27,7 +28,7 @@ public interface CompleteTableWidgetView extends IsWidget, SynapseView {
 
 	}
 
-	public void configure(TableEntity table, List<ColumnModel> columns, String queryString, boolean canEdit);
+	public void configure(TableEntity table, List<ColumnModel> columns, boolean canEdit, String queryString, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler);
 	
 	
 }

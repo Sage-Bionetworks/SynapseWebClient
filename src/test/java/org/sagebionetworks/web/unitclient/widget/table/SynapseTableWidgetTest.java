@@ -45,7 +45,7 @@ public class SynapseTableWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		tableWidget.configure(table);		
+		tableWidget.configure(table, false);		
 	}
 
 }
