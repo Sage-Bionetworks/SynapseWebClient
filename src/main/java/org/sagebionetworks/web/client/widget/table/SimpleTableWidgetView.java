@@ -51,7 +51,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	
 	public void showTableUnavailable(TableStatus status, Integer percentComplete);
 
-	public void showQueryProblem(QueryProblem problem, String message);
+	public void showQueryProblem(String message);
 
 	public void insertNewRow(TableModel model);
 }

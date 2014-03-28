@@ -7,14 +7,6 @@ import org.sagebionetworks.repo.model.table.Row;
 
 public class TableUtils {
 
-	public static QueryProblem parseQueryProblem(String message) {
-		if(message.contains("blah")) {
-			return QueryProblem.UNRECOGNIZED_COLUMN;
-		} else {
-			return QueryProblem.UNKNOWN;
-		}
-	}
-	
 	public static TableModel convertRowToModel(List<String> headers, Row row) {
 		if(headers == null || row == null) return null;		
 		String id = row.getRowId() != null ? row.getRowId().toString() : null;		

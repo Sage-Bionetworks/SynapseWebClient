@@ -260,12 +260,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 
 	@Override
-	public void showQueryProblem(QueryProblem problem, String message) {
+	public void showQueryProblem(String message) {
 		hideLoading();
-		if(problem == QueryProblem.UNRECOGNIZED_COLUMN) 
-			queryFeedback.setText("Unrecognized column: " + message);
-		else 
-			queryFeedback.setText("Query Error: " + message);
+		queryFeedback.setText("Query Error - : " + message);
 		queryFeedback.setVisible(true);
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}

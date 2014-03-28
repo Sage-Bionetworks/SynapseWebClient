@@ -213,8 +213,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					}
 					view.showTableUnavailable(status, progress);
 				} else if(caught instanceof BadRequestException) {
-						QueryProblem problem = TableUtils.parseQueryProblem(caught.getMessage());
-						view.showQueryProblem(problem, caught.getMessage());
+						view.showQueryProblem(caught.getMessage());
 				} else {
 					if(updateCallback != null) updateCallback.onFailure(caught);
 					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
