@@ -80,6 +80,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			isFirstDefault = true;
 			this.currentQuery = getDefaultQuery(tableEntityId);	
 		} else {
+			isFirstDefault = false;
 			this.currentQuery = queryString;
 		}
 		
@@ -258,7 +259,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						rrs = new RowReferenceSet(adapterFactory.createNew(result));
 						currentEtag = rrs.getEtag();
 					} catch (JSONObjectAdapterException e) {
-						e.printStackTrace();
+						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+						callback.onFailure(e);
 					}
 					callback.onSuccess(rrs);
 				}

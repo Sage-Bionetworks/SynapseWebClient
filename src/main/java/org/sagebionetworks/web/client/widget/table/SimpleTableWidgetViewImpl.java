@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -40,6 +41,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -96,11 +98,15 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
 	TableModel newRow = null;
+	SynapseJSNIUtils jsniUtils;
 	
 	List<TableModel> currentPage;
 	
 	@Inject
-	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle) {
+	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
+		this.sageImageBundle = sageImageBundle;
+		this.jsniUtils = jsniUtils;
+		
 		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
 
@@ -362,6 +368,11 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				
 			}
 		};
+		
+		// attempt to get view width
+		int windowWidth = Window.getClientWidth();
+		
+		
 		for(ColumnModel model : columns) {
 			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
 			cellTable.addColumn(column, model.getName());
@@ -397,7 +408,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				}
 				
 				// extract sorted column
-				String sortedColumnId = null;
+				String sortedColumnName = null;
 				QueryDetails.SortDirection sortDirection = null;
 				ColumnSortList sortList = cellTable.getColumnSortList();
 				if (sortList.size() > 0 && sortList.get(0).getColumn() != null) {
@@ -405,7 +416,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					ColumnModel model = columnToModel.get(columnSortInfo
 							.getColumn());
 					if (model != null) {
-						sortedColumnId = model.getName();
+						sortedColumnName = model.getName();
 						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
 					}
 				}
@@ -414,7 +425,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				Long offset = new Long(range.getStart());
 				Long limit = new Long(range.getLength());
 				
-				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnId, sortDirection), new AsyncCallback<RowSet>() {
+				presenter.alterCurrentQuery(new QueryDetails(offset, limit, sortedColumnName, sortDirection), new AsyncCallback<RowSet>() {
 					@Override
 					public void onSuccess(RowSet rowData) {
 						updateData(range, rowData);

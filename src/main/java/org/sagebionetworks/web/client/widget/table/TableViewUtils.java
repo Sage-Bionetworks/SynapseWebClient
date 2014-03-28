@@ -200,8 +200,7 @@ public class TableViewUtils {
 									}
 								});
 							} catch(NumberFormatException e) {
-								// TODO : better way to alert view?
-								Window.alert("Number not valid: " + value);
+								view.showErrorMessage(DisplayConstants.NUMBER_NOT_VALID + ": "+ value);
 							}
 						}
 					});
