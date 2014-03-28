@@ -69,18 +69,18 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testGetQuestionaire() {
-		presenter.getQuestionaire();
+		presenter.getQuestionnaire();
 		verify(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
 		ArgumentCaptor<List> arg = ArgumentCaptor.forClass(List.class);
 		verify(mockView).showQuiz(anyString(), arg.capture());
-		//mock quiz has 2 variants of a single question, verify that a single question is passed to the view
-		assertEquals(1, arg.getValue().size());
+		//mock quiz has 3 questions, one having 2 variants, verify that a single question is passed to the view
+		assertEquals(3, arg.getValue().size());
 	}
 	
 	@Test
 	public void testGetQuestionaireFailure() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
-		presenter.getQuestionaire();
+		presenter.getQuestionnaire();
 		verify(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}

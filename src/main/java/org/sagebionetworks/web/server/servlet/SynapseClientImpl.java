@@ -1869,16 +1869,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public Boolean isCertifiedUser(String userId) throws RestServiceException {
-		//TODO: is this user a member of the bootstrapped group
+		//TODO: is this user already certified?
 //		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
-		Boolean isCertified = isTeamMember(userId, 3318979L);
+		Boolean isCertified = isTeamMember(userId, 3318980L);
 		return isCertified;
 	}
 	
 	@Override
 	public String getCertificationDate(String userId) throws RestServiceException {
-		//if so, when did this user pass the certification test
-		String dateJoined = "TODO: " + certificateDateFormatter.format(new Date());
+		//if certified, when did this user pass the certification test
+		String dateJoined = certificateDateFormatter.format(new Date()) + " (todo)";
 		return dateJoined;
 	}
 	
@@ -2682,7 +2682,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
 		
 		return pageName2WikiKeyMap;
 	}

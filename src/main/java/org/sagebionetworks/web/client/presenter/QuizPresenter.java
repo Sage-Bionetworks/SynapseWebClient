@@ -138,11 +138,31 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.testPlace = place;
 		view.setPresenter(this);
 		view.clear();
-		//ask for questions/answers and pass to view
-		getQuestionaire();
+		getIsCertified();
 	}
 	
-	public void getQuestionaire() {
+	public void getIsCertified() {
+		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isCertified) {
+				//if certified, show the certificate again
+				//otherwise, show the questionnaire
+				if (isCertified) {
+					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
+				} else {
+					getQuestionnaire();
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			}
+		});
+	}
+	
+	public void getQuestionnaire() {
 		synapseClient.getCertificationQuestionnaire(new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String questionnaireJson) {

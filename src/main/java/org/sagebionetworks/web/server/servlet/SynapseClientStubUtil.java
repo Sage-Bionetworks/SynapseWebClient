@@ -206,6 +206,7 @@ public class SynapseClientStubUtil {
 	}
 	
 	public static Questionnaire mockQuestionnaire() {
+		
 		//the mock questionnaire has 2 varieties of a single question.  One will be randomly selected client-side.  One is exclusive, one is not.
 		Questionnaire questionnaire = new Questionnaire();
 		questionnaire.setHeader("Certification");
@@ -214,30 +215,71 @@ public class SynapseClientStubUtil {
 		List<Question> questionOptions = new ArrayList<Question>();
 		MultichoiceQuestion q1 = new MultichoiceQuestion();
 		q1.setExclusive(true);
-		q1.setQuestionIndex(0L);
-		q1.setPrompt("What... is the air-speed velocity of an unladen swallow?");
+		long questionIndex = 0;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("How is information organized in Synapse?");
 		List<MultichoiceAnswer> answers = new ArrayList<MultichoiceAnswer>();
 		long answerIndex = 0L;
-		answers.add(getAnswer(answerIndex++, "42 m/s"));
-		answers.add(getAnswer(answerIndex++, "African or European?"));
-		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
+		answers.add(getAnswer(answerIndex++, "Projects"));
+		answers.add(getAnswer(answerIndex++, "Relationship"));
+		answers.add(getAnswer(answerIndex++, "Versioning"));
+		answers.add(getAnswer(answerIndex++, "Data sharing"));
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
-		
 		q1 = new MultichoiceQuestion();
-		q1.setExclusive(false);
-		q1.setQuestionIndex(1L);
-		q1.setPrompt("What... is the air-speed velocity of an unladen finch?");
+		q1.setExclusive(true);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("Who can have an account on Synapse?");
 		answers = new ArrayList<MultichoiceAnswer>();
 		answerIndex = 0L;
-		answers.add(getAnswer(answerIndex++, "18 m/s"));
-		answers.add(getAnswer(answerIndex++, "This is silly"));
-		answers.add(getAnswer(answerIndex++, "Huh? I... I don't know that!"));
+		answers.add(getAnswer(answerIndex++, "Anyone over 13 years old"));
+		answers.add(getAnswer(answerIndex++, "only researchers in an accredited academic institution"));
+		answers.add(getAnswer(answerIndex++, "only European data privacy regulators"));
+		answers.add(getAnswer(answerIndex++, "only people working at not-for-profit research organizations"));
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
 		
 		qv.setQuestionOptions(questionOptions);
 		questionVarieties.add(qv);
+		
+		qv = new QuestionVariety();
+		questionOptions = new ArrayList<Question>();
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(true);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("What... is the air-speed velocity of an unladen swallow?");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "42 m/s"));
+		answers.add(getAnswer(answerIndex++, "African or European?"));
+		answers.add(getAnswer(answerIndex++, "Huh?  I don't know that!"));
+		
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		
+		qv = new QuestionVariety();
+		questionOptions = new ArrayList<Question>();
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(false);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("Mark each of the following statements about downloading data as true or false:");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Data marked as having no Conditions for Use can be downloaded with no additional requirements."));
+		answers.add(getAnswer(answerIndex++, "Controlled Use data can be downloaded without contacting Sage Bionetworks' Access and Compliance Team if the user has IRB approval already."));
+		answers.add(getAnswer(answerIndex++, "Restricted Use data requires agreement to certain terms of use, but no IRB approval"));
+		answers.add(getAnswer(answerIndex++, "I can freely share any data, no matter what Conditions for Use, downloaded from Synapse with my collaborators."));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		
+		
 		questionnaire.setQuestions(questionVarieties);
 		return questionnaire;
 	}
