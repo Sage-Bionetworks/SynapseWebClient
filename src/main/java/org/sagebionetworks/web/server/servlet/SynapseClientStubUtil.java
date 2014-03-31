@@ -239,6 +239,18 @@ public class SynapseClientStubUtil {
 		answers.add(getAnswer(answerIndex++, "only people working at not-for-profit research organizations"));
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(false);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("If I have any questions about Synapse I can do the following:");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Send an email to synapseInfo@sagebase.org"));
+		answers.add(getAnswer(answerIndex++, "Ask questions in the Synpase support forum"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		
 		
 		qv.setQuestionOptions(questionOptions);
 		questionVarieties.add(qv);
@@ -267,13 +279,12 @@ public class SynapseClientStubUtil {
 		q1.setExclusive(false);
 		questionIndex++;
 		q1.setQuestionIndex(questionIndex);
-		q1.setPrompt("Mark each of the following statements about downloading data as true or false:");
+		q1.setPrompt("Mark the following statements true or false about interacting with Synapse:");
 		answers = new ArrayList<MultichoiceAnswer>();
 		answerIndex = 0L;
-		answers.add(getAnswer(answerIndex++, "Data marked as having no Conditions for Use can be downloaded with no additional requirements."));
-		answers.add(getAnswer(answerIndex++, "Controlled Use data can be downloaded without contacting Sage Bionetworks' Access and Compliance Team if the user has IRB approval already."));
-		answers.add(getAnswer(answerIndex++, "Restricted Use data requires agreement to certain terms of use, but no IRB approval"));
-		answers.add(getAnswer(answerIndex++, "I can freely share any data, no matter what Conditions for Use, downloaded from Synapse with my collaborators."));
+		answers.add(getAnswer(answerIndex++, "Synapse only has a web interface"));
+		answers.add(getAnswer(answerIndex++, "Synapse has a set of programmatic clients in addition to the web client"));
+		answers.add(getAnswer(answerIndex++, "I can <b>only</b> upload or download data via the web client"));
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
 		qv.setQuestionOptions(questionOptions);

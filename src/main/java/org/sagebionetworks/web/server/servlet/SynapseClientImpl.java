@@ -1877,8 +1877,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String getCertificationDate(String userId) throws RestServiceException {
-		//if certified, when did this user pass the certification test
-		String dateJoined = certificateDateFormatter.format(new Date()) + " (todo)";
+		//TODO: if certified, when did this user pass the certification test 
+		String dateJoined = certificateDateFormatter.format(new Date());
 		return dateJoined;
 	}
 	
