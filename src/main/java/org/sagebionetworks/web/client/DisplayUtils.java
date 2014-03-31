@@ -370,31 +370,8 @@ public class DisplayUtils {
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			String reason = ex.getMessage();			
-			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
-			if(reason.matches(".*entity with the name: .+ already exites.*")) {
-				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			} else {
-				RegExp regEx = RegExp.compile(".*Name.+is already used.*", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null)
-					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
-			}
-			
-			//final attempt to communicate a more relevant message. do this by looking for the "reason" stated in the response
-			if (DisplayConstants.ERROR_BAD_REQUEST_MESSAGE.equals(message)) {
-				//look for something in the form: "reason":"This is the reason for the error"
-				RegExp regEx = RegExp.compile("\"reason\"\\s*:\\s*\"(.+)\"", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null && matchResult.getGroupCount()==2) {
-					String parsedReason = matchResult.getGroup(1);
-					if (parsedReason != null && parsedReason.trim().length() > 0) {
-						message = parsedReason;
-					}
-				}
-			}
-			
-			view.showErrorMessage(message);
+			//exception handling on the backend now throws the reason into the exception message.  Easy!
+			view.showErrorMessage(ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
