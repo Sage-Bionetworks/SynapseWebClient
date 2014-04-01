@@ -60,11 +60,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel myTeamsPanel;
 	@UiField
 	SimplePanel myTeamInvitesPanel;
-	
-	@UiField
-	SimplePanel notificationsPanel;
-	@UiField
-	CheckBox emailNotificationsCheckbox;
 
 	@UiField
 	FlowPanel editProfileButtonPanel;
@@ -127,20 +122,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createEditProfileCommandsPanel();
 		
 		picturePanel.clear();
-		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
-		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 	}
-	
-	private ClickHandler getNotificationsClickHandler() {
-		return new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//update notification settings
-				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
-			}
-		};
-	}
-
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
@@ -177,7 +159,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
 			updateViewProfile(profile, isOwner);
 			viewProfilePanel.add(profileWidget);
-			notificationsPanel.setVisible(isOwner);
+			
 			if (isOwner) {
 				editProfileButtonPanel.add(editProfileButton);
 				editProfileButtonPanel.add(linkedInButtonViewProfile);
@@ -190,12 +172,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}, (CallbackP)null);
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
-				
-				boolean isNotify = true;
-				if(profile.getNotificationSettings() != null) {
-					isNotify = profile.getNotificationSettings().getSendEmailNotifications();
-				}
-				emailNotificationsCheckbox.setValue(isNotify, false);
 			}
 		}
 	}
@@ -380,6 +356,5 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		editPicturePanel.clear();
 		editPictureButtonPanel.clear();
-		notificationsPanel.setVisible(false);
 	}
 }

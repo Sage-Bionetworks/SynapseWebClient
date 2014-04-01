@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -31,6 +34,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private NodeModelCreator nodeModelCreator;
+	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	
 	private String apiKey = null;
@@ -42,7 +46,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookieProvider,
 			NodeModelCreator nodeModelCreator,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -50,6 +55,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
+		this.adapterFactory = adapterFactory;
 		view.setPresenter(this);
 	}
 
@@ -88,6 +94,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		} else {
 			view.setApiKey(apiKey);
 		}
+		
+		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	@Override
@@ -196,6 +204,50 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
+	}
+	
+	@Override
+	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead){
+		//get my profile
+		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userProfileJson) {
+				try {
+					final UserProfile myProfile = new UserProfile(adapterFactory.createNew(userProfileJson));
+					org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
+					if (settings == null) {
+						settings = new org.sagebionetworks.repo.model.message.Settings();
+						settings.setMarkEmailedMessagesAsRead(false);
+						settings.setSendEmailNotifications(true);
+						myProfile.setNotificationSettings(settings);
+					}
+					settings.setSendEmailNotifications(sendEmailNotifications);
+					settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
+					JSONObjectAdapter adapter = myProfile.writeToJSONObject(adapterFactory.createNew());
+					userProfileJson = adapter.toJSONString();
+					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+							authenticationController.updateCachedProfile(myProfile);
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(caught.getMessage());
+						}
+					});
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}    				
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			}
+		});
 	}
 	
 	private void showView(Settings place) {
