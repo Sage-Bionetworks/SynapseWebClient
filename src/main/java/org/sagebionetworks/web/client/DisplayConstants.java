@@ -424,6 +424,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String INVALID_USERNAME_MESSAGE = "Please enter a valid username";
 	public static final String SHOW_EXPAND = "Show Expand";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
 	public static final String DEPTH_LABEL = "Depth";

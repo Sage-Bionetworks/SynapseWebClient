@@ -56,6 +56,13 @@
 					        <input ui:field="moreInfoField" type="text" class="form-control" placeholder="Enter link to more info"></input>
 		   				</div>
 		   			</div>
+		   			<div class="col-sm-6">
+					    <div class="form-group margin-bottom-10">
+					        <label>Username</label>
+					        <input ui:field="userNameField" type="text" class="form-control" placeholder="Enter username"></input>
+		   				</div>
+		   			</div>
+		   			
 		   		</div>
 		   		<div class="row">
 		   			<div class="col-sm-12">

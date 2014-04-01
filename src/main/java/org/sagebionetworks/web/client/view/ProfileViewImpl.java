@@ -286,12 +286,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		 builder.appendHtmlConstant("<h2>");
 		 builder.appendEscapedLines(name);
-		 
-		 //add a change username link if owner
-		 if (isOwner) {
-			 builder.appendHtmlConstant("<small class=\"smallestText\"> (<a class=\"link\" href=\""+DisplayUtils.getLoginPlaceHistoryToken(LoginPlace.CHANGE_USERNAME)+"\">change username</a>)</small>");	 
-		 }
-		 
 		 builder.appendHtmlConstant("</h2>");
 		 
 		 if (position.length()>0 || company.length()>0) {

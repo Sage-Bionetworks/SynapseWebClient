@@ -36,6 +36,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	@UiField
 	InputElement lastNameField;
 	@UiField
+	InputElement userNameField;
+	
+	@UiField
 	InputElement currentPositionField;
 	@UiField
 	InputElement currentAffiliationField;
@@ -108,7 +111,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(okButton);
-		 presenter.updateProfile(trim(firstNameField.getValue()), trim(lastNameField.getValue()), trim(bioField.getValue()), trim(currentPositionField.getValue()), trim(locationField.getValue()), trim(industryField.getValue()), trim(currentAffiliationField.getValue()), null, null, null, trim(moreInfoField.getValue()));
+		 presenter.updateProfile(trim(firstNameField.getValue()), trim(lastNameField.getValue()), trim(bioField.getValue()), trim(currentPositionField.getValue()), trim(locationField.getValue()), trim(industryField.getValue()), trim(currentAffiliationField.getValue()), null, null, null, trim(moreInfoField.getValue()), trim(userNameField.getValue()));
 	 }
 	 
 	 private String trim(String value) {
@@ -127,6 +130,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		 bioField.setValue(profile.getSummary());
 		 locationField.setValue(profile.getLocation());
 		 moreInfoField.setValue(profile.getUrl());
+		 userNameField.setValue(profile.getUserName());
 	 }
 		 
 
