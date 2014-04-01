@@ -19,15 +19,15 @@
 			<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<div class="container">
-			<div class="row" style="margin-top: 5px !important">
-				<div class="col-md-9" style="white-space: normal;">
-							<g:SimplePanel ui:field="breadcrumbsPanel"/>
-						</div>
-				<div class="col-md-3 user-profile-linkedin-bar">
-							<g:SimplePanel ui:field="editProfileButtonPanel" />
-						</div>
-					</div>
-					
+			<div class="row margin-top-5">
+				<div class="col-md-3" style="white-space: normal;">
+					<g:SimplePanel ui:field="breadcrumbsPanel"/>
+				</div>
+				<div class="col-md-9">
+					<g:FlowPanel ui:field="editProfileButtonPanel" />
+				</div>
+			</div>
+			
 			<div class="row">
 				<div class="col-md-3 col-sm-4 col-xs-12">
 						<g:SimplePanel ui:field="pictureCanvasPanel"/>
@@ -41,15 +41,21 @@
 							       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
 							    </g:FlowPanel>
 							</g:SimplePanel>
-						</div>
-					</div>
-			<div class="user-profile-linkedin-bar">
-						<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-					</div>
-						<g:SimplePanel ui:field="updateUserInfoPanel" />
-					
-					<p>&nbsp;</p>
 				</div>
+			</div>
+			<div class="row margin-top-5">
+			    <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-20">
+		        	<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+				</div>
+				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+					<g:SimplePanel ui:field="updateUserInfoPanel" />
+				</div>
+			</div>
+			<div class="row margin-top-5">				
+				
+			</div>
+			<p>&nbsp;</p>
+		</div>
 					
 <!-- start footer -->
             <div class="clear"></div>

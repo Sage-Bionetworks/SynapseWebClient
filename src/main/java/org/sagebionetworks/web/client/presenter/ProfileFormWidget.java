@@ -7,11 +7,16 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,18 +30,21 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	private JSONObjectAdapter jsonObjectAdapter;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private AdapterFactory adapterFactory;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
 	public ProfileFormWidget(ProfileFormView view,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
+			GlobalApplicationState globalApplicationState,
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 	
@@ -60,61 +68,78 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		return view.asWidget();
 	}
 	
+	public static boolean isValidUrl(String url, boolean isUndefinedUrlValid) {
+		if (url == null || url.trim().length() == 0) {
+			//url is undefined
+			return isUndefinedUrlValid;
+		}
+		RegExp regEx = RegExp.compile(WebConstants.VALID_URL_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(url);
+		//the entire string must match (group 0 is the whole matched string)
+		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
+	}
+
 	@Override
 	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {				
 		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
-				//get the owner profile (may or may not be currently set
-				ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-					@Override
-					public void onSuccess(UserProfile profile) {
-						try {
-							ownerProfile = profile;
-							ownerProfile.setFirstName(firstName);
-							ownerProfile.setLastName(lastName);
-							ownerProfile.setSummary(summary);
-							ownerProfile.setPosition(position);
-							ownerProfile.setLocation(location);
-							ownerProfile.setIndustry(industry);
-							ownerProfile.setCompany(company);
-							ownerProfile.setDisplayName(firstName + " " + lastName);
-							if (teamName != null)
-								ownerProfile.setTeamName(teamName);
-							if (url != null)
-								ownerProfile.setUrl(url);
-							final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
-							if (isUpdatingEmail) {
-								ownerProfile.setEmail(email);
-							}
-								
-							if (pic != null)
-								ownerProfile.setPic(pic);
-							
-							JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-							String userProfileJson = adapter.toJSONString();
-
-							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-								@Override
-								public void onSuccess(Void result) {
-									view.showUserUpdateSuccess();
-									updateLoginInfo(currentUser);	
+				//check for valid url
+				if (isValidUrl(url, true)) {
+					//get the owner profile (may or may not be currently set
+					ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
+						@Override
+						public void onSuccess(UserProfile profile) {
+							try {
+								ownerProfile = profile;
+								ownerProfile.setFirstName(firstName);
+								ownerProfile.setLastName(lastName);
+								ownerProfile.setSummary(summary);
+								ownerProfile.setPosition(position);
+								ownerProfile.setLocation(location);
+								ownerProfile.setIndustry(industry);
+								ownerProfile.setCompany(company);
+								ownerProfile.setDisplayName(firstName + " " + lastName);
+								if (teamName != null)
+									ownerProfile.setTeamName(teamName);
+								if (url != null)
+									ownerProfile.setUrl(url);
+								final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
+								if (isUpdatingEmail) {
+									ownerProfile.setEmail(email);
 								}
+									
+								if (pic != null)
+									ownerProfile.setPic(pic);
 								
-								@Override
-								public void onFailure(Throwable caught) {
-									view.userUpdateFailed();
-									profileUpdatedCallback.onFailure(caught);
-								}
-							});
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}    				
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						profileUpdatedCallback.onFailure(caught);
-					}
-				});
+								JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
+								String userProfileJson = adapter.toJSONString();
+	
+								synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+									@Override
+									public void onSuccess(Void result) {
+										view.showUserUpdateSuccess();
+										updateLoginInfo(currentUser);	
+									}
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										view.userUpdateFailed();
+										profileUpdatedCallback.onFailure(caught);
+									}
+								});
+							} catch (JSONObjectAdapterException e) {
+								onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+							}    				
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							profileUpdatedCallback.onFailure(caught);
+						}
+					});
+				} else {
+					//invalid url
+					view.showErrorMessage(DisplayConstants.INVALID_URL_MESSAGE);
+				}
 		}
 	}
 	
@@ -158,7 +183,10 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 			}
 			
 			public void sendSuccessMessageBackToOwner() {
-				profileUpdatedCallback.profileUpdateSuccess();
+				if (profileUpdatedCallback != null)
+					profileUpdatedCallback.profileUpdateSuccess();
+				else 
+					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 			}
 		};
 

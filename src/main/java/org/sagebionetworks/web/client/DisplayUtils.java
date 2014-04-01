@@ -422,7 +422,6 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
-
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service

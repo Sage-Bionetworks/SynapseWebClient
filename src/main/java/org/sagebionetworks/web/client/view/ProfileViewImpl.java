@@ -8,7 +8,7 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -24,11 +24,8 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,11 +35,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -73,7 +70,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	CheckBox emailNotificationsCheckbox;
 
 	@UiField
-	SimplePanel editProfileButtonPanel;
+	FlowPanel editProfileButtonPanel;
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
@@ -83,13 +80,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private LayoutContainer profilePictureContainer;
 	private LayoutContainer editPhotoButtonContainer;
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private FormPanel userFormPanel;
-	private HorizontalPanel linkedInPanelForViewProfile;
-	private HorizontalPanel linkedInPanelForEditProfile;
-	private HorizontalPanel editProfileCommandPanel;
+	private Button linkedInButtonEditProfile;
+	private Button linkedInButtonViewProfile;
 	private Button editProfileButton;
 	private Anchor editPhotoLink;
 	private Breadcrumb breadcrumb;
@@ -111,8 +106,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, 
 			Footer footerWidget, 
-			IconsImageBundle icons,
-			SageImageBundle imageBundle, 
 			SageImageBundle sageImageBundle,
 			Breadcrumb breadcrumb, 
 			SynapseJSNIUtils synapseJSNIUtils, 
@@ -120,8 +113,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			TeamListWidget myTeamsWidget,
 			CookieProvider cookies) {		
 		initWidget(binder.createAndBindUi(this));
-
-		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
@@ -136,8 +127,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		
 		createViewProfile();
-		linkedInPanelForViewProfile = createLinkedInPanel();
-		linkedInPanelForEditProfile = createLinkedInPanel();
+		linkedInButtonEditProfile = createLinkedInButton();
+		linkedInButtonViewProfile = createLinkedInButton();
 		
 		createEditProfileCommandsPanel();
 		
@@ -190,7 +181,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (isEditing)
 		{
 			updateUserInfoPanel.add(profileFormWidget);
-		 	updateWithLinkedInPanel.add(linkedInPanelForEditProfile);
+		 	updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 		}
 		else
 		{
@@ -206,7 +197,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			if (isOwner) {
 				editPhotoButtonContainer.add(editPhotoLink);
 				editPhotoButtonContainer.layout();
-				editProfileButtonPanel.add(editProfileCommandPanel);
+				editProfileButtonPanel.add(editProfileButton);
+				editProfileButtonPanel.add(linkedInButtonViewProfile);
 				openInvitesWidget.configure(new Callback() {
 					@Override
 					public void invoke() {
@@ -234,49 +226,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	private void createEditProfileCommandsPanel() {
-		editProfileCommandPanel = new HorizontalPanel();
-		
-		editProfileButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
-	    editProfileButton.setHeight(25);
-	    editProfileButton.setBorders(false);
-	    editProfileButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
-	    	@Override
-	    	public void componentSelected(ButtonEvent ce) {
-	    		presenter.redirectToEditProfile();
-	    	}
-	    });
-	    
-		editProfileCommandPanel.add(linkedInPanelForViewProfile);
-		editProfileCommandPanel.add(editProfileButton);
-		editProfileCommandPanel.setCellWidth(editProfileButton, "15%");
+		editProfileButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_PROFILE, ButtonType.DEFAULT, "glyphicon-pencil");
+		editProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.redirectToEditProfile();
+			}
+		});
+		editProfileButton.addStyleName("right btn-xs margin-left-5");
 	}
-	 
-	private HorizontalPanel createLinkedInPanel() {
-		HorizontalPanel linkedInPanel = new HorizontalPanel();
-		Anchor linkedInImportLink = new Anchor();
-		linkedInImportLink.addStyleName("user-profile-linkedin");
-		linkedInImportLink.setText("Import from ");
-		Button linkedInButton = new Button();
-	    linkedInButton.setIcon(AbstractImagePrototype.create(sageImageBundle.linkedinsmall()));
-	    linkedInButton.setSize(sageImageBundle.linkedinsmall().getWidth() + 1, sageImageBundle.linkedinsmall().getHeight() + 1);
-	    linkedInButton.setBorders(false);
-	    linkedInButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
-	    	@Override
-	    	public void componentSelected(ButtonEvent ce) {
-	    		linkedInClicked();
-	    	}
-	    });
-	    
-	    linkedInImportLink.addClickHandler(new ClickHandler() {
+	
+	private Button createLinkedInButton() {
+		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
+		command.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				linkedInClicked();
 			}
 		});
-	    
-	    linkedInPanel.add(linkedInImportLink);
-	    linkedInPanel.add(linkedInButton);
-	    return linkedInPanel;
+		
+		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
+		command.addStyleName("right btn-xs");
+		
+	    return command;
 	}
 	
 	private void linkedInClicked()

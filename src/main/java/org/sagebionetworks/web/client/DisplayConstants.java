@@ -214,6 +214,7 @@ public class DisplayConstants {
 	public static final String BUTTON_TOOLS_MENU = "Tools";
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
+	public static final String BUTTON_EDIT_PROFILE = "Edit Your Profile";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
 	public static final String EDIT_DESCRIPTION = "Edit Description";	
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";

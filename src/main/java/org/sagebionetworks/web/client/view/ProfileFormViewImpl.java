@@ -5,48 +5,57 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
-import com.extjs.gxt.ui.client.widget.form.TextArea;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.ColumnData;
-import com.extjs.gxt.ui.client.widget.layout.ColumnLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.extjs.gxt.ui.client.widget.layout.FormLayout;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.dom.client.TextAreaElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView {
+public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 
-	private static final int COLUMN_FORM_WIDTH = 600;
+	public interface ProfileFormImplUiBinder extends UiBinder<Widget, ProfileFormViewImpl> {}
+	
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
-	private FormPanel userFormPanel;
-	private Button updateUserInfoButton;
-	private Button cancelUpdateUserButton;
 	
-	//Edit profile form fields
-	private TextField<String> firstName, lastName, position, company, industry, location, email, teamName, url;
-	private TextArea summary;
+	@UiField
+	Button okButton;
+	@UiField
+	Button cancelButton;
+	
+	@UiField
+	InputElement firstNameField;
+	@UiField
+	InputElement lastNameField;
+	@UiField
+	InputElement currentPositionField;
+	@UiField
+	InputElement currentAffiliationField;
+	@UiField
+	InputElement industryField;
+	@UiField
+	InputElement locationField;
+	@UiField
+	InputElement moreInfoField;
+	@UiField
+	TextAreaElement bioField;
 	
 	@Inject
-	public ProfileFormViewImpl(IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle) {		
+	public ProfileFormViewImpl(ProfileFormImplUiBinder binder, 
+			IconsImageBundle icons,
+			SageImageBundle sageImageBundle) {
+		initWidget(binder.createAndBindUi(this));
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
-		createProfileForm();
+		init();
 	}
 
 	@Override
@@ -58,7 +67,6 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	public void updateView(UserProfile profile) {
 		clear();
 		updateUserForm(profile);
-		add(userFormPanel);
 	}
 	
 	@Override
@@ -73,147 +81,34 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	
 	private void changeUserInfoButtonToDefault()
 	{
-		updateUserInfoButton.setIcon(null);
-		updateUserInfoButton.setText(DisplayConstants.BUTTON_CHANGE_USER_INFO);
+		setUpdateButtonText(DisplayConstants.BUTTON_CHANGE_USER_INFO);
 	}
 
 	@Override
 	public void setUpdateButtonText(String text){
-		updateUserInfoButton.setText(text);
+		okButton.removeStyleName("disabled");
+		okButton.setHTML(text);
 	}
 	
-	 private void createProfileForm() {
-		 userFormPanel = new FormPanel();
-		 FormData formData = new FormData("-20");
-		 
-	     userFormPanel.setFrame(true);
-	     userFormPanel.setHeaderVisible(false); 
-	     userFormPanel.setLabelAlign(LabelAlign.TOP);
-	     userFormPanel.setSize(COLUMN_FORM_WIDTH, -1);
-	     
-	     LayoutContainer main = new LayoutContainer();
-	     main.setLayout(new ColumnLayout());
-
-	     LayoutContainer left = new LayoutContainer();
-	     left.setStyleAttribute("paddingRight", "10px");
-	     FormLayout layout = new FormLayout();
-	     layout.setLabelAlign(LabelAlign.TOP);
-	     left.setLayout(layout);
-	     
-	     LayoutContainer right = new LayoutContainer();
-	     right.setStyleAttribute("paddingLeft", "10px");
-	     layout = new FormLayout();
-	     layout.setLabelAlign(LabelAlign.TOP);
-	     right.setLayout(layout);
-	     
-	     firstName = new TextField<String>();  
-	     firstName.setFieldLabel("First Name");  
-	     firstName.setAllowBlank(true);
-	     left.add(firstName, formData);
-	   
-	     lastName = new TextField<String>();  
-	     lastName.setFieldLabel("Last Name");  
-	     lastName.setAllowBlank(true);
-	     right.add(lastName, formData);
-	     
-	     position = new TextField<String>();  
-	     position.setFieldLabel("Current Position");  
-	     position.setAllowBlank(true);
-	     left.add(position, formData);
-	     
-	     company = new TextField<String>();  
-	     company.setFieldLabel("Current Affiliation");  
-	     company.setAllowBlank(true);
-	     right.add(company, formData);
-	     
-	     industry = new TextField<String>();  
-	     industry.setFieldLabel("Industry/Discipline");  
-	     industry.setAllowBlank(true);
-	     left.add(industry, formData);
-	     
-	     location = new TextField<String>();  
-	     location.setFieldLabel("City, Country");  
-	     location.setAllowBlank(true);
-	     right.add(location, formData);
-	     
-	     teamName = new TextField<String>();  
-	     teamName.setFieldLabel("DREAM 8 Team Name");  
-	     teamName.setAllowBlank(true);
-	     
-	     url = new TextField<String>();  
-	     url.setFieldLabel("Link To More Info");  
-	     url.setAllowBlank(true);
-	     url.setRegex(WebConstants.VALID_URL_REGEX);
-	     url.getMessages().setRegexText(DisplayConstants.INVALID_URL_MESSAGE);
-	     right.add(url, formData);
-	     
-	     main.add(left, new ColumnData(.5));
-	     main.add(right, new ColumnData(.5));
-	     
-	     summary = new TextArea();  
-	     summary.setFieldLabel("Bio");  
-	     summary.setAllowBlank(true);
-	     summary.setHeight(200);
-	   
-	     email = new TextField<String>();  
-	     email.setFieldLabel("Email");  
-	     email.setAllowBlank(false);
-	     email.setRegex(WebConstants.VALID_EMAIL_REGEX);
-	     email.getMessages().setRegexText(WebConstants.INVALID_EMAIL_MESSAGE);
-	     
-	     userFormPanel.add(main, new FormData("100%"));
-	     userFormPanel.add(summary, new FormData("100%"));
-		 //TODO: uncomment to add ability to change email
-//	     userFormPanel.add(email, new FormData("100%"));
-	     
-	     userFormPanel.setButtonAlign(HorizontalAlignment.LEFT);  
-	     updateUserInfoButton = new Button(DisplayConstants.BUTTON_CHANGE_USER_INFO);
-	     updateUserInfoButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
-	    	 @Override
-	    	 public void componentSelected(ButtonEvent ce) {
-	    		 //TODO: uncomment to add ability to change email
-//	    		 } else if(!email.isValid()) {
-//		    			 MessageBox.alert("Error", email.getErrorMessage(), null);
-	    		 if(!url.isValid()) {
-	    			 MessageBox.alert("Error", url.getErrorMessage(), null);
-	    		 } else {
-	    			 startSave();
-	    		 }
-	    	 }
-	     });
-	     cancelUpdateUserButton = new Button(DisplayConstants.BUTTON_CANCEL);
-	     cancelUpdateUserButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
-	    	 @Override
-	    	 public void componentSelected(ButtonEvent ce) {
-	    		  presenter.cancelClicked();
-	    	 }
-	     });	     
-	     
-	     setUpdateUserInfoDefaultIcon();
-	     userFormPanel.addButton(updateUserInfoButton);
-	     userFormPanel.addButton(cancelUpdateUserButton);
-	     // Enter key used to submit.  with a multiline component in the mix, we lose this convenience (unless we add code to
-	     //	know if the summary field is in focus, or have a way of asking for the currently selected component (via the focus manager?)
-//	     new KeyNav<ComponentEvent>(userFormPanel) {
-//	    	 @Override
-//	    	 public void onEnter(ComponentEvent ce) {
-//	    		 super.onEnter(ce);
-//	    		 if (updateUserInfoButton.isEnabled())
-//	    			 updateUserInfoButton.fireEvent(Events.Select);
-//	    	 }
-//	     };
-
-	     // form binding so submit button is greyed out until all fields are filled 
-	     final FormButtonBinding binding = new FormButtonBinding(userFormPanel);
-	     binding.addButton(updateUserInfoButton);
-
+	 private void init() {
+		okButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				startSave();
+			}
+		});
+		cancelButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.cancelClicked();
+			}
+		});
 	 }
 	 
 	 private void startSave() {
-		 DisplayUtils.changeButtonToSaving(updateUserInfoButton, sageImageBundle);
-		 presenter.updateProfile(trim(firstName.getValue()), trim(lastName.getValue()), trim(summary.getValue()), trim(position.getValue()), trim(location.getValue()), trim(industry.getValue()), trim(company.getValue()), null, null, trim(teamName.getValue()), trim(url.getValue()));
-//TODO: uncomment to add ability to change email
-//		 presenter.updateProfile(firstName.getValue(), lastName.getValue(), summary.getValue(), position.getValue(), location.getValue(), industry.getValue(), company.getValue(), email.getValue(), null);
+		 DisplayUtils.changeButtonToSaving(okButton);
+		 presenter.updateProfile(trim(firstNameField.getValue()), trim(lastNameField.getValue()), trim(bioField.getValue()), trim(currentPositionField.getValue()), trim(locationField.getValue()), trim(industryField.getValue()), trim(currentAffiliationField.getValue()), null, null, null, trim(moreInfoField.getValue()));
 	 }
 	 
 	 private String trim(String value) {
@@ -223,30 +118,27 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	 }
 	 
 	 private void updateUserForm(UserProfile profile) {
-		 firstName.setValue(profile.getFirstName());
-		 lastName.setValue(profile.getLastName());
-		 position.setValue(profile.getPosition());
-		 company.setValue(profile.getCompany());
+		 firstNameField.setValue(profile.getFirstName());
+		 lastNameField.setValue(profile.getLastName());
+		 currentPositionField.setValue(profile.getPosition());
+		 currentAffiliationField.setValue(profile.getCompany());
 
-		 industry.setValue(profile.getIndustry());
-		 summary.setValue(profile.getSummary());
-		 location.setValue(profile.getLocation());
-		 email.setValue(profile.getEmail());
-		 url.setValue(profile.getUrl());
-		 teamName.setValue(profile.getTeamName());
+		 industryField.setValue(profile.getIndustry());
+		 bioField.setValue(profile.getSummary());
+		 locationField.setValue(profile.getLocation());
+		 moreInfoField.setValue(profile.getUrl());
 	 }
 		 
-	 private void setUpdateUserInfoDefaultIcon() {
-		 updateUserInfoButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));
-	 }
+
 	 @Override
 	 public void hideCancelButton(){
-		 cancelUpdateUserButton.setVisible(false);
+		 cancelButton.setVisible(false);
 	 }
 
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+		changeUserInfoButtonToDefault();
 	}
 
 	@Override
@@ -256,5 +148,10 @@ public class ProfileFormViewImpl extends SimplePanel implements ProfileFormView 
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+	
+	@Override
+	
+	public void clear() {
 	}
 }
