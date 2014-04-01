@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -12,9 +13,9 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -25,17 +26,13 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -74,28 +71,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
-	SimplePanel pictureCanvasPanel;
+	SimplePanel picturePanel;
+	@UiField
+	SimplePanel editPicturePanel;
+	@UiField
+	SimplePanel editPictureButtonPanel;
+
 	
-	private LayoutContainer pictureCanvasContainer;
-	private LayoutContainer profilePictureContainer;
-	private LayoutContainer editPhotoButtonContainer;
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
-	private FormPanel userFormPanel;
 	private Button linkedInButtonEditProfile;
 	private Button linkedInButtonViewProfile;
 	private Button editProfileButton;
-	private Anchor editPhotoLink;
 	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
 	private Html profileWidget;
 	private Image defaultProfilePicture;
-	private Html profilePictureHtml;
 	
-	private HandlerRegistration editPhotoHandler = null;
-
 	private Footer footerWidget;
 	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -132,21 +126,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		createEditProfileCommandsPanel();
 		
-	    editPhotoLink = new Anchor();
-	    editPhotoLink.addStyleName("user-profile-change-photo");
-	    editPhotoLink.setText("Edit Photo");
-	    pictureCanvasContainer = new LayoutContainer();
-	    pictureCanvasContainer.setStyleName("inner-6 view notopmargin");
-	    pictureCanvasPanel.clear();
-	    pictureCanvasPanel.add(pictureCanvasContainer);
-	    
-	    profilePictureContainer = new LayoutContainer();
-	    profilePictureContainer.addStyleName("center");
-		editPhotoButtonContainer = new LayoutContainer();
-		editPhotoButtonContainer.setStyleName("center notopmargin");
-		
-		pictureCanvasContainer.add(profilePictureContainer);
-		pictureCanvasContainer.add(editPhotoButtonContainer);
+		picturePanel.clear();
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 	}
@@ -180,6 +160,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
+			Widget profilePicture = getProfilePicture(profile, profile.getPic());
+			profilePicture.addStyleName("left");
+			editPicturePanel.add(profilePicture);
+			editPictureButtonPanel.add(getEditPictureButton(profile));
 			updateUserInfoPanel.add(profileFormWidget);
 		 	updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 		}
@@ -195,8 +179,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			viewProfilePanel.add(profileWidget);
 			notificationsPanel.setVisible(isOwner);
 			if (isOwner) {
-				editPhotoButtonContainer.add(editPhotoLink);
-				editPhotoButtonContainer.layout();
 				editProfileButtonPanel.add(editProfileButton);
 				editProfileButtonPanel.add(linkedInButtonViewProfile);
 				openInvitesWidget.configure(new Callback() {
@@ -258,7 +240,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	 private void createViewProfile() {
 		 profileWidget = new Html();
-		 profilePictureHtml = new Html();
 		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
 	 }
 	 
@@ -270,6 +251,47 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (s == null)
 			return "";
 		else return s;
+	 }
+	 
+	 private Widget getProfilePicture(UserProfile profile, AttachmentData pic) {
+		 if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
+			 return new FitImage(url, 150, 150);
+		 }
+		 else {
+			 return defaultProfilePicture;
+		 }
+	 }
+	 
+	 private Button getEditPictureButton(final UserProfile profile) {
+		 String userId = profile.getOwnerId();
+		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
+		 Button editPictureButton = DisplayUtils.createButton("Upload new picture");
+		 editPictureButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
+						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+							@Override
+							public void onSaveAttachment(UploadResult result) {
+								if(result != null){
+									if(UploadStatus.SUCCESS == result.getUploadStatus()){
+										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
+										editPicturePanel.clear();
+										Widget profilePicture = getProfilePicture(profile, result.getAttachmentData());
+										profilePicture.addStyleName("left");
+										editPicturePanel.add(profilePicture);
+									}else{
+										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
+									}
+								}
+							}
+						});
+			}
+		});
+		return editPictureButton;
 	 }
 	 
 	 private void updateViewProfile(UserProfile profile, boolean isOwner) {
@@ -324,44 +346,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
-		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-			 profilePictureContainer.add(profilePictureHtml);
-			 profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
-			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
-			    		+ DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
-			    		+ "</div>").asString());
-		 }
-		 else {
-			 profilePictureContainer.add(defaultProfilePicture);
-		 }
-		 profilePictureContainer.layout();
-		 pictureCanvasContainer.setVisible(true);
-		 
-		 String userId = profile.getOwnerId();
-		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
-		 if (editPhotoHandler != null)
-			 editPhotoHandler.removeHandler();
-		 editPhotoHandler = editPhotoLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
-						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
-							@Override
-							public void onSaveAttachment(UploadResult result) {
-								if(result != null){
-									if(UploadStatus.SUCCESS == result.getUploadStatus()){
-										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
-									}else{
-										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
-									}
-								}
-								presenter.redirectToViewProfile();
-							}
-						});
-			}
-		});
+		 picturePanel.add(getProfilePicture(profile, profile.getPic()));
 	 }
 	 
 	@Override
@@ -392,9 +377,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		myTeamInvitesPanel.clear();
 		myTeamsPanel.clear();
 		myTeamsPanel.setVisible(false);
-		editPhotoButtonContainer.removeAll();
-		profilePictureContainer.removeAll();
-		pictureCanvasContainer.setVisible(false);
+		picturePanel.clear();
+		editPicturePanel.clear();
+		editPictureButtonPanel.clear();
 		notificationsPanel.setVisible(false);
 	}
 }
