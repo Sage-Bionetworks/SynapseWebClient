@@ -71,12 +71,12 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		if(currentUser != null) {
 				//check for valid url
 				if (!LoginPresenter.isValidUrl(url, true)) {
-					view.showErrorMessage(DisplayConstants.INVALID_URL_MESSAGE);
+					view.showInvalidUrlUi();
 					return;
 				}
 				//will only update username if it is set.  if cleared out it will keep the existing username
 				if (userName != null && !LoginPresenter.isValidUsername(userName)) {
-					view.showErrorMessage(DisplayConstants.INVALID_USERNAME_MESSAGE);
+					view.showInvalidUsernameUi();
 					return;
 				}
 				

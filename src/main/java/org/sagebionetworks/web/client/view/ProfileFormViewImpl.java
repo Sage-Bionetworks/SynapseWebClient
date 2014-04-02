@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,11 +34,24 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	Button cancelButton;
 	
 	@UiField
+	Button changeUsernameButton;
+	
+	@UiField
+	HeadingElement userNameHeading;
+	@UiField
 	InputElement firstNameField;
 	@UiField
 	InputElement lastNameField;
 	@UiField
 	InputElement userNameField;
+	@UiField
+	DivElement changeUsernameUi;
+	@UiField
+	DivElement moreInfoUi;
+	@UiField
+	DivElement urlError;
+	@UiField
+	DivElement userNameError;
 	
 	@UiField
 	InputElement currentPositionField;
@@ -107,10 +122,41 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 				presenter.cancelClicked();
 			}
 		});
+		changeUsernameButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				changeUsernameButton.addStyleName("disabled");
+				changeUsernameUi.removeClassName("hide");
+			}
+		});
+		changeUsernameUi.addClassName("hide");
+	 }
+	 @Override
+	 public void showInvalidUrlUi() {
+		 userUpdateFailed();
+		 showError(moreInfoUi, urlError);
+	 }
+	 
+	 @Override
+	 public void showInvalidUsernameUi() {
+		 userUpdateFailed();
+		 showError(changeUsernameUi, userNameError);
+	 }
+	 
+	 private void showError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.addClassName("has-error");
+		 messageElement.removeClassName("hide");
+	 }
+	 
+	 private void hideError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.removeClassName("has-error");
+		 messageElement.addClassName("hide");
 	 }
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(okButton);
+		 hideError(moreInfoUi, urlError);
+		 hideError(changeUsernameUi, userNameError);
 		 presenter.updateProfile(trim(firstNameField.getValue()), trim(lastNameField.getValue()), trim(bioField.getValue()), trim(currentPositionField.getValue()), trim(locationField.getValue()), trim(industryField.getValue()), trim(currentAffiliationField.getValue()), null, null, null, trim(moreInfoField.getValue()), trim(userNameField.getValue()));
 	 }
 	 
@@ -131,6 +177,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		 locationField.setValue(profile.getLocation());
 		 moreInfoField.setValue(profile.getUrl());
 		 userNameField.setValue(profile.getUserName());
+		 userNameHeading.setInnerText(profile.getUserName());
 	 }
 		 
 
