@@ -12,11 +12,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -68,23 +65,12 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		return view.asWidget();
 	}
 	
-	public static boolean isValidUrl(String url, boolean isUndefinedUrlValid) {
-		if (url == null || url.trim().length() == 0) {
-			//url is undefined
-			return isUndefinedUrlValid;
-		}
-		RegExp regEx = RegExp.compile(WebConstants.VALID_URL_REGEX, "gm");
-		MatchResult matchResult = regEx.exec(url);
-		//the entire string must match (group 0 is the whole matched string)
-		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
-	}
-
 	@Override
 	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url, final String userName) {				
 		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
 				//check for valid url
-				if (!isValidUrl(url, true)) {
+				if (!LoginPresenter.isValidUrl(url, true)) {
 					view.showErrorMessage(DisplayConstants.INVALID_URL_MESSAGE);
 					return;
 				}
