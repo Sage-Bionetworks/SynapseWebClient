@@ -37,6 +37,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -230,11 +231,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 }
 	 
 	 private Widget getProfilePicture(UserProfile profile, AttachmentData pic) {
-		 if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
+		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
+			 //use preview
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
+			 return new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
+					 + "<img style=\"margin:auto; display:block;\" src=\"" 
+					 + url+ "\"/>"
+					 + "</div>"));
+		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
+			 //use token
 			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
 			 return new FitImage(url, 150, 150);
 		 }
 		 else {
+			 //use default picture
 			 return defaultProfilePicture;
 		 }
 	 }

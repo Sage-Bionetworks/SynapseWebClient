@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -11,14 +14,19 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummary;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -58,6 +66,7 @@ public class SettingsPresenterTest {
 	String newPassword = "otherpassword";
 	String username = "testuser";
 	String email = "testuser@test.com";
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -69,12 +78,18 @@ public class SettingsPresenterTest {
 		mockCookieProvider = mock(CookieProvider.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
+
+		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
+		profile.writeToJSONObject(adapter);
+		String userProfileJson = adapter.toJSONString(); 
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		
 		profile.setDisplayName("tester");
 		profile.setEmail(username);
@@ -90,7 +105,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testStart() {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		profilePresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -124,7 +139,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
@@ -135,7 +150,7 @@ public class SettingsPresenterTest {
 	public void testResetPasswordFailInitialLogin() throws RestServiceException {		
 		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
@@ -147,7 +162,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
@@ -160,7 +175,7 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
@@ -170,14 +185,14 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testCreateSynapsePassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		profilePresenter.setPlace(place);
 
 		profilePresenter.createSynapsePassword();
 	}
 	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		
 		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
 		Long totalSize = 12345l;
@@ -192,10 +207,62 @@ public class SettingsPresenterTest {
 	}
 	@Test
 	public void testUsageFailure() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
 		profilePresenter.setPlace(place);
 		verify(mockView).clearStorageUsageUI();
+	}
+	
+	//if notification settings are null, should still successfully update with user specified notification setting
+	public void testUpdateMyNotificationSettingsLazyInstantiation() throws JSONObjectAdapterException {
+		//creates new UserProfile notification settings
+		boolean sendEmailNotifications = true;
+		boolean markEmailedMessagesAsRead = true;
+		profilePresenter.setPlace(place);
+		assertNull(profile.getNotificationSettings());
+		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		
+		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		//should have called updateUserProfile
+		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
+		//with our new notification settings
+		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		assertNotNull(updatedProfile.getNotificationSettings());
+		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
+		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+	}
+	
+	@Test
+	public void testUpdateMyNotificationSettings() throws JSONObjectAdapterException {
+		//updates existing UserProfile notification settings
+		boolean sendEmailNotifications = false;
+		boolean markEmailedMessagesAsRead = false;
+		profilePresenter.setPlace(place);
+		org.sagebionetworks.repo.model.message.Settings notificationSettings = new org.sagebionetworks.repo.model.message.Settings();
+		notificationSettings.setMarkEmailedMessagesAsRead(true);
+		notificationSettings.setSendEmailNotifications(true);
+		profile.setNotificationSettings(notificationSettings);
+		assertNotNull(profile.getNotificationSettings());
+		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
+		
+		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		//should have called updateUserProfile
+		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
+		//with our new notification settings
+		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
+		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+	}
+	
+	@Test
+	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
+		profilePresenter.setPlace(place);
+		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		profilePresenter.updateMyNotificationSettings(true, true);
+		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 	}
 }
