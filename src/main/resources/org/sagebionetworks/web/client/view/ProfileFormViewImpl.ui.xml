@@ -68,7 +68,7 @@
 		   			<div class="col-sm-12">
 	   			    	<div class="form-group margin-bottom-10">
 					        <label>Bio</label>
-					        <textarea ui:field="bioField" class="form-control" rows="5"></textarea>
+					        <textarea ui:field="bioField" class="form-control" placeholder="Enter bio" rows="5"></textarea>
 		   				</div>
 		   			</div>
 		   		</div>
