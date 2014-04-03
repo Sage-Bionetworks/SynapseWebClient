@@ -295,13 +295,13 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
 							// if headers are empty (no results) add table columns						
 							if(tableColumns.size() == 0) tableColumns = new ArrayList<ColumnModel>();
-							currentHeaders = extractHeaders(tableColumns);
+							currentHeaders = TableUtils.extractHeaders(tableColumns);
 							displayColumns.addAll(tableColumns); 
 						} else {
 							// Determine column type and which columns to send to view from query result headers
 							currentHeaders = rowset.getHeaders();
 							for(String resultColumnId : rowset.getHeaders()) {
-								ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
+								ColumnModel col = TableUtils.wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
 								if(col != null) displayColumns.add(col);
 							}							
 						}
@@ -379,23 +379,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		}
 	}
 
-	/**
-	 * Convert ColumnModel list to a list of ColumnModel id strings (headers)
-	 * @param columns
-	 * @return
-	 */
-	private List<String> extractHeaders(List<ColumnModel> columns) {
-		List<String> headers = new ArrayList<String>();
-		if(columns != null) {
-			for(ColumnModel model : columns) {
-				headers.add(model.getId());
-			}
-		}
-		return headers;
-	}
 	
 	/**
-	 * Update the current TableEntity with the repo
+	 * Update the current TableEntity in repo
 	 */
 	private void updateTableEntity() {
 		try {
@@ -429,39 +415,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
 		}
-	}
-
-	
-	/**
-	 * If a column doesn't have a proper ColumnModel id (i.e. a Long) then wrap it as a DerivedColumn
-	 * @param idToCol
-	 * @param resultColumnId
-	 * @return
-	 */
-	private ColumnModel wrapDerivedColumnIfNeeded(final Map<String, ColumnModel> idToCol, String resultColumnId) {
-		// test for strait column id, otherwise it is a derived column
-		try {				
-			Long.parseLong(resultColumnId);
-			if(idToCol.containsKey(resultColumnId)) {
-				return idToCol.get(resultColumnId);
-			} // ignore unknown non-derived columns
-		} catch (NumberFormatException e) {									
-			return createDerivedColumn(resultColumnId);				
-		}
-		return null;
-	}
-
-	/**
-	 * Create a DerivedColumnModel
-	 * @param resultColumnId
-	 * @return
-	 */
-	private DerivedColumnModel createDerivedColumn(String resultColumnId) {
-		DerivedColumnModel derivedCol = new DerivedColumnModel();
-		derivedCol.setId(resultColumnId);
-		derivedCol.setName(resultColumnId);
-		derivedCol.setColumnType(ColumnType.STRING);
-		return derivedCol;
 	}
 
 	/**

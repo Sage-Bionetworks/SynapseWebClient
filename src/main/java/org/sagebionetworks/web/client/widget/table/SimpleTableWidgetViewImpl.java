@@ -380,55 +380,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 	}
 
-	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
-		// checkbox selector
-		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
-				new CheckboxCell(true, false)) {
-			@Override
-			public Boolean getValue(TableModel object) {
-				// Get the value from the selection model.
-				return selectionModel.isSelected(object);
-			}		
-		}; 
-		cellTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
-		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
-
-		int nPercentageCols = columns.size();
-		for(ColumnModel model : columns) {
-			// TODO : uncomment and replace below when we have DATE column type
-			if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
-//			if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
-		}		
-		
-		// Table's columns
-		RowUpdater rowUpdater = new RowUpdater() {			
-			@Override
-			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
-				presenter.updateRow(row, callback);			
-				
-			}
-		};
-		
-		// attempt to get view width
-		int windowWidth = Window.getClientWidth();
-		
-		
-		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
-			cellTable.addColumn(column, model.getName());
-			columnToModel.put(column, model);
-			
-			// TODO : just have a fixed width for each column and let table scroll horizontally?
-			if(model.getColumnType() == ColumnType.BOOLEAN) {
-				cellTable.setColumnWidth(column, 100, Unit.PX);
-//			} else if(model.getColumnType() == ColumnType.DATE) {
-//				cellTable.setColumnWidth(column, 140, Unit.PX);								
-			} else {
-				cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
-			}
-		}
-	}
-
+	/**
+	 * Create an AsyncDataProvider that updates the Data in the view when requested
+	 * @return
+	 */
 	private AsyncDataProvider<TableModel> createAsyncDataProvider() {
 		return new AsyncDataProvider<TableModel>() {
 			@Override
@@ -492,6 +447,59 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    };
 	}
 
+	/**
+	 * Build the GWT CellTable Columns from a list of ColumnModels
+	 * @param columns
+	 * @param canEdit
+	 */
+	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
+		// checkbox selector
+		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
+				new CheckboxCell(true, false)) {
+			@Override
+			public Boolean getValue(TableModel object) {
+				// Get the value from the selection model.
+				return selectionModel.isSelected(object);
+			}		
+		}; 
+		cellTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
+
+		int nPercentageCols = columns.size();
+		for(ColumnModel model : columns) {
+			// TODO : uncomment and replace below when we have DATE column type
+			if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
+//			if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
+		}		
+		
+		// Table's columns
+		RowUpdater rowUpdater = new RowUpdater() {			
+			@Override
+			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
+				presenter.updateRow(row, callback);			
+				
+			}
+		};
+		
+		// attempt to get view width
+		int windowWidth = Window.getClientWidth();
+		
+		
+		for(ColumnModel model : columns) {
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
+			cellTable.addColumn(column, model.getName());
+			columnToModel.put(column, model);
+			
+			// TODO : just have a fixed width for each column and let table scroll horizontally?
+			if(model.getColumnType() == ColumnType.BOOLEAN) {
+				cellTable.setColumnWidth(column, 100, Unit.PX);
+//			} else if(model.getColumnType() == ColumnType.DATE) {
+//				cellTable.setColumnWidth(column, 140, Unit.PX);								
+			} else {
+				cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
+			}
+		}
+	}
 	
 	private HTML getLoadingWidget() {
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
@@ -509,7 +517,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	
 	/**
-	 * ----- Column Methods -----
+	 * ----- Column Editor Methods -----
 	 */
 	/**
 	 * Sets up the top level editing toolbar
@@ -566,7 +574,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				public void onClick(ClickEvent event) {
 					// swap columns
 					int formerIdx = columnPanelOrder.indexOf(columnPanel);
-					swapColumns(allColumnsPanel, columnPanel, formerIdx, formerIdx-1);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx-1);
 				}
 
 			});
@@ -575,7 +583,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				public void onClick(ClickEvent event) {
 					// swap columns
 					int formerIdx = columnPanelOrder.indexOf(columnPanel);
-					swapColumns(allColumnsPanel, columnPanel, formerIdx, formerIdx+1);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx+1);
 				}
 
 			});
@@ -600,8 +608,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 										// update ends, if needed
 										int size = columnPanelOrder.size();
 										if(size > 0) {
-											setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
-											setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
+											TableViewUtils.setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
+											TableViewUtils.setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
 										}
 									}
 								};
@@ -679,7 +687,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
 		form.add(inputLabel);
-		form.add(createDefaultValueRadio(col));
+		form.add(TableViewUtils.createDefaultValueRadio(col));
 
 		// Enum Values
 		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
@@ -749,65 +757,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		return columnTypeRadio;
 	}
 	
-	/**
-	 * Create a default value input with on/off switch. Initializes to the given col, and modifiees the given col.
-	 * @param col
-	 * @return
-	 */
-	private Widget createDefaultValueRadio(
-			final org.sagebionetworks.repo.model.table.ColumnModel col) {
-		FlowPanel row = new FlowPanel();		
-		FlowPanel defaultValueRadio = new FlowPanel();
-		defaultValueRadio.addStyleName("btn-group");
-		 						
-		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
-		final Button offBtn = DisplayUtils.createButton(DisplayConstants.OFF);
-		final TextBox defaultValueBox = new TextBox();
-		defaultValueBox.addChangeHandler(new ChangeHandler() {			
-			@Override
-			public void onChange(ChangeEvent event) {
-				col.setDefaultValue(defaultValueBox.getValue());
-			}
-		});
-		DisplayUtils.setPlaceholder(defaultValueBox, DisplayConstants.DEFAULT_VALUE);
-		onBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				offBtn.removeStyleName("active");
-				onBtn.addStyleName("active");
-				defaultValueBox.setVisible(true);
-			}
-		});
-		offBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				onBtn.removeStyleName("active");
-				offBtn.addStyleName("active");
-				defaultValueBox.setVisible(false);
-			}
-		});
-		if(col.getDefaultValue() != null) {
-			onBtn.addStyleName("active");
-			defaultValueBox.setVisible(true);
-		} else {
-			offBtn.addStyleName("active");
-			defaultValueBox.setVisible(false);
-		}
-		
-		defaultValueRadio.add(onBtn);
-		defaultValueRadio.add(offBtn);			
-		
-		
-		// TODO : choose appropriate input type for default value (string, enum, date, etc)
-		defaultValueBox.addStyleName("form-control display-inline margin-top-5");
-		defaultValueBox.setWidth("300px");
-		defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
-		defaultValueBox.setValue(col.getDefaultValue());
-		
-		row.add(defaultValueRadio);
-		row.add(defaultValueBox);
-		return row;
-	}
+
 
 	/**
 	 * Create the restricted values list
@@ -839,52 +789,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		addColumnPanel.add(createColumnEditor(newColumn));
 	}
 
-	private static void setArrowVisibility(int idx, int size, Anchor moveUp, Anchor moveDown) {
-		if(idx == 0) moveUp.setVisible(false);
-		else moveUp.setVisible(true);
-		if(idx == size-1) moveDown.setVisible(false);
-		else moveDown.setVisible(true);
-	}
-
-	private void swapColumns(final FlowPanel allColumnsPanel, final ColumnDetailsPanel thisColumn,
-			final int formerIdx, final int newIdx) {
-		final ColumnDetailsPanel displacedColumn = columnPanelOrder.get(newIdx);
-		// fade out		
-		thisColumn.addStyleName("fade");
-		Timer t1 = new Timer() {			
-			@Override
-			public void run() {
-				// swap columns
-				columnPanelOrder.set(newIdx, thisColumn);				
-				columnPanelOrder.set(formerIdx, displacedColumn);
-				allColumnsPanel.remove(thisColumn);
-				allColumnsPanel.insert(thisColumn, newIdx);
-				setArrowVisibility(newIdx, columnPanelOrder.size(), thisColumn.getMoveUp(), thisColumn.getMoveDown());
-				setArrowVisibility(formerIdx, columnPanelOrder.size(), displacedColumn.getMoveUp(), displacedColumn.getMoveDown());
-
-				// fade in
-				Timer t2 = new Timer() {					
-					@Override
-					public void run() {
-						thisColumn.addStyleName("in");
-						
-						// cleanup
-						Timer t3 = new Timer() {			
-							@Override
-							public void run() {
-								thisColumn.removeStyleName("fade");
-								thisColumn.removeStyleName("in");
-							}
-						};
-						t3.schedule(250);
-
-					}
-				};
-				t2.schedule(250);
-			}
-		};
-		t1.schedule(250);		
-	}
 
 	private List<String> extractColumns() {
 		List<String> columns = new ArrayList<String>();

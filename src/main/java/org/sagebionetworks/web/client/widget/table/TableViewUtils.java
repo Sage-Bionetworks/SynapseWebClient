@@ -4,12 +4,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -19,13 +21,23 @@ import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 public class TableViewUtils {
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
@@ -70,8 +82,115 @@ public class TableViewUtils {
 	}	
 	
 	
+	/**
+	 * Create a default value input with on/off switch. Initializes to the given col, and modifiees the given col.
+	 * @param col
+	 * @return
+	 */
+	public static Widget createDefaultValueRadio(final ColumnModel col) {
+		FlowPanel row = new FlowPanel();		
+		FlowPanel defaultValueRadio = new FlowPanel();
+		defaultValueRadio.addStyleName("btn-group");
+		 						
+		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
+		final Button offBtn = DisplayUtils.createButton(DisplayConstants.OFF);
+		final TextBox defaultValueBox = new TextBox();
+		defaultValueBox.addChangeHandler(new ChangeHandler() {			
+			@Override
+			public void onChange(ChangeEvent event) {
+				col.setDefaultValue(defaultValueBox.getValue());
+			}
+		});
+		DisplayUtils.setPlaceholder(defaultValueBox, DisplayConstants.DEFAULT_VALUE);
+		onBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				offBtn.removeStyleName("active");
+				onBtn.addStyleName("active");
+				defaultValueBox.setVisible(true);
+			}
+		});
+		offBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				onBtn.removeStyleName("active");
+				offBtn.addStyleName("active");
+				defaultValueBox.setVisible(false);
+			}
+		});
+		if(col.getDefaultValue() != null) {
+			onBtn.addStyleName("active");
+			defaultValueBox.setVisible(true);
+		} else {
+			offBtn.addStyleName("active");
+			defaultValueBox.setVisible(false);
+		}
+		
+		defaultValueRadio.add(onBtn);
+		defaultValueRadio.add(offBtn);			
+		
+		
+		// TODO : choose appropriate input type for default value (string, enum, date, etc)
+		defaultValueBox.addStyleName("form-control display-inline margin-top-5");
+		defaultValueBox.setWidth("300px");
+		defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
+		defaultValueBox.setValue(col.getDefaultValue());
+		
+		row.add(defaultValueRadio);
+		row.add(defaultValueBox);
+		return row;
+	}
+	
+	public static void swapColumns(final List<ColumnDetailsPanel> columnPanelOrder, final FlowPanel allColumnsPanel, final ColumnDetailsPanel thisColumn,
+			final int formerIdx, final int newIdx) {
+		final ColumnDetailsPanel displacedColumn = columnPanelOrder.get(newIdx);
+		// fade out		
+		thisColumn.addStyleName("fade");
+		Timer t1 = new Timer() {			
+			@Override
+			public void run() {
+				// swap columns
+				columnPanelOrder.set(newIdx, thisColumn);				
+				columnPanelOrder.set(formerIdx, displacedColumn);
+				allColumnsPanel.remove(thisColumn);
+				allColumnsPanel.insert(thisColumn, newIdx);
+				setArrowVisibility(newIdx, columnPanelOrder.size(), thisColumn.getMoveUp(), thisColumn.getMoveDown());
+				setArrowVisibility(formerIdx, columnPanelOrder.size(), displacedColumn.getMoveUp(), displacedColumn.getMoveDown());
+
+				// fade in
+				Timer t2 = new Timer() {					
+					@Override
+					public void run() {
+						thisColumn.addStyleName("in");
+						
+						// cleanup
+						Timer t3 = new Timer() {			
+							@Override
+							public void run() {
+								thisColumn.removeStyleName("fade");
+								thisColumn.removeStyleName("in");
+							}
+						};
+						t3.schedule(250);
+
+					}
+				};
+				t2.schedule(250);
+			}
+		};
+		t1.schedule(250);		
+	}
+
+	public static void setArrowVisibility(int idx, int size, Anchor moveUp, Anchor moveDown) {
+		if(idx == 0) moveUp.setVisible(false);
+		else moveUp.setVisible(true);
+		if(idx == size-1) moveDown.setVisible(false);
+		else moveDown.setVisible(true);
+	}
+
+	
 	/*
-	 * Private Methods
+	 * ----- Column Type methods -----
 	 */
 	private static Column<TableModel, String> configComboString(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		if(col.getEnumValues() == null) return null;
