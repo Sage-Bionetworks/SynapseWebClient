@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -54,6 +55,7 @@ public class FilesBrowserTest {
 		filesBrowser.configure(configuredEntityId);
 		String newId = "syn456";
 		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		reset(mockView);
 	}
 	
@@ -141,14 +143,13 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadButtonClickedCertified(){
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
 		filesBrowser.uploadButtonClicked();
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
 	@Test
 	public void testUploadButtonClickedNotCertified(){
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		filesBrowser.uploadButtonClicked();
 		
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
@@ -164,21 +165,20 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadButtonClickedFailure(){
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		filesBrowser.uploadButtonClicked();
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testAddFolderButtonClickedCertified(){
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
 		filesBrowser.addFolderClicked();
 		verify(mockView).showFolderEditDialog(anyString());
 	}
 	
 	@Test
 	public void testAddFolderButtonClickedNotCertified(){
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		filesBrowser.addFolderClicked();
 		
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
@@ -194,7 +194,7 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testAddFolderButtonClickedFailure(){
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		filesBrowser.addFolderClicked();
 		verify(mockView).showErrorMessage(anyString());

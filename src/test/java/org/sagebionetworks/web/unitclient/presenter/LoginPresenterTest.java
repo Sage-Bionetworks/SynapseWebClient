@@ -94,7 +94,7 @@ public class LoginPresenterTest {
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
 
 	}	
 	
