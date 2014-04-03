@@ -178,21 +178,32 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						view.setQuery(currentQuery);
 					} else {
 						// new query
-						currentTotalRowCount = queryResult.getTotalRowCount();
-						currentHeaders = rowset.getHeaders();
+						currentTotalRowCount = queryResult.getTotalRowCount() == null ? 0 : queryResult.getTotalRowCount();						
+						QueryDetails queryDetails = queryResult.getQueryDetails();
 						
 						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
 
-						// Determine column type and which columns to send to view from query result headers
-						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();		
-						for(String resultColumnId : rowset.getHeaders()) {
-							ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
-							if(col != null) displayColumns.add(col);
+						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();
+						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
+							// if headers are empty (no results) add table columns						
+							if(tableColumns.size() == 0) tableColumns = new ArrayList<ColumnModel>();
+							currentHeaders = extractHeaders(tableColumns);
+							displayColumns.addAll(tableColumns); 
+						} else {
+							// Determine column type and which columns to send to view from query result headers
+							currentHeaders = rowset.getHeaders();
+							for(String resultColumnId : rowset.getHeaders()) {
+								ColumnModel col = wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
+								if(col != null) displayColumns.add(col);
+							}							
 						}
+							
+							
+						
 						
 						// send to view
-						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, queryString, queryResult.getQueryDetails());						
+						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
 					}
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
@@ -273,6 +284,16 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			callback.onFailure(e);
 		}
+	}
+
+	private List<String> extractHeaders(List<ColumnModel> columns) {
+		List<String> headers = new ArrayList<String>();
+		if(columns != null) {
+			for(ColumnModel model : columns) {
+				headers.add(model.getId());
+			}
+		}
+		return headers;
 	}
 
 }

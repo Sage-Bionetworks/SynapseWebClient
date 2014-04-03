@@ -109,6 +109,7 @@ public class CompleteTableWidget implements CompleteTableWidgetView.Presenter, W
 					try {
 						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
 						if(newCol.getId() != null) {
+							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
 							table.getColumnIds().add(newCol.getId());
 							updateTableEntity();
 						}

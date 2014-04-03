@@ -159,7 +159,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@Override
 	public void insertNewRow(TableModel model) {
 		newRow = model;
-		currentPage.add(0, model);
+		if(currentPage == null) currentPage  = new ArrayList<TableModel>();
+		currentPage.add(0, model);			
 		cellTable.setRowData(currentPage); // causes onRangeChange event
 	}
 
@@ -262,7 +263,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@Override
 	public void showQueryProblem(String message) {
 		hideLoading();
-		queryFeedback.setText("Query Error - : " + message);
+		queryFeedback.setText("Query Error - " + message);
 		queryFeedback.setVisible(true);
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}
