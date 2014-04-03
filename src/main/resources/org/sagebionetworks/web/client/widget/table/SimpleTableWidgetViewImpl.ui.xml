@@ -26,13 +26,9 @@
 					styleName="col-xs-4 col-sm-2 col-md-2" />
 			</div>
 		</g:HTMLPanel>
-		
+				
+		<g:SimplePanel ui:field="tableContainer" styleName="margin-top-15"/>
 	    <table cellspacing='0' cellpadding='0' style='width:100%;'>
-	      <tr>
-	        <td valign='top'>
-	          <g:SimplePanel ui:field="tableContainer" styleName="margin-top-15"/>
-	        </td>
-	      </tr>
 	      <tr>
 	        <td align='center'>
 	          <g:SimplePanel ui:field="pagerContainer" />

@@ -45,6 +45,7 @@ public class TableViewUtils {
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 	
 	static final Map<ColumnType,String> columnToDisplayName;
+	static final Map<ColumnType,Integer> columnToDisplayWidth;
 	static {
 		columnToDisplayName = new HashMap<ColumnType, String>();
 		columnToDisplayName.put(ColumnType.STRING, "String");
@@ -52,10 +53,23 @@ public class TableViewUtils {
 		columnToDisplayName.put(ColumnType.DOUBLE, "Double");
 		columnToDisplayName.put(ColumnType.BOOLEAN, "Boolean");
 		columnToDisplayName.put(ColumnType.FILEHANDLEID, "File");
+		//columnToDisplayName.put(ColumnType.DATE, "Date");
+		
+		columnToDisplayWidth = new HashMap<ColumnType, Integer>();
+		columnToDisplayWidth.put(ColumnType.STRING, 150);
+		columnToDisplayWidth.put(ColumnType.LONG, 100);
+		columnToDisplayWidth.put(ColumnType.DOUBLE, 100);
+		columnToDisplayWidth.put(ColumnType.BOOLEAN, 100);
+		columnToDisplayWidth.put(ColumnType.FILEHANDLEID, 150);
+		//columnToDisplayWidth.put(ColumnType.DATE, 140);
 	}
 	
 	public static String getColumnDisplayName(ColumnType type) {
 		return columnToDisplayName.containsKey(type) ? columnToDisplayName.get(type) : "Unknown Type";
+	}
+	
+	public static int getColumnDisplayWidth(ColumnType type) {
+		return columnToDisplayWidth.containsKey(type) ? columnToDisplayWidth.get(type).intValue() : 150;
 	}
 	
 	public static Column<TableModel, ?> getColumn(ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
@@ -81,6 +95,15 @@ public class TableViewUtils {
 		} 
 	}	
 	
+	public static boolean isAllFixedWidthColumns(List<ColumnModel> columns, int windowWidth) {
+		if(windowWidth > 0) {
+			int minRequiredWidth = 0;
+			for(ColumnModel model : columns) minRequiredWidth += getColumnDisplayWidth(model.getColumnType());
+			return minRequiredWidth > windowWidth;
+		} 		
+		return true; // if we don't know the window width, just use fixed widths
+	}
+
 	
 	/**
 	 * Create a default value input with on/off switch. Initializes to the given col, and modifiees the given col.

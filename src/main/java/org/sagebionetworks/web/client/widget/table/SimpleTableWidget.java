@@ -369,7 +369,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(DisplayConstants.ROW_UPDATE_FAILED);
+					view.showErrorMessage(DisplayConstants.ROW_UPDATE_FAILED + " " + DisplayConstants.REASON + ": " + caught.getMessage());
 					callback.onFailure(caught);
 				}
 			});

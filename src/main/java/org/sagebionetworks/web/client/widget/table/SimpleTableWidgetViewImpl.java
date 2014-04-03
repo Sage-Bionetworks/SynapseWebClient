@@ -466,13 +466,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		cellTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
 		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
 
-		int nPercentageCols = columns.size();
-		for(ColumnModel model : columns) {
-			// TODO : uncomment and replace below when we have DATE column type
-			if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
-//			if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
-		}		
-		
 		// Table's columns
 		RowUpdater rowUpdater = new RowUpdater() {			
 			@Override
@@ -483,21 +476,35 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		};
 		
 		// attempt to get view width
-		int windowWidth = Window.getClientWidth();
-		
+		boolean isFixedWidth = TableViewUtils.isAllFixedWidthColumns(columns, Window.getClientWidth());
+		int nPercentageCols = columns.size();		
+		tableContainer.removeStyleName("overflow-x-auto");
+		if(!isFixedWidth) {
+			for(ColumnModel model : columns) {
+// TODO : uncomment and replace below when we have DATE column type
+//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
+				if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
+			}					
+		} else {
+			tableContainer.addStyleName("overflow-x-auto");
+		}
 		
 		for(ColumnModel model : columns) {
 			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			
-			// TODO : just have a fixed width for each column and let table scroll horizontally?
-			if(model.getColumnType() == ColumnType.BOOLEAN) {
-				cellTable.setColumnWidth(column, 100, Unit.PX);
-//			} else if(model.getColumnType() == ColumnType.DATE) {
-//				cellTable.setColumnWidth(column, 140, Unit.PX);								
+			if(isFixedWidth) {
+				cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
 			} else {
-				cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
+				// always fix boolean and date
+// TODO : uncomment when we have DATE type				
+//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) {
+				if(model.getColumnType() == ColumnType.BOOLEAN) {
+					cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
+				} else {
+					cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
+				}
 			}
 		}
 	}

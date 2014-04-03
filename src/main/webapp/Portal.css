@@ -1505,6 +1505,10 @@ a.projectTitle:hover {
   z-index: 2;
 }
 
+.overflow-x-auto {
+	overflow-x: auto;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
