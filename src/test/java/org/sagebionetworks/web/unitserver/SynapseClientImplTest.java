@@ -96,6 +96,9 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -1333,23 +1336,29 @@ public class SynapseClientImplTest {
 
 	
 	@Test
-	public void testIsCertifiedUser() {
-		//TODO
-		//when(mockSynapse.getIsCertifiedUser(userId)).thenReturn(x);
+	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException{
+		PassingRecord mockPassingRecord = new PassingRecord();
+		when(mockSynapse.getCertifiedUserPassingRecord(anyLong())).thenReturn(mockPassingRecord);
+		synapseClient.getCertifiedUserPassingRecord("123");
+		verify(mockSynapse).getCertifiedUserPassingRecord(anyLong());
 	}
 	
 	@Test
-	public void testGetCertificationDate() {
-		//TODO
+	public void testGetCertificationQuiz() throws RestServiceException, SynapseException{
+		when(mockSynapse.getCertifiedUserTest()).thenReturn(new Quiz());
+		synapseClient.getCertificationQuiz();
+		verify(mockSynapse).getCertifiedUserTest();
 	}
 	
 	@Test
-	public void testGetCertificationQuestionnaire() {
-		//TODO
-	}
-	
-	@Test
-	public void testSubmitCertificationQuestionnaireResponse() {
-		//TODO
+	public void testSubmitCertificationQuizResponse() throws RestServiceException, SynapseException, JSONObjectAdapterException{
+		PassingRecord mockPassingRecord = new PassingRecord();
+		when(mockSynapse.submitCertifiedUserTestResponse(any(QuizResponse.class))).thenReturn(mockPassingRecord);
+		QuizResponse myResponse = new QuizResponse();
+		myResponse.setId(837L);
+		String quizResponseJson = myResponse.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		synapseClient.submitCertificationQuizResponse(quizResponseJson);
+		verify(mockSynapse).submitCertifiedUserTestResponse(eq(myResponse));
+		
 	}
 }

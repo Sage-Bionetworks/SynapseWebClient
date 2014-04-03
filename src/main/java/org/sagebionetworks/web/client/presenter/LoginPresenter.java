@@ -273,16 +273,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 
-	public void updateProfile(final UserProfile profile, final AsyncCallback<Void> callback) {
+	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {
 		try { 
-			JSONObjectAdapter adapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
+			JSONObjectAdapter adapter = newProfile.writeToJSONObject(jsonObjectAdapter.createNew());
 			String userProfileJson = adapter.toJSONString();
 	
 			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					callback.onSuccess(result);
+					profile = newProfile;
 					authenticationController.updateCachedProfile(profile);
+					callback.onSuccess(result);
 				}
 				
 				@Override

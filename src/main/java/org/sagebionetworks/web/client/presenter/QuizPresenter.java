@@ -40,7 +40,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private GWTWrapper gwt;
 	private Quiz quiz;
 	
 	@Inject
@@ -49,8 +48,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
-			JSONObjectAdapter jsonObjectAdapter,
-			GWTWrapper gwt){
+			JSONObjectAdapter jsonObjectAdapter){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -58,7 +56,6 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.gwt = gwt;
 		this.view.setPresenter(this);
 	}
 	

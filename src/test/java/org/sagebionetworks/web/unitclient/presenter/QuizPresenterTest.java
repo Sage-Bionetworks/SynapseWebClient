@@ -46,7 +46,6 @@ public class QuizPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
-	GWTWrapper mockGwt;
 	org.sagebionetworks.web.client.place.Quiz place;
 	
 	@Before
@@ -55,9 +54,8 @@ public class QuizPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockGwt = mock(GWTWrapper.class);
-		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter, mockGwt);
-		when(mockGwt.getRandomNextInt(anyInt())).thenReturn(0);
+		
+		presenter = new QuizPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory, adapter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		Quiz questionnaire = SynapseClientStubUtil.mockQuiz();
