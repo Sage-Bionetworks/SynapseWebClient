@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -27,7 +23,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.AttachmentSelectedEvent;
 import org.sagebionetworks.web.client.events.AttachmentSelectedHandler;
@@ -39,19 +34,16 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
-import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
-import org.sagebionetworks.web.client.widget.table.CompleteTableWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -71,7 +63,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -141,7 +132,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private GlobalApplicationState globalApplicationState;
 	private boolean isProject = false;
 	private EntityArea currentArea;
-	private CompleteTableWidget completeTableWidget;
 	
 	private static int WIDGET_HEIGHT_PX = 270;
 	private static final int MAX_DISPLAY_NAME_CHAR = 40;
@@ -162,8 +152,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			MarkdownWidget markdownWidget, 
 			WikiPageWidget wikiPageWidget, 
 			PreviewWidget previewWidget, CookieProvider cookies,
-			GlobalApplicationState globalApplicationState,
-			CompleteTableWidget synapseTableWidget) {
+			GlobalApplicationState globalApplicationState) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
@@ -184,7 +173,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.wikiPageWidget = wikiPageWidget;
 		this.cookies = cookies;
 		this.globalApplicationState = globalApplicationState;
-		this.completeTableWidget = synapseTableWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		initProjectLayout();
 	}
@@ -723,7 +711,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, true, null);
 
 		// Table
-		CompleteTableWidget tableWidget = ginInjector.getCompleteTableWidget();
+		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
 			public void onQueryChange(String newQuery) {
