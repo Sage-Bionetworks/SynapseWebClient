@@ -12,6 +12,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -122,6 +123,7 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -1869,9 +1871,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
 			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
 			return passingRecordJson.toJSONString();
-		} catch (SynapseNotFoundException e) {
-			return null;
- 		} catch (SynapseException e) {
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
  		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());

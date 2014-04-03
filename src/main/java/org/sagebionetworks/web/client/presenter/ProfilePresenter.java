@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -27,6 +26,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -220,7 +220,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
-					PassingRecord passingRecord = QuizPresenter.getPassingRecord(passingRecordJson, adapterFactory);
+					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, teams, editable, isOwner, passingRecord, profileForm.asWidget());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -228,7 +228,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				if (caught instanceof NotFoundException)
+					view.updateView(profile, teams, editable, isOwner, null, profileForm.asWidget());
+				else
+					view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}

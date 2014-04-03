@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -100,12 +101,11 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
 			String questionnaireResponse = adapter.toJSONString();
 			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
-				
 				@Override
 				public void onSuccess(String passingRecordJson) {
 					try {
-						PassingRecord passingRecord = QuizPresenter.getPassingRecord(passingRecordJson, adapterFactory);
-						if (passingRecord != null && passingRecord.getPassed())
+						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+						if (passingRecord.getPassed())
 							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
 						else
 							view.showFailure();
@@ -147,20 +147,21 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				try {
 					//if certified, show the certificate
 					//otherwise, show the quiz
-					if (passingRecordJson != null) {
-						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-						view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
-					} else {
-						getQuiz();
-					}
+					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+				
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(caught.getMessage());
+				if (caught instanceof NotFoundException) {
+					getQuiz();
+				} else {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+						view.showErrorMessage(caught.getMessage());
+					}
 				}
 			}
 		});
@@ -185,13 +186,5 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				} 
 			}
 		});
-	}
-	
-	public static PassingRecord getPassingRecord(String passingRecordJson, AdapterFactory adapterFactory) throws JSONObjectAdapterException {
-		PassingRecord passingRecord = null;
-		if (passingRecordJson != null) {
-			passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-		}
-		return passingRecord;
 	}
 }

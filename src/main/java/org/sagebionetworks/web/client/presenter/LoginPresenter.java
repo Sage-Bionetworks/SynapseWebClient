@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -215,16 +216,15 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String passingRecordJson) {
-					if (passingRecordJson == null) {
-						view.hideLoggingInLoader();
-						view.showQuizInfoUI();
-					} else {
-						goToLastPlace();
-					}
+					goToLastPlace();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					goToLastPlace();
+					if (caught instanceof NotFoundException) {
+						view.hideLoggingInLoader();
+						view.showQuizInfoUI();
+					} else
+						goToLastPlace();
 				}
 			});
 		} else {

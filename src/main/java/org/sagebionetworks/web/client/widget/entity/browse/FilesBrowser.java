@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -98,20 +99,20 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecord) {
-				if (passingRecord != null)
-					view.showUploadDialog(configuredEntityId);
-				else
+				view.showUploadDialog(configuredEntityId);
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
 					view.showQuizInfoDialog(new CallbackP<Boolean>() {
 						@Override
 						public void invoke(Boolean tutorialClicked) {
 							if (!tutorialClicked)
 								view.showUploadDialog(configuredEntityId);
 						}
-					});
-			}
-			@Override
-			public void onFailure(Throwable t) {
-				view.showErrorMessage(t.getMessage());
+					});					
+				} else
+					view.showErrorMessage(t.getMessage());
 			}
 		};
 		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
@@ -123,9 +124,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecord) {
-				if (passingRecord != null)
-					createFolder();
-				else
+				createFolder();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
 					view.showQuizInfoDialog(new CallbackP<Boolean>() {
 						@Override
 						public void invoke(Boolean tutorialClicked) {
@@ -133,10 +136,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 								createFolder();
 						}
 					});
-			}
-			@Override
-			public void onFailure(Throwable t) {
-				view.showErrorMessage(t.getMessage());
+				} else 
+					view.showErrorMessage(t.getMessage());
 			}
 		};
 		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);

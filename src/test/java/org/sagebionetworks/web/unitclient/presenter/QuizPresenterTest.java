@@ -59,7 +59,7 @@ public class QuizPresenterTest {
 		when(mockGwt.getRandomNextInt(anyInt())).thenReturn(0);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
-		Questionnaire questionnaire = SynapseClientStubUtil.mockQuestionnaire();
+		Questionnaire questionnaire = SynapseClientStubUtil.mockQuiz();
 		String questionnaireJson = questionnaire.writeToJSONObject(adapter.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(questionnaireJson).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));

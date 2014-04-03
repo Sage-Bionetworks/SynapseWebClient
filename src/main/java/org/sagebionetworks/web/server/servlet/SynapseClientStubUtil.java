@@ -204,7 +204,7 @@ public class SynapseClientStubUtil {
 		return a;
 	}
 	
-	public static Quiz mockQuestionnaire() {
+	public static Quiz mockQuiz() {
 		Quiz quiz = new Quiz();
 		quiz.setHeader("Certification");
 		List<Question> questionOptions = new ArrayList<Question>();
