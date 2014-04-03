@@ -716,6 +716,7 @@ a.shortBtn {
     padding: 0 5px 2px;
     overflow:auto;
     white-space:pre;
+    word-wrap: normal;
 }
 
 .apitable label {
