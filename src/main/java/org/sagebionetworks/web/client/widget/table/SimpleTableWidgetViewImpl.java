@@ -116,9 +116,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
 	TableModel newRow = null;
-	SynapseJSNIUtils jsniUtils;
-	
+	SynapseJSNIUtils jsniUtils;	
 	List<TableModel> currentPage;
+	Button addRowBtn;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
@@ -185,12 +185,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	
 	private void showAddColumnsView() {
 		hideLoading();		
-		pagerContainer.setVisible(false);
-		FlowPanel addColumnPanel = new FlowPanel();
+		pagerContainer.setVisible(false);		
+		if(addRowBtn != null) addRowBtn.setEnabled(false);
+		FlowPanel addAColumnPanel = new FlowPanel();
+		addAColumnPanel.addStyleName("alert alert-success");
+		addAColumnPanel.add(new HTML("Consider adding a column"));
 		
-		// TODO : complete
-		
-		tableContainer.setWidget(addColumnPanel);		
+		tableContainer.setWidget(addAColumnPanel);		
 	}
 
 	@Override
@@ -201,7 +202,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@Override
 	public void insertNewRow(TableModel model) {
 		newRow = model;
-		if(currentPage == null) currentPage  = new ArrayList<TableModel>();
+		if(currentPage == null) currentPage = new ArrayList<TableModel>();
 		currentPage.add(0, model);			
 		cellTable.setRowData(currentPage); // causes onRangeChange event
 	}
@@ -536,7 +537,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			}
 		});
 		
-		Button addRowBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_ROW, ButtonType.DEFAULT, "glyphicon-plus");
+		addRowBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_ROW, ButtonType.DEFAULT, "glyphicon-plus");
 		addRowBtn.addStyleName("margin-right-5");
 		addRowBtn.addClickHandler(new ClickHandler() {			
 			@Override
@@ -653,7 +654,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @return
 	 */
 	private Widget createColumnEditor(final org.sagebionetworks.repo.model.table.ColumnModel col) {
-		FlowPanel form = new FlowPanel();
+		final FlowPanel form = new FlowPanel();
 		form.addStyleName("margin-top-15");		
 		
 		// Column Name	
@@ -720,7 +721,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				if(restrictedValues.size() > 0) col.setEnumValues(restrictedValues);
 				presenter.createColumn(col);
 				
-				refreshAddColumnPanel();
+				columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
+				refreshAddColumnPanel(); // clear aout add column view
 			}
 		});
 		form.add(save);
@@ -786,7 +788,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		addColumnPanel.setVisible(false);
 		org.sagebionetworks.repo.model.table.ColumnModel newColumn = new org.sagebionetworks.repo.model.table.ColumnModel();
 		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
-		addColumnPanel.add(createColumnEditor(newColumn));
+		addColumnPanel.add(createColumnEditor(newColumn));		
 	}
 
 
