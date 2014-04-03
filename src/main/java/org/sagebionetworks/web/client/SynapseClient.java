@@ -276,10 +276,9 @@ public interface SynapseClient extends RemoteService {
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
 	
-	public Boolean isCertifiedUser(String userId) throws RestServiceException;
-	public String getCertificationDate(String userId) throws RestServiceException;
-	public String getCertificationQuestionnaire() throws RestServiceException;
-	public Boolean submitCertificationQuestionnaireResponse(String questionnaireResponseJson) throws RestServiceException; 
+	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
+	public String getCertificationQuiz() throws RestServiceException;
+	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException; 
 	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	

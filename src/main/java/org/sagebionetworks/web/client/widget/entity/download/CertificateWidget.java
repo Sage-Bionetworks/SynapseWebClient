@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,24 +34,9 @@ public class CertificateWidget implements Presenter, SynapseWidgetPresenter {
 		view.setPresenter(this);
 	}
 
-	public void setProfile(UserProfile profile) {
+	public void configure(UserProfile profile, PassingRecord passingRecord) {
 		view.setProfile(profile);
-		getCertificationDate(profile.getOwnerId());
-	}
-	
-	public void getCertificationDate(String userId) {
-		synapseClient.getCertificationDate(userId, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				view.setCertificationDate(result);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		});
+		view.setCertificationDate(passingRecord.getPassedOn());
 	}
 	
 	@Override

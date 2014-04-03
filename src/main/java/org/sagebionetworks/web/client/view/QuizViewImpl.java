@@ -2,13 +2,17 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
-import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
+import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Question;
+import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -74,7 +78,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
-	Map<Long, List<Long>> questionIndex2AnswerIndices; 
+	Map<Long, Set<Long>> questionIndex2AnswerIndices; 
 	private int currentQuestionCount;
 	
 	@Inject
@@ -94,7 +98,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		successContainer.setWidget(certificateWidget.asWidget());
 		
 		isSubmitInitialized = false;
-		questionIndex2AnswerIndices = new HashMap<Long, List<Long>>();
+		questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
 		
 		tutorialButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -145,14 +149,15 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 	
 	@Override
-	public void showQuiz(String quizHeader, List<Question> quiz) {
+	public void showQuiz(Quiz quiz) {
 		hideAll();
-		quizHighlightBox.setAttribute("title", quizHeader);
+		quizHighlightBox.setAttribute("title", quiz.getHeader());
 		//clear old questions
 		clear();
-		currentQuestionCount = quiz.size();
+		List<Question> questions = quiz.getQuestions();
+		currentQuestionCount = questions.size();
 		int questionNumber = 1;
-		for (Question question : quiz) {
+		for (Question question : questions) {
 			testContainer.add(addQuestion(questionNumber++, question));
 		}
 		
@@ -174,9 +179,9 @@ public class QuizViewImpl extends Composite implements QuizView {
     }
 	
 	@Override
-	public void showSuccess(UserProfile profile) {
+	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
 		hideAll();
-		certificateWidget.setProfile(profile);
+		certificateWidget.configure(profile, passingRecord);
 		successContainer.setVisible(true);
 	}
 	
@@ -204,7 +209,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 					answerButton.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							List<Long> answers = getAnswerIndexes(multichoiceQuestion.getQuestionIndex());
+							Set<Long> answers = getAnswerIndexes(multichoiceQuestion.getQuestionIndex());
 							answers.clear();
 							answers.add(answer.getAnswerIndex());
 						}
@@ -223,10 +228,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 						@Override
 						public void onClick(ClickEvent event) {
 							//not exclusive, include all possible answer indexes
-							List<Long> answers = getAnswerIndexes(multichoiceQuestion.getQuestionIndex());
+							Set<Long> answers = getAnswerIndexes(multichoiceQuestion.getQuestionIndex());
 							if (checkbox.getValue()) {
-								if (!answers.contains(answer.getAnswerIndex()))
-									answers.add(answer.getAnswerIndex());	
+								answers.add(answer.getAnswerIndex());	
 							} else {
 								answers.remove(answer.getAnswerIndex());
 							}
@@ -241,10 +245,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 		return questionContainer;
 	}
 	
-	private List<Long> getAnswerIndexes(Long questionIndex) {
-		List<Long> answers = questionIndex2AnswerIndices.get(questionIndex);
+	private Set<Long> getAnswerIndexes(Long questionIndex) {
+		Set<Long> answers = questionIndex2AnswerIndices.get(questionIndex);
 		if (answers == null) {
-			answers = new ArrayList<Long>();
+			answers = new HashSet<Long>();
 			questionIndex2AnswerIndices.put(questionIndex, answers);
 		}
 		return answers;

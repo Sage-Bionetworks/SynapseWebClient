@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceResponse;
-import org.sagebionetworks.repo.model.questionnaire.Question;
-import org.sagebionetworks.repo.model.questionnaire.QuestionResponse;
-import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
-import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
-import org.sagebionetworks.repo.model.questionnaire.QuestionnaireResponse;
+import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.QuestionResponse;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
 
@@ -31,9 +30,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class QuizPresenter extends AbstractActivity implements QuizView.Presenter, Presenter<Quiz> {
+public class QuizPresenter extends AbstractActivity implements QuizView.Presenter, Presenter<org.sagebionetworks.web.client.place.Quiz> {
 
-	private Quiz testPlace;
+	private org.sagebionetworks.web.client.place.Quiz testPlace;
 	private QuizView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
@@ -41,7 +40,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	private AdapterFactory adapterFactory;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private GWTWrapper gwt;
-	private List<Question> quiz;
+	private Quiz quiz;
 	
 	@Inject
 	public QuizPresenter(QuizView view,  
@@ -84,35 +83,35 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	@Override
-	public void submitAnswers(Map<Long, List<Long>> questionIndex2AnswerIndices) {
+	public void submitAnswers(Map<Long, Set<Long>> questionIndex2AnswerIndices) {
 		try {
 			//submit question/answer combinations for approval
 			//create response object from answers
-			QuestionnaireResponse submission = new QuestionnaireResponse();
+			QuizResponse submission = new QuizResponse();
 			List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
 			for (Long questionIndex : questionIndex2AnswerIndices.keySet()) {
-				List<Long> answerIndices = questionIndex2AnswerIndices.get(questionIndex);
+				Set<Long> answerIndices = questionIndex2AnswerIndices.get(questionIndex);
 				MultichoiceResponse response = new MultichoiceResponse();
 				response.setQuestionIndex(questionIndex);
-				//TODO: these should be ints, but they are currently incorrectly Strings in the json schema.
-				List<String> answerIndicesStrings = new ArrayList<String>();
-				for (Long index : answerIndices) {
-					answerIndicesStrings.add(index.toString());
-				}
-				response.setAnswerIndex(answerIndicesStrings);
+				response.setAnswerIndex(answerIndices);
 				questionResponses.add(response);
 			}
 			submission.setQuestionResponses(questionResponses);
 			JSONObjectAdapter adapter = submission.writeToJSONObject(jsonObjectAdapter.createNew());
 			String questionnaireResponse = adapter.toJSONString();
-			synapseClient.submitCertificationQuestionnaireResponse(questionnaireResponse, new AsyncCallback<Boolean>() {
+			synapseClient.submitCertificationQuizResponse(questionnaireResponse, new AsyncCallback<String>() {
 				
 				@Override
-				public void onSuccess(Boolean passed) {
-					if (passed)
-						view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
-					else
-						view.showFailure();
+				public void onSuccess(String passingRecordJson) {
+					try {
+						PassingRecord passingRecord = QuizPresenter.getPassingRecord(passingRecordJson, adapterFactory);
+						if (passingRecord != null && passingRecord.getPassed())
+							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+						else
+							view.showFailure();
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
 				}
 				
 				@Override
@@ -134,7 +133,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
     }
 
 	@Override
-	public void setPlace(Quiz place) {
+	public void setPlace(org.sagebionetworks.web.client.place.Quiz place) {
 		this.testPlace = place;
 		view.setPresenter(this);
 		view.clear();
@@ -142,15 +141,20 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	}
 	
 	public void getIsCertified() {
-		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(Boolean isCertified) {
-				//if certified, show the certificate again
-				//otherwise, show the questionnaire
-				if (isCertified) {
-					view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile());
-				} else {
-					getQuestionnaire();
+			public void onSuccess(String passingRecordJson) {
+				try {
+					//if certified, show the certificate
+					//otherwise, show the quiz
+					if (passingRecordJson != null) {
+						PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+						view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
+					} else {
+						getQuiz();
+					}
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
 				}
 			}
 			@Override
@@ -162,19 +166,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		});
 	}
 	
-	public void getQuestionnaire() {
-		synapseClient.getCertificationQuestionnaire(new AsyncCallback<String>() {
+	public void getQuiz() {
+		synapseClient.getCertificationQuiz(new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String questionnaireJson) {
+			public void onSuccess(String quizJson) {
 				try {
-					Questionnaire questionnaire = new Questionnaire(adapterFactory.createNew(questionnaireJson));
-					quiz = new ArrayList<Question>();
-					//create a quiz
-					for (QuestionVariety qv : questionnaire.getQuestions()) {
-						List<Question> possibleQuestions = qv.getQuestionOptions();
-						quiz.add(possibleQuestions.get(gwt.getRandomNextInt(possibleQuestions.size())));
-					}
-					view.showQuiz(questionnaire.getHeader(), quiz);
+					quiz = new Quiz(adapterFactory.createNew(quizJson));
+					view.showQuiz(quiz);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -187,5 +185,13 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				} 
 			}
 		});
+	}
+	
+	public static PassingRecord getPassingRecord(String passingRecordJson, AdapterFactory adapterFactory) throws JSONObjectAdapterException {
+		PassingRecord passingRecord = null;
+		if (passingRecordJson != null) {
+			passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+		}
+		return passingRecord;
 	}
 }

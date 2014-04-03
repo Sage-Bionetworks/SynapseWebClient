@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.Date;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
@@ -42,8 +45,8 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	}
 	
 	@Override
-	public void setCertificationDate(String dateCertified) {
-		datePassed.setInnerHTML(dateCertified);
+	public void setCertificationDate(Date dateCertified) {
+		datePassed.setInnerHTML(DateTimeFormat.getLongDateFormat().format(dateCertified));
 	}
 
 	@Override

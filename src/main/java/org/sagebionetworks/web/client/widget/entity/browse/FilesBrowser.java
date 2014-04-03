@@ -95,10 +95,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	@Override
 	public void uploadButtonClicked() {
 		//is this a certified user?
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(Boolean isCertified) {
-				if (isCertified)
+			public void onSuccess(String passingRecord) {
+				if (passingRecord != null)
 					view.showUploadDialog(configuredEntityId);
 				else
 					view.showQuizInfoDialog(new CallbackP<Boolean>() {
@@ -114,16 +114,16 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	@Override
 	public void addFolderClicked() {
 		//is this a certified user?
-		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(Boolean isCertified) {
-				if (isCertified)
+			public void onSuccess(String passingRecord) {
+				if (passingRecord != null)
 					createFolder();
 				else
 					view.showQuizInfoDialog(new CallbackP<Boolean>() {
@@ -139,7 +139,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				view.showErrorMessage(t.getMessage());
 			}
 		};
-		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	public void createFolder() {

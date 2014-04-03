@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
@@ -26,7 +27,6 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.Html;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -34,12 +34,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -87,7 +86,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
-	private Html profileWidget;
+	private FlowPanel profileWidget;
 	private Image defaultProfilePicture;
 	
 	private Footer footerWidget;
@@ -146,7 +145,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, boolean isCertified, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -166,7 +165,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, isCertified, isOwner);
+			updateViewProfile(profile, passingRecord, isOwner);
 			viewProfilePanel.add(profileWidget);
 			
 			if (isOwner) {
@@ -225,7 +224,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	 private void createViewProfile() {
 		 profileWidget = new FlowPanel();
-		 profilePictureHtml = new Html();
 		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
 	 }
 	 
@@ -289,7 +287,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		return editPictureButton;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, boolean isCertified, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, PassingRecord passingRecord, boolean isOwner) {
+		 profileWidget.clear();
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -301,10 +300,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		 if (isCertified) {
+		 if (passingRecord != null) {
 			 Anchor tutorialLink = new Anchor();
 			 tutorialLink.setHTML(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
-			 certificateWidget.setProfile(profile);
+			 certificateWidget.configure(profile, passingRecord);
 			 tutorialLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -319,6 +318,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 builder.appendHtmlConstant("<h2>");
 		 builder.appendEscapedLines(name);
 		 builder.appendHtmlConstant("</h2>");
+		 
+		 HTML headlineHtml = new HTML(builder.toSafeHtml());
+		 headlineHtml.addStyleName("inline-block");
+		 profileWidget.add(headlineHtml);
+		 builder = new SafeHtmlBuilder();
 		 
 		 if (position.length()>0 || company.length()>0) {
 			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
@@ -354,10 +358,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 // Account number
 		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
 		 
-		 profileWidget.setHtml(builder.toSafeHtml().asString());
-		 
+		 HTML profileHtml = new HTML(builder.toSafeHtml());
+		 profileWidget.add(profileHtml);
+
 		 picturePanel.add(getProfilePicture(profile, profile.getPic()));
-		 }
+	}
 		 
 			@Override
 	public void refreshHeader() {

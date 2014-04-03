@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -213,10 +212,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void checkForCertifiedUser(){
 		view.showLoggingInLoader();
 		if (!isIgnoreQuizReminder()) {
-			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
 				@Override
-				public void onSuccess(Boolean isCertified) {
-					if (!isCertified) {
+				public void onSuccess(String passingRecordJson) {
+					if (passingRecordJson == null) {
 						view.hideLoggingInLoader();
 						view.showQuizInfoUI();
 					} else {

@@ -9,11 +9,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -85,21 +83,15 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.provenance.Activity;
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
-import org.sagebionetworks.repo.model.questionnaire.Question;
-import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
-import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
-import org.sagebionetworks.repo.model.questionnaire.QuestionnaireResponse;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.TableState;
-import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -115,17 +107,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.table.query.model.OrderByClause;
-import org.sagebionetworks.table.query.model.OrderingSpecification;
-import org.sagebionetworks.table.query.model.Pagination;
-import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SortKey;
-import org.sagebionetworks.table.query.model.SortSpecification;
-import org.sagebionetworks.table.query.model.SortSpecificationList;
-import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.util.SqlElementUntils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -145,7 +126,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -164,7 +144,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	SimpleDateFormat certificateDateFormatter = new SimpleDateFormat("MMMMM d, yyyy");
 	
 	/**
 	 * Injected with Gin
@@ -1884,53 +1863,46 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public Boolean isCertifiedUser(String userId) throws RestServiceException {
-		//TODO: is this user already certified?
-//		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
-		Boolean isCertified = isTeamMember(userId, 3318980L);
-		return isCertified;
-	}
-	
-	@Override
-	public String getCertificationDate(String userId) throws RestServiceException {
-		//TODO: if certified, when did this user pass the certification test 
-		String dateJoined = certificateDateFormatter.format(new Date());
-		return dateJoined;
-	}
-	
-	@Override
-	public String getCertificationQuestionnaire() throws RestServiceException {
+	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//Questionnaire questionnaire = synapseClient.getCertificationQuestionnaire();
-			Questionnaire questionnaire = SynapseClientStubUtil.mockQuestionnaire();
-			JSONObjectAdapter questionnaireJson = questionnaire.writeToJSONObject(adapterFactory.createNew());
-			return questionnaireJson.toJSONString();
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
+			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
+			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+			return passingRecordJson.toJSONString();
+		} catch (SynapseNotFoundException e) {
+			return null;
+ 		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
  		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
-	private static Boolean success = true;
+	@Override
+	public String getCertificationQuiz() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Quiz quiz = synapseClient.getCertifiedUserTest();
+			JSONObjectAdapter quizJson = quiz.writeToJSONObject(adapterFactory.createNew());
+			return quizJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 	
 	@Override
-	public Boolean submitCertificationQuestionnaireResponse(String questionnaireResponseJson) throws RestServiceException {
+	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			QuestionnaireResponse response = jsonEntityFactory.createEntity(questionnaireResponseJson, QuestionnaireResponse.class);
-			//TODO: score? pass/fail? = synapseClient.submitResponse(response);
-			if (success) {
-				success = false;
-				return true;
-			} else {
-				success = true;
-				return false;
-			}
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
+			QuizResponse response = jsonEntityFactory.createEntity(quizResponseJson, QuizResponse.class);
+			PassingRecord passingRecord = synapseClient.submitCertifiedUserTestResponse(response);
+			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+			return passingRecordJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
  		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}

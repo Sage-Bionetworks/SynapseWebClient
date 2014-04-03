@@ -3,11 +3,10 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
-import org.sagebionetworks.repo.model.questionnaire.Question;
-import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
-import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
+import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
+import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.quiz.Question;
+import org.sagebionetworks.repo.model.quiz.Quiz;
 
 //import java.util.logging.Logger;
 //
@@ -205,13 +204,9 @@ public class SynapseClientStubUtil {
 		return a;
 	}
 	
-	public static Questionnaire mockQuestionnaire() {
-		
-		//the mock questionnaire has 2 varieties of a single question.  One will be randomly selected client-side.  One is exclusive, one is not.
-		Questionnaire questionnaire = new Questionnaire();
-		questionnaire.setHeader("Certification");
-		List<QuestionVariety> questionVarieties = new ArrayList<QuestionVariety>();
-		QuestionVariety qv = new QuestionVariety();
+	public static Quiz mockQuestionnaire() {
+		Quiz quiz = new Quiz();
+		quiz.setHeader("Certification");
 		List<Question> questionOptions = new ArrayList<Question>();
 		MultichoiceQuestion q1 = new MultichoiceQuestion();
 		q1.setExclusive(true);
@@ -251,12 +246,6 @@ public class SynapseClientStubUtil {
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
 		
-		
-		qv.setQuestionOptions(questionOptions);
-		questionVarieties.add(qv);
-		
-		qv = new QuestionVariety();
-		questionOptions = new ArrayList<Question>();
 		q1 = new MultichoiceQuestion();
 		q1.setExclusive(true);
 		questionIndex++;
@@ -270,11 +259,7 @@ public class SynapseClientStubUtil {
 		
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
-		qv.setQuestionOptions(questionOptions);
-		questionVarieties.add(qv);
 		
-		qv = new QuestionVariety();
-		questionOptions = new ArrayList<Question>();
 		q1 = new MultichoiceQuestion();
 		q1.setExclusive(false);
 		questionIndex++;
@@ -287,11 +272,8 @@ public class SynapseClientStubUtil {
 		answers.add(getAnswer(answerIndex++, "I can <b>only</b> upload or download data via the web client"));
 		q1.setAnswers(answers);
 		questionOptions.add(q1);
-		qv.setQuestionOptions(questionOptions);
-		questionVarieties.add(qv);
 		
-		
-		questionnaire.setQuestions(questionVarieties);
-		return questionnaire;
+		quiz.setQuestions(questionOptions);
+		return quiz;
 	}
 }

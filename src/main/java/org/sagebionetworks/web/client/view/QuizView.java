@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -14,8 +15,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface QuizView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter loginPresenter);	
-	void showQuiz(String quizHeader, List<Question> questions);
-	void showSuccess(UserProfile profile);
+	void showQuiz(Quiz questions);
+	void showSuccess(UserProfile profile, PassingRecord passingRecord);
 	void showFailure();
 	void hideLoading();
 	
@@ -23,7 +24,7 @@ public interface QuizView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void goToLastPlace();
 		
-		void submitAnswers(Map<Long, List<Long>> questionIndex2AnswerIndices);
+		void submitAnswers(Map<Long, Set<Long>> questionIndex2AnswerIndices);
     }
 	
 }

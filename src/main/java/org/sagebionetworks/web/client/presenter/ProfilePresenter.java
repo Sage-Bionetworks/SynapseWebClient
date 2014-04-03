@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.message.Settings;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -215,10 +216,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean editable, final boolean isOwner) {
-		synapseClient.isCertifiedUser(profile.getOwnerId(), new AsyncCallback<Boolean>() {
+		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(Boolean isCertified) {
-				view.updateView(profile, teams, editable, isOwner, isCertified, profileForm.asWidget());
+			public void onSuccess(String passingRecordJson) {
+				try {
+					PassingRecord passingRecord = QuizPresenter.getPassingRecord(passingRecordJson, adapterFactory);
+					view.updateView(profile, teams, editable, isOwner, passingRecord, profileForm.asWidget());
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -61,16 +61,16 @@ public class QuizPresenterTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		Questionnaire questionnaire = SynapseClientStubUtil.mockQuestionnaire();
 		String questionnaireJson = questionnaire.writeToJSONObject(adapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(questionnaireJson).when(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).submitCertificationQuestionnaireResponse(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(questionnaireJson).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));
 		verify(mockView).setPresenter(presenter);
 		place = Mockito.mock(Quiz.class);
 	}	
 	
 	@Test
 	public void testGetQuestionaire() {
-		presenter.getQuestionnaire();
-		verify(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
+		presenter.getQuiz();
+		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		ArgumentCaptor<List> arg = ArgumentCaptor.forClass(List.class);
 		verify(mockView).showQuiz(anyString(), arg.capture());
 		//mock quiz has 3 questions, one having 2 variants, verify that a single question is passed to the view
@@ -79,9 +79,9 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testGetQuestionaireFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
-		presenter.getQuestionnaire();
-		verify(mockSynapseClient).getCertificationQuestionnaire(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
+		presenter.getQuiz();
+		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
@@ -107,7 +107,7 @@ public class QuizPresenterTest {
 		
 		//let's also check the response object
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).submitCertificationQuestionnaireResponse(arg.capture(), any(AsyncCallback.class));
+		verify(mockSynapseClient).submitCertificationQuizResponse(arg.capture(), any(AsyncCallback.class));
 		//reconstruct the QuestionnaireResponse, and sanity check that it should have 2 question responses
 		QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse(adapterFactory.createNew(arg.getValue()));
 		assertEquals(2, questionnaireResponse.getQuestionResponses().size());
@@ -115,7 +115,7 @@ public class QuizPresenterTest {
 
 	@Test
 	public void testSubmitAnswersFailed() throws JSONObjectAdapterException {
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).submitCertificationQuestionnaireResponse(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));
 		presenter.submitAnswers(new HashMap<Long, List<Long>>());
 		
 		//since we set it up to return false, it should show the failed UI
@@ -124,7 +124,7 @@ public class QuizPresenterTest {
 	
 	@Test
 	public void testSubmitAnswersError() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuestionnaireResponse(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).submitCertificationQuizResponse(anyString(), any(AsyncCallback.class));
 		presenter.submitAnswers(new HashMap<Long, List<Long>>());
 		verify(mockView).showErrorMessage(anyString());
 	}
