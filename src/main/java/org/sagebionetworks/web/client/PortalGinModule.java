@@ -54,6 +54,8 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
 import org.sagebionetworks.web.client.view.ProjectsHomeView;
 import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
+import org.sagebionetworks.web.client.view.QuizView;
+import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.view.SearchViewImpl;
 import org.sagebionetworks.web.client.view.SettingsView;
@@ -64,8 +66,6 @@ import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.client.view.TeamSearchViewImpl;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
-import org.sagebionetworks.web.client.view.QuizView;
-import org.sagebionetworks.web.client.view.QuizViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -134,6 +134,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateView;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
@@ -447,7 +451,10 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// QuizView
 		bind(QuizViewImpl.class).in(Singleton.class);
-		bind(QuizView.class).to(QuizViewImpl.class);		
+		bind(QuizView.class).to(QuizViewImpl.class);
+		
+		// Certificate
+		bind(CertificateView.class).to(CertificateViewImpl.class);		
 		
 		/*
 		 * Factories
@@ -547,6 +554,8 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// LocationableUploader
 		bind(UploaderView.class).to(UploaderViewImpl.class);
+		
+		bind(QuizInfoWidgetView.class).to(QuizInfoViewImpl.class);
 
 		// EntityTreeBrowser
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);

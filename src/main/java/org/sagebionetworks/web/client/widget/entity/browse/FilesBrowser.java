@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
 
@@ -91,8 +92,56 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}
 
+	@Override
+	public void uploadButtonClicked() {
+		//is this a certified user?
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isCertified) {
+				if (isCertified)
+					view.showUploadDialog(configuredEntityId);
+				else
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								view.showUploadDialog(configuredEntityId);
+						}
+					});
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+	}
 	
 	@Override
+	public void addFolderClicked() {
+		//is this a certified user?
+		AsyncCallback<Boolean> userCertifiedCallback = new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean isCertified) {
+				if (isCertified)
+					createFolder();
+				else
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								createFolder();
+						}
+					});
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				view.showErrorMessage(t.getMessage());
+			}
+		};
+		synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+	}
+	
 	public void createFolder() {
 		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
 		String entityJson;

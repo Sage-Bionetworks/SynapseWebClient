@@ -17,6 +17,14 @@ public class DisplayConstants {
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	
+	//quiz
+	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
+	public static final String QUIZ_MORE_INFO = 
+			"<blockquote class=\"margin-bottom-40\"><div class=\"margin-top-left-10\">Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse.</div>" +
+			"<div class=\"margin-top-left-10\">Certified Synapse users are allowed to upload content and access Client API.</div>" +
+			"<div class=\"margin-top-left-10\">Individuals wishing to gain the certification must:" +
+			"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> Study the tutorial materials</li><li>Complete a brief examination</li></ul></div></blockquote>";
+	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
 	public static final String FOLLOW_ANALYSIS_HTML = "Following an analysis project allows you to be notified when the analysis has new comments or additional steps.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
@@ -153,6 +161,9 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String REMIND_ME_LATER = "Remind me later";
+	public static final String BUTTON_CONTINUE = "Continue";
+	public static final String BECOME_CERTIFIED = "Become Certified";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_NO_DOWNLOADS = "There are no downloads available.";
 	public static final String TEXT_UNAUTH_DOWNLOADS = "Please login or sign the End User License Agreement to see downloads.";
@@ -189,6 +200,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
+	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String TITLE_ADD_ANNOTATION = "Add Annotation";
 	public static final String BUTTON_RETURN_TO_LAYER = "Return to Layer";
 	public static final String LABEL_GOTO_SYNAPSE_ID = "Enter a Synapse Id...";

@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -85,6 +85,12 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
+import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
+import org.sagebionetworks.repo.model.questionnaire.QuestionnaireResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -158,6 +164,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	SimpleDateFormat certificateDateFormatter = new SimpleDateFormat("MMMMM d, yyyy");
 	
 	/**
 	 * Injected with Gin
@@ -1818,7 +1825,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-
 	public String getTeamMembershipState(String currentUserId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1877,6 +1883,70 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	@Override
+	public Boolean isCertifiedUser(String userId) throws RestServiceException {
+		//TODO: is this user already certified?
+//		return isTeamMember(userId, AuthorizationConstants.BOOTSTRAP_PRINCIPAL.TRAINED_USER_GROUP.getPrincipalId());
+		Boolean isCertified = isTeamMember(userId, 3318980L);
+		return isCertified;
+	}
+	
+	@Override
+	public String getCertificationDate(String userId) throws RestServiceException {
+		//TODO: if certified, when did this user pass the certification test 
+		String dateJoined = certificateDateFormatter.format(new Date());
+		return dateJoined;
+	}
+	
+	@Override
+	public String getCertificationQuestionnaire() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			//Questionnaire questionnaire = synapseClient.getCertificationQuestionnaire();
+			Questionnaire questionnaire = SynapseClientStubUtil.mockQuestionnaire();
+			JSONObjectAdapter questionnaireJson = questionnaire.writeToJSONObject(adapterFactory.createNew());
+			return questionnaireJson.toJSONString();
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	private static Boolean success = true;
+	
+	@Override
+	public Boolean submitCertificationQuestionnaireResponse(String questionnaireResponseJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			QuestionnaireResponse response = jsonEntityFactory.createEntity(questionnaireResponseJson, QuestionnaireResponse.class);
+			//TODO: score? pass/fail? = synapseClient.submitResponse(response);
+			if (success) {
+				success = false;
+				return true;
+			} else {
+				success = true;
+				return false;
+			}
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
+		Boolean isMember = null;
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(groupPrincipalId.toString(), userId);
+			isMember = membershipStatus.getIsMember(); 
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		return isMember;
+	}
 	
 	@Override
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {
@@ -2594,7 +2664,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String json = null;
 		try {
 			RowSet rs = synapseClient.queryTableEntity(executedQuery);
-			json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		} catch (SynapseTableUnavilableException e) {
 			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
@@ -2641,6 +2711,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
 		
 		return pageName2WikiKeyMap;
 	}

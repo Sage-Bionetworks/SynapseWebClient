@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -38,6 +39,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,6 +56,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel updateUserInfoPanel;
 	@UiField
+	SimplePanel certificatePanel;
+	@UiField
 	SimplePanel updateWithLinkedInPanel;
 	@UiField
 	SimplePanel viewProfilePanel;
@@ -61,7 +65,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel myTeamsPanel;
 	@UiField
 	SimplePanel myTeamInvitesPanel;
-
+	
 	@UiField
 	FlowPanel editProfileButtonPanel;
 	@UiField
@@ -72,7 +76,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel editPicturePanel;
 	@UiField
 	SimplePanel editPictureButtonPanel;
-
+	
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -91,6 +95,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
+	private CertificateWidget certificateWidget;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -101,7 +106,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			CookieProvider cookies) {		
+			CookieProvider cookies,
+			CertificateWidget certificateWidget) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -111,11 +117,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.cookies = cookies;
+		this.certificateWidget = certificateWidget;
+		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-		
+		certificatePanel.setWidget(certificateWidget.asWidget());
 		createViewProfile();
 		linkedInButtonEditProfile = createLinkedInButton();
 		linkedInButtonViewProfile = createLinkedInButton();
@@ -124,8 +132,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		picturePanel.clear();
 	}
-
-	@Override
+	
+			@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
@@ -138,7 +146,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, boolean isCertified, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -158,7 +166,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, isOwner);
+			updateViewProfile(profile, isCertified, isOwner);
 			viewProfilePanel.add(profileWidget);
 			
 			if (isOwner) {
@@ -173,9 +181,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}, (CallbackP)null);
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
+				}
 			}
 		}
-	}
 	
 	@Override
 	public void render() {
@@ -187,23 +195,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private void createEditProfileCommandsPanel() {
 		editProfileButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_PROFILE, ButtonType.DEFAULT, "glyphicon-pencil");
 		editProfileButton.addClickHandler(new ClickHandler() {
-			@Override
+	    	@Override
 			public void onClick(ClickEvent event) {
-				presenter.redirectToEditProfile();
-			}
-		});
+	    		presenter.redirectToEditProfile();
+	    	}
+	    });
 		editProfileButton.addStyleName("right btn-xs margin-left-5");
 	}
-	
+	 
 	private Button createLinkedInButton() {
 		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
 		command.addClickHandler(new ClickHandler() {
-			@Override
+	    	@Override
 			public void onClick(ClickEvent event) {
 				linkedInClicked();
 			}
 		});
-		
+	    
 		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
 		command.addStyleName("right btn-xs");
 		
@@ -216,7 +224,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	 private void createViewProfile() {
-		 profileWidget = new Html();
+		 profileWidget = new FlowPanel();
+		 profilePictureHtml = new Html();
 		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
 	 }
 	 
@@ -280,7 +289,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		return editPictureButton;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, boolean isCertified, boolean isOwner) {
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -292,6 +301,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		 if (isCertified) {
+			 Anchor tutorialLink = new Anchor();
+			 tutorialLink.setHTML(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
+			 certificateWidget.setProfile(profile);
+			 tutorialLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					clear();
+					certificatePanel.setVisible(true);
+				}
+			});
+			 
+			profileWidget.add(tutorialLink);
+		 }
+			 
 		 builder.appendHtmlConstant("<h2>");
 		 builder.appendEscapedLines(name);
 		 builder.appendHtmlConstant("</h2>");
@@ -329,13 +353,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 // Account number
 		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
-
+		 
 		 profileWidget.setHtml(builder.toSafeHtml().asString());
 		 
 		 picturePanel.add(getProfilePicture(profile, profile.getPic()));
-	 }
-	 
-	@Override
+		 }
+		 
+			@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
 	}
@@ -366,5 +390,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		editPicturePanel.clear();
 		editPictureButtonPanel.clear();
+		certificatePanel.setVisible(false);
 	}
 }

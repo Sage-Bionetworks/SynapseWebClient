@@ -15,9 +15,9 @@
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
     	<div class="container margin-top-15"> 		
-			<g:HTMLPanel>
+			<g:HTMLPanel ui:field="quizContainer" visible="false">
 				<div class="row">				
-					<div class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10" title="Quiz">
+					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 						<form>
 						    <g:FlowPanel ui:field="testContainer">
 						    </g:FlowPanel>
@@ -28,6 +28,29 @@
 					</div>
 				</div>
 			</g:HTMLPanel>
+			<g:SimplePanel ui:field="successContainer" visible="false">
+			</g:SimplePanel>
+			
+			<g:HTMLPanel ui:field="failureContainer" visible="false">
+				<div class="row">
+				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+				        <div class="panel panel-danger">
+					      <div class="panel-heading">
+							<h3 class="panel-title">Try again</h3>
+					      </div>
+					      <div class="panel-body">
+								<p>All questions must be answered correctly in order to be granted certification.</p>
+								<p>Please review the tutorial, and try again.</p>
+					      </div>
+					    </div>
+				    </div>
+					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+					    <g:Button ui:field="tutorialButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Back to the Tutorial"/>
+					</div>
+				</div>
+			</g:HTMLPanel>
+			
+			
 		</div> <!-- close class="container" -->
 <!-- start footer -->
 		<div class="clear"></div>

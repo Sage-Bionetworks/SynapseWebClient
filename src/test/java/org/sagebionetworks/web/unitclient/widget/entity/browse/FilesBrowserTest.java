@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -50,6 +52,8 @@ public class FilesBrowserTest {
 				mockGlobalApplicationState, mockAuthenticationController);
 		verify(mockView).setPresenter(filesBrowser);
 		filesBrowser.configure(configuredEntityId);
+		String newId = "syn456";
+		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		reset(mockView);
 	}
 	
@@ -69,9 +73,6 @@ public class FilesBrowserTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateFolder() throws Exception {
-		String newId = "syn456";
-		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
-		
 		filesBrowser.createFolder();
 		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		verify(mockView).showFolderEditDialog(anyString());
@@ -137,6 +138,68 @@ public class FilesBrowserTest {
 		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 	}
+	
+	@Test
+	public void testUploadButtonClickedCertified(){
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		filesBrowser.uploadButtonClicked();
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadButtonClickedNotCertified(){
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		filesBrowser.uploadButtonClicked();
+		
+		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockView).showQuizInfoDialog(arg.capture());
+		CallbackP callback = arg.getValue();
+		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
+		callback.invoke(true);
+		verify(mockView, never()).showUploadDialog(anyString());
+		//but if the tutorial was not clicked, then it should show the upload dialog
+		callback.invoke(false);
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadButtonClickedFailure(){
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		filesBrowser.uploadButtonClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testAddFolderButtonClickedCertified(){
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		filesBrowser.addFolderClicked();
+		verify(mockView).showFolderEditDialog(anyString());
+	}
+	
+	@Test
+	public void testAddFolderButtonClickedNotCertified(){
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		filesBrowser.addFolderClicked();
+		
+		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockView).showQuizInfoDialog(arg.capture());
+		CallbackP callback = arg.getValue();
+		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
+		callback.invoke(true);
+		verify(mockView, never()).showFolderEditDialog(anyString());
+		//but if the tutorial was not clicked, then it should show the upload dialog
+		callback.invoke(false);
+		verify(mockView).showFolderEditDialog(anyString());
+	}
+	
+	@Test
+	public void testAddFolderButtonClickedFailure(){
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).isCertifiedUser(anyString(), any(AsyncCallback.class));
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		filesBrowser.addFolderClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
 }
 
 

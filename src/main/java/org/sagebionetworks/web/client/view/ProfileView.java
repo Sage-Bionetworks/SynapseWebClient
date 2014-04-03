@@ -24,7 +24,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	public void render();
 	
-	public void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, Widget profileFormView);
+	public void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, boolean isCertified, Widget profileFormView);
 	public void refreshHeader();
 	
 	public interface Presenter extends SynapsePresenter {

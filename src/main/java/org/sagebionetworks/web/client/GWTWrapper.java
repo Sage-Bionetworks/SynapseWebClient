@@ -17,4 +17,11 @@ public interface GWTWrapper {
 	NumberFormat getNumberFormat(String pattern);
 	
 	String getHostPrefix(); 
+	
+	/**
+	 * nextInt(upperbound) selects a value of x where 0 <= x < upperbound
+	 * @param upperbound
+	 * @return
+	 */
+	int getRandomNextInt(int upperbound);
 }

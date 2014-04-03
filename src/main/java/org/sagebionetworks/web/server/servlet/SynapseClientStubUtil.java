@@ -1,5 +1,14 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceAnswer;
+import org.sagebionetworks.repo.model.questionnaire.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.questionnaire.Question;
+import org.sagebionetworks.repo.model.questionnaire.QuestionVariety;
+import org.sagebionetworks.repo.model.questionnaire.Questionnaire;
+
 //import java.util.logging.Logger;
 //
 //import org.mockito.Mockito;
@@ -188,4 +197,101 @@ public class SynapseClientStubUtil {
 //		return bundle;
 //	}
 
+	
+	public static MultichoiceAnswer getAnswer(long answerIndex, String prompt) {
+		MultichoiceAnswer a = new MultichoiceAnswer();
+		a.setAnswerIndex(answerIndex);
+		a.setPrompt(prompt);
+		return a;
+	}
+	
+	public static Questionnaire mockQuestionnaire() {
+		
+		//the mock questionnaire has 2 varieties of a single question.  One will be randomly selected client-side.  One is exclusive, one is not.
+		Questionnaire questionnaire = new Questionnaire();
+		questionnaire.setHeader("Certification");
+		List<QuestionVariety> questionVarieties = new ArrayList<QuestionVariety>();
+		QuestionVariety qv = new QuestionVariety();
+		List<Question> questionOptions = new ArrayList<Question>();
+		MultichoiceQuestion q1 = new MultichoiceQuestion();
+		q1.setExclusive(true);
+		long questionIndex = 0;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("How is information organized in Synapse?");
+		List<MultichoiceAnswer> answers = new ArrayList<MultichoiceAnswer>();
+		long answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Projects"));
+		answers.add(getAnswer(answerIndex++, "Relationship"));
+		answers.add(getAnswer(answerIndex++, "Versioning"));
+		answers.add(getAnswer(answerIndex++, "Data sharing"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(true);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("Who can have an account on Synapse?");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Anyone over 13 years old"));
+		answers.add(getAnswer(answerIndex++, "only researchers in an accredited academic institution"));
+		answers.add(getAnswer(answerIndex++, "only European data privacy regulators"));
+		answers.add(getAnswer(answerIndex++, "only people working at not-for-profit research organizations"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(false);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("If I have any questions about Synapse I can do the following:");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Send an email to synapseInfo@sagebase.org"));
+		answers.add(getAnswer(answerIndex++, "Ask questions in the Synpase support forum"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		
+		
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		
+		qv = new QuestionVariety();
+		questionOptions = new ArrayList<Question>();
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(true);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("What... is the air-speed velocity of an unladen swallow?");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "42 m/s"));
+		answers.add(getAnswer(answerIndex++, "African or European?"));
+		answers.add(getAnswer(answerIndex++, "Huh?  I don't know that!"));
+		
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		
+		qv = new QuestionVariety();
+		questionOptions = new ArrayList<Question>();
+		q1 = new MultichoiceQuestion();
+		q1.setExclusive(false);
+		questionIndex++;
+		q1.setQuestionIndex(questionIndex);
+		q1.setPrompt("Mark the following statements true or false about interacting with Synapse:");
+		answers = new ArrayList<MultichoiceAnswer>();
+		answerIndex = 0L;
+		answers.add(getAnswer(answerIndex++, "Synapse only has a web interface"));
+		answers.add(getAnswer(answerIndex++, "Synapse has a set of programmatic clients in addition to the web client"));
+		answers.add(getAnswer(answerIndex++, "I can <b>only</b> upload or download data via the web client"));
+		q1.setAnswers(answers);
+		questionOptions.add(q1);
+		qv.setQuestionOptions(questionOptions);
+		questionVarieties.add(qv);
+		
+		
+		questionnaire.setQuestions(questionVarieties);
+		return questionnaire;
+	}
 }

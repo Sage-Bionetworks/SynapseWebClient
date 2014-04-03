@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -19,6 +20,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -45,6 +47,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private JSONObjectAdapter jsonObjectAdapter;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
+	private CookieProvider cookies;
 	private UserProfile profile;
 	
 	@Inject
@@ -56,6 +59,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	} 
 
@@ -129,7 +133,20 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			//quick check to see if it's valid.
 			if (isValidUsername(newUsername)) {
 				profile.setUserName(newUsername);
-				updateProfile(profile);
+				
+				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showInfo("Successfully updated your username", "");
+						goToLastPlace();
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showUsernameTaken();
+					}
+				};
+				updateProfile(profile, profileUpdatedCallback);
 			} else {
 				//invalid username
 				view.showUsernameInvalid();
@@ -181,20 +198,83 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showSetUsernameUI();
 				}
 				else {
-					goToLastPlace();
+					checkForCertifiedUser();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				goToLastPlace();
+				checkForCertifiedUser();
 			}
 		});
-
+	}
+	
+	public void checkForCertifiedUser(){
+		view.showLoggingInLoader();
+		if (!isIgnoreQuizReminder()) {
+			synapseClient.isCertifiedUser(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean isCertified) {
+					if (!isCertified) {
+						view.hideLoggingInLoader();
+						view.showQuizInfoUI();
+					} else {
+						goToLastPlace();
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					goToLastPlace();
+				}
+			});
+		} else {
+			//don't check, user previously indicated to ignore quiz
+			goToLastPlace();
+		}
+	}
+	
+	public boolean isIgnoreQuizReminder() {
+		if (profile != null && profile.getNotificationSettings() != null) {
+			//TODO:
+//			List suppressionList = profile.getNotificationSettings().getReminderSuppressionList();
+//			return suppressionList.contains(SUPPRESS_CERTIFICATION_REMINDER);
+			return false;
+		} else
+			return false;
 	}
 
-	public void updateProfile(final UserProfile profile) {
+	
+	@Override
+	public void setIgnoreQuiz(boolean ignoreQuiz) {
+		if (ignoreQuiz) {
+			//suppress reminder
+			//update profile
+			if (profile.getNotificationSettings() == null)
+				profile.setNotificationSettings(new Settings());
+			Settings notificationSettings = profile.getNotificationSettings();
+			//TODO
+//			if (notificationSettings.getReminderSuppressionList() == null)
+//				notificationSettings.setReminderSuppressionList(new ArrayList<>());
+//			List<> reminderSuppressionList = notificationSettings.getReminderSuppressionList();
+//			reminderSuppressionList.add(CERTIFICATION_REMINDER);
+			
+			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					view.showInfo("Successfully updated your reminder setting", "");
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			};
+			updateProfile(profile, profileUpdatedCallback);	
+		}
+	}
+
+	public void updateProfile(final UserProfile profile, final AsyncCallback<Void> callback) {
 		try { 
 			JSONObjectAdapter adapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
 			String userProfileJson = adapter.toJSONString();
@@ -202,14 +282,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your username", "");
+					callback.onSuccess(result);
 					authenticationController.updateCachedProfile(profile);
-					goToLastPlace();
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showUsernameTaken();
+					callback.onFailure(caught);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
