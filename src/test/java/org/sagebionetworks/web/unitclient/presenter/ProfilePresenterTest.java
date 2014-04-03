@@ -1,8 +1,16 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,13 +19,12 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.message.Settings;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
@@ -28,19 +35,19 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
 	
@@ -98,6 +105,10 @@ public class ProfilePresenterTest {
 		
 		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		setupGetUserProfile();
+		
+		PassingRecord myPassingRecord = new PassingRecord();
+		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
@@ -194,5 +205,33 @@ public class ProfilePresenterTest {
 		when(place.toToken()).thenReturn(Profile.EDIT_PROFILE_PLACE_TOKEN);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).updateView(any(UserProfile.class), anyList(), anyBoolean(), anyBoolean(), any(PassingRecord.class), any(Widget.class));
+	}
+	
+	@Test
+	public void testGetIsCertifiedAndUpdateViewQuizNotTaken() throws JSONObjectAdapterException {
+		//have not taken the test
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		
+		verify(mockView).updateView(any(UserProfile.class), anyList(), anyBoolean(), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
+	}
+	
+	@Test
+	public void testGetIsCertifiedAndUpdateViewError() throws JSONObjectAdapterException {
+		//some other error occurred
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+	
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 	}
 }
