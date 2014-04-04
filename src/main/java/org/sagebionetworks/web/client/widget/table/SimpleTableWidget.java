@@ -240,8 +240,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
 	}
 
@@ -294,7 +293,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();
 						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
 							// if headers are empty (no results) add table columns						
-							if(tableColumns.size() == 0) tableColumns = new ArrayList<ColumnModel>();
+							if(tableColumns == null) tableColumns = new ArrayList<ColumnModel>();
 							currentHeaders = TableUtils.extractHeaders(tableColumns);
 							displayColumns.addAll(tableColumns); 
 						} else {

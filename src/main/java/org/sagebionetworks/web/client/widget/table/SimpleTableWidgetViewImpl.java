@@ -154,8 +154,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		
 		// special cases display user instructions instead of empty table
-		if(columns != null && columns.size() == 0) {
-			showAddColumnsView();
+		if(columns == null || (columns != null && columns.size() == 0)) {
+			showAddColumnsView(canEdit);
 			return;
 		}
 		
@@ -183,13 +183,15 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    hideLoading();
 	}
 	
-	private void showAddColumnsView() {
+	private void showAddColumnsView(boolean canEdit) {
 		hideLoading();		
 		pagerContainer.setVisible(false);		
 		if(addRowBtn != null) addRowBtn.setEnabled(false);
 		FlowPanel addAColumnPanel = new FlowPanel();
 		addAColumnPanel.addStyleName("alert alert-success");
-		addAColumnPanel.add(new HTML("Consider adding a column"));
+		String str = "This Table does not contain any Columns.";
+		if(canEdit) str += " You can add columns in the \"Column Details\" section above.";
+		addAColumnPanel.add(new HTML(str));
 		
 		tableContainer.setWidget(addAColumnPanel);		
 	}
