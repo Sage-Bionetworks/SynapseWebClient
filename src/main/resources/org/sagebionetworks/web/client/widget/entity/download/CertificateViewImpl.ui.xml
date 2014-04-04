@@ -8,9 +8,9 @@
 		<div class="row">
 		    <div class="double-border col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 		        <h3 class="center margin-top-60">This qualification is hereby granted to:</h3>
-		        <h1 ui:field="userNameCertificate" class="margin-top-30 certificate-cursive-font center"></h1>
+		        <h1 ui:field="userNameCertificate" class="margin-top-30 font-family-cursive center"></h1>
 		        <h3 class="margin-top-30 center">For passing the Synapse Certification Test on</h3>
-		        <h1 ui:field="datePassed" class="margin-top-30 certificate-cursive-font center"></h1>
+		        <h1 ui:field="datePassed" class="margin-top-30 font-family-cursive center"></h1>
 		        <div class="margin-top-30 margin-bottom-60 center"> <span class="glyphicon glyphicon-certificate font-size-90"></span> </div>
 		    </div>
 			<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
