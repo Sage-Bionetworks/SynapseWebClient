@@ -122,9 +122,9 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
-				authenticationController, synapseClient,
-				jiraURLHelper, jsonObjectAdapter, synapseJsniUtils,
-				adapterFactory, autogenFactory, gwt);
+				synapseClient,
+				jsonObjectAdapter, synapseJsniUtils,
+				gwt, authenticationController);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId, null);

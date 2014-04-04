@@ -196,6 +196,10 @@ public interface SynapseClientAsync {
 	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
 	/////////////////
 	
+	void getCertifiedUserPassingRecord(String userId, AsyncCallback<String> callback);
+	void getCertificationQuiz(AsyncCallback<String> callback);
+	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
+	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);

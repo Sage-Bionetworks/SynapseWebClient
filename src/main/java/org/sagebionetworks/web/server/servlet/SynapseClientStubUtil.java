@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
+
 //import java.util.logging.Logger;
 //
 //import org.mockito.Mockito;
@@ -187,5 +188,5 @@ public class SynapseClientStubUtil {
 //		bundle.setUnmetAccessRequirements(unmetAccessRequirements);
 //		return bundle;
 //	}
-
+	
 }

@@ -135,6 +135,12 @@ public class DisplayConstants {
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
+	public static final String CERTIFICATION_MESSAGE_1="Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse.";
+	public static final String CERTIFICATION_MESSAGE_2="Certified Synapse users are allowed to upload content and access Client API.";
+	public static final String CERTIFICATION_MESSAGE_3="Individuals wishing to gain the certification must:";
+	public static final String CERTIFICATION_MESSAGE_4=	"Study the tutorial materials";
+	public static final String CERTIFICATION_MESSAGE_5=	"Complete a brief examination";
+	
 	/*
 	 * Service Constants (move to another file?)
 	 */
@@ -153,6 +159,9 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String REMIND_ME_LATER = "Remind me later";
+	public static final String BUTTON_CONTINUE = "Continue";
+	public static final String BECOME_CERTIFIED = "Become Certified";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_NO_DOWNLOADS = "There are no downloads available.";
 	public static final String TEXT_UNAUTH_DOWNLOADS = "Please login or sign the End User License Agreement to see downloads.";
@@ -189,6 +198,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
+	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String TITLE_ADD_ANNOTATION = "Add Annotation";
 	public static final String BUTTON_RETURN_TO_LAYER = "Return to Layer";
 	public static final String LABEL_GOTO_SYNAPSE_ID = "Enter a Synapse Id...";
@@ -723,6 +733,8 @@ public class DisplayConstants {
 	public static final String ROW_UPDATE_FAILED = "An error occurred updating the row. Please reload the page and try again.";
 	public static final String NUMBER_NOT_VALID = "Number not valid";
 	public static final String REASON = "Reason";
+	//quiz
+	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
 
 }
 

@@ -9,12 +9,15 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,6 +34,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	CookieProvider cookies;
 	boolean canEdit = false;
 	
 	@Inject
@@ -39,7 +43,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -47,6 +52,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -91,8 +97,67 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}
 
+	@Override
+	public void uploadButtonClicked() {
+		//is this a certified user?
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecord) {
+				view.showUploadDialog(configuredEntityId);
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								view.showUploadDialog(configuredEntityId);
+						}
+					});					
+				} else
+					view.showErrorMessage(t.getMessage());
+			}
+		};
+		//TODO:  only in test website until tutorial content is ready
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		} else {
+			userCertifiedCallback.onSuccess("");
+		}
+	}
 	
 	@Override
+	public void addFolderClicked() {
+		//is this a certified user?
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecord) {
+				createFolder();
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								createFolder();
+						}
+					});
+				} else 
+					view.showErrorMessage(t.getMessage());
+			}
+		};
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);	
+		} else {
+			userCertifiedCallback.onSuccess("");
+		}
+			
+		
+	}
+	
 	public void createFolder() {
 		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
 		String entityJson;

@@ -81,7 +81,6 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(Down.class);
 		openAccessPlaces.add(Profile.class);
-		openAccessPlaces.add(Quiz.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);

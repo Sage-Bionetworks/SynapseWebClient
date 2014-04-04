@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-
-import javax.validation.constraints.AssertTrue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -37,7 +36,6 @@ import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -89,9 +87,10 @@ public class LoginPresenterTest {
 		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockNodeModelCreator,mockCookieProvier, mockGwtWrapper, mockJSNIUtils, jsonObjectAdapter, mockSynapseClient, adapterFactory);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
-		
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
+		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	
 	
 	private void setPlace() {
@@ -174,10 +173,11 @@ public class LoginPresenterTest {
 		setPlace();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		loginPresenter.updateProfile(profile);
+		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
+		loginPresenter.updateProfile(profile, mockCallback);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+		verify(mockCallback).onSuccess(any(Void.class));
 	}
 	
 	@Test
@@ -186,9 +186,10 @@ public class LoginPresenterTest {
 		setPlace();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		loginPresenter.updateProfile(profile);
+		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
+		loginPresenter.updateProfile(profile, mockCallback);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockView).showUsernameTaken();
+		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 	
 	@Test
@@ -199,7 +200,7 @@ public class LoginPresenterTest {
 		profile.setOwnerId("1233");
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
 		setMyProfile(profile);
-		loginPresenter.checkForTempUsernameAndContinue();
+		loginPresenter.postLoginStep1();
 		verify(mockView).showLoggingInLoader();
 		verify(mockView).showSetUsernameUI();
 		verify(mockView).hideLoggingInLoader();
@@ -209,8 +210,8 @@ public class LoginPresenterTest {
 	public void testCheckForTempUsernameAndContinueFailure() throws JSONObjectAdapterException {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		loginPresenter.checkForTempUsernameAndContinue();
-		verify(mockView).showLoggingInLoader();
+		loginPresenter.postLoginStep1();
+		verify(mockView, times(2)).showLoggingInLoader();
 		//hides loading UI and continue (go to last place) 
 		verify(mockView).hideLoggingInLoader();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
@@ -242,6 +243,22 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
+	public void testSetUsernameSuccess()throws JSONObjectAdapterException {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("222");
+		setMyProfile(profile);
+		loginPresenter.updateProfile(profile, mock(AsyncCallback.class));
+		//TODO: mock notification suppression setting for certification, once in place
+		loginPresenter.setUsername("newname");
+		
+		verify(mockSynapseClient, times(2)).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+	}
+
+	
+	@Test 
 	public void testSetPlaceChangeUsernameFailure()throws JSONObjectAdapterException {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		String exceptionMessage = "unhandled";
@@ -265,6 +282,7 @@ public class LoginPresenterTest {
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).loginUserSSO(eq(fakeToken), any(AsyncCallback.class));
 	}
+	
 	
 //	@Test 
 //	public void testSetPlaceSSOLoginNotSignedToU() {
