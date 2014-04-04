@@ -498,13 +498,6 @@ a.shortBtn {
 	clear: both;
 }
 
-.user-profile-linkedin {
-	margin-right: 3px;
-}
-.user-profile-linkedin-bar {
-	margin-bottom: 3px !important;
-}
-
 .user-profile-change-photo {
 }
 	
@@ -723,6 +716,7 @@ a.shortBtn {
     padding: 0 5px 2px;
     overflow:auto;
     white-space:pre;
+    word-wrap: normal;
 }
 
 .apitable label {
@@ -1503,6 +1497,10 @@ a.projectTitle:hover {
 }
 .signin-panel .form-control:focus {
   z-index: 2;
+}
+
+.overflow-x-auto {
+	overflow-x: auto;
 }
 
 /*==================================*/

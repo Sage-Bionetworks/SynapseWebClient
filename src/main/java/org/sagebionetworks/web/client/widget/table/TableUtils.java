@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 
 public class TableUtils {
@@ -33,4 +36,51 @@ public class TableUtils {
 		return row;
 	}
 
+	/**
+	 * Convert ColumnModel list to a list of ColumnModel id strings (headers)
+	 * @param columns
+	 * @return
+	 */
+	public static List<String> extractHeaders(List<ColumnModel> columns) {
+		List<String> headers = new ArrayList<String>();
+		if(columns != null) {
+			for(ColumnModel model : columns) {
+				headers.add(model.getId());
+			}
+		}
+		return headers;
+	}
+
+	/**
+	 * If a column doesn't have a proper ColumnModel id (i.e. a Long) then wrap it as a DerivedColumn
+	 * @param idToCol
+	 * @param resultColumnId
+	 * @return
+	 */
+	public static ColumnModel wrapDerivedColumnIfNeeded(final Map<String, ColumnModel> idToCol, String resultColumnId) {
+		// test for strait column id, otherwise it is a derived column
+		try {				
+			Long.parseLong(resultColumnId);
+			if(idToCol.containsKey(resultColumnId)) {
+				return idToCol.get(resultColumnId);
+			} // ignore unknown non-derived columns
+		} catch (NumberFormatException e) {									
+			return createDerivedColumn(resultColumnId);				
+		}
+		return null;
+	}
+
+	/**
+	 * Create a DerivedColumnModel
+	 * @param resultColumnId
+	 * @return
+	 */
+	public static DerivedColumnModel createDerivedColumn(String resultColumnId) {
+		DerivedColumnModel derivedCol = new DerivedColumnModel();
+		derivedCol.setId(resultColumnId);
+		derivedCol.setName(resultColumnId);
+		derivedCol.setColumnType(ColumnType.STRING);
+		return derivedCol;
+	}	
+	
 }

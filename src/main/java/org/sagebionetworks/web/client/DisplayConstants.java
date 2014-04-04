@@ -214,6 +214,7 @@ public class DisplayConstants {
 	public static final String BUTTON_TOOLS_MENU = "Tools";
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
+	public static final String BUTTON_EDIT_PROFILE = "Edit Your Profile";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
 	public static final String EDIT_DESCRIPTION = "Edit Description";	
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
@@ -423,6 +424,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String INVALID_USERNAME_MESSAGE = "Please enter a valid username";
 	public static final String SHOW_EXPAND = "Show Expand";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
 	public static final String DEPTH_LABEL = "Depth";
@@ -720,6 +722,7 @@ public class DisplayConstants {
 	public static final String WAITING = "Waiting";
 	public static final String ROW_UPDATE_FAILED = "An error occurred updating the row. Please reload the page and try again.";
 	public static final String NUMBER_NOT_VALID = "Number not valid";
+	public static final String REASON = "Reason";
 
 }
 

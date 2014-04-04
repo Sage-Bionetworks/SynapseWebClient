@@ -40,7 +40,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		
 		String getEmailAddress();
-		
-		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);
 	}
 }
