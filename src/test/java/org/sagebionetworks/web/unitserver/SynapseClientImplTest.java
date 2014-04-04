@@ -5,8 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -61,7 +68,6 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -85,12 +91,14 @@ import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -115,7 +123,6 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -1328,4 +1335,30 @@ public class SynapseClientImplTest {
 	}
 
 	
+//	@Test
+//	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException{
+//		PassingRecord mockPassingRecord = new PassingRecord();
+//		when(mockSynapse.getCertifiedUserPassingRecord(anyLong())).thenReturn(mockPassingRecord);
+//		synapseClient.getCertifiedUserPassingRecord("123");
+//		verify(mockSynapse).getCertifiedUserPassingRecord(anyLong());
+//	}
+	
+	@Test
+	public void testGetCertificationQuiz() throws RestServiceException, SynapseException{
+		when(mockSynapse.getCertifiedUserTest()).thenReturn(new Quiz());
+		synapseClient.getCertificationQuiz();
+		verify(mockSynapse).getCertifiedUserTest();
+	}
+	
+	@Test
+	public void testSubmitCertificationQuizResponse() throws RestServiceException, SynapseException, JSONObjectAdapterException{
+		PassingRecord mockPassingRecord = new PassingRecord();
+		when(mockSynapse.submitCertifiedUserTestResponse(any(QuizResponse.class))).thenReturn(mockPassingRecord);
+		QuizResponse myResponse = new QuizResponse();
+		myResponse.setId(837L);
+		String quizResponseJson = myResponse.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		synapseClient.submitCertificationQuizResponse(quizResponseJson);
+		verify(mockSynapse).submitCertifiedUserTestResponse(eq(myResponse));
+		
+	}
 }

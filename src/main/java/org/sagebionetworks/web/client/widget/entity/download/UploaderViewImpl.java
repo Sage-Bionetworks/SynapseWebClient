@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
@@ -28,7 +27,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.user.client.ui.HTML;
@@ -39,7 +37,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
 
 	private boolean showCancelButton = true;
-
+	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
@@ -64,19 +62,15 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private HTML spinningProgressContainer;
 	
 	LayoutContainer container;
-	IconsImageBundle iconsImageBundle;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
-			IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle,
 			SharingAndDataUseConditionWidget sharingDataUseWidget) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
-		
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
@@ -117,10 +111,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void clear() {
-		fileUploadField.clear();
-		if (pathField != null)
+		removeAll();
+		if (fileUploadField.isRendered())
+			fileUploadField.clear();
+		if (pathField != null && pathField.isRendered())
 			pathField.clear();
-		if (nameField != null)
+		if (nameField != null && nameField.isRendered())
 			nameField.clear();
 	}
 	
@@ -129,6 +125,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.isEntity = isEntity;
 		this.parentEntityId = parentEntityId;
 		initializeControls();
+		
+		setSize(PANEL_WIDTH, PANEL_HEIGHT);
 		createUploadContents();
 		
 		// reset
@@ -180,17 +178,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 	 * Private Methods
 	 */	
 	private void createUploadContents() {
-		this.removeAll();
 		if (container == null)
 			this.container = new LayoutContainer();
 		else
 			container.removeAll();
 		
-		this.setLayout(new FitLayout());
 		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.setLayout(new FlowLayout());
-		this.add(container);
 				
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		if (isEntity) {
@@ -254,9 +249,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 			bar.add(cancelButton);
 		}
 		container.add(bar);
-		this.setSize(PANEL_WIDTH+200, PANEL_HEIGHT);
 		container.layout(true);
-		this.layout(true);
+	}
+
+	@Override
+	public void showUploaderUI() {
+		removeAll();
+		add(container);
+		layout(true);
 	}
 	
 	// set the initial state of the controls when widget is made visible
@@ -300,7 +300,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 		
 	private static final int PANEL_HEIGHT = 100;
-	private static final int PANEL_WIDTH = 590;
+	private static final int PANEL_WIDTH = 790;
 	
 	
 	private Widget createUploadPanel() {
@@ -313,10 +313,10 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setHeight(PANEL_HEIGHT);
 		formPanel.setBorders(false);
 		formPanel.setAutoWidth(false);
-		formPanel.setWidth(PANEL_WIDTH+30);
-		formPanel.setFieldWidth(PANEL_WIDTH-100);
+		formPanel.setWidth(PANEL_WIDTH-170);
+		formPanel.setFieldWidth(PANEL_WIDTH-300);
 
-		fileUploadField.setWidth(PANEL_WIDTH-100);
+		fileUploadField.setWidth(PANEL_WIDTH-300);
 		fileUploadField.setAllowBlank(false);
 		fileUploadField.setName("file");
 		fileUploadField.setFieldLabel("File");
@@ -336,7 +336,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		configureUploadButton(); // upload tab first by default
 		
-		progressBar.setWidth(PANEL_WIDTH - 30);
+		progressBar.setWidth(PANEL_WIDTH - 230);
 								
 		formPanel.layout(true);
 		
@@ -353,9 +353,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
 		externalLinkFormPanel.setLabelWidth(110);
 		externalLinkFormPanel.setBorders(false);
-		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-150);
+		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-350);
 		externalLinkFormPanel.setAutoWidth(false);
-		externalLinkFormPanel.setWidth(PANEL_WIDTH+30);
+		externalLinkFormPanel.setWidth(PANEL_WIDTH-270);
 		pathField.setFieldLabel("URL");
 		pathField.addListener(Events.KeyPress, new Listener<BaseEvent>() {
 			@Override

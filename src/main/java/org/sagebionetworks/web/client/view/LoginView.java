@@ -22,10 +22,12 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
 	
-	public void showSetUsernameUI();
+	void showSetUsernameUI();
 	
-	public void showUsernameInvalid();
-	public void showUsernameTaken();
+	void showUsernameInvalid();
+	void showUsernameTaken();
+	
+	void showQuizInfoUI();
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
@@ -33,6 +35,7 @@ public interface LoginView extends IsWidget, SynapseView {
 		void setNewUser(UserSessionData newUser);
 		
 		void setUsername(String newUsername);
+		void setIgnoreQuiz(boolean ignoreQuiz);
     }
 	
 }

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.util.ModelConstants;
+import org.sagebionetworks.web.client.DisplayConstants;
 
 
 /**
@@ -180,6 +181,9 @@ public class WebConstants {
 	public static final String R_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.rclient_wiki_id";
 	public static final String PYTHON_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_synapse_id";
 	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
+	public static final String TRUSTED_USER_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_synapse_id";
+	public static final String TRUSTED_USER_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_wiki_id";
+
 	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
@@ -193,6 +197,7 @@ public class WebConstants {
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	public static final String USER_CERTIFICATION_TUTORIAL = "Certification";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
@@ -207,5 +212,11 @@ public class WebConstants {
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
+
+	public static final String QUIZ_MORE_INFO = 
+		"<blockquote class=\"margin-bottom-40\"><div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_1+"</div>" +
+		"<div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_2+"</div>" +
+		"<div class=\"margin-top-left-10\">" +DisplayConstants.CERTIFICATION_MESSAGE_3 +
+		"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> "+DisplayConstants.CERTIFICATION_MESSAGE_4+"</li><li>"+DisplayConstants.CERTIFICATION_MESSAGE_5+"</li></ul></div></blockquote>";
 	
 }

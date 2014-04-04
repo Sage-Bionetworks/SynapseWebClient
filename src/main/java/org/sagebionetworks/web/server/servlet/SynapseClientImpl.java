@@ -10,7 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -85,15 +84,15 @@ import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
 import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.repo.model.table.TableState;
-import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -109,17 +108,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.table.query.ParseException;
-import org.sagebionetworks.table.query.TableQueryParser;
-import org.sagebionetworks.table.query.model.OrderByClause;
-import org.sagebionetworks.table.query.model.OrderingSpecification;
-import org.sagebionetworks.table.query.model.Pagination;
-import org.sagebionetworks.table.query.model.QuerySpecification;
-import org.sagebionetworks.table.query.model.SortKey;
-import org.sagebionetworks.table.query.model.SortSpecification;
-import org.sagebionetworks.table.query.model.SortSpecificationList;
-import org.sagebionetworks.table.query.model.TableExpression;
-import org.sagebionetworks.table.query.util.SqlElementUntils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -135,11 +123,11 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -1818,7 +1806,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
-
 	public String getTeamMembershipState(String currentUserId, String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1877,6 +1864,62 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	@Override
+	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
+		throw new NotFoundException("Certification system not yet implemented");
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
+//			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+//			return passingRecordJson.toJSONString();
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+// 		} catch (JSONObjectAdapterException e) {
+//			throw new UnknownErrorException(e.getMessage());
+//		}
+	}
+	
+	@Override
+	public String getCertificationQuiz() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Quiz quiz = synapseClient.getCertifiedUserTest();
+			JSONObjectAdapter quizJson = quiz.writeToJSONObject(adapterFactory.createNew());
+			return quizJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			QuizResponse response = jsonEntityFactory.createEntity(quizResponseJson, QuizResponse.class);
+			PassingRecord passingRecord = synapseClient.submitCertifiedUserTestResponse(response);
+			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+			return passingRecordJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
+		Boolean isMember = null;
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(groupPrincipalId.toString(), userId);
+			isMember = membershipStatus.getIsMember(); 
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		return isMember;
+	}
 	
 	@Override
 	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {
@@ -2594,7 +2637,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String json = null;
 		try {
 			RowSet rs = synapseClient.queryTableEntity(executedQuery);
-			json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		} catch (SynapseTableUnavilableException e) {
 			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
@@ -2641,6 +2684,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
 		
 		return pageName2WikiKeyMap;
 	}

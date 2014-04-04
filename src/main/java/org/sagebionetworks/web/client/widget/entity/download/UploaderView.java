@@ -54,5 +54,5 @@ public interface UploaderView extends IsWidget, SynapseView {
 	}
 
 	public void setShowCancelButton(boolean showCancel);
-	
+	public void showUploaderUI();
 }
