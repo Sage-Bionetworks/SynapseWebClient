@@ -168,12 +168,15 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 			}
 			// Now add all of the attachments to the entity.
 			UserProfile userProfile = client.getUserProfile(userId);
+			UploadResult result = new UploadResult();
 			//set the profile picture
-			if (!list.isEmpty())
+			if (!list.isEmpty()) {
 				userProfile.setPic(list.get(0));
+				result.setAttachmentData(list.get(0));
+			}
+				
 			// Save the changes.
 			client.updateMyProfile(userProfile);
-			UploadResult result = new UploadResult();
 			result.setMessage("File upload successfully");
 			result.setUploadStatus(UploadStatus.SUCCESS);
 			String out = EntityFactory.createJSONStringForEntity(result);

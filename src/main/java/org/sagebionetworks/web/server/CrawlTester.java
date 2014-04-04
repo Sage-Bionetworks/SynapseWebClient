@@ -2,15 +2,15 @@ package org.sagebionetworks.web.server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -69,14 +69,13 @@ public class CrawlTester {
 		}
 	}
 	
-	protected static String fixUrl(String url) throws URIException{
-		String delimiter = "?";
-		if (url.indexOf("?") > -1) {
-			delimiter = "&";
-		}
-		String newUrl =  url.replace("#!", delimiter+"_escaped_fragment_=");
-		return URIUtil.encodeQuery(newUrl);
-		
+	protected static String fixUrl(String url) throws UnsupportedEncodingException {
+//		String delimiter = "?";
+//		if (url.indexOf("?") > -1) {
+//			delimiter = "&";
+//		}
+//		String newUrl =  url.replace("#!", delimiter+"_escaped_fragment_=");
+		return URLEncoder.encode(url, "UTF-8");
 	}
 	
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -26,12 +27,15 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -56,6 +60,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SpanElement storageUsageSpan;
 	@UiField
 	SpanElement apiKeyContainer;
+	
+	@UiField
+	SimplePanel notificationsPanel;
+	@UiField
+	CheckBox emailNotificationsCheckbox;
+
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -83,6 +93,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+	
+		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
+		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 	}
 
 
@@ -261,6 +274,26 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			storageUsageSpan.setInnerText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
 		}
 	}
+	
+	@Override
+	public void updateNotificationCheckbox(UserProfile profile) {
+		boolean isNotify = true;
+		if(profile.getNotificationSettings() != null) {
+			isNotify = profile.getNotificationSettings().getSendEmailNotifications();
+		}
+		emailNotificationsCheckbox.setValue(isNotify, false);
+	}
+	
+	private ClickHandler getNotificationsClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//update notification settings
+				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
+			}
+		};
+	}
+	
 	
 
 	@Override

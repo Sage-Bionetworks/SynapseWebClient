@@ -153,6 +153,16 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		return (matchResult != null && email.equals(matchResult.getGroup(0))); 
 	}
 	
+	public static boolean isValidUrl(String url, boolean isUndefinedUrlValid) {
+		if (url == null || url.trim().length() == 0) {
+			//url is undefined
+			return isUndefinedUrlValid;
+		}
+		RegExp regEx = RegExp.compile(WebConstants.VALID_URL_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(url);
+		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
+	}
+	
 	@Override
 	public void setNewUser(UserSessionData newUser) {
 		loginSSOUser(newUser.getSession().getSessionToken());
@@ -330,5 +340,4 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			});
 		}
 	}
-
 }

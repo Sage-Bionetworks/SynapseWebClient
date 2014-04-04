@@ -370,31 +370,8 @@ public class DisplayUtils {
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			String reason = ex.getMessage();			
-			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
-			if(reason.matches(".*entity with the name: .+ already exites.*")) {
-				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			} else {
-				RegExp regEx = RegExp.compile(".*Name.+is already used.*", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null)
-					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
-			}
-			
-			//final attempt to communicate a more relevant message. do this by looking for the "reason" stated in the response
-			if (DisplayConstants.ERROR_BAD_REQUEST_MESSAGE.equals(message)) {
-				//look for something in the form: "reason":"This is the reason for the error"
-				RegExp regEx = RegExp.compile("\"reason\"\\s*:\\s*\"(.+)\"", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null && matchResult.getGroupCount()==2) {
-					String parsedReason = matchResult.getGroup(1);
-					if (parsedReason != null && parsedReason.trim().length() > 0) {
-						message = parsedReason;
-					}
-				}
-			}
-			
-			view.showErrorMessage(message);
+			//exception handling on the backend now throws the reason into the exception message.  Easy!
+			view.showErrorMessage(ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
@@ -445,7 +422,6 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
-
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -1407,9 +1383,13 @@ public class DisplayUtils {
 
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
-    	var window = $wnd.open(url, name, features);
-    	return window;
-		}-*/;
+    	try {
+	    	var window = $wnd.open(url, name, features);
+	    	return window;
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
     	window.location = target;
@@ -2137,7 +2117,7 @@ public class DisplayUtils {
 	}
 
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
-		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
 		//alternatively, could use the gwt I18n Messages class client side
 	}
 

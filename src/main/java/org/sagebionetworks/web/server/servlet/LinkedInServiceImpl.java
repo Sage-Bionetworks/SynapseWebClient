@@ -92,11 +92,32 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 		
 		// Post a request to LinkedIn to get the user's public information
 		// Note: three-current-positions is used for position and company
-		OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,summary,industry,location:(name),three-current-positions,picture-url::(original))");
+		OAuthRequest request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,summary,industry,location:(name),three-current-positions)");
 		oAuthService.signRequest(accessToken, request);
 		Response response = request.send();
 		//parse the response
-		return parseLinkedInResponse(response.getBody());
+		String responseBody = response.getBody();
+		UserProfile linkedInProfile = parseLinkedInResponse(responseBody);
+		//also ask for the original profile picture url
+		request = new OAuthRequest(Verb.GET, "http://api.linkedin.com/v1/people/~/picture-urls::(original)");
+		oAuthService.signRequest(accessToken, request);
+		response = request.send();
+		responseBody = response.getBody();
+		
+		String picUrl = parseLinkedInPictureResponse(responseBody);
+		if (picUrl.length() > 0) {
+			AttachmentData pic = new AttachmentData();
+		    pic.setUrl(picUrl);
+		    linkedInProfile.setPic(pic);
+	    }
+		String linkedInProfileJson = "";
+		try {
+			linkedInProfileJson = EntityFactory.createJSONStringForEntity(linkedInProfile);
+		}catch(Exception e) {
+			throw new RestClientException("Unable to create LinkedIn profile json.", e);
+		}
+
+		return linkedInProfileJson;
 	}
 	
 	/**
@@ -104,13 +125,12 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 	 * @param response
 	 * @return
 	 */
-	public static String parseLinkedInResponse(String response){
+	public static UserProfile parseLinkedInResponse(String response){
 		//sax parsing will work for this small xml string
-		String linkedInProfileJson = "";
+		UserProfile linkedInProfile = new UserProfile();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 		try {
-			UserProfile linkedInProfile = new UserProfile();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			InputStream is = new ByteArrayInputStream(response.getBytes());
 			Document doc = db.parse(is);
@@ -155,11 +175,26 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements LinkedI
 		    linkedInProfile.setPic(pic);
 		    linkedInProfile.setPosition(position.toString());
 		    linkedInProfile.setSummary(summary);
-		    linkedInProfileJson = EntityFactory.createJSONStringForEntity(linkedInProfile);
 		}catch(Exception e) {
 			throw new RestClientException("Unable to obtain LinkedIn profile information.", e);
 		}
-		return linkedInProfileJson;
+		return linkedInProfile;
+	}
+	
+	public static String parseLinkedInPictureResponse(String response){
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			InputStream is = new ByteArrayInputStream(response.getBytes());
+			Document doc = db.parse(is);
+			 
+			//get the profile picture data from picture-url
+		    String picUrl = getLinkedInProfileElementValue(doc, "picture-url");
+		    return picUrl;
+		}catch(Exception e) {
+			throw new RestClientException("Unable to obtain LinkedIn profile picture information.", e);
+		}
 	}
 	
 	private static String getLinkedInProfileElementValue(Document linkedInProfile, String elementName) {

@@ -68,7 +68,7 @@ public class FileHandleServletTest {
 		when(mockSynapse.getFileEntityPreviewTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
 		when(mockSynapse.getFileEntityTemporaryUrlForCurrentVersion(anyString())).thenReturn(resolvedUrl);
 
-		when(mockSynapse.getTeamIcon(anyString(), anyBoolean())).thenReturn(resolvedUrl);
+		when(mockSynapse.getTeamIcon(anyString())).thenReturn(resolvedUrl);
 
 		mockUrlProvider = mock(ServiceUrlProvider.class);
 		mockTokenProvider = mock(TokenProvider.class);
@@ -189,7 +189,7 @@ public class FileHandleServletTest {
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
 		when(mockRequest.getCookies()).thenReturn(cookies);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockSynapse).getTeamIcon(anyString(), anyBoolean());
+		verify(mockSynapse).getTeamIcon(anyString());
 		verify(mockResponse).sendRedirect(anyString());
 	}
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -45,6 +46,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public void refreshHeader();
 	
+	public void updateNotificationCheckbox(UserProfile profile);
+	
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);
@@ -52,6 +55,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void createSynapsePassword();
 		
 		void goTo(Place place);
+		
+		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);
 	}
 
 	public void setApiKey(String apiKey);

@@ -38,9 +38,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/headerSearchButtonIcon.png")
 	ImageResource searchButtonHeaderIcon();
 	
-	@Source("images/linkedin-small.png")
-	ImageResource linkedinsmall();
-	
 	@Source("images/defaultProfilePicture.png")
 	ImageResource defaultProfilePicture();
 	
