@@ -1866,16 +1866,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
-			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
-			return passingRecordJson.toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
- 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		throw new NotFoundException("Certification system not yet implemented");
+//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//		try {
+//			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
+//			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+//			return passingRecordJson.toJSONString();
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+// 		} catch (JSONObjectAdapterException e) {
+//			throw new UnknownErrorException(e.getMessage());
+//		}
 	}
 	
 	@Override

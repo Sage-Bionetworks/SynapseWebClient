@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -33,6 +34,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	CookieProvider cookies;
 	boolean canEdit = false;
 	
 	@Inject
@@ -41,7 +43,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -49,6 +52,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -115,7 +119,12 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		//TODO:  only in test website until tutorial content is ready
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		} else {
+			userCertifiedCallback.onSuccess("");
+		}
 	}
 	
 	@Override
@@ -140,7 +149,13 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);	
+		} else {
+			userCertifiedCallback.onSuccess("");
+		}
+			
+		
 	}
 	
 	public void createFolder() {

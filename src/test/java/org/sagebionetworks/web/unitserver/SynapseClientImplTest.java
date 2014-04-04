@@ -1335,13 +1335,13 @@ public class SynapseClientImplTest {
 	}
 
 	
-	@Test
-	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException{
-		PassingRecord mockPassingRecord = new PassingRecord();
-		when(mockSynapse.getCertifiedUserPassingRecord(anyLong())).thenReturn(mockPassingRecord);
-		synapseClient.getCertifiedUserPassingRecord("123");
-		verify(mockSynapse).getCertifiedUserPassingRecord(anyLong());
-	}
+//	@Test
+//	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException{
+//		PassingRecord mockPassingRecord = new PassingRecord();
+//		when(mockSynapse.getCertifiedUserPassingRecord(anyLong())).thenReturn(mockPassingRecord);
+//		synapseClient.getCertifiedUserPassingRecord("123");
+//		verify(mockSynapse).getCertifiedUserPassingRecord(anyLong());
+//	}
 	
 	@Test
 	public void testGetCertificationQuiz() throws RestServiceException, SynapseException{

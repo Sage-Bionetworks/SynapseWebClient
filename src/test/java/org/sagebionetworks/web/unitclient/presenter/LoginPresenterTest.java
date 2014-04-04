@@ -95,7 +95,7 @@ public class LoginPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
-
+		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	
 	
 	private void setPlace() {

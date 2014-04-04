@@ -234,13 +234,18 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	}
 	
 	public boolean isIgnoreQuizReminder() {
-		if (profile != null && profile.getNotificationSettings() != null) {
-			//TODO:
-//			List suppressionList = profile.getNotificationSettings().getReminderSuppressionList();
-//			return suppressionList.contains(SUPPRESS_CERTIFICATION_REMINDER);
-			return false;
-		} else
-			return false;
+		//TODO: implement when new setting in place.  only in test website until tutorial content is ready
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			if (profile != null && profile.getNotificationSettings() != null) {
+				//TODO:
+	//			List suppressionList = profile.getNotificationSettings().getReminderSuppressionList();
+	//			return suppressionList.contains(SUPPRESS_CERTIFICATION_REMINDER);
+				return false;
+			} else
+				return false;
+		} else {
+			return true;
+		}
 	}
 
 	
