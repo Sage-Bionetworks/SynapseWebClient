@@ -138,7 +138,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					@Override
 					public void onSuccess(Void result) {
 						view.showInfo("Successfully updated your username", "");
-						goToLastPlace();
+						postLoginStep2();
 					}
 					
 					@Override
@@ -185,7 +185,10 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		loginSSOUser(newUser.getSession().getSessionToken());
 	}
 	
-	public void checkForTempUsernameAndContinue(){
+	/**
+	 * Check for temp username, and prompt for change if user has not set
+	 */
+	public void postLoginStep1(){
 		//get my profile, and check for a default username
 		view.showLoggingInLoader();
 		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
@@ -198,19 +201,22 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showSetUsernameUI();
 				}
 				else {
-					checkForCertifiedUser();
+					postLoginStep2();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				checkForCertifiedUser();
+				postLoginStep2();
 			}
 		});
 	}
 	
-	public void checkForCertifiedUser(){
+	/**
+	 * Check to see if user is certified
+	 */
+	public void postLoginStep2(){
 		view.showLoggingInLoader();
 		if (!isIgnoreQuizReminder()) {
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
@@ -409,7 +415,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-						checkForTempUsernameAndContinue();
+						postLoginStep1();
 					}
 				}
 				@Override
