@@ -36,6 +36,11 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback);
 		
 		void addRow();
+		
+		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
+
+		void updateColumnOrder(List<String> columnIds);
+
 	}
 	
 	/**

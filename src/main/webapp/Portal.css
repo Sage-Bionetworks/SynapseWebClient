@@ -1519,6 +1519,10 @@ a.projectTitle:hover {
   z-index: 2;
 }
 
+.overflow-x-auto {
+	overflow-x: auto;
+
+}
 .double-border {
 	border: 1px double #000;
 	outline: 2px solid #717171;

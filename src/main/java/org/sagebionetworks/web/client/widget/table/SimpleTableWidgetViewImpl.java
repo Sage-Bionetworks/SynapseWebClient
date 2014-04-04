@@ -15,15 +15,22 @@ import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.shared.QueryConstants;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
+import com.extjs.gxt.ui.client.event.Listener;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -43,11 +50,13 @@ import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -62,9 +71,14 @@ import com.google.inject.Inject;
 
 public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableWidgetView {
 	private static final String HAS_ERROR_HAS_FEEDBACK = "has-error has-feedback";
-
+	private static int sequence = 0;
+	
 	public interface Binder extends UiBinder<Widget, SimpleTableWidgetViewImpl> {	}
 	
+	@UiField
+	HTMLPanel buttonToolbar;
+	@UiField
+	SimplePanel columnEditorPanel;
 	@UiField
 	HTMLPanel queryPanel;
 	@UiField
@@ -84,6 +98,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@UiField
 	SimplePanel errorMessage;
 
+	FlowPanel addColumnPanel;
+	List<ColumnDetailsPanel> columnPanelOrder;
+	private boolean columnEditorBuilt = false;
+	
 	SageImageBundle sageImageBundle;
 	CellTable<TableModel> cellTable;
 	MySimplePager pager;
@@ -98,9 +116,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	QueryDetails initialDetails = null;	
 	int timerRemainingSec;
 	TableModel newRow = null;
-	SynapseJSNIUtils jsniUtils;
-	
+	SynapseJSNIUtils jsniUtils;	
 	List<TableModel> currentPage;
+	Button addRowBtn;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
@@ -127,6 +145,20 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		this.initialDetails = queryDetails;
 		columnToModel.clear();
 				
+		// clear out old column editor view
+		columnEditorBuilt = false;
+		setupTableEditorToolbar(columns);
+		if(canEdit) {
+			buttonToolbar.setVisible(true);
+		}
+
+		
+		// special cases display user instructions instead of empty table
+		if(columns == null || (columns != null && columns.size() == 0)) {
+			showAddColumnsView(canEdit);
+			return;
+		}
+		
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
 		buildTable(queryDetails.getLimit().intValue());
@@ -151,6 +183,19 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    hideLoading();
 	}
 	
+	private void showAddColumnsView(boolean canEdit) {
+		hideLoading();		
+		pagerContainer.setVisible(false);		
+		if(addRowBtn != null) addRowBtn.setEnabled(false);
+		FlowPanel addAColumnPanel = new FlowPanel();
+		addAColumnPanel.addStyleName("alert alert-success");
+		String str = "This Table does not contain any Columns.";
+		if(canEdit) str += " You can add columns in the \"Column Details\" section above.";
+		addAColumnPanel.add(new HTML(str));
+		
+		tableContainer.setWidget(addAColumnPanel);		
+	}
+
 	@Override
 	public void setQuery(String query) {
 		queryField.setValue(query);
@@ -159,7 +204,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@Override
 	public void insertNewRow(TableModel model) {
 		newRow = model;
-		currentPage.add(0, model);
+		if(currentPage == null) currentPage = new ArrayList<TableModel>();
+		currentPage.add(0, model);			
 		cellTable.setRowData(currentPage); // causes onRangeChange event
 	}
 
@@ -262,7 +308,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	@Override
 	public void showQueryProblem(String message) {
 		hideLoading();
-		queryFeedback.setText("Query Error - : " + message);
+		queryFeedback.setText("Query Error - " + message);
 		queryFeedback.setVisible(true);
 		queryFieldContainer.addClassName(HAS_ERROR_HAS_FEEDBACK);
 	}
@@ -337,55 +383,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 	}
 
-	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
-		// checkbox selector
-		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
-				new CheckboxCell(true, false)) {
-			@Override
-			public Boolean getValue(TableModel object) {
-				// Get the value from the selection model.
-				return selectionModel.isSelected(object);
-			}		
-		}; 
-		cellTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
-		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
-
-		int nPercentageCols = columns.size();
-		for(ColumnModel model : columns) {
-			// TODO : uncomment and replace below when we have DATE column type
-			if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
-//			if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
-		}		
-		
-		// Table's columns
-		RowUpdater rowUpdater = new RowUpdater() {			
-			@Override
-			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
-				presenter.updateRow(row, callback);			
-				
-			}
-		};
-		
-		// attempt to get view width
-		int windowWidth = Window.getClientWidth();
-		
-		
-		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
-			cellTable.addColumn(column, model.getName());
-			columnToModel.put(column, model);
-			
-			// TODO : just have a fixed width for each column and let table scroll horizontally?
-			if(model.getColumnType() == ColumnType.BOOLEAN) {
-				cellTable.setColumnWidth(column, 100, Unit.PX);
-//			} else if(model.getColumnType() == ColumnType.DATE) {
-//				cellTable.setColumnWidth(column, 140, Unit.PX);								
-			} else {
-				cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
-			}
-		}
-	}
-
+	/**
+	 * Create an AsyncDataProvider that updates the Data in the view when requested
+	 * @return
+	 */
 	private AsyncDataProvider<TableModel> createAsyncDataProvider() {
 		return new AsyncDataProvider<TableModel>() {
 			@Override
@@ -449,6 +450,66 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    };
 	}
 
+	/**
+	 * Build the GWT CellTable Columns from a list of ColumnModels
+	 * @param columns
+	 * @param canEdit
+	 */
+	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
+		// checkbox selector
+		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
+				new CheckboxCell(true, false)) {
+			@Override
+			public Boolean getValue(TableModel object) {
+				// Get the value from the selection model.
+				return selectionModel.isSelected(object);
+			}		
+		}; 
+		cellTable.addColumn(checkColumn, SafeHtmlUtils.fromSafeConstant("<br/>"));
+		cellTable.setColumnWidth(checkColumn, 40, Unit.PX);
+
+		// Table's columns
+		RowUpdater rowUpdater = new RowUpdater() {			
+			@Override
+			public void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback) {
+				presenter.updateRow(row, callback);			
+				
+			}
+		};
+		
+		// attempt to get view width
+		boolean isFixedWidth = TableViewUtils.isAllFixedWidthColumns(columns, Window.getClientWidth());
+		int nPercentageCols = columns.size();		
+		tableContainer.removeStyleName("overflow-x-auto");
+		if(!isFixedWidth) {
+			for(ColumnModel model : columns) {
+// TODO : uncomment and replace below when we have DATE column type
+//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
+				if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
+			}					
+		} else {
+			tableContainer.addStyleName("overflow-x-auto");
+		}
+		
+		for(ColumnModel model : columns) {
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
+			cellTable.addColumn(column, model.getName());
+			columnToModel.put(column, model);
+			
+			if(isFixedWidth) {
+				cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
+			} else {
+				// always fix boolean and date
+// TODO : uncomment when we have DATE type				
+//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) {
+				if(model.getColumnType() == ColumnType.BOOLEAN) {
+					cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
+				} else {
+					cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
+				}
+			}
+		}
+	}
 	
 	private HTML getLoadingWidget() {
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
@@ -462,6 +523,290 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {
 		jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ DisplayConstants.TABLE_UNAVAILABLE_GENERIC +"</p>"));
+	}
+
+	
+	/**
+	 * ----- Column Editor Methods -----
+	 */
+	/**
+	 * Sets up the top level editing toolbar
+	 * @param columns
+	 */
+	private void setupTableEditorToolbar(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+		buttonToolbar.clear();
+
+		Button showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
+		showColumnsBtn.addStyleName("margin-right-5");
+		showColumnsBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(!columnEditorBuilt) columnEditorPanel.setWidget(buildColumnsEditor(columns));
+				columnEditorPanel.setVisible( columnEditorPanel.isVisible() ? false : true ); 
+			}
+		});
+		
+		addRowBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_ROW, ButtonType.DEFAULT, "glyphicon-plus");
+		addRowBtn.addStyleName("margin-right-5");
+		addRowBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+		    	presenter.addRow();  
+			}
+		});
+		
+		buttonToolbar.add(showColumnsBtn);		
+		buttonToolbar.add(addRowBtn);
+	}
+	
+	/**
+	 * Builds a widget for the column editor/view panel
+	 * @param columns
+	 * @return
+	 */
+	private Widget buildColumnsEditor(List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+		FlowPanel parent = new FlowPanel();
+		parent.addStyleName("panel-group");
+		String accordionId = "accordion-" + ++sequence;
+		parent.getElement().setId(accordionId);
+		
+		// add header
+		parent.add(new HTML("<h4>" + DisplayConstants.COLUMN_DETAILS + "</h4>"));
+		
+		final FlowPanel allColumnsPanel = new FlowPanel();
+		columnPanelOrder = new ArrayList<ColumnDetailsPanel>();
+		for(int i=0; i<columns.size(); i++) {
+			final org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);			
+			final ColumnDetailsPanel columnPanel = new ColumnDetailsPanel(accordionId, col, "contentId" + ++sequence);
+			
+			columnPanel.getMoveUp().addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					// swap columns
+					int formerIdx = columnPanelOrder.indexOf(columnPanel);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx-1);
+				}
+
+			});
+			columnPanel.getMoveDown().addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					// swap columns
+					int formerIdx = columnPanelOrder.indexOf(columnPanel);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx+1);
+				}
+
+			});
+			columnPanel.getDelete().addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					MessageBox.confirm("Confirm", DisplayConstants.CONFIRM_DELETE_COLUMN + col.getName(), new Listener<MessageBoxEvent>() {
+						public void handleEvent(MessageBoxEvent ce) {							
+							com.extjs.gxt.ui.client.widget.button.Button btn = ce.getButtonClicked();	
+							if (btn.getText().equals("Yes")) {
+								columnPanel.addStyleName("fade");
+								// allow for fade before removal
+								Timer t = new Timer() {								
+									@Override
+									public void run() {
+										allColumnsPanel.remove(columnPanel);
+										columnPanelOrder.remove(columnPanel);
+										
+										// update table entity
+										presenter.updateColumnOrder(extractColumns());
+										
+										// update ends, if needed
+										int size = columnPanelOrder.size();
+										if(size > 0) {
+											TableViewUtils.setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
+											TableViewUtils.setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
+										}
+									}
+								};
+								t.schedule(250);
+							}
+						}
+					});
+				}
+			});
+			if(i==0) columnPanel.getMoveUp().setVisible(false);
+			if(i==columns.size()-1) columnPanel.getMoveDown().setVisible(false); 
+			
+			columnPanelOrder.add(columnPanel);
+			allColumnsPanel.add(columnPanel);
+		}
+		parent.add(allColumnsPanel);
+
+		// Add Column
+		addColumnPanel = new FlowPanel();
+		addColumnPanel.addStyleName("well margin-top-15");		
+		refreshAddColumnPanel();
+
+		Button addColumnBtn = DisplayUtils.createIconButton(DisplayConstants.ADD_COLUMN, ButtonType.DEFAULT, "glyphicon-plus");
+		addColumnBtn.addStyleName("margin-top-15");	
+		addColumnBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(addColumnPanel.isVisible()) addColumnPanel.setVisible(false);
+				else addColumnPanel.setVisible(true);
+			}
+		});
+		parent.add(addColumnBtn);
+		parent.add(addColumnPanel);
+		
+		return parent;
+	}
+
+	/**
+	 * Create an editor widget for a column
+	 * @param col
+	 * @return
+	 */
+	private Widget createColumnEditor(final org.sagebionetworks.repo.model.table.ColumnModel col) {
+		final FlowPanel form = new FlowPanel();
+		form.addStyleName("margin-top-15");		
+		
+		// Column Name	
+		FlowPanel formGroup = new FlowPanel();		
+		formGroup.addStyleName("form-group");
+		HTML inputLabel = new InlineHTML(DisplayConstants.COLUMN_NAME + ": ");
+		inputLabel.addStyleName("boldText");
+		final TextBox name = new TextBox();
+		if(col.getName() != null) name.setValue(SafeHtmlUtils.fromString(col.getName()).asString());
+		name.addStyleName("form-control");
+		DisplayUtils.setPlaceholder(name, DisplayConstants.COLUMN_NAME);
+		final InlineHTML columnNameError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_NAME + " " + DisplayConstants.REQUIRED);
+		columnNameError.addStyleName("text-danger-imp");
+		columnNameError.setVisible(false);
+		formGroup.add(inputLabel);
+		formGroup.add(name);
+		formGroup.add(columnNameError);
+		form.add(formGroup);
+		
+		// Column Type
+		inputLabel = new HTML(DisplayConstants.COLUMN_TYPE + ": ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		final InlineHTML columnTypeError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_TYPE + " " + DisplayConstants.REQUIRED);
+		columnTypeError.addStyleName("text-danger-imp");
+		columnTypeError.setVisible(false);
+		form.add(inputLabel);		
+		form.add(createColumnTypeRadio(col));		
+		form.add(columnTypeError);
+						
+		// Default Value	
+		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		form.add(inputLabel);
+		form.add(TableViewUtils.createDefaultValueRadio(col));
+
+		// Enum Values
+		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		form.add(inputLabel);	
+		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
+		form.add(createRestrictedValues(col, list));
+		
+		// Create column
+		Button save = DisplayUtils.createButton(DisplayConstants.CREATE_COLUMN, ButtonType.PRIMARY);
+		save.addStyleName("margin-top-15");
+		save.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(name.getValue() == null || name.getValue().length() == 0) {
+					columnNameError.setVisible(true);
+					return;
+				} else {
+					columnNameError.setVisible(false);
+				}
+				if(col.getColumnType() == null) {
+					columnTypeError.setVisible(true);
+					return;
+				} else {
+					columnTypeError.setVisible(false);
+				}
+				// import values into col. Type and default are set automatically
+				col.setName(name.getValue());				
+				List<String> restrictedValues = list.getValues();
+				if(restrictedValues.size() > 0) col.setEnumValues(restrictedValues);
+				presenter.createColumn(col);
+				
+				columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
+				refreshAddColumnPanel(); // clear aout add column view
+			}
+		});
+		form.add(save);
+		
+		return form;		
+	}
+
+	/**
+	 * Create a radio input widget for column type. Initializes to the given col, and modifies the given col.
+	 * @param col
+	 * @return
+	 */
+	private Widget createColumnTypeRadio(final org.sagebionetworks.repo.model.table.ColumnModel col) {
+		FlowPanel columnTypeRadio = new FlowPanel();
+		columnTypeRadio.addStyleName("btn-group");
+		final List<Button> groupBtns = new ArrayList<Button>(); 
+		for(final ColumnType type : ColumnType.values()) {			
+			String radioLabel = TableViewUtils.getColumnDisplayName(type);
+			final Button btn = DisplayUtils.createButton(radioLabel);
+			btn.addClickHandler(new ClickHandler() {			
+				@Override
+				public void onClick(ClickEvent event) {
+					for(Button gBtn : groupBtns) {
+						gBtn.removeStyleName("active");
+					}
+					btn.addStyleName("active");
+					col.setColumnType(type);
+				}
+			});
+			if(col.getColumnType() != null && col.getColumnType() == type) btn.addStyleName("active");
+			groupBtns.add(btn);
+			columnTypeRadio.add(btn);
+		}
+		return columnTypeRadio;
+	}
+	
+
+
+	/**
+	 * Create the restricted values list
+	 * @param col
+	 * @param list
+	 * @return
+	 */
+	private Widget createRestrictedValues(org.sagebionetworks.repo.model.table.ColumnModel col, ListCreatorViewWidget list) {
+		FlowPanel row = new FlowPanel();
+		row.addStyleName("row");
+		FlowPanel left = new FlowPanel();
+		left.addStyleName("col-sm-6");
+		FlowPanel right = new FlowPanel();
+		right.addStyleName("col-sm-6");
+		row.add(left);
+		row.add(right);		
+		left.add(list);		
+		return row;
+	}
+
+	/**
+	 * Clears, hides and rebuilds the add column panel.
+	 */
+	private void refreshAddColumnPanel() {
+		addColumnPanel.clear();
+		addColumnPanel.setVisible(false);
+		org.sagebionetworks.repo.model.table.ColumnModel newColumn = new org.sagebionetworks.repo.model.table.ColumnModel();
+		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
+		addColumnPanel.add(createColumnEditor(newColumn));		
+	}
+
+
+	private List<String> extractColumns() {
+		List<String> columns = new ArrayList<String>();
+		for(ColumnDetailsPanel colD : columnPanelOrder) {
+			columns.add(colD.getCol().getId());
+		}		
+		return columns;
 	}
 
 }
