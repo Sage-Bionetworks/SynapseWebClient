@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.util.ModelConstants;
+import org.sagebionetworks.web.client.DisplayConstants;
 
 
 /**
@@ -211,5 +212,14 @@ public class WebConstants {
 	//ClientCache key suffixes (used to avoid collision in the cache)
 	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
 	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
+
+	public static final String QUIZ_MORE_INFO = 
+		"<blockquote class=\"margin-bottom-40\"><div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_1+"</div>" +
+		"<div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_2+"</div>" +
+		"<div class=\"margin-top-left-10\">" +DisplayConstants.CERTIFICATION_MESSAGE_3 +
+		"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> "+DisplayConstants.CERTIFICATION_MESSAGE_4+"</li><li>"+DisplayConstants.CERTIFICATION_MESSAGE_5+"</li></ul></div></blockquote>";
+
+	//quiz
+	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
 	
 }
