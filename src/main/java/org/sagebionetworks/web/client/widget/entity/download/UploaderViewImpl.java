@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
@@ -63,17 +62,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private HTML spinningProgressContainer;
 	
 	LayoutContainer container;
-	IconsImageBundle iconsImageBundle;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
-			IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle,
-			SharingAndDataUseConditionWidget sharingDataUseWidget, 
-			QuizInfoWidget quizInfoWidget) {
+			SharingAndDataUseConditionWidget sharingDataUseWidget) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.uploadBtn = new Button();
