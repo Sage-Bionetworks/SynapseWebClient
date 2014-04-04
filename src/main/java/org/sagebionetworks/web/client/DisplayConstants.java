@@ -732,6 +732,8 @@ public class DisplayConstants {
 	public static final String WAITING = "Waiting";
 	public static final String ROW_UPDATE_FAILED = "An error occurred updating the row. Please reload the page and try again.";
 	public static final String NUMBER_NOT_VALID = "Number not valid";
+	//quiz
+	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
 
 }
 

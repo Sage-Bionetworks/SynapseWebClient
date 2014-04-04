@@ -125,7 +125,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			}
 		});
 		
-		quizInfoLabel.setInnerHTML(WebConstants.QUIZ_INFO);
+		quizInfoLabel.setInnerHTML(DisplayConstants.QUIZ_INFO);
 		moreQuizInfoLabel.setInnerHTML(WebConstants.QUIZ_MORE_INFO);
 		gotoQuizButton.addClickHandler(new ClickHandler() {
 			@Override
