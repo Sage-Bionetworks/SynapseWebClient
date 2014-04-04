@@ -220,14 +220,14 @@
 					
 					<!-- DATA USE -->
 					<div class="col-md-3">
-						<h3>Certification</h3>
+						<h3>Terms of Use</h3>
 						<div class="well">
 							<p>There are times where human data can only be shared with certain
 								restrictions. Learn what the rules are and how to apply and comply
-								with data privacy levels.  This topic is covered during certification.</p>
+								with data privacy levels.</p>
 							<div style="margin-top: 10px;">
 								<h4>
-									<a href="#!Help:Certification" class="service-tipsy north link">Learn more about certification</a>
+									<a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a>
 								</h4>
 							</div>
 						</div>				
