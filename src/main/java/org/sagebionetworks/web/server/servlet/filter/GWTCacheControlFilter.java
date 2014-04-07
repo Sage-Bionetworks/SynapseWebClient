@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 public class GWTCacheControlFilter implements Filter {
 	
 	//break up into three buckets.  never cache, cache for some time, or cache forever (when changed, GWT will rename the file)
-	public static final long CACHE_TIME=1000*60*60*12;  //12 hours.  cache for some time
+	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
 	public static final long MONTH_CACHE_TIME=1000*60*60*24*30;  //30 days.  cache "forever"
 	private FilterConfig filterConfig;
 
