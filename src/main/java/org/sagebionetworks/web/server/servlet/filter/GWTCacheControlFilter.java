@@ -12,6 +12,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.sagebionetworks.web.client.ClientProperties;
+
 /**
  * very basic filter to cache resources
  * 
@@ -20,21 +22,30 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GWTCacheControlFilter implements Filter {
 	
-	public static final long CACHE_TIME=1000*60*60*6;  //6 hours
+	//break up into three buckets.  never cache, cache for some time, or cache forever (when changed, GWT will rename the file)
+	public static final long CACHE_TIME=1000*60*60*12;  //12 hours.  cache for some time
+	public static final long MONTH_CACHE_TIME=1000*60*60*24*30;  //30 days.  cache "forever"
 	private FilterConfig filterConfig;
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
-		if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
-			long now = new Date().getTime();
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
+		if (requestURI.contains(".cache.")) {
+			setCacheTime(response, MONTH_CACHE_TIME);
+		}
+		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
+			setCacheTime(response, CACHE_TIME);
 		}
 		filterChain.doFilter(request, response);
 	}
 
+	private void setCacheTime(ServletResponse response, long cacheTime) {
+		long now = new Date().getTime();
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		httpResponse.setDateHeader("Expires", now+cacheTime);
+	}
+	
 	public void init(FilterConfig config) throws ServletException {
 		this.filterConfig = config;
 	}
