@@ -76,6 +76,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
+	private Footer footerWidget;
 	
 	@Inject
 	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter) {		
@@ -83,14 +84,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 		this.iconsImageBundle = iconsImageBundle;
 		this.headerWidget = headerWidget;
-		
-		// header setup
-		header.clear();
-		footer.clear();
-		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
-		
+		this.footerWidget = footerWidget;
 		init();
 	}
 
@@ -99,11 +93,12 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			@Override
 			public void onClick(ClickEvent event) {
 				if (checkUsernameFormat() && checkEmailFormat()) {
-					// formatting is ok. submit to presenter (will see if they
-					// are already taken)
+					// formatting is ok. submit to presenter (will fail if one is taken)
+					registerBtn.setEnabled(false);
 					presenter.registerUser(userNameField.getValue(),
 							emailAddressField.getValue(),
-							firstNameField.getValue(), lastNameField.getValue());
+							firstNameField.getValue(), 
+							lastNameField.getValue());
 				}
 
 			}
@@ -177,6 +172,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	@Override
 	public void showErrorMessage(String errorMessage) {
+		registerBtn.setEnabled(true);
 		MessageBox.info("Error", errorMessage, null);
 	}
 
@@ -185,12 +181,19 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		if(contentHtml != null) contentHtml.setInnerHTML("");
 		registrationForm.addClassName("hide");
 		registerBtn.setVisible(false);
+		registerBtn.setEnabled(true);
 		firstNameField.setValue("");
 		lastNameField.setValue("");
 		userNameField.setValue("");
 		emailAddressField.setValue("");
 		DisplayUtils.hideFormError(emailAddress, emailAddressError);
 		DisplayUtils.hideFormError(userName, userNameError);
+		
+		header.clear();
+		footer.clear();
+		headerWidget.configure(false);
+		header.add(headerWidget.asWidget());
+		footer.add(footerWidget.asWidget());
 	}
 
 	@Override

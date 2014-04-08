@@ -1940,7 +1940,7 @@ public class DisplayUtils {
 		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
 	
-	private static boolean isDefined(String testString) {
+	public static boolean isDefined(String testString) {
 		return testString != null && testString.trim().length() > 0;
 	}
 	
