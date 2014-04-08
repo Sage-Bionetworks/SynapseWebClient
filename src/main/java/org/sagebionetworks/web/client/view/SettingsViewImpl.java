@@ -277,11 +277,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void updateNotificationCheckbox(UserProfile profile) {
-		Boolean isNotify = true;
+		boolean isNotify = true;
 		if(profile.getNotificationSettings() != null) {
 			isNotify = profile.getNotificationSettings().getSendEmailNotifications();
-			if (isNotify == null)
-				isNotify = true;
 		}
 		emailNotificationsCheckbox.setValue(isNotify, false);
 	}
