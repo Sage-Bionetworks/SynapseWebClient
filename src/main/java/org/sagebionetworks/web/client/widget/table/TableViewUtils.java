@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.DatePickerCell;
 import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
@@ -29,9 +27,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -53,7 +49,7 @@ public class TableViewUtils {
 		columnToDisplayName.put(ColumnType.DOUBLE, "Double");
 		columnToDisplayName.put(ColumnType.BOOLEAN, "Boolean");
 		columnToDisplayName.put(ColumnType.FILEHANDLEID, "File");
-		//columnToDisplayName.put(ColumnType.DATE, "Date");
+		columnToDisplayName.put(ColumnType.DATE, "Date");
 		
 		columnToDisplayWidth = new HashMap<ColumnType, Integer>();
 		columnToDisplayWidth.put(ColumnType.STRING, 150);
@@ -61,7 +57,7 @@ public class TableViewUtils {
 		columnToDisplayWidth.put(ColumnType.DOUBLE, 100);
 		columnToDisplayWidth.put(ColumnType.BOOLEAN, 100);
 		columnToDisplayWidth.put(ColumnType.FILEHANDLEID, 150);
-		//columnToDisplayWidth.put(ColumnType.DATE, 140);
+		columnToDisplayWidth.put(ColumnType.DATE, 140);
 	}
 	
 	public static String getColumnDisplayName(ColumnType type) {
@@ -72,24 +68,24 @@ public class TableViewUtils {
 		return columnToDisplayWidth.containsKey(type) ? columnToDisplayWidth.get(type).intValue() : 150;
 	}
 	
-	public static Column<TableModel, ?> getColumn(ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
+	public static Column<TableModel, ?> getColumn(ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
 		if(col.getColumnType() == ColumnType.STRING) {
 			if(!canEdit || col.getEnumValues() == null || col.getEnumValues().size() == 0) {				
-			    return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable, view); // Simple text field    				
+			    return configSimpleText(col, canEdit, rowUpdater, cellTable, view); // Simple text field    				
 			} else {				  
 			    return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box  
 			}
 		} else if(col.getColumnType() == ColumnType.DOUBLE) {
-			return configNumberField(col, sortHandler, true, canEdit, rowUpdater, cellTable, view);   
+			return configNumberField(col, true, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.LONG) {
-			return configNumberField(col, sortHandler, false, canEdit, rowUpdater, cellTable, view);   
+			return configNumberField(col, false, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.BOOLEAN) {			
 			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable, view); 
-			else return configSimpleText(col, sortHandler, canEdit, rowUpdater, cellTable, view);			
+			else return configSimpleText(col, canEdit, rowUpdater, cellTable, view);			
 		} else if(col.getColumnType() == ColumnType.FILEHANDLEID) {
 			return configFileHandle(col, canEdit, rowUpdater, cellTable, view);  
-//		} else if(col.getColumnType() == ColumnType.DATE) {
-//			return configDateColumn(col, sortHandler, canEdit, rowUpdater, cellTable, view);
+		} else if(col.getColumnType() == ColumnType.DATE) {
+			return configDateColumn(col, canEdit, rowUpdater, cellTable, view);
 		} else {
 			return null;
 		} 
@@ -253,7 +249,7 @@ public class TableViewUtils {
 		return column;
 	}
 
-	private static Column<TableModel, String> configSimpleText(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
+	private static Column<TableModel, String> configSimpleText(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		final AbstractCell<String> cell = canEdit ? new EditTextCell() : new TextCell();
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
@@ -262,13 +258,6 @@ public class TableViewUtils {
 			}
 		};
 		column.setSortable(true);
-		sortHandler.setComparator(column,
-				new Comparator<TableModel>() {
-					@Override
-					public int compare(TableModel o1, TableModel o2) {
-						return o1.getNeverNull(col.getId()).compareTo(o2.getNeverNull(col.getId()));
-					}
-				});		
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 						@Override
@@ -295,7 +284,7 @@ public class TableViewUtils {
 		return column;
 	}
 
-	private static Column<TableModel, String> configNumberField(final ColumnModel col, ListHandler<TableModel> sortHandler, final boolean isDouble, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
+	private static Column<TableModel, String> configNumberField(final ColumnModel col, final boolean isDouble, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		final AbstractCell<String> cell = canEdit ? new EditTextCell() : new TextCell();
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
@@ -304,17 +293,6 @@ public class TableViewUtils {
 			}
 		};
 		column.setSortable(true);
-		sortHandler.setComparator(column,
-				new Comparator<TableModel>() {
-					@Override
-					public int compare(TableModel o1, TableModel o2) {
-						if(isDouble) {
-							return Double.valueOf(o1.getNeverNull(col.getId())) == Double.valueOf(o2.getNeverNull(col.getId())) ? 0 : Double.valueOf(o1.getNeverNull(col.getId())) < Double.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
-						} else {
-							return Long.valueOf(o1.getNeverNull(col.getId())) == Long.valueOf(o2.getNeverNull(col.getId())) ? 0 : Long.valueOf(o1.getNeverNull(col.getId())) < Long.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
-						}						
-					}
-				});		
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 						@Override
@@ -397,8 +375,8 @@ public class TableViewUtils {
 		
 	}	
 	
-	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, ListHandler<TableModel> sortHandler, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {		
-		final AbstractCell<Date> cell = canEdit ? new DatePickerCell(DATE_FORMAT) : new DateCell(DATE_FORMAT);
+	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {		
+		final AbstractCell<Date> cell = canEdit ? new DatePickerCellNullTolerant(DATE_FORMAT) : new DateCell(DATE_FORMAT);
 		Column<TableModel, Date> column = new Column<TableModel, Date>(cell) {
 			@Override
 			public Date getValue(TableModel object) {
@@ -410,13 +388,6 @@ public class TableViewUtils {
 			}					
 		};
 		column.setSortable(true);
-		sortHandler.setComparator(column,
-				new Comparator<TableModel>() {
-					@Override
-					public int compare(TableModel o1, TableModel o2) {						
-						return Long.valueOf(o1.getNeverNull(col.getId())) == Long.valueOf(o2.getNeverNull(col.getId())) ? 0 : Long.valueOf(o1.getNeverNull(col.getId())) < Long.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
-					}
-				});		
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, Date>() {
 						@Override
@@ -432,7 +403,7 @@ public class TableViewUtils {
 								@Override
 								public void onFailure(Throwable caught) {
 									object.put(col.getId(), original);
-									((DatePickerCell)cell).clearViewData(TableModel.KEY_PROVIDER.getKey(object));
+									((DatePickerCellNullTolerant)cell).clearViewData(TableModel.KEY_PROVIDER.getKey(object));
 									cellTable.redraw();
 								}
 							});
