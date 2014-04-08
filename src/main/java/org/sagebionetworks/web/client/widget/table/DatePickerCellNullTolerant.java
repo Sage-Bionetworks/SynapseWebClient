@@ -119,7 +119,12 @@ public class DatePickerCellNullTolerant extends AbstractEditableCell<Date, Date>
         }
       }
     };
+    
+    
+    /** CUSTOM MODIFICATION **/
     panel.addStyleName("fullOpacityImp");
+    /** END CUSTOM MODIFICATION **/
+    
     panel.addCloseHandler(new CloseHandler<PopupPanel>() {
       public void onClose(CloseEvent<PopupPanel> event) {
         lastKey = null;
@@ -205,9 +210,14 @@ public class DatePickerCellNullTolerant extends AbstractEditableCell<Date, Date>
 
     Date viewData = getViewData(lastKey);
     Date date = (viewData == null) ? lastValue : viewData;
+    
+    
+    /** CUSTOM MODIFICATION (just the if statement wrapper, not the setCurrentMonth... **/
     if(date != null) {
     	datePicker.setCurrentMonth(date);
     }
+    /** END CUSTOM MODIFICATION **/
+    
     datePicker.setValue(date);    
     panel.setPopupPositionAndShow(new PositionCallback() {
       public void setPosition(int offsetWidth, int offsetHeight) {
