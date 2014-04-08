@@ -134,29 +134,19 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	 @Override
 	 public void showInvalidUrlUi() {
 		 userUpdateFailed();
-		 showError(moreInfoUi, urlError);
+		 DisplayUtils.showFormError(moreInfoUi, urlError);
 	 }
 	 
 	 @Override
 	 public void showInvalidUsernameUi() {
 		 userUpdateFailed();
-		 showError(changeUsernameUi, userNameError);
-	 }
-	 
-	 private void showError(DivElement parentElement, DivElement messageElement) {
-		 parentElement.addClassName("has-error");
-		 messageElement.removeClassName("hide");
-	 }
-	 
-	 private void hideError(DivElement parentElement, DivElement messageElement) {
-		 parentElement.removeClassName("has-error");
-		 messageElement.addClassName("hide");
+		 DisplayUtils.showFormError(changeUsernameUi, userNameError);
 	 }
 	 
 	 private void startSave() {
 		 DisplayUtils.changeButtonToSaving(okButton);
-		 hideError(moreInfoUi, urlError);
-		 hideError(changeUsernameUi, userNameError);
+		 DisplayUtils.hideFormError(moreInfoUi, urlError);
+		 DisplayUtils.hideFormError(changeUsernameUi, userNameError);
 		 presenter.updateProfile(trim(firstNameField.getValue()), trim(lastNameField.getValue()), trim(bioField.getValue()), trim(currentPositionField.getValue()), trim(locationField.getValue()), trim(industryField.getValue()), trim(currentAffiliationField.getValue()), null, null, null, trim(moreInfoField.getValue()), trim(userNameField.getValue()));
 	 }
 	 

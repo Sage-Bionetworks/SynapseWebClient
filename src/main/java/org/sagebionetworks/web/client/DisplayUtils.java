@@ -125,6 +125,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -2169,5 +2170,16 @@ public class DisplayUtils {
 	public static String getPreviewSuffix(Boolean isPreview) {
 		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
+	
+	 public static void showFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.addClassName("has-error");
+		 messageElement.removeClassName("hide");
+	 }
+	 
+	 public static void hideFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.removeClassName("has-error");
+		 messageElement.addClassName("hide");
+	 }
+
 
 }

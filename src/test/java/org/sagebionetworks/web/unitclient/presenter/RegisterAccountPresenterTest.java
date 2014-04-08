@@ -131,13 +131,13 @@ public class RegisterAccountPresenterTest {
 	@Test
 	public void testIsUsernameAvailableTooSmall() {
 		//should not check if too short
-		registerAccountPresenter.checkUsernameAvailable("abc");
+		registerAccountPresenter.registerUserStep1("abc");
 		verify(mockSynapseClient, never()).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testIsUsernameAvailableTrue() {
-		registerAccountPresenter.checkUsernameAvailable("abcd");
+		registerAccountPresenter.registerUserStep1("abcd");
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		verify(mockView, never()).markUsernameUnavailable();
 	}
@@ -145,14 +145,14 @@ public class RegisterAccountPresenterTest {
 	@Test
 	public void testIsUsernameAvailableFalse() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-		registerAccountPresenter.checkUsernameAvailable("abcd");
+		registerAccountPresenter.registerUserStep1("abcd");
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		verify(mockView).markUsernameUnavailable();
 	}
 	
 	@Test
 	public void testIsEmailAvailableTrue() {
-		registerAccountPresenter.checkEmailAvailable("abcd@efg.com");
+		registerAccountPresenter.registerUserStep2("abcd@efg.com");
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		verify(mockView, never()).markEmailUnavailable();
 	}
@@ -160,7 +160,7 @@ public class RegisterAccountPresenterTest {
 	@Test
 	public void testIsEmailAvailableFalse() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
-		registerAccountPresenter.checkEmailAvailable("abcd@efg.com");
+		registerAccountPresenter.registerUserStep2("abcd@efg.com");
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		verify(mockView).markEmailUnavailable();
 	}
