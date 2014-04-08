@@ -1088,6 +1088,8 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+		//and do not cache
+		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
@@ -1658,7 +1660,7 @@ public class DisplayUtils {
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
-			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+			String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
@@ -1671,6 +1673,10 @@ public class DisplayUtils {
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
 	
+	public static String getParamForNoCaching() {
+		return "&nocache=" + new Date().getTime();
+	}
+	
 	/**
 	 * Create a url that points to the FileHandleServlet.
 	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
@@ -1680,7 +1686,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
-		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + getParamForNoCaching() +"&" + 
 				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
 	}
 	
@@ -1693,7 +1699,7 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
-		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
@@ -1709,7 +1715,9 @@ public class DisplayUtils {
 	 */
 	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId +
+				//and do not cache
+				getParamForNoCaching();
 	}
 
 
