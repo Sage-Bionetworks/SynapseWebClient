@@ -20,12 +20,12 @@ public class TableUtilsTest {
 	public void convertRowToModelTest() {
 		Row row = new Row();
 		row.setRowId(rowId);
-		row.setValues(Arrays.asList(new String []{ "v1", "v2", "v3" }));
+		row.setValues(Arrays.asList(new String []{ "v1", "v2", null }));
 		TableModel model = TableUtils.convertRowToModel(headers, row);
 		assertEquals(rowId.toString(), model.getId());
 		assertEquals("v1", model.get("1"));
 		assertEquals("v2", model.get("2"));
-		assertEquals("v3", model.get("3"));
+		assertEquals(null, model.get("3"));
 	}
 	
 	@Test
@@ -33,12 +33,12 @@ public class TableUtilsTest {
 		TableModel model = new TableModel(rowId.toString());
 		model.put("1", "v1");
 		model.put("2", "v2");
-		model.put("3", "v3");
+		model.put("3", null);
 		Row row = TableUtils.convertModelToRow(headers, model);
 		assertEquals(rowId, row.getRowId());
 		assertEquals("v1", row.getValues().get(0));
 		assertEquals("v2", row.getValues().get(1));
-		assertEquals("v3", row.getValues().get(2));		
+		assertEquals(null, row.getValues().get(2));		
 	}
 	
 }

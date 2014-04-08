@@ -15,10 +15,9 @@ import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.QueryConstants;
+import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -29,8 +28,6 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -50,7 +47,6 @@ import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -108,7 +104,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private List<ColumnModel> columns;
 	ListHandler<TableModel> sortHandler;
 	SelectionModel<TableModel> selectionModel;
-	ContactDatabase database;
 	Presenter presenter;
 	Map<Column,ColumnModel> columnToModel;
 	AsyncDataProvider<TableModel> dataProvider;
@@ -363,13 +358,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		// Do not refresh the headers and footers every time the data is
 		// updated.
-//		cellTable.setAutoHeaderRefreshDisabled(true);
-//		cellTable.setAutoFooterRefreshDisabled(true);
-
-		// Attach a column sort handler to the ListDataProvider to sort the
-		// list.
-		sortHandler = new ListHandler<TableModel>(ContactDatabase.get().getDataProvider().getList());
-		cellTable.addColumnSortHandler(sortHandler);
+		cellTable.setAutoHeaderRefreshDisabled(true);
+		cellTable.setAutoFooterRefreshDisabled(true);
 
 		// Create a Pager to control the table.
 		SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);

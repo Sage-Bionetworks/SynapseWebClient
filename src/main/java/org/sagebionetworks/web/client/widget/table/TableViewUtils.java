@@ -221,14 +221,14 @@ public class TableViewUtils {
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
 			public String getValue(TableModel object) {
-				return object.get(col.getId());
+				return object.getNeverNull(col.getId());
 			}
 		};
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 				@Override
 				public void update(int index, final TableModel object, String value) {
-					final String original = object.get(col.getId()); 
+					final String original = object.getNeverNull(col.getId()); 
 					for (String enumVal : col.getEnumValues()) {
 						if (enumVal.equals(value)) {
 							object.put(col.getId(), enumVal);
@@ -258,7 +258,7 @@ public class TableViewUtils {
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
 			public String getValue(TableModel object) {
-				return object.get(col.getId());
+				return object.getNeverNull(col.getId());
 			}
 		};
 		column.setSortable(true);
@@ -266,7 +266,7 @@ public class TableViewUtils {
 				new Comparator<TableModel>() {
 					@Override
 					public int compare(TableModel o1, TableModel o2) {
-						return o1.get(col.getId()).compareTo(o2.get(col.getId()));
+						return o1.getNeverNull(col.getId()).compareTo(o2.getNeverNull(col.getId()));
 					}
 				});		
 		if(canEdit) {
@@ -274,7 +274,7 @@ public class TableViewUtils {
 						@Override
 						public void update(int index, final TableModel object,
 								final String value) {
-							final String original = object.get(col.getId());
+							final String original = object.getNeverNull(col.getId());
 							object.put(col.getId(), value);
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
@@ -300,7 +300,7 @@ public class TableViewUtils {
 		Column<TableModel, String> column = new Column<TableModel, String>(cell) {
 			@Override
 			public String getValue(TableModel object) {
-				return object.get(col.getId());
+				return object.getNeverNull(col.getId());
 			}
 		};
 		column.setSortable(true);
@@ -309,9 +309,9 @@ public class TableViewUtils {
 					@Override
 					public int compare(TableModel o1, TableModel o2) {
 						if(isDouble) {
-							return Double.valueOf(o1.get(col.getId())) == Double.valueOf(o2.get(col.getId())) ? 0 : Double.valueOf(o1.get(col.getId())) < Double.valueOf(o2.get(col.getId())) ? -1 : 1;
+							return Double.valueOf(o1.getNeverNull(col.getId())) == Double.valueOf(o2.getNeverNull(col.getId())) ? 0 : Double.valueOf(o1.getNeverNull(col.getId())) < Double.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
 						} else {
-							return Long.valueOf(o1.get(col.getId())) == Long.valueOf(o2.get(col.getId())) ? 0 : Long.valueOf(o1.get(col.getId())) < Long.valueOf(o2.get(col.getId())) ? -1 : 1;
+							return Long.valueOf(o1.getNeverNull(col.getId())) == Long.valueOf(o2.getNeverNull(col.getId())) ? 0 : Long.valueOf(o1.getNeverNull(col.getId())) < Long.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
 						}						
 					}
 				});		
@@ -319,7 +319,7 @@ public class TableViewUtils {
 			column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 						@Override
 						public void update(int index, final TableModel object, String value) {						
-							final String original = object.get(col.getId()); 
+							final String original = object.getNeverNull(col.getId()); 
 							try {
 								if(isDouble) {
 									Double.parseDouble(value);
@@ -355,13 +355,13 @@ public class TableViewUtils {
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
 			public String getValue(TableModel object) {
-				return object.get(col.getId());
+				return object.getNeverNull(col.getId());
 			}
 		};
 		column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 			@Override
 			public void update(int index, final TableModel object, String value) {				
-				final String original = object.get(col.getId()); 
+				final String original = object.getNeverNull(col.getId()); 
 				if (TRUE.equals(value)) {
 					object.put(col.getId(), TRUE);
 				} else {
@@ -389,7 +389,7 @@ public class TableViewUtils {
 	Column<TableModel, String> column = new Column<TableModel, String>(new FileHandleCell(canEdit)) {
 		@Override
 		public String getValue(TableModel object) {
-			return object.get(col.getId());
+			return object.getNeverNull(col.getId());
 		}
 	};
 	// TODO : complete
@@ -403,7 +403,7 @@ public class TableViewUtils {
 			@Override
 			public Date getValue(TableModel object) {
 				try {
-					return new Date(Long.parseLong(object.get(col.getId())));
+					return new Date(Long.parseLong(object.getNeverNull(col.getId())));
 				} catch (Exception e) {
 					return null; 
 				}
@@ -414,14 +414,14 @@ public class TableViewUtils {
 				new Comparator<TableModel>() {
 					@Override
 					public int compare(TableModel o1, TableModel o2) {						
-						return Long.valueOf(o1.get(col.getId())) == Long.valueOf(o2.get(col.getId())) ? 0 : Long.valueOf(o1.get(col.getId())) < Long.valueOf(o2.get(col.getId())) ? -1 : 1;
+						return Long.valueOf(o1.getNeverNull(col.getId())) == Long.valueOf(o2.getNeverNull(col.getId())) ? 0 : Long.valueOf(o1.getNeverNull(col.getId())) < Long.valueOf(o2.getNeverNull(col.getId())) ? -1 : 1;
 					}
 				});		
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, Date>() {
 						@Override
 						public void update(int index, final TableModel object, Date value) {					
-							final String original = object.get(col.getId()); 
+							final String original = object.getNeverNull(col.getId()); 
 							object.put(col.getId(), String.valueOf(value.getTime()));
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override

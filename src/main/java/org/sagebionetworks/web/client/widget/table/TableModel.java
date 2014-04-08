@@ -54,13 +54,26 @@ public class TableModel implements Comparable<TableModel> {
 		return (o == null || o.getId() == null) ? -1 : -o.getId().compareTo(getId());
 	}
 
-	public String get(String key) {
+	/**
+	 * For use by the GWT CellTable which doesn't handle null values well
+	 * @param key
+	 * @return
+	 */
+	public String getNeverNull(String key) {
 		String val = map.get(key) == null ? "" : map.get(key);
 		return val;
+	}
+	
+	public String get(String key) {
+		return map.get(key);
 	}
 
 	public void put(String key, String value) {
 		map.put(key, value);
+	}
+	
+	public boolean containsKey(String key) {
+		return map.containsKey(key);
 	}
 	
 }
