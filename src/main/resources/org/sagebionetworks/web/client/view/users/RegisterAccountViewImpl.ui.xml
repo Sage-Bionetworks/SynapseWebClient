@@ -15,7 +15,7 @@
 			<div class="row">
 			    <div class="col-sm-6 col-sm-offset-3">
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
-			        <span ui:field="contentHtml" />
+			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">
 				        <form class="form-horizontal" role="form">
 							  <div ui:field="userName" class="form-group row">

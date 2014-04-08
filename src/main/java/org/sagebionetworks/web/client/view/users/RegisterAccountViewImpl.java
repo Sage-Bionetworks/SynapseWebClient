@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view.users;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -11,7 +12,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -70,7 +70,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	Button registerBtn;
 	
 	@UiField
-	SpanElement contentHtml;
+	DivElement contentHtml;
 	
 
 	private Presenter presenter;
@@ -166,8 +166,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	@Override
 	public void showAccountCreated() {
-		clear();		
-		contentHtml.setInnerHTML("<div class=\"alert alert-info\">Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then <a class=\"link\" href=\"#!LoginPlace:0\">login here</a>.</div>");				
+		clear();
+		String loginPlaceHref = DisplayUtils.getLoginPlaceHistoryToken(LoginPlace.LOGIN_TOKEN);
+		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.ACCOUNT_CREATED + "<a class=\"link\" href=\""+loginPlaceHref+"\">"+DisplayConstants.LOGIN_HERE+"</a>."));				
 	}
 
 	@Override

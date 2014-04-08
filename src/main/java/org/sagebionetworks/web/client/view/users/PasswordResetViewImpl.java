@@ -4,11 +4,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.dom.client.DivElement;
@@ -136,7 +134,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	private boolean checkPasswordMatch() {
 		DisplayUtils.hideFormError(password2, password2Error);
 		if (!password1Field.getValue().equals(password2Field.getValue())) {
-			password2Error.setInnerHTML("Passwords do not match. Please re-enter your new password.");
+			password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
 			DisplayUtils.showFormError(password2, password2Error);
 			return false;
 		} else
@@ -152,12 +150,15 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 				if (isShowingResetUI) {
 					//validate passwords are filled in and match
 					if(checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+						submitBtn.setEnabled(false);
 						presenter.resetPassword(password1Field.getValue());
 					}
 				} else {
 					//validate email address is filled in
-					if(checkEmail())
-						presenter.requestPasswordReset(emailAddressField.getValue()); 
+					if(checkEmail()) {
+						submitBtn.setEnabled(false);
+						presenter.requestPasswordReset(emailAddressField.getValue());
+					}
 				}
 			}
 		});
@@ -218,7 +219,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		loadingPanel.setVisible(false);
 		sendPasswordChangeForm.addClassName("hide");
 		resetPasswordForm.addClassName("hide");
-		
+		submitBtn.setEnabled(true);
 		submitBtn.setVisible(false);
 		password1Field.setValue("");
 		password2Field.setValue("");
@@ -238,12 +239,13 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void showPasswordResetSuccess() {
 		clear();
 		pageTitle.setInnerHTML(DisplayConstants.SUCCESS);
-		contentHtml.setInnerHTML("<div class=\"alert alert-info\">Your password has been changed.</div>");
+		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_HAS_BEEN_CHANGED));
 	}
 
 
 	@Override
-	public void showErrorMessage(String errorMessage) {		
+	public void showErrorMessage(String errorMessage) {
+		submitBtn.setEnabled(true);
 		MessageBox.info("Error", errorMessage, null);
 	}
 
@@ -252,7 +254,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void showRequestSentSuccess() {
 		clear();
 		pageTitle.setInnerHTML(DisplayConstants.REQUEST_SENT);
-		contentHtml.setInnerHTML("<div class=\"alert alert-info\">Your password reset request has been sent. Please check your email.</div>");
+		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.PASSWORD_RESET_SENT));
 	}
 
 	@Override
