@@ -2583,24 +2583,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private static long sequence = 0; 
 	
 	@Override
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {
-// TODO : eventually remove. keeping around for demo.
-//		TableStatus st = new TableStatus();
-//		st.setState(TableState.PROCESSING);
-//		st.setStartedOn(new Date());
-//		st.setChangedOn(new Date());
-//		st.setErrorDetails("Error details");
-//		st.setErrorMessage("error Message");
-//		sequence += 10;
-//		st.setProgresssCurrent(sequence);
-//		st.setProgresssTotal(100L);
-//		st.setProgresssMessage("Progress message");
-//		try {
-//			throw new TableUnavilableException(st.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-//		} catch (JSONObjectAdapterException e1) {
-//			e1.printStackTrace();
-//		}
-		
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {		
 		if(query == null) throw new BadRequestException("query must be defined");
 		
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

@@ -30,7 +30,7 @@ public class TableUtils {
 		row.setRowId(id);
 		List<String> values = new ArrayList<String>();		
 		for(String col : headers) {
-			values.add(model.get(col));
+			values.add(model.get(col));			
 		}
 		row.setValues(values);
 		return row;

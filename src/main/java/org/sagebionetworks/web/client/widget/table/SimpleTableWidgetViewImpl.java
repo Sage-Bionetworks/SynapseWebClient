@@ -15,10 +15,9 @@ import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.QueryConstants;
+import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -29,8 +28,6 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -50,7 +47,6 @@ import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -106,9 +102,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	CellTable<TableModel> cellTable;
 	MySimplePager pager;
 	private List<ColumnModel> columns;
-	ListHandler<TableModel> sortHandler;
 	SelectionModel<TableModel> selectionModel;
-	ContactDatabase database;
 	Presenter presenter;
 	Map<Column,ColumnModel> columnToModel;
 	AsyncDataProvider<TableModel> dataProvider;
@@ -161,25 +155,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
-		buildTable(queryDetails.getLimit().intValue());
+		buildTable(queryDetails, totalRowCount);
 		buildColumns(columns, canEdit);
-		
-	    cellTable.setRowCount(totalRowCount, true);
-	    if(queryDetails.getOffset() != null && queryDetails.getLimit() != null) {	    	
-	    	cellTable.setVisibleRange(queryDetails.getOffset().intValue(), queryDetails.getOffset().intValue() + queryDetails.getLimit().intValue());
-	    } else {
-	    	cellTable.setVisibleRange(0, totalRowCount);
-	    }	    
-	    
-
-	    // Connect the list to the data provider.
-	    dataProvider.addDataDisplay(cellTable);
- 
-	    // Add a ColumnSortEvent.AsyncHandler to connect sorting to the
-	    // AsyncDataPRrovider.
-	    AsyncHandler columnSortHandler = new AsyncHandler(cellTable);
-	    cellTable.addColumnSortHandler(columnSortHandler);
-	    
+		 	    
 	    hideLoading();
 	}
 	
@@ -188,7 +166,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		pagerContainer.setVisible(false);		
 		if(addRowBtn != null) addRowBtn.setEnabled(false);
 		FlowPanel addAColumnPanel = new FlowPanel();
-		addAColumnPanel.addStyleName("alert alert-success");
+		addAColumnPanel.addStyleName("alert alert-info");
 		String str = "This Table does not contain any Columns.";
 		if(canEdit) str += " You can add columns in the \"Column Details\" section above.";
 		addAColumnPanel.add(new HTML(str));
@@ -353,23 +331,18 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		presenter.query(queryField.getValue());
 	}
 	
-	private void buildTable(int pageSize) {
+	private void buildTable(QueryDetails queryDetails, int totalRowCount) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setWidth("100%", true);
-		cellTable.setPageSize(pageSize);
+		cellTable.setPageSize(queryDetails.getLimit().intValue());
 		cellTable.addStyleName("cellTable");
 		cellTable.setLoadingIndicator(getLoadingWidget());
 		tableContainer.setWidget(cellTable);
 
 		// Do not refresh the headers and footers every time the data is
 		// updated.
-//		cellTable.setAutoHeaderRefreshDisabled(true);
-//		cellTable.setAutoFooterRefreshDisabled(true);
-
-		// Attach a column sort handler to the ListDataProvider to sort the
-		// list.
-		sortHandler = new ListHandler<TableModel>(ContactDatabase.get().getDataProvider().getList());
-		cellTable.addColumnSortHandler(sortHandler);
+		cellTable.setAutoHeaderRefreshDisabled(true);
+		cellTable.setAutoFooterRefreshDisabled(true);
 
 		// Create a Pager to control the table.
 		SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
@@ -381,6 +354,22 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		selectionModel = new MultiSelectionModel<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setSelectionModel(selectionModel, DefaultSelectionEventManager.<TableModel> createCheckboxManager());
 		
+	    // Add a ColumnSortEvent.AsyncHandler to connect sorting to the
+	    // AsyncDataPRrovider.
+		AsyncHandler columnSortHandler = new AsyncHandler(cellTable);
+	    cellTable.addColumnSortHandler(columnSortHandler);	    
+	    
+	    cellTable.setRowCount(totalRowCount, true);
+	    if(queryDetails.getOffset() != null && queryDetails.getLimit() != null) {	    	
+	    	cellTable.setVisibleRange(queryDetails.getOffset().intValue(), queryDetails.getOffset().intValue() + queryDetails.getLimit().intValue());
+	    } else {
+	    	cellTable.setVisibleRange(0, totalRowCount);
+	    }	    
+	    
+
+	    // Connect the list to the data provider.
+	    dataProvider.addDataDisplay(cellTable);
+
 	}
 
 	/**
@@ -483,16 +472,14 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		tableContainer.removeStyleName("overflow-x-auto");
 		if(!isFixedWidth) {
 			for(ColumnModel model : columns) {
-// TODO : uncomment and replace below when we have DATE column type
-//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
-				if(model.getColumnType() == ColumnType.BOOLEAN) nPercentageCols--;	
+				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) nPercentageCols--;
 			}					
 		} else {
 			tableContainer.addStyleName("overflow-x-auto");
 		}
 		
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, sortHandler, canEdit, rowUpdater, cellTable, this);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(model, canEdit, rowUpdater, cellTable, this);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			
@@ -500,9 +487,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
 			} else {
 				// always fix boolean and date
-// TODO : uncomment when we have DATE type				
-//				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) {
-				if(model.getColumnType() == ColumnType.BOOLEAN) {
+				if(model.getColumnType() == ColumnType.BOOLEAN || model.getColumnType() == ColumnType.DATE) {
 					cellTable.setColumnWidth(column, TableViewUtils.getColumnDisplayWidth(model.getColumnType()), Unit.PX);
 				} else {
 					cellTable.setColumnWidth(column, (100/nPercentageCols), Unit.PCT);			
@@ -700,11 +685,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		form.add(TableViewUtils.createDefaultValueRadio(col));
 
 		// Enum Values
+// TODO : uncomment the following lines when the service supports unique values		
 		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
-		form.add(inputLabel);	
+//		form.add(inputLabel);	
 		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
-		form.add(createRestrictedValues(col, list));
+//		form.add(createRestrictedValues(col, list));
 		
 		// Create column
 		Button save = DisplayUtils.createButton(DisplayConstants.CREATE_COLUMN, ButtonType.PRIMARY);
