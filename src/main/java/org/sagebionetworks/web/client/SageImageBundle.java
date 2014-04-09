@@ -74,5 +74,30 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/SynapseLogo-small.png")
 	ImageResource synapseLogoSmall();
 	
+	@Source("images/NCI_logo.jpg")
+	ImageResource nciLogo();
+
+	@Source("images/LSDF_logo.jpg")
+	ImageResource lsdfLogo();
+
+	@Source("images/NHLBI_logo.jpg")
+	ImageResource nhlbiLogo();
+
+	@Source("images/Sloan_logo.jpg")
+	ImageResource sloanLogo();
+
+	@Source("images/spotlight/Dream85_AD.jpg")
+	ImageResource dream85AD();
 	
+	@Source("images/spotlight/Dream85_Banner.jpg")
+	ImageResource dream85Banner();
+	
+	@Source("images/spotlight/Dream85_RA.jpg")
+	ImageResource dream85RA();
+	
+	@Source("images/spotlight/Dream85_SM.jpg")
+	ImageResource dream85SM();
+	
+	@Source("images/spotlight/TcgaPancancer.jpg")
+	ImageResource tcgaPancancer();
 }
