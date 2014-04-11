@@ -65,7 +65,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel notificationsPanel;
 	@UiField
 	CheckBox emailNotificationsCheckbox;
-
+	@UiField
+	com.google.gwt.user.client.ui.Button changeApiKey;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -138,6 +139,12 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		setupPasswordButtonPanel.clear();
 		setupPasswordButtonPanel.add(createPasswordButton);
 		
+		changeApiKey.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.changeApiKey();
+			}
+		});
 	}
 
 	@Override
