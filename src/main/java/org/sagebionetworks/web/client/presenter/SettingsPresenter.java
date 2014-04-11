@@ -76,6 +76,12 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.view.clear();
 		showView(place);
 		
+		getAPIKey();
+		
+		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+	}
+
+	private void getAPIKey() {
 		// lookup API key
 		if(apiKey == null) {			
 			synapseClient.getAPIKey(new AsyncCallback<String>() {
@@ -94,8 +100,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		} else {
 			view.setApiKey(apiKey);
 		}
-		
-		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	@Override
@@ -254,6 +258,23 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
+	}
+
+	@Override
+	public void changeApiKey() {
+		synapseClient.deleteApiKey(new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showInfo(DisplayConstants.API_KEY_CHANGED, "");
+				view.setApiKey(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		});
+		
 	}
 }
 

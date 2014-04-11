@@ -57,6 +57,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		
 		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);
+
+		void changeApiKey();
 	}
 
 	public void setApiKey(String apiKey);
