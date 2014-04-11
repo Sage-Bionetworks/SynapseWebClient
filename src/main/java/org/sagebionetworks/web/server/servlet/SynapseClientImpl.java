@@ -2671,5 +2671,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		
 		return pageName2WikiKeyMap;
 	}
+
+	@Override
+	public String deleteApiKey() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.invalidateApiKey();
+			return getAPIKey();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 	
 }
