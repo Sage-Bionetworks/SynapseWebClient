@@ -130,14 +130,14 @@ public class LoginViewImpl extends Composite implements LoginView {
 		gotoQuizButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.setIgnoreQuiz(ignoreQuizCb.getValue());
+				presenter.setHideQuizReminder(ignoreQuizCb.getValue());
 				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
 		ignoreQuizButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.setIgnoreQuiz(ignoreQuizCb.getValue());
+				presenter.setHideQuizReminder(ignoreQuizCb.getValue());
 				presenter.goToLastPlace();
 			}
 		});
