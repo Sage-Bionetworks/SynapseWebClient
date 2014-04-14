@@ -260,26 +260,24 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void setHideQuizReminder(boolean hideQuizReminder) {
-		if (hideQuizReminder) {
-			//suppress reminder
-			//update profile
-			if (profile.getPreferences() == null) 
-				profile.setPreferences(new UserPreferences());
-			UserPreferences notificationSettings = profile.getPreferences();
-			notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
-			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your preferences", "");
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			};
-			updateProfile(profile, profileUpdatedCallback);	
-		}
+		//suppress reminder
+		//update profile
+		if (profile.getPreferences() == null) 
+			profile.setPreferences(new UserPreferences());
+		UserPreferences notificationSettings = profile.getPreferences();
+		notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
+		AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Successfully updated your preferences", "");
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
+		updateProfile(profile, profileUpdatedCallback);	
 	}
 
 	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {
@@ -428,4 +426,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			});
 		}
 	}
+	
+	/**
+	 * setter for user profile, for testing purposes only
+	 * @param profile
+	 */
+	public void setUserProfile(UserProfile profile) {
+		this.profile = profile;
+	}
+
 }

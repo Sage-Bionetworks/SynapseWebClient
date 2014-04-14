@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.UserPreferences;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -345,4 +346,59 @@ public class LoginPresenterTest {
 	}
 
 	
+	@Test 
+	public void testIsHideQuizReminder(){
+		//if not test website, then always hide the reminder (to be removed on initial rollout)
+		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
+		assertTrue(loginPresenter.isHideQuizReminder());
+		
+		//test website
+		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		//with null profile, should not hide
+		assertFalse(loginPresenter.isHideQuizReminder());
+
+		//with profile with null preferences, should not hide
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("valid-username");
+		loginPresenter.setUserProfile(profile);
+		assertFalse(loginPresenter.isHideQuizReminder());
+
+		//with profile with preferences, but value is not set
+		UserPreferences preferences = new UserPreferences();
+		profile.setPreferences(preferences);
+		assertFalse(loginPresenter.isHideQuizReminder());
+		
+		//value is set, to false (so still show)
+		preferences.setDontShowCertifiedUserReminder(false);
+		assertFalse(loginPresenter.isHideQuizReminder());
+		
+		//finally, if value is set to true, then hide
+		preferences.setDontShowCertifiedUserReminder(true);
+		assertTrue(loginPresenter.isHideQuizReminder());
+	}
+	
+	@Test 
+	public void testSetHideQuizReminder() throws JSONObjectAdapterException{
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId("1233");
+		profile.setUserName("valid-username");
+		//note that user preferences have not even been initialized
+		loginPresenter.setUserProfile(profile);
+		
+		boolean hideQuizReminder = true;
+		loginPresenter.setHideQuizReminder(hideQuizReminder);
+		
+		//get the user profile json
+		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
+		String profileJson = argument.getValue();
+		
+		UserProfile newProfile = new UserProfile(adapterFactory.createNew(profileJson));
+		//assert user preferences have been initialized
+		assertNotNull(newProfile.getPreferences());
+		//and quiz reminder is in the expected state
+		assertEquals(hideQuizReminder, newProfile.getPreferences().getDontShowCertifiedUserReminder());
+		
+	}
 }
