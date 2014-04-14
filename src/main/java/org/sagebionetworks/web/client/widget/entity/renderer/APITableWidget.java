@@ -330,7 +330,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			}
 			//if there is something to sort
 			if (COLUMN_SORT_TYPE.NONE != sort) {
-				newUri = newUri + "+order+by+"+columnName+"+"+sort.toString();
+				newUri = newUri + "+order+by+%22"+columnName+"%22+"+sort.toString();
 			}
 		}
 		return newUri;
