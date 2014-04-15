@@ -685,12 +685,11 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		form.add(TableViewUtils.createDefaultValueRadio(col));
 
 		// Enum Values
-// TODO : uncomment the following lines when the service supports unique values		
 		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
-//		form.add(inputLabel);	
+		form.add(inputLabel);	
 		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
-//		form.add(createRestrictedValues(col, list));
+		form.add(createRestrictedValues(col, list));
 
 		final InlineHTML generalError = DisplayUtils.createFormHelpText("");
 		generalError.addStyleName("text-danger-imp"); 

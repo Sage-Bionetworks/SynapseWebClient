@@ -216,38 +216,30 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	public void createColumn(ColumnModel col, final AsyncCallback<String> callback) {
 		try {									
 			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			Timer t = new Timer() {
+			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
+						if(newCol.getId() != null) {
+							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
+							table.getColumnIds().add(newCol.getId());
+							updateTableEntity();
+							callback.onSuccess(null);
+						}
+						else {
+							onFailure(null);
+						}
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
+				}
 				
 				@Override
-				public void run() {
-					callback.onFailure(new Exception("something went wrong"));					
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
 				}
-			};
-			t.schedule(1000);
-//			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
-//				@Override
-//				public void onSuccess(String result) {
-//					try {
-//						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
-//						if(newCol.getId() != null) {
-//							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
-//							table.getColumnIds().add(newCol.getId());
-//							updateTableEntity();
-//							callback.onSuccess(null);
-//						}
-//						else {
-//							onFailure(null);
-//						}
-//					} catch (JSONObjectAdapterException e) {
-//						onFailure(e);
-//					}
-//				}
-//				
-//				@Override
-//				public void onFailure(Throwable caught) {
-//					callback.onFailure(caught);
-//				}
-//			});
+			});
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}

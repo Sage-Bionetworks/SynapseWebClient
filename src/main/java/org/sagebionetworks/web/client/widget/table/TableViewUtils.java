@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,12 +70,13 @@ public class TableViewUtils {
 	}
 	
 	public static Column<TableModel, ?> getColumn(ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
+		// any restrained column, regardless of type
+		if(canEdit && col.getEnumValues() != null && col.getEnumValues().size() > 0)
+			return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box
+		
+		// determine types
 		if(col.getColumnType() == ColumnType.STRING) {
-			if(!canEdit || col.getEnumValues() == null || col.getEnumValues().size() == 0) {				
-			    return configSimpleText(col, canEdit, rowUpdater, cellTable, view); // Simple text field    				
-			} else {				  
-			    return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box  
-			}
+		    return configSimpleText(col, canEdit, rowUpdater, cellTable, view); // Simple text field    				
 		} else if(col.getColumnType() == ColumnType.DOUBLE) {
 			return configNumberField(col, true, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.LONG) {
@@ -213,21 +215,27 @@ public class TableViewUtils {
 	 */
 	private static Column<TableModel, String> configComboString(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		if(col.getEnumValues() == null) return null;
-		final SelectionCell comboCell = new SelectionCell(col.getEnumValues());
+		List<String> options = (col.getDefaultValue() == null) ? withEmpty(col.getEnumValues()) : col.getEnumValues(); 
+		final SelectionCell comboCell = new SelectionCell(options);
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
 			public String getValue(TableModel object) {
 				return object.getNeverNull(col.getId());
 			}
 		};
+		column.setSortable(true);
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 				@Override
 				public void update(int index, final TableModel object, String value) {
-					final String original = object.getNeverNull(col.getId()); 
-					for (String enumVal : col.getEnumValues()) {
-						if (enumVal.equals(value)) {
-							object.put(col.getId(), enumVal);
+					final String original = object.getNeverNull(col.getId());
+					if(value.equals("")) {
+						object.put(col.getId(), value);
+					} else {
+						for (String enumVal : col.getEnumValues()) {
+							if (enumVal.equals(value)) {
+								object.put(col.getId(), enumVal);
+							}
 						}
 					}
 					rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
@@ -329,7 +337,9 @@ public class TableViewUtils {
 	}
 
 	private static Column<TableModel, String> configBooleanCombo(final ColumnModel col, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
-		final SelectionCell comboCell = new SelectionCell(Arrays.asList(new String[] { TRUE, FALSE }));
+		List<String> trueFalse = Arrays.asList(new String[] { TRUE, FALSE });
+		List<String> options = (col.getDefaultValue() == null) ? withEmpty(trueFalse) : trueFalse;
+		final SelectionCell comboCell = new SelectionCell(options);
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
 			public String getValue(TableModel object) {
@@ -342,9 +352,13 @@ public class TableViewUtils {
 			@Override
 			public void update(int index, final TableModel object, String value) {				
 				final String original = object.getNeverNull(col.getId());
-				// convert true/false display string to DB value true/false, not 0/1 as you would expect. See PLFM-2703 
-				if (TRUE.equals(value)) object.put(col.getId(), "true");
-				else object.put(col.getId(), "false");						
+				if(value.equals("")) {
+					object.put(col.getId(), value);
+				} else {
+					// convert true/false display string to DB value true/false, not 0/1 as you would expect. See PLFM-2703 
+					if (TRUE.equals(value)) object.put(col.getId(), "true");
+					else object.put(col.getId(), "false");						
+				}
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
 					public void onSuccess(RowReferenceSet result) {
@@ -438,5 +452,12 @@ public class TableViewUtils {
 		}
 	}
 	
-	
+
+	private static List<String> withEmpty(List<String> values) {
+		List<String> enums = new ArrayList<String>();
+		enums.add("");
+		enums.addAll(values);
+		return enums;
+	}
+
 }
