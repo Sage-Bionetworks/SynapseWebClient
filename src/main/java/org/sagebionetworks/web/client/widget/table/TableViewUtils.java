@@ -333,18 +333,18 @@ public class TableViewUtils {
 		Column<TableModel, String> column = new Column<TableModel, String>(comboCell) {
 			@Override
 			public String getValue(TableModel object) {
-				return object.getNeverNull(col.getId());
+				// convert 0/1 to display string false/true
+				if(object.getNeverNull(col.getId()).equals("1")) return TRUE;
+				else return FALSE;
 			}
 		};
 		column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 			@Override
 			public void update(int index, final TableModel object, String value) {				
-				final String original = object.getNeverNull(col.getId()); 
-				if (TRUE.equals(value)) {
-					object.put(col.getId(), TRUE);
-				} else {
-					object.put(col.getId(), FALSE);
-				}			
+				final String original = object.getNeverNull(col.getId());
+				// convert true/false display string to DB value true/false, not 0/1 as you would expect. See PLFM-2703 
+				if (TRUE.equals(value)) object.put(col.getId(), "true");
+				else object.put(col.getId(), "false");						
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
 					public void onSuccess(RowReferenceSet result) {

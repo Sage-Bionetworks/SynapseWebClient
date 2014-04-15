@@ -320,8 +320,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					TableStatus status = null;
 					try {
 						status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
-						if(startProgress == null) startProgress = status.getProgresssCurrent();					
-						if(startProgress != null) progress = new Long(100*(status.getProgresssCurrent().longValue() - startProgress.longValue()) / status.getProgresssTotal().longValue()).intValue();
+						if(startProgress == null) startProgress = status.getProgressCurrent();					
+						if(startProgress != null) progress = new Long(100*(status.getProgressCurrent().longValue() - startProgress.longValue()) / status.getProgressTotal().longValue()).intValue();
 						if(progress != null && progress > 100) progress = 100;
 					} catch (JSONObjectAdapterException e) {
 					}
