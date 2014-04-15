@@ -29,6 +29,7 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -212,33 +213,41 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	 * Add a new column to the table
 	 */
 	@Override
-	public void createColumn(ColumnModel col) {
+	public void createColumn(ColumnModel col, final AsyncCallback<String> callback) {
 		try {									
-			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
-			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					try {
-						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
-						if(newCol.getId() != null) {
-							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
-							table.getColumnIds().add(newCol.getId());
-							updateTableEntity();
-						}
-						else {
-							onFailure(null);
-						}
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
-				}
+			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			Timer t = new Timer() {
 				
 				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-							view.showErrorMessage(DisplayConstants.COLUMN_CREATION_FAILED);
+				public void run() {
+					callback.onFailure(new Exception("something went wrong"));					
 				}
-			});
+			};
+			t.schedule(1000);
+//			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
+//				@Override
+//				public void onSuccess(String result) {
+//					try {
+//						ColumnModel newCol = new ColumnModel(adapterFactory.createNew(result));
+//						if(newCol.getId() != null) {
+//							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
+//							table.getColumnIds().add(newCol.getId());
+//							updateTableEntity();
+//							callback.onSuccess(null);
+//						}
+//						else {
+//							onFailure(null);
+//						}
+//					} catch (JSONObjectAdapterException e) {
+//						onFailure(e);
+//					}
+//				}
+//				
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					callback.onFailure(caught);
+//				}
+//			});
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 		}
