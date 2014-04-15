@@ -276,13 +276,13 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 */
 	@Override
 	public void entityDeleted(EntityDeletedEvent event) {
-		if (event != null
-				&& event.getDeletedId() != null
-				&& projectAreaState != null
-				&& projectAreaState.getLastFileAreaEntity() != null
-				&& event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) {
-			// remove file state if entity was deleted
-			projectAreaState.setLastFileAreaEntity(null);
+		if (event != null && event.getDeletedId() != null && projectAreaState != null) {			
+			if(projectAreaState.getLastFileAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) {
+				// remove file state
+				projectAreaState.setLastFileAreaEntity(null);
+			} else if(projectAreaState.getLastTableAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastTableAreaEntity().getId())) {
+				projectAreaState.setLastTableAreaEntity(null);
+			}
 		}
 	}
 
