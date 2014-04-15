@@ -196,6 +196,11 @@ public interface SynapseClientAsync {
 	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
 	/////////////////
 	
+	/**
+	 * The PassingRecord that documents when a user was certified is returned.  Otherwise, a NotFoundException is thrown.
+	 * @param userId
+	 * @param callback
+	 */
 	void getCertifiedUserPassingRecord(String userId, AsyncCallback<String> callback);
 	void getCertificationQuiz(AsyncCallback<String> callback);
 	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);

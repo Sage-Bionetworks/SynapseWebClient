@@ -151,7 +151,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void showQuiz(Quiz quiz) {
 		hideAll();
-		quizHighlightBox.setAttribute("title", quiz.getHeader());
+		if (quiz.getHeader() != null)
+			quizHighlightBox.setAttribute("title", quiz.getHeader());
 		//clear old questions
 		clear();
 		List<Question> questions = quiz.getQuestions();

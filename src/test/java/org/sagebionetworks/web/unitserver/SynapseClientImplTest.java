@@ -1334,14 +1334,32 @@ public class SynapseClientImplTest {
 		assertEquals(recipients, toSendMessage.getRecipients());
 	}
 
+	@Test
+	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException, JSONObjectAdapterException{
+		PassingRecord passingRecord = new PassingRecord();
+		passingRecord.setPassed(true);
+		passingRecord.setQuizId(1238L);
+		String passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenReturn(passingRecord);
+		String returnedPassingRecordJson = synapseClient.getCertifiedUserPassingRecord("123");
+		verify(mockSynapse).getCertifiedUserPassingRecord(anyString());
+		assertEquals(passingRecordJson, returnedPassingRecordJson);
+	}
 	
-//	@Test
-//	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException{
-//		PassingRecord mockPassingRecord = new PassingRecord();
-//		when(mockSynapse.getCertifiedUserPassingRecord(anyLong())).thenReturn(mockPassingRecord);
-//		synapseClient.getCertifiedUserPassingRecord("123");
-//		verify(mockSynapse).getCertifiedUserPassingRecord(anyLong());
-//	}
+	@Test (expected=NotFoundException.class)
+	public void testUserNeverAttemptedCertification() throws RestServiceException, SynapseException{
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenThrow(new SynapseNotFoundException("PassingRecord not found"));
+		synapseClient.getCertifiedUserPassingRecord("123");
+	}
+	
+	@Test (expected=NotFoundException.class)
+	public void testUserFailedCertification() throws RestServiceException, SynapseException{
+		PassingRecord passingRecord = new PassingRecord();
+		passingRecord.setPassed(false);
+		passingRecord.setQuizId(1238L);
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenReturn(passingRecord);
+		synapseClient.getCertifiedUserPassingRecord("123");
+	}
 	
 	@Test
 	public void testGetCertificationQuiz() throws RestServiceException, SynapseException{

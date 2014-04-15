@@ -35,7 +35,7 @@ public interface LoginView extends IsWidget, SynapseView {
 		void setNewUser(UserSessionData newUser);
 		
 		void setUsername(String newUsername);
-		void setIgnoreQuiz(boolean ignoreQuiz);
+		void setHideQuizReminder(boolean ignoreQuiz);
     }
 	
 }
