@@ -28,6 +28,7 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	
 	public void showError(String message);
 	
+	void showTableUnavailable();
 	
 	/**
 	 * Presenter interface
@@ -36,5 +37,6 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 		void pageBack();
 		void pageForward();
 		void columnConfigClicked(APITableColumnConfig columnConfig);
+		void refreshData();
 	}
 }

@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -179,6 +180,14 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).showError(eq(errorMessage));
 	}
+	
+	@Test
+	public void testTableUnavailableFailure() throws JSONObjectAdapterException {
+		AsyncMockStubber.callFailureWith(new TableUnavilableException()).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		widget.configure(testWikiKey, descriptor, null, null);
+		verify(mockView).showTableUnavailable();
+	}
+
 	
 	@Test
 	public void testNoPaging() throws JSONObjectAdapterException {

@@ -10,11 +10,12 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.client.widget.table.TimedRetryWidget;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.dom.client.Element;
@@ -22,6 +23,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -199,6 +201,27 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 		removeAll();
 		String errorMessage = DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message;
 		add(new HTMLPanel(DisplayUtils.getMarkdownAPITableWarningHtml(errorMessage)));	
+		layout(true);
+	}
+	
+	@Override
+	public void showTableUnavailable() {
+		removeAll();
+		FlowPanel unavailableContainer = new FlowPanel();
+		unavailableContainer.addStyleName("jumbotron");
+		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2>"));
+		
+		TimedRetryWidget tryAgain = new TimedRetryWidget();
+		tryAgain.configure(10, new Callback() {
+			
+			@Override
+			public void invoke() {
+				presenter.refreshData();
+			}
+		});
+		unavailableContainer.add(tryAgain);
+		
+		add(unavailableContainer);
 		layout(true);
 	}
 	

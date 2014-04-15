@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
@@ -39,7 +40,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -108,7 +108,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	AsyncDataProvider<TableModel> dataProvider;
 	RowSet initialLoad = null;
 	QueryDetails initialDetails = null;	
-	int timerRemainingSec;
 	TableModel newRow = null;
 	SynapseJSNIUtils jsniUtils;	
 	List<TableModel> currentPage;
@@ -238,35 +237,15 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					jumbo.add(progress);
 				}
 				
-				FlowPanel tryAgain = new FlowPanel();
-				
-				timerRemainingSec = 10;
-				final HTML timerLabel = new HTML(getWaitingString(timerRemainingSec));
-				final Timer timer = new Timer() {					
+				TimedRetryWidget tryAgain = new TimedRetryWidget();
+				tryAgain.configure(10, new Callback() {
+					
 					@Override
-					public void run() {
-						timerRemainingSec--;
-						if(timerRemainingSec <= 0) {
-							cancel();
-							presenter.retryCurrentQuery();
-							return;
-						}
-						timerLabel.setHTML(getWaitingString(timerRemainingSec));
-					}
-				};
-				timer.scheduleRepeating(1000);
-
-				Button btn = DisplayUtils.createButton(DisplayConstants.TRY_NOW, ButtonType.DEFAULT);
-				btn.addStyleName("btn-lg left");
-				btn.addClickHandler(new ClickHandler() {					
-					@Override
-					public void onClick(ClickEvent event) {
-						timer.cancel();
+					public void invoke() {
 						presenter.retryCurrentQuery();
 					}
 				});
-				tryAgain.add(btn);
-				tryAgain.add(timerLabel);				
+			
 				jumbo.add(tryAgain);
 			} else if(status.getState() == TableState.PROCESSING_FAILED) {
 				jumbo.add(new HTML(tableUnavailableHeading + "<p>"+ stateStr +": "+ DisplayConstants.ERROR_GENERIC_NOTIFY +"</p>"));
@@ -500,10 +479,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		HTML widget = new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + " " + DisplayConstants.EXECUTING_QUERY + "..."));
 		widget.addStyleName("margin-top-15 center");
 		return widget;
-	}
-
-	private String getWaitingString(int remainingSec) {
-		return "&nbsp;" + DisplayConstants.WAITING + " " + remainingSec + "s...";
 	}
 
 	private void handleGeneric(FlowPanel jumbo, String tableUnavailableHeading) {

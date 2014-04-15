@@ -12,7 +12,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1212,6 +1211,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			JSONObject entity = synapseClient.getEntity(repoUri);
 			return entity.toString();
+		} catch (SynapseTableUnavilableException e) {
+			handleTableUnavailableException(e);
+			//TableUnavilableException is thrown in line above, should never reach the next line
+			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
