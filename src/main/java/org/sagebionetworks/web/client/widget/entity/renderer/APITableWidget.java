@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -111,8 +112,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		refreshData();
 	}
 	
-	
-	private void refreshData() {
+	@Override
+	public void refreshData() {
 		String fullUri = tableConfig.getUri();
 		
 		if (tableConfig.isPaging()) {
@@ -197,7 +198,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showError(caught.getMessage());
+				if(caught instanceof TableUnavilableException)
+					view.showTableUnavailable();
+				else
+					view.showError(caught.getMessage());
 			}
 		});
 	}
