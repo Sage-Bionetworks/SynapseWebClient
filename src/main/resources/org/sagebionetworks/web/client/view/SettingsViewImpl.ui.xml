@@ -45,6 +45,7 @@
 						<span ui:field="apiKeyContainer" />
 					</span>
 				</div>
+				<g:Button ui:field="changeApiKey" styleName="btn btn-default margin-top-10">Change API Key</g:Button>
 			</div>
 
 			<div class="row margin-top-15">

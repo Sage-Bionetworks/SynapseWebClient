@@ -60,7 +60,6 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -125,6 +124,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -139,8 +139,6 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -1088,6 +1086,8 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+		//and do not cache
+		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
@@ -1658,7 +1658,7 @@ public class DisplayUtils {
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
-			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+			String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
@@ -1671,6 +1671,10 @@ public class DisplayUtils {
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
 	
+	public static String getParamForNoCaching() {
+		return "&nocache=" + new Date().getTime();
+	}
+	
 	/**
 	 * Create a url that points to the FileHandleServlet.
 	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
@@ -1680,7 +1684,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
-		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + getParamForNoCaching() +"&" + 
 				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
 	}
 	
@@ -1693,7 +1697,7 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
-		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
@@ -1709,7 +1713,9 @@ public class DisplayUtils {
 	 */
 	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId +
+				//and do not cache
+				getParamForNoCaching();
 	}
 
 
@@ -1939,7 +1945,7 @@ public class DisplayUtils {
 		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
 	
-	private static boolean isDefined(String testString) {
+	public static boolean isDefined(String testString) {
 		return testString != null && testString.trim().length() > 0;
 	}
 	
@@ -2169,5 +2175,19 @@ public class DisplayUtils {
 	public static String getPreviewSuffix(Boolean isPreview) {
 		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
+	
+	 public static void showFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.addClassName("has-error");
+		 messageElement.removeClassName("hide");
+	 }
+	 
+	 public static void hideFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.removeClassName("has-error");
+		 messageElement.addClassName("hide");
+	 }
+
+	 public static String getInfoHtml(String safeHtmlMessage) {
+		 return "<div class=\"alert alert-info\">"+safeHtmlMessage+"</div>";
+	 }
 
 }

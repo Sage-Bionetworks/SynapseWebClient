@@ -51,7 +51,7 @@ public class RegisterAccountPresenterTest {
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState, mockSynapseClient);			
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);			
 		verify(mockView).setPresenter(registerAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
@@ -64,7 +64,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
 		registerAccountPresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -89,7 +89,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
 		registerAccountPresenter.setPlace(place);
 		
 		registerAccountPresenter.registerUser(username, email, firstName, lastName);
@@ -104,7 +104,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockGlobalApplicationState);
 		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
 		registerAccountPresenter.setPlace(place);
 		
 		registerAccountPresenter.registerUser(username, email, firstName, lastName);
@@ -120,7 +120,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockGlobalApplicationState);
 		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockCookieProvider, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
 		registerAccountPresenter.setPlace(place);
 		
 		registerAccountPresenter.registerUser(username, email, firstName, lastName);
