@@ -304,9 +304,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 								if(col != null) displayColumns.add(col);
 							}							
 						}
-							
-							
-						
 						
 						// send to view
 						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
@@ -323,9 +320,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 					TableStatus status = null;
 					try {
 						status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
-						if(startProgress == null) startProgress = status.getProgresssCurrent();					
-						if(startProgress != null) progress = new Long(100*(status.getProgresssCurrent().longValue() - startProgress.longValue()) / status.getProgresssTotal().longValue()).intValue();
-						if(progress > 100) progress = 100;
+						if(startProgress == null) startProgress = status.getProgressCurrent();					
+						if(startProgress != null) progress = new Long(100*(status.getProgressCurrent().longValue() - startProgress.longValue()) / status.getProgressTotal().longValue()).intValue();
+						if(progress != null && progress > 100) progress = 100;
 					} catch (JSONObjectAdapterException e) {
 					}
 					view.showTableUnavailable(status, progress);
