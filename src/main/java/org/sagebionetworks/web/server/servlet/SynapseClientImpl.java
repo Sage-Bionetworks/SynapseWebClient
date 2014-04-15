@@ -1880,10 +1880,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
 			return passingRecordJson.toJSONString();
 		} catch (SynapseException e) {
-			//TODO: remove when PLFM-2700 is fixed
-			if (e instanceof SynapseClientException) {
-				throw new NotFoundException();
-			}
 			throw ExceptionUtil.convertSynapseException(e);
  		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());

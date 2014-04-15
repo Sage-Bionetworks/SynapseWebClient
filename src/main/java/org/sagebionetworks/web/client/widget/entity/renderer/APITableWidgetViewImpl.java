@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -209,7 +210,7 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 		removeAll();
 		FlowPanel unavailableContainer = new FlowPanel();
 		unavailableContainer.addStyleName("jumbotron");
-		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2>"));
+		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2><p><strong>"+ TableState.PROCESSING +"</strong>: "+ DisplayConstants.TABLE_PROCESSING_DESCRIPTION +"</p>"));
 		
 		TimedRetryWidget tryAgain = new TimedRetryWidget();
 		tryAgain.configure(10, new Callback() {
