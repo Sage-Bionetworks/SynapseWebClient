@@ -332,7 +332,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// now delete entity 
-		pageTop.entityDeleted(new EntityDeletedEvent(entityId, FileEntity.class));
+		pageTop.entityDeleted(new EntityDeletedEvent(entityId));
 		// goto files tab and check that entity is gone from the state and we are at project root
 		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.FILES);
 		gotoPlace = captureGoTo();
@@ -347,7 +347,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// now delete entity 
-		pageTop.entityDeleted(new EntityDeletedEvent(entityId, TableEntity.class));
+		pageTop.entityDeleted(new EntityDeletedEvent(entityId));
 		// goto tables tab and check that entity is gone from the state and we are at tables root
 		pageTop.gotoProjectArea(EntityArea.TABLES, EntityArea.TABLES);
 		gotoPlace = captureGoTo();
@@ -358,7 +358,7 @@ public class EntityPageTopTest {
 	@Test 
 	public void testEntityDeleted_SWC_1116() {
 		String id = "syn123";
-		EntityDeletedEvent event = new EntityDeletedEvent(id, FileEntity.class);
+		EntityDeletedEvent event = new EntityDeletedEvent(id);
 		pageTop.entityDeleted(event);		
 	}
 	
