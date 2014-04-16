@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
@@ -131,7 +132,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.setHideQuizReminder(ignoreQuizCb.getValue());
-				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
+				presenter.goTo(new Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
 		ignoreQuizButton.addClickHandler(new ClickHandler() {

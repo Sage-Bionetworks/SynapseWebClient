@@ -16,7 +16,10 @@
         <div class="separator margin-top-10-imp"></div>
     	<div class="container margin-top-15"> 		
 			<g:HTMLPanel ui:field="quizContainer" visible="false">
-				<div class="row">				
+				<div class="row">
+				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+					    <g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default right" text="Open the Guide"/>
+					</div>
 					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10" title="Certification Quiz">
 						<form>
 						    <g:FlowPanel ui:field="testContainer">
@@ -24,7 +27,7 @@
 		   				</form>
 					</div>
 					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-					    <g:Button ui:field="submitButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Submit"/>
+					    <g:Button ui:field="submitButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Submit"/>
 					</div>
 				</div>
 			</g:HTMLPanel>
@@ -45,7 +48,7 @@
 					    </div>
 				    </div>
 					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-					    <g:Button ui:field="tutorialButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Back to the Tutorial"/>
+					    <g:Button ui:field="tutorialButton2" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Back to the Guide"/>
 					</div>
 				</div>
 			</g:HTMLPanel>
