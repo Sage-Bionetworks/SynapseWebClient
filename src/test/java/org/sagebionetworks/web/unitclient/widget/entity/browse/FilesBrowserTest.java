@@ -179,31 +179,6 @@ public class FilesBrowserTest {
 		filesBrowser.addFolderClicked();
 		verify(mockView).showFolderEditDialog(anyString());
 	}
-	
-	@Test
-	public void testAddFolderButtonClickedNotCertified(){
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		filesBrowser.addFolderClicked();
-		
-		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockView).showQuizInfoDialog(arg.capture());
-		CallbackP callback = arg.getValue();
-		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
-		callback.invoke(true);
-		verify(mockView, never()).showFolderEditDialog(anyString());
-		//but if the tutorial was not clicked, then it should show the upload dialog
-		callback.invoke(false);
-		verify(mockView).showFolderEditDialog(anyString());
-	}
-	
-	@Test
-	public void testAddFolderButtonClickedFailure(){
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		filesBrowser.addFolderClicked();
-		verify(mockView).showErrorMessage(anyString());
-	}
-	
 }
 
 
