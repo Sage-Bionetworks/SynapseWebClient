@@ -23,6 +23,7 @@
 
 .header-inner-commands-container {
 	border-radius: 0.2em;
+	height: 23px;
 }
 .header-inner-commands-container td {
 	padding: 3px 7px 3px 7px;
@@ -775,6 +776,10 @@ a.shortBtn {
 
 .font-size-22 {
 	font-size: 22px;
+}
+
+.font-size-17 {
+	font-size: 17px;
 }
 
 .font-size-15 {

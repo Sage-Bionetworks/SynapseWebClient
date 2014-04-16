@@ -20,9 +20,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/wrench-screwdriver-16.png")
 	ImageResource adminTools16();		
 	
-	@Source("images/icons/grey_wrench-screwdriver-16.png")
-	ImageResource adminToolsGrey16();		
-	
 	@Source("images/icons/application--pencil-16.png")
 	ImageResource applicationEdit16();	
 
@@ -40,9 +37,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/book-brown-16.png")
 	ImageResource bookBrown16();
-	
-	@Source("images/icons/book-open-16.png")
-	ImageResource bookOpen16();
 	
 	@Source("images/icons/tick-16.png")
 	ImageResource checkGreen16();
@@ -169,9 +163,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
-
-	@Source("images/icons/door-open-out-grey-16.png")
-	ImageResource logoutGrey16();	
 	
 	@Source("images/icons/magnifier-zoom-16.png")
 	ImageResource magnify16();		
@@ -223,9 +214,6 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/rstudio-36.png")
 	ImageResource rstudio36();
-	
-	@Source("images/icons/grey_wrench-screwdriver-16.png")
-	ImageResource settings16();	
 	
 	@Source("images/icons/edit-16.png")
 	ImageResource slideInfo16();	
