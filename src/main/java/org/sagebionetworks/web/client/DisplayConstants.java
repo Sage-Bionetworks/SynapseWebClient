@@ -743,6 +743,7 @@ public class DisplayConstants {
 	
 	//quiz
 	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
+	public static final String ERROR_CREATING_COLUMN = "Error creating column";
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
 
 }

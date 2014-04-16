@@ -29,6 +29,7 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -212,9 +213,9 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	 * Add a new column to the table
 	 */
 	@Override
-	public void createColumn(ColumnModel col) {
+	public void createColumn(ColumnModel col, final AsyncCallback<String> callback) {
 		try {									
-			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
+			String columnJson = col.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createColumnModel(columnJson, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
@@ -224,6 +225,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 							if(table.getColumnIds() == null) table.setColumnIds(new ArrayList<String>()); 
 							table.getColumnIds().add(newCol.getId());
 							updateTableEntity();
+							callback.onSuccess(null);
 						}
 						else {
 							onFailure(null);
@@ -235,8 +237,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-							view.showErrorMessage(DisplayConstants.COLUMN_CREATION_FAILED);
+					callback.onFailure(caught);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
