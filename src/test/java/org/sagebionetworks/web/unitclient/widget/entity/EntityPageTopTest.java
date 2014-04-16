@@ -23,8 +23,10 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ExampleEntity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -71,6 +73,7 @@ public class EntityPageTopTest {
 	WidgetRegistrar mockWidgetRegistrar;
 	EntityPageTop pageTop;
 	ExampleEntity entity;
+	TableEntity tableEntity;
 	AttachmentData attachment1;
 	WidgetRendererPresenter testWidgetRenderer;
 	String entityId = "syn123";
@@ -78,6 +81,7 @@ public class EntityPageTopTest {
 	String projectId = "syn456";
 	String wikiSubpage = "987654";
 	EntityBundle entityBundle;
+	EntityBundle entityBundleTable;
 	EntityHeader projectHeader;
 	ArgumentCaptor<Synapse> capture;
 	Synapse gotoPlace;
@@ -129,6 +133,13 @@ public class EntityPageTopTest {
 		testWidgetRenderer = new YouTubeWidget(mock(YouTubeWidgetView.class));
 		when(mockWidgetRegistrar.getWidgetRendererForWidgetDescriptor(any(WikiPageKey.class), anyString(), any(Map.class), anyBoolean(), any(Callback.class), any(Long.class))).thenReturn(testWidgetRenderer);
 
+		
+		// setup table entity
+		tableEntity = new TableEntity();
+		tableEntity.setId(entityId);
+		tableEntity.setEntityType(TableEntity.class.getName());
+		entityBundleTable = new EntityBundle(tableEntity, null, null, null, null, null, null);
+		
 		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
 		projectHeader = new EntityHeader();
 		projectHeader.setId(projectId);
@@ -321,21 +332,36 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// now delete entity 
-		pageTop.entityDeleted(new EntityDeletedEvent(entityId));
+		pageTop.entityDeleted(new EntityDeletedEvent(entityId, FileEntity.class));
 		// goto files tab and check that entity is gone from the state and we are at project root
 		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.FILES);
 		gotoPlace = captureGoTo();
 		assertEquals(EntityArea.FILES, gotoPlace.getArea());
 		assertEquals(projectId, gotoPlace.getEntityId());
 	}
+
+	@Test
+	public void testDeletedTableEntityIdInTabState() {
+		// create some state for tables tab
+		pageTop.configure(entityBundleTable, entityVersion, projectHeader, null, null);
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
+		// now delete entity 
+		pageTop.entityDeleted(new EntityDeletedEvent(entityId, TableEntity.class));
+		// goto tables tab and check that entity is gone from the state and we are at tables root
+		pageTop.gotoProjectArea(EntityArea.TABLES, EntityArea.TABLES);
+		gotoPlace = captureGoTo();
+		assertEquals(EntityArea.TABLES, gotoPlace.getArea());
+		assertEquals(projectId, gotoPlace.getEntityId());
+	}
 	
 	@Test 
 	public void testEntityDeleted_SWC_1116() {
 		String id = "syn123";
-		EntityDeletedEvent event = new EntityDeletedEvent(id);
+		EntityDeletedEvent event = new EntityDeletedEvent(id, FileEntity.class);
 		pageTop.entityDeleted(event);		
 	}
-
+	
 	@Test 
 	public void testSetArea() {
 		String areaToken = "token";
@@ -423,8 +449,7 @@ public class EntityPageTopTest {
 		assertEquals("SELECT 'query/' FROM syn123 LIMIT 1", query);
 		
 	}
-	
-	
+
 	
 	/*
 	 * Private Methods

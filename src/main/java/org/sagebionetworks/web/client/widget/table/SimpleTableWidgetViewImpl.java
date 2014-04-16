@@ -705,12 +705,14 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				save.setEnabled(false);
 				if(name.getValue() == null || name.getValue().length() == 0) {
 					columnNameError.setVisible(true);
+					save.setEnabled(true);
 					return;
 				} else {
 					columnNameError.setVisible(false);
 				}
 				if(col.getColumnType() == null) {
 					columnTypeError.setVisible(true);
+					save.setEnabled(true);
 					return;
 				} else {
 					columnTypeError.setVisible(false);
