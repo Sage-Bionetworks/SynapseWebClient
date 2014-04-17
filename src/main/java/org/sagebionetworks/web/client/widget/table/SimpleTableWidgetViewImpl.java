@@ -693,6 +693,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		inputLabel.addStyleName("margin-top-15 boldText control-label");
 		stringLengthContainer.add(inputLabel);
 		stringLengthContainer.add(TableViewUtils.createStringLengthField(col, stringLengthContainer));
+		inputLabel = new HTML(DisplayConstants.MAX_LENGTH_REASON);
+		inputLabel.addStyleName("control-label");	
+		stringLengthContainer.add(inputLabel);
 		form.add(stringLengthContainer);
 		
 		
