@@ -660,27 +660,34 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		form.add(TableViewUtils.createDefaultValueRadio(col));
 
 		// Enum Values
-// TODO : uncomment the following lines when the service supports unique values		
 		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
-//		form.add(inputLabel);	
+		form.add(inputLabel);	
 		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
-//		form.add(createRestrictedValues(col, list));
+		form.add(createRestrictedValues(col, list));
+
+		final InlineHTML generalError = DisplayUtils.createFormHelpText("");
+		generalError.addStyleName("text-danger-imp"); 
+		generalError.setVisible(false);
 		
 		// Create column
-		Button save = DisplayUtils.createButton(DisplayConstants.CREATE_COLUMN, ButtonType.PRIMARY);
+		final Button save = DisplayUtils.createButton(DisplayConstants.CREATE_COLUMN, ButtonType.PRIMARY);
 		save.addStyleName("margin-top-15");
 		save.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
+				generalError.setVisible(false);
+				save.setEnabled(false);
 				if(name.getValue() == null || name.getValue().length() == 0) {
 					columnNameError.setVisible(true);
+					save.setEnabled(true);
 					return;
 				} else {
 					columnNameError.setVisible(false);
 				}
 				if(col.getColumnType() == null) {
 					columnTypeError.setVisible(true);
+					save.setEnabled(true);
 					return;
 				} else {
 					columnTypeError.setVisible(false);
@@ -689,13 +696,25 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				col.setName(name.getValue());				
 				List<String> restrictedValues = list.getValues();
 				if(restrictedValues.size() > 0) col.setEnumValues(restrictedValues);
-				presenter.createColumn(col);
 				
-				columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
-				refreshAddColumnPanel(); // clear aout add column view
+				// create
+				presenter.createColumn(col, new AsyncCallback<String> () {
+					@Override
+					public void onSuccess(String result) { 
+						columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
+						refreshAddColumnPanel(); // clear aout add column view	
+					}					
+					@Override
+					public void onFailure(Throwable caught) {
+						save.setEnabled(true);
+						generalError.setHTML(DisplayConstants.ERROR_CREATING_COLUMN + ": " + caught.getMessage());
+						generalError.setVisible(true);						
+					}
+				});				
 			}
 		});
 		form.add(save);
+		form.add(generalError);
 		
 		return form;		
 	}
@@ -709,7 +728,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
-		for(final ColumnType type : ColumnType.values()) {			
+		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE }) {			
 			String radioLabel = TableViewUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			

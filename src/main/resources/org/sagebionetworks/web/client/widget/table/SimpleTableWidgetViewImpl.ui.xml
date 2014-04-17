@@ -13,6 +13,7 @@
   </ui:style>
 
   <g:HTMLPanel>
+  		<div class="alert alert-danger">Warning: The Table feature is in a test phase. <strong>All production data will be DELETED at a future date.</strong></div>
   	    <g:HTMLPanel ui:field="buttonToolbar" visible="false"/>
   	    <g:SimplePanel ui:field="columnEditorPanel" visible="false" styleName="margin-top-15 panel panel-default panel-body" />
   	    
