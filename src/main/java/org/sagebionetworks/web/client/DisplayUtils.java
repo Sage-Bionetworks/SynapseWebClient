@@ -2079,7 +2079,7 @@ public class DisplayUtils {
 		return null;
 	}
 	
-	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, int headingLevel) {
+	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
 		String linkStyle = "";
@@ -2089,12 +2089,21 @@ public class DisplayUtils {
 		if (clickHandler != null)
 			headingHtml.addClickHandler(clickHandler);
 		
-		FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-		profilePicture.addStyleName("pull-left media-object");
-		profilePicture.addStyleName("imageButton");
-		if (clickHandler != null)
-			profilePicture.addClickHandler(clickHandler);
-		panel.add(profilePicture);
+		if (pictureUri != null) {
+			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+			profilePicture.addStyleName("pull-left media-object imageButton");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		} else {
+			//display default picture
+			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			profilePicture.addStyleName("pull-left media-object displayInline ");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		}
 		FlowPanel mediaBodyPanel = new FlowPanel();
 		mediaBodyPanel.addStyleName("media-body");
 		mediaBodyPanel.add(headingHtml);

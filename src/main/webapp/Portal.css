@@ -149,11 +149,7 @@
 }
 
 .userProfileImage {
-	margin:auto; 
-	display:block;
 	border-radius: 3px;
-	margin-right: 5px;
-	box-shadow: 0 1px 2px #000000;
 }
 
 /* Search loading image */
@@ -510,6 +506,9 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-0-imp-before:before {
+	margin: 0px !important;
+}
 
 .user-profile-edit-table td {
 	padding-bottom: 5px;
@@ -770,10 +769,17 @@ a.shortBtn {
 	font-family: Yanone Kaffeesatz;
 }
 
+.font-size-150 {
+	font-size: 150px;
+}
+
 .font-size-90 {
 	font-size: 90px;
 }
 
+.font-size-58 {
+	font-size: 58px;
+}
 .font-size-22 {
 	font-size: 22px;
 }
@@ -784,6 +790,9 @@ a.shortBtn {
 
 .font-size-15 {
 	font-size: 15px;
+}
+.font-size-13 {
+	font-size: 13px;
 }
 
 .vertical-align-bottom {
@@ -1065,6 +1074,10 @@ ol.lowerroman {
     color: #717171 !important;
 }
 
+.lightGreyText {
+	color: #909090;
+}
+
 
 .pagesTree {
 	overflow: hidden !important;	
@@ -1086,6 +1099,11 @@ ol.lowerroman {
 .padding-5 {
 	padding: 5px;
 }
+
+.padding-2 {
+	padding: 2px;
+}
+
 
 .howToUseLink {
 	font-size: 16px;

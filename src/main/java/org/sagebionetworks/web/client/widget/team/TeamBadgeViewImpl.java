@@ -49,7 +49,7 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(name);
-			anchor.addStyleName("usernameLink");
+			anchor.addStyleName("usernameLink margin-left-5");
 			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -57,25 +57,27 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 				}
 			});
 			
-			Image profilePicture; 
-			if (team.getIcon() != null && team.getIcon().length() > 0) {
-				profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
-			} else {
-				profilePicture = new Image(sageImageBundle.defaultProfilePicture20().getSafeUri());
-				profilePicture.setPixelSize(16,16);
-			}
-			
-			profilePicture.setWidth("16px");
-			profilePicture.setHeight("16px");
-			profilePicture.addStyleName("imageButton userProfileImage");
-			profilePicture.addClickHandler(new ClickHandler() {
+			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					anchor.fireEvent(event);
 				}
-			});
-			container.add(profilePicture);
+			};
+			
+			if (team.getIcon() != null && team.getIcon().length() > 0) {
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
+				profilePicture.setWidth("16px");
+				profilePicture.setHeight("16px");
+				profilePicture.addStyleName("imageButton userProfileImage");
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);
+			} else {
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 movedown-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);
+			}
+			
 			container.add(anchor);
 		} 		
 		

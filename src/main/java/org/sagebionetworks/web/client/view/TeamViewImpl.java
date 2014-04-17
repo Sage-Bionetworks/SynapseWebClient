@@ -144,14 +144,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void configure(final Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount) {
 		clear();
 		this.team = team;
-		String pictureUrl;
+		String pictureUrl = null;
 		if (team.getIcon() != null) {
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
-		} else {
-			pictureUrl = sageImageBundle.defaultProfilePicture().getSafeUri().asString();
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, 2);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
 		mediaObjectContainer.add(mediaObjectPanel);
 		mainContainer.add(new HTML("<div><span class=\"padding-left-74 boldText margin-right-5\">Total members: </span><span>"+totalMemberCount+"</span></div>"));
 		//initialize the tools menu button

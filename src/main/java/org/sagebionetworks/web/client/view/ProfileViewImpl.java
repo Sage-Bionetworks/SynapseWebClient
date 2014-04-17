@@ -87,7 +87,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//View profile widgets
 	private FlowPanel profileWidget;
-	private Image defaultProfilePicture;
+	private HTML defaultProfilePicture;
 	
 	private Footer footerWidget;
 	private CookieProvider cookies;
@@ -224,7 +224,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	 private void createViewProfile() {
 		 profileWidget = new FlowPanel();
-		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
+		 defaultProfilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-150 lightGreyText"));
 	 }
 	 
 	 /**

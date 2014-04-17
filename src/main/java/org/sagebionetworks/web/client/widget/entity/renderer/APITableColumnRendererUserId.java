@@ -79,7 +79,7 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 							html.append("\" style=\"width: 20px; height: 20px\"></img></span>");
 						}
 						else
-							html.append(DisplayUtils.getIconHtml(sageImageBundle.defaultProfilePicture20()));
+							html.append(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
 							
 						html.append("&nbsp;"+DisplayUtils.getDisplayName(ugh)+"</a>");
 						userId2html.put(ugh.getOwnerId(), html.toString());
