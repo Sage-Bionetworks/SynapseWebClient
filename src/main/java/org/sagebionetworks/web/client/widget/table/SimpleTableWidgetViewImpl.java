@@ -571,7 +571,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				public void onClick(ClickEvent event) {
 					// swap columns
 					int formerIdx = columnPanelOrder.indexOf(columnPanel);
-					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx-1);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx-1, presenter);
 				}
 
 			});
@@ -580,7 +580,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				public void onClick(ClickEvent event) {
 					// swap columns
 					int formerIdx = columnPanelOrder.indexOf(columnPanel);
-					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx+1);
+					TableViewUtils.swapColumns(columnPanelOrder, allColumnsPanel, columnPanel, formerIdx, formerIdx+1, presenter);
 				}
 
 			});
@@ -600,7 +600,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 										columnPanelOrder.remove(columnPanel);
 										
 										// update table entity
-										presenter.updateColumnOrder(extractColumns());
+										presenter.updateColumnOrder(TableViewUtils.extractColumns(columnPanelOrder));
 										
 										// update ends, if needed
 										int size = columnPanelOrder.size();
@@ -825,15 +825,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		ColumnModel newColumn = new ColumnModel();
 		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
 		addColumnPanel.add(createColumnEditor(newColumn));		
-	}
-
-
-	private List<String> extractColumns() {
-		List<String> columns = new ArrayList<String>();
-		for(ColumnDetailsPanel colD : columnPanelOrder) {
-			columns.add(colD.getCol().getId());
-		}		
-		return columns;
 	}
 
 }

@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView.Presenter;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
@@ -167,7 +168,7 @@ public class TableViewUtils {
 	}
 	
 	public static void swapColumns(final List<ColumnDetailsPanel> columnPanelOrder, final FlowPanel allColumnsPanel, final ColumnDetailsPanel thisColumn,
-			final int formerIdx, final int newIdx) {
+			final int formerIdx, final int newIdx, final Presenter presenter) {
 		final ColumnDetailsPanel displacedColumn = columnPanelOrder.get(newIdx);
 		// fade out		
 		thisColumn.addStyleName("fade");
@@ -182,6 +183,8 @@ public class TableViewUtils {
 				setArrowVisibility(newIdx, columnPanelOrder.size(), thisColumn.getMoveUp(), thisColumn.getMoveDown());
 				setArrowVisibility(formerIdx, columnPanelOrder.size(), displacedColumn.getMoveUp(), displacedColumn.getMoveDown());
 
+				presenter.updateColumnOrder(extractColumns(columnPanelOrder));
+				
 				// fade in
 				Timer t2 = new Timer() {					
 					@Override
@@ -211,6 +214,14 @@ public class TableViewUtils {
 		else moveUp.setVisible(true);
 		if(idx == size-1) moveDown.setVisible(false);
 		else moveDown.setVisible(true);
+	}
+
+	public static List<String> extractColumns(List<ColumnDetailsPanel> columnPanelOrder) {
+		List<String> columns = new ArrayList<String>();
+		for(ColumnDetailsPanel colD : columnPanelOrder) {
+			columns.add(colD.getCol().getId());
+		}		
+		return columns;
 	}
 
 	

@@ -82,5 +82,6 @@ public class TableUtils {
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
 	}	
+
 	
 }
