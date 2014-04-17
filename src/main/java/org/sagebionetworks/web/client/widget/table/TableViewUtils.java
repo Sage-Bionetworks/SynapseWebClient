@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,6 +25,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -33,6 +36,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -458,6 +462,47 @@ public class TableViewUtils {
 		enums.add("");
 		enums.addAll(values);
 		return enums;
+	}
+
+	public static Widget createStringLengthField(final ColumnModel col, final Widget container) {
+		final IntegerBox stringLength = new IntegerBox();
+		stringLength.setWidth("100px");
+		stringLength.addStyleName("form-control");
+		// show error when non-integer values added
+		stringLength.addKeyUpHandler(new KeyUpHandler() {	
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				try {
+					stringLength.getValueOrThrow();
+					container.removeStyleName("has-error");
+				} catch (ParseException e) {
+					container.addStyleName("has-error");
+				}
+			}
+		});
+		
+		// set length
+		setStringMaxLength(col, stringLength);
+		stringLength.addChangeHandler(new ChangeHandler() {			
+			@Override
+			public void onChange(ChangeEvent event) {
+				try {					
+					col.setMaximumSize(new Long(stringLength.getValueOrThrow()));
+				} catch (ParseException e) {
+					// clear user's invalid change
+					setStringMaxLength(col, stringLength);
+					container.removeStyleName("has-error");
+				}
+
+			}
+		});
+		return stringLength;
+	}
+
+	private static void setStringMaxLength(final ColumnModel col,
+			final IntegerBox stringLength) {
+		if(col.getMaximumSize() != null) stringLength.setValue(col.getMaximumSize().intValue());
+		else stringLength.setValue(50);
 	}
 
 }

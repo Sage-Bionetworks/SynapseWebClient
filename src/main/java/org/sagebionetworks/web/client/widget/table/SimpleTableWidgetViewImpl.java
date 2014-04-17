@@ -28,6 +28,8 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -518,7 +520,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * Sets up the top level editing toolbar
 	 * @param columns
 	 */
-	private void setupTableEditorToolbar(final List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+	private void setupTableEditorToolbar(final List<ColumnModel> columns) {
 		buttonToolbar.clear();
 
 		Button showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
@@ -549,7 +551,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param columns
 	 * @return
 	 */
-	private Widget buildColumnsEditor(List<org.sagebionetworks.repo.model.table.ColumnModel> columns) {
+	private Widget buildColumnsEditor(List<ColumnModel> columns) {
 		FlowPanel parent = new FlowPanel();
 		parent.addStyleName("panel-group");
 		String accordionId = "accordion-" + ++sequence;
@@ -561,7 +563,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		final FlowPanel allColumnsPanel = new FlowPanel();
 		columnPanelOrder = new ArrayList<ColumnDetailsPanel>();
 		for(int i=0; i<columns.size(); i++) {
-			final org.sagebionetworks.repo.model.table.ColumnModel col = columns.get(i);			
+			final ColumnModel col = columns.get(i);			
 			final ColumnDetailsPanel columnPanel = new ColumnDetailsPanel(accordionId, col, "contentId" + ++sequence);
 			
 			columnPanel.getMoveUp().addClickHandler(new ClickHandler() {				
@@ -647,7 +649,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param col
 	 * @return
 	 */
-	private Widget createColumnEditor(final org.sagebionetworks.repo.model.table.ColumnModel col) {
+	private Widget createColumnEditor(final ColumnModel col) {
 		final FlowPanel form = new FlowPanel();
 		form.addStyleName("margin-top-15");		
 		
@@ -669,15 +671,31 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		form.add(formGroup);
 		
 		// Column Type
+		final FlowPanel stringLengthContainer = new FlowPanel();
+		ColumnTypeChangeHandler typeChangeHandler = new ColumnTypeChangeHandler() {			
+			@Override
+			public void onChange(ColumnType selectedType) {
+				stringLengthContainer.setVisible(selectedType == ColumnType.STRING);				
+			}
+		};
 		inputLabel = new HTML(DisplayConstants.COLUMN_TYPE + ": ");
 		inputLabel.addStyleName("margin-top-15 boldText");
 		final InlineHTML columnTypeError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_TYPE + " " + DisplayConstants.REQUIRED);
 		columnTypeError.addStyleName("text-danger-imp");
 		columnTypeError.setVisible(false);
 		form.add(inputLabel);		
-		form.add(createColumnTypeRadio(col));		
+		form.add(createColumnTypeRadio(col, typeChangeHandler));		
 		form.add(columnTypeError);
 						
+		// String length
+		stringLengthContainer.setVisible(false);
+		inputLabel = new HTML(DisplayConstants.MAX_STRING_LENGTH + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText control-label");
+		stringLengthContainer.add(inputLabel);
+		stringLengthContainer.add(TableViewUtils.createStringLengthField(col, stringLengthContainer));
+		form.add(stringLengthContainer);
+		
+		
 		// Default Value	
 		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
@@ -749,7 +767,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param col
 	 * @return
 	 */
-	private Widget createColumnTypeRadio(final org.sagebionetworks.repo.model.table.ColumnModel col) {
+	private Widget createColumnTypeRadio(final ColumnModel col, final ColumnTypeChangeHandler handler) {
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
@@ -764,6 +782,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					}
 					btn.addStyleName("active");
 					col.setColumnType(type);
+					handler.onChange(type);
 				}
 			});
 			if(col.getColumnType() != null && col.getColumnType() == type) btn.addStyleName("active");
@@ -781,7 +800,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param list
 	 * @return
 	 */
-	private Widget createRestrictedValues(org.sagebionetworks.repo.model.table.ColumnModel col, ListCreatorViewWidget list) {
+	private Widget createRestrictedValues(ColumnModel col, ListCreatorViewWidget list) {
 		FlowPanel row = new FlowPanel();
 		row.addStyleName("row");
 		FlowPanel left = new FlowPanel();
@@ -800,7 +819,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private void refreshAddColumnPanel() {
 		addColumnPanel.clear();
 		addColumnPanel.setVisible(false);
-		org.sagebionetworks.repo.model.table.ColumnModel newColumn = new org.sagebionetworks.repo.model.table.ColumnModel();
+		ColumnModel newColumn = new ColumnModel();
 		addColumnPanel.add(new HTML("<h4>" + DisplayConstants.ADD_COLUMN + "</h4>"));
 		addColumnPanel.add(createColumnEditor(newColumn));		
 	}
