@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -276,13 +277,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 */
 	@Override
 	public void entityDeleted(EntityDeletedEvent event) {
-		if (event != null
-				&& event.getDeletedId() != null
-				&& projectAreaState != null
-				&& projectAreaState.getLastFileAreaEntity() != null
-				&& event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) {
-			// remove file state if entity was deleted
-			projectAreaState.setLastFileAreaEntity(null);
+		if (event != null && event.getDeletedId() != null && projectAreaState != null) {			
+			if(projectAreaState.getLastTableAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastTableAreaEntity().getId())) {
+				// remove table state
+				projectAreaState.setLastTableAreaEntity(null);
+			} else if(projectAreaState.getLastFileAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) { 
+				// remove file state
+				projectAreaState.setLastFileAreaEntity(null);
+			}
 		}
 	}
 

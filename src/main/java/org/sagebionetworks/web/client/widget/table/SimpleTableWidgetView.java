@@ -37,7 +37,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		
 		void addRow();
 		
-		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col);
+		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col, AsyncCallback<String> callback);
 
 		void updateColumnOrder(List<String> columnIds);
 
