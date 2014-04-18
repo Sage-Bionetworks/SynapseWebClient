@@ -42,7 +42,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		container = new HorizontalPanel();
 		container.addStyleName("nobordertable-imp");
 		this.add(container);
-		addStyleName("displayInline movedown-4");
+		addStyleName("displayInline");
 	}
 	
 	@Override
