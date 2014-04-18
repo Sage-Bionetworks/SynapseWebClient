@@ -150,18 +150,19 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * Private Methods
 	 */	
 	private void configureShareButton(Entity entity, final boolean isAdministrator) { 
+		final String shareButtonText = isAdministrator ? DisplayConstants.BUTTON_SHARE : DisplayConstants.BUTTON_SHARING;
 		publicPrivateBadge.configure(entity, new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isPublic) {
 				if(isPublic) {
-					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-globe");
+					DisplayUtils.relabelIconButton(shareButton, shareButtonText, "glyphicon-globe");
 				} else {
-					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-lock");
+					DisplayUtils.relabelIconButton(shareButton, shareButtonText, "glyphicon-lock");
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, null);
+				DisplayUtils.relabelIconButton(shareButton, shareButtonText, null);
 			}
 		});
 		
