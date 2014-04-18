@@ -405,6 +405,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 									}
 								};
 								t.schedule(500);
+								view.showLoading();
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}							

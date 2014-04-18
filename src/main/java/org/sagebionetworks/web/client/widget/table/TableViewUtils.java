@@ -42,6 +42,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TableViewUtils {
+	private static final int DEFAULT_STRING_MAX_LENGTH = 50;
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
@@ -513,7 +514,7 @@ public class TableViewUtils {
 	private static void setStringMaxLength(final ColumnModel col,
 			final IntegerBox stringLength) {
 		if(col.getMaximumSize() != null) stringLength.setValue(col.getMaximumSize().intValue());
-		else stringLength.setValue(50);
+		else stringLength.setValue(DEFAULT_STRING_MAX_LENGTH);
 	}
 
 }
