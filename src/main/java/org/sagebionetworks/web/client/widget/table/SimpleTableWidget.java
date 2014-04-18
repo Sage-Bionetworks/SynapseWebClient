@@ -164,10 +164,10 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	}
 
 	@Override
-	public void query(String query) {
-		view.showLoading();
+	public void query(final String query) {
+		view.showLoading();		
 		this.currentQuery = query;
-		executeQuery(query, null, null);
+		executeQuery(query, null, null);				
 	}
 	
 	@Override
@@ -292,15 +292,21 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
 
 						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();
+						List<String> tableColIds = TableUtils.extractHeaders(tableColumns);
 						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
 							// if headers are empty (no results) add table columns						
 							if(tableColumns == null) tableColumns = new ArrayList<ColumnModel>();
-							currentHeaders = TableUtils.extractHeaders(tableColumns);
+							currentHeaders = tableColIds;
 							displayColumns.addAll(tableColumns); 
 						} else {
-							// Determine column type and which columns to send to view from query result headers
 							currentHeaders = rowset.getHeaders();
+							// first add table columns from rowset *in order*
+							for(ColumnModel col : tableColumns) {
+								if(rowset.getHeaders().contains(col.getId())) displayColumns.add(col); 
+							}
+							// then grab any remaining derived columns
 							for(String resultColumnId : rowset.getHeaders()) {
+								if(idToCol.containsKey(resultColumnId)) continue; // skip tableColumns
 								ColumnModel col = TableUtils.wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
 								if(col != null) displayColumns.add(col);
 							}							
@@ -391,7 +397,15 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						public void onSuccess(EntityWrapper result) {
 							try {						
 								table = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-								configure(table, canEdit);
+								// delay reconfiguring a bit to allow table processing to catch up. Avoids excessive TableUnavailableExceptions
+								Timer t = new Timer() {			
+									@Override
+									public void run() {
+										configure(table, canEdit);
+									}
+								};
+								t.schedule(500);
+								view.showLoading();
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}							
