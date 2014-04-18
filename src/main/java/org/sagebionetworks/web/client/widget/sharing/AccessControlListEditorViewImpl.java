@@ -94,6 +94,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ComboBox<ModelData> peopleCombo;
 	private CheckBox notifyPeopleCheckbox;
+	private boolean showEditColumns;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
@@ -165,12 +166,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 	
 	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges) {		
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
 		this.removeAll(true);
 		this.setLayout(new FlowLayout(10));
-
+		
 		// show existing permissions
 		permissionsStore = new ListStore<PermissionsTableEntry>();
+		showEditColumns = canChangePermission && !isInherited;
 		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
 				permissionsStore, 
 				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
@@ -180,7 +182,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					public void invoke(Long principalId) {
 						presenter.removeAccess(principalId);
 					}
-				}));
+				}),
+				showEditColumns);
 
 		add(permissionsGrid, new MarginData(5, 0, 0, 0));
 		columnModel = permissionsGrid.getColumnModel();
@@ -192,139 +195,139 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		tdLeft.setPadding(BUTTON_PADDING);
 		TableData tdRight = new TableData();
 		tdRight.setPadding(BUTTON_PADDING);
-		
-		if(isInherited) { 
-			permissionsGrid.disable();
-			Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-			readOnly.setWidth(450);
-			add(readOnly, new MarginData(15, 0, 0, 0));			
-			
-			// 'Create ACL' button
-			Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
-			createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
-			createAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.createAcl();
-				}
-			});
-			hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-			hPanel.add(createAclButton, tdLeft);
-		} else {
-			// show add people view
-			FormPanel form2 = new FormPanel();  
-			form2.setFrame(false);  
-			form2.setHeaderVisible(false);  
-			form2.setAutoWidth(true);			
-			form2.setLayout(new FlowLayout());
-			
-			FormLayout layout = new FormLayout();  
-			layout.setLabelWidth(75);
-			layout.setDefaultWidth(DEFAULT_WIDTH);
-			  
-			FieldSet fieldSet = new FieldSet();  
-			fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
-			fieldSet.setCheckboxToggle(false);
-			fieldSet.setCollapsible(false);			
-			fieldSet.setLayout(layout);
-			fieldSet.setWidth(FIELD_WIDTH);
-			
-			
-			// user/group combobox
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-			peopleCombo.setEmptyText("Enter name...");
-			peopleCombo.setFieldLabel("Name");
-			peopleCombo.setForceSelection(true);
-			peopleCombo.setTriggerAction(TriggerAction.ALL);
-			peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-					presenter.setUnsavedViewChanges(true);
-				}
-			});
-			fieldSet.add(peopleCombo);
-			
-			// permission level combobox
-			permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
-			permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
-			permissionLevelCombo.setEmptyText("Select access level...");
-			permissionLevelCombo.setFieldLabel("Access Level");
-			permissionLevelCombo.setTypeAhead(false);
-			permissionLevelCombo.setEditable(false);
-			permissionLevelCombo.setForceSelection(true);
-			permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
-			permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
-				@Override
-				public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
-					presenter.setUnsavedViewChanges(true);
-				}
-			});
-			fieldSet.add(permissionLevelCombo);
-			
-			// share button and listener
-			Button shareButton = new Button("Add");
-			shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					addPersonToAcl();
-				}
-			});
-
-			fieldSet.add(shareButton);
-			
-			form2.add(fieldSet);
-			
-			//Make Public button
-			publicButton = new Button();
-			publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					//add the ability for PUBLIC to see this entity
-					if (isPubliclyVisible) {
-						presenter.makePrivate();
+		if (canChangePermission) {
+			if(isInherited) { 
+				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
+				readOnly.setWidth(450);
+				add(readOnly, new MarginData(15, 0, 0, 0));			
+				
+				// 'Create ACL' button
+				Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
+				createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
+				createAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						presenter.createAcl();
 					}
-					else {
-						if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-							presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+				});
+				hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
+				hPanel.add(createAclButton, tdLeft);
+			} else {
+				// show add people view
+				FormPanel form2 = new FormPanel();  
+				form2.setFrame(false);  
+				form2.setHeaderVisible(false);  
+				form2.setAutoWidth(true);			
+				form2.setLayout(new FlowLayout());
+				
+				FormLayout layout = new FormLayout();  
+				layout.setLabelWidth(75);
+				layout.setDefaultWidth(DEFAULT_WIDTH);
+				  
+				FieldSet fieldSet = new FieldSet();  
+				fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
+				fieldSet.setCheckboxToggle(false);
+				fieldSet.setCollapsible(false);			
+				fieldSet.setLayout(layout);
+				fieldSet.setWidth(FIELD_WIDTH);
+				
+				
+				// user/group combobox
+				peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+				peopleCombo.setEmptyText("Enter name...");
+				peopleCombo.setFieldLabel("Name");
+				peopleCombo.setForceSelection(true);
+				peopleCombo.setTriggerAction(TriggerAction.ALL);
+				peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
+					@Override
+					public void selectionChanged(SelectionChangedEvent<ModelData> se) {
+						presenter.setUnsavedViewChanges(true);
+					}
+				});
+				fieldSet.add(peopleCombo);
+				
+				// permission level combobox
+				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
+				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
+				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
+				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
+				permissionLevelCombo.setEmptyText("Select access level...");
+				permissionLevelCombo.setFieldLabel("Access Level");
+				permissionLevelCombo.setTypeAhead(false);
+				permissionLevelCombo.setEditable(false);
+				permissionLevelCombo.setForceSelection(true);
+				permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
+				permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
+					@Override
+					public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
+						presenter.setUnsavedViewChanges(true);
+					}
+				});
+				fieldSet.add(permissionLevelCombo);
+				
+				// share button and listener
+				Button shareButton = new Button("Add");
+				shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						addPersonToAcl();
+					}
+				});
+	
+				fieldSet.add(shareButton);
+				
+				form2.add(fieldSet);
+				
+				//Make Public button
+				publicButton = new Button();
+				publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						//add the ability for PUBLIC to see this entity
+						if (isPubliclyVisible) {
+							presenter.makePrivate();
 						}
+						else {
+							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+							}
+						}
+						
 					}
-					
+				});
+				publicButton.addStyleName("left");
+				
+				if (notifyPeopleCheckbox == null) {
+					notifyPeopleCheckbox = new CheckBox("Notify people via email");
+					setIsNotifyPeople(true);
+					DisplayUtils.addToolTip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 				}
-			});
-			publicButton.addStyleName("left");
-			
-			if (notifyPeopleCheckbox == null) {
-				notifyPeopleCheckbox = new CheckBox("Notify people via email");
-				setIsNotifyPeople(true);
-				DisplayUtils.addToolTip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+				
+				FlowPanel cbPanel = new FlowPanel();
+				cbPanel.addStyleName("margin-top-0 margin-right-10 checkbox right");
+				cbPanel.add(notifyPeopleCheckbox);
+				FlowPanel publicButtonAndCheckbox = new FlowPanel();
+				publicButtonAndCheckbox.add(publicButton);
+				publicButtonAndCheckbox.add(cbPanel);
+				form2.add(publicButtonAndCheckbox);
+				add(form2);
+				
+				// 'Delete ACL' button
+				Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
+				deleteAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT));
+				deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+					@Override
+					public void componentSelected(ButtonEvent ce) {
+						presenter.deleteAcl();					
+					}
+				});
+				
+				hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
+				//delete button takes up the rest of the line space
+				hPanel.add(deleteAclButton, tdLeft);
+				deleteAclButton.setEnabled(canEnableInheritance);
 			}
-			
-			FlowPanel cbPanel = new FlowPanel();
-			cbPanel.addStyleName("margin-top-0 margin-right-10 checkbox right");
-			cbPanel.add(notifyPeopleCheckbox);
-			FlowPanel publicButtonAndCheckbox = new FlowPanel();
-			publicButtonAndCheckbox.add(publicButton);
-			publicButtonAndCheckbox.add(cbPanel);
-			form2.add(publicButtonAndCheckbox);
-			add(form2);
-			
-			// 'Delete ACL' button
-			Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
-			deleteAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT));
-			deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.deleteAcl();					
-				}
-			});
-			
-			hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-			//delete button takes up the rest of the line space
-			hPanel.add(deleteAclButton, tdLeft);
-			deleteAclButton.setEnabled(canEnableInheritance);
 		}
 		
 		// Unsaved changes label
@@ -397,7 +400,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			ListStore<PermissionsTableEntry> permissionsStore,
 			GridCellRenderer<PermissionsTableEntry> peopleRenderer,
 			GridCellRenderer<PermissionsTableEntry> buttonRenderer,
-			GridCellRenderer<PermissionsTableEntry> removeRenderer) {
+			GridCellRenderer<PermissionsTableEntry> removeRenderer,
+			boolean isEditable) {
 		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
 		ColumnConfig column = new ColumnConfig();
@@ -413,6 +417,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setWidth(110);
 		column.setRenderer(buttonRenderer);
 		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
+		column.setMenuDisabled(isEditable);
 		configs.add(column);
 
 		column = new ColumnConfig();
@@ -421,6 +426,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setWidth(25);
 		column.setRenderer(removeRenderer);
 		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
+		column.setHidden(!isEditable);
 		configs.add(column);
 
 		Grid<PermissionsTableEntry> permissionsGrid = new Grid<PermissionsTableEntry>(
@@ -561,7 +567,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			    } else {
 				    Button b = new Button((String) model.get(property));  
 				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 25);  
-				    b.setToolTip("Click to change");				  
+				    if (showEditColumns) {
+				    	b.setToolTip("Click to change");
+				    } else {
+				    	b.disable();
+				    }
+				    				  
 				    b.setMenu(createEditAccessMenu(entry.getAclEntry()));
 				    return b;
 			    }

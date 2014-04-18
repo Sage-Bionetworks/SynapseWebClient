@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -70,7 +69,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
 			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
@@ -151,7 +149,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	/*
 	 * Private Methods
 	 */	
-	private void configureShareButton(Entity entity, boolean isAdministrator) { 
+	private void configureShareButton(Entity entity, final boolean isAdministrator) { 
 		publicPrivateBadge.configure(entity, new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isPublic) {
@@ -166,12 +164,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 				DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, null);
 			}
 		});
-		shareButton.setVisible(isAdministrator);
-		accessControlListEditor.setResource(entity);  
+		
+		accessControlListEditor.setResource(entity, isAdministrator);  
 		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
+				DisplayUtils.showSharingDialog(accessControlListEditor, isAdministrator, new Callback() {
 					@Override
 					public void invoke() {
 						presenter.fireEntityUpdatedEvent();

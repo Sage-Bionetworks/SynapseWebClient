@@ -86,11 +86,11 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			Anchor change = new Anchor();
 			change.setText(DisplayConstants.CHANGE);
 			change.addStyleName("link");
-			aclEditor.setResource(bundle.getEntity());
+			aclEditor.setResource(bundle.getEntity(), true);
 			change.addClickHandler(new ClickHandler(){
 				@Override
 				public void onClick(ClickEvent event) {
-					DisplayUtils.showSharingDialog(aclEditor, new Callback() {
+					DisplayUtils.showSharingDialog(aclEditor, true, new Callback() {
 						@Override
 						public void invoke() {
 							presenter.entityUpdated();

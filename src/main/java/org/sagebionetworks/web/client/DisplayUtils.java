@@ -1977,10 +1977,11 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 552);
+		int windowHeight = canChangePermission ? 552 : 282;
+		window.setSize(560, windowHeight);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);

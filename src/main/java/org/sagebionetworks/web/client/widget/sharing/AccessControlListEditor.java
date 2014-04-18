@@ -69,6 +69,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	// Entity components
 	private Entity entity;
+	private boolean canChangePermission;
 	private UserEntityPermissions uep;
 	private AccessControlList acl;	
 	private Map<String, UserGroupHeader> userGroupHeaders;
@@ -101,12 +102,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	/**
 	 * Set the entity with which this ACLEditor is associated.
 	 */
-	public void setResource(Entity entity) {
+	public void setResource(Entity entity, boolean canChangePermission) {
 		if (!entity.equals(this.entity)) {
 			acl = null;
 			uep = null;
 		}
 		this.entity = entity;
+		this.canChangePermission = canChangePermission;
 	}
 	
 	/**
@@ -212,7 +214,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges);
+		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges, canChangePermission);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}
