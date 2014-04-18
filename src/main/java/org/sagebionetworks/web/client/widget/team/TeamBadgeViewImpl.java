@@ -38,6 +38,7 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 		this.iconsImageBundle = iconsImageBundle;
 		
 		container = new HorizontalPanel();
+		container.addStyleName("displayInline");
 		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
 		addStyleName("displayInline");
