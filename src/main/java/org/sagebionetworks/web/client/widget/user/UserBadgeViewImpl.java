@@ -41,7 +41,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		
 		customClickHandler = null;
 		container = new HorizontalPanel();
-		container.addStyleName("nobordertable-imp");
+		container.addStyleName("nobordertable-imp displayInline");
 		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
 		addStyleName("displayInline");
