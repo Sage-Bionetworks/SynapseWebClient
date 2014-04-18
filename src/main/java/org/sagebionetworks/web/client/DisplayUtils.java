@@ -1977,10 +1977,11 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 552);
+		int windowHeight = canChangePermission ? 552 : 282;
+		window.setSize(560, windowHeight);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
@@ -1988,35 +1989,42 @@ public class DisplayUtils {
 		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
 	    
 		// configure buttons
-		window.okText = "Save";
-		window.cancelText = "Cancel";
-	    window.setButtons(Dialog.OKCANCEL);
-	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+		if (canChangePermission) {
+			window.okText = "Save";
+			window.cancelText = "Cancel";
+			window.setButtons(Dialog.OKCANCEL);
+		} else {
+			window.cancelText = "Close";
+			window.setButtons(Dialog.CANCEL);
+		}
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
 	    window.setHideOnButtonClick(false);
 		window.setResizable(true);
 		
-		// "Apply" button
-		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-		Button applyButton = window.getButtonById(Dialog.OK);
-		applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// confirm close action if there are unsaved changes
-				if (accessControlListEditor.hasUnsavedChanges()) {
-					accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-						@Override
-						public void onSuccess(EntityWrapper result) {
-							callback.invoke();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							//failure notification is handled by the acl editor view.
-						}
-					});
+		if (canChangePermission) {
+			// "Apply" button
+			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+			Button applyButton = window.getButtonById(Dialog.OK);
+			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					// confirm close action if there are unsaved changes
+					if (accessControlListEditor.hasUnsavedChanges()) {
+						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								callback.invoke();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								//failure notification is handled by the acl editor view.
+							}
+						});
+					}
+					window.hide();
 				}
-				window.hide();
-			}
-	    });
+		    });
+		}
 		
 		// "Close" button				
 		Button closeButton = window.getButtonById(Dialog.CANCEL);

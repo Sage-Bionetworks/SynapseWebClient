@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.search;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -33,8 +32,7 @@ public class HomeSearchBoxViewImpl extends LayoutContainer implements HomeSearch
 	private TextBox searchField;
 	
 	@Inject
-	public HomeSearchBoxViewImpl(AccessMenuButton accessMenuButton,
-			AccessControlListEditor accessControlListEditor) {			
+	public HomeSearchBoxViewImpl(AccessControlListEditor accessControlListEditor) {			
 		simplePanel = new LayoutContainer();
 		simplePanel.setId("simplePanelLC");
 		simplePanel.addStyleName("row");

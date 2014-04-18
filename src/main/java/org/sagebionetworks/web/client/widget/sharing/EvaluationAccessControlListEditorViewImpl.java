@@ -164,7 +164,8 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 					public void invoke(Long principalId) {
 						presenter.removeAccess(principalId);
 					}
-				}));
+				}),
+				true);
 
 		add(permissionsGrid, new MarginData(5, 0, 0, 0));
 		columnModel = permissionsGrid.getColumnModel();

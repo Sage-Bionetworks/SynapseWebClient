@@ -236,8 +236,6 @@ import org.sagebionetworks.web.client.widget.search.SearchBoxView;
 import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButtonView;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButtonViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
@@ -510,10 +508,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Query filter
 		bind(QueryFilterViewImpl.class).in(Singleton.class);
 		bind(QueryFilterView.class).to(QueryFilterViewImpl.class);
-		
-		// Access Menu Button
-		bind(AccessMenuButtonViewImpl.class).in(Singleton.class);
-		bind(AccessMenuButtonView.class).to(AccessMenuButtonViewImpl.class);
 		
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
