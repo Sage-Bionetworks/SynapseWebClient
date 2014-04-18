@@ -417,7 +417,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		column.setWidth(110);
 		column.setRenderer(buttonRenderer);
 		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
-		column.setMenuDisabled(isEditable);
 		configs.add(column);
 
 		column = new ColumnConfig();
