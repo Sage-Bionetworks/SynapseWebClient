@@ -51,14 +51,12 @@ public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadg
 			}
 		};
 		
-		String pictureUrl; 
+		String pictureUrl = null; 
 		if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
 			pictureUrl = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
-		} else {
-			pictureUrl = sageImageBundle.defaultProfilePicture().getSafeUri().asString();
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, 4);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, true, 4);
 		container.add(mediaObjectPanel);				 
 	}
 

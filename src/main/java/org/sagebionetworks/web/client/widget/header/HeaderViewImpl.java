@@ -196,7 +196,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userCommands = new FlowPanel();
         	userCommands.addStyleName("view header-inner-commands-container");
         	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
-        	userGuide.addStyleName("btn btn-xs font-size-17");
+        	userGuide.addStyleName("displayInline imageButton moveup-2 margin-left-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
@@ -206,7 +206,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
     		
         	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
-        	settings.addStyleName("btn btn-xs moveup-2 font-size-17");
+        	settings.addStyleName("displayInline imageButton margin-left-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
         	settings.addClickHandler(new ClickHandler() {
 				@Override
@@ -216,7 +216,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		 	
         	HTML logout = new HTML(DisplayUtils.getFontelloIcon("logout"));
-        	logout.addStyleName("btn btn-xs font-size-17");
+        	logout.addStyleName("displayInline imageButton moveup-2 margin-left-5 margin-right-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
         	logout.addClickHandler(new ClickHandler() {
 				@Override

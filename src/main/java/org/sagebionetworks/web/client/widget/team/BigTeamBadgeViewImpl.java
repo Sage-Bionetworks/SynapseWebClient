@@ -49,14 +49,12 @@ public class BigTeamBadgeViewImpl extends LayoutContainer implements BigTeamBadg
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
 			}
 		};
-		String pictureUrl;
+		String pictureUrl = null;
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
-		} else {
-			pictureUrl = sageImageBundle.defaultProfilePicture().getSafeUri().asString();
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, 5);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5);
 		container.add(mediaObjectPanel);
 	}
 
