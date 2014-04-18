@@ -1168,6 +1168,8 @@ ol.lowerroman {
 .inlineWidgetContainer {
 	overflow-x: auto;
 	display: inline-block;
+	position: relative;
+	top: 4px;
 }
 
 .myEvaluationListContainer {

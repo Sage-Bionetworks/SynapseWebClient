@@ -37,6 +37,7 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 		
 		container = new HorizontalPanel();
 		this.add(container);
+		addStyleName("displayInline movedown-4");
 	}
 	
 	@Override
