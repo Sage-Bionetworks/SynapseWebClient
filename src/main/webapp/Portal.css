@@ -1301,6 +1301,10 @@ ol.lowerroman {
     padding: 5px;
 }
 
+.line-height-1em-imp {
+	line-height:1em !important;	
+}
+
 
 .fixedWidthFont {
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;

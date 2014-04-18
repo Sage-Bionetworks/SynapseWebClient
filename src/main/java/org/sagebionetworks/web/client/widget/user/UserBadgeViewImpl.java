@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,6 +42,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		customClickHandler = null;
 		container = new HorizontalPanel();
 		container.addStyleName("nobordertable-imp");
+		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
 		addStyleName("displayInline");
 	}
@@ -94,7 +96,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				profilePicture.addClickHandler(clickHandler);
 				container.add(profilePicture);	
 			} else {
-				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-13 movedown-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before"));
 				profilePicture.addClickHandler(clickHandler);
 				container.add(profilePicture);
 			}

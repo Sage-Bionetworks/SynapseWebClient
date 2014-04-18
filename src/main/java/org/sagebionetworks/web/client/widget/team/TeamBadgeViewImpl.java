@@ -13,6 +13,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.inject.Inject;
@@ -36,6 +38,7 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 		this.iconsImageBundle = iconsImageBundle;
 		
 		container = new HorizontalPanel();
+		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
 		addStyleName("displayInline");
 	}
@@ -74,7 +77,7 @@ public class TeamBadgeViewImpl extends LayoutContainer implements TeamBadgeView 
 				profilePicture.addClickHandler(clickHandler);
 				container.add(profilePicture);
 			} else {
-				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 movedown-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before"));
 				profilePicture.addClickHandler(clickHandler);
 				container.add(profilePicture);
 			}
