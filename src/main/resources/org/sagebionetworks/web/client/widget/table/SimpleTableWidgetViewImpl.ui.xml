@@ -11,8 +11,8 @@
       margin-bottom: 4px;
     }
   </ui:style>
-
-  <g:HTMLPanel>
+<g:HTMLPanel>	
+	<g:HTMLPanel>
   		<div class="alert alert-danger">Warning: The Table feature is in a test phase. <strong>All production data will be DELETED at a future date.</strong></div>
   	    <g:HTMLPanel ui:field="buttonToolbar" visible="false"/>
   	    <g:SimplePanel ui:field="columnEditorPanel" visible="false" styleName="margin-top-15 panel panel-default panel-body" />
@@ -36,8 +36,10 @@
 	        </td>
 	      </tr>
 	    </table>
+		<g:HTMLPanel ui:field="allRowContainer" />
 	    <g:SimplePanel ui:field="tableLoading" visible="false" styleName="margin-top-15"/>
 	    <g:SimplePanel ui:field="errorMessage" visible="false" styleName="margin-top-15"/>
   
-  </g:HTMLPanel>
+	</g:HTMLPanel>
+</g:HTMLPanel>    
 </ui:UiBinder>

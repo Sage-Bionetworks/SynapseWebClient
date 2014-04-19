@@ -28,8 +28,6 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -41,7 +39,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -95,6 +92,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SimplePanel pagerContainer;
 	@UiField
 	SimplePanel errorMessage;
+	@UiField
+	HTMLPanel allRowContainer;
 
 	FlowPanel addColumnPanel;
 	List<ColumnDetailsPanel> columnPanelOrder;
@@ -135,19 +134,20 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails) {		
+	public void createNewTable(List<ColumnModel> columns, RowSet rowset,
+			int totalRowCount, boolean canEdit, String queryString,
+			QueryDetails queryDetails) {		
 		this.columns = columns;				
 		this.initialLoad = rowset;
 		this.initialDetails = queryDetails;
 		columnToModel.clear();
-				
-		// clear out old column editor view
-		columnEditorBuilt = false;
+
+		// Render Table			
+		columnEditorBuilt = false; // clear out old column editor view
 		setupTableEditorToolbar(columns);
 		if(canEdit) {
 			buttonToolbar.setVisible(true);
 		}
-
 		
 		// special cases display user instructions instead of empty table
 		if(columns == null || (columns != null && columns.size() == 0)) {
@@ -158,11 +158,49 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
 		buildTable(queryDetails, totalRowCount);
-		buildColumns(columns, canEdit);
-		 	    
-	    hideLoading();
+		buildColumns(columns, canEdit);			
+		hideLoading();		 	    
 	}
 	
+
+	@Override
+	public void createRowView(List<ColumnModel> columns, RowSet rowset) {
+		// Render Row
+		buildRowView(columns, rowset);
+		tableContainer.setVisible(false);
+		allRowContainer.setVisible(true);
+		hideLoading();
+	}
+
+	
+	private void buildRowView(List<ColumnModel> columns, RowSet rowset) {
+		allRowContainer.clear();
+		Button btn = DisplayUtils.createIconButton(DisplayConstants.BACK_TO_TABLE, ButtonType.DEFAULT, "glyphicon-chevron-left");
+		btn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {				
+				presenter.retryCurrentQuery();
+			}
+		});
+		allRowContainer.add(btn);
+		
+		final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
+		for(ColumnModel col : columns) idToCol.put(col.getId(), col);
+
+		if(rowset != null && rowset.getHeaders() != null && rowset.getRows() != null && rowset.getHeaders().size() > 0 && rowset.getRows().size() > 0) {			
+			List<String> headers = rowset.getHeaders();
+			for(int i=0; i<headers.size(); i++) {					
+				HTML widget;
+				// TODO : switch on type with id2Col
+				widget = new HTML(idToCol.get(headers.get(i)).getName() + ": " + rowset.getRows().get(0).getValues().get(i));
+				allRowContainer.add(widget);
+			}							
+		} else {
+			// show empty
+			allRowContainer.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
+		}	
+	}
+
 	private void showAddColumnsView(boolean canEdit) {
 		hideLoading();		
 		pagerContainer.setVisible(false);		
@@ -202,6 +240,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	@Override
 	public void showLoading() {
+		allRowContainer.setVisible(false);
 		queryField.setEnabled(false);
 		tableContainer.setVisible(false);
 		pagerContainer.setVisible(false);

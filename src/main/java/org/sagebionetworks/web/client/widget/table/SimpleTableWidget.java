@@ -55,7 +55,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private boolean isFirstDefault = false;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-
 	
 	@Inject
 	public SimpleTableWidget(SimpleTableWidgetView view,
@@ -121,6 +120,8 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});			
 	}
@@ -137,8 +138,12 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private void buildTable(String tableEntityId, List<ColumnModel> tableColumns, boolean canEdit, String queryString, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
 		this.tableEntityId = tableEntityId;
 		this.tableColumns = tableColumns;
+		this.canEdit = canEdit;
+		this.queryChangeHandler = queryChangeHandler;
+		this.startProgress = null;
 
 		if(rowHeader == null) {
+			// execute regular query
 			if(queryString == null) {
 				isFirstDefault = true;
 				this.currentQuery = getDefaultQuery(tableEntityId);	
@@ -146,15 +151,13 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 				isFirstDefault = false;
 				this.currentQuery = queryString;
 			}
-			
-			this.canEdit = canEdit;
-			this.queryChangeHandler = queryChangeHandler;
-			this.startProgress = null;
 		
 			view.showLoading();
 			executeQuery(currentQuery, null, null);			
 		} else {
-			// TODO : execute a query for the TableRow specified and render single row
+			// execute a query for the TableRow specified			
+			view.showLoading();
+			executeRowQuery(rowHeader);
 		}
 	}
 
@@ -173,6 +176,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	@Override
 	public void retryCurrentQuery() {
 		view.showLoading();
+		if(currentQuery == null) currentQuery = getDefaultQuery(tableEntityId);
 		executeQuery(currentQuery, null, null);
 	}
 
@@ -323,16 +327,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof TableUnavilableException) {
-					Integer progress = null;
-					TableStatus status = null;
-					try {
-						status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
-						if(startProgress == null) startProgress = status.getProgressCurrent();					
-						if(startProgress != null) progress = new Long(100*(status.getProgressCurrent().longValue() - startProgress.longValue()) / status.getProgressTotal().longValue()).intValue();
-						if(progress != null && progress > 100) progress = 100;
-					} catch (JSONObjectAdapterException e) {
-					}
-					view.showTableUnavailable(status, progress);
+					handleTableUnavailableException(caught);
 				} else if(caught instanceof BadRequestException) {
 						view.showQueryProblem(caught.getMessage());
 				} else {
@@ -342,6 +337,51 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			}
 		});
 	}
+	
+	/**
+	 * Not fundamentally different from executeQuery, just different process logic
+	 */
+	private void executeRowQuery(TableRowHeader rowHeader) {
+		String query = getDefaultRowQuery(rowHeader);
+		synapseClient.executeTableQuery(query, null, false, new AsyncCallback<QueryResult>() {
+			@Override
+			public void onSuccess(QueryResult result) {
+				RowSet rowset;
+				try {
+					rowset = new RowSet(adapterFactory.createNew(result.getRowSetJson()));
+					// send to view
+					view.createRowView(tableColumns, rowset);						
+				} catch (JSONObjectAdapterException e) {
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof TableUnavilableException) {
+					handleTableUnavailableException(caught);
+				} else if(caught instanceof BadRequestException) {
+						view.showQueryProblem(caught.getMessage());
+				} else {					
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+				}
+				
+			}
+		});
+	}
+	
+	private void handleTableUnavailableException(Throwable caught) {
+		Integer progress = null;
+		TableStatus status = null;
+		try {
+			status = new TableStatus(adapterFactory.createNew(((TableUnavilableException) caught).getStatusJson()));
+			if(startProgress == null) startProgress = status.getProgressCurrent();					
+			if(startProgress != null) progress = new Long(100*(status.getProgressCurrent().longValue() - startProgress.longValue()) / status.getProgressTotal().longValue()).intValue();
+			if(progress != null && progress > 100) progress = 100;
+		} catch (JSONObjectAdapterException e) {
+		}
+		view.showTableUnavailable(status, progress);
+	}
+
 
 	/**
 	 * Add or update row. Row objects without a rowId are considered an add
@@ -436,5 +476,21 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private String getDefaultQuery(String tableEntityId) {
 		return "SELECT * FROM " + tableEntityId + " LIMIT " + DEFAULT_PAGE_SIZE + " OFFSET " + DEFAULT_OFFSET;
 	}
+
+	/**
+	 * Default Query for a row
+	 * @param rowHeader
+	 * @return
+	 */
+	private String getDefaultRowQuery(TableRowHeader rowHeader) {
+		if(rowHeader != null && rowHeader.getRowId() != null && !rowHeader.getRowId().equals("")) {			
+			String query = "SELECT * FROM " + tableEntityId + " WHERE ROW_ID=" + rowHeader.getRowId();
+			if(rowHeader.getVersion() != null && !rowHeader.getVersion().equals("")) query += " AND ROW_VERSION="+ rowHeader.getVersion();  
+			query += " LIMIT 1";
+			return query;
+		}
+		return null;
+	}
+
 
 }
