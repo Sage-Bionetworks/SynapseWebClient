@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,6 +14,7 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView.Presenter;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
@@ -24,6 +26,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -33,10 +37,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TableViewUtils {
+	private static final int DEFAULT_STRING_MAX_LENGTH = 50;
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
@@ -163,7 +169,7 @@ public class TableViewUtils {
 	}
 	
 	public static void swapColumns(final List<ColumnDetailsPanel> columnPanelOrder, final FlowPanel allColumnsPanel, final ColumnDetailsPanel thisColumn,
-			final int formerIdx, final int newIdx) {
+			final int formerIdx, final int newIdx, final Presenter presenter) {
 		final ColumnDetailsPanel displacedColumn = columnPanelOrder.get(newIdx);
 		// fade out		
 		thisColumn.addStyleName("fade");
@@ -178,6 +184,8 @@ public class TableViewUtils {
 				setArrowVisibility(newIdx, columnPanelOrder.size(), thisColumn.getMoveUp(), thisColumn.getMoveDown());
 				setArrowVisibility(formerIdx, columnPanelOrder.size(), displacedColumn.getMoveUp(), displacedColumn.getMoveDown());
 
+				presenter.updateColumnOrder(extractColumns(columnPanelOrder));
+				
 				// fade in
 				Timer t2 = new Timer() {					
 					@Override
@@ -207,6 +215,14 @@ public class TableViewUtils {
 		else moveUp.setVisible(true);
 		if(idx == size-1) moveDown.setVisible(false);
 		else moveDown.setVisible(true);
+	}
+
+	public static List<String> extractColumns(List<ColumnDetailsPanel> columnPanelOrder) {
+		List<String> columns = new ArrayList<String>();
+		for(ColumnDetailsPanel colD : columnPanelOrder) {
+			columns.add(colD.getCol().getId());
+		}		
+		return columns;
 	}
 
 	
@@ -458,6 +474,47 @@ public class TableViewUtils {
 		enums.add("");
 		enums.addAll(values);
 		return enums;
+	}
+
+	public static Widget createStringLengthField(final ColumnModel col, final Widget container) {
+		final IntegerBox stringLength = new IntegerBox();
+		stringLength.setWidth("100px");
+		stringLength.addStyleName("form-control");
+		// show error when non-integer values added
+		stringLength.addKeyUpHandler(new KeyUpHandler() {	
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				try {
+					stringLength.getValueOrThrow();
+					container.removeStyleName("has-error");
+				} catch (ParseException e) {
+					container.addStyleName("has-error");
+				}
+			}
+		});
+		
+		// set length
+		setStringMaxLength(col, stringLength);
+		stringLength.addChangeHandler(new ChangeHandler() {			
+			@Override
+			public void onChange(ChangeEvent event) {
+				try {					
+					col.setMaximumSize(new Long(stringLength.getValueOrThrow()));
+				} catch (ParseException e) {
+					// clear user's invalid change
+					setStringMaxLength(col, stringLength);
+					container.removeStyleName("has-error");
+				}
+
+			}
+		});
+		return stringLength;
+	}
+
+	private static void setStringMaxLength(final ColumnModel col,
+			final IntegerBox stringLength) {
+		if(col.getMaximumSize() != null) stringLength.setValue(col.getMaximumSize().intValue());
+		else stringLength.setValue(DEFAULT_STRING_MAX_LENGTH);
 	}
 
 }
