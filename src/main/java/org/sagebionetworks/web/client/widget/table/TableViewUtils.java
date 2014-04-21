@@ -225,6 +225,9 @@ public class TableViewUtils {
 		return columns;
 	}
 
+	public static String getDateStringTableFormat(Date date) {
+		return DATE_FORMAT.format(date);
+	}
 	
 	/*
 	 * ----- Column Type methods -----
@@ -534,4 +537,5 @@ public class TableViewUtils {
 		else stringLength.setValue(DEFAULT_STRING_MAX_LENGTH);
 	}
 
+	
 }

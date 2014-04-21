@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
@@ -187,14 +189,39 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 		for(ColumnModel col : columns) idToCol.put(col.getId(), col);
 
+		BootstrapTable table = new BootstrapTable();
+		table.addStyleName("margin-top-15");
+		table.setWidth("100%");		
+		table.getColumnFormatter().setWidth(0, "10%");
+		table.getColumnFormatter().setWidth(1, "90%");
 		if(rowset != null && rowset.getHeaders() != null && rowset.getRows() != null && rowset.getHeaders().size() > 0 && rowset.getRows().size() > 0) {			
 			List<String> headers = rowset.getHeaders();
-			for(int i=0; i<headers.size(); i++) {					
-				HTML widget;
+			List<String> headerNamesRow = new ArrayList<String>();
+			headerNamesRow.add(DisplayConstants.COLUMN);
+			headerNamesRow.add("");			
+			List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
+			tableHeaderRows.add(headerNamesRow);
+			table.setHeaders(tableHeaderRows);			
+
+			// add data to table
+			for(int i=0; i<headers.size(); i++) {
+				table.setHTML(i, 0, "<span class=\"strong\">"+idToCol.get(headers.get(i)).getName()+"</span>");
 				// TODO : switch on type with id2Col
-				widget = new HTML(idToCol.get(headers.get(i)).getName() + ": " + rowset.getRows().get(0).getValues().get(i));
-				allRowContainer.add(widget);
-			}							
+				ColumnModel col = idToCol.get(headers.get(i));
+				String value = rowset.getRows().get(0).getValues().get(i);
+				if(value != null) {
+					if(col != null && col.getColumnType() == ColumnType.DATE) {											
+						table.setText(i, 1, TableViewUtils.getDateStringTableFormat(new Date(Long.parseLong(value))));
+					} else if(col != null && col.getColumnType() == ColumnType.FILEHANDLEID) {					
+						// TODO : render filehandle
+						//table.setWidget(i, 1, new Image...);
+					} else {
+						// regular string
+						table.setText(i, 1, value);
+					}
+				}
+			}
+			allRowContainer.add(table);
 		} else {
 			// show empty
 			allRowContainer.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
