@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,7 +44,7 @@ public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.continueClicked();
-				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
+				presenter.goTo(new Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
 		

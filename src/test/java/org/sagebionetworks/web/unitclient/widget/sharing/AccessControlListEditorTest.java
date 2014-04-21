@@ -130,7 +130,7 @@ public class AccessControlListEditorTest {
 				mockGwt,
 				adapterFactory
 		);
-		acle.setResource(project);
+		acle.setResource(project, true);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
 	}
 	
@@ -270,7 +270,7 @@ public class AccessControlListEditorTest {
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(),anyBoolean());
 		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
@@ -321,7 +321,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
@@ -417,7 +417,7 @@ public class AccessControlListEditorTest {
 		returnedACL.setResourceAccess(null);
 		assertTrue(localACL.equals(returnedACL));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -453,7 +453,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -479,7 +479,7 @@ public class AccessControlListEditorTest {
 		
 		verify(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -513,7 +513,7 @@ public class AccessControlListEditorTest {
 		
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -528,7 +528,7 @@ public class AccessControlListEditorTest {
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
 		verify(mockACLEView).showErrorMessage(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -541,7 +541,7 @@ public class AccessControlListEditorTest {
 		acle.asWidget();
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -556,7 +556,7 @@ public class AccessControlListEditorTest {
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 
 		verify(mockACLEView).showErrorMessage(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean());
+		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 	}
 
 	@Test

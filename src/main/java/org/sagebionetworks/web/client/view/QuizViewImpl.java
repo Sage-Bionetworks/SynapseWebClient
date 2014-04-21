@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +64,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@UiField
 	HTMLPanel failureContainer;
 	@UiField
-	Button tutorialButton;
+	Button tutorialButton1;
+	@UiField
+	Button tutorialButton2;
 
 	
 	
@@ -99,13 +100,22 @@ public class QuizViewImpl extends Composite implements QuizView {
 		
 		isSubmitInitialized = false;
 		questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
-		
-		tutorialButton.addClickHandler(new ClickHandler() {
+		ClickHandler gotoGettingStarted = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new Help(WebConstants.USER_CERTIFICATION_TUTORIAL));
+				presenter.goTo(new Help(WebConstants.GETTING_STARTED));
 			}
-		});
+		};
+		
+		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.GETTING_STARTED), "", "");
+			}
+		};
+		
+		tutorialButton1.addClickHandler(gotoGettingStartedNewWindow);
+		tutorialButton2.addClickHandler(gotoGettingStarted);
 	}
 
 	@Override
@@ -151,7 +161,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void showQuiz(Quiz quiz) {
 		hideAll();
-		quizHighlightBox.setAttribute("title", quiz.getHeader());
+		if (quiz.getHeader() != null)
+			quizHighlightBox.setAttribute("title", quiz.getHeader());
 		//clear old questions
 		clear();
 		List<Question> questions = quiz.getQuestions();

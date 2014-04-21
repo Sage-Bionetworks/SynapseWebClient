@@ -419,7 +419,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		headerRow.add(wrapButton);
 		myTeamsContainer.add(headerRow);
 		Widget teamListWidget = teamsListWidget.asWidget();
-		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min");
+		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min line-height-1-7em-imp padding-top-15-imp");
 		myTeamsContainer.add(teamListWidget);
 		return myTeamsContainer;
 	}

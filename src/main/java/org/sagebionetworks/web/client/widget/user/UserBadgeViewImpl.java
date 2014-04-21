@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,8 +41,10 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		
 		customClickHandler = null;
 		container = new HorizontalPanel();
-		container.addStyleName("nobordertable-imp");
+		container.addStyleName("nobordertable-imp displayInline");
+		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
+		addStyleName("displayInline");
 	}
 	
 	@Override
@@ -58,7 +61,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 			final Anchor userAnchor = new Anchor();
 			if(profile.getOwnerId() != null) {				
 				userAnchor.setText(name);
-				userAnchor.addStyleName("usernameLink");
+				userAnchor.addStyleName("usernameLink margin-left-5");
 				userAnchor.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
@@ -71,31 +74,33 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 				nameWidget = userAnchor;
 			} else {
 				HTML html = new HTML(name);
-				html.addStyleName("usernamelink");
+				html.addStyleName("usernamelink margin-left-5");
 				nameWidget = html;
 			}
 			//also add the username in a popup (in the case when the name shown does not show the entire display name)
 			if (displayName.length() != name.length())
 				DisplayUtils.addToolTip(nameWidget, displayName);
-			Image profilePicture; 
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-			} else {
-				profilePicture = new Image(sageImageBundle.defaultProfilePicture20().getSafeUri());
-				profilePicture.setPixelSize(16,16);
-			}
-			
-			profilePicture.setWidth("16px");
-			profilePicture.setHeight("16px");
-			profilePicture.addStyleName("imageButton userProfileImage");
-			profilePicture.addClickHandler(new ClickHandler() {
+			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					userAnchor.fireEvent(event);
 				}
-			});
-			container.add(profilePicture);
+			};
+			
+			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setWidth("16px");
+				profilePicture.setHeight("16px");
+				profilePicture.addStyleName("imageButton userProfileImage");
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);	
+			} else {
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);
+			}
+			
 			container.add(nameWidget);				 
 		} 		
 		

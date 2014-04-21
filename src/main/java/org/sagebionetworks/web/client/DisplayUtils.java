@@ -1977,10 +1977,11 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 552);
+		int windowHeight = canChangePermission ? 552 : 282;
+		window.setSize(560, windowHeight);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
@@ -1988,35 +1989,42 @@ public class DisplayUtils {
 		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
 	    
 		// configure buttons
-		window.okText = "Save";
-		window.cancelText = "Cancel";
-	    window.setButtons(Dialog.OKCANCEL);
-	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+		if (canChangePermission) {
+			window.okText = "Save";
+			window.cancelText = "Cancel";
+			window.setButtons(Dialog.OKCANCEL);
+		} else {
+			window.cancelText = "Close";
+			window.setButtons(Dialog.CANCEL);
+		}
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
 	    window.setHideOnButtonClick(false);
 		window.setResizable(true);
 		
-		// "Apply" button
-		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-		Button applyButton = window.getButtonById(Dialog.OK);
-		applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// confirm close action if there are unsaved changes
-				if (accessControlListEditor.hasUnsavedChanges()) {
-					accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-						@Override
-						public void onSuccess(EntityWrapper result) {
-							callback.invoke();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							//failure notification is handled by the acl editor view.
-						}
-					});
+		if (canChangePermission) {
+			// "Apply" button
+			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+			Button applyButton = window.getButtonById(Dialog.OK);
+			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					// confirm close action if there are unsaved changes
+					if (accessControlListEditor.hasUnsavedChanges()) {
+						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								callback.invoke();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								//failure notification is handled by the acl editor view.
+							}
+						});
+					}
+					window.hide();
 				}
-				window.hide();
-			}
-	    });
+		    });
+		}
 		
 		// "Close" button				
 		Button closeButton = window.getButtonById(Dialog.CANCEL);
@@ -2079,7 +2087,7 @@ public class DisplayUtils {
 		return null;
 	}
 	
-	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, int headingLevel) {
+	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
 		String linkStyle = "";
@@ -2089,12 +2097,21 @@ public class DisplayUtils {
 		if (clickHandler != null)
 			headingHtml.addClickHandler(clickHandler);
 		
-		FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-		profilePicture.addStyleName("pull-left media-object");
-		profilePicture.addStyleName("imageButton");
-		if (clickHandler != null)
-			profilePicture.addClickHandler(clickHandler);
-		panel.add(profilePicture);
+		if (pictureUri != null) {
+			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+			profilePicture.addStyleName("pull-left media-object imageButton");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		} else {
+			//display default picture
+			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			profilePicture.addStyleName("pull-left media-object displayInline ");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		}
 		FlowPanel mediaBodyPanel = new FlowPanel();
 		mediaBodyPanel.addStyleName("media-body");
 		mediaBodyPanel.add(headingHtml);

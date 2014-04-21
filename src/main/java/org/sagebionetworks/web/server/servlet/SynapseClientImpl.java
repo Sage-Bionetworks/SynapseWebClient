@@ -12,7 +12,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -1212,6 +1212,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			JSONObject entity = synapseClient.getEntity(repoUri);
 			return entity.toString();
+		} catch (SynapseTableUnavilableException e) {
+			handleTableUnavailableException(e);
+			//TableUnavilableException is thrown in line above, should never reach the next line
+			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1866,17 +1870,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
-		throw new NotFoundException("Certification system not yet implemented");
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		try {
-//			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(Long.parseLong(userId));
-//			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
-//			return passingRecordJson.toJSONString();
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-// 		} catch (JSONObjectAdapterException e) {
-//			throw new UnknownErrorException(e.getMessage());
-//		}
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(userId);
+			//This method only returns the PassingRecord if the user actually passed (portal does not currently care about the top failed attempt).
+			if (passingRecord.getPassed() == null || !passingRecord.getPassed()) {
+				throw new NotFoundException("The user has not passed the certification quiz.");
+			}
+			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+			return passingRecordJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+ 		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
 	}
 	
 	@Override

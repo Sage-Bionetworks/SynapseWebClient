@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,12 +17,13 @@ import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetView {
+public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
@@ -43,7 +43,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
 			final String scale, String alignment, final String synapseId, final boolean isLoggedIn, Long wikiVersion) {
-		this.removeAll();
+		this.clear();
 		hasTriedCache = false;
 		// Add a html panel that contains the image src from the attachments server (to pull asynchronously)
 		
@@ -58,6 +58,7 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		}
 		
 		final Image image = new Image();
+		image.addStyleName("maxWidth100");
 		if (synapseId != null) {
 			image.addStyleName("imageButton");
 			image.addClickHandler(new ClickHandler() {
@@ -133,10 +134,6 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 							image.setHeight(scaledImageHeight + "px");
 						}
 					}
-					else if (imageWidth > MAX_IMAGE_WIDTH){
-						//if scale is not specified (or if 100%), then only scale this image if it's too wide to fit in the screen
-						setImageToMaxSize(imageWidth, imageHeight);
-					}
 					image.getElement().getStyle().setVisibility(Visibility.VISIBLE);
 				} catch (Throwable e) {
 					remove(image);
@@ -152,12 +149,10 @@ public class ImageWidgetViewImpl extends LayoutContainer implements ImageWidgetV
 		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
 		image.setUrl(url);
-		this.layout(true);
 	}
 
 	public void showError(String error) {
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
-		layout(true);
 	}
 
 	@Override

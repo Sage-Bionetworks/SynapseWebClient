@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -36,6 +37,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -84,7 +86,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private Anchor registerButton;
 	private Anchor supportLink;
 	private SimplePanel supportLinkContainer;
-	private HorizontalPanel userCommands;
+	private FlowPanel userCommands;
 	private FlowPanel userNameContainer;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HorizontalPanel userNameWrapper;
@@ -191,40 +193,37 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		}
 		if (userCommands == null){
-			userCommands = new HorizontalPanel();
+			userCommands = new FlowPanel();
         	userCommands.addStyleName("view header-inner-commands-container");
-
-        	Image userGuide = new Image(iconsImageBundle.bookOpen16());
-        	userGuide.addStyleName("imageButton");
-		 	
+        	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
+        	userGuide.addStyleName("displayInline imageButton moveup-2 margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(ClientProperties.USER_GUIDE_ID));
 				}
-			});   		 	
-	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
-
-        	Image settings = new Image(iconsImageBundle.settings16());
-   		 	settings.addStyleName("imageButton");
-		 	
-   		 	settings.addClickHandler(new ClickHandler() {
+			});
+    		
+        	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
+        	settings.addStyleName("displayInline imageButton margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
+        	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
-			});   		 	
-	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
+			});
 		 	
-   		 	Image logout = new Image(iconsImageBundle.logoutGrey16());
-   		 	logout.addStyleName("imageButton");
-		 	logout.addClickHandler(new ClickHandler() {
+        	HTML logout = new HTML(DisplayUtils.getFontelloIcon("logout"));
+        	logout.addStyleName("displayInline imageButton moveup-2 margin-left-5 margin-right-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
+        	logout.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 				}
 			});
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
 		 			
 			userCommands.add(userGuide);
 		 	userCommands.add(settings);

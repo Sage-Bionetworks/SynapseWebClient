@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.UserPreferences;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -218,7 +218,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 */
 	public void postLoginStep2(){
 		view.showLoggingInLoader();
-		if (!isIgnoreQuizReminder()) {
+		if (!isHideQuizReminder()) {
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String passingRecordJson) {
@@ -239,14 +239,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 	
-	public boolean isIgnoreQuizReminder() {
-		//TODO: implement when new setting in place.  only in test website until tutorial content is ready
+	public boolean isHideQuizReminder() {
+		//TODO: currently only in test website until tutorial content is ready
 		if (DisplayUtils.isInTestWebsite(cookies)) {
-			if (profile != null && profile.getNotificationSettings() != null) {
-				//TODO:
-	//			List suppressionList = profile.getNotificationSettings().getReminderSuppressionList();
-	//			return suppressionList.contains(SUPPRESS_CERTIFICATION_REMINDER);
-				return false;
+			if (profile != null) {
+				if (profile.getPreferences() != null) {
+					Boolean hideQuizReminder = profile.getPreferences().getDontShowCertifiedUserReminder();
+					return hideQuizReminder != null ? hideQuizReminder : false;
+				} else {
+					//if the preferences have not been set, then show the certification reminder
+					return false;
+				}
 			} else
 				return false;
 		} else {
@@ -256,23 +259,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 
 	
 	@Override
-	public void setIgnoreQuiz(boolean ignoreQuiz) {
-		if (ignoreQuiz) {
-			//suppress reminder
-			//update profile
-			if (profile.getNotificationSettings() == null)
-				profile.setNotificationSettings(new Settings());
-			Settings notificationSettings = profile.getNotificationSettings();
-			//TODO
-//			if (notificationSettings.getReminderSuppressionList() == null)
-//				notificationSettings.setReminderSuppressionList(new ArrayList<>());
-//			List<> reminderSuppressionList = notificationSettings.getReminderSuppressionList();
-//			reminderSuppressionList.add(CERTIFICATION_REMINDER);
-			
+	public void setHideQuizReminder(boolean hideQuizReminder) {
+		//update profile if hiding
+		if (hideQuizReminder) {
+			if (profile.getPreferences() == null) 
+				profile.setPreferences(new UserPreferences());
+			UserPreferences notificationSettings = profile.getPreferences();
+			notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
 			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your reminder setting", "");
+					view.showInfo("Successfully updated your preferences", "");
 				}
 				
 				@Override
@@ -280,7 +277,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showErrorMessage(caught.getMessage());
 				}
 			};
-			updateProfile(profile, profileUpdatedCallback);	
+			updateProfile(profile, profileUpdatedCallback);
 		}
 	}
 
@@ -384,8 +381,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												@Override
 												public void onSuccess(
 														String result) {
-													// All setup complete, so forward the user
-													goToLastPlace();
+													// Signed ToU. Check for temp username, passing record, and then forward
+													postLoginStep1();
 												}	
 												
 											});
@@ -430,4 +427,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			});
 		}
 	}
+	
+	/**
+	 * setter for user profile, for testing purposes only
+	 * @param profile
+	 */
+	public void setUserProfile(UserProfile profile) {
+		this.profile = profile;
+	}
+
 }

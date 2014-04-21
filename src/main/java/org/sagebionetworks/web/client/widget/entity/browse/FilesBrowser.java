@@ -129,33 +129,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	
 	@Override
 	public void addFolderClicked() {
-		//is this a certified user?
-		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecord) {
-				createFolder();
-			}
-			@Override
-			public void onFailure(Throwable t) {
-				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(new CallbackP<Boolean>() {
-						@Override
-						public void invoke(Boolean tutorialClicked) {
-							if (!tutorialClicked)
-								createFolder();
-						}
-					});
-				} else 
-					view.showErrorMessage(t.getMessage());
-			}
-		};
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);	
-		} else {
-			userCertifiedCallback.onSuccess("");
-		}
-			
-		
+		createFolder();
 	}
 	
 	public void createFolder() {
