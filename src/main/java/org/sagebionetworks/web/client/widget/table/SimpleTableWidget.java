@@ -121,7 +121,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			@Override
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD + ": " + caught.getMessage());
 			}
 		});			
 	}
@@ -332,7 +332,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						view.showQueryProblem(caught.getMessage());
 				} else {
 					if(updateCallback != null) updateCallback.onFailure(caught);
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY + ": " + caught.getMessage());
 				}
 			}
 		});

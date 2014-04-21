@@ -198,7 +198,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			List<String> headers = rowset.getHeaders();
 			List<String> headerNamesRow = new ArrayList<String>();
 			headerNamesRow.add(DisplayConstants.COLUMN);
-			headerNamesRow.add("");			
+			headerNamesRow.add(DisplayConstants.VALUE);			
 			List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
 			tableHeaderRows.add(headerNamesRow);
 			table.setHeaders(tableHeaderRows);			
@@ -206,7 +206,6 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			// add data to table
 			for(int i=0; i<headers.size(); i++) {
 				table.setHTML(i, 0, "<span class=\"strong\">"+idToCol.get(headers.get(i)).getName()+"</span>");
-				// TODO : switch on type with id2Col
 				ColumnModel col = idToCol.get(headers.get(i));
 				String value = rowset.getRows().get(0).getValues().get(i);
 				if(value != null) {

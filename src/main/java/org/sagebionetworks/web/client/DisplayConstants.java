@@ -752,6 +752,7 @@ public class DisplayConstants {
 	public static final String ROW_IS_EMPTY = "Row is empty";
 	public static final String ROW = "Row";
 	public static final String COLUMN = "Column";
+	public static final String VALUE = "Value";
 
 }
 
