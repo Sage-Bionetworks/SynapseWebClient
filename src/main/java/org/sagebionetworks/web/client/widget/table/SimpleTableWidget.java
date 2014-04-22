@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -174,7 +175,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	}
 	
 	@Override
-	public void retryCurrentQuery() {
+	public void rerunCurrentQuery() {
 		view.showLoading();
 		if(currentQuery == null) currentQuery = getDefaultQuery(tableEntityId);
 		executeQuery(currentQuery, null, null);
@@ -256,6 +257,50 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	public void updateColumnOrder(List<String> columnIds) {
 		table.setColumnIds(columnIds);
 		updateTableEntity();
+	}
+
+	/**
+	 * Delete rows from the table
+	 */
+	@Override
+	public void deleteRows(List<TableModel> selectedRows) {
+		RowReferenceSet toDeleteSet = new RowReferenceSet();
+		toDeleteSet.setTableId(tableEntityId);
+		toDeleteSet.setEtag(currentEtag);
+		toDeleteSet.setHeaders(TableUtils.extractHeaders(tableColumns));
+		final List<RowReference> rows = new ArrayList<RowReference>();
+		for(TableModel model : selectedRows) {
+			if(model != null && model.getId() != null && !model.getId().startsWith(TableModel.TEMP_ID_PREFIX)) {
+				RowReference row = new RowReference();
+				row.setRowId(Long.parseLong(model.getId()));
+				rows.add(row);
+			}
+		} 
+		toDeleteSet.setRows(rows);
+		
+		try {
+			synapseClient.deleteRowsFromTable(toDeleteSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					RowReferenceSet rrs = null;
+					try {
+						rrs = new RowReferenceSet(adapterFactory.createNew(result));
+						currentEtag = rrs.getEtag();
+						view.showInfo(rows.size() + " " + DisplayConstants.ROWS_DELETED, "");
+						rerunCurrentQuery();
+					} catch (JSONObjectAdapterException e) {
+						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);			
+					}
+
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_DELETE_ROWS + ": " + caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
 	}
 
 	
@@ -491,6 +536,5 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		}
 		return null;
 	}
-
 
 }

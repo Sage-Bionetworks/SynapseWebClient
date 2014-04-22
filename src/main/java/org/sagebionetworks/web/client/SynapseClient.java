@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -333,4 +334,6 @@ public interface SynapseClient extends RemoteService {
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
+	
+	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
 }

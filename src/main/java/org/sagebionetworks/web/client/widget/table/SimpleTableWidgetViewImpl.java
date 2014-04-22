@@ -64,6 +64,7 @@ import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
@@ -116,6 +117,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SynapseJSNIUtils jsniUtils;	
 	List<TableModel> currentPage;
 	Button addRowBtn;
+	Button deleteRowBtn;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
@@ -181,7 +183,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		btn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {				
-				presenter.retryCurrentQuery();
+				presenter.rerunCurrentQuery();
 			}
 		});
 		allRowContainer.add(btn);
@@ -189,8 +191,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 		for(ColumnModel col : columns) idToCol.put(col.getId(), col);
 
+		FlowPanel panel = new FlowPanel();
+		panel.addStyleName("panel panel-default panel-body margin-top-15");
 		BootstrapTable table = new BootstrapTable();
-		table.addStyleName("margin-top-15");
 		table.setWidth("100%");		
 		table.getColumnFormatter().setWidth(0, "10%");
 		table.getColumnFormatter().setWidth(1, "90%");
@@ -220,11 +223,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					}
 				}
 			}
-			allRowContainer.add(table);
+			panel.add(table);
 		} else {
 			// show empty
-			allRowContainer.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
+			panel.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
 		}	
+		allRowContainer.add(panel);
 	}
 
 	private void showAddColumnsView(boolean canEdit) {
@@ -310,7 +314,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					
 					@Override
 					public void invoke() {
-						presenter.retryCurrentQuery();
+						presenter.rerunCurrentQuery();
 					}
 				});
 			
@@ -400,6 +404,21 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		// Add a selection model so we can select cells.
 		selectionModel = new MultiSelectionModel<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setSelectionModel(selectionModel, DefaultSelectionEventManager.<TableModel> createCheckboxManager());
+		selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {
+				for(HasData<TableModel> hd : dataProvider.getDataDisplays()) {
+					for(TableModel model : hd.getVisibleItems()) {
+						if(selectionModel.isSelected(model)) {
+							setSelectionButtonVisibility(true);
+							return;
+						}					
+					}
+				}
+				// none selected
+				setSelectionButtonVisibility(false);				
+			}			
+		});
 		
 	    // Add a ColumnSortEvent.AsyncHandler to connect sorting to the
 	    // AsyncDataPRrovider.
@@ -419,6 +438,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	}
 
+	private void setSelectionButtonVisibility(boolean show) {
+		deleteRowBtn.setVisible(show);
+	}
+	
 	/**
 	 * Create an AsyncDataProvider that updates the Data in the view when requested
 	 * @return
@@ -583,9 +606,39 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			}
 		});
 		
+		deleteRowBtn = DisplayUtils.createButton(DisplayConstants.DELETE_SELECTED, ButtonType.DANGER);
+		deleteRowBtn.addStyleName("margin-right-5");
+		deleteRowBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+		    	presenter.deleteRows(getSelectedRows());
+			}
+		});
+		deleteRowBtn.setVisible(false);
+		
 		buttonToolbar.add(showColumnsBtn);		
 		buttonToolbar.add(addRowBtn);
+		buttonToolbar.add(deleteRowBtn);
 	}
+	
+	/**
+	 * Get the currently selected rows
+	 * @return
+	 */
+	private List<TableModel> getSelectedRows() {
+		List<TableModel> selected = new ArrayList<TableModel>();		
+		if(selectionModel != null && dataProvider != null && dataProvider.getDataDisplays() != null) {
+			for(HasData<TableModel> hd : dataProvider.getDataDisplays()) {
+				for(TableModel model : hd.getVisibleItems()) {
+					if(selectionModel.isSelected(model)) {
+						selected.add(model);
+					}					
+				}
+			}
+		}		
+		return selected;
+	}
+
 	
 	/**
 	 * Builds a widget for the column editor/view panel

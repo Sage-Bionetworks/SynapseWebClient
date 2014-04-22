@@ -753,6 +753,9 @@ public class DisplayConstants {
 	public static final String ROW = "Row";
 	public static final String COLUMN = "Column";
 	public static final String VALUE = "Value";
+	public static final String DELETE_SELECTED = "Delete Selected";
+	public static final String ERROR_DELETE_ROWS = "Error deleting rows";
+	public static final String ROWS_DELETED = "Rows Deleted";
 
 }
 

@@ -24,11 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.SynapseTableUnavilableException;
+import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
@@ -1212,7 +1211,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			JSONObject entity = synapseClient.getEntity(repoUri);
 			return entity.toString();
-		} catch (SynapseTableUnavilableException e) {
+		} catch (SynapseTableUnavailableException e) {
 			handleTableUnavailableException(e);
 			//TableUnavilableException is thrown in line above, should never reach the next line
 			return null;
@@ -2613,7 +2612,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						&& countSet.getRows().get(0).getValues().size() > 0) {					
 					totalRowCount = Integer.parseInt(countSet.getRows().get(0).getValues().get(0));							
 				}
-			} catch (SynapseTableUnavilableException e) {
+			} catch (SynapseTableUnavailableException e) {
 				handleTableUnavailableException(e);
 			} catch (SynapseException e) {
 				logError(e.getMessage());
@@ -2628,7 +2627,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			RowSet rs = synapseClient.queryTableEntity(executedQuery);
 			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-		} catch (SynapseTableUnavilableException e) {
+		} catch (SynapseTableUnavailableException e) {
 			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2639,8 +2638,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
 	}
 
-	private void handleTableUnavailableException(
-			SynapseTableUnavilableException e) throws TableUnavilableException {
+	private void handleTableUnavailableException(SynapseTableUnavailableException e) throws TableUnavilableException {
 		try {
 			throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
 		} catch (JSONObjectAdapterException e1) {
@@ -2688,6 +2686,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+
+	@Override
+	public String deleteRowsFromTable(String toDelete) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RowReferenceSet toDeleteSet = new RowReferenceSet(adapterFactory.createNew(toDelete));
+			RowReferenceSet responseSet = synapseClient.deleteRowsFromTable(toDeleteSet);			
+			return responseSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseTableUnavailableException e) {
+			try {
+				throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			} catch (JSONObjectAdapterException e1) {
+				throw new TableUnavilableException(e.getMessage());
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());		
+		}		
 	}
 	
 }

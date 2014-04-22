@@ -31,7 +31,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 
 		void query(String query);
 
-		void retryCurrentQuery();
+		void rerunCurrentQuery();
 
 		void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback);
 		
@@ -40,6 +40,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col, AsyncCallback<String> callback);
 
 		void updateColumnOrder(List<String> columnIds);
+
+		void deleteRows(List<TableModel> selectedRows);
 
 	}
 	
