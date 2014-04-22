@@ -40,5 +40,10 @@ public class TableUtilsTest {
 		assertEquals("v2", row.getValues().get(1));
 		assertEquals(null, row.getValues().get(2));		
 	}
-	
+
+	@Test
+	public void testEscapeColumnName() {
+		assertEquals("\"name with spaces\"", TableUtils.escapeColumnName("name with spaces"));
+		assertEquals("\"name with \"\" quotes\"", TableUtils.escapeColumnName("name with \" quotes"));
+	}
 }

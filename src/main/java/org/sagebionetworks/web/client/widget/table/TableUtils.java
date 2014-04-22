@@ -81,6 +81,13 @@ public class TableUtils {
 		derivedCol.setName(resultColumnId);
 		derivedCol.setColumnType(ColumnType.STRING);
 		return derivedCol;
+	}
+
+	public static String escapeColumnName(String name) {
+		String escaped = name;
+		if(name.contains("\"")) 
+			escaped = name.replaceAll("\"", "\"\"");		
+		return "\"" + escaped + "\"";
 	}	
 
 	

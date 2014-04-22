@@ -478,7 +478,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					ColumnModel model = columnToModel.get(columnSortInfo
 							.getColumn());
 					if (model != null) {
-						sortedColumnName = model.getName();
+						sortedColumnName = TableUtils.escapeColumnName(model.getName());
 						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
 					}
 				}
