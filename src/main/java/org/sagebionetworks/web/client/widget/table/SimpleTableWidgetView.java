@@ -43,6 +43,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 
 		void deleteRows(List<TableModel> selectedRows);
 
+		void viewRow(List<TableModel> selectedRows);
+
 	}
 	
 	/**

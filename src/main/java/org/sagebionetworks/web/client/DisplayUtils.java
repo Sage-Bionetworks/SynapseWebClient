@@ -2207,4 +2207,15 @@ public class DisplayUtils {
 		 return "<div class=\"alert alert-info\">"+safeHtmlMessage+"</div>";
 	 }
 
+	public static String getTableRowViewAreaToken(String id) {
+		return "row/" + id;
+	}
+
+	public static String getTableRowViewAreaToken(String id, String version) {
+		String str = "row/" + id;
+		if (version != null)
+			str += "/rowversion/" + version;
+		return str;
+	}
+
 }

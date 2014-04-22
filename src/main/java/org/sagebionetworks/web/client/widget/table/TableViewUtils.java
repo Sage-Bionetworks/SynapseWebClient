@@ -474,7 +474,7 @@ public class TableViewUtils {
 	 */
 	private static void checkForTempRowId(final TableModel object, RowReferenceSet result, SynapseView view) {
 		// set rowId if this was a UI added row
-		if(object.getId().startsWith(TableModel.TEMP_ID_PREFIX)) {										
+		if(object.getId() == null) {										
 			if (result != null
 					&& result.getRows() != null
 					&& result.getRows().size() > 0

@@ -7,13 +7,17 @@ import com.google.gwt.view.client.ProvidesKey;
 
 public class TableModel implements Comparable<TableModel> {
 	
-	public static final String TEMP_ID_PREFIX = "__tm";
+	private static final String TEMP_ID_PREFIX = "__tm";
 	
 	// The key provider that provides the unique ID of a contact.
 	public static final ProvidesKey<TableModel> KEY_PROVIDER = new ProvidesKey<TableModel>() {
 		@Override
 		public Object getKey(TableModel item) {
-			return item == null ? null : item.getId();
+			if(item == null || item.id.startsWith(TEMP_ID_PREFIX)) {
+				return null;
+			} else {
+				return item.id;
+			}
 		}
 	};
 
@@ -46,9 +50,10 @@ public class TableModel implements Comparable<TableModel> {
 	}
 	
 	public String getId() {
+		if(id.startsWith(TEMP_ID_PREFIX)) return null;
 		return id;
 	}
-
+	
 	@Override
 	public int compareTo(TableModel o) {
 		return (o == null || o.getId() == null) ? -1 : -o.getId().compareTo(getId());

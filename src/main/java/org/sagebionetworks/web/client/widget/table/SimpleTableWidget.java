@@ -20,6 +20,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -184,9 +186,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	@Override
 	public void updateRow(TableModel rowModel, final AsyncCallback<RowReferenceSet> callback) {		
 		Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);		
-		// rows with temporary ids are new rows
-		if(row != null && row.getRowId() != null && row.getRowId().toString().startsWith(TableModel.TEMP_ID_PREFIX)) 
-			row.setRowId(null); 
 		sendRowToTable(row, currentEtag, currentHeaders, callback);
 	}
 
@@ -270,7 +269,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		toDeleteSet.setHeaders(TableUtils.extractHeaders(tableColumns));
 		final List<RowReference> rows = new ArrayList<RowReference>();
 		for(TableModel model : selectedRows) {
-			if(model != null && model.getId() != null && !model.getId().startsWith(TableModel.TEMP_ID_PREFIX)) {
+			if(model != null && model.getId() != null) {
 				RowReference row = new RowReference();
 				row.setRowId(Long.parseLong(model.getId()));
 				rows.add(row);
@@ -300,6 +299,14 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			});
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
+	}
+
+	@Override
+	public void viewRow(List<TableModel> selectedRows) {
+		if(selectedRows != null && selectedRows.size() > 0 && selectedRows.get(0).getId() != null) {		
+			// only view the first row
+			globalApplicationState.getPlaceChanger().goTo(new Synapse(tableEntityId, null, EntityArea.TABLES, DisplayUtils.getTableRowViewAreaToken(selectedRows.get(0).getId())));
 		}
 	}
 
