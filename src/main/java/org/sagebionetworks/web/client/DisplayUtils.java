@@ -156,6 +156,7 @@ import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -533,12 +534,27 @@ public class DisplayUtils {
 			return;
 		}
 		final Dialog d = new Dialog();
-		d.addStyleName("markdown padding-5");
+		d.addStyleName("padding-5");
 		
 		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
-		HTML content = new HTML(SafeHtmlUtils.htmlEscape(errorMessage));
-		content.addStyleName("margin-10");
-		d.add(content);
+		HTML errorContent = new HTML(getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger") + errorMessage);
+		FlowPanel dialogContent = new FlowPanel();
+		dialogContent.addStyleName("margin-10");
+		dialogContent.add(errorContent);
+		
+		//create text area for steps
+		FlowPanel formGroup = new FlowPanel();
+		formGroup.addStyleName("form-group margin-top-10");
+		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
+		final TextArea textArea = new TextArea();
+		textArea.addStyleName("form-control");
+		textArea.getElement().setAttribute("placeholder", "Steps to reproduce the error");
+		textArea.getElement().setAttribute("rows", "4");
+		formGroup.add(textArea);
+		dialogContent.add(formGroup);
+		
+		d.add(dialogContent);
+		
 		d.setAutoHeight(true);
 		d.setHideOnButtonClick(true);
 		d.setWidth(400);
@@ -554,7 +570,7 @@ public class DisplayUtils {
 	    yesButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				jiraHelper.createIssueOnBackend("step 1: go to coming soon place...", t, errorMessage, new AsyncCallback<Void>() {
+				jiraHelper.createIssueOnBackend(textArea.getValue(), t, errorMessage, new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
 						showInfo("Report sent", "Thank you!");
