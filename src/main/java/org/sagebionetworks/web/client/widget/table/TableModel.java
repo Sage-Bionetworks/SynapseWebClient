@@ -13,11 +13,7 @@ public class TableModel implements Comparable<TableModel> {
 	public static final ProvidesKey<TableModel> KEY_PROVIDER = new ProvidesKey<TableModel>() {
 		@Override
 		public Object getKey(TableModel item) {
-			if(item == null || item.id.startsWith(TEMP_ID_PREFIX)) {
-				return null;
-			} else {
-				return item.id;
-			}
+			return item == null ? null : item.id;
 		}
 	};
 
