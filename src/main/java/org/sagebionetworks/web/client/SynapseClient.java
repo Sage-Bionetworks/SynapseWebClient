@@ -334,6 +334,4 @@ public interface SynapseClient extends RemoteService {
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
-	 
-	public void createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException ;
 }

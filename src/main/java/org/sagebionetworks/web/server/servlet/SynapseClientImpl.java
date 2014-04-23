@@ -2509,7 +2509,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return PortalPropertiesHolder.getProperty(key);
 	}
 
-	private static class PortalPropertiesHolder {
+	public static class PortalPropertiesHolder {
 		private static Properties props;
 		
 		static {
@@ -2522,7 +2522,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 		}
 		
-		private static String getProperty(String key) {
+		public static String getProperty(String key) {
 			return props.getProperty(key);
 		}
 	}
@@ -2699,43 +2699,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return getAPIKey();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	private JiraRestClient initJiraClient() {
-		String jiraBaseURL = getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
-		try {
-			final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
-			URI jiraServerUri = new URI(jiraBaseURL);
-			AnonymousAuthenticationHandler anonymousAuthHandler = new AnonymousAuthenticationHandler();
-			return factory.create(jiraServerUri, anonymousAuthHandler);
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid URL in properties: " + jiraBaseURL);
-		}
-	}
-	
-	@Override
-	public void createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException  {
-		if (jiraClient == null) {
-			jiraClient = initJiraClient();
-		}
-		String projectID = getSynapseProperty(WebConstants.JIRA_PROJECT_ID);
-		String projectKey = getSynapseProperty(WebConstants.JIRA_PROJECT_KEY);
-        IssueRestClient issueClient = jiraClient.getIssueClient();
-        IssueInputBuilder builder = new IssueInputBuilder(projectID, 1L); //1=bug
-        builder.setProjectKey(projectKey);
-        builder.setSummary(summary);
-        builder.setDescription(description);
-        builder.setReporterName(reporter);
-        for (String fieldKey : customFieldValues.keySet()) {
-			builder.setFieldValue(fieldKey, customFieldValues.get(fieldKey));
-		}
-        
-        Promise<BasicIssue> promise = issueClient.createIssue(builder.build());
-        try {
-			BasicIssue createdIssue = promise.get();
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 }

@@ -280,6 +280,4 @@ public interface SynapseClientAsync {
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
-	
-	void createJiraIssue(String summary, String description, String reporter, Map<String, String> fieldValues, AsyncCallback<Void> callback);
 }

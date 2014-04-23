@@ -521,70 +521,78 @@ public class DisplayUtils {
 	public static void showErrorMessage(String message) {
 		com.google.gwt.user.client.Window.alert(message);  
 	}
-	
+
 	/**
 	 * @param t
 	 * @param jiraHelper
 	 * @param profile
-	 * @param friendlyErrorMessage (optional)
+	 * @param friendlyErrorMessage
+	 *            (optional)
 	 */
-	public static void showErrorMessage(final Throwable t, final JiraURLHelper jiraHelper, boolean isLoggedIn, String friendlyErrorMessage) {
+	public static void showErrorMessage(final Throwable t,
+			final JiraURLHelper jiraHelper, boolean isLoggedIn,
+			String friendlyErrorMessage) {
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;
 		}
 		final Dialog d = new Dialog();
 		d.addStyleName("padding-5");
-		
+
 		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
-		HTML errorContent = new HTML(getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger") + errorMessage);
+		HTML errorContent = new HTML(
+				getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger")
+				+ errorMessage);
 		FlowPanel dialogContent = new FlowPanel();
 		dialogContent.addStyleName("margin-10");
 		dialogContent.add(errorContent);
-		
-		//create text area for steps
+
+		// create text area for steps
 		FlowPanel formGroup = new FlowPanel();
 		formGroup.addStyleName("form-group margin-top-10");
 		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
 		final TextArea textArea = new TextArea();
 		textArea.addStyleName("form-control");
-		textArea.getElement().setAttribute("placeholder", "Steps to reproduce the error");
+		textArea.getElement().setAttribute("placeholder","Steps to reproduce the error");
 		textArea.getElement().setAttribute("rows", "4");
 		formGroup.add(textArea);
 		dialogContent.add(formGroup);
-		
+
 		d.add(dialogContent);
-		
+
 		d.setAutoHeight(true);
 		d.setHideOnButtonClick(true);
 		d.setWidth(400);
 		d.setPlain(true);
 		d.setModal(true);
-		d.setLayout(new FitLayout());			    
-	    d.setButtonAlign(HorizontalAlignment.RIGHT);
-	    d.setHeading("Synapse Error");
-        d.yesText = DisplayConstants.SEND_BUG_REPORT;
-        d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
-        d.setButtons(Dialog.YESNO);
-	    com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
-	    yesButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+		d.setLayout(new FitLayout());
+		d.setButtonAlign(HorizontalAlignment.RIGHT);
+		d.setHeading("Synapse Error");
+		d.yesText = DisplayConstants.SEND_BUG_REPORT;
+		d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
+		d.setButtons(Dialog.YESNO);
+		com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
+		yesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
-				jiraHelper.createIssueOnBackend(textArea.getValue(), t, errorMessage, new AsyncCallback<Void>() {
-					@Override
-					public void onSuccess(Void result) {
-						showInfo("Report sent", "Thank you!");
-						
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						//failure to create issue!
-						DisplayUtils.showErrorMessage(caught.getMessage());
-					}
-				});
+				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
+						errorMessage, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								showInfo("Report sent", "Thank you!");
+
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// failure to create issue!
+								DisplayUtils.showErrorMessage(caught
+										.getMessage());
+							}
+						});
 			}
-        });
-        d.show();		
+		});
+		d.show();
 	}
 	
 	public static void showOkCancelMessage(

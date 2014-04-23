@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
@@ -80,18 +81,18 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static int major_priority; 
 
 	private int jiraProjectId;
-	public SynapseClientAsync synapseClient;
+	public JiraClientAsync jiraClient;
 	public GWTWrapper gwt;
 	public AuthenticationController authenticationController;
 	
 	@Inject
 	public JiraURLHelperImpl(
 			JiraGovernanceConstants constants, 
-			SynapseClientAsync synapseClient,
+			JiraClientAsync jiraClient,
 			GWTWrapper gwt, 
 			AuthenticationController authenticationController
 			) {
-		this.synapseClient = synapseClient;
+		this.jiraClient = jiraClient;
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
 		jiraProjectId = constants.jiraProjectId();
@@ -223,7 +224,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	    description.append("\n\n" + stepsToRepro);
 	    description.append("\n\n" + gwt.getCurrentURL());
 	    description.append("\n\n" + stackTrace.toString());
-	    synapseClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
+	    jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
 	}
 
 }
