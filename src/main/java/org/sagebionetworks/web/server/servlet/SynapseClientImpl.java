@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -24,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -130,6 +132,14 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
+import com.atlassian.jira.rest.client.IssueRestClient;
+import com.atlassian.jira.rest.client.JiraRestClient;
+import com.atlassian.jira.rest.client.JiraRestClientFactory;
+import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
+import com.atlassian.jira.rest.client.domain.BasicIssue;
+import com.atlassian.jira.rest.client.domain.input.IssueInputBuilder;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import com.atlassian.util.concurrent.Promise;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -146,6 +156,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	
+	JiraRestClient jiraClient = null;
 	
 	/**
 	 * Injected with Gin
@@ -2690,4 +2702,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	private JiraRestClient initJiraClient() {
+		String jiraBaseURL = getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT);
+		try {
+			final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
+			URI jiraServerUri = new URI(jiraBaseURL);
+			AnonymousAuthenticationHandler anonymousAuthHandler = new AnonymousAuthenticationHandler();
+			return factory.create(jiraServerUri, anonymousAuthHandler);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Invalid URL in properties: " + jiraBaseURL);
+		}
+	}
+	
+	@Override
+	public void createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException  {
+		if (jiraClient == null) {
+			jiraClient = initJiraClient();
+		}
+		String projectID = getSynapseProperty(WebConstants.JIRA_PROJECT_ID);
+		String projectKey = getSynapseProperty(WebConstants.JIRA_PROJECT_KEY);
+        IssueRestClient issueClient = jiraClient.getIssueClient();
+        IssueInputBuilder builder = new IssueInputBuilder(projectID, 1L); //1=bug
+        builder.setProjectKey(projectKey);
+        builder.setSummary(summary);
+        builder.setDescription(description);
+        builder.setReporterName(reporter);
+        for (String fieldKey : customFieldValues.keySet()) {
+			builder.setFieldValue(fieldKey, customFieldValues.get(fieldKey));
+		}
+        
+        Promise<BasicIssue> promise = issueClient.createIssue(builder.build());
+        try {
+			BasicIssue createdIssue = promise.get();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 }

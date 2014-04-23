@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
@@ -11,6 +12,8 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
@@ -41,24 +44,27 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
 	SynapseJSNIUtils synapseJSNIUtils;
+	JiraURLHelper jiraErrorHelper;
+	AuthenticationController authenticationController;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
-			PortalGinInjector ginInjector) {		
+			PortalGinInjector ginInjector,
+			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		
+		this.jiraErrorHelper = jiraErrorHelper;
 		this.provenanceWidget = provenanceWidget;
+		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());		
-		
 	}
 
 	@Override
@@ -73,7 +79,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
-		Window.scrollTo(0, 0); // scroll user to top of page				
+		Window.scrollTo(0, 0); // scroll user to top of page
+		
+		//test error reporting
+	    Throwable t = new SynapseBadRequestException("This was a bad request");
+	    DisplayUtils.showErrorMessage(t, jiraErrorHelper, authenticationController.isLoggedIn(), "Error loading the Coming Soon test place");
 	}
 
 	@Override

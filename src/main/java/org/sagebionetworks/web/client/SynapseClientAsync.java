@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -279,5 +280,6 @@ public interface SynapseClientAsync {
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
-
+	
+	void createJiraIssue(String summary, String description, String reporter, Map<String, String> fieldValues, AsyncCallback<Void> callback);
 }

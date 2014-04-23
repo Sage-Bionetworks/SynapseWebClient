@@ -81,6 +81,7 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -518,6 +519,56 @@ public class DisplayUtils {
 	
 	public static void showErrorMessage(String message) {
 		com.google.gwt.user.client.Window.alert(message);  
+	}
+	
+	/**
+	 * @param t
+	 * @param jiraHelper
+	 * @param profile
+	 * @param friendlyErrorMessage (optional)
+	 */
+	public static void showErrorMessage(final Throwable t, final JiraURLHelper jiraHelper, boolean isLoggedIn, String friendlyErrorMessage) {
+		if (!isLoggedIn) {
+			showErrorMessage(t.getMessage());
+			return;
+		}
+		final Dialog d = new Dialog();
+		d.addStyleName("markdown padding-5");
+		
+		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
+		HTML content = new HTML(SafeHtmlUtils.htmlEscape(errorMessage));
+		content.addStyleName("margin-10");
+		d.add(content);
+		d.setAutoHeight(true);
+		d.setHideOnButtonClick(true);
+		d.setWidth(400);
+		d.setPlain(true);
+		d.setModal(true);
+		d.setLayout(new FitLayout());			    
+	    d.setButtonAlign(HorizontalAlignment.RIGHT);
+	    d.setHeading("Synapse Error");
+        d.yesText = DisplayConstants.SEND_BUG_REPORT;
+        d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
+        d.setButtons(Dialog.YESNO);
+	    com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
+	    yesButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				jiraHelper.createIssueOnBackend("step 1: go to coming soon place...", t, errorMessage, new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						showInfo("Report sent", "Thank you!");
+						
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						//failure to create issue!
+						DisplayUtils.showErrorMessage(caught.getMessage());
+					}
+				});
+			}
+        });
+        d.show();		
 	}
 	
 	public static void showOkCancelMessage(

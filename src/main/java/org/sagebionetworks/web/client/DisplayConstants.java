@@ -499,6 +499,8 @@ public class DisplayConstants {
 	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
+	public static final String SEND_BUG_REPORT = "Send Error Report";
+	public static final String DO_NOT_SEND_BUG_REPORT = "Don't Send";
 	public static final String BUTTON_TEXT_LOGIN = "Login";
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
 	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";

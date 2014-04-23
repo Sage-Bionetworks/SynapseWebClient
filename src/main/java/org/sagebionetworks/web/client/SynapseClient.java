@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -333,4 +334,6 @@ public interface SynapseClient extends RemoteService {
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
+	 
+	public void createJiraIssue(String summary, String description, String reporter, Map<String, String> customFieldValues) throws RestServiceException ;
 }
