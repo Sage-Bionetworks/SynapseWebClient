@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -223,7 +222,8 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	    }
 	    description.append("\n\n" + stepsToRepro);
 	    description.append("\n\n" + gwt.getCurrentURL());
-	    description.append("\n\n" + stackTrace.toString());
+	    description.append("\n\n" + t.getMessage());
+	    description.append("\n" + stackTrace.toString());
 	    jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
 	}
 
