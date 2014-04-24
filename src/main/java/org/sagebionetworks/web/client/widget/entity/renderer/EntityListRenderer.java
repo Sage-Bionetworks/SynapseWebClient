@@ -164,7 +164,8 @@ public class EntityListRenderer extends LayoutContainer {
 	 */
 	private LayoutContainer initTable(boolean canEdit) {
 
-		table = new BootstrapTable();			
+		table = new BootstrapTable();
+		table.addStyleName("table-striped table-bordered table-condensed");
 		List<String> headerRow = new ArrayList<String>();
 		headerRow.add(HEADER_NAME_IDX, HEADER_NAME);
 		headerRow.add(HEADER_DOWNLOAD_IDX, HEADER_DOWNLOAD);
