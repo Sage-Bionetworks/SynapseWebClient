@@ -26,11 +26,6 @@ public class JiraClientImpl extends RemoteServiceServlet implements JiraClient {
 		this.jiraJavaClient = jiraJavaClient;
 	}
 	
-	
-	private void initJiraClient() {
-		jiraJavaClient = new JiraJavaClientImpl();
-	}
-
 	@Override
 	public void createJiraIssue(
 			String summary, 
@@ -58,7 +53,6 @@ public class JiraClientImpl extends RemoteServiceServlet implements JiraClient {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
 	
 	/**
 	 * Validate that the service is ready to go.
