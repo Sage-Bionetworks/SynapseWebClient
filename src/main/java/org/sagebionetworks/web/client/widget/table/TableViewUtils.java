@@ -13,6 +13,8 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView.Presenter;
 
@@ -46,6 +48,7 @@ public class TableViewUtils {
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
+	static PortalGinInjector ginInjector;
 	
 	static final Map<ColumnType,String> columnToDisplayName;
 	static final Map<ColumnType,Integer> columnToDisplayWidth;
@@ -75,7 +78,10 @@ public class TableViewUtils {
 		return columnToDisplayWidth.containsKey(type) ? columnToDisplayWidth.get(type).intValue() : 150;
 	}
 	
-	public static Column<TableModel, ?> getColumn(ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
+	public static Column<TableModel, ?> getColumn(String tableEntityId,
+			ColumnModel col, boolean canEdit, final RowUpdater rowUpdater,
+			CellTable<TableModel> cellTable, SynapseView view,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		// any restrained column, regardless of type
 		if(canEdit && col.getEnumValues() != null && col.getEnumValues().size() > 0)
 			return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box
@@ -91,7 +97,7 @@ public class TableViewUtils {
 			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable, view); 
 			else return configSimpleText(col, canEdit, rowUpdater, cellTable, view);			
 		} else if(col.getColumnType() == ColumnType.FILEHANDLEID) {
-			return configFileHandle(col, canEdit, rowUpdater, cellTable, view);  
+			return configFileHandle(tableEntityId, col, canEdit, rowUpdater, cellTable, view, synapseJSNIUtils);  
 		} else if(col.getColumnType() == ColumnType.DATE) {
 			return configDateColumn(col, canEdit, rowUpdater, cellTable, view);
 		} else {
@@ -413,16 +419,41 @@ public class TableViewUtils {
 		return column;
 	}
 	
-	private static Column<TableModel, ?> configFileHandle(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {		
-	Column<TableModel, String> column = new Column<TableModel, String>(new FileHandleCell(canEdit)) {
-		@Override
-		public String getValue(TableModel object) {
-			return object.getNeverNull(col.getId());
+	private static Column<TableModel, ?> configFileHandle(final String tableEntityId, final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view, SynapseJSNIUtils synapseJSNIUtils) {
+		final FileHandleCell cell = new FileHandleCell(canEdit, synapseJSNIUtils);
+		Column<TableModel, TableCellFileHandle> column = new Column<TableModel, TableCellFileHandle>(cell) {
+			@Override
+			public TableCellFileHandle getValue(TableModel object) {
+				return new TableCellFileHandle(tableEntityId, col.getId(), object.getId(), object.getVersionNumber(), object.get(col.getId()));				
+			}
+		};
+		column.setSortable(false);
+		if(canEdit) {
+			column.setFieldUpdater(new FieldUpdater<TableModel, TableCellFileHandle>() {
+						@Override
+						public void update(int index, final TableModel object, TableCellFileHandle updatedFileHandle) {
+							view.showErrorMessage("column.setFieldUpdater");
+							if(updatedFileHandle.getFileHandleId() != null) {
+								object.put(col.getId(), updatedFileHandle.getFileHandleId());
+								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
+									@Override
+									public void onSuccess(RowReferenceSet result) { 
+										checkForTempRowId(object, result, view);
+									}
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										// TODO : need to clear view data?
+										//cell.clearViewData(TableModel.KEY_PROVIDER.getKey(object));
+										cellTable.redraw();
+									}
+								});
+							}
+						}
+					});
 		}
-	};
-	// TODO : complete
-	return column;
 		
+		return column;		
 	}	
 	
 	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {		

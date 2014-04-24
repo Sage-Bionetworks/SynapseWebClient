@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
@@ -123,9 +124,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	Button viewRowBtn;
 	
 	@Inject
-	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
+	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.jsniUtils = jsniUtils;
+		TableViewUtils.ginInjector = ginInjector;
 		
 		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
@@ -141,7 +143,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void createNewTable(List<ColumnModel> columns, RowSet rowset,
+	public void createNewTable(String tableEntityId, List<ColumnModel> columns, RowSet rowset,
 			int totalRowCount, boolean canEdit, String queryString,
 			QueryDetails queryDetails) {		
 		this.columns = columns;				
@@ -163,7 +165,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
 		buildTable(queryDetails, totalRowCount, canEdit);
-		buildColumns(columns, canEdit);			
+		buildColumns(tableEntityId, columns, canEdit);			
 		hideLoading();		 	    
 	}
 	
@@ -229,6 +231,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 						// regular string
 						table.setText(i, 1, value);
 					}
+				} else {
+					table.setText(i,  1, "");
 				}
 			}
 			panel.add(table);
@@ -519,7 +523,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param columns
 	 * @param canEdit
 	 */
-	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
+	private void buildColumns(String tableEntityId, List<ColumnModel> columns, boolean canEdit) {
 		// checkbox selector
 		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
 				new CheckboxCell(true, false)) {
@@ -554,7 +558,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		}
 		
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, canEdit, rowUpdater, cellTable, this);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(tableEntityId, model, canEdit, rowUpdater, cellTable, this, jsniUtils);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			
@@ -890,7 +894,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
-		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE }) {			
+		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE , ColumnType.FILEHANDLEID }) {			
 			String radioLabel = TableViewUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			

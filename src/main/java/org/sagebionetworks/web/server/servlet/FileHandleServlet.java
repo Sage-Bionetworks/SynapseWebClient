@@ -38,8 +38,10 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -129,6 +131,11 @@ public class FileHandleServlet extends HttpServlet {
 			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 			String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
 			
+			// table params
+			String tableColumnId = request.getParameter(WebConstants.TABLE_COLUMN_ID);
+			String tableRowId = request.getParameter(WebConstants.TABLE_ROW_ID);
+			String tableRowVersionNumbrer = request.getParameter(WebConstants.TABLE_ROW_VERSION_NUMBER);
+			
 			String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
 			String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 			String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
@@ -165,19 +172,36 @@ public class FileHandleServlet extends HttpServlet {
 				//Done
 			}
 			else if (entityId != null) {
-				if (entityVersion == null) {
-					if (isPreview)
-						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
-					else
-						resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
-				}
-					
-				else {
-					Long versionNumber = Long.parseLong(entityVersion);
-					if (isPreview)
-						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
-					else
-						resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+				// Table File Handle
+				if(tableColumnId != null || tableRowId != null || tableRowVersionNumbrer != null) {
+					if(tableColumnId != null && tableRowId != null && tableRowVersionNumbrer != null) {
+						try {
+							RowReference row = new RowReference();
+							row.setRowId(Long.parseLong(tableRowId));
+							row.setVersionNumber(Long.parseLong(tableRowVersionNumbrer));
+							if(isPreview) resolvedUrl = client.getTableFileHandlePreviewTemporaryUrl(entityId, row, tableColumnId);
+							else resolvedUrl = client.getTableFileHandleTemporaryUrl(entityId, row, tableColumnId);
+						} catch (NumberFormatException e) {
+							throw new ServletException(WebConstants.TABLE_ROW_ID +" and "+ WebConstants.TABLE_ROW_VERSION_NUMBER + " must be Long values. Actual values: "+ tableRowId +", " + tableRowVersionNumbrer);
+						}
+							
+					} else {
+						throw new ServletException("All table fields must be defined, if any are defined: " + WebConstants.TABLE_COLUMN_ID +", "+ WebConstants.TABLE_ROW_ID +", "+ WebConstants.TABLE_ROW_VERSION_NUMBER);
+					}
+				} else {
+					// Entity
+					if (entityVersion == null) {
+						if (isPreview)
+							resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
+						else
+							resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
+					} else {
+						Long versionNumber = Long.parseLong(entityVersion);
+						if (isPreview)
+							resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
+						else
+							resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+					}
 				}
 			} else if (teamId != null) {
 				try {

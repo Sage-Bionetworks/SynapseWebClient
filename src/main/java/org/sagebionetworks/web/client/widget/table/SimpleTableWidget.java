@@ -369,7 +369,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						}
 						
 						// send to view
-						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
+						view.createNewTable(table.getId(), displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
 					}
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);

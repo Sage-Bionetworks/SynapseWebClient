@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.table;
 
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -20,11 +22,11 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
-public class FileHandleCell extends AbstractCell<String> {
+public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
 
-	
-	
 	boolean canEdit = false;
+	SynapseJSNIUtils synapseJSNIUtils;
+	
     /**
      * The HTML templates used to render the cell.
      */
@@ -45,7 +47,7 @@ public class FileHandleCell extends AbstractCell<String> {
      */
     private static Templates templates = GWT.create(Templates.class);
 
-    public FileHandleCell(boolean canEdit) {
+    public FileHandleCell(boolean canEdit, SynapseJSNIUtils synapseJSNIUtils) {
       /*
        * Sink the click and keydown events. We handle click events in this
        * class. AbstractCell will handle the keydown event and call
@@ -54,6 +56,7 @@ public class FileHandleCell extends AbstractCell<String> {
        */
       super("click", "keydown");
       this.canEdit = canEdit;
+      this.synapseJSNIUtils = synapseJSNIUtils;
     }
 
     /**
@@ -62,8 +65,8 @@ public class FileHandleCell extends AbstractCell<String> {
      * to the outermost element that the Cell rendered.
      */
     @Override
-    public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event,
-        ValueUpdater<String> valueUpdater) {
+    public void onBrowserEvent(Context context, Element parent, TableCellFileHandle value, NativeEvent event,
+        ValueUpdater<TableCellFileHandle> valueUpdater) {
       // Let AbstractCell handle the keydown event.
       super.onBrowserEvent(context, parent, value, event, valueUpdater);
 
@@ -74,53 +77,25 @@ public class FileHandleCell extends AbstractCell<String> {
         Element image = parent.getFirstChildElement();
         Element uploadLink = image.getNextSiblingElement();
         if (image.equals(Element.as(eventTarget))) {
-        	//doAction(value, valueUpdater);
-        	//Window.alert("image clicked for "+ context.getKey());
+        	// do nothing at the moment
         } else if(uploadLink.isOrHasChild(Element.as(eventTarget))) {
-        	Window.alert("link clicked for " + context.getKey() + ", col:" + context.getColumn());
+        	showUploadForm(value, valueUpdater);
         }
       }
     }
 
     @Override
-    public void render(final Context context, final String value, final SafeHtmlBuilder sb) {
+    public void render(final Context context, final TableCellFileHandle value, final SafeHtmlBuilder sb) {
     	if(value == null) return;
-    	 
-    	// TODO: replace fake getFileHandle method with call to synapse client
-    	getFileHandle(value, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				// TODO : actually properly create file handles
-				S3FileHandle fileHandle = new S3FileHandle();
-				fileHandle.setFileName("logo11w.png");
-				PreviewFileHandle previewFileHandle = new PreviewFileHandle();
-				previewFileHandle.setContentType("image/png"); 
-				renderFileHandle(previewFileHandle, fileHandle, context, sb);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				renderFileHandle(null, null, context, sb);
-			}
-		});
+    	boolean hasPreview = false; // TODO : how to determine this?
     	
-    }
-
-	private void renderFileHandle(PreviewFileHandle previewFileHandle,
-			S3FileHandle fileHandle, Context context, SafeHtmlBuilder sb) {
-    	boolean hasPreview = (previewFileHandle != null 
-    			&& previewFileHandle.getContentType() != null 
-    			&& DisplayUtils.isRecognizedImageContentType(previewFileHandle.getContentType())) ? true : false;
-    	 
-    	// TODO : get real URLs from file handles
-//    	String previewUrl = DisplayUtils.createPreviewFileHandleUrl(previewFileHandle);
-//    	String fullUrl = DisplayUtils.createPreviewFileHandleUrl(fileHandle);
-    	SafeUri previewUri = UriUtils.fromString("https://www.google.com/images/srpr/logo11w.png");
-    	SafeUri fullUri = UriUtils.fromString("https://www.google.com/images/srpr/logo11w.png");
-    	SafeHtml filename = fileHandle.getFileName() != null ? SafeHtmlUtils.fromString(fileHandle.getFileName()) : SafeHtmlUtils.EMPTY_SAFE_HTML;
-    	
+    	// TODO : also how to determine 
+    	SafeUri previewUri = UriUtils.fromString(DisplayUtils.createTableCellFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), value, true, true));
+    	SafeUri fullUri = UriUtils.fromString(DisplayUtils.createTableCellFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), value, true, true));
+    	SafeHtml filename = SafeHtmlUtils.fromSafeConstant(DisplayConstants.DOWNLOAD_FILE_LOCAL);
     	SafeHtml preview; 
     	if(fullUri != null) {
-    		SafeHtml download = SafeHtmlUtils.fromSafeConstant("<span class=\"margin-top-5\" style=\"color:#000; font-size:16px;\"> "+ filename.asString() +"</span>");
+    		SafeHtml download = value.getFileHandleId() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromSafeConstant("<span class=\"margin-top-5\" style=\"color:#000; font-size:16px;\"> "+ filename.asString() +"</span>");
     		if(hasPreview) {    			
 	    		preview = templates.previewImageLink(fullUri, previewUri, download);	    				
 	    	} else {
@@ -131,36 +106,15 @@ public class FileHandleCell extends AbstractCell<String> {
     	}
     	
 		sb.append(preview);
-		// TODO : open up file uplaoder and replace correct cell value
-		if(canEdit) sb.appendHtmlConstant("<div class=\"margin-top-5\"><a id='"+ context.getKey() +"'>Upload File</a></div>");      
-		
-		
-	}
-
-    
-    // TODO : remove, this is a placeholder 
-    private void getFileHandle(String value, AsyncCallback<String> asyncCallback) {
-		asyncCallback.onSuccess("");
-	}
-
-	/**
-     * onEnterKeyDown is called when the user presses the ENTER key will the
-     * Cell is selected. You are not required to override this method, but its a
-     * common convention that allows your cell to respond to key events.
-     */
-    @Override
-    protected void onEnterKeyDown(Context context, Element parent, String value, NativeEvent event,
-        ValueUpdater<String> valueUpdater) {
-      doAction(value, valueUpdater);
+		String uploadLabel = value.getFileHandleId() == null ? "Upload File" : "Update File";
+		if(canEdit) sb.appendHtmlConstant("<div class=\"margin-top-5\"><a class=\"btn btn-default btn-sm\" id='"+ context.getKey() +"'>"+ uploadLabel +"</a></div>");      		
     }
+    
 
-    private void doAction(String value, ValueUpdater<String> valueUpdater) {
-      // Alert the user that they selected a value.
-      Window.alert("clicked filehandle URL: " + value);
+    private void showUploadForm(TableCellFileHandle value, ValueUpdater<TableCellFileHandle> valueUpdater) {
+    	// TODO : show file uploader
+      Window.alert("show Upload form: " + value);
 
-      // Trigger a value updater. In this case, the value doesn't actually
-      // change, but we use a ValueUpdater to let the app know that a value
-      // was clicked.
       if(valueUpdater != null) valueUpdater.update(value);
     }
   }

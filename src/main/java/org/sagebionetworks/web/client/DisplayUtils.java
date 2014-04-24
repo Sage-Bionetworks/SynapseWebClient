@@ -86,6 +86,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
@@ -1704,6 +1705,26 @@ public class DisplayUtils {
 				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
+
+	/**
+	 * Create the url to a Table cell file handle.
+	 * @param baseFileHandleUrl
+	 * @param details
+	 * @param preview
+	 * @param proxy
+	 * @return
+	 */
+	public static String createTableCellFileEntityUrl(String baseFileHandleUrl, TableCellFileHandle details, boolean preview, boolean proxy){		
+		//if preview, then avoid cache
+		String nocacheParam = preview ? getParamForNoCaching()  : "";
+		return baseFileHandleUrl + "?" +
+				WebConstants.ENTITY_PARAM_KEY + "=" + details.getTableId() + "&" +
+				WebConstants.TABLE_COLUMN_ID + "=" + details.getColumnId() + "&" +
+				WebConstants.TABLE_ROW_ID + "=" + details.getRowId() + "&" +
+				WebConstants.TABLE_ROW_VERSION_NUMBER + "=" + details.getVersionNumber() + "&" +
+				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + nocacheParam;
+	}
 	
 	/**
 	 * Create the url to a Team icon filehandle.
@@ -2159,17 +2180,6 @@ public class DisplayUtils {
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
 		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
 		//alternatively, could use the gwt I18n Messages class client side
-	}
-
-	public static String createPreviewFileHandleUrl(
-			PreviewFileHandle previewFileHandle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static String createPreviewFileHandleUrl(S3FileHandle fileHandle) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){

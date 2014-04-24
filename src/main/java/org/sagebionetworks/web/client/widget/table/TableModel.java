@@ -19,21 +19,23 @@ public class TableModel implements Comparable<TableModel> {
 
 	private static int sequence = 0;
 	private String id;
+	private String versionNumber;
 	private Map<String, String> map;
 
 	/**
 	 * Construct TableModel with default (temp) id
 	 */
 	public TableModel() {
-		this(TEMP_ID_PREFIX + String.valueOf(++sequence));
+		this(TEMP_ID_PREFIX + String.valueOf(++sequence), null);
 	}
 
 	/**
 	 * Construct TableModel with provided id
 	 * @param id - identified for this model. MUST be unique amongst other table models! If not, use the default constructor.
 	 */
-	public TableModel(String id) {
+	public TableModel(String id, String versionNumber) {
 		this.id = id;
+		this.versionNumber = versionNumber;
 		map = new HashMap<String, String>();
 	}
 
@@ -48,8 +50,12 @@ public class TableModel implements Comparable<TableModel> {
 	public String getId() {
 		if(id.startsWith(TEMP_ID_PREFIX)) return null;
 		return id;
-	}
+	}	
 	
+	public String getVersionNumber() {
+		return versionNumber;
+	}
+
 	@Override
 	public int compareTo(TableModel o) {
 		return (o == null || o.getId() == null) ? -1 : -o.getId().compareTo(getId());
@@ -76,5 +82,12 @@ public class TableModel implements Comparable<TableModel> {
 	public boolean containsKey(String key) {
 		return map.containsKey(key);
 	}
+
+	@Override
+	public String toString() {
+		return "TableModel [id=" + id + ", versionNumber=" + versionNumber
+				+ ", map=" + map + "]";
+	}
+	
 	
 }

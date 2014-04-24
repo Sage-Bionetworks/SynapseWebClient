@@ -218,5 +218,10 @@ public class WebConstants {
 		"<div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_2+"</div>" +
 		"<div class=\"margin-top-left-10\">" +DisplayConstants.CERTIFICATION_MESSAGE_3 +
 		"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> "+DisplayConstants.CERTIFICATION_MESSAGE_4+"</li><li>"+DisplayConstants.CERTIFICATION_MESSAGE_5+"</li></ul></div></blockquote>";
+
+	public static final String TABLE_COLUMN_ID = "columnId";
+	public static final String TABLE_ROW_ID = "rowId";
+	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
+
 	
 }
