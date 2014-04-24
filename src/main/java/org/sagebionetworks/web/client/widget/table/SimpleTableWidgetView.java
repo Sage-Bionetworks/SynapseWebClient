@@ -49,6 +49,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param columns
 	 * @param rowset 
 	 * @param canEdit
+	 * @param isRowQuery 
 	 * @param limit 
 	 * @param offset 
 	 */
@@ -59,4 +60,6 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	public void showQueryProblem(String message);
 
 	public void insertNewRow(TableModel model);
+
+	public void createRowView(List<ColumnModel> tableColumns, RowSet rowset);
 }

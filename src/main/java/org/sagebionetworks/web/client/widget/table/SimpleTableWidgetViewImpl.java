@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
@@ -29,8 +31,6 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -95,6 +95,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SimplePanel pagerContainer;
 	@UiField
 	SimplePanel errorMessage;
+	@UiField
+	HTMLPanel allRowContainer;
 
 	FlowPanel addColumnPanel;
 	List<ColumnDetailsPanel> columnPanelOrder;
@@ -134,19 +136,20 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails) {		
+	public void createNewTable(List<ColumnModel> columns, RowSet rowset,
+			int totalRowCount, boolean canEdit, String queryString,
+			QueryDetails queryDetails) {		
 		this.columns = columns;				
 		this.initialLoad = rowset;
 		this.initialDetails = queryDetails;
 		columnToModel.clear();
-				
-		// clear out old column editor view
-		columnEditorBuilt = false;
+
+		// Render Table			
+		columnEditorBuilt = false; // clear out old column editor view
 		setupTableEditorToolbar(columns);
 		if(canEdit) {
 			buttonToolbar.setVisible(true);
 		}
-
 		
 		// special cases display user instructions instead of empty table
 		if(columns == null || (columns != null && columns.size() == 0)) {
@@ -157,11 +160,73 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
 		buildTable(queryDetails, totalRowCount);
-		buildColumns(columns, canEdit);
-		 	    
-	    hideLoading();
+		buildColumns(columns, canEdit);			
+		hideLoading();		 	    
 	}
 	
+
+	@Override
+	public void createRowView(List<ColumnModel> columns, RowSet rowset) {
+		// Render Row
+		buildRowView(columns, rowset);
+		tableContainer.setVisible(false);
+		allRowContainer.setVisible(true);
+		hideLoading();
+	}
+
+	
+	private void buildRowView(List<ColumnModel> columns, RowSet rowset) {
+		allRowContainer.clear();
+		Button btn = DisplayUtils.createIconButton(DisplayConstants.BACK_TO_TABLE, ButtonType.DEFAULT, "glyphicon-chevron-left");
+		btn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {				
+				presenter.retryCurrentQuery();
+			}
+		});
+		allRowContainer.add(btn);
+		
+		final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
+		for(ColumnModel col : columns) idToCol.put(col.getId(), col);
+
+		BootstrapTable table = new BootstrapTable();
+		table.addStyleName("margin-top-15");
+		table.setWidth("100%");		
+		table.getColumnFormatter().setWidth(0, "10%");
+		table.getColumnFormatter().setWidth(1, "90%");
+		if(rowset != null && rowset.getHeaders() != null && rowset.getRows() != null && rowset.getHeaders().size() > 0 && rowset.getRows().size() > 0) {			
+			List<String> headers = rowset.getHeaders();
+			List<String> headerNamesRow = new ArrayList<String>();
+			headerNamesRow.add(DisplayConstants.COLUMN);
+			headerNamesRow.add(DisplayConstants.VALUE);			
+			List<List<String>> tableHeaderRows = new ArrayList<List<String>>();
+			tableHeaderRows.add(headerNamesRow);
+			table.setHeaders(tableHeaderRows);			
+
+			// add data to table
+			for(int i=0; i<headers.size(); i++) {
+				table.setHTML(i, 0, "<span class=\"strong\">"+idToCol.get(headers.get(i)).getName()+"</span>");
+				ColumnModel col = idToCol.get(headers.get(i));
+				String value = rowset.getRows().get(0).getValues().get(i);
+				if(value != null) {
+					if(col != null && col.getColumnType() == ColumnType.DATE) {											
+						table.setText(i, 1, TableViewUtils.getDateStringTableFormat(new Date(Long.parseLong(value))));
+					} else if(col != null && col.getColumnType() == ColumnType.FILEHANDLEID) {					
+						// TODO : render filehandle
+						//table.setWidget(i, 1, new Image...);
+					} else {
+						// regular string
+						table.setText(i, 1, value);
+					}
+				}
+			}
+			allRowContainer.add(table);
+		} else {
+			// show empty
+			allRowContainer.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
+		}	
+	}
+
 	private void showAddColumnsView(boolean canEdit) {
 		hideLoading();		
 		pagerContainer.setVisible(false);		
@@ -201,6 +266,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	@Override
 	public void showLoading() {
+		allRowContainer.setVisible(false);
 		queryField.setEnabled(false);
 		tableContainer.setVisible(false);
 		pagerContainer.setVisible(false);

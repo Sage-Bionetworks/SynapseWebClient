@@ -225,6 +225,9 @@ public class TableViewUtils {
 		return columns;
 	}
 
+	public static String getDateStringTableFormat(Date date) {
+		return DATE_FORMAT.format(date);
+	}
 	
 	/*
 	 * ----- Column Type methods -----
@@ -297,9 +300,7 @@ public class TableViewUtils {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									object.put(col.getId(), original);
-									((EditTextCell)cell).clearViewData(TableModel.KEY_PROVIDER.getKey(object));
-									cellTable.redraw();
+									revertEditTextCell(col, cellTable, cell, object, original);
 								}
 							});
 						}
@@ -338,19 +339,37 @@ public class TableViewUtils {
 									
 									@Override
 									public void onFailure(Throwable caught) {
-										object.put(col.getId(), original);
-										((EditTextCell)cell).clearViewData(TableModel.KEY_PROVIDER.getKey(object));
-										cellTable.redraw();
+										revertEditTextCell(col, cellTable, cell, object, original);
 									}
+
 								});
 							} catch(NumberFormatException e) {
 								view.showErrorMessage(DisplayConstants.NUMBER_NOT_VALID + ": "+ value);
+								revertEditTextCell(col, cellTable, cell, object, original);
 							}
-						}
+						}						
 					});
 		}
 		return column;
 	}
+	
+	/**
+	 * revert a cell back to its original value
+	 * @param col
+	 * @param cellTable
+	 * @param cell
+	 * @param object
+	 * @param original
+	 */
+	private static void revertEditTextCell(final ColumnModel col,
+			final CellTable<TableModel> cellTable,
+			final AbstractCell<String> cell, final TableModel object,
+			final String original) {
+		object.put(col.getId(), original);
+		((EditTextCell)cell).clearViewData(TableModel.KEY_PROVIDER.getKey(object));
+		cellTable.redraw();
+	}
+
 
 	private static Column<TableModel, String> configBooleanCombo(final ColumnModel col, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {
 		List<String> trueFalse = Arrays.asList(new String[] { TRUE, FALSE });
@@ -364,6 +383,7 @@ public class TableViewUtils {
 				else return FALSE;
 			}
 		};
+		column.setSortable(true);
 		column.setFieldUpdater(new FieldUpdater<TableModel, String>() {
 			@Override
 			public void update(int index, final TableModel object, String value) {				
@@ -517,4 +537,5 @@ public class TableViewUtils {
 		else stringLength.setValue(DEFAULT_STRING_MAX_LENGTH);
 	}
 
+	
 }
