@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.UserPreferences;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -242,16 +241,16 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public boolean isHideQuizReminder() {
 		//TODO: currently only in test website until tutorial content is ready
 		if (DisplayUtils.isInTestWebsite(cookies)) {
-			if (profile != null) {
-				if (profile.getPreferences() != null) {
-					Boolean hideQuizReminder = profile.getPreferences().getDontShowCertifiedUserReminder();
-					return hideQuizReminder != null ? hideQuizReminder : false;
-				} else {
-					//if the preferences have not been set, then show the certification reminder
-					return false;
-				}
-			} else
-				return false;
+//			if (profile != null) {
+//				if (profile.getPreferences() != null) {
+//					Boolean hideQuizReminder = profile.getPreferences().getDontShowCertifiedUserReminder();
+//					return hideQuizReminder != null ? hideQuizReminder : false;
+//				} else {
+//					//if the preferences have not been set, then show the certification reminder
+//					return false;
+//				}
+//			} else
+			return false;
 		} else {
 			return true;
 		}
@@ -261,24 +260,24 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void setHideQuizReminder(boolean hideQuizReminder) {
 		//update profile if hiding
-		if (hideQuizReminder) {
-			if (profile.getPreferences() == null) 
-				profile.setPreferences(new UserPreferences());
-			UserPreferences notificationSettings = profile.getPreferences();
-			notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
-			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your preferences", "");
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			};
-			updateProfile(profile, profileUpdatedCallback);
-		}
+//		if (hideQuizReminder) {
+//			if (profile.getPreferences() == null) 
+//				profile.setPreferences(new UserPreferences());
+//			UserPreferences notificationSettings = profile.getPreferences();
+//			notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
+//			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
+//				@Override
+//				public void onSuccess(Void result) {
+//					view.showInfo("Successfully updated your preferences", "");
+//				}
+//				
+//				@Override
+//				public void onFailure(Throwable caught) {
+//					view.showErrorMessage(caught.getMessage());
+//				}
+//			};
+//			updateProfile(profile, profileUpdatedCallback);
+//		}
 	}
 
 	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {

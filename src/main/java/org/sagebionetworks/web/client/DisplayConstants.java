@@ -750,6 +750,11 @@ public class DisplayConstants {
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
 	public static final String MAX_STRING_LENGTH = "Maximum String Length";
 	public static final String MAX_LENGTH_REASON = "The smaller the maximum length, the more columns you can include in your table.";
+	public static final String BACK_TO_TABLE = "Back to Table";
+	public static final String ROW_IS_EMPTY = "Row is empty";
+	public static final String ROW = "Row";
+	public static final String COLUMN = "Column";
+	public static final String VALUE = "Value";
 
 }
 
