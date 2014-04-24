@@ -37,7 +37,7 @@ public class TableCellFileHandle {
 	public String getFileHandleId() {
 		return fileHandleId;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "TableCellFileHandle [tableId=" + tableId + ", columnId="

@@ -758,6 +758,7 @@ public class DisplayConstants {
 	public static final String ROWS_DELETED = "Rows Deleted";
 	public static final String VIEW_ROW = "View Row";
 	public static final String CONFIRM_DELETE_SELECTED = "Are you sure you want to delete the selected rows?";
+	public static final String DOWNLOAD = "Download";
 
 }
 

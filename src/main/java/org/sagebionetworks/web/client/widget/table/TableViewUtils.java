@@ -266,7 +266,7 @@ public class TableViewUtils {
 					rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 						@Override
 						public void onSuccess(RowReferenceSet result) { 
-							checkForTempRowId(object, result, view);
+							updateRowIdAndVersion(object, result, view);
 						}
 						
 						@Override
@@ -301,7 +301,7 @@ public class TableViewUtils {
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
 								public void onSuccess(RowReferenceSet result) {
-									checkForTempRowId(object, result, view);
+									updateRowIdAndVersion(object, result, view);
 								}
 
 								@Override
@@ -340,7 +340,7 @@ public class TableViewUtils {
 								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 									@Override
 									public void onSuccess(RowReferenceSet result) { 
-										checkForTempRowId(object, result, view);
+										updateRowIdAndVersion(object, result, view);
 									}
 									
 									@Override
@@ -404,7 +404,7 @@ public class TableViewUtils {
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
 					public void onSuccess(RowReferenceSet result) {
-						checkForTempRowId(object, result, view);
+						updateRowIdAndVersion(object, result, view);
 					}
 					
 					@Override
@@ -420,10 +420,10 @@ public class TableViewUtils {
 	}
 	
 	private static Column<TableModel, ?> configFileHandle(final String tableEntityId, final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view, SynapseJSNIUtils synapseJSNIUtils) {
-		final FileHandleCell cell = new FileHandleCell(canEdit, synapseJSNIUtils);
+		final FileHandleCell cell = new FileHandleCell(canEdit, synapseJSNIUtils, ginInjector);
 		Column<TableModel, TableCellFileHandle> column = new Column<TableModel, TableCellFileHandle>(cell) {
 			@Override
-			public TableCellFileHandle getValue(TableModel object) {
+			public TableCellFileHandle getValue(TableModel object) {				
 				return new TableCellFileHandle(tableEntityId, col.getId(), object.getId(), object.getVersionNumber(), object.get(col.getId()));				
 			}
 		};
@@ -431,21 +431,19 @@ public class TableViewUtils {
 		if(canEdit) {
 			column.setFieldUpdater(new FieldUpdater<TableModel, TableCellFileHandle>() {
 						@Override
-						public void update(int index, final TableModel object, TableCellFileHandle updatedFileHandle) {
-							view.showErrorMessage("column.setFieldUpdater");
+						public void update(final int index, final TableModel object, TableCellFileHandle updatedFileHandle) {						
 							if(updatedFileHandle.getFileHandleId() != null) {
 								object.put(col.getId(), updatedFileHandle.getFileHandleId());
 								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 									@Override
 									public void onSuccess(RowReferenceSet result) { 
-										checkForTempRowId(object, result, view);
+										updateRowIdAndVersion(object, result, view);										
+										cellTable.redrawRow(index); // to get updated URLs												
 									}
 									
 									@Override
 									public void onFailure(Throwable caught) {
-										// TODO : need to clear view data?
-										//cell.clearViewData(TableModel.KEY_PROVIDER.getKey(object));
-										cellTable.redraw();
+										cellTable.redraw();											
 									}
 								});
 							}
@@ -478,7 +476,7 @@ public class TableViewUtils {
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
 								public void onSuccess(RowReferenceSet result) { 
-									checkForTempRowId(object, result, view);
+									updateRowIdAndVersion(object, result, view);
 								}
 								
 								@Override
@@ -496,26 +494,22 @@ public class TableViewUtils {
 	}	
 
 	/**
-	 * Check if the TableModel has a temporary id and if so replace with first row in the RowReferenceSet
-	 * This is for new Rows added to the view after their first cell update. Future updates need to reference the actual rowId
+	 * Update row's id and version. 
+	 * If this is a new Row, rowId and version are added to the view after their first cell update. Future updates need to reference the actual rowId
 	 * created in the first update otherwise duplicate rows will result.
 	 * @param object
 	 * @param result
 	 * @param view
 	 */
-	private static void checkForTempRowId(final TableModel object, RowReferenceSet result, SynapseView view) {
+	private static void updateRowIdAndVersion(final TableModel object, RowReferenceSet result, SynapseView view) {
 		// set rowId if this was a UI added row
-		if(object.getId() == null) {										
 			if (result != null
 					&& result.getRows() != null
 					&& result.getRows().size() > 0
 					&& result.getRows().get(0) != null
 					&& result.getRows().get(0).getRowId() != null) {
 				object.setId(result.getRows().get(0).getRowId().toString());
-			} else {
-				// page reload should fix any row id/view sync issues
-				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-			}
+				object.setVersionNumber(result.getRows().get(0).getVersionNumber().toString());
 		}
 	}
 	

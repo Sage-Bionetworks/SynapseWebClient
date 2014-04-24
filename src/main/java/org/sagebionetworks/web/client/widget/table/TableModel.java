@@ -52,6 +52,10 @@ public class TableModel implements Comparable<TableModel> {
 		return id;
 	}	
 	
+	public void setVersionNumber(String versionNumber) {
+		this.versionNumber = versionNumber;
+	}
+
 	public String getVersionNumber() {
 		return versionNumber;
 	}

@@ -29,6 +29,8 @@ public class WebConstants {
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
 	
+	public static final String PREVIEW_UNAVAILABLE_PATH = "images/preview_unavailable.png";
+	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
