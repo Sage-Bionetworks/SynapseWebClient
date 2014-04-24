@@ -12,7 +12,7 @@
 	float: right !important;
 	margin-bottom: 1em;
 	margin-top: 2em;
-	font-size:0.625em;
+	font-size:10px;
 	font-family:Oswald;
 }
 
@@ -55,7 +55,7 @@
 
 .sendButton {
 	display: block;
-	font-size: 1.313em;
+	font-size: 16pt;
 }
 
 /** Most GWT widgets already have a style name defined */
@@ -103,7 +103,7 @@
 	text-align: left;
 	width: 100px;
 	color: #939598;
-	font-size: 0.688em;
+	font-size: 11px;
 }
 
 .nobordertable-imp td {
@@ -118,7 +118,7 @@
 .downloadLink,.downloadLink:hover,.downloadLink:visited { text-decoration:underline; margin-left:5px;}
 
 /* header links. transition from grey to black on hover, don't underline */
-.headerLink { line-height: 25px; font-size: 0.813em; font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
+.headerLink { line-height: 25px; font-size: 13px; font-weight: bold; color: #6e6e6e; padding: 0px 2px 0px 4px;
   -o-transition:.2s;
   -ms-transition:.2s;
   -moz-transition:.2s;
@@ -182,7 +182,7 @@
 
 .smallGreyText {
     color: #717171;
-	font-size: 0.625em;
+	font-size: 10px;
 }
 
 .codeContent {
@@ -193,7 +193,7 @@
     overflow: auto;
     padding: 3px;
     text-align: left;
-    font-size: 0.688em;
+    font-size: 11px;
     line-height: 13px;
     text-align: left;
     
@@ -351,7 +351,7 @@
 	cursor: auto;
 	display: inline-block;
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 0.813em;
+	font-size: 13px;
 	font-weight: normal;
 	height: 26px;
 	letter-spacing: normal;
@@ -674,7 +674,7 @@ a.shortBtn {
     top: -1px;
     left: -1px;
     padding: 3px 7px;
-    font-size: 0.750em;
+    font-size: 12px;
     background-color: whiteSmoke;
     border: 1px solid #DDD;
     color: #9DA0A4;
@@ -685,14 +685,14 @@ a.shortBtn {
 
 .markdownEditor {
     font-family: Lucida Console, monospace !important;
-    font-size: 0.813em;
+    font-size: 13px;
 }
 
 .markdown {
 	word-wrap:break-word;
 	overflow: hidden;
 	text-align: justify;
-	font-size: 0.813em; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
+	font-size: 13px; /* Body font-size defined by Svarog as 12px, bootstrap as 14px */
 }
 
 .markdown ol { 
@@ -738,7 +738,7 @@ a.shortBtn {
 
 .wiki-description {
 	color: #000000;
-	font-size: 0.813em;
+	font-size: 13px;
 }
 
 .entity-description-preview-wrapper {
@@ -765,34 +765,34 @@ a.shortBtn {
 }
 
 .font-size-32 {
-	font-size: 2em;
+	font-size: 32px;
 	font-family: Yanone Kaffeesatz;
 }
 
 .font-size-150 {
-	font-size: 9.375em;
+	font-size: 150px;
 }
 
 .font-size-90 {
-	font-size: 5.625em;
+	font-size: 90px;
 }
 
 .font-size-58 {
-	font-size: 3.625em;
+	font-size: 58px;
 }
 .font-size-22 {
-	font-size: 1.375em;
+	font-size: 22px;
 }
 
 .font-size-17 {
-	font-size: 1.063em;
+	font-size: 17px;
 }
 
 .font-size-15 {
-	font-size: 0.938em;
+	font-size: 15px;
 }
 .font-size-13 {
-	font-size: 0.813em;
+	font-size: 13px;
 }
 
 .vertical-align-bottom {
@@ -950,7 +950,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .wikiVersionNotice {
-	font-size: 0.938em;		
+	font-size: 15px;		
 }
 
 .markdownHi
@@ -1089,7 +1089,7 @@ ol.lowerroman {
 
 .pagesTree span{
 	font-family: Verdana,Arial,sans-serif;
-	font-size: 0.813em;
+	font-size: 13px;
 }
 
 .padding-top-15 {
@@ -1115,11 +1115,11 @@ ol.lowerroman {
 
 
 .howToUseLink {
-	font-size: 1em;
+	font-size: 16px;
 	font-style: normal !important;
 }
 .whatIsSynapseText {
-	font-size: 0.813em;
+	font-size: 13px;
 }
 
 
@@ -1138,7 +1138,7 @@ ol.lowerroman {
 }
 
 .form-signinInput {
-  font-size: 1em;
+  font-size: 16px;
   height: auto;
   margin-bottom: 15px;
   padding: 7px 9px;
@@ -1204,7 +1204,7 @@ ol.lowerroman {
 .text-align-center { text-align: center;}
 
 .highlighted-version {
-    font-size: 0.688em !important;
+    font-size: 11px !important;
     color: black !important;
 }
 
@@ -1225,7 +1225,7 @@ ol.lowerroman {
 	text-align: left;
 	white-space: normal;
 	
-	font-size: 0.688em;
+	font-size: 11px;
 	opacity: 0.8;
 	filter: alpha(opacity = 80);
 	max-width: 200px;
@@ -1295,7 +1295,7 @@ ol.lowerroman {
     left: 6px;
 	color: #333333;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 1.313em;
+    font-size: 21px;
     font-weight: 200;
     line-height: 1.4;
     padding: 3px 7px;
@@ -1318,7 +1318,7 @@ ol.lowerroman {
 .fixedWidthFont {
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
     font-family: Courier,monospace;
-    font-size: 0.688em;
+    font-size: 11px;
     line-height: 13px;
 }	
 
@@ -1364,7 +1364,7 @@ ol.lowerroman {
 }
 
 .member-search-button {
-	font-size: 0.750em !important;
+	font-size: 12px !important;
 	width: 120px;
 }
 
@@ -1381,7 +1381,7 @@ ol.lowerroman {
   bottom: 0;
   left: 0;
   width: 15%;
-  font-size: 1.250em;
+  font-size: 20px;
   color: #ffffff;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
@@ -1449,7 +1449,7 @@ ol.lowerroman {
 	color: #555;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: 100;
-    font-size: 1.750em;
+    font-size: 28px;
     cursor: pointer;
 }
 a.projectTitle:hover {
@@ -1474,12 +1474,12 @@ a.projectTitle:hover {
 .tabLabel {
     position: absolute;
     top: 4px;
-    font-size: 0.625em;
+    font-size: 10px;
 }
 
 .entity-tab {
 	width: 140px;
-	font-size: 1em;	
+	font-size: 16px;	
 }
 
 .rowAdaptiveHeight{
@@ -1525,7 +1525,7 @@ a.projectTitle:hover {
 
 .updateTeamIconLink {
 	padding: 0px 0px 10px 0px;
-	font-size:	0.750em;
+	font-size: 12px;
 }
 
 .dropText-10 {
@@ -1550,7 +1550,7 @@ a.projectTitle:hover {
 
 .signin-panel .form-control {
   position: relative;
-  font-size: 1em;
+  font-size: 16px;
   height: auto;
   padding: 10px;
   -webkit-box-sizing: border-box;
@@ -1696,7 +1696,7 @@ a.projectTitle:hover {
 /*===========*/
 
 .largeIconButton {
-	font-size: 1.375em;
+	font-size: 22px;
 	line-height: 30px;
 	color: #000000;
 }
