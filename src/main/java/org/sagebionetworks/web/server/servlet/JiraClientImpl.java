@@ -39,7 +39,8 @@ public class JiraClientImpl extends RemoteServiceServlet implements JiraClient {
 		IssueRestClient issueClient = jiraJavaClient.getIssueClient();
 		IssueInputBuilder builder = new IssueInputBuilder(projectID, 1L); // 1=bug
 		builder.setProjectKey(projectKey);
-		builder.setSummary(summary);
+		//newlines are not allowed in the summary
+		builder.setSummary(summary.replaceAll("\n", " "));
 		builder.setDescription(description);
 		builder.setReporterName(reporter);
 		for (String fieldKey : customFieldValues.keySet()) {
