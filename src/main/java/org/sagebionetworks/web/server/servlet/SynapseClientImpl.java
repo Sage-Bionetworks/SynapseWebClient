@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -93,6 +92,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -2639,8 +2639,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
 	}
 
-	private void handleTableUnavailableException(
-			SynapseTableUnavailableException e) throws TableUnavilableException {
+	private void handleTableUnavailableException(SynapseTableUnavailableException e) throws TableUnavilableException {
 		try {
 			throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
 		} catch (JSONObjectAdapterException e1) {
@@ -2687,6 +2686,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return getAPIKey();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public String deleteRowsFromTable(String toDelete) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RowReferenceSet toDeleteSet = new RowReferenceSet(adapterFactory.createNew(toDelete));
+			RowReferenceSet responseSet = synapseClient.deleteRowsFromTable(toDeleteSet);			
+			return responseSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseTableUnavailableException e) {
+			try {
+				throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			} catch (JSONObjectAdapterException e1) {
+				throw new TableUnavilableException(e.getMessage());
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());		
+		}		
+	}
+
+	@Override
+	public String getTableFileHandle(String fileHandlesToFindRowReferenceSet) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RowReferenceSet fileHandlesToFind = new RowReferenceSet(adapterFactory.createNew(fileHandlesToFindRowReferenceSet));
+			TableFileHandleResults results = synapseClient.getFileHandlesFromTable(fileHandlesToFind);
+			return results.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	

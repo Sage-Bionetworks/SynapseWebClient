@@ -13,6 +13,8 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView.Presenter;
 
@@ -46,6 +48,7 @@ public class TableViewUtils {
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
+	static PortalGinInjector ginInjector;
 	
 	static final Map<ColumnType,String> columnToDisplayName;
 	static final Map<ColumnType,Integer> columnToDisplayWidth;
@@ -75,7 +78,10 @@ public class TableViewUtils {
 		return columnToDisplayWidth.containsKey(type) ? columnToDisplayWidth.get(type).intValue() : 150;
 	}
 	
-	public static Column<TableModel, ?> getColumn(ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {
+	public static Column<TableModel, ?> getColumn(String tableEntityId,
+			ColumnModel col, boolean canEdit, final RowUpdater rowUpdater,
+			CellTable<TableModel> cellTable, SynapseView view,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		// any restrained column, regardless of type
 		if(canEdit && col.getEnumValues() != null && col.getEnumValues().size() > 0)
 			return configComboString(col, canEdit, rowUpdater, cellTable, view); // Enum combo box
@@ -91,7 +97,7 @@ public class TableViewUtils {
 			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable, view); 
 			else return configSimpleText(col, canEdit, rowUpdater, cellTable, view);			
 		} else if(col.getColumnType() == ColumnType.FILEHANDLEID) {
-			return configFileHandle(col, canEdit, rowUpdater, cellTable, view);  
+			return configFileHandle(tableEntityId, col, canEdit, rowUpdater, cellTable, view, synapseJSNIUtils);  
 		} else if(col.getColumnType() == ColumnType.DATE) {
 			return configDateColumn(col, canEdit, rowUpdater, cellTable, view);
 		} else {
@@ -260,7 +266,7 @@ public class TableViewUtils {
 					rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 						@Override
 						public void onSuccess(RowReferenceSet result) { 
-							checkForTempRowId(object, result, view);
+							updateRowIdAndVersion(object, result, view);
 						}
 						
 						@Override
@@ -295,7 +301,7 @@ public class TableViewUtils {
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
 								public void onSuccess(RowReferenceSet result) {
-									checkForTempRowId(object, result, view);
+									updateRowIdAndVersion(object, result, view);
 								}
 
 								@Override
@@ -334,7 +340,7 @@ public class TableViewUtils {
 								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 									@Override
 									public void onSuccess(RowReferenceSet result) { 
-										checkForTempRowId(object, result, view);
+										updateRowIdAndVersion(object, result, view);
 									}
 									
 									@Override
@@ -398,7 +404,7 @@ public class TableViewUtils {
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
 					public void onSuccess(RowReferenceSet result) {
-						checkForTempRowId(object, result, view);
+						updateRowIdAndVersion(object, result, view);
 					}
 					
 					@Override
@@ -413,16 +419,42 @@ public class TableViewUtils {
 		return column;
 	}
 	
-	private static Column<TableModel, ?> configFileHandle(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, CellTable<TableModel> cellTable, SynapseView view) {		
-	Column<TableModel, String> column = new Column<TableModel, String>(new FileHandleCell(canEdit)) {
-		@Override
-		public String getValue(TableModel object) {
-			return object.getNeverNull(col.getId());
+	private static Column<TableModel, ?> configFileHandle(
+			final String tableEntityId, final ColumnModel col, boolean canEdit,
+			final RowUpdater rowUpdater, final CellTable<TableModel> cellTable,
+			final SynapseView view, SynapseJSNIUtils synapseJSNIUtils) {
+		final FileHandleCell cell = new FileHandleCell(canEdit, synapseJSNIUtils, ginInjector);
+		Column<TableModel, TableCellFileHandle> column = new Column<TableModel, TableCellFileHandle>(cell) {
+			@Override
+			public TableCellFileHandle getValue(TableModel object) {				
+				return new TableCellFileHandle(tableEntityId, col.getId(), object.getId(), object.getVersionNumber(), object.get(col.getId()));				
+			}
+		};
+		column.setSortable(false);
+		if(canEdit) {
+			column.setFieldUpdater(new FieldUpdater<TableModel, TableCellFileHandle>() {
+						@Override
+						public void update(final int index, final TableModel object, TableCellFileHandle updatedFileHandle) {						
+							if(updatedFileHandle.getFileHandleId() != null) {
+								object.put(col.getId(), updatedFileHandle.getFileHandleId());
+								rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
+									@Override
+									public void onSuccess(RowReferenceSet result) { 
+										updateRowIdAndVersion(object, result, view);										
+										cellTable.redrawRow(index); // to get updated URLs												
+									}
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										cellTable.redraw();											
+									}
+								});
+							}
+						}
+					});
 		}
-	};
-	// TODO : complete
-	return column;
 		
+		return column;		
 	}	
 	
 	private static Column<TableModel, Date> configDateColumn(final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view) {		
@@ -447,7 +479,7 @@ public class TableViewUtils {
 							rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 								@Override
 								public void onSuccess(RowReferenceSet result) { 
-									checkForTempRowId(object, result, view);
+									updateRowIdAndVersion(object, result, view);
 								}
 								
 								@Override
@@ -465,26 +497,22 @@ public class TableViewUtils {
 	}	
 
 	/**
-	 * Check if the TableModel has a temporary id and if so replace with first row in the RowReferenceSet
-	 * This is for new Rows added to the view after their first cell update. Future updates need to reference the actual rowId
+	 * Update row's id and version. 
+	 * If this is a new Row, rowId and version are added to the view after their first cell update. Future updates need to reference the actual rowId
 	 * created in the first update otherwise duplicate rows will result.
 	 * @param object
 	 * @param result
 	 * @param view
 	 */
-	private static void checkForTempRowId(final TableModel object, RowReferenceSet result, SynapseView view) {
+	private static void updateRowIdAndVersion(final TableModel object, RowReferenceSet result, SynapseView view) {
 		// set rowId if this was a UI added row
-		if(object.getId().startsWith(TableModel.TEMP_ID_PREFIX)) {										
 			if (result != null
 					&& result.getRows() != null
 					&& result.getRows().size() > 0
 					&& result.getRows().get(0) != null
 					&& result.getRows().get(0).getRowId() != null) {
 				object.setId(result.getRows().get(0).getRowId().toString());
-			} else {
-				// page reload should fix any row id/view sync issues
-				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-			}
+				object.setVersionNumber(result.getRows().get(0).getVersionNumber().toString());
 		}
 	}
 	
