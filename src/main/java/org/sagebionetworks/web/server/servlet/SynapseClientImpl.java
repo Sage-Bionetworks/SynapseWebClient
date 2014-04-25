@@ -129,7 +129,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
-import com.atlassian.jira.rest.client.JiraRestClient;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -147,7 +146,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
 	
-	JiraRestClient jiraClient = null;
 	
 	/**
 	 * Injected with Gin
