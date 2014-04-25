@@ -586,8 +586,9 @@ public class DisplayUtils {
 							@Override
 							public void onFailure(Throwable caught) {
 								// failure to create issue!
-								DisplayUtils.showErrorMessage(caught
-										.getMessage());
+								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
+								+ caught.getMessage() +"\n\n"
+								+ textArea.getValue());
 							}
 						});
 			}
