@@ -14,14 +14,14 @@ public class TableUtilsTest {
 	
 	List<String> headers = Arrays.asList(new String[] { "1", "2", "3" });
 	Long rowId = 1234L;
-	Long version = 456L;
+	String version = "456";
 
 	
 	@Test
 	public void convertRowToModelTest() {
 		Row row = new Row();
 		row.setRowId(rowId);
-		row.setVersionNumber(version);
+		row.setVersionNumber(Long.parseLong(version));
 		row.setValues(Arrays.asList(new String []{ "v1", "v2", null }));
 		TableModel model = TableUtils.convertRowToModel(headers, row);
 		assertEquals(rowId.toString(), model.getId());
@@ -42,7 +42,7 @@ public class TableUtilsTest {
 		assertEquals("v1", row.getValues().get(0));
 		assertEquals("v2", row.getValues().get(1));
 		assertEquals(null, row.getValues().get(2));		
-		assertEquals(version, row.getVersionNumber());
+		assertEquals(version, row.getVersionNumber().toString());
 	}
 
 	@Test
