@@ -81,6 +81,7 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
@@ -155,6 +156,7 @@ import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -518,6 +520,80 @@ public class DisplayUtils {
 	
 	public static void showErrorMessage(String message) {
 		com.google.gwt.user.client.Window.alert(message);  
+	}
+
+	/**
+	 * @param t
+	 * @param jiraHelper
+	 * @param profile
+	 * @param friendlyErrorMessage
+	 *            (optional)
+	 */
+	public static void showErrorMessage(final Throwable t,
+			final JiraURLHelper jiraHelper, boolean isLoggedIn,
+			String friendlyErrorMessage) {
+		if (!isLoggedIn) {
+			showErrorMessage(t.getMessage());
+			return;
+		}
+		final Dialog d = new Dialog();
+		d.addStyleName("padding-5");
+
+		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
+		HTML errorContent = new HTML(
+				getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger")
+				+ errorMessage);
+		FlowPanel dialogContent = new FlowPanel();
+		dialogContent.addStyleName("margin-10");
+		dialogContent.add(errorContent);
+
+		// create text area for steps
+		FlowPanel formGroup = new FlowPanel();
+		formGroup.addStyleName("form-group margin-top-10");
+		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
+		final TextArea textArea = new TextArea();
+		textArea.addStyleName("form-control");
+		textArea.getElement().setAttribute("placeholder","Steps to reproduce the error");
+		textArea.getElement().setAttribute("rows", "4");
+		formGroup.add(textArea);
+		dialogContent.add(formGroup);
+
+		d.add(dialogContent);
+
+		d.setAutoHeight(true);
+		d.setHideOnButtonClick(true);
+		d.setWidth(400);
+		d.setPlain(true);
+		d.setModal(true);
+		d.setLayout(new FitLayout());
+		d.setButtonAlign(HorizontalAlignment.RIGHT);
+		d.setHeading("Synapse Error");
+		d.yesText = DisplayConstants.SEND_BUG_REPORT;
+		d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
+		d.setButtons(Dialog.YESNO);
+		com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
+		yesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
+						errorMessage, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								showInfo("Report sent", "Thank you!");
+
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// failure to create issue!
+								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
+								+ caught.getMessage() +"\n\n"
+								+ textArea.getValue());
+							}
+						});
+			}
+		});
+		d.show();
 	}
 	
 	public static void showOkCancelMessage(

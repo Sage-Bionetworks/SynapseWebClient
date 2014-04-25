@@ -12,6 +12,9 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
+import org.sagebionetworks.web.server.servlet.JiraClientImpl;
+import org.sagebionetworks.web.server.servlet.JiraJavaClient;
+import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
@@ -122,6 +125,11 @@ public class PortalServletModule extends ServletModule {
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
+		
+		//Jira client service mapping
+		bind(JiraClientImpl.class).in(Singleton.class);
+		serve("/Portal/jira").with(JiraClientImpl.class);
+		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
 		
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);

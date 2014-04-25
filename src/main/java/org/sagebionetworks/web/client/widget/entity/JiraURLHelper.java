@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 public interface JiraURLHelper {
 
 	public String createFlagIssue(String userEmailAddress,
@@ -12,4 +14,11 @@ public interface JiraURLHelper {
 			String userDisplayName, String userEmailAddress,
 			String dataObjectId, String accessRequirementId);
 
+	public void createIssueOnBackend(
+			String stepsToRepro,
+			Throwable t,
+			String errorMessage,
+			AsyncCallback<Void> callback);
+
+	
 }

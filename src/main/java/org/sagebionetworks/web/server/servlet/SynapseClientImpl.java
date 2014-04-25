@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sagebionetworks.StackConfiguration;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -146,6 +145,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	
 	
 	/**
 	 * Injected with Gin
@@ -2497,7 +2497,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return PortalPropertiesHolder.getProperty(key);
 	}
 
-	private static class PortalPropertiesHolder {
+	public static class PortalPropertiesHolder {
 		private static Properties props;
 		
 		static {
@@ -2510,7 +2510,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 		}
 		
-		private static String getProperty(String key) {
+		public static String getProperty(String key) {
 			return props.getProperty(key);
 		}
 	}
@@ -2689,5 +2689,4 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
 }

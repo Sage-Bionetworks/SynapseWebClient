@@ -355,7 +355,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
-		
 		// ClientCache
 		bind(ClientCacheImpl.class).in(Singleton.class);
 		bind(ClientCache.class).to(ClientCacheImpl.class);

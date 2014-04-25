@@ -279,5 +279,4 @@ public interface SynapseClientAsync {
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
-
 }
