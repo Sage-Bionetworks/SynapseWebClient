@@ -44,7 +44,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		container.addStyleName("nobordertable-imp displayInline");
 		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
-		addStyleName("displayInline");
+		addStyleName("inline-block");
 	}
 	
 	@Override
