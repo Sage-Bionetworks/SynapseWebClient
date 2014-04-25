@@ -283,6 +283,6 @@ public interface SynapseClientAsync {
 
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
 
-	
+	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
 
 }

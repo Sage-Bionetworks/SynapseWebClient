@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
@@ -13,6 +14,7 @@ import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -307,6 +309,51 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		if(selectedRows != null && selectedRows.size() > 0 && selectedRows.get(0).getId() != null) {		
 			// only view the first row
 			globalApplicationState.getPlaceChanger().goTo(new Synapse(tableEntityId, null, EntityArea.TABLES, DisplayUtils.getTableRowViewAreaToken(selectedRows.get(0).getId())));
+		}
+	}
+
+	@Override
+	public void getFileHandle(String rowId, String versionNumber, String colId,
+			final AsyncCallback<FileHandle> callback) {
+		try {
+			RowReferenceSet fileHandlesToFind = new RowReferenceSet();		
+			fileHandlesToFind.setTableId(tableEntityId);		
+			fileHandlesToFind.setEtag(currentEtag);
+			fileHandlesToFind.setHeaders(Arrays.asList(new String [] { colId }));
+			List<RowReference> rows = new ArrayList<RowReference>();
+			RowReference row = new RowReference();
+			row.setRowId(Long.parseLong(rowId));
+			row.setVersionNumber(Long.parseLong(versionNumber));
+			rows.add(row);
+			fileHandlesToFind.setRows(rows);
+		
+			synapseClient.getTableFileHandle(fileHandlesToFind.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						if(result == null) onFailure(null);
+						
+						TableFileHandleResults results;
+							results = new TableFileHandleResults(adapterFactory.createNew(result));
+						if (results != null
+								&& results.getRows() != null
+								&& results.getRows().size() > 0
+								&& results.getRows().get(0).getList() != null
+								&& results.getRows().get(0).getList().size() > 0) {
+							// send file handle
+							callback.onSuccess(results.getRows().get(0).getList().get(0));
+						}
+					} catch (Exception e) {
+						onFailure(null);
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} catch (Exception e) {
+			callback.onFailure(null);
 		}
 	}
 

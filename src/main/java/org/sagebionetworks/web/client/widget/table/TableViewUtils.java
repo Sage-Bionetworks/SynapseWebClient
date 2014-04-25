@@ -419,7 +419,10 @@ public class TableViewUtils {
 		return column;
 	}
 	
-	private static Column<TableModel, ?> configFileHandle(final String tableEntityId, final ColumnModel col, boolean canEdit, final RowUpdater rowUpdater, final CellTable<TableModel> cellTable, final SynapseView view, SynapseJSNIUtils synapseJSNIUtils) {
+	private static Column<TableModel, ?> configFileHandle(
+			final String tableEntityId, final ColumnModel col, boolean canEdit,
+			final RowUpdater rowUpdater, final CellTable<TableModel> cellTable,
+			final SynapseView view, SynapseJSNIUtils synapseJSNIUtils) {
 		final FileHandleCell cell = new FileHandleCell(canEdit, synapseJSNIUtils, ginInjector);
 		Column<TableModel, TableCellFileHandle> column = new Column<TableModel, TableCellFileHandle>(cell) {
 			@Override

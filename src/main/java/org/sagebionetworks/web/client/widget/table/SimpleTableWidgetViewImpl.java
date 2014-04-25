@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
@@ -556,7 +557,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		} else {
 			tableContainer.addStyleName("overflow-x-auto");
 		}
-		
+				
 		for(ColumnModel model : columns) {
 			Column<TableModel, ?> column = TableViewUtils.getColumn(tableEntityId, model, canEdit, rowUpdater, cellTable, this, jsniUtils);
 			cellTable.addColumn(column, model.getName());

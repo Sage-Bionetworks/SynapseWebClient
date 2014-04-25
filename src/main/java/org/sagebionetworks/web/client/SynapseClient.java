@@ -336,4 +336,6 @@ public interface SynapseClient extends RemoteService {
 	public String deleteApiKey() throws RestServiceException;
 	
 	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
+	
+	public String getTableFileHandle(String fileHandlesToFindRowReferenceSet) throws RestServiceException;
 }

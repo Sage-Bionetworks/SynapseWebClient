@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
@@ -44,6 +45,8 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void deleteRows(List<TableModel> selectedRows);
 
 		void viewRow(List<TableModel> selectedRows);
+
+		void getFileHandle(String rowId, String versionNumber, String colId, AsyncCallback<FileHandle> callback);
 
 	}
 	

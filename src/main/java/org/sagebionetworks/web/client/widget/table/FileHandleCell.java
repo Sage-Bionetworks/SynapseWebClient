@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -25,6 +26,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -41,9 +43,6 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
     interface Templates extends SafeHtmlTemplates {
     	@SafeHtmlTemplates.Template("<a href=\"{0}\" target=\"_blank\"><img class=\"margin-top-5\" src=\"{1}\"  style=\"max-height:150px; \"/></a><br/><a class=\"btn btn-default btn-sm margin-top-5 margin-right-5\" href=\"{0}\" target=\"_blank\">{2}</a>")
         SafeHtml previewImageLink(SafeUri fullUri, SafeUri previewUri, SafeHtml download); 
-
-    	@SafeHtmlTemplates.Template("<a class=\"btn btn-default btn-sm margin-top-5 margin-right-5\" href=\"{0}\" target=\"_blank\">{1}</a>") 
-        SafeHtml fileLink(SafeUri fullUri, SafeHtml download);     
     }
 
     interface Template extends SafeHtmlTemplates { 
@@ -55,7 +54,7 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
      */
     private static Templates templates = GWT.create(Templates.class);
 
-    public FileHandleCell(boolean canEdit, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
+	public FileHandleCell(boolean canEdit, SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
       /*
        * Sink the click and keydown events. We handle click events in this
        * class. AbstractCell will handle the keydown event and call
@@ -88,30 +87,27 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
       }
     }
     
+    /**
+     * NOTE: this method can not make async calls. Later changes to sb are not rendered
+     */
     @Override
     public void render(final Context context, final TableCellFileHandle value, final SafeHtmlBuilder sb) {
     	if(value == null) return;
-    	boolean hasPreview = true; // TODO : how to determine this?
-    	
-    	// TODO : also how to determine 
     	SafeUri previewUri = UriUtils.fromString(DisplayUtils.createTableCellFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), value, true, true));
     	SafeUri fullUri = UriUtils.fromString(DisplayUtils.createTableCellFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), value, false, true));
     	SafeHtml filename = SafeHtmlUtils.fromSafeConstant(DisplayConstants.DOWNLOAD);
-    	SafeHtml preview; 
+    	final SafeHtml preview; 
     	if(value.getFileHandleId() != null) {
     		SafeHtml download = value.getFileHandleId() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromSafeConstant(filename.asString());
-    		if(hasPreview) {    			
-	    		preview = templates.previewImageLink(fullUri, previewUri, download);	    				
-	    	} else {
-	    		preview = templates.fileLink(fullUri, download);
-	    	}
+    		preview = templates.previewImageLink(fullUri, previewUri, download);	    				
     	} else {
     		preview = SafeHtmlUtils.EMPTY_SAFE_HTML;
     	}
+    	String uploadLabel = value.getFileHandleId() == null ? DisplayConstants.UPLOAD_FILE : DisplayConstants.UPDATE_FILE;
+    	final String uploadLink = "<a class=\"btn btn-default btn-sm margin-top-5\" uploadLink=\"true\">"+ uploadLabel +"</a>";
     	
-		sb.append(preview);
-		String uploadLabel = value.getFileHandleId() == null ? "Upload File" : "Update File";
-		if(canEdit) sb.appendHtmlConstant("<a class=\"btn btn-default btn-sm margin-top-5\" uploadLink=\"true\">"+ uploadLabel +"</a>");      		
+    	sb.append(preview);
+    	if(canEdit) sb.appendHtmlConstant(uploadLink);
     }
 
     /*
