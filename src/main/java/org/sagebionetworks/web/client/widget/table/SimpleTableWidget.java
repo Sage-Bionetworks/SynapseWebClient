@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -19,6 +22,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -174,7 +179,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	}
 	
 	@Override
-	public void retryCurrentQuery() {
+	public void rerunCurrentQuery() {
 		view.showLoading();
 		if(currentQuery == null) currentQuery = getDefaultQuery(tableEntityId);
 		executeQuery(currentQuery, null, null);
@@ -183,9 +188,6 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	@Override
 	public void updateRow(TableModel rowModel, final AsyncCallback<RowReferenceSet> callback) {		
 		Row row = TableUtils.convertModelToRow(currentHeaders, rowModel);		
-		// rows with temporary ids are new rows
-		if(row != null && row.getRowId() != null && row.getRowId().toString().startsWith(TableModel.TEMP_ID_PREFIX)) 
-			row.setRowId(null); 
 		sendRowToTable(row, currentEtag, currentHeaders, callback);
 	}
 
@@ -258,6 +260,103 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		updateTableEntity();
 	}
 
+	/**
+	 * Delete rows from the table
+	 */
+	@Override
+	public void deleteRows(List<TableModel> selectedRows) {
+		RowReferenceSet toDeleteSet = new RowReferenceSet();
+		toDeleteSet.setTableId(tableEntityId);
+		toDeleteSet.setEtag(currentEtag);
+		toDeleteSet.setHeaders(TableUtils.extractHeaders(tableColumns));
+		final List<RowReference> rows = new ArrayList<RowReference>();
+		for(TableModel model : selectedRows) {
+			if(model != null && model.getId() != null) {
+				RowReference row = new RowReference();
+				row.setRowId(Long.parseLong(model.getId()));
+				rows.add(row);
+			}
+		} 
+		toDeleteSet.setRows(rows);
+		
+		try {
+			synapseClient.deleteRowsFromTable(toDeleteSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					RowReferenceSet rrs = null;
+					try {
+						rrs = new RowReferenceSet(adapterFactory.createNew(result));
+						currentEtag = rrs.getEtag();
+						view.showInfo(rows.size() + " " + DisplayConstants.ROWS_DELETED, "");
+						rerunCurrentQuery();
+					} catch (JSONObjectAdapterException e) {
+						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);			
+					}
+
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_DELETE_ROWS + ": " + caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
+	}
+
+	@Override
+	public void viewRow(List<TableModel> selectedRows) {
+		if(selectedRows != null && selectedRows.size() > 0 && selectedRows.get(0).getId() != null) {		
+			// only view the first row
+			globalApplicationState.getPlaceChanger().goTo(new Synapse(tableEntityId, null, EntityArea.TABLES, DisplayUtils.getTableRowViewAreaToken(selectedRows.get(0).getId())));
+		}
+	}
+
+	@Override
+	public void getFileHandle(String rowId, String versionNumber, String colId,
+			final AsyncCallback<FileHandle> callback) {
+		try {
+			RowReferenceSet fileHandlesToFind = new RowReferenceSet();		
+			fileHandlesToFind.setTableId(tableEntityId);		
+			fileHandlesToFind.setEtag(currentEtag);
+			fileHandlesToFind.setHeaders(Arrays.asList(new String [] { colId }));
+			List<RowReference> rows = new ArrayList<RowReference>();
+			RowReference row = new RowReference();
+			row.setRowId(Long.parseLong(rowId));
+			row.setVersionNumber(Long.parseLong(versionNumber));
+			rows.add(row);
+			fileHandlesToFind.setRows(rows);
+		
+			synapseClient.getTableFileHandle(fileHandlesToFind.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					try {
+						if(result == null) onFailure(null);
+						
+						TableFileHandleResults results;
+							results = new TableFileHandleResults(adapterFactory.createNew(result));
+						if (results != null
+								&& results.getRows() != null
+								&& results.getRows().size() > 0
+								&& results.getRows().get(0).getList() != null
+								&& results.getRows().get(0).getList().size() > 0) {
+							// send file handle
+							callback.onSuccess(results.getRows().get(0).getList().get(0));
+						}
+					} catch (Exception e) {
+						onFailure(null);
+					}
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} catch (Exception e) {
+			callback.onFailure(null);
+		}
+	}
+
 	
 	/*
 	 * Private Methods
@@ -317,7 +416,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						}
 						
 						// send to view
-						view.createNewTable(displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
+						view.createNewTable(table.getId(), displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
 					}
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
@@ -491,6 +590,5 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		}
 		return null;
 	}
-
 
 }

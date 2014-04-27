@@ -323,6 +323,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		fileUploadField.addListener(Events.OnChange, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
+				if(fileUploadField.getValue() == null) return;
 				final String fullPath = fileUploadField.getValue();
 				final int lastIndex = fullPath.lastIndexOf('\\');
 				fileName = fullPath.substring(lastIndex + 1);

@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.Timer;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -22,12 +24,14 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -38,8 +42,10 @@ import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
+import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -57,7 +63,7 @@ public class FileHandleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -116,97 +122,160 @@ public class FileHandleServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		String token = getSessionToken(request);
+		SynapseClient client = createNewClient(token);
+		boolean isProxy = false;
+		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
+		if (proxy != null)
+			isProxy = Boolean.parseBoolean(proxy);
+		
+		String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
+		
+		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
+		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
+		
+		// table params
+		String tableColumnId = request.getParameter(WebConstants.TABLE_COLUMN_ID);
+		String tableRowId = request.getParameter(WebConstants.TABLE_ROW_ID);
+		String tableRowVersionNumbrer = request.getParameter(WebConstants.TABLE_ROW_VERSION_NUMBER);
+		
+		String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
+		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
+		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
+		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
+		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
+		URL resolvedUrl = null;
+		
 		try {
-			String token = getSessionToken(request);
-			SynapseClient client = createNewClient(token);
-			boolean isProxy = false;
-			String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
-			if (proxy != null)
-				isProxy = Boolean.parseBoolean(proxy);
+			resolveUrlAndRedirect(request, response, client, isProxy, teamId,
+					entityId, entityVersion, tableColumnId, tableRowId,
+					tableRowVersionNumbrer, ownerId, ownerType, fileName,
+					isPreview, redirectUrlString, resolvedUrl);
+		} catch (SynapseNotFoundException e) {
+			// Retry preview once, after 1.5 seconds
+			if(isPreview) {
+				try {
+					Thread.sleep(1500);
+					resolveUrlAndRedirect(request, response, client, isProxy, teamId,
+							entityId, entityVersion, tableColumnId, tableRowId,
+							tableRowVersionNumbrer, ownerId, ownerType, fileName,
+							isPreview, redirectUrlString, resolvedUrl);					
+				} catch (InterruptedException e1) { 
+					// ...
+				} catch (SynapseNotFoundException e1) {
+					// show generic image
+					doRedirect(request, response, isProxy, new URL(getBaseUrl(request) + WebConstants.PREVIEW_UNAVAILABLE_PATH));
+				} catch (SynapseException e1) { 
+					throw new ServletException(e);
+				}				
+			}			
+		} catch (SynapseException e) {
+			throw new ServletException(e);
+		}
+	}
+
+	private void resolveUrlAndRedirect(HttpServletRequest request,
+			HttpServletResponse response, SynapseClient client,
+			boolean isProxy, String teamId, String entityId,
+			String entityVersion, String tableColumnId, String tableRowId,
+			String tableRowVersionNumbrer, String ownerId, String ownerType,
+			String fileName, Boolean isPreview, String redirectUrlString,
+			URL resolvedUrl) throws MalformedURLException,
+			UnsupportedEncodingException, ClientProtocolException, IOException,
+			SynapseException, ServletException {
+		if (redirectUrlString != null) {
+			//simple redirect
+			resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
+		}
+		
+		if (ownerId != null && ownerType != null) {
+			ObjectType type = ObjectType.valueOf(ownerType);
+			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
+			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
+			String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
 			
-			String teamId = request.getParameter(WebConstants.TEAM_PARAM_KEY);
-			
-			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
-			String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
-			
-			String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
-			String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
-			String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
-			Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
-			String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
-			URL resolvedUrl = null;
-			if (redirectUrlString != null) {
-				//simple redirect
-				resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
-			}
-			
-			if (ownerId != null && ownerType != null) {
-				ObjectType type = ObjectType.valueOf(ownerType);
-				String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
-				WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
-				String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
-				
-				// Redirect the user to the url
-				// If we're rendering a version of a wiki page, 
-				// we must get the URL for the attachment from that version of the wiki
-				if(wikiVersion != null) {
-					if(isPreview) {
-						resolvedUrl = client.getVersionOfV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName, new Long(wikiVersion));
-					} else {
-						resolvedUrl = client.getVersionOfV2WikiAttachmentTemporaryUrl(properKey, fileName, new Long(wikiVersion));
-					}
+			// Redirect the user to the url
+			// If we're rendering a version of a wiki page, 
+			// we must get the URL for the attachment from that version of the wiki
+			if(wikiVersion != null) {
+				if(isPreview) {
+					resolvedUrl = client.getVersionOfV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName, new Long(wikiVersion));
 				} else {
-					if(isPreview) {
-						resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
-					} else {
-						resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
-					}
+					resolvedUrl = client.getVersionOfV2WikiAttachmentTemporaryUrl(properKey, fileName, new Long(wikiVersion));
 				}
-				//Done
+			} else {
+				if(isPreview) {
+					resolvedUrl = client.getV2WikiAttachmentPreviewTemporaryUrl(properKey, fileName);
+				} else {
+					resolvedUrl = client.getV2WikiAttachmentTemporaryUrl(properKey, fileName);
+				}
 			}
-			else if (entityId != null) {
+			//Done
+		}
+		else if (entityId != null) {
+			// Table File Handle
+			if(tableColumnId != null || tableRowId != null || tableRowVersionNumbrer != null) {
+				if(tableColumnId != null && tableRowId != null && tableRowVersionNumbrer != null) {
+					try {
+						RowReference row = new RowReference();
+						row.setRowId(Long.parseLong(tableRowId));
+						row.setVersionNumber(Long.parseLong(tableRowVersionNumbrer));
+						if(isPreview) resolvedUrl = client.getTableFileHandlePreviewTemporaryUrl(entityId, row, tableColumnId);
+						else resolvedUrl = client.getTableFileHandleTemporaryUrl(entityId, row, tableColumnId);
+					} catch (NumberFormatException e) {
+						throw new ServletException(WebConstants.TABLE_ROW_ID +" and "+ WebConstants.TABLE_ROW_VERSION_NUMBER + " must be Long values. Actual values: "+ tableRowId +", " + tableRowVersionNumbrer);
+					}
+						
+				} else {
+					throw new ServletException("All table fields must be defined, if any are defined: " + WebConstants.TABLE_COLUMN_ID +", "+ WebConstants.TABLE_ROW_ID +", "+ WebConstants.TABLE_ROW_VERSION_NUMBER);
+				}
+			} else {
+				// Entity
 				if (entityVersion == null) {
 					if (isPreview)
 						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
 					else
 						resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
-				}
-					
-				else {
+				} else {
 					Long versionNumber = Long.parseLong(entityVersion);
 					if (isPreview)
 						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
 					else
 						resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
 				}
-			} else if (teamId != null) {
-				try {
-					resolvedUrl = client.getTeamIcon(teamId);
-				} catch (SynapseException e) {
-					return;
+			}
+		} else if (teamId != null) {
+			try {
+				resolvedUrl = client.getTeamIcon(teamId);
+			} catch (SynapseException e) {
+				return;
+			}
+		}
+		
+		doRedirect(request, response, isProxy, resolvedUrl);
+	}
+
+	private void doRedirect(HttpServletRequest request,
+			HttpServletResponse response, boolean isProxy, URL resolvedUrl)
+			throws ClientProtocolException, IOException {
+		if (resolvedUrl != null){
+			if (isProxy) {
+				//do the get
+				HttpGet httpGet = new HttpGet(resolvedUrl.toString());
+				//copy headers
+				Enumeration<?> headerValues = request.getHeaders("Cookie");
+				while (headerValues.hasMoreElements()) {
+					String headerValue = (String) headerValues.nextElement();
+					httpGet.addHeader("Cookie", headerValue);
 				}
-			}
-			
-			if (resolvedUrl != null){
-				if (isProxy) {
-					//do the get
-					HttpGet httpGet = new HttpGet(resolvedUrl.toString());
-					//copy headers
-					Enumeration<?> headerValues = request.getHeaders("Cookie");
-					while (headerValues.hasMoreElements()) {
-						String headerValue = (String) headerValues.nextElement();
-						httpGet.addHeader("Cookie", headerValue);
-					}
-					HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
-					HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
-					if (responseEntity != null) {
-						responseEntity.writeTo(response.getOutputStream());
-					}
-				}else
-					response.sendRedirect(resolvedUrl.toString());	
-			}
-		} catch (SynapseException e) {
-			throw new ServletException(e);
+				HttpResponse newResponse = new HttpClientProviderImpl().execute(httpGet);
+				HttpEntity responseEntity = (null != newResponse.getEntity()) ? newResponse.getEntity() : null;
+				if (responseEntity != null) {
+					responseEntity.writeTo(response.getOutputStream());
+				}
+			}else
+				response.sendRedirect(resolvedUrl.toString());	
 		}
 	}
 
@@ -396,5 +465,12 @@ public class FileHandleServlet extends HttpServlet {
 		return client;
 	}
 
+	private String getBaseUrl(HttpServletRequest request) {
+		StringBuffer url = request.getRequestURL();
+		String uri = request.getRequestURI();
+		String ctx = request.getContextPath();
+		String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
+		return base;
+	}
 
 }

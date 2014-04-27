@@ -7,33 +7,35 @@ import com.google.gwt.view.client.ProvidesKey;
 
 public class TableModel implements Comparable<TableModel> {
 	
-	public static final String TEMP_ID_PREFIX = "__tm";
+	private static final String TEMP_ID_PREFIX = "__tm";
 	
 	// The key provider that provides the unique ID of a contact.
 	public static final ProvidesKey<TableModel> KEY_PROVIDER = new ProvidesKey<TableModel>() {
 		@Override
 		public Object getKey(TableModel item) {
-			return item == null ? null : item.getId();
+			return item == null ? null : item.id;
 		}
 	};
 
 	private static int sequence = 0;
 	private String id;
+	private String versionNumber;
 	private Map<String, String> map;
 
 	/**
 	 * Construct TableModel with default (temp) id
 	 */
 	public TableModel() {
-		this(TEMP_ID_PREFIX + String.valueOf(++sequence));
+		this(TEMP_ID_PREFIX + String.valueOf(++sequence), null);
 	}
 
 	/**
 	 * Construct TableModel with provided id
 	 * @param id - identified for this model. MUST be unique amongst other table models! If not, use the default constructor.
 	 */
-	public TableModel(String id) {
+	public TableModel(String id, String versionNumber) {
 		this.id = id;
+		this.versionNumber = versionNumber;
 		map = new HashMap<String, String>();
 	}
 
@@ -46,7 +48,16 @@ public class TableModel implements Comparable<TableModel> {
 	}
 	
 	public String getId() {
+		if(id.startsWith(TEMP_ID_PREFIX)) return null;
 		return id;
+	}	
+	
+	public void setVersionNumber(String versionNumber) {
+		this.versionNumber = versionNumber;
+	}
+
+	public String getVersionNumber() {
+		return versionNumber;
 	}
 
 	@Override
@@ -75,5 +86,12 @@ public class TableModel implements Comparable<TableModel> {
 	public boolean containsKey(String key) {
 		return map.containsKey(key);
 	}
+
+	@Override
+	public String toString() {
+		return "TableModel [id=" + id + ", versionNumber=" + versionNumber
+				+ ", map=" + map + "]";
+	}
+	
 	
 }

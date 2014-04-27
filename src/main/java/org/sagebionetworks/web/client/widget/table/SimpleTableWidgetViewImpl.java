@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
@@ -16,6 +17,7 @@ import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
@@ -26,6 +28,7 @@ import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
@@ -64,6 +67,7 @@ import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionModel;
 import com.google.inject.Inject;
 
@@ -115,12 +119,16 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	TableModel newRow = null;
 	SynapseJSNIUtils jsniUtils;	
 	List<TableModel> currentPage;
+	Button showColumnsBtn;
 	Button addRowBtn;
+	Button deleteRowBtn;
+	Button viewRowBtn;
 	
 	@Inject
-	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
+	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.jsniUtils = jsniUtils;
+		TableViewUtils.ginInjector = ginInjector;
 		
 		columnToModel = new HashMap<Column, ColumnModel>();
 		initWidget(uiBinder.createAndBindUi(this));
@@ -136,7 +144,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	}
 	
 	@Override
-	public void createNewTable(List<ColumnModel> columns, RowSet rowset,
+	public void createNewTable(String tableEntityId, List<ColumnModel> columns, RowSet rowset,
 			int totalRowCount, boolean canEdit, String queryString,
 			QueryDetails queryDetails) {		
 		this.columns = columns;				
@@ -147,9 +155,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		// Render Table			
 		columnEditorBuilt = false; // clear out old column editor view
 		setupTableEditorToolbar(columns);
-		if(canEdit) {
-			buttonToolbar.setVisible(true);
-		}
+		setDefaultToolbarButtonVisibility(canEdit);
 		
 		// special cases display user instructions instead of empty table
 		if(columns == null || (columns != null && columns.size() == 0)) {
@@ -159,11 +165,18 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
-		buildTable(queryDetails, totalRowCount);
-		buildColumns(columns, canEdit);			
+		buildTable(queryDetails, totalRowCount, canEdit);
+		buildColumns(tableEntityId, columns, canEdit);			
 		hideLoading();		 	    
 	}
 	
+
+	private void setDefaultToolbarButtonVisibility(boolean canEdit) {
+		showColumnsBtn.setVisible(canEdit);
+		addRowBtn.setVisible(canEdit);
+		deleteRowBtn.setVisible(false);
+		viewRowBtn.setVisible(false);
+	}
 
 	@Override
 	public void createRowView(List<ColumnModel> columns, RowSet rowset) {
@@ -181,7 +194,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		btn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {				
-				presenter.retryCurrentQuery();
+				presenter.rerunCurrentQuery();
 			}
 		});
 		allRowContainer.add(btn);
@@ -189,8 +202,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
 		for(ColumnModel col : columns) idToCol.put(col.getId(), col);
 
+		FlowPanel panel = new FlowPanel();
+		panel.addStyleName("panel panel-default panel-body margin-top-15");
 		BootstrapTable table = new BootstrapTable();
-		table.addStyleName("margin-top-15");
 		table.setWidth("100%");		
 		table.getColumnFormatter().setWidth(0, "10%");
 		table.getColumnFormatter().setWidth(1, "90%");
@@ -218,13 +232,16 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 						// regular string
 						table.setText(i, 1, value);
 					}
+				} else {
+					table.setText(i,  1, "");
 				}
 			}
-			allRowContainer.add(table);
+			panel.add(table);
 		} else {
 			// show empty
-			allRowContainer.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
+			panel.add(new HTML("<h3>" + DisplayConstants.ROW_IS_EMPTY + "</h3>"));
 		}	
+		allRowContainer.add(panel);
 	}
 
 	private void showAddColumnsView(boolean canEdit) {
@@ -310,7 +327,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					
 					@Override
 					public void invoke() {
-						presenter.retryCurrentQuery();
+						presenter.rerunCurrentQuery();
 					}
 				});
 			
@@ -378,7 +395,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		presenter.query(queryField.getValue());
 	}
 	
-	private void buildTable(QueryDetails queryDetails, int totalRowCount) {
+	private void buildTable(QueryDetails queryDetails, int totalRowCount, final boolean canEdit) {
 		cellTable = new CellTable<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setWidth("100%", true);
 		cellTable.setPageSize(queryDetails.getLimit().intValue());
@@ -400,6 +417,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		// Add a selection model so we can select cells.
 		selectionModel = new MultiSelectionModel<TableModel>(TableModel.KEY_PROVIDER);
 		cellTable.setSelectionModel(selectionModel, DefaultSelectionEventManager.<TableModel> createCheckboxManager());
+		selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			@Override
+			public void onSelectionChange(SelectionChangeEvent event) {				
+				setSelectionButtonVisibility(getSelectedRows(), canEdit);				
+			}			
+		});
 		
 	    // Add a ColumnSortEvent.AsyncHandler to connect sorting to the
 	    // AsyncDataPRrovider.
@@ -419,6 +442,16 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 	}
 
+	/**
+	 * Control the visibility of buttons depending upon selection state
+	 * @param selected
+	 * @param canEdit
+	 */
+	private void setSelectionButtonVisibility(List<TableModel> selected, boolean canEdit) {
+		deleteRowBtn.setVisible(canEdit && selected != null && selected.size() > 0);
+		viewRowBtn.setVisible(selected != null && selected.size() == 1);
+	}
+	
 	/**
 	 * Create an AsyncDataProvider that updates the Data in the view when requested
 	 * @return
@@ -450,7 +483,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 					ColumnModel model = columnToModel.get(columnSortInfo
 							.getColumn());
 					if (model != null) {
-						sortedColumnName = model.getName();
+						sortedColumnName = TableUtils.escapeColumnName(model.getName());
 						sortDirection = columnSortInfo.isAscending() ? SortDirection.ASC : SortDirection.DESC;
 					}
 				}
@@ -491,7 +524,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * @param columns
 	 * @param canEdit
 	 */
-	private void buildColumns(List<ColumnModel> columns, boolean canEdit) {
+	private void buildColumns(String tableEntityId, List<ColumnModel> columns, boolean canEdit) {
 		// checkbox selector
 		Column<TableModel, Boolean> checkColumn = new Column<TableModel, Boolean>(
 				new CheckboxCell(true, false)) {
@@ -524,9 +557,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		} else {
 			tableContainer.addStyleName("overflow-x-auto");
 		}
-		
+				
 		for(ColumnModel model : columns) {
-			Column<TableModel, ?> column = TableViewUtils.getColumn(model, canEdit, rowUpdater, cellTable, this);
+			Column<TableModel, ?> column = TableViewUtils.getColumn(tableEntityId, model, canEdit, rowUpdater, cellTable, this, jsniUtils);
 			cellTable.addColumn(column, model.getName());
 			columnToModel.put(column, model);
 			
@@ -564,7 +597,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private void setupTableEditorToolbar(final List<ColumnModel> columns) {
 		buttonToolbar.clear();
 
-		Button showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
+		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");
 		showColumnsBtn.addClickHandler(new ClickHandler() {			
 			@Override
@@ -583,9 +616,56 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			}
 		});
 		
+		deleteRowBtn = DisplayUtils.createButton(DisplayConstants.DELETE_SELECTED, ButtonType.DANGER);
+		deleteRowBtn.addStyleName("margin-right-5");
+		deleteRowBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				MessageBox.confirm(DisplayConstants.DELETE_SELECTED, DisplayConstants.CONFIRM_DELETE_SELECTED, new Listener<MessageBoxEvent>() {					
+					@Override
+					public void handleEvent(MessageBoxEvent be) { 					
+						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
+						if(Dialog.YES.equals(btn.getItemId())) {
+							presenter.deleteRows(getSelectedRows());
+						}
+					}
+				});
+			}
+		});		
+		
+		viewRowBtn = DisplayUtils.createButton(DisplayConstants.VIEW_ROW, ButtonType.DEFAULT);
+		viewRowBtn.addStyleName("margin-right-5");
+		viewRowBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+		    	presenter.viewRow(getSelectedRows());
+			}
+		});
+		
 		buttonToolbar.add(showColumnsBtn);		
 		buttonToolbar.add(addRowBtn);
+		buttonToolbar.add(viewRowBtn);
+		buttonToolbar.add(deleteRowBtn);
 	}
+	
+	/**
+	 * Get the currently selected rows
+	 * @return
+	 */
+	private List<TableModel> getSelectedRows() {
+		List<TableModel> selected = new ArrayList<TableModel>();		
+		if(selectionModel != null && dataProvider != null && dataProvider.getDataDisplays() != null) {
+			for(HasData<TableModel> hd : dataProvider.getDataDisplays()) {
+				for(TableModel model : hd.getVisibleItems()) {
+					if(selectionModel.isSelected(model)) {
+						selected.add(model);
+					}					
+				}
+			}
+		}		
+		return selected;
+	}
+
 	
 	/**
 	 * Builds a widget for the column editor/view panel
@@ -815,7 +895,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
-		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE }) {			
+		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE , ColumnType.FILEHANDLEID }) {			
 			String radioLabel = TableViewUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			

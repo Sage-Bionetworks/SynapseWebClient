@@ -29,6 +29,8 @@ public class WebConstants {
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
 	
+	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
+	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
@@ -221,5 +223,10 @@ public class WebConstants {
 		"<div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_2+"</div>" +
 		"<div class=\"margin-top-left-10\">" +DisplayConstants.CERTIFICATION_MESSAGE_3 +
 		"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> "+DisplayConstants.CERTIFICATION_MESSAGE_4+"</li><li>"+DisplayConstants.CERTIFICATION_MESSAGE_5+"</li></ul></div></blockquote>";
+
+	public static final String TABLE_COLUMN_ID = "columnId";
+	public static final String TABLE_ROW_ID = "rowId";
+	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
+
 	
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
@@ -31,7 +32,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 
 		void query(String query);
 
-		void retryCurrentQuery();
+		void rerunCurrentQuery();
 
 		void updateRow(TableModel row, AsyncCallback<RowReferenceSet> callback);
 		
@@ -40,6 +41,12 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 		void createColumn(org.sagebionetworks.repo.model.table.ColumnModel col, AsyncCallback<String> callback);
 
 		void updateColumnOrder(List<String> columnIds);
+
+		void deleteRows(List<TableModel> selectedRows);
+
+		void viewRow(List<TableModel> selectedRows);
+
+		void getFileHandle(String rowId, String versionNumber, String colId, AsyncCallback<FileHandle> callback);
 
 	}
 	
@@ -53,7 +60,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param limit 
 	 * @param offset 
 	 */
-	public void createNewTable(List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
+	public void createNewTable(String tableEntityId, List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
 	
 	public void showTableUnavailable(TableStatus status, Integer percentComplete);
 
