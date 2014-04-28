@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -126,7 +127,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		}		
 	}
 		
-	private void validateToken() {
+	public void validateToken() {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -142,10 +143,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				}
 			}
 		};
-		if(authenticationController.getCurrentUserSessionData().getIsSSO()) {
-			authenticationController.loginUserSSO(authenticationController.getCurrentUserSessionToken(), callback);
-		} else {
-			authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), callback);
+		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
+		if (userSessionData != null) {
+			if(userSessionData.getIsSSO() != null && userSessionData.getIsSSO()) {
+				authenticationController.loginUserSSO(authenticationController.getCurrentUserSessionToken(), callback);
+			} else {
+				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), callback);
+			}
 		}
 	}
 	
