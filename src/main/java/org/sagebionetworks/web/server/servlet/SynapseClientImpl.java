@@ -91,6 +91,7 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -2694,7 +2695,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String deleteRowsFromTable(String toDelete) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			RowReferenceSet toDeleteSet = new RowReferenceSet(adapterFactory.createNew(toDelete));
+			RowSelection toDeleteSet = new RowSelection(adapterFactory.createNew(toDelete));
 			RowReferenceSet responseSet = synapseClient.deleteRowsFromTable(toDeleteSet);			
 			return responseSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		} catch (SynapseTableUnavailableException e) {
