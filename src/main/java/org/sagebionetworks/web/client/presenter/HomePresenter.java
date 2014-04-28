@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -27,8 +28,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
@@ -119,9 +122,37 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Things to load for authenticated users
 		if(showLoggedInDetails()) {
 			loadProjectsAndFavorites();
+			//validate token
+			validateToken();
 		}		
 	}
 		
+	public void validateToken() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				//do nothing
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				//token is invalid
+				if (ex instanceof AuthenticationException) {
+					// send user to login page						
+					view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				}
+			}
+		};
+		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
+		if (userSessionData != null) {
+			if(userSessionData.getIsSSO() != null && userSessionData.getIsSSO()) {
+				authenticationController.loginUserSSO(authenticationController.getCurrentUserSessionToken(), callback);
+			} else {
+				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), callback);
+			}
+		}
+	}
+	
 	public void loadNewsFeed(){
 		rssService.getCachedContent(ClientProperties.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override

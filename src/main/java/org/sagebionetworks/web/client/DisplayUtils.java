@@ -359,7 +359,7 @@ public class DisplayUtils {
 			return true;
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
-			showInfo("Session Timeout", "Your session has timed out. Please login again.");
+			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
 			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			

@@ -34,8 +34,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -145,7 +147,11 @@ public class HomePresenterTest {
 		Session testSession = new Session();
 		testSession.setAcceptsTermsOfUse(true);
 		testSessionData.setSession(testSession);
+		testSessionData.setIsSSO(false);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
 	}	
 	
 	@Test
@@ -154,7 +160,43 @@ public class HomePresenterTest {
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
 		verify(mockView).refreshMyTeams(any(List.class));
+		
 	}
+	
+	@Test
+	public void testValidateTokenSSO() {
+		testSessionData.setIsSSO(true);
+		homePresenter.validateToken();
+
+		verify(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testValidateTokenNotSSO() {
+		testSessionData.setIsSSO(false);
+		homePresenter.validateToken();
+
+		verify(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testInvalidTokenSSO() {
+		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+		testSessionData.setIsSSO(true);
+		homePresenter.validateToken();
+		verify(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testInvalidTokenNotSSO() {
+		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		testSessionData.setIsSSO(false);
+		homePresenter.validateToken();
+		verify(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+
 	
 	@Test
 	public void testNewsFeed() throws JSONObjectAdapterException {
