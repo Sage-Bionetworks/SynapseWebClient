@@ -131,7 +131,7 @@ public class EntityPropertyForm implements EntityPropertyFormView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD + caught.getMessage());
 			}			
 		};

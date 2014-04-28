@@ -87,13 +87,13 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), fakeView);
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), fakeView);
 				callback.onFailure(caught);			
 			}
 		});
 	}
 	
-	public void loadData(EntityType entityType, Object loadConfig, final List<WhereCondition> where, final PlaceChanger placeChanger, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
+	public void loadData(EntityType entityType, Object loadConfig, final List<WhereCondition> where, final GlobalApplicationState globalApplicationState, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
 		final TableContext context = new TableContext();
 		setCurrentSearchParameters(context, (PagingLoadConfig) loadConfig);
 		SearchParameters searchParams = getCurrentSearchParameters(context, entityType, where);
@@ -111,7 +111,7 @@ public class QueryTableFactoryPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, placeChanger, authenticationController.isLoggedIn(), fakeView);
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), fakeView);
 				callback.onFailure(caught);
 			}
 		});

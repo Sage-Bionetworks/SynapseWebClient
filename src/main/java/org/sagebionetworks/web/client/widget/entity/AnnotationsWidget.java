@@ -149,7 +149,7 @@ public class AnnotationsWidget implements AnnotationsWidgetView.Presenter, IsWid
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), propertyView)) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), propertyView)) {
 						propertyView.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED);			
 					}
 				}

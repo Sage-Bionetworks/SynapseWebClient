@@ -543,7 +543,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

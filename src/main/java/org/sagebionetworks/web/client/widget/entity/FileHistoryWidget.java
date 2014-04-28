@@ -105,7 +105,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			@Override
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState.getPlaceChanger(),
+						globalApplicationState,
 						authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED + "\n" + caught.getMessage());
 				}
@@ -135,7 +135,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						@Override
 						public void onFailure(Throwable caught) {
 							if (!DisplayUtils.handleServiceException(
-									caught, globalApplicationState.getPlaceChanger(),
+									caught, globalApplicationState,
 									authenticationController.isLoggedIn(), view)) {
 								view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED
 										+ "\n" + caught.getMessage());
@@ -156,7 +156,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			@Override
 			public void onFailure(Throwable caught) {
 				if (!DisplayUtils.handleServiceException(caught,
-						globalApplicationState.getPlaceChanger(),
+						globalApplicationState,
 						authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE + "\n" + caught.getMessage());
 				}

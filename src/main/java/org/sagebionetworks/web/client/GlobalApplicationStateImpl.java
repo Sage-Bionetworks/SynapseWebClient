@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.event.shared.EventBus;
@@ -24,14 +25,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
+	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
 	private boolean isEditing;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, EventBus eventBus) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus) {
 		this.cookieProvider = cookieProvider;
+		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		isEditing = false;
 	}
@@ -58,6 +61,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setPlaceController(PlaceController placeController) {
 		this.placeController = placeController;
+	}
+	
+	@Override
+	public JiraURLHelper getJiraURLHelper() {
+		return jiraUrlHelper;
 	}
 
 	@Override

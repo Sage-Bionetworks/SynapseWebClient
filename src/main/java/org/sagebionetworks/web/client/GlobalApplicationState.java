@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
@@ -23,6 +24,13 @@ public interface GlobalApplicationState {
 	 * @param placeController
 	 */
 	public void setPlaceController(PlaceController placeController);
+	
+
+	/**
+	 * Gets the Jira url helper for the application
+	 * @return
+	 */	
+	public JiraURLHelper getJiraURLHelper();
 	
 	/**
 	 * Set the activity mapper.

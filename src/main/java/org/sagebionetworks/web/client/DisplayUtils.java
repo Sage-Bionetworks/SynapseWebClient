@@ -347,7 +347,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, SynapseView view) {
 		//send exception to the javascript console
 		if (displayUtilsLogger != null && ex != null)
 			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
@@ -355,28 +355,28 @@ public class DisplayUtils {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(ex instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 			return true;
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
 				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
 			//exception handling on the backend now throws the reason into the exception message.  Easy!
-			view.showErrorMessage(ex.getMessage());
+			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			placeChanger.goTo(new Home(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
 			return true;
 		}
 		
