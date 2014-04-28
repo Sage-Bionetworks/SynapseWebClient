@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
@@ -265,29 +266,26 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	 */
 	@Override
 	public void deleteRows(List<TableModel> selectedRows) {
-		RowReferenceSet toDeleteSet = new RowReferenceSet();
-		toDeleteSet.setTableId(tableEntityId);
-		toDeleteSet.setEtag(currentEtag);
-		toDeleteSet.setHeaders(TableUtils.extractHeaders(tableColumns));
-		final List<RowReference> rows = new ArrayList<RowReference>();
+		RowSelection toDeleteSelection = new RowSelection();
+		toDeleteSelection.setTableId(tableEntityId);
+		toDeleteSelection.setEtag(currentEtag);
+		final List<Long> rowIds = new ArrayList<Long>();
 		for(TableModel model : selectedRows) {
-			if(model != null && model.getId() != null) {
-				RowReference row = new RowReference();
-				row.setRowId(Long.parseLong(model.getId()));
-				rows.add(row);
+			if(model != null && model.getId() != null) {				
+				rowIds.add(Long.parseLong(model.getId()));
 			}
 		} 
-		toDeleteSet.setRows(rows);
+		toDeleteSelection.setRowIds(rowIds);
 		
 		try {
-			synapseClient.deleteRowsFromTable(toDeleteSet.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
+			synapseClient.deleteRowsFromTable(toDeleteSelection.writeToJSONObject(adapterFactory.createNew()).toJSONString(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					RowReferenceSet rrs = null;
 					try {
 						rrs = new RowReferenceSet(adapterFactory.createNew(result));
 						currentEtag = rrs.getEtag();
-						view.showInfo(rows.size() + " " + DisplayConstants.ROWS_DELETED, "");
+						view.showInfo(rowIds.size() + " " + DisplayConstants.ROWS_DELETED, "");
 						rerunCurrentQuery();
 					} catch (JSONObjectAdapterException e) {
 						view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);			
