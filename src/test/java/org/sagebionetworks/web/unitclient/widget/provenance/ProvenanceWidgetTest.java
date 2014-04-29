@@ -434,7 +434,7 @@ public class ProvenanceWidgetTest {
 			}
 			@Override
 			public void uploadFileChunk(String contentType, String fileFieldId,
-					double startByte, double endByte, String url, XMLHttpRequest xhr,
+					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
 					ProgressCallback callback) {
 				// TODO Auto-generated method stub
 				
