@@ -398,10 +398,12 @@ public class TableViewUtils {
 						public void update(int index, final TableModel object, String value) {						
 							final String original = object.getNeverNull(col.getId()); 
 							try {
-								if(isDouble) {
-									Double.parseDouble(value);
-								} else {
-									Long.parseLong(value);
+								if(value != null && !"".equals(value)) {
+									if(isDouble) {
+										Double.parseDouble(value);
+									} else {
+										Long.parseLong(value);
+									}
 								}
 								// save value after validation
 								object.put(col.getId(), value);
