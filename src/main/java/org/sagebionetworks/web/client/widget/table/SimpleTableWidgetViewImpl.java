@@ -791,14 +791,25 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		formGroup.add(columnNameError);
 		form.add(formGroup);
 		
-		// Column Type
+		// Containers
 		final FlowPanel stringLengthContainer = new FlowPanel();
+		final FlowPanel defaultValueContainer = new FlowPanel();
+		final FlowPanel enumContainer = new FlowPanel();
+		// itital column view states
+		if(col.getColumnType() == ColumnType.STRING) stringLengthContainer.setVisible(true);
+		if(col.getColumnType() == ColumnType.FILEHANDLEID || col.getColumnType() == ColumnType.DATE || col.getColumnType() == ColumnType.BOOLEAN) enumContainer.setVisible(false);
 		ColumnTypeChangeHandler typeChangeHandler = new ColumnTypeChangeHandler() {			
 			@Override
 			public void onChange(ColumnType selectedType) {
-				stringLengthContainer.setVisible(selectedType == ColumnType.STRING);				
+				col.setColumnType(selectedType);
+				stringLengthContainer.setVisible(selectedType == ColumnType.STRING);
+				enumContainer.setVisible(selectedType != ColumnType.FILEHANDLEID && selectedType != ColumnType.DATE && selectedType != ColumnType.BOOLEAN);			
+				defaultValueContainer.clear();
+				defaultValueContainer.add(TableViewUtils.createDefaultValueRadio(col));
 			}
 		};
+
+		// Column Type
 		inputLabel = new HTML(DisplayConstants.COLUMN_TYPE + ": ");
 		inputLabel.addStyleName("margin-top-15 boldText");
 		final InlineHTML columnTypeError = DisplayUtils.createFormHelpText(DisplayConstants.COLUMN_TYPE + " " + DisplayConstants.REQUIRED);
@@ -821,17 +832,16 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 		
 		// Default Value	
-		inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
-		inputLabel.addStyleName("margin-top-15 boldText");
-		form.add(inputLabel);
-		form.add(TableViewUtils.createDefaultValueRadio(col));
+		defaultValueContainer.add(TableViewUtils.createDefaultValueRadio(col));
+		form.add(defaultValueContainer);
 
-		// Enum Values
+		// Enum Values		
 		inputLabel = new HTML(DisplayConstants.RESTRICT_VALUES + " (" + DisplayConstants.OPTIONAL + "): ");
 		inputLabel.addStyleName("margin-top-15 boldText");
-		form.add(inputLabel);	
+		enumContainer.add(inputLabel);	
 		final ListCreatorViewWidget list = new ListCreatorViewWidget(DisplayConstants.ADD_VALUE, true);
-		form.add(createRestrictedValues(col, list));
+		enumContainer.add(createRestrictedValues(col, list));
+		form.add(enumContainer);
 
 		final InlineHTML generalError = DisplayUtils.createFormHelpText("");
 		generalError.addStyleName("text-danger-imp"); 

@@ -30,6 +30,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -39,9 +41,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 public class TableViewUtils {
 	private static final int DEFAULT_STRING_MAX_LENGTH = 50;
@@ -114,6 +120,9 @@ public class TableViewUtils {
 		return true; // if we don't know the window width, just use fixed widths
 	}
 
+	private interface SwitchHandler {
+		void onSwitchChanged(boolean switchOn);
+	}
 	
 	/**
 	 * Create a default value input with on/off switch. Initializes to the given col, and modifiees the given col.
@@ -122,25 +131,87 @@ public class TableViewUtils {
 	 */
 	public static Widget createDefaultValueRadio(final ColumnModel col) {
 		FlowPanel row = new FlowPanel();		
+		
+		HTML inputLabel = new HTML(DisplayConstants.DEFAULT_VALUE + " (" + DisplayConstants.OPTIONAL + "): ");
+		inputLabel.addStyleName("margin-top-15 boldText");
+		row.add(inputLabel);
+
+		
 		FlowPanel defaultValueRadio = new FlowPanel();
 		defaultValueRadio.addStyleName("btn-group");
 		 						
 		final Button onBtn = DisplayUtils.createButton(DisplayConstants.ON_CAP);
 		final Button offBtn = DisplayUtils.createButton(DisplayConstants.OFF);
-		final TextBox defaultValueBox = new TextBox();
-		defaultValueBox.addChangeHandler(new ChangeHandler() {			
-			@Override
-			public void onChange(ChangeEvent event) {
-				col.setDefaultValue(defaultValueBox.getValue());
-			}
-		});
-		DisplayUtils.setPlaceholder(defaultValueBox, DisplayConstants.DEFAULT_VALUE);
+		final Widget defaultValueBox;
+		final SwitchHandler switchHandler;
+		if(col.getColumnType() == ColumnType.BOOLEAN) {
+			// make drop down box
+			defaultValueBox = new ListBox();
+			((ListBox)defaultValueBox).addItem(FALSE);
+			((ListBox)defaultValueBox).addItem(TRUE);
+			((ListBox)defaultValueBox).addChangeHandler(new ChangeHandler() {				
+				@Override
+				public void onChange(ChangeEvent event) {
+					col.setDefaultValue(((ListBox)defaultValueBox).getValue(((ListBox)defaultValueBox).getSelectedIndex()));					
+				}
+			});
+			switchHandler = new SwitchHandler() {				
+				@Override
+				public void onSwitchChanged(boolean switchOn) {
+					if(switchOn) col.setDefaultValue(((ListBox)defaultValueBox).getValue(((ListBox)defaultValueBox).getSelectedIndex()));
+					else col.setDefaultValue(null);
+				}
+			};
+		} else if(col.getColumnType() == ColumnType.DATE) {
+			// make date picker
+			defaultValueBox = new DateBox();
+		    ((DateBox)defaultValueBox).setFormat(new DateBox.DefaultFormat(DATE_FORMAT));
+		    ((DateBox)defaultValueBox).addValueChangeHandler(new ValueChangeHandler<Date>() {				
+				@Override
+				public void onValueChange(ValueChangeEvent<Date> event) {
+					col.setDefaultValue(String.valueOf(((DateBox)defaultValueBox).getValue().getTime()));
+				}
+			});
+			switchHandler = new SwitchHandler() {				
+				@Override
+				public void onSwitchChanged(boolean switchOn) {
+					if(switchOn && ((DateBox)defaultValueBox).getValue() != null) col.setDefaultValue(String.valueOf(((DateBox)defaultValueBox).getValue().getTime()));
+					else col.setDefaultValue(null);
+				}
+			};
+		} else if(col.getColumnType() == ColumnType.FILEHANDLEID) {
+			// just hide the default value for files
+			defaultValueBox = new TextBox();
+			switchHandler = null;
+			row.setVisible(false);
+		} else {
+			// regular text box
+			defaultValueBox = new TextBox();
+			((TextBox)defaultValueBox).addChangeHandler(new ChangeHandler() {			
+				@Override
+				public void onChange(ChangeEvent event) {
+					col.setDefaultValue(((TextBox)defaultValueBox).getValue());
+				}
+			});
+			DisplayUtils.setPlaceholder(defaultValueBox, DisplayConstants.DEFAULT_VALUE);
+			((TextBox)defaultValueBox).setValue(col.getDefaultValue());
+			defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
+			switchHandler = new SwitchHandler() {				
+				@Override
+				public void onSwitchChanged(boolean switchOn) {
+					if(switchOn) col.setDefaultValue(((TextBox)defaultValueBox).getValue());
+					else col.setDefaultValue(null);
+				}
+			};
+
+		}
 		onBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				offBtn.removeStyleName("active");
 				onBtn.addStyleName("active");
 				defaultValueBox.setVisible(true);
+				if(switchHandler != null) switchHandler.onSwitchChanged(true);
 			}
 		});
 		offBtn.addClickHandler(new ClickHandler() {			
@@ -149,6 +220,7 @@ public class TableViewUtils {
 				onBtn.removeStyleName("active");
 				offBtn.addStyleName("active");
 				defaultValueBox.setVisible(false);
+				if(switchHandler != null) switchHandler.onSwitchChanged(false);
 			}
 		});
 		if(col.getDefaultValue() != null) {
@@ -161,13 +233,9 @@ public class TableViewUtils {
 		
 		defaultValueRadio.add(onBtn);
 		defaultValueRadio.add(offBtn);			
-		
-		
-		// TODO : choose appropriate input type for default value (string, enum, date, etc)
 		defaultValueBox.addStyleName("form-control display-inline margin-top-5");
-		defaultValueBox.setWidth("300px");
-		defaultValueBox.getElement().setAttribute("placeholder", "Default Value");
-		defaultValueBox.setValue(col.getDefaultValue());
+		defaultValueBox.setWidth("300px");		
+
 		
 		row.add(defaultValueRadio);
 		row.add(defaultValueBox);
