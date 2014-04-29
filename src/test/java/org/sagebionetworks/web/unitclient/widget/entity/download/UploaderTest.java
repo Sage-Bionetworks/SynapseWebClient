@@ -2,10 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -231,7 +228,7 @@ public class UploaderTest {
 		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyInt(), anyInt(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep3(false, null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -312,17 +309,17 @@ public class UploaderTest {
 		Uploader.ByteRange range;
 		//case when total file size is less than chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK - 1024);
-		assertEquals(0.0, range.getStart());
+		assertEquals(0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK - 1024 - 1, range.getEnd());
 		
 		//case when total file size is equal to chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK);
-		assertEquals(0.0, range.getStart());
+		assertEquals(0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK-1, range.getEnd());
 
 		//case when total file size is greater than chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK + 1024); 
-		assertEquals(0.0, range.getStart());
+		assertEquals(0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK-1, range.getEnd());
 		//also verify second chunk has the expected range
 		range = uploader.getByteRange(2, Uploader.BYTES_PER_CHUNK + 1024);
@@ -330,7 +327,7 @@ public class UploaderTest {
 		assertEquals(Uploader.BYTES_PER_CHUNK+1024-1, range.getEnd());
 		
 		//verify byte range is valid in later chunk in large file
-		range = uploader.getByteRange(430, 4 * ClientProperties.GB);
+		range = uploader.getByteRange(430, (long)(4 * ClientProperties.GB));
 		assertTrue(range.getStart() > -1);
 		assertTrue(range.getEnd() > -1);
 	}
