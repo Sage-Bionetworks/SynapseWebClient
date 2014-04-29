@@ -53,7 +53,7 @@ public class TableViewUtils {
 	private static final int DEFAULT_STRING_MAX_LENGTH = 50;
 	static final String TRUE = Boolean.TRUE.toString().toLowerCase();
 	static final String FALSE = Boolean.FALSE.toString().toLowerCase();
-	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
+	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_SHORT);
 	static PortalGinInjector ginInjector;
 	
 	static final Map<ColumnType,String> columnToDisplayName;
