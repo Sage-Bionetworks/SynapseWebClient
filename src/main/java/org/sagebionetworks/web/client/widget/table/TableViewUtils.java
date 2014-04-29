@@ -385,8 +385,9 @@ public class TableViewUtils {
 			@Override
 			public String getValue(TableModel object) {
 				// convert 0/1 to display string false/true
-				if(object.getNeverNull(col.getId()).equals("1")) return TRUE;
-				else return FALSE;
+				if(object.getNeverNull(col.getId()).equals("1") || object.getNeverNull(col.getId()).equalsIgnoreCase("true")) return TRUE;
+				else if(object.getNeverNull(col.getId()).equals("0") || object.getNeverNull(col.getId()).equalsIgnoreCase("false")) return FALSE;
+				else return null;
 			}
 		};
 		column.setSortable(true);
@@ -398,8 +399,9 @@ public class TableViewUtils {
 					object.put(col.getId(), value);
 				} else {
 					// convert true/false display string to DB value true/false, not 0/1 as you would expect. See PLFM-2703 
-					if (TRUE.equals(value)) object.put(col.getId(), "true");
-					else object.put(col.getId(), "false");						
+					if (TRUE.equals(value) || "1".equals(value)) object.put(col.getId(), "true");
+					else if (FALSE.equals(value) || "0".equals(value)) object.put(col.getId(), "false");
+					else object.put(col.getId(), null);
 				}
 				rowUpdater.updateRow(object, new AsyncCallback<RowReferenceSet>() {								
 					@Override
