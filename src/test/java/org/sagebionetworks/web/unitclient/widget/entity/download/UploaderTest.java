@@ -28,6 +28,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -311,22 +312,27 @@ public class UploaderTest {
 		Uploader.ByteRange range;
 		//case when total file size is less than chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK - 1024);
-		assertEquals(0, range.getStart());
+		assertEquals(0.0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK - 1024 - 1, range.getEnd());
 		
 		//case when total file size is equal to chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK);
-		assertEquals(0, range.getStart());
+		assertEquals(0.0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK-1, range.getEnd());
 
 		//case when total file size is greater than chunk size
 		range = uploader.getByteRange(1, Uploader.BYTES_PER_CHUNK + 1024); 
-		assertEquals(0, range.getStart());
+		assertEquals(0.0, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK-1, range.getEnd());
 		//also verify second chunk has the expected range
 		range = uploader.getByteRange(2, Uploader.BYTES_PER_CHUNK + 1024);
 		assertEquals(Uploader.BYTES_PER_CHUNK, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK+1024-1, range.getEnd());
+		
+		//verify byte range is valid in later chunk in large file
+		range = uploader.getByteRange(430, 4 * ClientProperties.GB);
+		assertTrue(range.getStart() > -1);
+		assertTrue(range.getEnd() > -1);
 	}
 	
 	@Test
