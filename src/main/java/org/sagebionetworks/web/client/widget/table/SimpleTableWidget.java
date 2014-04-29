@@ -126,7 +126,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD + ": " + caught.getMessage());
 			}
 		});			
@@ -549,14 +549,14 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);							
 						}
 					});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(DisplayConstants.TABLE_UPDATE_FAILED);
 				}
 			});

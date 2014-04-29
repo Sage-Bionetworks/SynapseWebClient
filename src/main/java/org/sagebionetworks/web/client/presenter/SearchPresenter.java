@@ -314,7 +314,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					}
 				}

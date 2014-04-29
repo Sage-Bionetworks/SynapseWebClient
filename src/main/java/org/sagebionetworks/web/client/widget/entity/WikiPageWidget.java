@@ -141,7 +141,7 @@ SynapseWidgetPresenter {
 								view.show403();
 						}
 						else {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
@@ -181,7 +181,7 @@ SynapseWidgetPresenter {
 					
 					@Override
 					public void onFailure(Throwable caught) {					
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 							view.showErrorMessage(caught.getMessage());
 					}
 				});
@@ -213,7 +213,7 @@ SynapseWidgetPresenter {
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
 				}
 			});
@@ -239,7 +239,7 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});	
@@ -286,7 +286,7 @@ SynapseWidgetPresenter {
                 
                 @Override
                 public void onFailure(Throwable caught) {
-                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
                         view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
                 }
             });
@@ -322,7 +322,7 @@ SynapseWidgetPresenter {
 							view.show403();
 						}
 						else {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
@@ -379,7 +379,7 @@ SynapseWidgetPresenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});

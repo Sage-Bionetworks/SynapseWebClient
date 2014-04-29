@@ -146,7 +146,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					showErrorMessage("Could not find the public group: " + caught.getMessage());
 			}
 		});
@@ -185,7 +185,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
@@ -205,7 +205,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});
@@ -374,7 +374,7 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 				view.showInfoError("Error", "Permissions were not saved to Synapse");				
 				changesPushedCallback.onFailure(caught);
 			}

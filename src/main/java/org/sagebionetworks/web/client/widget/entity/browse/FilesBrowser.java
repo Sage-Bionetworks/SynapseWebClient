@@ -145,7 +145,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
 				}			
 			});
@@ -206,7 +206,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
 			}			
 		});

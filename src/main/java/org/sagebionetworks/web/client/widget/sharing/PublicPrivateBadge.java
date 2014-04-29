@@ -69,7 +69,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		};
@@ -92,7 +92,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			public void onFailure(Throwable caught) {
 				if (isPublicCallback != null)
 					isPublicCallback.onFailure(caught);
-				else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage("Could not find the public group: " + caught.getMessage());
 			}
 		});

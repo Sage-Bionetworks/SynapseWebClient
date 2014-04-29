@@ -99,7 +99,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), MarkdownWidget.this))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), MarkdownWidget.this))
 					MarkdownWidget.this.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 			}
 		});				
@@ -159,7 +159,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			@Override
 			public void onFailure(Throwable caught) {
 				removeAll();
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
 		});

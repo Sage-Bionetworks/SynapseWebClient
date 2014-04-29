@@ -113,7 +113,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(caught.getMessage());
 					} 
 				}
@@ -156,7 +156,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 				if (caught instanceof NotFoundException) {
 					getQuiz();
 				} else {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
 						view.showErrorMessage(caught.getMessage());
 					}
 				}
@@ -178,7 +178,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}

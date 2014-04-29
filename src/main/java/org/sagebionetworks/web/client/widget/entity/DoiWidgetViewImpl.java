@@ -76,7 +76,7 @@ public class DoiWidgetViewImpl extends Composite implements DoiWidgetView {
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						showErrorMessage(caught.getMessage());
 				}
 			});
