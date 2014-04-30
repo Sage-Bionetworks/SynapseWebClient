@@ -60,8 +60,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
-	public static final double OLD_BROWSER_MAX_SIZE = ClientProperties.MB * 5; //5MB
-	public static final int BYTES_PER_CHUNK = (int)ClientProperties.MB * 5; //5MB
+	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
+	public static final long BYTES_PER_CHUNK = (long)ClientProperties.MB * 5; //5MB
 	public static final int MAX_RETRY = 3;
 	
 	private UploaderView view;
@@ -171,7 +171,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//if using this method, block if file size is > MAX_SIZE
 			if (isFileEntity) {
 				try {
-					double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+					long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
 					//check
 					if (fileSize > OLD_BROWSER_MAX_SIZE) {
 						view.showErrorMessage(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
@@ -225,10 +225,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(String result) {
 					try {
 						token = nodeModelCreator.createJSONEntity(result, ChunkedFileToken.class);
-						double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
 						long totalChunkCount = (long)Math.ceil(fileSize / BYTES_PER_CHUNK);;
 						view.showProgressBar();
-						directUploadStep2(contentType, 1, 1, totalChunkCount, (int)fileSize, new ArrayList<String>());
+						directUploadStep2(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -250,7 +250,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param currentAttempt This is our nth attempt at uploading this chunk (starting at 1, trying up to MAX_RETRY times)
 	 * @param totalChunkCount The total number of chunks to complete upload of the file
 	 */
-	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final int fileSize, final List<String> requestList){
+	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<String> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
@@ -314,7 +314,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadSuccess(String requestJson, String contentType, int currentChunkNumber, long totalChunkCount, int fileSize, List<String> requestList){
+	public void chunkUploadSuccess(String requestJson, String contentType, int currentChunkNumber, long totalChunkCount, long fileSize, List<String> requestList){
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
@@ -332,7 +332,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, int fileSize, List<String> requestList) {
+	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, long fileSize, List<String> requestList) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError("Exceeded the maximum number of attempts to upload a single file chunk.");
 		else //retry
@@ -340,22 +340,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public class ByteRange {
-		private int start, end;
-		public ByteRange(int start, int end) {
+		private long start, end;
+		public ByteRange(long start, long end) {
 			this.start = start;
 			this.end = end;
 		}
-		public int getEnd() {
+		public long getEnd() {
 			return end;
 		}
-		public int getStart() {
+		public long getStart() {
 			return start;
 		}
 	}
 	
-	public ByteRange getByteRange(int currentChunkNumber, int fileSize) {
-		int startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
-		int endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
+	public ByteRange getByteRange(int currentChunkNumber, Long fileSize) {
+		long startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
+		long endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
 		if (endByte >= fileSize)
 			endByte = fileSize-1;
 		return new ByteRange(startByte, endByte);
