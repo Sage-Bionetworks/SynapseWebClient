@@ -40,7 +40,7 @@ public class QueryStringUtils {
 	public static final String ORDER = "order";
 	public static final String BY = "by";
 	public static final String STAR = "*";
-	public static final String WHITE_SPACE = "+";
+	public static final String WHITE_SPACE = " ";
 	public static final String COMMA = ",";
 	
 	public static final String PATH_QUERY = "query?query=";
@@ -138,7 +138,9 @@ public class QueryStringUtils {
 		SearchParameters params = new SearchParameters();
 		queryString = queryString.replaceAll("%22", "");
 		queryString = queryString.replaceAll("%20", " ");
+		queryString = queryString.replaceAll("%2B", " ");
 		queryString = queryString.replaceAll("%3E", ">");
+		queryString = queryString.replaceAll("%3D", "=");
 		queryString = queryString.replaceAll("\\+", " ");
 		queryString = queryString.replaceAll("\"", "");
 		StringTokenizer tokenizer = new StringTokenizer(queryString, " ");

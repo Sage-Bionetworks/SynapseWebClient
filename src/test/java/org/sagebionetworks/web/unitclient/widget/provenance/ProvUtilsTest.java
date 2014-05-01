@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.provenance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -27,10 +28,10 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -42,11 +43,13 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
+import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
-import com.extjs.gxt.ui.client.widget.ProgressBar;
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class ProvUtilsTest {
@@ -69,7 +72,19 @@ public class ProvUtilsTest {
 		mockLayoutService = mock(LayoutServiceAsync.class);		
 		adapterFactory = new AdapterFactoryImpl();				
 	}
-		
+
+	
+	/*
+	 * Test Graph:
+	 * 
+	 *          expand
+	 *           |
+	 *    ent2  ent3
+	 *     \   /
+	 *    Activity
+	 *       |
+	 *      ent1
+	 */
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildProvGraph() throws Exception {
@@ -79,6 +94,9 @@ public class ProvUtilsTest {
 		Data entity2 = new Data();
 		entity2.setId("syn456");
 		entity2.setVersionNumber(1L);
+		Data entity3 = new Data();
+		entity3.setId("syn456654");
+		entity3.setVersionNumber(1L);
 		Activity act = new Activity();
 		act.setId("789");
 
@@ -93,12 +111,24 @@ public class ProvUtilsTest {
 		ref2.setTargetId(entity2.getId());
 		ref2.setTargetVersionNumber(entity2.getVersionNumber());
 		EntityHeader header2 = new EntityHeader();
-		header2.setId(ref2.getTargetId());
+		header2.setId(ref2.getTargetId());		
 		header2.setVersionNumber(ref2.getTargetVersionNumber());
 		
-		UsedEntity ue = new UsedEntity();
-		ue.setReference(ref2);
+		Reference ref3 = new Reference();
+		ref3.setTargetId(entity3.getId());
+		ref3.setTargetVersionNumber(entity3.getVersionNumber());
+		EntityHeader header3 = new EntityHeader();
+		header3.setId(ref3.getTargetId());
+		header3.setName("Some Name");
+		header3.setType(Data.class.getName());
+		header3.setVersionNumber(ref3.getTargetVersionNumber());
+		
 		Set<Used> used = new HashSet<Used>();
+		UsedEntity ue = new UsedEntity();
+		ue.setReference(ref2);		
+		used.add(ue);
+		ue = new UsedEntity();
+		ue.setReference(ref3);
 		used.add(ue);
 		act.setUsed(used);
 
@@ -108,6 +138,7 @@ public class ProvUtilsTest {
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
 		refToHeader.put(ref1, header1);
 		refToHeader.put(ref2, header2);
+		refToHeader.put(ref3, header3);
 		
 		Map<Reference, String> generatedByActivityId = new HashMap<Reference, String>();
 		generatedByActivityId.put(ref1, act.getId());
@@ -120,35 +151,52 @@ public class ProvUtilsTest {
 		
 		Set<Reference> noExpandNodes = new HashSet<Reference>();
 		
-		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, false, startRefs, noExpandNodes);		
+		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, true, startRefs, noExpandNodes);		
 		
 		assertNotNull(graph.getNodes());
 		assertNotNull(graph.getEdges());		
 		Set<ProvGraphNode> nodes = graph.getNodes();
 		Set<ProvGraphEdge> edges = graph.getEdges();
 		
-		// verify all nodes created
-		
+		// verify all nodes created		
 		EntityGraphNode entity1Node = null;
 		EntityGraphNode entity2Node = null;
+		EntityGraphNode entity3Node = null;
+		ExpandGraphNode entity3ExpandNode = null;
 		ActivityGraphNode actNode = null;
 		for(ProvGraphNode node : nodes) {			
 			if(node instanceof EntityGraphNode) {
 				if(((EntityGraphNode)node).getEntityId().equals(entity1.getId())) entity1Node = (EntityGraphNode) node;
 				if(((EntityGraphNode)node).getEntityId().equals(entity2.getId())) entity2Node = (EntityGraphNode) node;
+				if(((EntityGraphNode)node).getEntityId().equals(entity3.getId())) entity3Node = (EntityGraphNode) node;
 			} else if(node instanceof ActivityGraphNode) {
 				if(((ActivityGraphNode)node).getActivityId().equals(act.getId())) actNode = (ActivityGraphNode) node;
+			} else if(node instanceof ExpandGraphNode) {
+				if(((ExpandGraphNode)node).getEntityId().equals(entity3.getId())) entity3ExpandNode = (ExpandGraphNode) node;
 			}
 		}
 		assertNotNull(entity1Node);
 		assertNotNull(entity2Node);
+		assertNotNull(entity3Node);		
 		assertNotNull(actNode);
+		assertNotNull(entity3ExpandNode);
 		
 		// verify all edges created
 		ProvGraphEdge generatedByEdge = new ProvGraphEdge(entity1Node, actNode);
 		assertTrue(edges.contains(generatedByEdge));
 		ProvGraphEdge usedEdge = new ProvGraphEdge(actNode, entity2Node);
 		assertTrue(edges.contains(usedEdge));
+		
+		// SWC-1070 regression test
+		// find and verify expand nodes are not created for entities with no name (forbidden or not found entities) 
+		assertNull(header2.getName()); // precondition
+		boolean foundExpand2 = false;
+		for(ProvGraphEdge edge : edges) {
+			if(edge.getSource().equals(entity2Node) && edge.getSink() instanceof ExpandGraphNode) {
+				foundExpand2 = true;
+			}
+		}
+		assertFalse(foundExpand2);
 	}
 
 	public void testCreateUniqueNodeId() throws Exception {
@@ -312,7 +360,7 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public void uploadFileChunk(String contentType, String fileFieldId,
-					int startByte, int endByte, String url, XMLHttpRequest xhr,
+					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
 					ProgressCallback callback) {
 				// TODO Auto-generated method stub
 			}
@@ -338,6 +386,23 @@ public class ProvUtilsTest {
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public void processWithMathJax(Element element) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void loadCss(String url, Callback<Void, Exception> callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public String getFileUrl(String fileFieldId) {
+				return null;
 			}
 		};
 	}

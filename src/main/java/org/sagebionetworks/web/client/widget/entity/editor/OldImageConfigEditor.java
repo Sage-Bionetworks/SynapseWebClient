@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
 public class OldImageConfigEditor implements OldImageConfigView.Presenter, WidgetEditorPresenter {
 	
 	private OldImageConfigView view;
@@ -22,7 +23,7 @@ public class OldImageConfigEditor implements OldImageConfigView.Presenter, Widge
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		//TODO: change file upload to support other owner object types
@@ -62,6 +63,13 @@ public class OldImageConfigEditor implements OldImageConfigView.Presenter, Widge
 		return view.getAdditionalWidth();
 	}
 	
+	/**
+	 * widget creates entity AttachmentData objects, not file handles
+	 */
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return null;
+	}
 	/*
 	 * Private Methods
 	 */

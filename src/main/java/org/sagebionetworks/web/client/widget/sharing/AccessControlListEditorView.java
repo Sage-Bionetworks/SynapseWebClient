@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.SaveCallback;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.VoidCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
@@ -24,7 +24,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges);
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission);
 	
 	/**
 	 * Add an ACL Entry to the permissions dialog
@@ -34,8 +34,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void addAclEntry(AclEntry entry);
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
-	public void setPublicPrincipalId(Long id);
-	public void setAuthenticatedPrincipalId(Long id);
+	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
+	
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -50,7 +50,15 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * Prompt about unsaved view changes
 	 * @param saveCallback 
 	 */
-	public void alertUnsavedViewChanges(SaveCallback saveCallback);
+	public void alertUnsavedViewChanges(Callback saveCallback);
+	
+	/**
+	 * true if user would like to notify newly added people that this item has been shared with them.
+	 * @return
+	 */
+	public Boolean isNotifyPeople();
+	
+	public void setIsNotifyPeople(Boolean value);
 	
 	/**
 	 * Presenter interface
@@ -65,7 +73,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * @param permissionLevel
 		 */
 		void setAccess(Long principalId, PermissionLevel permissionLevel);
-
+		
 		/**
 		 * Remove the given principal from the ACL. Changes are NOT pushed to 
 		 * Synapse.
@@ -101,5 +109,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * @param unsavedChanges
 		 */
 		public void setUnsavedViewChanges(boolean unsavedChanges);
+		
+		void makePrivate();
 	}
 }

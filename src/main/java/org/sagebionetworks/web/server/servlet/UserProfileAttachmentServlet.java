@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.ServiceConstants.AttachmentType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -100,10 +100,16 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		String token = getSessionToken(request);
 
 		// Now get the signed url
-		Synapse client = createNewClient(token);
+		SynapseClient client = createNewClient(token);
 		String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
 		String tokenId = request.getParameter(WebConstants.TOKEN_ID_PARAM_KEY);
 		try {
+			if (tokenId == null || tokenId.trim().length() == 0) {
+				//if token is null, assume we want the user profile picture
+				UserProfile profile = client.getUserProfile(userId);
+				if (profile.getPic() != null)
+					tokenId = profile.getPic().getTokenId();
+			}
 			PresignedUrl url = null;
 			url = client.waitForPreviewToBeCreated(userId, AttachmentType.USER_PROFILE, tokenId, MAX_TIME_OUT);
 			// Redirect the user to the url
@@ -139,7 +145,7 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		try {
 			List<AttachmentData> list = new ArrayList<AttachmentData>();
 			// Connect to synapse
-			Synapse client = createNewClient(token);
+			SynapseClient client = createNewClient(token);
 			// get user and store file in location
 			String userId = request.getParameter(WebConstants.USER_PROFILE_PARAM_KEY);
 			FileItemIterator iter = upload.getItemIterator(request);
@@ -162,12 +168,15 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 			}
 			// Now add all of the attachments to the entity.
 			UserProfile userProfile = client.getUserProfile(userId);
+			UploadResult result = new UploadResult();
 			//set the profile picture
-			if (!list.isEmpty())
+			if (!list.isEmpty()) {
 				userProfile.setPic(list.get(0));
+				result.setAttachmentData(list.get(0));
+			}
+				
 			// Save the changes.
 			client.updateMyProfile(userProfile);
-			UploadResult result = new UploadResult();
 			result.setMessage("File upload successfully");
 			result.setUploadStatus(UploadStatus.SUCCESS);
 			String out = EntityFactory.createJSONStringForEntity(result);
@@ -220,8 +229,8 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 *
 	 * @return
 	 */
-	private Synapse createNewClient(String sessionToken) {
-		Synapse client = synapseProvider.createNewClient();
+	private SynapseClient createNewClient(String sessionToken) {
+		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
 		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
 		client.setSessionToken(sessionToken);

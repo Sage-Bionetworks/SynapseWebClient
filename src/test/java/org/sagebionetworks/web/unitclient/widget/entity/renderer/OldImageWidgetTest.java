@@ -15,13 +15,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.OldImageWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -70,20 +70,20 @@ public class OldImageWidgetTest {
 		attachments.add(testImage);
 		testPage.setAttachments(attachments);
 		
-		widget.configure(wikiKey,descriptor);
+		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView).configure(anyString(), eq(testImage), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasNullAttachments() {
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
 	@Test
 	public void testConfigureWhenEntityHasZeroAttachments() {
 		testPage.setAttachments(new ArrayList());
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 	
@@ -97,7 +97,7 @@ public class OldImageWidgetTest {
 		attachments.add(testImage);
 		testPage.setAttachments(attachments);
 
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView, times(0)).configure(anyString(), any(AttachmentData.class), anyString());
 	}
 

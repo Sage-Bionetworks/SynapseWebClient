@@ -100,7 +100,7 @@ public class QueryTableFactory {
         RpcProxy<PagingLoadResult<BaseModelData>> proxy = new RpcProxy<PagingLoadResult<BaseModelData>>() {
             @Override
             public void load(Object loadConfig, final AsyncCallback<PagingLoadResult<BaseModelData>> callback) {
-            	presenter.loadData(entityType, loadConfig, where, globalApplicationState.getPlaceChanger(), callback);
+            	presenter.loadData(entityType, loadConfig, where, globalApplicationState, callback);
             }
         };
 		

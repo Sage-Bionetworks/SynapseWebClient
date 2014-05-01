@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -26,12 +27,15 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -53,9 +57,16 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
-	SimplePanel storageUsagePanel;
+	SpanElement storageUsageSpan;
 	@UiField
 	SpanElement apiKeyContainer;
+	
+	@UiField
+	SimplePanel notificationsPanel;
+	@UiField
+	CheckBox emailNotificationsCheckbox;
+	@UiField
+	com.google.gwt.user.client.ui.Button changeApiKey;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -67,8 +78,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	private HTML changePasswordLabel;
 	private Breadcrumb breadcrumb;
 	private Footer footerWidget;
-
-	private Html storageUsageWidget;
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
@@ -81,9 +90,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+	
+		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
+		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
 	}
 
 
@@ -91,6 +104,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -124,10 +138,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		
 		setupPasswordButtonPanel.clear();
 		setupPasswordButtonPanel.add(createPasswordButton);
-
-		storageUsageWidget = new Html();
-		storageUsagePanel.add(storageUsageWidget);
 		
+		changeApiKey.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.changeApiKey();
+			}
+		});
 	}
 
 	@Override
@@ -176,11 +193,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	     layout.setLabelWidth(100);  
 	     fieldSet.setLayout(layout);  
 	   
-	     final TextField<String> username = new TextField<String>();  
-	     username.setFieldLabel(DisplayConstants.LOGIN_USERNAME_LABEL);  
-	     username.setAllowBlank(false);
-	     fieldSet.add(username, formData);  
-
 	     final TextField<String> currentPassword = new TextField<String>();  
 	     currentPassword.setFieldLabel("Current Password");  
 	     currentPassword.setAllowBlank(false);
@@ -212,7 +224,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	    		 if(newPassword.getValue() != null && newPasswordConfirm.getValue() != null && newPassword.getValue().equals(newPasswordConfirm.getValue())) {
 	    			 changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
 	    			 DisplayUtils.changeButtonToSaving(changePasswordButton, sageImageBundle);
-	    			 presenter.resetPassword(username.getValue(), currentPassword.getValue(), newPassword.getValue());
+	    			 presenter.resetPassword(currentPassword.getValue(), newPassword.getValue());
 	    		 } else {
 	    			 MessageBox.alert("Error", "Passwords do not match. Please re-enter your new password.", null);
 	    		 }
@@ -257,7 +269,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void clearStorageUsageUI() {
-		storageUsageWidget.setHtml(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
+		storageUsageSpan.setInnerText(DisplayConstants.STORAGE_USAGE_FAILED_TEXT);
 	}
 	
 	@Override
@@ -266,9 +278,30 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			clearStorageUsageUI();
 		}
 		else {
-			storageUsageWidget.setHtml("<h4>You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false) + "</h4>");
+			storageUsageSpan.setInnerText("You are currently using " + DisplayUtils.getFriendlySize(grandTotal.doubleValue(), false));
 		}
 	}
+	
+	@Override
+	public void updateNotificationCheckbox(UserProfile profile) {
+		boolean isNotify = true;
+		if(profile.getNotificationSettings() != null) {
+			if (profile.getNotificationSettings().getSendEmailNotifications() != null)
+				isNotify = profile.getNotificationSettings().getSendEmailNotifications();
+		}
+		emailNotificationsCheckbox.setValue(isNotify, false);
+	}
+	
+	private ClickHandler getNotificationsClickHandler() {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//update notification settings
+				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
+			}
+		};
+	}
+	
 	
 
 	@Override
@@ -281,7 +314,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		changePasswordPanel.clear();
 		setupPasswordButtonPanel.clear();
-		storageUsagePanel.clear();
+		storageUsageSpan.setInnerText("");
 	}
 
 

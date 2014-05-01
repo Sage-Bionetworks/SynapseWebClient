@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -44,6 +44,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.wikiPage = wikiPage;
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -54,6 +55,7 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -93,7 +95,10 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 			@Override
 			public void pageUpdated() {
 			}
-		}, true, 24);
+			@Override
+			public void noWikiFound() {
+			}
+		}, false);
 	}
 
 	@Override

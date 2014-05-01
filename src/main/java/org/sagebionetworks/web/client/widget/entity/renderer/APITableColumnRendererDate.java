@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 
 public class APITableColumnRendererDate implements APITableColumnRenderer {
 
-	private DateTimeFormat formatter;
+	private DateTimeFormat standardFormatter;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
@@ -26,7 +26,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 	@Inject
 	public APITableColumnRendererDate(SynapseJSNIUtils synapseJSNIUtils) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		formatter = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
+		standardFormatter = DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	}
 	
 	@Override
@@ -38,17 +38,28 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 		//and precompute the output values
 		outputColumnData = new HashMap<String, List<String>>();
 		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
-		List<String> colValues = columnData.get(inputColumnName);
+		List<String> colValues = APITableWidget.getColumnValues(inputColumnName, columnData);
 		if (colValues == null) {
 			//user defined an input column that doesn't exist in the service output
 			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
+			return;
 		}
 		List<String> outputValues = new ArrayList<String>();
-		
+		//assume dates are long values.  if parse exception occurs, then switch to standard formatter parsing (and don't try to parse as long again)
+		boolean isMsFromEpoch = true;
 		for (Iterator iterator2 = colValues.iterator(); iterator2
 				.hasNext();) {
 			String colValue = (String) iterator2.next();
-			Date date = formatter.parse(colValue);
+			Date date = null;
+			try {
+				if (isMsFromEpoch)
+					date = new Date(Long.parseLong(colValue));
+				else
+					date = standardFormatter.parse(colValue);	
+			} catch (NumberFormatException e) {
+				isMsFromEpoch = false;
+				date = standardFormatter.parse(colValue);
+			}
 			outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
 		}
 		outputColumnData.put(outputColumnName, outputValues);

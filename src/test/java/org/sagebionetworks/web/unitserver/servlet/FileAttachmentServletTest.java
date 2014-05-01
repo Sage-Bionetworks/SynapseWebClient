@@ -15,7 +15,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
@@ -32,7 +32,7 @@ public class FileAttachmentServletTest {
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	PresignedUrl mockUrl;
-	Synapse mockSynapse;
+	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	FileAttachmentServlet servlet;
 
@@ -42,7 +42,7 @@ public class FileAttachmentServletTest {
 
 		// Mock synapse and provider so we don't need to worry about
 		// unintentionally testing those classes
-		mockSynapse = mock(Synapse.class);
+		mockSynapse = mock(SynapseClient.class);
 		mockSynapseProvider = mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 

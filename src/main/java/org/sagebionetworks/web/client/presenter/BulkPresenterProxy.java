@@ -5,12 +5,15 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.web.client.AppLoadingView;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -18,6 +21,9 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -46,13 +52,16 @@ public class BulkPresenterProxy extends AbstractActivity {
 	Place place;
 	PortalGinInjector ginjector;
 	AppLoadingView loading;
+	GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public BulkPresenterProxy(){
+	public BulkPresenterProxy(GlobalApplicationState globalApplicationState){
+		this.globalApplicationState = globalApplicationState;
 	}
 
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
+		globalApplicationState.setIsEditing(false);
 		GWT.runAsync(new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
@@ -109,15 +118,12 @@ public class BulkPresenterProxy extends AbstractActivity {
 					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
 					presenter.setPlace((Challenges)place);
 					presenter.start(panel, eventBus);
+				} else if (place instanceof Help) {
+					HelpPresenter presenter = ginjector.getHelpPresenter();
+					presenter.setPlace((Help)place);
+					presenter.start(panel, eventBus);
 				} else if (place instanceof Search) {
 					// search results page
-					Search searchPlace = (Search) place;
-					Synapse redirect = SearchUtil.willRedirect(searchPlace);
-					if(redirect != null){
-						place = redirect;
-						onSuccess();						
-						return;
-					}
 					SearchPresenter presenter = ginjector.getSearchPresenter();
 					presenter.setPlace((Search)place);
 					presenter.start(panel, eventBus);
@@ -133,6 +139,21 @@ public class BulkPresenterProxy extends AbstractActivity {
 				} else if(place instanceof Down) {
 					DownPresenter presenter = ginjector.getDownPresenter();
 					presenter.setPlace((Down) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Team) {
+					// Team page
+					TeamPresenter presenter = ginjector.getTeamPresenter();
+					presenter.setPlace((Team)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof TeamSearch) {
+					// Team Search page
+					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
+					presenter.setPlace((TeamSearch)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Quiz) {
+					// Test page
+					QuizPresenter presenter = ginjector.getQuizPresenter();
+					presenter.setPlace((Quiz)place);
 					presenter.start(panel, eventBus);
 				} else {
 					// Log that we have an unknown place but send the user to the default
@@ -168,6 +189,13 @@ public class BulkPresenterProxy extends AbstractActivity {
 
 	public void setloader(AppLoadingView loading) {
 		this.loading = loading;		
+	}
+	@Override
+	public String mayStop() {
+		if (globalApplicationState.isEditing())
+			return DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE;
+		else
+			return null;
 	}
 	
 	

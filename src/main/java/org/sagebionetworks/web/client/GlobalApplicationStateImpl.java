@@ -7,11 +7,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -23,12 +25,18 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
+	private JiraURLHelper jiraUrlHelper;
+	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
+	private boolean isEditing;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus) {
 		this.cookieProvider = cookieProvider;
+		this.jiraUrlHelper = jiraUrlHelper;
+		this.eventBus = eventBus;
+		isEditing = false;
 	}
 
 	@Override
@@ -42,9 +50,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 						placeController.goTo(place);
 					}else{
 						// We are already on this page but we want to force it to reload.
-						directMapper.getActivity(place);
+						eventBus.fireEvent(new PlaceChangeEvent(place));
 					}
-
 				}
 			};
 		}
@@ -54,6 +61,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setPlaceController(PlaceController placeController) {
 		this.placeController = placeController;
+	}
+	
+	@Override
+	public JiraURLHelper getJiraURLHelper() {
+		return jiraUrlHelper;
 	}
 
 	@Override
@@ -135,5 +147,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
-		
+
+	@Override
+	public boolean isEditing() {
+		return isEditing;
+	}
+	
+	@Override
+	public void setIsEditing(boolean isEditing) {
+		this.isEditing = isEditing;
+	}
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -28,8 +29,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
@@ -104,7 +105,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}	
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		view.setPresenter(this);
 		view.showLoading();
 		//set up view based on descriptor parameters
@@ -278,7 +279,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				try {										
+				try {
 					Activity activity = new Activity(adapterFactory.createNew(result));
 					addActivityToStack(activity);
 				} catch (JSONObjectAdapterException e) {
@@ -531,7 +532,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 						// find graph nodes that should be marked as not current version
 						List<String> notCurrentNodeIds = new ArrayList<String>();
 						for(Reference ref : refToNodeId.keySet()) {
-							if(ref.getTargetVersionNumber() != null && ref.getTargetVersionNumber().equals(entityToCurrentVersion.get(ref.getTargetId()))) {
+							if(ref.getTargetVersionNumber() != null && !ref.getTargetVersionNumber().equals(entityToCurrentVersion.get(ref.getTargetId()))) {
 								notCurrentNodeIds.add(refToNodeId.get(ref));
 							}
 						}
@@ -542,7 +543,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

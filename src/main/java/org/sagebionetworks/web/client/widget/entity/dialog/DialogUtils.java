@@ -15,7 +15,7 @@ public class DialogUtils {
 		form.setFrame(false);
 		form.setBorders(false);
 		form.setShadow(false);
-		form.setLabelAlign(LabelAlign.RIGHT);
+		form.setLabelAlign(LabelAlign.LEFT);
 		form.setBodyStyleName("form-background"); 
 		return form;
 	}

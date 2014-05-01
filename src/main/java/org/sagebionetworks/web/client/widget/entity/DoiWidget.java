@@ -95,7 +95,7 @@ public class DoiWidget implements Presenter {
 					if (canEdit)
 						view.showCreateDoi();
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(caught.getMessage());
 				}
 			}
@@ -104,20 +104,19 @@ public class DoiWidget implements Presenter {
 
 	@Override
 	public void createDoi() {
-		synapseClient.createDoi(entityId, versionNumber, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void v) {
-				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
-				configureDoi();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
-			}
-		});
-	}
-	
+	  synapseClient.createDoi(entityId, versionNumber, new AsyncCallback<Void>() {
+	    @Override
+	    public void onSuccess(Void v) {
+	      view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+	      configureDoi();
+	    }
+	    @Override
+	    public void onFailure(Throwable caught) {
+	      if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+	        view.showErrorMessage(caught.getMessage());
+	    }
+	  });
+	} 
 	@Override
 	public void getDoiPrefix(AsyncCallback<String> callback) {
 		stackConfigService.getDoiPrefix(callback);
@@ -139,7 +138,7 @@ public class DoiWidget implements Presenter {
 			else
 				html = getDoiSpan(fullDoi);
 		}
-		return html;
+		return  html;
 	}
 	
 	public static String getDoiLink(String fullDoi, String doiName){

@@ -4,36 +4,61 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
 	<ui:style>
-		
+
 	</ui:style>
 	<g:HTMLPanel>
-
-		<!-- start header -->
-		<!-- MAIN CONTAINER -->
-		<!-- HEADER -->
 		<div class="color-line"></div>
 		<div class="clear"></div>
-		<div class="container">
-			<g:SimplePanel ui:field="header" />
-			<div class="span-24 notopmargin">
-				<div class="span-24 separator"></div>
-				<!-- end header -->
-				<div class="span-7"></div>
-				<div class="span-10 inner-6 view">
-					<h2>Register With Synapse </h2>
-					<g:SimplePanel ui:field="registerAccountPanel" />
-					<span ui:field="contentHtml"></span>
-
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp"></div>
+		<div class="container margin-top-15">
+			<div class="row">
+			    <div class="col-sm-6 col-sm-offset-3">
+			        <h2 class="margin-bottom-40">Register with Synapse</h2>
+			        <div class="margin-bottom-40" ui:field="contentHtml" />
+				    <div ui:field="registrationForm">
+				        <form class="form-horizontal" role="form">
+							  <div ui:field="userName" class="form-group row">
+							    <label class="col-sm-3 control-label">Username</label>
+							    <div class="col-sm-9">
+							      <g:TextBox ui:field="userNameField" styleName="form-control"/>
+								  <div ui:field="userNameError" class="help-block hide"></div>
+							    </div>
+							  </div>
+							  <div ui:field="emailAddress" class="form-group row">
+							    <label class="col-sm-3 control-label">Email</label>
+							    <div class="col-sm-9">
+							      <g:TextBox ui:field="emailAddressField" styleName="form-control"/>
+							      <div ui:field="emailAddressError" class="help-block hide"></div>
+							    </div>
+							  </div>
+							  <div ui:field="firstName" class="form-group row">
+							    <label class="col-sm-3 control-label">First name</label>
+							    <div class="col-sm-9">
+							       <g:TextBox ui:field="firstNameField" styleName="form-control"/>
+									<div ui:field="firstNameError" class="help-block hide"></div>
+							    </div>
+							  </div>				        
+							<div ui:field="lastName" class="form-group row">
+							    <label class="col-sm-3 control-label">Last name</label>
+							    <div class="col-sm-9">
+							       <g:TextBox ui:field="lastNameField" styleName="form-control"/>
+							      <div ui:field="lastNameError" class="help-block hide"></div>
+							    </div>
+							  </div>
+						</form>
+					</div>
 				</div>
-				<div class="span-7"></div>
-
+				<div class="col-sm-1" />
 			</div>
-
-			<!-- start footer -->
+			<div class="row">
+			    <div class="col-sm-6 col-sm-offset-3">
+					<g:Button ui:field="registerBtn" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Register"/>
+				</div>
+			</div>
 			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+		</div>
 		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

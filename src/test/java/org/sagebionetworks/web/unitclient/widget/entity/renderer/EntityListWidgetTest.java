@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
@@ -58,7 +58,7 @@ public class EntityListWidgetTest {
 		syn456 = new Data();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null);
 		EntityBundleTransport transport = new EntityBundleTransport();
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
@@ -90,7 +90,7 @@ public class EntityListWidgetTest {
 		String encoded = EntityListUtil.recordsToString(records);
 		descriptor.put(WidgetConstants.ENTITYLIST_WIDGET_LIST_KEY, encoded);
 				
-		widget.configure(null, descriptor);
+		widget.configure(null, descriptor, null, null);
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));

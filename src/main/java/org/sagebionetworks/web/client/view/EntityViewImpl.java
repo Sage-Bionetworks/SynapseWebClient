@@ -1,20 +1,31 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -22,7 +33,7 @@ import com.google.inject.Inject;
 public class EntityViewImpl extends Composite implements EntityView {
 	
 	private SageImageBundle sageImageBundle;
-	private HorizontalPanel loadingPanel;
+	private Widget loadingPanel;
 
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
@@ -37,21 +48,25 @@ public class EntityViewImpl extends Composite implements EntityView {
 	private Header headerWidget;
 	private EntityPageTop entityPageTop;
 	private Footer footerWidget;
-		
+	private OpenTeamInvitationsWidget openTeamInvitesWidget;
+	
 	@Inject
 	public EntityViewImpl(
 			EntityViewImplUiBinder binder,
 			Header headerWidget,
 			Footer footerWidget,
 			EntityPageTop entityPageTop,
-			SageImageBundle sageImageBundle) {		
+			SageImageBundle sageImageBundle, 
+			OpenTeamInvitationsWidget openTeamInvitesWidget) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.sageImageBundle = sageImageBundle;
+		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		// TODO : need to dynamically set the header widget
@@ -61,14 +76,21 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {			
+		entityPageTop.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
 			@Override
 			public void onPersistSuccess(EntityUpdatedEvent event) {
 				presenter.refresh();
 			}
-		};
-		entityPageTop.setEntityUpdatedHandler(handler);
+		});
+		entityPageTop.setAreaChangeHandler(new AreaChangeHandler() {			
+			@Override
+			public void areaChanged(EntityArea area, String areaToken) {
+				presenter.updateArea(area, areaToken);
+			}
+		});
+		
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -78,9 +100,9 @@ public class EntityViewImpl extends Composite implements EntityView {
 	}
 
 	@Override
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea area, String areaToken) {
 		entityPageTop.clearState();
-		entityPageTop.setBundle(bundle, versionNumber);
+		entityPageTop.configure(bundle, versionNumber, projectHeader, area, areaToken);
 		entityPageTopPanel.setWidget(entityPageTop.asWidget());
 		entityPageTop.refresh();
 	}
@@ -117,7 +139,36 @@ public class EntityViewImpl extends Composite implements EntityView {
 	@Override
 	public void show403() {
 		entityPageTop.clearState();
-		entityPageTopPanel.setWidget(new HTML(DisplayUtils.get403Html()));
+		FlowPanel panel = new FlowPanel();
+		panel.add(new HTML(DisplayUtils.get403Html()));
+		final SimplePanel invitesPanel = new SimplePanel();
+		panel.add(invitesPanel);
+		//also add the open team invitations widget (accepting may gain access to this project)
+		Callback callback = new Callback() {
+			@Override
+			public void invoke() {
+				//when team is updated, refresh to see if we can now access
+				presenter.refresh();
+			}
+		};
+		CallbackP<List<MembershipInvitationBundle>> teamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+			
+			@Override
+			public void invoke(List<MembershipInvitationBundle> invites) {
+				//if there are any, then also add the title text to the panel
+				if (invites != null && invites.size() > 0) {
+					HTML message = new HTML("<h4>"+DisplayConstants.ACCESS_DEPENDENT_ON_TEAM+"</h4>");
+					message.addStyleName("margin-top-100 margin-left-15");
+					invitesPanel.setWidget(message);
+				}
+			}
+		};
+		openTeamInvitesWidget.configure(callback, teamInvitationsCallback);
+		Widget openTeamInvites = openTeamInvitesWidget.asWidget();
+		openTeamInvites.addStyleName("margin-left-10 margin-bottom-10 margin-right-10");
+		panel.add(openTeamInvites);
+		entityPageTopPanel.setWidget(panel);
+		
 	}
 
 }

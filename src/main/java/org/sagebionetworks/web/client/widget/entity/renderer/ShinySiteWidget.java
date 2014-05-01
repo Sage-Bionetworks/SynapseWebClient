@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +13,14 @@ import com.google.inject.Inject;
 
 public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRendererPresenter {
 	
-	private static final String[] VALID_URL_BASES = { "http://glimmer.rstudio.com", "http://shiny.synapse.org" };
+	private static final String[] VALID_URL_BASES = { 
+		"http://glimmer.rstudio.com/", 
+		"http://shiny.synapse.org/", 
+		"https://shiny.synapse.org/", 
+		"http://spark.rstudio.com/",
+		"https://s3.amazonaws.com/static.synapse.org/",
+		"https://belltown.fhcrc.org:9898/"
+		};
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
@@ -26,7 +33,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 		int height = getHeightFromDescriptor(descriptor);

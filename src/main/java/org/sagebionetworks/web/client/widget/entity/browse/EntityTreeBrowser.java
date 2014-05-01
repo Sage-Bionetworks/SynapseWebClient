@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -89,9 +90,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 			}
 		});
+	}
+	
+	public void setWidgetHeight(int height) {
+		view.setWidgetHeight(height);
 	}
 	
 	/**
@@ -113,9 +118,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
 		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
 		
+		// NOTE: this is fragile, but there doesn't seem to be a way around querying by nodeType. 
+		// a query on concreteType!=org...TableEntity eliminates nodes who do not have concreteType defined
+		final String TABLE_ENTITY_NODE_TYPE_ID = "17"; 
+		
 		searchService.searchEntities("entity", Arrays
 				.asList(new WhereCondition[] { 
-						new WhereCondition("parentId", WhereOperator.EQUALS, entityId)
+						new WhereCondition("parentId", WhereOperator.EQUALS, entityId),
+						new WhereCondition(WebConstants.NODE_TYPE_KEY, WhereOperator.NOT_EQUALS, TABLE_ENTITY_NODE_TYPE_ID)
 						}), 1, MAX_FOLDER_LIMIT, null,
 				false, new AsyncCallback<List<String>>() {
 				@Override
@@ -132,7 +142,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);				
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
 					asyncCallback.onFailure(caught);
 				}
 			});					
@@ -173,24 +183,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		return MAX_FOLDER_LIMIT;
 	}
 
-	@Override
-	public void deleteEntity(final EntityTreeModel entityModel) {
-		final String entityId = entityModel.getId();
-		synapseClient.deleteEntityById(entityId, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo("Deleted", "Synapse id " + entityId + " was successfully deleted.");
-				view.removeEntity(entityModel);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
-				}
-			}
-		});
-	}
-
 	/**
 	 * Show links if true
 	 * @param makeLinks Make the labels entity links if true 
@@ -198,15 +190,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	public void setMakeLinks(boolean makeLinks) {
 		view.setMakeLinks(makeLinks);
 	}
-
-	/**
-	 * Show the right click menu
-	 * @param showContextMenu
-	 */
-	public void setShowContextMenu(boolean showContextMenu) {
-		view.setShowContextMenu(showContextMenu);
-	}
-
+	
 	
 	/*
 	 * Private Methods

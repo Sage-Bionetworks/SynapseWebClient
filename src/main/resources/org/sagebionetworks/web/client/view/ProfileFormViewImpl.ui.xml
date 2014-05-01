@@ -1,0 +1,112 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+		div.center {
+		margin-left: auto;
+		margin-right: auto;
+		width: 8em;
+		padding:15px;
+		}
+	</ui:style>
+
+	<g:HTMLPanel>
+		<div class="row margin-bottom-10">
+			<div class="col-sm-6">
+				<h3 ui:field="userNameHeading" class="inline-block margin-right-10"></h3>
+				<g:Button ui:field="changeUsernameButton" styleName="btn btn-default btn-xs"
+					text="Change username" />
+			</div>
+			<div class="col-sm-6">
+				<div ui:field="changeUsernameUi" class="form-group margin-bottom-10">
+					<label class="control-label">Username</label>
+					<input ui:field="userNameField" type="text" class="form-control"
+						placeholder="Enter username"></input>
+					<div ui:field="userNameError" class="help-block hide">Please enter a valid username</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">First name</label>
+					<input ui:field="firstNameField" type="text" class="form-control"
+						placeholder="Enter first name"></input>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">Last name</label>
+					<input ui:field="lastNameField" type="text" class="form-control"
+						placeholder="Enter last name"></input>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">Current position</label>
+					<input ui:field="currentPositionField" type="text" class="form-control"
+						placeholder="Enter current position"></input>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">Current affiliation</label>
+					<input ui:field="currentAffiliationField" type="text" class="form-control"
+						placeholder="Enter current affiliation"></input>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label>Industry/Discipline</label>
+					<input ui:field="industryField" type="text" class="form-control"
+						placeholder="Enter industry/discipline"></input>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">City, Country</label>
+					<input ui:field="locationField" type="text" class="form-control"
+						placeholder="Enter City, Country"></input>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div ui:field="moreInfoUi" class="form-group margin-bottom-10">
+					<label class="control-label">Link to more info</label>
+					<input ui:field="moreInfoField" type="text" class="form-control"
+						placeholder="Enter link to more info"></input>
+					<div ui:field="urlError" class="help-block hide">Please enter a valid URL</div>
+				</div>
+			</div>
+			<div class="col-sm-6">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="form-group margin-bottom-10">
+					<label class="control-label">Bio</label>
+					<textarea ui:field="bioField" class="form-control"
+						placeholder="Enter bio" rows="5"></textarea>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<g:Button ui:field="cancelButton"
+					styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right"
+					text="Cancel" />
+				<g:Button ui:field="okButton"
+					styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right"
+					text="Update" />
+			</div>
+		</div>
+	</g:HTMLPanel>
+
+</ui:UiBinder> 

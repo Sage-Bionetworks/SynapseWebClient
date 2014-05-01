@@ -5,46 +5,28 @@
 
 	<ui:style>
 		.important {
-			font-weight: bold;
+		font-weight: bold;
 		}
-		
+
 		.rowTop {
-			vertical-align: top;
+		vertical-align: top;
 		}
 	</ui:style>
 
 	<g:HTMLPanel>
-
-		<!-- start header -->
-		<!-- MAIN CONTAINER -->
-		<!-- HEADER -->
 		<div class="color-line"></div>
-		<div class="clear"></div>
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp"></div>
 		<div class="container">
-			<g:SimplePanel ui:field="header" />
-			<div class="span-24 notopmargin">
-				<!-- end header -->
-				<div class="span-24 separator "></div>
-
-				<ul class="breadcrumbs">
-					<li class="breadcrumb">
-						<a href="#">Home</a>
-					</li>
-				</ul>
-
-
-				
-				<div>
-					<g:SimplePanel ui:field="content" />
-				</div>
-
-			</div>
-
-			<!-- start footer -->
-			<div class="clear"></div>
-		</div> <!-- close class="container" -->
+			<ul class="breadcrumbs">
+				<li>
+					<a href="#">Home</a>
+				</li>
+			</ul>
+			<g:SimplePanel ui:field="content" />
+		</div>
+		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

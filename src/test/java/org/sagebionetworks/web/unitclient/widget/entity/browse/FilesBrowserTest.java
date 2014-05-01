@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,17 +11,19 @@ import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,7 +38,7 @@ public class FilesBrowserTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	FilesBrowser filesBrowser;
-	
+	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
 	
 	@Before
@@ -51,11 +50,16 @@ public class FilesBrowserTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
+		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
 				mockNodeModelCreator, adapterFactory, autoGenFactory,
-				mockGlobalApplicationState, mockAuthenticationController);
+				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
 		verify(mockView).setPresenter(filesBrowser);
 		filesBrowser.configure(configuredEntityId);
+		String newId = "syn456";
+		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		reset(mockView);
 	}
 	
@@ -75,31 +79,105 @@ public class FilesBrowserTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateFolder() throws Exception {
-		String name = "folder name";
-		String newId = "syn456";
-		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		filesBrowser.createFolder();
+		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		verify(mockView).showFolderEditDialog(anyString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testCreateFolderFail() throws Exception {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		
-		filesBrowser.createFolder(name);
+		filesBrowser.createFolder();
 		
-		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).createOrUpdateEntity(arg.capture(), anyString(), eq(true), any(AsyncCallback.class));
-		JSONObjectAdapter entityJson = new JSONObjectAdapterImpl(arg.getValue());
-		Folder folder = new Folder(entityJson);
-		assertEquals(name, folder.getName());
+		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDeleteFolder() throws Exception {
+		String id = "syn456";
+		boolean skipTrashCan = true;
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		
+		filesBrowser.deleteFolder(id, skipTrashCan);
+		verify(mockSynapseClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
+		verify(mockView).refreshTreeView(anyString());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDeleteFolderFail() throws Exception {
+		String id = "syn456";
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		filesBrowser.deleteFolder(id, true);
+		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testUpdateFolderName() throws Exception {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		Folder f = new Folder();
+		f.setName("raven");
+		filesBrowser.updateFolderName(f);
+		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockView).refreshTreeView(configuredEntityId);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testCreateFolderFail() throws Exception {
-		String name = "folder name";
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
+	public void testUpdateFolderNameFail() throws Exception {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
 		
-		filesBrowser.createFolder(name);
+		Folder f = new Folder();
+		f.setName("raven");
+		filesBrowser.updateFolderName(f);
 		
-		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+		verify(mockSynapseClient).updateEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
+	}
+	
+	@Test
+	public void testUploadButtonClickedCertified(){
+		filesBrowser.uploadButtonClicked();
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadButtonClickedNotCertified(){
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		filesBrowser.uploadButtonClicked();
+		
+		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockView).showQuizInfoDialog(arg.capture());
+		CallbackP callback = arg.getValue();
+		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
+		callback.invoke(true);
+		verify(mockView, never()).showUploadDialog(anyString());
+		//but if the tutorial was not clicked, then it should show the upload dialog
+		callback.invoke(false);
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadButtonClickedFailure(){
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		filesBrowser.uploadButtonClicked();
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testAddFolderButtonClickedCertified(){
+		filesBrowser.addFolderClicked();
+		verify(mockView).showFolderEditDialog(anyString());
 	}
 }
 

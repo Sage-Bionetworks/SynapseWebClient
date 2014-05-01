@@ -12,41 +12,56 @@ import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
+import com.extjs.gxt.ui.client.util.KeyNav;
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.FormPanel;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowserView {
 
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Uploader uploader;
-	private CookieProvider cookies;
+	private QuizInfoWidget quizInfoWidget;
+	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
 			Uploader uploader,
-			EntityTreeBrowser entityTreeBrowser, CookieProvider cookies) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
+			EntityTreeBrowser entityTreeBrowser, 
+			CookieProvider cookies,
+			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
+			QuizInfoWidget quizInfoWidget) {
 		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
-		this.cookies = cookies;
+		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
+		this.quizInfoWidget = quizInfoWidget;
 		this.setLayout(new FitLayout());
 	}
 	
@@ -65,57 +80,195 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	public void configure(String entityId, boolean canEdit, String title) {
 		this.removeAll(true);
 		LayoutContainer lc = new LayoutContainer();
-		lc.addStyleName("span-24 notopmargin");
 		lc.setAutoWidth(true);
 		lc.setAutoHeight(true);
 		LayoutContainer topbar = new LayoutContainer();		
-		LayoutContainer left = new LayoutContainer();
-		left.setStyleName("left span-17 notopmargin");
-		LayoutContainer right = new LayoutContainer();
-		right.setStyleName("right span-7 notopmargin");
-		topbar.add(left);
-		topbar.add(right);
-
-		if(title == null) title = "&nbsp;"; 
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<h3>" + title + "</h3>");
-		left.add(new HTML(shb.toSafeHtml()));
-
-		Button upload = getUploadButton(entityId); 
-		upload.addStyleName("right last");
-
-		Button addFolder = new Button(DisplayConstants.ADD_FOLDER, AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16()), new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				NameAndDescriptionEditorDialog.showNameDialog(DisplayConstants.LABEL_NAME, new NameAndDescriptionEditorDialog.Callback() {					
-					@Override
-					public void onSave(String name, String description) {
-						presenter.createFolder(name);
-					}
-				});
-			}
-		});
-		addFolder.setHeight(25);
-		//SWC-363: explicitly set the width, since the auto-width is not calculated correctly in Chrome (but it is in Firefox).
-		addFolder.setWidth(90);
-		addFolder.addStyleName("right");
-
+		boolean isTitle = (title!=null);
+		if(isTitle) {
+			SafeHtmlBuilder shb = new SafeHtmlBuilder();
+			shb.appendHtmlConstant("<h3>" + title + "</h3>");
+			topbar.add(new HTML(shb.toSafeHtml()));
+		}
+		
 		if(canEdit) {
-			right.add(upload);
-			right.add(addFolder, new MarginData(0, 3, 0, 0));
+			Button upload = getUploadButton(entityId);
+			upload.addStyleName("margin-right-5");
+			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
+			Button addFolder = DisplayUtils.createIconButton(DisplayConstants.ADD_FOLDER, DisplayUtils.ButtonType.DEFAULT, "glyphicon-plus");
+			addFolder.addClickHandler(new ClickHandler() {				
+				@Override
+				public void onClick(ClickEvent event) {
+					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
+					presenter.addFolderClicked();
+				}
+			});
+		
+			topbar.add(upload);
+			topbar.add(addFolder, new MarginData(0, 3, 0, 0));
 		}
 		
 		LayoutContainer files = new LayoutContainer();
-		files.setStyleName("span-24 notopmargin");
 		entityTreeBrowser.configure(entityId, true);
-		files.add(entityTreeBrowser.asWidget());
-		lc.add(topbar);
+		Widget etbW = entityTreeBrowser.asWidget();
+		etbW.addStyleName("margin-top-10");
+		files.add(etbW);
+		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
+		if (canEdit || isTitle)
+			lc.add(topbar);
 		lc.add(files);
 		lc.layout();
 		this.add(lc);
 		this.layout(true);
-	}	
+	}
+	
+	@Override
+	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
+		final Window dialog = new Window();
+		dialog.setMaximizable(false);
+		dialog.setSize(550, 320);
+		dialog.setPlain(true);
+		dialog.setModal(true);
+		dialog.setLayout(new FitLayout());
+		dialog.setBorders(false);
+		dialog.setHeading("Certification");
 
+		quizInfoWidget.configure(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean tutorialClicked) {
+				dialog.hide();
+				callback.invoke(tutorialClicked);
+			}
+		});
+		dialog.add(quizInfoWidget.asWidget());
+		dialog.show();
+	}
+	
+	@Override
+	public void showUploadDialog(String entityId){
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		};
+
+		final Window window = new Window();
+		uploader.clearHandlers();
+		// add user defined handler
+		uploader.addPersistSuccessHandler(handler);
+		
+		// add handlers for closing the window
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+			}
+		});
+		uploader.addCancelHandler(new CancelHandler() {				
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		
+		//let the uploader create the FileEntity
+		window.removeAll();
+		window.setPlain(true);
+		window.setModal(true);
+		window.setLayout(new FitLayout());
+		window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+		window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+		window.show();
+		window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+	}
+	
+	@Override
+	public void showFolderEditDialog(final String folderEntityId) {
+		SimplePanel sharingAndDataUseContainer = new SimplePanel();
+		Callback refreshSharingAndDataUseWidget = new Callback() {
+			@Override
+			public void invoke() {
+				//entity was updated by the sharing and data use widget.
+				sharingAndDataUseWidget.setEntity(folderEntityId);
+			}
+		};
+		sharingAndDataUseWidget.configure(folderEntityId, true, refreshSharingAndDataUseWidget);
+		sharingAndDataUseContainer.add(sharingAndDataUseWidget.asWidget());
+
+		final Dialog dialog = new Dialog();
+		dialog.setMaximizable(false);
+		dialog.setSize(460, 260);
+		dialog.setPlain(true);
+		dialog.setModal(true);
+		dialog.setHideOnButtonClick(true);
+		dialog.setLayout(new FitLayout());
+		dialog.setBorders(false);
+		dialog.setButtons(Dialog.OKCANCEL);
+		dialog.setHeading("New Folder");
+
+		final FormPanel panel = new FormPanel();
+		panel.setHeaderVisible(false);
+		panel.setFrame(false);
+		panel.setBorders(false);
+		panel.setShadow(false);
+		panel.setBodyBorder(false);
+		panel.setFieldWidth(345);
+
+		final TextField<String> nameField = new TextField<String>();
+				nameField.setFieldLabel(DisplayConstants.LABEL_NAME);
+		panel.add(nameField);			
+		panel.add(sharingAndDataUseContainer);
+		dialog.getButtonBar().removeAll();
+		final com.extjs.gxt.ui.client.widget.button.Button okButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.OK);
+		okButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				dialog.hide(okButton);
+				String nameVal = nameField.getValue();
+				nameField.clear();
+				presenter.updateFolderName(nameVal, folderEntityId);
+			}
+		});
+		dialog.addButton(okButton);
+		
+		final com.extjs.gxt.ui.client.widget.button.Button cancelButton = new com.extjs.gxt.ui.client.widget.button.Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				dialog.hide();
+			}
+		});
+		dialog.addButton(cancelButton);
+		
+		dialog.addListener(Events.Hide, new Listener<BaseEvent>() {
+			public void handleEvent(BaseEvent be) {
+				//window is hiding.  if it was because of any reason other than the ok button being clicked, then cancel folder creation (delete it)
+				if (be instanceof WindowEvent && ((WindowEvent)be).getButtonClicked() != okButton) {
+					cancelFolderCreation(dialog, nameField, folderEntityId);
+				}
+			};
+		});
+		// Enter key in name field submits
+		new KeyNav<ComponentEvent>(nameField) {
+			@Override
+			public void onEnter(ComponentEvent ce) {
+				super.onEnter(ce);
+				if(okButton.isEnabled())
+					okButton.fireEvent(Events.Select);
+			}
+		};
+
+		//and name textfield should have focus by default
+		nameField.focus();
+		
+		dialog.add(panel);
+		dialog.show();
+	}
+
+	private void cancelFolderCreation(Dialog dialog, TextField<String> nameField, String folderEntityId){
+		nameField.clear();
+		presenter.deleteFolder(folderEntityId, true);
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -154,49 +307,19 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	 * an entity and upload file in a single transaction it modified to create a new 
 	 */
 	private Button getUploadButton(final String entityId) {
+		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
+		uploadButton.addStyleName("left display-inline");
 		
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
+		uploadButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		};
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-		uploadButton.setHeight(25);
-		final Window window = new Window();
-		uploader.clearHandlers();
-		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
-		
-		// add handlers for closing the window
-		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-			}
-		});
-		uploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		
-		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-					//let the uploader create the FileEntity
-					window.removeAll();
-					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-					window.setPlain(true);
-					window.setModal(true);		
-					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());
-					window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
-					window.show();
+			public void onClick(ClickEvent event) {
+				presenter.uploadButtonClicked();
 			}
 		});
 		return uploadButton;
 	}
+	
+	
 
 }

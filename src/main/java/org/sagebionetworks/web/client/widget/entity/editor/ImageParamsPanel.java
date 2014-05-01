@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -74,6 +74,16 @@ public class ImageParamsPanel extends FormPanel{
 		if (scaleSlider != null)
 			return Integer.toString(scaleSlider.getValue());
 		return null;
+	}
+	
+	public void setAlignment(String alignmentValue) {
+		if(alignmentCombo != null && alignmentCombo.getValue() != null)
+			alignmentCombo.getValue().setValue(alignmentValue);			
+	}
+
+	public void setScale(String scale) {
+		if (scaleSlider != null)
+			scaleSlider.setValue(Integer.parseInt(scale));
 	}
 }
 

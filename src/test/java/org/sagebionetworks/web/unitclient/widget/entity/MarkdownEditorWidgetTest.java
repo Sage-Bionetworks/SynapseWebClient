@@ -8,11 +8,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -29,6 +32,8 @@ public class MarkdownEditorWidgetTest {
 	IconsImageBundle mockIcons;
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
+	ResourceLoader mockResourceLoader;
+	GWTWrapper mockGwt;
 	
 	@Before
 	@Ignore
@@ -38,8 +43,10 @@ public class MarkdownEditorWidgetTest {
 		mockIcons = mock(IconsImageBundle.class);
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		mockBaseEditWidgetPresenter = mock(BaseEditWidgetDescriptorPresenter.class);
+		mockResourceLoader = mock(ResourceLoader.class);
 		mockCookies = mock(CookieProvider.class);
-		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies);
+		mockGwt = mock(GWTWrapper.class);
+		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader, mockGwt);
 	}
 	
 	@Test
@@ -50,10 +57,10 @@ public class MarkdownEditorWidgetTest {
 		AsyncMockStubber
 				.callFailureWith(new Exception())
 				.when(mockSynapseClient)
-				.markdown2Html(anyString(), anyBoolean(), anyBoolean(), 
+				.markdown2Html(anyString(), anyBoolean(), anyBoolean(),anyString(),
 						any(AsyncCallback.class));
 		
 		presenter.showPreview(testMarkdown, true);
-		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
 	}
 }

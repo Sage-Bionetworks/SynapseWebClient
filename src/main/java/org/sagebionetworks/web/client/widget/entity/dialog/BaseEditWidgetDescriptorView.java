@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseView;
@@ -13,7 +14,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	/**
 	 * Show the popup
 	 */
-	public void show(String windowTitle);
+	public void show();
 	
 	/**
 	 * Hide the popup
@@ -33,6 +34,8 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 	 */
 	public String getTextToInsert();
 	
+	public List<String> getNewFileHandleIds();
+	
 	public void showBaseParams(boolean visible);
 	
 	public void setSaveButtonText(String text);
@@ -44,7 +47,7 @@ public interface BaseEditWidgetDescriptorView extends SynapseView {
 		 * @param widgetType
 		 */
 		public void editNew(WikiPageKey wikiKey, String widgetType, boolean isWiki);
-		
+		public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, boolean isWiki);
 		/**
 		 * 
 		 * @param handler

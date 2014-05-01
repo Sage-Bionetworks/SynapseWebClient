@@ -50,7 +50,9 @@ public class AnimationProtectorViewImpl implements AnimationProtectorView {
 	
 	@Override
 	public boolean isSlideSupportedByView() {
-		//slide is not supported on Chrome for GWT 2.4
-		return !GXT.isChrome;
+		//SWC-1123: high profile failure of the animator. remove animation for now (report no views support animation)
+		return false;
+//		//slide is not supported on Chrome for GWT 2.4
+//		return !GXT.isChrome;
 	}
 }

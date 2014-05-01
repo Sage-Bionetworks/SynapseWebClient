@@ -11,13 +11,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.OldImageConfigView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class OldImageConfigEditorTest {
@@ -51,7 +51,7 @@ public class OldImageConfigEditorTest {
 		testImage.setMd5("test md5");
 		
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(any(WikiPageKey.class));
 		//verify(mockView).setExternalVisible(anyBoolean());
 		when(mockView.getUploadedAttachmentData()).thenReturn(testImage);

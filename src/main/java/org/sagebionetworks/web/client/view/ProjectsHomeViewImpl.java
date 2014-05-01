@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -19,6 +20,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
@@ -56,6 +58,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 		this.footerWidget = footerWidget;
 		this.icons = icons;
 		
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 	}
@@ -65,6 +68,7 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
+		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
@@ -75,33 +79,43 @@ public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView 
 	}
 
 	private void addCreateProject() {		
-		FlexTable horizontalTable = new FlexTable();
+		SimplePanel container;
+		LayoutContainer horizontalTable = new LayoutContainer();
+		horizontalTable.addStyleName("row");
 
-		horizontalTable.setWidget(0, 0, new HTML(SafeHtmlUtils.fromSafeConstant("<h1 class=\"left\">" + DisplayConstants.LABEL_PROJECT_NAME + "</h1>")));
-		
-		final TextBox searchField = new TextBox();
-	    searchField.setStyleName(ClientProperties.HOMESEARCH_BOX_STYLE_NAME + " " + ADD_PROJECT_BOX_STYLE);
-	    horizontalTable.setWidget(0, 1, searchField);
-		searchField.addKeyDownHandler(new KeyDownHandler() {				
+		// title
+	    container = new SimplePanel(new HTML(SafeHtmlUtils.fromSafeConstant("<h1>" + DisplayConstants.LABEL_PROJECT_NAME + "</h1>")));
+	    container.addStyleName("col-md-3");
+	    horizontalTable.add(container);
+	    	    
+		final TextBox textField = new TextBox();
+		textField.setStyleName("form-control input-lg");
+		textField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					createProject(searchField.getValue());
+					createProject(textField.getValue());
 	            }					
 			}
-		});			
+		});
+	    container = new SimplePanel(textField);
+	    container.addStyleName("col-md-7 col-sm-8 col-xs-8");
+	    horizontalTable.add(container);
+
 		
 		LayoutContainer searchButtonContainer = new LayoutContainer();		
-		Anchor anchor = new Anchor(DisplayConstants.LABEL_CREATE);
-		anchor.addClickHandler(new ClickHandler() {			
+		Button createBtn = DisplayUtils.createButton(DisplayConstants.LABEL_CREATE, ButtonType.DEFAULT);
+		createBtn.addStyleName("btn-block btn-lg");
+		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				createProject(searchField.getValue());
+				createProject(textField.getValue());
 			}
 		});
-		searchButtonContainer.setStyleName("mega-button");
-	    searchButtonContainer.add(anchor);
-	    horizontalTable.setWidget(0, 2, searchButtonContainer);
+	    searchButtonContainer.add(createBtn);
+	    container = new SimplePanel(searchButtonContainer);
+	    container.addStyleName("col-md-2 col-sm-4 col-xs-4");
+	    horizontalTable.add(container);
 
 
 	    createProjectPanel.clear();

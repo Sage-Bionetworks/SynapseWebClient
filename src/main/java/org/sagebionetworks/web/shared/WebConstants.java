@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.shared;
 
 import org.sagebionetworks.repo.model.util.ModelConstants;
+import org.sagebionetworks.web.client.DisplayConstants;
 
 
 /**
@@ -28,6 +29,8 @@ public class WebConstants {
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
 	
+	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
+	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
@@ -35,18 +38,35 @@ public class WebConstants {
 	 */
 	public static final String VALID_ANNOTATION_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
 	public static final String VALID_URL_REGEX = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-	public static final String VALID_EMAIL_REGEX = "^[_A-Za-z0-9-+.]+@[_A-Za-z0-9.]+";
+	//copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_NAME and USER_EMAIL, added uppercase support
+	public static final String VALID_USERNAME_REGEX = "^[A-Za-z0-9._-]{3,}";
+	public static final String VALID_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 	public static final String WIDGET_NAME_REGEX = "[a-z,A-Z,0-9,., ,\\-,\\+,(,)]";
 	public static final String VALID_WIDGET_NAME_REGEX = "^"+WIDGET_NAME_REGEX+"+";
 	public static final String VALID_ENTITY_ID_REGEX = "^[Ss]{1}[Yy]{1}[Nn]{1}\\d+";
 	public static final String VALID_POSITIVE_NUMBER_REGEX = "^[0-9]+";
+	public static final String VALID_BOOKMARK_ID_REGEX = "[_A-Za-z0-9-.[^\\s]]+";
+	public static final String HTML_ELLIPSIS = "&hellip;";
+	public static final String URL_PROTOCOL = "http://";
+	
+	public static final String TEMPORARY_USERNAME_PREFIX = "TEMPORARY-";
 	
 	// OpenID related constants
+	/**
+	 * A token built into the redirect URL by the authentication controller at the end of OpenID
+	 * authentication to indicate that an error has occurred.
+	 * 
+	 */
+	public static final String OPEN_ID_ERROR_TOKEN = "OpenIDError";
+	public static final String OPEN_ID_UNKNOWN_USER_ERROR_TOKEN = "OpenIDUnknownUser";
 
+	
 	public static final String OPEN_ID_URI = "/Portal/openid";
 
 	public static final String OPEN_ID_PROVIDER = "OPEN_ID_PROVIDER";
 	// 		e.g. https://www.google.com/accounts/o8/id
+	
+	public static final String OPEN_ID_PROVIDER_GOOGLE_VALUE = "GOOGLE";
 	
 	// this is the parameter name for the value of the final redirect
 	public static final String RETURN_TO_URL_PARAM = "RETURN_TO_URL";
@@ -74,9 +94,11 @@ public class WebConstants {
 	public static final String SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
 			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br>--strike out--<br></code></pre><br>" +
 			"<h3>Subscript/Superscript</h3><pre><code>~subscript~  ^superscript^<br></code></pre><br>" +
-			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre><br>" +
-			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><br>" +
+			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><br>" +
+			"<h3>Tables</h3><pre><code>Header 1 | Header 2 | Header 3<br>--- | --- | ---<br>Row 1 Content Cell 1  |  Row 1 Content Cell 2  |  Row 1 Content Cell 3<br>Row 2 Content Cell 1  |  Row 2 Content Cell 2  |  Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
 			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
+			"<h3>Inline LaTeX</h3><pre><code>$$\\(x^2\\)$$<br></code></pre><br>" +
+			"<h3>LaTeX Blocks</h3><p><pre><code>$$<br>\\begin{aligned}<br>x^2<br>\\end{aligned}<br>$$<br></code></pre></p><br>" +
 			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
 			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
 			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
@@ -95,20 +117,19 @@ public class WebConstants {
 
 	public static final int MAX_COLUMNS_IN_GRID = 100;
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
-	public static final String DIV_ID_PREVIEW_SUFFIX = "_preview";
-
-	public static final String DIV_ID_WIDGET_PREFIX = "widget_";
-	
-	public static final String FOOTNOTE_ID_WIDGET_PREFIX = "footnote_";
 
 	public static final String PROXY_PARAM_KEY = "proxy";
+	
+	public static final String REDIRECT_URL_KEY = "redirect";
 
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
 
 	public static final String ENTITY_EULA_ID_KEY = "eulaId";
 
 	public static final String ENTITY_PARAM_KEY = "entityId";
-
+	
+	public static final String TEAM_PARAM_KEY = "teamId";
+	
 	public static final String ENTITY_VERSION_PARAM_KEY = "version";
 
 	public static final String WIKI_OWNER_ID_PARAM_KEY = "ownerId";
@@ -118,6 +139,8 @@ public class WebConstants {
 	public static final String WIKI_ID_PARAM_KEY = "wikiId";
 
 	public static final String WIKI_FILENAME_PARAM_KEY = "fileName";
+	
+	public static final String WIKI_VERSION_PARAM_KEY = "wikiVersion";
 
 	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
 
@@ -143,14 +166,68 @@ public class WebConstants {
 
 	public static final String ENTITY_VERSION_STRING = "/version/";
 	
+	public static final String MATHJAX_PREFIX = "\\[";
+	public static final String MATHJAX_SUFFIX = "\\]";
 	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
+	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
+	public static final String USER_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.userguide_synapse_id";
+	public static final String USER_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.userguide_wiki_id";
+	public static final String GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_synapse_id";
+	public static final String GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_wiki_id";
+	public static final String CREATE_PROJECT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.createproject_synapse_id";
+	public static final String CREATE_PROJECT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.createproject_wiki_id";
+	public static final String R_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.rclient_synapse_id";
+	public static final String R_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.rclient_wiki_id";
+	public static final String PYTHON_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_synapse_id";
+	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
+	public static final String TRUSTED_USER_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_synapse_id";
+	public static final String TRUSTED_USER_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_wiki_id";
 
+	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
+	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
+	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
+	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
 	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";
 
 	public static final String CONTENT_TYPE_JNLP = "application/x-java-jnlp-file";
+	public static final String CONCRETE_TYPE_KEY = "concreteType";
+	public static final String NODE_TYPE_KEY = "nodeType";
+	
+	
+	public static final String USER_GUIDE = "UserGuide";
+	public static final String GETTING_STARTED = "GettingStarted";
+	public static final String CREATE_PROJECT = "CreateProject";
+	public static final String R_CLIENT = "RClient";
+	public static final String PYTHON_CLIENT = "PythonClient";
+	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	public static final String USER_CERTIFICATION_TUTORIAL = "Certification";
+	
+	//APITableWidget default column names
+	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
+	public static final String DEFAULT_COL_NAME_ENTITY_ID = "entityid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_ON = "modifiedon";
+	public static final String DEFAULT_COL_NAME_CREATED_ON = "createdon";
+	public static final String DEFAULT_COL_NAME_USER_ID = "userid";
+	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
+	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
+	public static final String DEFAULT_COL_NAME_ID = "id";
+
+	//ClientCache key suffixes (used to avoid collision in the cache)
+	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
+
+	public static final String QUIZ_MORE_INFO = 
+		"<blockquote class=\"margin-bottom-40\"><div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_1+"</div>" +
+		"<div class=\"margin-top-left-10\">"+DisplayConstants.CERTIFICATION_MESSAGE_2+"</div>" +
+		"<div class=\"margin-top-left-10\">" +DisplayConstants.CERTIFICATION_MESSAGE_3 +
+		"<ul class=\"margin-left-15\" style=\"list-style-type:disc\"><li> "+DisplayConstants.CERTIFICATION_MESSAGE_4+"</li><li>"+DisplayConstants.CERTIFICATION_MESSAGE_5+"</li></ul></div></blockquote>";
+
+	public static final String TABLE_COLUMN_ID = "columnId";
+	public static final String TABLE_ROW_ID = "rowId";
+	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
 	
 }

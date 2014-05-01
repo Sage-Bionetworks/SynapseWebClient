@@ -14,9 +14,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -28,8 +28,9 @@ public class ShinySiteWidgetTest {
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
-	String invalidSiteUrl = "http://google.com";
+	String invalidSiteUrl = "http://glimmer.rstudio.com.hackers.com/problem.html";
 	
 	@Before
 	public void setup(){
@@ -50,15 +51,19 @@ public class ShinySiteWidgetTest {
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).configure(eq(validSiteUrl), anyInt());
+		
+		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl2);
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(validSiteUrl2), anyInt());
 	}
 	
 	@Test
 	public void testConfigureInvalid() {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).showInvalidSiteUrl(invalidSiteUrl);
 	}
 	

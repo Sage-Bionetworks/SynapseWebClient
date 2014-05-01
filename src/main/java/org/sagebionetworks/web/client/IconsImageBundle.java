@@ -20,9 +20,6 @@ public interface IconsImageBundle extends ClientBundle {
 	@Source("images/icons/wrench-screwdriver-16.png")
 	ImageResource adminTools16();		
 	
-	@Source("images/icons/grey_wrench-screwdriver-16.png")
-	ImageResource adminToolsGrey16();		
-	
 	@Source("images/icons/application--pencil-16.png")
 	ImageResource applicationEdit16();	
 
@@ -40,9 +37,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/book-brown-16.png")
 	ImageResource bookBrown16();
-	
-	@Source("images/icons/book-open-16.png")
-	ImageResource bookOpen16();
 	
 	@Source("images/icons/tick-16.png")
 	ImageResource checkGreen16();
@@ -115,15 +109,9 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/flag-16.png")
 	ImageResource flag16();
-
-	@Source("images/icons/shield-green-16.png")
-	ImageResource sheildGreen16();
-
+	
 	@Source("images/icons/shield-red-16.png")
 	ImageResource shieldRed16();
-
-	@Source("images/icons/shield-yellow-16.png")
-	ImageResource shieldYellow16();
 
 	@Source("images/icons/flag-small-16.png")
 	ImageResource flagSmall16();
@@ -142,6 +130,9 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/globe-green-32.png")
 	ImageResource globe32();	
+	
+	@Source("images/icons/glyphicons_circle_plus-16.png")
+	ImageResource glyphCirclePlus16();
 	
 	@Source("images/icons/google-16.png")
 	ImageResource google16();	
@@ -172,9 +163,6 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/lock-unlock-16.png")
 	ImageResource lockUnlocked16();	
-
-	@Source("images/icons/door-open-out-grey-16.png")
-	ImageResource logoutGrey16();	
 	
 	@Source("images/icons/magnifier-zoom-16.png")
 	ImageResource magnify16();		
@@ -226,9 +214,6 @@ public interface IconsImageBundle extends ClientBundle {
 
 	@Source("images/icons/rstudio-36.png")
 	ImageResource rstudio36();
-	
-	@Source("images/icons/grey_wrench-screwdriver-16.png")
-	ImageResource settings16();	
 	
 	@Source("images/icons/edit-16.png")
 	ImageResource slideInfo16();	

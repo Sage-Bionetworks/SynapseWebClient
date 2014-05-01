@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNotNull;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -30,8 +29,10 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
@@ -51,7 +52,7 @@ public class BreadcrumbTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
-	EntityTypeProvider entityTypeProvider;
+	IconsImageBundle mockIconsImageBundle;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -61,10 +62,11 @@ public class BreadcrumbTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-				
-		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
-		
-		breadcrumb = new Breadcrumb(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, entityTypeProvider);
+		mockIconsImageBundle = mock(IconsImageBundle.class);
+						
+		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
+				mockGlobalApplicationState, mockAuthenticationController,
+				mockNodeModelCreator, mockIconsImageBundle);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);
@@ -111,15 +113,15 @@ public class BreadcrumbTest {
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(EntityPath.class))).thenReturn(null); // null model return
-		breadcrumb.asWidget((EntityPath)null);
-		verify(mockView).setLinksList(any(List.class), (String)isNull());
+		breadcrumb.asWidget((EntityPath)null, EntityArea.FILES, false);
+		verify(mockView).setLinksList(any(List.class));
 		
 		// success test
 		reset(mockView);			
 		AsyncMockStubber.callSuccessWith(entityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createJSONEntity(entityWrapper.getEntityJson(), EntityPath.class)).thenReturn(entityPath);
-		breadcrumb.asWidget(entityPath);
-		verify(mockView).setLinksList(any(List.class), (String)isNotNull());				
+		breadcrumb.asWidget(entityPath, EntityArea.FILES, false);
+		verify(mockView).setLinksList(any(List.class));				
 	}
 	
 

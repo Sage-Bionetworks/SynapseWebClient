@@ -52,5 +52,5 @@ public class TableColumnRendererFactoryImpl implements TableColumnRendererFactor
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations() {
 		return apiTableColumnRendererEntityIdAnnotationsProvider.get();
 	}
-
+	
 }

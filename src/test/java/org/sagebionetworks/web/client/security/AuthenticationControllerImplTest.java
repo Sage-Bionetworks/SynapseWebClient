@@ -4,14 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -45,7 +47,8 @@ public class AuthenticationControllerImplTest {
 		UserSessionData sessionData = new UserSessionData();
 		sessionData.setIsSSO(false);
 		sessionData.setProfile(new UserProfile());
-		sessionData.setSessionToken("1234");
+		sessionData.setSession(new Session());
+		sessionData.getSession().setSessionToken("1234");
 		
 		// logged in
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString());
@@ -60,7 +63,7 @@ public class AuthenticationControllerImplTest {
 		
 	}
 
-	@SuppressWarnings({ "deprecation", "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetCurrentUserPrincipalId() throws Exception {
 		String principalId = "4321";
@@ -69,10 +72,11 @@ public class AuthenticationControllerImplTest {
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId(principalId);
 		sessionData.setProfile(profile);
-		sessionData.setSessionToken("1234");
+		sessionData.setSession(new Session());
+		sessionData.getSession().setSessionToken("1234");
 		
 		AsyncCallback<String> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUser(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
 		assertNull(authenticationController.getCurrentUserPrincipalId());
@@ -83,7 +87,7 @@ public class AuthenticationControllerImplTest {
 		
 		// empty user profile
 		sessionData.setProfile(null);
-		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUser(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		authenticationController.loginUser("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 		

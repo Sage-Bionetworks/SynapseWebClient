@@ -33,9 +33,9 @@ public interface HeaderView extends IsWidget {
 	public interface Presenter {
 		
 		UserSessionData getUser();
-
-		void getSupportHRef(AsyncCallback<String> callback);
 	}
+
+	public void setLargeLogo(boolean isHome);
 
 
 }

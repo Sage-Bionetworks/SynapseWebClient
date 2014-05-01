@@ -2,19 +2,25 @@ package org.sagebionetworks.web.client;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -168,10 +174,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private final static native boolean _isDirectUploadSupported() /*-{ 
-		//if Safari, direct upload is not supported
 		var userAgentString = navigator.userAgent.toLowerCase();
-		if ((userAgentString.indexOf('safari') != -1 && userAgentString.indexOf('chrome') == -1) ||	//Safari or
-			(userAgentString.indexOf('msie') != -1))												//IE
+		if (userAgentString.indexOf('msie') != -1) //IE
 			return false;
 		var xhr = new XMLHttpRequest();
 		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
@@ -179,12 +183,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadFileChunk(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+	public void uploadFileChunk(String contentType, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
 		_directUploadFile(contentType, fileFieldId, startByte, endByte, url, xhr);
 	}
 	
-	private final static native void _directUploadFile(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr) /*-{
+	private final static native void _directUploadFile(String contentType, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		var fileToUpload = fileToUploadElement.files[0];
 		var start = parseInt(startByte) || 0;
@@ -202,7 +206,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    }
 		xhr.upload.onprogress = $entry(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::updateProgress(Lcom/google/gwt/core/client/JavaScriptObject;));
   		xhr.open('PUT', url, true);
-		xhr.send(fileSliceToUpload);
+  		if(contentType) {
+  			xhr.setRequestHeader('Content-type', contentType);
+  		}
+  		xhr.send(fileSliceToUpload);
 	}-*/;
 	
 	
@@ -236,7 +243,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	private final static native double _getFileSize(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		return fileToUploadElement.files[0].size;
+		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[0].size : 0;
+		return fileSize;
 	}-*/;
 	
 	/**
@@ -265,12 +273,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
             else {
                console.log("finished loading file (to calculate md5)");
                // Call instance method setMD5() on md5Callback with the final md5
-    			md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
             }
         };
         $wnd.frOnerror = function () {
         	console.warn("unable to calculate md5");
-            md5Callback.@org.sagebionetworks.web.client.MD5Callback::setMD5(Ljava/lang/String;)(null);
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
         };
         
         $wnd.loadNext = function() { 
@@ -286,6 +294,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
        $wnd.loadNext();
 	}-*/;
 
+	/**
+	 * Get the url to a local file blob.
+	 */
+	@Override
+	public String getFileUrl(String fileFieldId) {
+		return _getFileUrl(fileFieldId);
+	}
+	private final static native String _getFileUrl(String fileFieldId) /*-{
+		try {
+			var fileToUploadElement = $doc.getElementById(fileFieldId);
+			var file = fileToUploadElement.files[0];
+			return URL.createObjectURL(file);
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	@Override
 	public void uploadUrlToGenomeSpace(String url) {
@@ -314,4 +338,63 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+
+	@Override
+	public void processWithMathJax(Element element) {
+		_processWithMathJax(element);		
+	}
+
+	private final static native void _processWithMathJax(Element element) /*-{
+		$wnd.layoutMath(element);
+	}-*/;
+
+	@Override
+	public void loadCss(final String url, final Callback<Void, Exception> callback) {
+		final LinkElement link = Document.get().createLinkElement();
+		link.setRel("stylesheet");
+		link.setHref(url);
+		_nativeAttachToHead(link);
+		
+		// fall back timer
+		final Timer t = new Timer() {
+			@Override
+			public void run() {
+				callback.onSuccess(null);
+			}
+		};
+		
+		Command loadedCommand = new Command() {			
+			@Override
+			public void execute() {
+				callback.onSuccess(null);
+				t.cancel();
+			}
+		};
+		
+		_addCssLoadHandler(url, loadedCommand);		
+		t.schedule(5000); // failsafe: after 5 seconds assume loaded
+	}
+	
+	/**
+	 * Attach element to head
+	 */
+	protected static native void _nativeAttachToHead(JavaScriptObject scriptElement) /*-{
+	    $doc.getElementsByTagName("head")[0].appendChild(scriptElement);
+	}-*/;
+
+
+	/**
+	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
+	 * @param cssUrl
+	 * @param callback
+	 */
+	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
+		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
+		var img = $doc.createElement('img');		
+		img.onerror = function() {			
+			command.@com.google.gwt.user.client.Command::execute()();
+		}
+		img.src = cssUrl;
+	}-*/;
+	
 }

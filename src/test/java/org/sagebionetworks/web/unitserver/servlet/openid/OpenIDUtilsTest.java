@@ -1,35 +1,75 @@
 package org.sagebionetworks.web.unitserver.servlet.openid;
 
-import java.net.URLEncoder;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.web.server.servlet.openid.OpenIDUtils;
-
-import static org.junit.Assert.*;
 
 public class OpenIDUtilsTest {
 	
+	
 	@Test
-	public void testAddQueryParameter() throws Exception {
-		String queryParameter = "sessionToken=2u362864826428";
-		// simple case
-		String url = "https://foo.bar.com";
-		assertEquals(url+"?"+queryParameter, OpenIDUtils.addRequestParameter(url, queryParameter));
+	public void testCreateRedirectURLUnknownError() throws Exception {		
+		String exceptionMessage="Testing exception message is returned";
+		String encodedMessage = "Testing+exception+message+is+returned";
+		Exception e = new SynapseServerException(404, exceptionMessage);
 		
-		// adding to existing param's
-		url = "https://foo.bar.com?bas=blah";
-		assertEquals(url+"&"+queryParameter, OpenIDUtils.addRequestParameter(url, queryParameter));
+		// I. isGWTMode=false
 		
-		// inserting BEFORE a fragment
-		url = "https://foo.bar.com?bas=blah";
-		assertEquals(url+"&"+queryParameter+"#frag", OpenIDUtils.addRequestParameter(url+"#frag", queryParameter));
+		// basic case
+		assertEquals("foobar.com?status=OK&sessionToken=123", 
+				OpenIDUtils.createRedirectURL("foobar.com", "123", false));
+		
+		// error with detailed message, then without
+		assertEquals("foobar.com?status=OpenIDError&detailedMessage="+encodedMessage, 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, e));
+		assertEquals("foobar.com?status=OpenIDError", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseServerException(404)));
+		assertEquals("foobar.com?status=OpenIDError", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, new SynapseServerException(404, "")));
 
-		// url encoding required
-		queryParameter = "sessionToken";
-		String queryValue = "2u36286#826.28";
-		String urlEncodedQueryValue = URLEncoder.encode(queryValue, "UTF-8");
-		url = "https://foo.bar.com";
-		assertEquals(url+"?"+queryParameter+"="+urlEncodedQueryValue, OpenIDUtils.addRequestParameter(url, queryParameter+"="+queryValue));
+		
+		// II. isGWTMode=true
+		
+		// basic case
+		assertEquals("foobar.com/openid#LoginPlace:123", 
+				OpenIDUtils.createRedirectURL("foobar.com/openid#LoginPlace", "123", true));
+		
+		// error
+		assertEquals("foobar.com/openid#LoginPlace:OpenIDError", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com/openid#LoginPlace", true, e));
+		
+	
+	}
+
+	@Test
+	public void testCreateRedirectURLUnknownUserError() throws Exception {		
+		Exception e = new SynapseNotFoundException();
+		
+		// I. isGWTMode=false
+		
+		// basic case
+		assertEquals("foobar.com?status=OK&sessionToken=123", 
+				OpenIDUtils.createRedirectURL("foobar.com", "123", false));
+		
+		// error
+		assertEquals("foobar.com?status=OpenIDUnknownUser", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com", false, e));
+		
+		// II. isGWTMode=true
+		
+		// basic case
+		assertEquals("foobar.com/openid#LoginPlace:123", 
+				OpenIDUtils.createRedirectURL("foobar.com/openid#LoginPlace", "123", true));
+		
+		// error
+		assertEquals("foobar.com/openid#LoginPlace:OpenIDUnknownUser", 
+				OpenIDUtils.createErrorRedirectURL("foobar.com/openid#LoginPlace", true, e));
+		
+	
 	}
 
 }

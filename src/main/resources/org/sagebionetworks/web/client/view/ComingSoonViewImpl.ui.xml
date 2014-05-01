@@ -5,49 +5,26 @@
 
 	<ui:style>
 		.important {
-			font-weight: bold;
+		font-weight: bold;
 		}
-		
+
 		.rowTop {
-			vertical-align: top;
+		vertical-align: top;
 		}
 	</ui:style>
 
 	<g:HTMLPanel>
-
-		<!-- start header -->
-	<!-- MAIN CONTAINER -->
 		<!-- HEADER -->
-        <div class="color-line"></div>
-        <div class="clear"></div>
-    	<div class="container"> 		
-			<g:SimplePanel ui:field="header" />
-	        	<div class="span-24 notopmargin">
-				<!-- end header -->
-
-					<ul class="breadcrumbs">
-						<li class="breadcrumb">
-							<a href="#">Home</a>
-							> All Projects
-						</li>
-					</ul>
-					<h2>Coming Soon</h2>
-					<g:SimplePanel ui:field="entityView" />
-					<div class="info">
-						<div class="span-10">
-							<g:FlexTable ui:field="flextTable1"></g:FlexTable>
-						</div>
-						<div class="span-14">
-						</div>
-						This page is coming soon.									
-					</div>
-				</div>
-
-				<!-- start footer -->
-            <div class="clear"></div>
-        </div> <!-- close class="container" -->
-		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
-
+		<div class="color-line"></div>
+		<g:SimplePanel ui:field="header" />
+		<div class="separator separator-header-page"></div>
+		<h2>Coming Soon</h2>
+		<div style="margin: 15px;">
+			<g:SimplePanel ui:field="entityView" />
+		</div>
+		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
+		This page is coming soon.
+		<div class="clear"></div>
+		<g:SimplePanel ui:field="footer" />	    
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
@@ -216,25 +216,23 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			public void handleEvent(BaseEvent be) {	
 				// load the tooltip contents only once
 				if(filledPopoverIds.containsKey(node.getId())) {															
-//					container.setToolTip(ProvViewUtil.createTooltipConfig(title, filledPopoverIds.get(node.getId())));
 					return;
 				}															
 				// retrieve info
 				presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
 					@Override
 					public void onSuccess(KeyValueDisplay<String> result) {
-						String rendered = ProvViewUtil.createEntityPopoverHtml(result).asString();
-						filledPopoverIds.put(container.getId(), rendered);
-					    //container.setToolTip(ProvViewUtil.createTooltipConfig(title, rendered));
-						//DisplayUtils.addTooltipSpecial(synapseJSNIUtils, container, rendered, TOOLTIP_POSITION.RIGHT);
-						//container.setTitle(rendered);
-						popup.setWidget(new HTML(rendered));
+						renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						//container.setToolTip(ProvViewUtil.createTooltipConfig(title, DisplayConstants.ERROR_GENERIC_RELOAD));
-						container.setTitle(DisplayConstants.ERROR_GENERIC_RELOAD);
+						renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
+					}
+					
+					private void renderPopover(String rendered) {
+						filledPopoverIds.put(container.getId(), rendered);
+						popup.setWidget(new HTML(rendered));						
 					}
 				});
 			}

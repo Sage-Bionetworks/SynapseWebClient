@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -22,8 +25,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	public void render();
 	
-	public void updateView(UserProfile profile, boolean editable, boolean isOwner, Widget profileFormView);
-	
+	public void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
 	public void refreshHeader();
 	
 	public interface Presenter extends SynapsePresenter {

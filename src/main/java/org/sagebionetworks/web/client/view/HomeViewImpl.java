@@ -3,28 +3,34 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.widget.entity.MyEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -35,6 +41,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -61,7 +68,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	SimplePanel registerBtnPanel;		
 	@UiField
-	SimplePanel dream8BtnPanel;
+	SimplePanel dreamBtnPanel;
 	@UiField
 	HTMLPanel whatIsSynapseContainer;
 	@UiField
@@ -92,6 +99,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	Anchor javaAPILink;	
 	@UiField
 	Anchor javaExampleCodeLink;	
+	@UiField
+	Anchor aboutSynapseLink;
+	@UiField
+	Anchor restApiLink;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -101,7 +112,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private EntityTreeBrowser myProjectsTreeBrowser;
 	private EntityTreeBrowser favoritesTreeBrowser;
 	IconsImageBundle iconsImageBundle;
-	private MyEvaluationsList myEvaluationsList;
+	private TeamListWidget teamsListWidget;
+	private CookieProvider cookies;
+	private FlowPanel openTeamInvitesPanel;
+	private MyEvaluationEntitiesList myEvaluationsList;
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -113,7 +127,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 			HomeSearchBox homeSearchBox, 
 			EntityTreeBrowser myProjectsTreeBrowser,
 			EntityTreeBrowser favoritesTreeBrowser,
-			MyEvaluationsList myEvaluationsList) {
+			MyEvaluationEntitiesList myEvaluationsList,
+			CookieProvider cookies,
+			TeamListWidget teamsListWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -121,9 +137,12 @@ public class HomeViewImpl extends Composite implements HomeView {
 		this.homeSearchBox = homeSearchBox;
 		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		this.favoritesTreeBrowser = favoritesTreeBrowser;
-		this.myEvaluationsList = myEvaluationsList;
 		this.iconsImageBundle = icons;
+		this.teamsListWidget = teamsListWidget;
+		this.cookies = cookies;
+		this.myEvaluationsList = myEvaluationsList;
 		
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
@@ -132,7 +151,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button loginBtn = new Button(DisplayConstants.BUTTON_LOGIN);
 		loginBtn.removeStyleName("gwt-Button");
-		loginBtn.addStyleName("btn btn-large btn-block");
+		loginBtn.addStyleName("btn btn-default btn-lg btn-block");
 		loginBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -143,7 +162,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		Button registerBtn = new Button(DisplayConstants.REGISTER_BUTTON);
 		registerBtn.removeStyleName("gwt-Button");
-		registerBtn.addStyleName("btn btn-large btn-block");
+		registerBtn.addStyleName("btn btn-default btn-lg btn-block");
 		registerBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -152,26 +171,42 @@ public class HomeViewImpl extends Composite implements HomeView {
 		});
 		registerBtnPanel.setWidget(registerBtn);
 		
-		Button dream8Btn = new Button(DisplayConstants.BUTTON_DREAM_8);
-		dream8Btn.removeStyleName("gwt-Button");
-		dream8Btn.addStyleName("btn btn-large btn-block");
-		dream8Btn.addClickHandler(new ClickHandler() {			
+		Button dreamBtn = new Button(DisplayConstants.BUTTON_DREAM);
+		dreamBtn.removeStyleName("gwt-Button");
+		dreamBtn.addStyleName("btn btn-default btn-lg btn-block");
+		dreamBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM8"));
+				globalApplicationState.getPlaceChanger().goTo(new Challenges("DREAM"));
 			}
 		});
-		dream8BtnPanel.setWidget(dream8Btn);
+		dreamBtnPanel.setWidget(dreamBtn);
 		
 		// Programmatic Clients
 		fillProgrammaticClientInstallCode();
 		
-	}	
+		// Other links
+		configureNewWindowLink(aboutSynapseLink, ClientProperties.ABOUT_SYNAPSE_URL, DisplayConstants.MORE_DETAILS_SYNAPSE);
+		configureNewWindowLink(restApiLink, ClientProperties.REST_API_URL, DisplayConstants.REST_API_DOCUMENTATION);
+		
+		openTeamInvitesPanel = new FlowPanel();
+		openTeamInvitesPanel.addStyleName("highlight-line-min alert alert-"+BootstrapAlertType.INFO.toString().toLowerCase());
+		openTeamInvitesPanel.add(new HTML("<span class=\"biggerText\">You have pending Team invitations!</span>"));
+		Button userProfileButton = DisplayUtils.createButton("See Invitations");
+		userProfileButton.addStyleName("margin-top-5");
+		openTeamInvitesPanel.add(userProfileButton);
+		userProfileButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+			}
+		});
+	}
 
 	@Override
 	public void onAttach() {
 		super.onAttach();
-		carousel();
+		startCarousel();
 	}
 	
 	@Override
@@ -187,32 +222,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		newsFeed.clear();
 		newsFeed.add(panel);
 	}
-		
-	private static native void carousel() /*-{
-		$wnd.jQuery("#slider").nivoSlider({
-	        effect:"sliceDown",
-	        slices:15,
-	        boxCols:8,
-	        boxRows:4,
-	        animSpeed:500,
-	        pauseTime:9000,
-	        startSlide:0,
-	        directionNav:true,
-	        controlNav:true,
-	        controlNavThumbs:false,
-	        pauseOnHover:true,
-	        manualAdvance:false
-	    });
-	}-*/;
 	
 	@Override
 	public void refresh() {
 		header.clear();
+		headerWidget.configure(true);
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);			
 
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
@@ -252,30 +270,92 @@ public class HomeViewImpl extends Composite implements HomeView {
 	 */
 	private void injectProjectPanel() {
 		projectPanel.clear();
-		// Overall container
-		LayoutContainer container = new LayoutContainer();
-		container.setStyleName("span-16 notopmargin last");			
+		LayoutContainer projectPanelContainer = new LayoutContainer();
 		
 		LayoutContainer evalsAndProjects = new LayoutContainer();
-		evalsAndProjects.setStyleName("span-8 notopmargin");
+		evalsAndProjects.setStyleName("col-md-4");
 		evalsAndProjects.add(getMyEvaluationsContainer());
 		evalsAndProjects.add(getMyProjectsContainer());
-		container.add(evalsAndProjects);
-		container.add(getFavoritesContainer());
+		evalsAndProjects.add(createCreateProjectWidget()); 
+		projectPanelContainer.add(evalsAndProjects);
 		
+		LayoutContainer favsAndTeams = new LayoutContainer();
+		favsAndTeams.setStyleName("col-md-4");
+		favsAndTeams.add(openTeamInvitesPanel);
+		favsAndTeams.add(getFavoritesContainer());
+		favsAndTeams.add(getTeamsContainer());
+		favsAndTeams.add(createCreateTeamsContainer());
+		projectPanelContainer.add(favsAndTeams);
+		projectPanel.add(projectPanelContainer);
+	}
+
+	private LayoutContainer getMyEvaluationsContainer() {
+		//My Evaluations
+		LayoutContainer myEvaluations = new LayoutContainer();
+		myEvaluations.add(myEvaluationsList.asWidget());          
+		return myEvaluations;
+	}
+	
+	@Override
+	public void setMyChallenges(List<EntityHeader> myEvaluationEntities) {
+		myEvaluationsList.configure(myEvaluationEntities);
+	}
+
+	@Override
+	public void setMyChallengesError(String string) {
+	}
+
+	@Override
+	public void setMyTeamsError(String string) {
+	}
+
+	private LayoutContainer createCreateTeamsContainer() {
 		// Create a project
 		LayoutContainer createProjectContainer = new LayoutContainer();
-		createProjectContainer.addStyleName("span-16 last");		
+		createProjectContainer.setStyleName("row");
 		
+		LayoutContainer col1 = new LayoutContainer();
+		col1.addStyleName("col-md-7 padding-right-5");
 		final TextBox input = new TextBox();
-		input.addStyleName("form-signinInput displayInline");
-		input.setWidth("200px");
-		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
-		createProjectContainer.add(input, new MarginData(0, 10, 0, 0));		
+		input.addStyleName("form-control");
+		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		col1.add(input);
+		createProjectContainer.add(col1);		
 		
-		Button createBtn = new Button(DisplayConstants.LABEL_CREATE);
-		createBtn.removeStyleName("gwt-Button");
-		createBtn.addStyleName("btn displayInline form-inputButton");
+		LayoutContainer col2 = new LayoutContainer();
+		col2.addStyleName("col-md-5 padding-left-5");
+		Button createBtn = DisplayUtils.createButton(DisplayConstants.CREATE_TEAM);
+		createBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				String name = input.getValue();
+				if(name == null || name.isEmpty()) {
+					showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+					return;
+				}
+				presenter.createTeam(input.getValue());
+			}
+		});
+		col2.add(createBtn);
+		createProjectContainer.add(col2);		
+		return createProjectContainer;
+	}
+	private LayoutContainer createCreateProjectWidget() {
+		// Create a project
+		LayoutContainer createProjectContainer = new LayoutContainer();
+		createProjectContainer.setStyleName("row margin-top-15");
+		
+		LayoutContainer col1 = new LayoutContainer();
+		col1.addStyleName("col-md-7 padding-right-5");
+		final TextBox input = new TextBox();
+		input.addStyleName("form-control");
+		input.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		col1.add(input);
+		createProjectContainer.add(col1);		
+		
+		LayoutContainer col2 = new LayoutContainer();
+		col2.addStyleName("col-md-5 padding-left-5");
+		Button createBtn = DisplayUtils.createButton(DisplayConstants.CREATE_PROJECT);
 		createBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -287,8 +367,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 				presenter.createProject(input.getValue());
 			}
 		});
-		createProjectContainer.add(createBtn);		
+		col2.add(createBtn);
+		createProjectContainer.add(col2);		
 
+		LayoutContainer col3 = new LayoutContainer();
+		col3.addStyleName("col-md-12 right");		
 		Anchor whatProj = new Anchor(DisplayConstants.WHAT_IS_A_PROJECT);
 		whatProj.addClickHandler(new ClickHandler() {
 			@Override
@@ -296,34 +379,59 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new ProjectsHome(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		createProjectContainer.add(whatProj, new MarginData(0, 0, 0, 15));
-		
-		container.add(createProjectContainer);
-
-		projectPanel.add(container);		
+		col3.add(whatProj);
+		createProjectContainer.add(col3);
+		return createProjectContainer;
 	}
 	
 	private LayoutContainer getFavoritesContainer() {
 		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.setStyleName("span-8 notopmargin last");
 		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
 		return favoritesContainer;
 	}
 	
-	private LayoutContainer getMyEvaluationsContainer() {
-		//My Evaluations
-		LayoutContainer myEvaluations = new LayoutContainer();
-		myEvaluations.setStyleName("span-8 notopmargin");
-		myEvaluations.add(myEvaluationsList.asWidget());					
-		return myEvaluations;
+	@Override
+	public void refreshMyTeams(List<Team> teams) {
+		teamsListWidget.configure(teams, false);
+	}
+	
+	private LayoutContainer getTeamsContainer() {
+		LayoutContainer myTeamsContainer = new LayoutContainer();
+		myTeamsContainer.addStyleName("margin-top-15");
+		Button searchButton = DisplayUtils.createIconButton("Search for Teams", ButtonType.DEFAULT, "glyphicon-search");
+		searchButton.addStyleName("right btn-xs");
+		searchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				globalApplicationState.getPlaceChanger().goTo(new TeamSearch(""));
+			}
+		});
+		
+		LayoutContainer headerRow = DisplayUtils.createRowContainer();
+		HTML myTeamsHeader = new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_TEAMS + "</h3>"));
+		myTeamsHeader.addStyleName("col-md-6");
+		headerRow.add(myTeamsHeader);
+		FlowPanel wrapButton = new FlowPanel();
+		wrapButton.addStyleName("col-md-6");
+		wrapButton.add(searchButton);
+		headerRow.add(wrapButton);
+		myTeamsContainer.add(headerRow);
+		Widget teamListWidget = teamsListWidget.asWidget();
+		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min line-height-1-7em-imp padding-top-15-imp");
+		myTeamsContainer.add(teamListWidget);
+		return myTeamsContainer;
+	}
+	@Override
+	public void showOpenTeamInvitesMessage(Boolean visible) {
+		openTeamInvitesPanel.setVisible(visible);
 	}
 	
 	private LayoutContainer getMyProjectsContainer() {
 		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.setStyleName("span-8 notopmargin");
 		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
+		myProjectsTreeBrowser.setWidgetHeight(180);
 		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
 		return myProjContainer;
 	}
@@ -344,15 +452,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void setFavoritesError(String string) {
-	}
-	
-	@Override
-	public void setMyEvaluationList(List<EntityHeader> myEvaluationEntities) {
-		myEvaluationsList.configure(myEvaluationEntities);
-	}
-	
-	@Override
-	public void setMyEvaluationsError(String string) {
 	}
 	
 	private void fillProgrammaticClientInstallCode() {
@@ -381,7 +480,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 		Button showJava = new Button(DisplayConstants.SHOW);
 		showJava.removeStyleName("gwt-Button");
-		showJava.addStyleName("btn btn-large btn-block margin-top-5");
+		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
 		showJava.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -397,6 +496,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 		a.setHref(href);
 		a.setText(text);
 	}
+
+	private static native void startCarousel() /*-{
+		$wnd.jQuery('#myCarousel').carousel('cycle');
+	}-*/;
 
 	
 }

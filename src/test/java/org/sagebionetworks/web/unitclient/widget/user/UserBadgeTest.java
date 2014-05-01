@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +9,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -31,7 +28,8 @@ public class UserBadgeTest {
 	SynapseClientAsync mockSynapseClient;
 	UserBadgeView mockView;
 	UserBadge userBadge;
-	UserProfile profile;		
+	UserProfile profile;
+	ClientCache mockCache;
 	String principalId = "id1";
 	int max=10;
 	
@@ -44,7 +42,8 @@ public class UserBadgeTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(UserBadgeView.class);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockNodeModelCreator);
+		mockCache = mock(ClientCache.class);
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockNodeModelCreator, mockCache);
 	}
 	
 	@Test
@@ -70,6 +69,19 @@ public class UserBadgeTest {
 		userBadge.configure(principalId);
 		verify(mockView).showLoadError(principalId);
 	}
+	
+	@Test
+	public void testConfigureFromCache() throws Exception {
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		when(mockCache.get(anyString())).thenReturn("user profile json");
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(profile);
+		profile.setDisplayName("name");
+		userBadge.setMaxNameLength(max);
+		userBadge.configure(principalId);
+		verify(mockView).setProfile(profile, max);
+		//did not use the synapse client, used cache instead
+		verify(mockSynapseClient, never()).getUserProfile(anyString(), any(AsyncCallback.class));
+	}
 		
 	@Test
 	public void testSetNameLength() {
@@ -78,4 +90,15 @@ public class UserBadgeTest {
 		verify(mockView).setProfile(profile, max);		
 	}
 	
+	@Test
+	public void testConfigureNullPrincipalId() throws Exception {
+		userBadge.configure((String)null);
+		verify(mockView, never()).setProfile(any(UserProfile.class), anyInt());
+	}
+	
+	@Test
+	public void testConfigureEmptyPrincipalId() throws Exception {
+		userBadge.configure("");
+		verify(mockView, never()).setProfile(any(UserProfile.class), anyInt());
+	}
 }

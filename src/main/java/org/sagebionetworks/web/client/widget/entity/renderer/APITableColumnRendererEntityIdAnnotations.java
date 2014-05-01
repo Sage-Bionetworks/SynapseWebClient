@@ -17,7 +17,7 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.PropertyWidget;
+import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -91,7 +91,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 				
 				try {
 					EntityBundle bundle = nodeModelCreator.createEntityBundle(result);
-					List<EntityRow<?>> entityRowList =  PropertyWidget.getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
+					List<EntityRow<?>> entityRowList =  AnnotationsWidget.getRows(bundle.getEntity(), bundle.getAnnotations(), factory, cache);
 
 					if (masterAnnotationList == null && entityRowList.size() > 0)
 						masterAnnotationList = entityRowList;

@@ -3,14 +3,22 @@ package org.sagebionetworks.web.client;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.sagebionetworks.web.client.resources.WebResource;
+import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
+import org.sagebionetworks.web.shared.WebConstants;
+
 public class ClientProperties {
 
+	public static final String VIDEO_HTML5_BROWSER_LINK = "http://en.wikipedia.org/wiki/HTML5_video#Browser_support";
+	
 	public static final String HELP_EMAIL_ADDRESS = "synapseInfo@sagebase.org";
 	public static final String HELP_EMAIL_ADDRESS_LINK = "<a href=\""+ HELP_EMAIL_ADDRESS +"\" class=\"link\">contact us</a>";
 	public static final String NEWS_FEED_URL = "https://sagesynapse.wordpress.com/feed/";
 	public static final String SUPPORT_RECENT_ACTIVITY_URL = "http://support.sagebase.org/sagebase?view=recent";
 	public static final String WIKI_URL = "https://sagebionetworks.jira.com/wiki";
 	public static final String USER_GUIDE_ID = "syn1669771";
+	public static final String ABOUT_SYNAPSE_URL = "https://s3.amazonaws.com/static.synapse.org/About_Synapse.pdf";
+	public static final String TEAM2CHALLENGE_WHITELIST_URL = "https://s3.amazonaws.com/static.synapse.org/teamId2challengeEntityId.json";
 	
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
 	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
@@ -56,7 +64,7 @@ public class ClientProperties {
 	public static final String SYNAPSE_ID_PREFIX = "syn";
 	public static final String DEFAULT_RSTUDIO_URL = "http://localhost:8787";
 	public static final int FULL_ENTITY_PAGE_WIDTH = 940;
-	public static final int FULL_ENTITY_PAGE_HEIGHT = 500;
+	public static final int FULL_ENTITY_TOP_MARGIN_PX = 250;
 	public static final int BIG_BUTTON_HEIGHT_PX = 36;
 	public static final int MARKDOWN_WIDTH_WIDE_PX = 940;
 	public static final int MARKDOWN_WIDTH_NARROW_PX = 660;
@@ -96,14 +104,25 @@ public class ClientProperties {
 	/*
 	 * Client Documentation
 	 */
-	public static final String REST_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Synapse+REST+APIs";
-	public static final String CLIENT_R_API_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
-	public static final String CLIENT_R_EXAMPLE_CODE_URL = "https://sagebionetworks.jira.com/wiki/display/SYNR/Examples";
-	public static final String CLIENT_PYTHON_API_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
-	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "https://sagebionetworks.jira.com/wiki/pages/viewpage.action?pageId=34373660";
-	public static final String CLIENT_CL_API_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient";
-	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/synapsePythonClient/tree/master/examples/provenance";
+	public static final String REST_API_URL = "http://rest.synapse.org";
+	public static final String CLIENT_R_API_URL = "http://r-docs.synapse.org";
+	public static final String CLIENT_R_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.R_CLIENT;
+	public static final String CLIENT_PYTHON_API_URL = "#!Help:"+WebConstants.PYTHON_CLIENT;
+	public static final String CLIENT_PYTHON_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.PYTHON_CLIENT;
+	public static final String CLIENT_CL_API_URL = "#!Help:" + WebConstants.COMMAND_LINE_CLIENT;
+	public static final String CLIENT_CL_EXAMPLE_CODE_URL = "#!Help:"+WebConstants.COMMAND_LINE_CLIENT;
 	public static final String CLIENT_JAVA_API_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
-	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";
+	public static final String CLIENT_JAVA_EXAMPLE_CODE_URL = "https://github.com/Sage-Bionetworks/SynapseWebClient/blob/develop/src/main/java/org/sagebionetworks/web/server/servlet/SynapseClientImpl.java";	
+
+	/*
+	 * JavaScript WebResources
+	 */
+	public static final WebResource CYTOSCAPE_JS = new WebResource("js/cytoscape-2.0.2.min.js", ResourceType.JAVASCRIPT);
+	public static final WebResource MATHJAX_LOADER_JS = new WebResource("js/mathjax-loader.js", ResourceType.JAVASCRIPT);
+	public static final WebResource MATHJAX_JS = new WebResource("https://c328740.ssl.cf1.rackcdn.com/mathjax/2.2-latest/MathJax.js?config=default", ResourceType.JAVASCRIPT);
+	public static final WebResource JQUERY_JS = new WebResource("https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js", ResourceType.JAVASCRIPT);
+	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
+	public static final String EVALUATION_QUERY_SERVICE_PREFIX = "/evaluation/submission/query?query=";
 	
 }
+

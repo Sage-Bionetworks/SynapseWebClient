@@ -54,7 +54,7 @@ public class Portal implements EntryPoint {
 					try {
 						EventBus eventBus = ginjector.getEventBus();
 						PlaceController placeController = new PlaceController(eventBus);
-						
+
 						// Start ActivityManager for the main widget with our ActivityMapper
 						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), loading);
 						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
@@ -66,15 +66,18 @@ public class Portal implements EntryPoint {
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
 						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
 						PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());
-
+						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());						
+						
 						RootPanel.get("rootPanel").add(appWidget);
 
 						GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
-
+						
+						//listen for window close (or navigating away)
+						registerWindowClosingHandler(globalApplicationState);
+						
 						// start version timer
 						ginjector.getVersionTimer().start();
 						
@@ -88,5 +91,14 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
+		Window.addWindowClosingHandler(new Window.ClosingHandler() {
+		      public void onWindowClosing(Window.ClosingEvent closingEvent) {
+		    	  if (globalApplicationState.isEditing())
+		    		  closingEvent.setMessage(DisplayConstants.CLOSE_PORTAL_CONFIRMATION_MESSAGE);
+		      }
+		    });
 	}
 }

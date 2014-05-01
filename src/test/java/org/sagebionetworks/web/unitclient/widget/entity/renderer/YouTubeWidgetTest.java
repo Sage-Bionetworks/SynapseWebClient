@@ -9,8 +9,8 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -38,7 +38,7 @@ public class YouTubeWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String videoId = "my test video id";
 		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).configure(eq(videoId));
 	}
 }

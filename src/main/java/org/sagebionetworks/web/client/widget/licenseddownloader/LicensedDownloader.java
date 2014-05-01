@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -169,7 +170,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 						if (fileHandle instanceof S3FileHandleInterface) {
 							md5 = ((S3FileHandleInterface)fileHandle).getContentMd5();
 						}
-						this.view.setDownloadLocation(fileHandle.getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5);
+						String externalUrl = null;
+						if (fileHandle instanceof ExternalFileHandle) {
+							externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
+						}
+						this.view.setDownloadLocation(fileHandle.getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5, externalUrl);
 					}
 					else {
 						this.view.setNoDownloads();
@@ -279,10 +284,11 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	@Override
 	public Callback getRequestAccessCallback() {
+		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
 		final String jiraLink = jiraUrlHelper.createRequestAccessIssue(
 				userProfile.getOwnerId(), 
-				userProfile.getDisplayName(), 
-				userProfile.getUserName(), 
+				DisplayUtils.getDisplayName(userProfile), 
+				primaryEmail,
 				entityId, 
 				accessRequirementToDisplay.getId().toString());
 		

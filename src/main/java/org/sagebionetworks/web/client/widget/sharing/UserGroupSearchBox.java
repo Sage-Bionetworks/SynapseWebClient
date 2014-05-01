@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
+
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
 import com.extjs.gxt.ui.client.data.JsonPagingLoadResultReader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
@@ -29,13 +32,14 @@ public class UserGroupSearchBox {
 	public static final String KEY_LIMIT = "limit";
 
 	// This is the value to get and set.
-	public static final String KEY_DISPLAY_NAME = "displayName";
 	public static final String KEY_TOTAL_NUMBER_OF_RESULTS = "totalNumberOfResults";
 	public static final String KEY_CHILDREN = "children";
 	public static final String KEY_PROFILE_PICTURE = "pic";
 	public static final String KEY_IS_INDIVIDUAL = "isIndividual";
 	public static final String KEY_PRINCIPAL_ID = "ownerId";
-	public static final String KEY_EMAIL = "email";
+	public static final String KEY_USERNAME = "userName";
+	public static final String KEY_FIRSTNAME = "firstName";
+	public static final String KEY_LASTNAME = "lastName";
 
 	/**
 	 * Create a new editor for a given concept URL.
@@ -43,7 +47,7 @@ public class UserGroupSearchBox {
 	 * @param url
 	 * @return
 	 */
-	public static ComboBox<ModelData> createUserGroupSearchSuggestBox(String repositoryUrl, final Long publicPrincipleId, final Long authenticatedPrincipleId) {
+	public static ComboBox<ModelData> createUserGroupSearchSuggestBox(String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
 		String url = repositoryUrl + USER_GROUP_HEADER_URL;
 		ScriptTagProxy<PagingLoadResult<ModelData>> proxy = 
 				new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
@@ -52,11 +56,12 @@ public class UserGroupSearchBox {
 		ModelType type = new ModelType();
 		type.setRoot(KEY_CHILDREN);
 		type.setTotalName(KEY_TOTAL_NUMBER_OF_RESULTS);
-		type.addField(KEY_DISPLAY_NAME, KEY_DISPLAY_NAME);
+		type.addField(KEY_FIRSTNAME, KEY_FIRSTNAME);
+		type.addField(KEY_LASTNAME, KEY_LASTNAME);
 		type.addField(KEY_PROFILE_PICTURE, KEY_PROFILE_PICTURE);
 		type.addField(KEY_IS_INDIVIDUAL, KEY_IS_INDIVIDUAL);
 		type.addField(KEY_PRINCIPAL_ID, KEY_PRINCIPAL_ID);
-		type.addField(KEY_EMAIL, KEY_EMAIL);
+		type.addField(KEY_USERNAME, KEY_USERNAME);
 
 		// The paginated reader
 		JsonPagingLoadResultReader<PagingLoadResult<ModelData>> reader = 
@@ -75,7 +80,7 @@ public class UserGroupSearchBox {
 				be.<ModelData> getConfig().set(KEY_PREFIX,	be.<ModelData> getConfig().get(KEY_QUERY));
 			}
 		});
-		if (authenticatedPrincipleId != null || publicPrincipleId != null) {
+		if (publicPrincipalIds != null) {
 			//don't show the authenticated users group
 			loader.addListener(Loader.Load, new Listener<LoadEvent>() {
 				@Override
@@ -84,8 +89,8 @@ public class UserGroupSearchBox {
 					if (pagedResults != null) {
 						List<ModelData> modelDataList = pagedResults.getData();
 						if (modelDataList != null)  {
-							String authenticatedPrincipleIdString = authenticatedPrincipleId != null ? authenticatedPrincipleId.toString() : "";
-							String publicPrincipleIdString = publicPrincipleId != null ? publicPrincipleId.toString() : "";
+							String authenticatedPrincipleIdString = publicPrincipalIds.getAuthenticatedAclPrincipalId() != null ? publicPrincipalIds.getAuthenticatedAclPrincipalId().toString() : "";
+							String publicPrincipleIdString = publicPrincipalIds.getPublicAclPrincipalId() != null ? publicPrincipalIds.getPublicAclPrincipalId().toString() : "";
 							List<ModelData> removeItems = new ArrayList<ModelData>();
 							for (Iterator iterator = modelDataList.iterator(); iterator
 									.hasNext();) {
@@ -112,14 +117,19 @@ public class UserGroupSearchBox {
 			@Override
 			public String getStringValue(ModelData value) {
 				// Example output:
-				// dev usr  |  dev....1@sagebase.org  |  syn114085
+				// jane42  |  114085
 				
 				StringBuilder sb = new StringBuilder();
-				sb.append(value.get(KEY_DISPLAY_NAME).toString());
-				String email = value.get(KEY_EMAIL);
-				if (email != null)
-					sb.append("  |  " + email);
-				sb.append("  |  " + value.get(KEY_PRINCIPAL_ID));				
+				Boolean isIndividual = value.get(KEY_IS_INDIVIDUAL);
+				if (isIndividual != null && !isIndividual)
+					sb.append("(Team) ");
+
+				String firstName = value.get(KEY_FIRSTNAME);
+				String lastName = value.get(KEY_LASTNAME);
+				String username = value.get(KEY_USERNAME);
+				sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
+				sb.append("  |  "+ value.get(KEY_PRINCIPAL_ID));
+	
 				return sb.toString();
 			}
 			
@@ -140,8 +150,8 @@ public class UserGroupSearchBox {
 			}
 		});
 		combo.setDisplayField(KEY_PRINCIPAL_ID);
-		combo.setItemSelector("div.search-item");
-		combo.setTemplate(getTemplate());
+		combo.setItemSelector("span.search-item");
+		combo.setTemplate(getTemplate(baseFileHandleUrl, baseProfileAttachmentUrl));
 		combo.setStore(store);
 		combo.setHideTrigger(false);
 		combo.setAllowBlank(false);
@@ -150,10 +160,32 @@ public class UserGroupSearchBox {
 		return combo;
 	}
 
-	private static native String getTemplate() /*-{
+	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',
-				'<div class="search-item" qtitle="{displayName}" qtip="{email}">',
-				'{displayName}</div></tpl>' ].join("");
+				'<div class="margin-left-5" style="height:23px">',
+				'<img class="margin-right-5 vertical-align-center tiny-thumbnail-image-container" onerror="this.style.display=\'none\';" src="',
+				'<tpl if="isIndividual">',
+					baseProfileAttachmentUrl,
+					'?userId={ownerId}&waitForUrl=true" />',
+				'</tpl>',
+				
+				'<tpl if="!isIndividual">',
+					baseFileHandleUrl,
+					'?teamId={ownerId}" />',
+			    '</tpl>',
+				'<span class="search-item movedown-1 margin-right-5">',
+				'<span class="font-italic">{firstName} {lastName} </span> ',
+				'<tpl if="!userName.indexOf(\'TEMPORARY-\') == 0">',
+					'{userName}',
+				'</tpl>',
+				'</span>',
+				'<tpl if="!isIndividual">',
+			        '(Team)',
+			    '</tpl>',
+				
+				'</div>',
+				'</tpl>' ].join("");
+				
 	}-*/;
 
 }

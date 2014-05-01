@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -24,8 +23,6 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -55,7 +52,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Anchor md5Link;
+	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
 	NodeModelCreator nodeModelCreator;
 	
@@ -76,8 +73,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	SimplePanel uploadButtonContainer;
 	@UiField
-	SpanElement entityId;
-	@UiField
 	Image entityIcon;
 	@UiField
 	SpanElement fileName;
@@ -96,25 +91,24 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			AccessMenuButton accessMenuButton,
-			AccessControlListEditor accessControlListEditor,
 			Uploader locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
 			SynapseJSNIUtils synapseJSNIUtils,
 			FavoriteWidget favoriteWidget,
-			NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
 		this.nodeModelCreator = nodeModelCreator;
+		this.md5Link = md5Link;
 		
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
-		md5LinkContainer.addStyleName("inline-block font-italic margin-left-5");
+		md5LinkContainer.addStyleName("inline-block margin-left-5");
 		entityLink.addStyleName("downloadLink link");
 		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
 		
@@ -142,7 +136,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		downloadButtonContainer.clear();
 		downloadButtonContainer.add(downloadButton);
 		
-		md5Link = new Anchor("md5");
+		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
@@ -153,7 +147,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		if (isDataWithin) {
 			//add an anchor with the file name, that redirects to the download button for functionality
 			entityLink.setText(entity.getName());
-			entityId.setInnerText(entity.getId());
 			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 			synapseIconForEntity.applyTo(entityIcon);
 			//fileHandle is null if user can't access the filehandle associated with this fileentity
@@ -163,7 +156,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			if (isFilenamePanelVisible) {
 				//don't ask for the size if it's external, just display that this is external data
 				if (fileHandle instanceof ExternalFileHandle) {
-					fileName.setInnerText(DisplayUtils.getFileNameFromExternalUrl(((ExternalFileHandle) fileHandle).getExternalURL()));
+					fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
 					md5Link.setVisible(false);
 					fileSize.setInnerText("(External Storage)");
 				}
@@ -175,18 +168,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
 					final String md5 = s3FileHandle.getContentMd5();
 					if (md5 != null) {
-						md5Link.setVisible(true);
-						md5Link.addClickHandler(new ClickHandler() {
-							@Override
-							public void onClick(ClickEvent event) {
-								showMd5Dialog(md5);
-							}
-						});
-						DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
+						md5Link.configure(md5);
 					} 
-					else {
-						md5Link.setVisible(false);
-					}
 				}
 			}
 		}
@@ -222,7 +205,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		}
 		else {
 			//clear href, if there is one
-			entityLink.setHref(null);
+			entityLink.setHref((String)null);
 			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -260,24 +243,5 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	@Override
 	public void clear() {
-	}
-	
-	private void showMd5Dialog(String md5) {
-		final Dialog window = new Dialog();
-		window.setSize(220, 85);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading("md5");
-		
-		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant("<span style=\"margin-left: 10px;\">"+md5+"</span>");
-		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
-		window.add(htmlPanel);
-		
-	    window.setButtons(Dialog.OK);
-	    window.setButtonAlign(HorizontalAlignment.CENTER);
-	    window.setHideOnButtonClick(true);
-		window.setResizable(false);
-		window.show();
 	}
 }

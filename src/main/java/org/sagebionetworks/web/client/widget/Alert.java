@@ -13,10 +13,10 @@ import com.google.gwt.user.client.ui.Label;
 public class Alert extends Composite {
 
 	public static enum AlertType {
-		Error("error"),
+		Error("danger"),
 		Success("success"),
 		Info("info"),
-		Warn("");
+		Warn("warning");
 		
 		public final String type;
 		AlertType(String type) {

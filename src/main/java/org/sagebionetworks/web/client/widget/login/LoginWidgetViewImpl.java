@@ -1,149 +1,144 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.sagebionetworks.repo.model.ServiceConstants;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.view.TermsOfUseHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FieldSet;
-import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window.Location;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class LoginWidgetViewImpl extends LayoutContainer implements
+public class LoginWidgetViewImpl extends Composite implements
 		LoginWidgetView {
 
+	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
+	
+	@UiField
+	SimplePanel googleSSOContainer;
+	@UiField
+	SpanElement messageLabel;
+	@UiField
+	Button signInBtn;
+	@UiField
+	Anchor forgotPasswordLink;
+	@UiField
+	Button registerBtn;
+	@UiField
+	TextBox username;
+	@UiField
+	PasswordTextBox password;
+	
 	private Presenter presenter;
-	private VerticalPanel vp;
 	private FormData formData;
-	private Label messageLabel;
 	private IconsImageBundle iconsImageBundle;
-	private TextField<String> firstName = new TextField<String>();
-	private TextField<String> password = new TextField<String>();
 	
 	@Inject
-	public LoginWidgetViewImpl(IconsImageBundle iconsImageBundle) {
-		this.iconsImageBundle = iconsImageBundle;
-		messageLabel = new Label();
-	}
-	
-	private SafeHtml createSSOLoginButton(boolean userHasExplictlyAcceptedTermsOfUse) {
-		// federated login button
-		SafeHtmlBuilder sb = new SafeHtmlBuilder()		
-		.appendHtmlConstant("<form accept-charset=\"UTF-8\" action=\""+ presenter.getOpenIdActionUrl() +"\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
-		.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_PROVIDER+"\" type=\"hidden\" value=\""+ DisplayConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE +"\"/>")
-		.appendHtmlConstant("    <input name=\""+WebConstants.RETURN_TO_URL_PARAM+"\" type=\"hidden\" value=\""+  presenter.getOpenIdReturnUrl() +"\"/>");
-		if (userHasExplictlyAcceptedTermsOfUse) {
-			sb.appendHtmlConstant("    <input name=\""+ServiceConstants.ACCEPTS_TERMS_OF_USE_PARAM+"\" type=\"hidden\" value=\"true\"/>");
-		}
-		sb.appendHtmlConstant("    <input name=\""+WebConstants.OPEN_ID_MODE+"\" type=\"hidden\" value=\""+  WebConstants.OPEN_ID_MODE_GWT +"\"/>");
-		sb.appendHtmlConstant("    <button id=\"" + DisplayConstants.ID_BTN_LOGIN_GOOGLE + "\" type=\"submit\"><img alt=\""+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +" " +userHasExplictlyAcceptedTermsOfUse+" \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT +"</button>")
-		.appendHtmlConstant("</form>")		
-		.appendHtmlConstant("<p>&nbsp;</p>");
-		return sb.toSafeHtml();
-	}
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, IconsImageBundle iconsImageBundle) {
+		initWidget(binder.createAndBindUi(this));
+		this.iconsImageBundle = iconsImageBundle;		
 		
-//	private Html ssoLoginButton;
-	private boolean explicitlyAcceptsTermsOfUse = false;
-	
-	@Override
-	protected void onRender(Element parent, int pos) {
-		super.onRender(parent, pos);
-		formData = new FormData("-20");
-		vp = new VerticalPanel();
-		vp.setSpacing(10);
-		
-		HTML ssoLoginButton = new HTML(createSSOLoginButton(/*acceptTermsOfUse*/explicitlyAcceptsTermsOfUse));
-		vp.add(ssoLoginButton);
-		
-		createForm();
-		add(vp);
-	}
-	
-	@Override
-	public void acceptTermsOfUse() {
-		explicitlyAcceptsTermsOfUse = true;
-//		ssoLoginButton.setHtml(createSSOLoginButton(/*acceptTermsOfUse*/true)); // this had been creating a nullptr exception
-//		vp.layout();
-	}
-
-	private void createForm() {
-		final FormPanel formPanel = new FormPanel();
-		formPanel.setHeaderVisible(false);
-		formPanel.setFrame(true);
-		formPanel.setWidth(380);
-		formPanel.setLabelWidth(85);
-		
-		// synapse login
-		FieldSet fieldSet = new FieldSet();  
-		fieldSet.setHeading("Login with a Synapse Account");  
-		fieldSet.setCheckboxToggle(false);  		       
-		FormLayout layout = new FormLayout();  
-		layout.setLabelWidth(85);  		
-		fieldSet.setLayout(layout);  
-		fieldSet.setCollapsible(false);
-		
-		firstName.setFieldLabel(DisplayConstants.LOGIN_USERNAME_LABEL);
-		firstName.setAllowBlank(false);
-		firstName.getFocusSupport().setPreviousId(formPanel.getButtonBar().getId());
-		firstName.setId(DisplayConstants.ID_INP_EMAIL_NAME);
-		fieldSet.add(firstName, formData);
-
-		password.setFieldLabel("Password");
-		password.setAllowBlank(false);
-		password.setPassword(true);
-		password.setId(DisplayConstants.ID_INP_EMAIL_PASSWORD);
-		fieldSet.add(password, formData);
-
-		fieldSet.add(messageLabel);
-		
-		final Button loginButton = new Button("Login", new SelectionListener<ButtonEvent>(){			
+		signInBtn.setText(DisplayConstants.SIGN_IN);
+		signInBtn.addClickHandler(new ClickHandler() {			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
-				messageLabel.setText(""); 
-				presenter.setUsernameAndPassword(firstName.getValue(), password.getValue(), false);
+			public void onClick(ClickEvent event) {
+				loginUser();
 			}
 		});
-		loginButton.setId(DisplayConstants.ID_BTN_LOGIN2);
-
-		fieldSet.add(loginButton);
-		formPanel.add(fieldSet);		
 		
-		FormButtonBinding binding = new FormButtonBinding(formPanel);
-		binding.addButton(loginButton);
-
-		// Enter key submits login 
-		new KeyNav<ComponentEvent>(formPanel) {
+		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
+		forgotPasswordLink.addClickHandler(new ClickHandler() {			
 			@Override
-			public void onEnter(ComponentEvent ce) {
-				super.onEnter(ce);
-				if(loginButton.isEnabled())
-					loginButton.fireEvent(Events.Select);
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));				
 			}
-		};
+		});
 		
-		vp.add(formPanel);
+		registerBtn.setText(DisplayConstants.REGISTER_BUTTON);
+		registerBtn.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
+			}
+		});
+		
+		username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
+		username.setFocus(true);
+		
+		password.getElement().setAttribute("placeholder", DisplayConstants.PASSWORD);
+		password.addKeyDownHandler(new KeyDownHandler() {
+		    @Override
+		    public void onKeyDown(KeyDownEvent event) {
+		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {		        	
+		        	signInBtn.fireEvent(new GwtEvent<ClickHandler>() {
+		                @Override
+		                public com.google.gwt.event.shared.GwtEvent.Type<ClickHandler> getAssociatedType() {
+		                	return ClickEvent.getType();
+		                }
+		                @Override
+		                protected void dispatch(ClickHandler handler) {
+		                    handler.onClick(null);
+		                }
+		           });
+		        }
+		    }
+		});
+	}
+	
+	@Override 
+	public void onLoad() {
+		googleSSOContainer.setWidget(new HTML(createSSOLoginButton()));		
+	}
+	
+	private SafeHtml createSSOLoginButton() {
+		// Federated login button
+		SafeHtmlBuilder sb = new SafeHtmlBuilder()
+				.appendHtmlConstant(
+						"<form accept-charset=\"UTF-8\" action=\""
+								+ presenter.getOpenIdActionUrl()
+								+ "\" class=\"aui\" id=\"gapp-openid-form\" method=\"post\" name=\"gapp-openid-form\">")
+				.appendHtmlConstant(
+						"    <input name=\"" + WebConstants.OPEN_ID_PROVIDER
+								+ "\" type=\"hidden\" value=\""
+								+ WebConstants.OPEN_ID_PROVIDER_GOOGLE_VALUE
+								+ "\"/>")
+				.appendHtmlConstant(
+						"    <input name=\"" + WebConstants.RETURN_TO_URL_PARAM
+								+ "\" type=\"hidden\" value=\""
+								+ presenter.getOpenIdReturnUrl() + "\"/>");
+		sb.appendHtmlConstant("    <input name=\"" + WebConstants.OPEN_ID_MODE
+				+ "\" type=\"hidden\" value=\"" + WebConstants.OPEN_ID_MODE_GWT
+				+ "\"/>");
+		sb.appendHtmlConstant(
+				"    <button class=\"btn btn-default btn-lg btn-block\" id=\""
+						+ DisplayConstants.ID_BTN_LOGIN_GOOGLE
+						+ "\" type=\"submit\"><img alt=\""
+						+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT
+						+ " \" src=\"https://www.google.com/favicon.ico\"/>&nbsp; "
+						+ DisplayConstants.OPEN_ID_SAGE_LOGIN_BUTTON_TEXT
+						+ "</button>").appendHtmlConstant("</form>");
+		return sb.toSafeHtml();
 	}
 
 	@Override
@@ -163,21 +158,21 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showAuthenticationFailed() {
-		messageLabel.setStyleAttribute("color", "red");
-		messageLabel.setText(AbstractImagePrototype.create(iconsImageBundle.warning16()).getHTML() + " Invalid username or password.");
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">If you are confident that the credentials filled in are correct, please report this issue to synapseInfo@sagebase.org</span>");
 		clear();
 	}
 
 	@Override
 	public void showTermsOfUseDownloadFailed() {
-		messageLabel.setStyleAttribute("color", "red");
-		messageLabel.setText(AbstractImagePrototype.create(iconsImageBundle.warning16()).getHTML() + " Unable to Download Synapse Terms of Use.");
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to Download Synapse Terms of Use.</h4>");
 		clear();
 	}
 
 	@Override
 	public void clear() {		
-		password.clear();
+		password.setValue("");
+		signInBtn.setEnabled(true);
+		signInBtn.setText(DisplayConstants.SIGN_IN);
 	}
 
 	@Override
@@ -185,4 +180,15 @@ public class LoginWidgetViewImpl extends LayoutContainer implements
 		TermsOfUseHelper.showTermsOfUse(content, callback);
      }
 
+	/*
+	 * Private Methods
+	 */
+	private void loginUser() {
+		signInBtn.setEnabled(false);
+		signInBtn.setText(DisplayConstants.SIGNING_IN);
+		messageLabel.setInnerHTML(""); 
+		presenter.setUsernameAndPassword(username.getValue(), password.getValue());
+	}
+
+	
 }

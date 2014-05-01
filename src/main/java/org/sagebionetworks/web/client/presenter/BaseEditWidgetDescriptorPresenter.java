@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -43,16 +44,30 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		presenter.addWidgetDescriptorUpdatedHandler(handler);
 		presenter.editNew(wikiKey, contentTypeKey, isWiki);
 	}
+
+	/**
+	 * Pop up an editor to create a new widget of the given class type (class that implements WidgetDescriptor).  Add the given handler, which will be notified when the widget descriptor has been updated.
+	 * @param entityId
+	 * @param attachmentName
+	 * @param handler
+	 */
+	public static void editExistingWidget(BaseEditWidgetDescriptorPresenter presenter, WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, WidgetDescriptorUpdatedHandler handler, boolean isWiki) {
+		presenter.addWidgetDescriptorUpdatedHandler(handler);
+		presenter.editExisting(wikiKey, contentTypeKey, descriptor, isWiki);
+	}
+
 	
 	@Override
 	public void apply() {
 		//widgetDescriptor should have all of the updated parameter info.  But we do need to ask for the widget name from the view.
+		//ask for the new file handles that the editor added (if any)
+		List<String> newFileHandleIds = view.getNewFileHandleIds();
 		try {
 			view.updateDescriptorFromView();
 			String textToInsert = view.getTextToInsert();
 			if (textToInsert != null) {
 				//this is it!
-				fireUpdatedEvent(textToInsert);
+				fireUpdatedEvent(textToInsert, newFileHandleIds);
 				view.hide();
 				return;
 			}
@@ -62,16 +77,17 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 			return;
 		}
 		try {
-			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar));
+			fireUpdatedEvent(WidgetRegistrarImpl.getWidgetMarkdown(contentTypeKey, widgetDescriptor, widgetRegistrar), newFileHandleIds);
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(e.getMessage());
 		}
 		view.hide();
 	}
 	
-	public void fireUpdatedEvent(String valueToInsert) {
+	public void fireUpdatedEvent(String valueToInsert, List<String> newFileHandleIds) {
 		//fire event that contains a value to insert into the description
 		WidgetDescriptorUpdatedEvent event = new WidgetDescriptorUpdatedEvent();
+		event.setNewFileHandleIds(newFileHandleIds);
 		event.setInsertValue(valueToInsert);
 		fireUpdatedEvent(event);
 	}
@@ -94,6 +110,11 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 	
 	@Override
 	public void editNew(WikiPageKey wikiKey, String contentTypeKey, boolean isWiki) {
+		editExisting(wikiKey, contentTypeKey, new HashMap<String, String>(), isWiki);
+	}
+	
+	@Override
+	public void editExisting(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> descriptor, boolean isWiki) {
 		if(wikiKey == null) throw new IllegalArgumentException("wiki key cannot be null");
 		if(wikiKey.getOwnerObjectId() == null) throw new IllegalArgumentException("ownerObjectId cannot be null");
 		if(wikiKey.getOwnerObjectType() == null) throw new IllegalArgumentException("ownerObjectType cannot be null");
@@ -103,11 +124,9 @@ public class BaseEditWidgetDescriptorPresenter implements BaseEditWidgetDescript
 		this.contentTypeKey = contentTypeKey;
 		
 		//initialize the view with a new widget descriptor definition of the correct type and show
-		widgetDescriptor = new HashMap<String, String>();
+		widgetDescriptor = descriptor;
 		view.setWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
-		//prepopulate with a unique attachment name of the correct type
-		String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
-		view.show(friendlyName);
+		view.show();
 		view.setSaveButtonText(DisplayConstants.INSERT_BUTTON_LABEL);
 	}
 	

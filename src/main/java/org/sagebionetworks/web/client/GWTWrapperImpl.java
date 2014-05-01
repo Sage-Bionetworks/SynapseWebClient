@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -38,4 +39,15 @@ public class GWTWrapperImpl implements GWTWrapper {
 		return NumberFormat.getFormat(pattern);
 	}
 
+	@Override
+	public String getHostPrefix() {
+		return com.google.gwt.user.client.Window.Location.getProtocol()+"//"+com.google.gwt.user.client.Window.Location.getHost();
+	}
+	
+	@Override
+	public String getCurrentURL() {
+		return Window.Location.getHref();
+	}
+	
+	
 }

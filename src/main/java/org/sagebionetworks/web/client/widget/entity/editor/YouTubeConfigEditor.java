@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
 public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetEditorPresenter {
 	
 	private YouTubeConfigView view;
@@ -21,7 +22,7 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		String videoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
 		if (videoId != null)
@@ -57,6 +58,11 @@ public class YouTubeConfigEditor implements YouTubeConfigView.Presenter, WidgetE
 	
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 	

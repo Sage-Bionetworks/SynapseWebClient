@@ -38,15 +38,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/headerSearchButtonIcon.png")
 	ImageResource searchButtonHeaderIcon();
 	
-	@Source("images/linkedin-small.png")
-	ImageResource linkedinsmall();
-	
-	@Source("images/defaultProfilePicture.png")
-	ImageResource defaultProfilePicture();
-	
-	@Source("images/defaultProfilePicture-20.png")
-	ImageResource defaultProfilePicture20();
-	
 	@Source("images/expand.png")
 	ImageResource expand();
 
@@ -64,6 +55,43 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/genomeSpace-logo-title-16.gif")
 	ImageResource genomeSpaceLogoTitle16();
-
 	
+	@Source("images/SynapseHeader.png")
+	ImageResource synaspseHeader();
+	
+	@Source("images/SynapseTextHeader.png")
+	ImageResource synapseTextHeader();
+	
+	@Source("images/LogoHeader.png")
+	ImageResource logoHeader();
+	
+	@Source("images/SynapseLogo-small.png")
+	ImageResource synapseLogoSmall();
+	
+	@Source("images/NCI_logo.jpg")
+	ImageResource nciLogo();
+
+	@Source("images/LSDF_logo.jpg")
+	ImageResource lsdfLogo();
+
+	@Source("images/NHLBI_logo.jpg")
+	ImageResource nhlbiLogo();
+
+	@Source("images/Sloan_logo.jpg")
+	ImageResource sloanLogo();
+
+	@Source("images/spotlight/Dream85_AD.jpg")
+	ImageResource dream85AD();
+	
+	@Source("images/spotlight/Dream85_Banner.jpg")
+	ImageResource dream85Banner();
+	
+	@Source("images/spotlight/Dream85_RA.jpg")
+	ImageResource dream85RA();
+	
+	@Source("images/spotlight/Dream85_SM.jpg")
+	ImageResource dream85SM();
+	
+	@Source("images/spotlight/TcgaPancancer.jpg")
+	ImageResource tcgaPancancer();
 }

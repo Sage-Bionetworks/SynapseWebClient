@@ -12,9 +12,9 @@ public class DisplayUtilsGWT {
 				"<span style=\"font-weight: bold;\">{0}</span>" +
 				"<br><span style=\"color: darkGray;\">{1}</span>"+
 				"</div>")
-		SafeHtml nameAndEmail(String name, String email);
+		SafeHtml nameAndUsername(String name, String email);
 		
-		@Template("<span class=\"thumbnail-image-container\" " +
+		@Template("<span class=\"thumbnail-image-container header-username-picture-container\" " +
 				"style = \"background: url({0}) no-repeat center center; background-size: 125%\"/>" +
 		    	"</span></span>")
 		SafeHtml profilePicture(String url);		

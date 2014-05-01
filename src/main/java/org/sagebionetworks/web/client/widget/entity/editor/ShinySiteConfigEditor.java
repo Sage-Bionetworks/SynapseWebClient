@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
 public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, WidgetEditorPresenter {
 	
 	private ShinySiteConfigView view;
@@ -22,7 +22,7 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 		view.initView();
 	}
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		String siteUrl = descriptor.get(WidgetConstants.SHINYSITE_SITE_KEY);
 		int height = ShinySiteWidget.getHeightFromDescriptor(descriptor);
@@ -64,6 +64,11 @@ public class ShinySiteConfigEditor implements ShinySiteConfigView.Presenter, Wid
 	
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 	

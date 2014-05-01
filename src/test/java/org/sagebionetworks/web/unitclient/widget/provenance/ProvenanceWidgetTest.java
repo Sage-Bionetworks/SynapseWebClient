@@ -25,13 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -41,15 +42,14 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -68,7 +68,9 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
 
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.dev.util.collect.HashSet;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -173,7 +175,7 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildGraphSuccess() throws Exception {				
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null, null);	
 		ProvGraph graph = verifyBuildGraphCalls();					
 		verifySuccessGraphStructure(graph);
 	}
@@ -207,7 +209,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailGetActivity() throws Exception {
 		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));		
 		ProvGraph graph = captureGraph();
 		
@@ -234,7 +236,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailGetActivity404() throws Exception {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
@@ -262,7 +264,7 @@ public class ProvenanceWidgetTest {
 	public void testBuildTreeFailHeaderBatch() throws Exception {
 		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null, null);	
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
@@ -273,7 +275,7 @@ public class ProvenanceWidgetTest {
 	@Test
 	public void testFindOldVersions() throws Exception {
 		// create graph
-		provenanceWidget.configure(null, descriptor);	
+		provenanceWidget.configure(null, descriptor, null, null);	
 		ProvGraph graph = verifyBuildGraphCalls();					
 		
 		reset(mockSynapseClient);
@@ -432,7 +434,7 @@ public class ProvenanceWidgetTest {
 			}
 			@Override
 			public void uploadFileChunk(String contentType, String fileFieldId,
-					int startByte, int endByte, String url, XMLHttpRequest xhr,
+					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
 					ProgressCallback callback) {
 				// TODO Auto-generated method stub
 				
@@ -459,6 +461,21 @@ public class ProvenanceWidgetTest {
 			public void getFileMd5(String fileFieldId, MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			@Override
+			public void processWithMathJax(Element element) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void loadCss(String url, Callback<Void, Exception> callback) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public String getFileUrl(String fileFieldId) {
+				return null;
 			}
 		};
 	}

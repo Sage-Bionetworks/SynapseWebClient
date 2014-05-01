@@ -1,14 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +11,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -28,6 +24,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesView;
@@ -37,6 +35,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class WikiSubpagesTest {
@@ -51,7 +50,7 @@ public class WikiSubpagesTest {
 	
 	WikiSubpagesWidget widget;
 	List<JSONEntity> wikiHeadersList;
-	WikiHeader testRootHeader;
+	V2WikiHeader testRootHeader;
 	String entityId = "syn123";
 	Map<String, String> descriptor = new HashMap<String, String>();
 	
@@ -79,7 +78,7 @@ public class WikiSubpagesTest {
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		PaginatedResults<JSONEntity> wikiHeaders = new PaginatedResults<JSONEntity>();
 		wikiHeadersList = new ArrayList<JSONEntity>();
-		testRootHeader = new WikiHeader();
+		testRootHeader = new V2WikiHeader();
 		testRootHeader.setId("123");
 		testRootHeader.setParentId(null);
 		testRootHeader.setTitle("my test root wiki header (page)");
@@ -93,7 +92,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureEntityHeaderBatchFailure() throws Exception {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -101,18 +100,49 @@ public class WikiSubpagesTest {
 	
 	@Test
 	public void testConfigureFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
-		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
 	public void testConfigureProjectRootNotFound() throws Exception {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor);
-		verify(mockSynapseClient).getWikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView, times(2)).clear();
+	}
+	
+	@Test
+	public void testGetLinkPlaceSynapse() throws Exception {
+		boolean embeddedInOwnerPage = true;
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		String targetEntityId = "syn938";
+		Long targetEntityVersion = 4L;
+		String targetWikiId = "888";
+		Place targetPlace = widget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId);
+		assertTrue(targetPlace instanceof Synapse);
+		Synapse targetSynapsePlace = (Synapse)targetPlace;
+		assertEquals(targetEntityId, targetSynapsePlace.getEntityId());
+		assertEquals(targetEntityVersion, targetSynapsePlace.getVersionNumber());
+		assertEquals(Synapse.EntityArea.WIKI, targetSynapsePlace.getArea());
+		assertEquals(targetWikiId, targetSynapsePlace.getAreaToken());
+	}
+	
+	@Test
+	public void testGetLinkPlaceWiki() throws Exception {
+		boolean embeddedInOwnerPage = false;
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null, null, embeddedInOwnerPage);
+		String targetEntityId = "syn938";
+		Long targetEntityVersion = 4L;
+		String targetWikiId = "888";
+		Place targetPlace = widget.getLinkPlace(targetEntityId, targetEntityVersion, targetWikiId);
+		assertTrue(targetPlace instanceof Wiki);
+		Wiki targetWikiPlace = (Wiki)targetPlace;
+		assertEquals(targetEntityId, targetWikiPlace.getOwnerId());
+		assertEquals(ObjectType.ENTITY.toString(), targetWikiPlace.getOwnerType());
+		assertEquals(targetWikiId, targetWikiPlace.getWikiId());
 	}
 
 	@Test

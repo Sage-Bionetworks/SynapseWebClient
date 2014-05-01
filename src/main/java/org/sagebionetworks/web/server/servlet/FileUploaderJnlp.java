@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.client.Synapse;
+import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -115,7 +115,7 @@ public class FileUploaderJnlp extends HttpServlet {
 	}
 	
 	private void setJarUrl() throws SynapseException, JSONObjectAdapterException {
-		Synapse synapse = synapseProvider.createNewClient();
+		SynapseClient synapse = synapseProvider.createNewClient();
 		SynapseVersionInfo version = synapse.getVersionInfo();
 		jarUrl = "http://sagebionetworks.artifactoryonline.com/sagebionetworks/simple/libs-releases-local/org/sagebionetworks/fileUploadClient/"
 				+ version.getVersion()

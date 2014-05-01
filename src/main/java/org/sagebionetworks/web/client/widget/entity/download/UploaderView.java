@@ -13,14 +13,13 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean isDirectUploadSupported);
+	public void createUploadForm(boolean isEntity, String parentEntityId, boolean isDirectUploadSupported);
 	
 	public int getDisplayHeight();
 
 	public int getDisplayWidth();
 	public void submitForm();
 	public void hideLoading();
-	public boolean isNewlyRestricted();
 	public void updateProgress(double value, String text);
 	public void showProgressBar();
 	
@@ -58,5 +57,5 @@ public interface UploaderView extends IsWidget, SynapseView {
 	}
 
 	public void setShowCancelButton(boolean showCancel);
-	
+	public void showUploaderUI();
 }

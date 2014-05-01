@@ -18,8 +18,6 @@ public interface EntityPropertyFormView extends SynapseView, IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter extends SynapseView{
-		public void removeAnnotation();
-		public void addAnnotation();
 		public Entity getEntity();
 		public EntityFormModel getFormModel();
 		public void saveButtonClicked();

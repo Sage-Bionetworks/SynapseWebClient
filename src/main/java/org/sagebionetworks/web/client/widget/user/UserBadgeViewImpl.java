@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,6 +28,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	HorizontalPanel container;
+	ClickHandler customClickHandler;
 	
 	@Inject
 	public UserBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -37,59 +39,75 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		
+		customClickHandler = null;
 		container = new HorizontalPanel();
+		container.addStyleName("nobordertable-imp displayInline");
+		container.setVerticalAlignment( HasVerticalAlignment.ALIGN_MIDDLE);
 		this.add(container);
+		addStyleName("inline-block");
 	}
 	
 	@Override
 	public void setProfile(final UserProfile profile, Integer maxNameLength) {
 		container.clear();
+		
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		
 		if(profile != null) {
-			String name = maxNameLength == null ? profile.getDisplayName() : DisplayUtils.stubStrPartialWord(profile.getDisplayName(), maxNameLength); 
+			String displayName = DisplayUtils.getDisplayName(profile);
+			String name = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
 			
-			Widget nameWidget;	
+			Widget nameWidget;
 			final Anchor userAnchor = new Anchor();
 			if(profile.getOwnerId() != null) {				
 				userAnchor.setText(name);
-				userAnchor.addStyleName("usernameLink");
+				userAnchor.addStyleName("usernameLink margin-left-5");
 				userAnchor.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+						if (customClickHandler == null) 
+							globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));
+						else
+							customClickHandler.onClick(event);
 					}
 				});
 				nameWidget = userAnchor;
 			} else {
 				HTML html = new HTML(name);
-				html.addStyleName("usernamelink");
+				html.addStyleName("usernamelink margin-left-5");
 				nameWidget = html;
-			}				
-			
-			Image profilePicture; 
-			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-				profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
-			} else {
-				profilePicture = new Image(sageImageBundle.defaultProfilePicture());
 			}
-			
-			profilePicture.setWidth("16px");
-			profilePicture.setHeight("16px");
-			profilePicture.addStyleName("imageButton userProfileImage");
-			profilePicture.addClickHandler(new ClickHandler() {
+			//also add the username in a popup (in the case when the name shown does not show the entire display name)
+			if (displayName.length() != name.length())
+				DisplayUtils.addToolTip(nameWidget, displayName);
+			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					userAnchor.fireEvent(event);
 				}
-			});
-			container.add(profilePicture);
+			};
+			
+			if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
+				Image profilePicture = new Image();
+				profilePicture.setUrl(DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null));
+				profilePicture.setWidth("16px");
+				profilePicture.setHeight("16px");
+				profilePicture.addStyleName("imageButton userProfileImage");
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);	
+			} else {
+				HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+				profilePicture.addClickHandler(clickHandler);
+				container.add(profilePicture);
+			}
+			
 			container.add(nameWidget);				 
 		} 		
 		
 	}
 
+	
+	
 	@Override
 	public void showLoadError(String principalId) {
 		container.clear();
@@ -114,15 +132,17 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 		
 	}
 
-	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
 	}
-
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;		
+	}
+
+	@Override
+	public void setCustomClickHandler(ClickHandler clickHandler) {
+		customClickHandler = clickHandler;
 	}
 
 

@@ -11,10 +11,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ShinySiteConfigEditorTest {
@@ -22,7 +22,7 @@ public class ShinySiteConfigEditorTest {
 	ShinySiteConfigEditor editor;
 	ShinySiteConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+	String validSiteUrl = "http://static.synapse.com/rstudio/faithful/";
 	
 	@Before
 	public void setup(){
@@ -41,14 +41,14 @@ public class ShinySiteConfigEditorTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		descriptor.put(WidgetConstants.SHINYSITE_HEIGHT_KEY, "500");
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).configure(validSiteUrl, 500);		
 	}
 
 	@Test
 	public void testUpdateDescriptorFromView() {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		
 		when(mockView.getSiteUrl()).thenReturn(validSiteUrl);
 		when(mockView.getSiteHeight()).thenReturn(500);

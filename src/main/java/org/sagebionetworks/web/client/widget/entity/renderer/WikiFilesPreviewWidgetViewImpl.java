@@ -30,7 +30,7 @@ public class WikiFilesPreviewWidgetViewImpl extends LayoutContainer implements W
 		this.removeAll();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<h5>Wiki Attachments</h5>");
-		sb.append("<div class=\"span-24 left notopmargin\">");
+		sb.append("<div>");
 		int col = 0;
 		
 		for (Iterator iterator = list.iterator(); iterator.hasNext();) {

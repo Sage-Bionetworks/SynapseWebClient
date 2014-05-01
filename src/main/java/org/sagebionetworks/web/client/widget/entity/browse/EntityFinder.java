@@ -93,8 +93,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 				} else if (caught instanceof ForbiddenException) {
 					view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
 				}
 				callback.onFailure(caught);
 			}
@@ -116,8 +115,7 @@ public class EntityFinder implements EntityFinderView.Presenter, SynapseWidgetPr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
+				view.showErrorMessage(DisplayConstants.UNABLE_TO_LOAD_VERSIONS);
 			}
 		});
 	}

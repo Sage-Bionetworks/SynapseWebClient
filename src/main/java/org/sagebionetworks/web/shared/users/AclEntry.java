@@ -3,35 +3,33 @@ package org.sagebionetworks.web.shared.users;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.UserGroupHeader;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class AclEntry implements IsSerializable {
-
-	private UserGroupHeader principal;
 	private Set<ACCESS_TYPE> accessTypes;
-	private boolean isOwner;
+	private boolean isOwner, isIndividual;
+	private String ownerId, title, subtitle;
 	
 	public AclEntry() {}
 
-	public AclEntry(UserGroupHeader principal, Set<ACCESS_TYPE> accessTypes, boolean isOwner) {
+	
+	public AclEntry(String ownerId, Set<ACCESS_TYPE> accessTypes, boolean isOwner, String title, String subtitle, boolean isIndividual) {
 		super();
-		this.principal = principal;
+		this.ownerId = ownerId;
 		this.accessTypes = accessTypes;
 		this.isOwner = isOwner;
-	}
-
-	public UserGroupHeader getPrincipal() {
-		return principal;
-	}
-
-	public void setPrincipal(UserGroupHeader principal) {
-		this.principal = principal;
+		this.title = title;
+		this.isIndividual = isIndividual;
+		this.subtitle = subtitle;
 	}
 
 	public Set<ACCESS_TYPE> getAccessTypes() {
 		return accessTypes;
+	}
+	
+	public boolean isIndividual() {
+		return isIndividual;
 	}
 
 	public void setAccessTypes(Set<ACCESS_TYPE> accessTypes) {
@@ -45,6 +43,30 @@ public class AclEntry implements IsSerializable {
 	public void setOwner(boolean isOwner) {
 		this.isOwner = isOwner;
 	}
+	
+	public String getOwnerId() {
+		return ownerId;
+	}
+	
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	public String getSubtitle() {
+		return subtitle;
+	}
+	
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
 
 
 	@Override
@@ -53,11 +75,15 @@ public class AclEntry implements IsSerializable {
 		int result = 1;
 		result = prime * result
 				+ ((accessTypes == null) ? 0 : accessTypes.hashCode());
+		result = prime * result + (isIndividual ? 1231 : 1237);
 		result = prime * result + (isOwner ? 1231 : 1237);
+		result = prime * result + ((ownerId == null) ? 0 : ownerId.hashCode());
 		result = prime * result
-				+ ((principal == null) ? 0 : principal.hashCode());
+				+ ((subtitle == null) ? 0 : subtitle.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -73,21 +99,35 @@ public class AclEntry implements IsSerializable {
 				return false;
 		} else if (!accessTypes.equals(other.accessTypes))
 			return false;
+		if (isIndividual != other.isIndividual)
+			return false;
 		if (isOwner != other.isOwner)
 			return false;
-		if (principal == null) {
-			if (other.principal != null)
+		if (ownerId == null) {
+			if (other.ownerId != null)
 				return false;
-		} else if (!principal.equals(other.principal))
+		} else if (!ownerId.equals(other.ownerId))
+			return false;
+		if (subtitle == null) {
+			if (other.subtitle != null)
+				return false;
+		} else if (!subtitle.equals(other.subtitle))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
 			return false;
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "AclEntry [principal=" + principal + ", accessTypes="
-				+ accessTypes + "]";
+		return "AclEntry [accessTypes=" + accessTypes + ", isOwner=" + isOwner
+				+ ", isIndividual=" + isIndividual + ", ownerId=" + ownerId
+				+ ", title=" + title + ", subtitle=" + subtitle + "]";
 	}
 	
-
+	
 }

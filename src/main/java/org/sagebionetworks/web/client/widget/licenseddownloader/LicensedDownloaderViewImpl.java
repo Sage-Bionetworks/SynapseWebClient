@@ -101,7 +101,8 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 					termsOfUseCallback, 
 					presenter.getRequestAccessCallback(), 
 					null/*loginCallback*/, 
-					null/*jiraFlagLink*/);
+					null/*jiraFlagLink*/,
+					null /*on hide dialog callback*/);
 		}
 		
 	}
@@ -147,11 +148,14 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	
 	@Override
 	public void setDownloadLocation(String fileName, String entityId,
-			Long versionNumber, String md5) {
+			Long versionNumber, String md5, String externalUrl) {
 		// build a list of links in HTML
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
-		directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		if (externalUrl == null)
+			directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
+		else
+			directDownloadURL = externalUrl;
 		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">") 
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());

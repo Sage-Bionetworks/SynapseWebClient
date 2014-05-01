@@ -32,14 +32,12 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setImagePreview(String fullFileUrl, String previewUrl) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<p  class=\"file-preview\">");
 		sb.append("<a href=\"");
 		sb.append(fullFileUrl);
 		sb.append("\"><img class=\"imageDescriptor\" ");
 		sb.append(" src=\"");
 		sb.append(previewUrl);
 		sb.append("\"></img></a>");
-		sb.append("</p>");
 		add(new HTMLPanel(sb.toString()));
 	}
 	
@@ -47,7 +45,7 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setCodePreview(String code) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre class=\"file-preview\" style=\"overflow:auto;white-space:pre\"><code style=\"background-color:white;\">");
+		sb.append("<pre class=\"previewPreMaxHeight\" style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
 		sb.append(code);
 		sb.append("</code></pre>");
 		add(new HTMLPanel(sb.toString()));
@@ -58,7 +56,7 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setTextPreview(String text) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre class=\"file-preview\" style=\"overflow:auto;white-space:pre\">");
+		sb.append("<pre class=\"previewPreMaxHeight\" style=\"overflow:auto;white-space:pre;\">");
 		sb.append(text);
 		sb.append("</pre>");
 		add(new HTMLPanel(sb.toString()));
@@ -68,7 +66,7 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 	public void setTablePreview(String text, String delimiter) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table class=\"file-preview previewtable\" style=\"overflow:auto;display:block;max-height:200px\">");
+		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block;max-height:200px\">");
 		String[] lines = text.split("[\r\n]");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");

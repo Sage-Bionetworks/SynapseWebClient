@@ -2,8 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.SynapseView;
 
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.TreeItem;
+import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
 
@@ -18,9 +21,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(TreeItem root);
-	
-	public String getHTML(String href, String title, boolean isCurrentPage);
+	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
 	
 	/**
 	 * Presenter interface

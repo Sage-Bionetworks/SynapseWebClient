@@ -15,11 +15,16 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -42,6 +47,7 @@ public class AppActivityMapper implements ActivityMapper {
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
+	Activity lastActivity;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -68,9 +74,13 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(ComingSoon.class);
 		openAccessPlaces.add(Governance.class);
 		openAccessPlaces.add(Challenges.class);
+		openAccessPlaces.add(Help.class);
 		openAccessPlaces.add(Search.class);
 		openAccessPlaces.add(WikiPlace.class);
+		openAccessPlaces.add(Team.class);
+		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(Down.class);
+		openAccessPlaces.add(Profile.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);
@@ -116,13 +126,19 @@ public class AppActivityMapper implements ActivityMapper {
 			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
 			presenter.setPlace((Home)place);
 			presenter.setGinInjector(ginjector);
+			lastActivity = presenter;
 			return presenter;
 		} else {
+			// check if this is a no-restart place change
+			if(place instanceof Synapse && ((Synapse)place).isNoRestartActivity() && lastActivity != null) {
+				return lastActivity;
+			}
 			if(loading != null) loading.showWidget();
 			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
 			bulkPresenterProxy.setGinjector(ginjector);
 			bulkPresenterProxy.setloader(loading);
 			bulkPresenterProxy.setPlace(place);
+			lastActivity = bulkPresenterProxy;
 			return bulkPresenterProxy;
 		}
 	}

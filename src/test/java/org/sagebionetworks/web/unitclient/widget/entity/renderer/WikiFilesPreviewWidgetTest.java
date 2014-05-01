@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -53,7 +53,7 @@ public class WikiFilesPreviewWidgetTest {
 	@Test
 	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).configure(any(WikiPageKey.class), any(List.class));
 	}
 	
@@ -61,7 +61,7 @@ public class WikiFilesPreviewWidgetTest {
 	public void testConfigureFailure() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
-		widget.configure(wikiKey, descriptor);
+		widget.configure(wikiKey, descriptor, null, null);
 		verify(mockView).showErrorMessage(anyString());
 	}
 

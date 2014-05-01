@@ -386,7 +386,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		return new EntityGroupRecordDisplay(
 				"",
 				SafeHtmlUtils.EMPTY_SAFE_HTML,
-				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, "", SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 	private EntityGroupRecordDisplay getGenericErrorDisplay(String id, Long version) {
@@ -395,7 +395,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		return new EntityGroupRecordDisplay(
 				null,
 				SafeHtmlUtils.fromSafeConstant(msg),
-				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, "", SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 	private void updateSnapshot(final AsyncCallback<String> callback) {
@@ -473,7 +473,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 		String downloadUrl = null;
 		if (referencedEntity instanceof FileEntity) {
 			if(!isLoggedIn)
-				downloadUrl = "#!" + nameLinkUrl;
+				downloadUrl = "#" + nameLinkUrl;
 			else
 				downloadUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber(), false);
 		}
@@ -482,7 +482,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 			if(locations != null && locations.size() > 0) {
 				downloadUrl = locations.get(0).getPath();
 			} else if(!isLoggedIn) {				
-				downloadUrl = "#!" + nameLinkUrl;
+				downloadUrl = "#" + nameLinkUrl;
 			}
 		}
 		
@@ -511,7 +511,7 @@ public class SnapshotWidget implements SnapshotWidgetView.Presenter, IsWidget {
 				downloadUrl, descSafe,
 				SafeHtmlUtils.fromString(version),
 				referencedEntity.getModifiedOn(),
-				referencedEntity.getCreatedBy() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromString(referencedEntity.getCreatedBy()),
+				referencedEntity.getCreatedBy() == null ? "" : referencedEntity.getCreatedBy(),
 				noteSafe);		
 	}
 

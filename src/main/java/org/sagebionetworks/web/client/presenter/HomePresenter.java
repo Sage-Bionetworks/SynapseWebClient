@@ -1,31 +1,54 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.RssServiceAsync;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationException;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -33,7 +56,8 @@ import com.google.inject.Inject;
 @SuppressWarnings("unused")
 public class HomePresenter extends AbstractActivity implements HomeView.Presenter, Presenter<Home> {
 	public static final String KEY_DATASETS_SELECTED_COLUMNS_COOKIE = "org.sagebionetworks.selected.dataset.columns";
-
+	public static final String TEAMS_2_CHALLENGE_ENTITIES_COOKIE = "org.sagebionetworks.team.2.challenge.project";
+	
 	private static final int MAX_NEWS_ITEMS = 3;
 	
 	private Home place;
@@ -44,6 +68,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	private SearchServiceAsync searchService;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
+	private SynapseJSNIUtils synapseJSNIUtils;
+	private GWTWrapper gwt;
+	private RequestBuilderWrapper requestBuilder;
+	private CookieProvider cookies;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -52,7 +80,11 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RssServiceAsync rssService,
 			SearchServiceAsync searchService, 
 			SynapseClientAsync synapseClient, 			
-			AdapterFactory adapterFactory){
+			AdapterFactory adapterFactory,
+			SynapseJSNIUtils synapseJSNIUtils,
+			GWTWrapper gwt,
+			RequestBuilderWrapper requestBuilder,
+			CookieProvider cookies){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -62,6 +94,10 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.authenticationController = authenticationController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.gwt = gwt;
+		this.requestBuilder = requestBuilder;
+		this.cookies = cookies;
 		this.view.setPresenter(this);
 	}
 
@@ -74,18 +110,49 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	@Override
 	public void setPlace(Home place) {
 		this.place = place;		
-		view.setPresenter(this);		
+		view.setPresenter(this);
+		
+		checkAcceptToU();
+		
 		view.refresh();
 		
 		// Thing to load regardless of Authentication
 		loadNewsFeed();
 		
 		// Things to load for authenticated users
-		if(authenticationController.isLoggedIn()) {
+		if(showLoggedInDetails()) {
 			loadProjectsAndFavorites();
+			//validate token
+			validateToken();
 		}		
 	}
 		
+	public void validateToken() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				//do nothing
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				//token is invalid
+				if (ex instanceof AuthenticationException) {
+					// send user to login page						
+					view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				}
+			}
+		};
+		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
+		if (userSessionData != null) {
+			if(userSessionData.getIsSSO() != null && userSessionData.getIsSSO()) {
+				authenticationController.loginUserSSO(authenticationController.getCurrentUserSessionToken(), callback);
+			} else {
+				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), callback);
+			}
+		}
+	}
+	
 	public void loadNewsFeed(){
 		rssService.getCachedContent(ClientProperties.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
@@ -111,7 +178,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			RSSEntry entry = feed.getEntries().get(i);
 			//every max, set as the last
 			String lastString = (i+1)%MAX_NEWS_ITEMS==0 ? "last" : "";
-			htmlResponse.append("<div class=\"span-6 serv notopmargin "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
+			htmlResponse.append("<div class=\"col-md-4 serv "+lastString+"\"><div class=\"icon-white-big left icon161-white\" style=\"background-color: rgb(122, 122, 122);\"></div><h5 style=\"margin-left: 25px;\"><a href=\"");
             htmlResponse.append(entry.getLink());
             htmlResponse.append("\" class=\"service-tipsy north link\">");
             htmlResponse.append(entry.getTitle());
@@ -126,7 +193,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public String getSupportFeedHtml(String rssFeedJson) throws JSONObjectAdapterException {
 		RSSFeed feed = new RSSFeed(adapterFactory.createNew(rssFeedJson));
 		StringBuilder htmlResponse = new StringBuilder();
-		htmlResponse.append("<div class=\"span-12 last notopmargin\"> <ul class=\"list question-list\">");
+		htmlResponse.append("<div> <ul class=\"list question-list\">");
 		for (int i = 0; i < feed.getEntries().size(); i++) {
 			RSSEntry entry = feed.getEntries().get(i);
 			htmlResponse.append("<li style=\"padding-top: 0px; padding-bottom: 3px\"><h5 style=\"margin-bottom: 0px;\"><a href=\"");
@@ -154,19 +221,37 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		return authenticationController.isLoggedIn();
 	}
 	
-	private void loadProjectsAndFavorites() {
-		loadEvaluations(new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setMyEvaluationList(result);
-			}
+	public void checkAcceptToU() {
+		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
+			authenticationController.logoutUser();
+		}
+	}
+	
+	public void loadProjectsAndFavorites() {
+		//ask for my teams
+		TeamListWidget.getTeams(authenticationController.getCurrentUserPrincipalId(), synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setMyEvaluationsError("Could not load My Evaluations");
+				view.setMyTeamsError("Could not load My Teams");
+			}
+			@Override
+			public void onSuccess(List<Team> myTeams) {
+				view.refreshMyTeams(myTeams);
+				getChallengeProjectIds(myTeams);
 			}
 		});
 		
-		
+		view.showOpenTeamInvitesMessage(false);
+		isOpenTeamInvites(new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean b) {
+				view.showOpenTeamInvitesMessage(b);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				//do nothing
+			}
+		});
 		
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
@@ -190,32 +275,120 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			}
 		});
 	}
+	
+	public void isOpenTeamInvites(final AsyncCallback<Boolean> callback) {
+		if (!authenticationController.isLoggedIn()) { 
+			callback.onSuccess(false);
+			return;
+		}
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+			@Override
+			public void onSuccess(List<MembershipInvitationBundle> result) {
+				callback.onSuccess(result.size() > 0);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});		
+	}
 
-	public void loadEvaluations(final AsyncCallback<List<EntityHeader>> callback){
-		try {
-			synapseClient.getAvailableEvaluationEntitiesList(new AsyncCallback<ArrayList<String>>() {
-				@Override
-				public void onSuccess(ArrayList<String> results) {					
-					try {	
-						List<EntityHeader> evals = new ArrayList<EntityHeader>();
-						for(String eh : results) {
-							evals.add(new EntityHeader(adapterFactory.createNew(eh)));
+	public void getChallengeProjectIds(final List<Team> myTeams) {
+		getTeamId2ChallengeIdWhitelist(new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter mapping) {
+				Set<String> challengeEntities = new HashSet<String>();
+				for (Team team : myTeams) {
+					if (mapping.has(team.getId())) {
+						try {
+							challengeEntities.add(mapping.getString(team.getId()));
+						} catch (JSONObjectAdapterException e) {
+							//problem with one of the mapping entries
 						}
-						callback.onSuccess(evals);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (RestServiceException e) {
-			callback.onFailure(e);
+				getChallengeProjectHeaders(challengeEntities);
+			}
+		});
+	}
+	
+	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
+		List<String> challengeProjectIds = new ArrayList<String>();
+		challengeProjectIds.addAll(challengeProjectIdsSet);
+		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
+			
+			@Override
+			public void onSuccess(List<String> entityHeaderStrings) {
+				try {
+					//finally, we can tell the view to update the user challenges based on these entity headers
+					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					for (String headerString : entityHeaderStrings) {
+						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
+						headers.add(header);
+					}
+					
+					//sort by name
+					Collections.sort(headers, new Comparator<EntityHeader>() {
+				        @Override
+				        public int compare(EntityHeader o1, EntityHeader o2) {
+				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+				        }
+					});
+					
+					view.setMyChallenges(headers);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}	
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setMyChallengesError("Could not load My Challenges:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public void getTeamId2ChallengeIdWhitelist(final CallbackP<JSONObjectAdapter> callback) {
+		String responseText = cookies.getCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE);
+		
+		if (responseText != null) {
+			parseTeam2ChallengeWhitelist(responseText, callback);
+			return;
 		}
+		requestBuilder.configure(RequestBuilder.GET, DisplayUtils.createRedirectUrl(synapseJSNIUtils.getBaseFileHandleUrl(), gwt.encodeQueryString(ClientProperties.TEAM2CHALLENGE_WHITELIST_URL)));
+	     try
+	     {
+	    	 requestBuilder.sendRequest(null, new RequestCallback() {
+	            @Override
+	            public void onError(Request request, Throwable exception) 
+	            {
+	            	//do nothing, may or may not have any challenges
+	            }
 
+	            @Override
+	            public void onResponseReceived(Request request,Response response) 
+	            {
+	            	String responseText = response.getText();
+	            	Date expires = new Date(System.currentTimeMillis() + 1000*60*60*24); // store for a day
+	            	cookies.setCookie(TEAMS_2_CHALLENGE_ENTITIES_COOKIE, responseText, expires);
+	            	parseTeam2ChallengeWhitelist(responseText, callback);
+	            }
+
+	         });
+	     }
+	     catch (Exception e){
+         	//failed to load my challenges
+	    	 view.setMyChallengesError("Could not load My Challenges: " + e.getMessage());
+	     }
+	}
+	
+	private void parseTeam2ChallengeWhitelist(String responseText, CallbackP<JSONObjectAdapter> callback){
+		try {
+			callback.invoke(adapterFactory.createNew(responseText));
+		} catch (Throwable e) {
+			//just in case there is a parsing exception
+		}
 	}
 	
 	@Override
@@ -232,7 +405,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}
@@ -240,4 +413,25 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		});
 	}
 	
+	@Override
+	public void createTeam(final String teamName) {
+		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newTeamId) {
+				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof ConflictException) {
+					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+				} else {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
+			}
+		});
+	}
 }

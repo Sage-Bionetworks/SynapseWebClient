@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.dialog;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -53,14 +54,7 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	    window.setButtons(Dialog.OKCANCEL);
 	    window.setHideOnButtonClick(false);
 	    
-	    FlowPanel container = new FlowPanel();
-		container.add(paramsPanel);
-		container.add(new HTML("<hr style=\"margin: 0px\">"));
-		container.add(baseContentPanel);
-		
-		window.add(container);
-		
-		Button saveButton = window.getButtonById(Dialog.OK);	    
+	    Button saveButton = window.getButtonById(Dialog.OK);	    
 	    saveButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
 			public void componentSelected(ButtonEvent ce) {
@@ -74,14 +68,6 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 				hide();
 			}
 	    });
-	    
-	    String width = Integer.toString(STARTING_WIDTH + widgetDescriptorPresenter.getAdditionalWidth()) + "px";
-		String height = Integer.toString(STARTING_HEIGHT + widgetDescriptorPresenter.getDisplayHeight())+"px";
-		container.setWidth(width);
-		container.setHeight(height);
-		window.setWidth(width);
-		window.setHeight(height);
-		
 	    return window;
 	}
 	
@@ -92,11 +78,31 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		baseContentPanel.add(hp);
 	}
 	
-	@Override
-	public void show(String windowTitle) {
-		window = getNewDialog();
+	private void setupDialog(String windowTitle) {
+		FlowPanel container = new FlowPanel();
+		container.add(paramsPanel);
+		container.add(new HTML("<hr style=\"margin: 0px\">"));
+		container.add(baseContentPanel);
+		
+		window.add(container);
+	    
+	    String width = Integer.toString(STARTING_WIDTH + widgetDescriptorPresenter.getAdditionalWidth()) + "px";
+		String height = Integer.toString(STARTING_HEIGHT + widgetDescriptorPresenter.getDisplayHeight())+"px";
+		container.setWidth(width);
+		container.setHeight(height);
+		window.setWidth(width);
+		window.setHeight(height);
 		window.setHeading(windowTitle);
-		window.show();
+	}
+	
+	@Override
+	public void show() {
+		if (widgetDescriptorPresenter != null) {
+			window.show();
+		} else {
+			//widget editor presenter not found for this content type
+			DisplayUtils.showErrorMessage("No editor was found for the selected widget.");
+		}
 	}
 
 	@Override
@@ -126,12 +132,20 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 	
 	@Override
 	public void setWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> widgetDescriptor, boolean isWiki) {
+		window = getNewDialog();
+		
 		//clear out params panel.  Get the right params editor based on the descriptor (it's concrete class, and configure based on the parameters inside of it).
 		paramsPanel.clear();
-		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki);
+		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, isWiki, window);
 		if (widgetDescriptorPresenter != null) {
 			Widget w = widgetDescriptorPresenter.asWidget();
 			paramsPanel.add(w);
+			//finish setting up the main dialog
+			String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
+			setupDialog(friendlyName);
+
+		} else {
+			showErrorMessage("No editor found for the content type: " + contentTypeKey);
 		}
 	}
 	
@@ -145,6 +159,10 @@ public class BaseEditWidgetDescriptorViewImpl extends Composite implements BaseE
 		widgetDescriptorPresenter.updateDescriptorFromView();
 	}
 	
+	@Override
+	public List<String> getNewFileHandleIds() {
+		return widgetDescriptorPresenter.getNewFileHandleIds();
+	}
 	
 	@Override
 	public void showBaseParams(boolean visible) {

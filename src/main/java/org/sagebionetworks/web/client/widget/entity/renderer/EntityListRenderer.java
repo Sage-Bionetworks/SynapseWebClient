@@ -5,16 +5,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.WidgetMenu;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -49,6 +49,8 @@ public class EntityListRenderer extends LayoutContainer {
 	
 	private IconsImageBundle iconsImageBundle;		
 	SynapseJSNIUtils synapseJSNIUtils;
+	PortalGinInjector ginInjector;
+	
 	BootstrapTable table;
 	LayoutContainer nameContainer;
 	LayoutContainer descriptionContainer;
@@ -59,9 +61,10 @@ public class EntityListRenderer extends LayoutContainer {
 	}
 			
 	public EntityListRenderer(IconsImageBundle iconsImageBundle,
-			SynapseJSNIUtils synapseJSNIUtils, boolean canEdit) {
+			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector, boolean canEdit) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.ginInjector = ginInjector;
 		this.nameContainer = new LayoutContainer();
 		this.descriptionContainer = new LayoutContainer();			
 		
@@ -92,18 +95,11 @@ public class EntityListRenderer extends LayoutContainer {
 			Anchor link = new Anchor();
 			link.setHref(display.getDownloadUrl());
 			link.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.NavigateDown16())));
-			//DisplayConstants.BUTTON_DOWNLOAD
 			link.setStyleName("link");
 			if(isLoggedIn) {
+				// logged in users want to stay on the entity list page when downloading
 				link.setTarget("_new");
-			} else {
-				link.addClickHandler(new ClickHandler() {					
-					@Override
-					public void onClick(ClickEvent event) {
-						MessageBox.info(DisplayConstants.INFO, DisplayConstants.LOGIN_TO_DOWNLOAD, null);
-					}
-				});				
-			}
+			} 
 			downloadLink = link;
 		} else {
 			downloadLink = new HTML("");
@@ -118,7 +114,7 @@ public class EntityListRenderer extends LayoutContainer {
 		// set row in table
 		setRow(rowIndex, name, downloadLink,
 				display.getVersion(), description,
-				display.getModifienOn(), display.getContact(),
+				display.getModifienOn(), display.getCreatedByPrincipalId(),
 				display.getNote());
 
 		this.layout();
@@ -127,13 +123,16 @@ public class EntityListRenderer extends LayoutContainer {
 	
 	private void setRow(int rowIndex, Widget nameLink, Widget downloadLink,
 			SafeHtml version, HTML description, Date date,
-			SafeHtml createdBy, SafeHtml note) {			
+			String createdByPrincipalId, SafeHtml note) {			
 		table.setWidget(rowIndex, HEADER_NAME_IDX, nameLink);
 		table.setWidget(rowIndex, HEADER_DOWNLOAD_IDX, downloadLink);			
 		if(version != null) table.setHTML(rowIndex, HEADER_VERSION_IDX, version);			
 		table.setWidget(rowIndex, HEADER_DESC_IDX, description);
 		table.setHTML(rowIndex, HEADER_DATE_IDX, date == null ? "" : synapseJSNIUtils.convertDateToSmallString(date) + "</br>&nbsp;");
-		table.setHTML(rowIndex, HEADER_CREATEDBY_IDX, createdBy);
+		//set userbadge widget
+		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+		createdByBadge.configure(createdByPrincipalId);
+		table.setWidget(rowIndex, HEADER_CREATEDBY_IDX, createdByBadge.asWidget());
 		updateRowNote(rowIndex, note);
 	}
 	
@@ -165,7 +164,8 @@ public class EntityListRenderer extends LayoutContainer {
 	 */
 	private LayoutContainer initTable(boolean canEdit) {
 
-		table = new BootstrapTable();			
+		table = new BootstrapTable();
+		table.addStyleName("table-striped table-bordered table-condensed");
 		List<String> headerRow = new ArrayList<String>();
 		headerRow.add(HEADER_NAME_IDX, HEADER_NAME);
 		headerRow.add(HEADER_DOWNLOAD_IDX, HEADER_DOWNLOAD);
@@ -201,8 +201,7 @@ public class EntityListRenderer extends LayoutContainer {
 			table.getColumnFormatter().setWidth(7, "6%"); // edit column
 		}
 
-		LayoutContainer tbl = new LayoutContainer();
-		tbl.setStyleName("span-24 last notopmargin");
+		LayoutContainer tbl = new LayoutContainer();		
 		tbl.add(table);
 		return tbl;
 	}

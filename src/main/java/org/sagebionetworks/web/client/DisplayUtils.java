@@ -1,21 +1,41 @@
 package org.sagebionetworks.web.client;
 
 
+import static org.sagebionetworks.web.client.ClientProperties.ALERT_CONTAINER_ID;
+import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
+import static org.sagebionetworks.web.client.ClientProperties.ERROR_OBJ_REASON_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.ESCAPE_CHARACTERS_SET;
+import static org.sagebionetworks.web.client.ClientProperties.FULL_ENTITY_TOP_MARGIN_PX;
+import static org.sagebionetworks.web.client.ClientProperties.GB;
+import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
+import static org.sagebionetworks.web.client.ClientProperties.KB;
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ANNOTATION_KEY;
+import static org.sagebionetworks.web.client.ClientProperties.REGEX_CLEAN_ENTITY_NAME;
+import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.ClientProperties.WHITE_SPACE;
+import static org.sagebionetworks.web.client.ClientProperties.WIKI_URL;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import static org.sagebionetworks.web.client.ClientProperties.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
+import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExpressionData;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -30,10 +50,13 @@ import org.sagebionetworks.repo.model.Step;
 import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -44,20 +67,31 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
+import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -80,9 +114,13 @@ import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
+import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
@@ -94,10 +132,10 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
@@ -109,21 +147,26 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-
+	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
+	public static PublicPrincipalIds publicPrincipalIds = null;
 	
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
@@ -153,24 +196,12 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Returns a properly aligned name and e-mail address for a given UserGroupHeader
-	 * @param principal
-	 * @return
-	 */
-	public static String getUserNameEmailHtml(UserGroupHeader principal) {
-		if (principal == null) return "";
-		String name = principal.getDisplayName() == null ? "" : principal.getDisplayName();
-		String email = principal.getEmail() == null ? "" : principal.getEmail();
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, email).asString();
-	}
-	
-	/**
 	 * Returns a properly aligned name and description for a special user or group
 	 * @param name of user or group
 	 * @return
 	 */
-	public static String getUserNameEmailHtml(String name, String description) {
-		return DisplayUtilsGWT.TEMPLATES.nameAndEmail(name, description).asString();
+	public static String getUserNameDescriptionHtml(String name, String description) {
+		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
 	}
 	
 	
@@ -311,42 +342,41 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Handles the exception. Resturn true if the user has been alerted to the exception already
+	 * Handles the exception. Returns true if the user has been alerted to the exception already
 	 * @param ex
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, SynapseView view) {
+		//send exception to the javascript console
+		if (displayUtilsLogger != null && ex != null)
+			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
 		if(ex instanceof ReadOnlyModeException) {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(ex instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 			return true;
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
-			showInfo("Session Timeout", "Your session has timed out. Please login again.");
-			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
 				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			String reason = ex.getMessage();			
-			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
-			if(reason.matches(".*entity with the name: .+ already exites.*")) {
-				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			}			
-			view.showErrorMessage(message);
+			//exception handling on the backend now throws the reason into the exception message.  Easy!
+			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			placeChanger.goTo(new Home(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
 			return true;
 		}
 		
@@ -384,6 +414,14 @@ public class DisplayUtils {
 	public static void changeButtonToSaving(Button button, SageImageBundle sageImageBundle) {
 		button.setText(DisplayConstants.BUTTON_SAVING);
 		button.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
+	}
+	
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(com.google.gwt.user.client.ui.Button button) {
+		button.addStyleName("disabled");
+		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
 	
 	/**
@@ -482,7 +520,81 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		MessageBox.info(DisplayConstants.TITLE_ERROR, message, null);  
+		com.google.gwt.user.client.Window.alert(message);  
+	}
+
+	/**
+	 * @param t
+	 * @param jiraHelper
+	 * @param profile
+	 * @param friendlyErrorMessage
+	 *            (optional)
+	 */
+	public static void showErrorMessage(final Throwable t,
+			final JiraURLHelper jiraHelper, boolean isLoggedIn,
+			String friendlyErrorMessage) {
+		if (!isLoggedIn) {
+			showErrorMessage(t.getMessage());
+			return;
+		}
+		final Dialog d = new Dialog();
+		d.addStyleName("padding-5");
+
+		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
+		HTML errorContent = new HTML(
+				getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger")
+				+ errorMessage);
+		FlowPanel dialogContent = new FlowPanel();
+		dialogContent.addStyleName("margin-10");
+		dialogContent.add(errorContent);
+
+		// create text area for steps
+		FlowPanel formGroup = new FlowPanel();
+		formGroup.addStyleName("form-group margin-top-10");
+		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
+		final TextArea textArea = new TextArea();
+		textArea.addStyleName("form-control");
+		textArea.getElement().setAttribute("placeholder","Steps to reproduce the error");
+		textArea.getElement().setAttribute("rows", "4");
+		formGroup.add(textArea);
+		dialogContent.add(formGroup);
+
+		d.add(dialogContent);
+
+		d.setAutoHeight(true);
+		d.setHideOnButtonClick(true);
+		d.setWidth(400);
+		d.setPlain(true);
+		d.setModal(true);
+		d.setLayout(new FitLayout());
+		d.setButtonAlign(HorizontalAlignment.RIGHT);
+		d.setHeading("Synapse Error");
+		d.yesText = DisplayConstants.SEND_BUG_REPORT;
+		d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
+		d.setButtons(Dialog.YESNO);
+		com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
+		yesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
+						errorMessage, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								showInfo("Report sent", "Thank you!");
+
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// failure to create issue!
+								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
+								+ caught.getMessage() +"\n\n"
+								+ textArea.getValue());
+							}
+						});
+			}
+		});
+		d.show();
 	}
 	
 	public static void showOkCancelMessage(
@@ -512,6 +624,60 @@ public class DisplayUtils {
 	    box.show();
 
 	}
+	
+	public static String getPrimaryEmail(UserProfile userProfile) {
+		List<String> emailAddresses = userProfile.getEmails();
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		return emailAddresses.get(0);
+	}
+	
+	public static String getDisplayName(UserProfile profile) {
+		return getDisplayName(profile.getFirstName(), profile.getLastName(), profile.getUserName());
+	}
+	
+	public static String getDisplayName(UserGroupHeader header) {
+		return DisplayUtils.getDisplayName(header.getFirstName(), header.getLastName(), header.getUserName());
+	}
+	
+	public static String getDisplayName(String firstName, String lastName, String userName) {
+		StringBuilder sb = new StringBuilder();
+		boolean hasDisplayName = false;
+		if (firstName != null && firstName.length() > 0) {
+			sb.append(firstName.trim());
+			hasDisplayName = true;
+		}
+		if (lastName != null && lastName.length() > 0) {
+			sb.append(" ");
+			sb.append(lastName.trim());
+			hasDisplayName = true;
+		}
+		
+		sb.append(getUserName(userName, hasDisplayName));
+		
+		return sb.toString();
+	}
+	
+	public static boolean isTemporaryUsername(String username){
+		if(username == null) throw new IllegalArgumentException("UserName cannot be null");
+		return username.startsWith(WebConstants.TEMPORARY_USERNAME_PREFIX);
+	}
+
+	public static String getUserName(String userName, boolean inParens) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (userName != null && !isTemporaryUsername(userName)) {
+			//if the name is filled in, then put the username in parens
+			if (inParens)
+				sb.append(" (");
+			sb.append(userName);
+			if (inParens)
+				sb.append(")");
+		}
+		
+		return sb.toString();
+	}
+	
+
 	
 	/**
 	 * Returns the NodeType for this entity class. 
@@ -551,9 +717,26 @@ public class DisplayUtils {
 		return getWarningHtml(DisplayConstants.MARKDOWN_WIDGET_WARNING, warningText);
 	}
 	
-	public static String getWarningHtml(String title, String warningText) {
-		return "<div class=\"alert alert-block\"><strong>"+ title + "</strong><br/> " + warningText + "</div>";
+	public static String getMarkdownAPITableWarningHtml(String warningText) {
+		return getWarningHtml(DisplayConstants.MARKDOWN_API_TABLE_WARNING, warningText);
 	}
+	
+	public static String getWarningHtml(String title, String warningText) {
+		return getAlertHtml(title, warningText, BootstrapAlertType.WARNING);
+	}
+	
+	public static String getAlertHtml(String title, String text, BootstrapAlertType type) {
+		return "<div class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</div>";
+	}
+	
+	public static String getAlertHtmlSpan(String title, String text, BootstrapAlertType type) {
+		return "<span class=\"alert alert-"+type.toString().toLowerCase()+"\"><span class=\"boldText\">"+ title + "</span> " + text + "</span>";
+	}
+	
+	public static String getBadgeHtml(String i) {
+		return "<span class=\"badge\">"+i+"</span>";
+	}
+
 	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
@@ -585,6 +768,32 @@ public class DisplayUtils {
 		return "#!" + getWikiPlaceString(Wiki.class) + ":" + place.toToken();
 	}
 	
+	public static String getTeamHistoryToken(String teamId) {
+		Team place = new Team(teamId);
+		return "#!" + getTeamPlaceString(Team.class) + ":" + place.toToken();
+	}
+	
+	public static String getTeamSearchHistoryToken(String searchTerm) {
+		TeamSearch place = new TeamSearch(searchTerm);
+		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
+	}
+	
+	public static String getTeamSearchHistoryToken(String searchTerm, Integer start) {
+		TeamSearch place = new TeamSearch(searchTerm, start);
+		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
+	}
+
+	public static String getLoginPlaceHistoryToken(String token) {
+		LoginPlace place = new LoginPlace(token);
+		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
+	}
+
+	public static String getHelpPlaceHistoryToken(String token) {
+		Help place = new Help(token);
+		return "#!" + getHelpPlaceString(Help.class) + ":" + place.toToken();
+	}
+
+	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
 		return "#!" + getSearchPlaceString(Search.class) + ":" + place.toToken();
@@ -608,7 +817,14 @@ public class DisplayUtils {
 	}
 	
 	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber) {
-		Synapse place = new Synapse(entityId, versionNumber);
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, null);
+	}
+	
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area) {
+		return getSynapseHistoryTokenNoHash(entityId, versionNumber, area, null);
+	}
+	public static String getSynapseHistoryTokenNoHash(String entityId, Long versionNumber, Synapse.EntityArea area, String areaToken) {
+		Synapse place = new Synapse(entityId, versionNumber, area, areaToken);
 		return "!"+ getPlaceString(Synapse.class) + ":" + place.toToken();
 	}
 	
@@ -650,19 +866,45 @@ public class DisplayUtils {
 	 * Private methods
 	 */
 	private static String getPlaceString(Class<Synapse> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
 	}
 	
 	private static String getWikiPlaceString(Class<Wiki> place) {
-		String fullPlaceName = place.getName();		
-		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
-		return fullPlaceName;
+		return getPlaceString(place.getName());		
+	}
+	
+	public static LayoutContainer wrap(Widget widget) {
+		LayoutContainer lc = new LayoutContainer();
+		lc.addStyleName("col-md-12");
+		lc.add(widget);
+		return lc;
+	}
+	
+	public static SimplePanel wrapInDiv(Widget widget) {
+		SimplePanel lc = new SimplePanel();
+		lc.setWidget(widget);
+		return lc;
+	}
+	private static String getTeamPlaceString(Class<Team> place) {
+		return getPlaceString(place.getName());		
+	}
+
+	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+
+	private static String getLoginPlaceString(Class<LoginPlace> place) {
+		return getPlaceString(place.getName());		
+	}
+	private static String getHelpPlaceString(Class<Help> place) {
+		return getPlaceString(place.getName());		
 	}
 	
 	private static String getSearchPlaceString(Class<Search> place) {
-		String fullPlaceName = place.getName();		
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPlaceString(String fullPlaceName) {
 		fullPlaceName = fullPlaceName.replaceAll(".+\\.", "");
 		return fullPlaceName;
 	}
@@ -728,7 +970,7 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle) {
 		return createFullWidthLoadingPanel(sageImageBundle, " Loading...");
 	}
 
@@ -740,15 +982,13 @@ public class DisplayUtils {
 	 * @param height
 	 * @return
 	 */
-	public static HorizontalPanel createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
-		HorizontalPanel hp = new HorizontalPanel();
-		hp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		hp.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		hp.setPixelSize(FULL_ENTITY_PAGE_WIDTH, FULL_ENTITY_PAGE_HEIGHT);
+	public static Widget createFullWidthLoadingPanel(SageImageBundle sageImageBundle, String message) {
 		Widget w = new HTML(SafeHtmlUtils.fromSafeConstant(
 				DisplayUtils.getIconHtml(sageImageBundle.loading31()) +" "+ message));	
-		hp.add(w);
-		return hp;
+		LayoutContainer panel = new LayoutContainer();
+		panel.add(w, new MarginData(FULL_ENTITY_TOP_MARGIN_PX, 0, FULL_ENTITY_TOP_MARGIN_PX, 0));
+		panel.addStyleName("center");				
+		return panel;
 	}
 	
 	public static ImageResource getSynapseIconForEntityClassName(String className, IconSize iconSize, IconsImageBundle iconsImageBundle) {
@@ -802,6 +1042,10 @@ public class DisplayUtils {
 			// Page
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapsePage16();
 			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapsePage24();			
+		} else if(TableEntity.class.getName().equals(className)) {
+			// TableEntity
+			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseData16();
+			else if (iconSize == IconSize.PX24) icon = iconsImageBundle.synapseData24();			
 		} else {
 			// default to Model
 			if(iconSize == IconSize.PX16) icon = iconsImageBundle.synapseModel16();
@@ -898,7 +1142,11 @@ public class DisplayUtils {
 	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String tokenId, String fileName){
 		return createAttachmentUrl(baseURl, userId, tokenId, fileName, WebConstants.USER_PROFILE_PARAM_KEY);
 	}
-	
+
+	public static String createUserProfilePicUrl(String baseURl, String userId){
+		return createAttachmentUrl(baseURl, userId, "", null, WebConstants.USER_PROFILE_PARAM_KEY);
+	}
+
 	/**
 	 * Create the url to an attachment image.
 	 * @param baseURl
@@ -915,6 +1163,8 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+		//and do not cache
+		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
@@ -959,7 +1209,13 @@ public class DisplayUtils {
 		
 		return ordered;
 	}
-
+	
+	public static PopupPanel addToolTip(Widget widget, String message) {
+		PopupPanel popup = addToolTip(widget);
+		popup.setWidget(new HTML(message));
+		return popup;
+	}
+	
 	/**
 	 * Creates and attaches a simple tooltip to a GWT widget
 	 * 
@@ -1211,9 +1467,13 @@ public class DisplayUtils {
 
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
-    	var window = $wnd.open(url, name, features);
-    	return window;
-		}-*/;
+    	try {
+	    	var window = $wnd.open(url, name, features);
+	    	return window;
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
     	window.location = target;
@@ -1291,7 +1551,7 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
@@ -1310,11 +1570,31 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"span-24\"><p class=\"error left colored\">403</p><h1>"
-						+ DisplayConstants.UNAUTHORIZED
+				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
+						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
 						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+	}
+	
+	/**
+	 * 'Upload File' button for an entity
+	 * @param entity 
+	 * @param entityType 
+	 */
+	public static Widget getUploadButton(final EntityBundle entityBundle,
+			EntityType entityType, final Uploader uploader,
+			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
+		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, ButtonType.DEFAULT, "glyphicon-arrow-up");
+		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, null, entityBundle, handler, entityType, DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+	}
+
+	/**
+	 * 'Upload File' button something other than an entity (for example the team icon)
+	 */
+	public static Widget getUploadButton(final CallbackP<String> fileHandleIdCallback, final Uploader uploader,	IconsImageBundle iconsImageBundle, String buttonText, ButtonType buttonType) {
+		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(buttonText, buttonType, null);
+		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, fileHandleIdCallback, null, null, null, buttonText);
 	}
 	
 	/**
@@ -1322,21 +1602,14 @@ public class DisplayUtils {
 	 * @param entity 
 	 * @param entityType 
 	 */
-	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final Uploader uploader,
-			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		Button uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, AbstractImagePrototype.create(iconsImageBundle.NavigateUp16()));
-		uploadButton.setHeight(25);
+	private static Widget configureUploadWidget(final FocusWidget uploadButton, final Uploader uploader,
+			IconsImageBundle iconsImageBundle, final CallbackP<String> fileHandleIdCallback, final EntityBundle entityBundle, EntityUpdatedHandler handler, EntityType entityType, final String buttonText) {
 		final Window window = new Window();  
-		window.addButton(new Button(DisplayConstants.BUTTON_CANCEL, new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-		}));
+		
 		uploader.clearHandlers();
 		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
+		if (handler != null)
+			uploader.addPersistSuccessHandler(handler);
 		
 		// add handlers for closing the window
 		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
@@ -1351,20 +1624,34 @@ public class DisplayUtils {
 				window.hide();
 			}
 		});
-		
-		uploadButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+		uploadButton.addClickHandler(new ClickHandler() {
+			
 			@Override
-			public void componentSelected(ButtonEvent ce) {
+			public void onClick(ClickEvent event) {
 				window.removeAll();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 				window.setPlain(true);
 				window.setModal(true);		
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-				window.setLayout(new FitLayout());			
-				window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+				window.setHeading(buttonText);
+				window.setLayout(new FitLayout());
+				List<AccessRequirement> ars = null;
+				Entity entity = null;
+				boolean isEntity = true;
+				
+				if (entityBundle != null) {
+					//is entity
+					ars = entityBundle.getAccessRequirements();
+					entity = entityBundle.getEntity();
+				} else {
+					//is something else that just wants a file handle id
+					isEntity = false;
+				}
+				
+				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
 				window.show();
+				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 			}
 		});
+		
 		return uploadButton;
 	}
 
@@ -1389,20 +1676,45 @@ public class DisplayUtils {
 	}
 
 	public static boolean isInTestWebsite(CookieProvider cookies) {
-		return cookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY) != null;
+		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 
 	public static void setTestWebsite(boolean testWebsite, CookieProvider cookies) {
-		if (testWebsite && !isInTestWebsite(cookies)) {
-			//set the cookie
-			cookies.setCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, "true");
-		} else{
-			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
-		}
+		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
+	
+	public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
+		return cookies.getCookie(cookieKey) != null;
+	}
 
+	public static void setInCookies(boolean value, String cookieKey, CookieProvider cookies) {
+		if (value && !isInCookies(cookieKey, cookies)) {
+			//set the cookie
+			cookies.setCookie(cookieKey, "true");
+		} else{
+			cookies.removeCookie(cookieKey);
+		}
+	}
+
+		
+	
+	/**
+	 * Create the URL to a version of a wiki's attachments.
+	 * @param baseFileHandleUrl
+	 * @param wikiKey
+	 * @param fileName
+	 * @param preview
+	 * @param wikiVersion
+	 * @return
+	 */
+	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
+			boolean preview, Long wikiVersion) {
+		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
+		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
+	}
+	
 	/**
 		 * Create the url to a wiki filehandle.
 		 * @param baseURl
@@ -1423,7 +1735,7 @@ public class DisplayUtils {
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
 			//if preview, then avoid cache
-			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+			String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
@@ -1435,7 +1747,24 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
-
+	
+	public static String getParamForNoCaching() {
+		return "&nocache=" + new Date().getTime();
+	}
+	
+	/**
+	 * Create a url that points to the FileHandleServlet.
+	 * WARNING: A GET request to this url will cause the file contents to be downloaded on the Servlet and sent back in the response.
+	 * USE TO REQUEST SMALL FILES ONLY and CACHE THE RESULTS
+	 * @param baseURl
+	 * @param encodedRedirectUrl
+	 * @return
+	 */
+	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + getParamForNoCaching() +"&" + 
+				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
+	}
+	
 	/**
 	 * Create the url to a FileEntity filehandle.
 	 * @param baseURl
@@ -1445,13 +1774,47 @@ public class DisplayUtils {
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		//if preview, then avoid cache
-		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
+		String nocacheParam = preview ? getParamForNoCaching()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
 				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
 				versionParam + nocacheParam;
 	}
+
+	/**
+	 * Create the url to a Table cell file handle.
+	 * @param baseFileHandleUrl
+	 * @param details
+	 * @param preview
+	 * @param proxy
+	 * @return
+	 */
+	public static String createTableCellFileEntityUrl(String baseFileHandleUrl, TableCellFileHandle details, boolean preview, boolean proxy){		
+		//if preview, then avoid cache
+		String nocacheParam = preview ? getParamForNoCaching()  : "";
+		return baseFileHandleUrl + "?" +
+				WebConstants.ENTITY_PARAM_KEY + "=" + details.getTableId() + "&" +
+				WebConstants.TABLE_COLUMN_ID + "=" + details.getColumnId() + "&" +
+				WebConstants.TABLE_ROW_ID + "=" + details.getRowId() + "&" +
+				WebConstants.TABLE_ROW_VERSION_NUMBER + "=" + details.getVersionNumber() + "&" +
+				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + nocacheParam;
+	}
+	
+	/**
+	 * Create the url to a Team icon filehandle.
+	 * @param baseURl
+	 * @param teamId
+	 * @return
+	 */
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
+		return baseFileHandleUrl + "?" +
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId +
+				//and do not cache
+				getParamForNoCaching();
+	}
+
 
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
@@ -1479,7 +1842,7 @@ public class DisplayUtils {
 	}
 	
 	public static boolean isWikiSupportedType(Entity entity) {
-		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project); 
+		return (entity instanceof FileEntity || entity instanceof Folder || entity instanceof Project || entity instanceof TableEntity); 
 	}
 		
 	public static boolean isRecognizedImageContentType(String contentType) {
@@ -1543,7 +1906,6 @@ public class DisplayUtils {
 	}
 	
 	public static void configureAndShowEntityFinderWindow(final EntityFinder entityFinder, final Window window, final SelectedHandler<Reference> handler) {  				
-		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.FIND_ENTITIES);
@@ -1564,6 +1926,7 @@ public class DisplayUtils {
 		}));
 		window.setButtonAlign(HorizontalAlignment.RIGHT);
 		window.show();
+		window.setSize(entityFinder.getViewWidth(), entityFinder.getViewHeight());
 		entityFinder.refresh();
 	}
 
@@ -1578,8 +1941,7 @@ public class DisplayUtils {
 		}
 	}
 
-	public static Widget getShareSettingsDisplay(String prefix, boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
-		if(prefix == null) prefix = "";
+	public static Widget getShareSettingsDisplay(boolean isPublic, SynapseJSNIUtils synapseJSNIUtils) {
 		final SimplePanel lc = new SimplePanel();
 		lc.addStyleName(STYLE_DISPLAY_INLINE);
 		String styleName = isPublic ? "public-acl-image" : "private-acl-image";
@@ -1587,7 +1949,7 @@ public class DisplayUtils {
 		String tooltip = isPublic ? DisplayConstants.PUBLIC_ACL_DESCRIPTION : DisplayConstants.PRIVATE_ACL_DESCRIPTION;
 
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
-		shb.appendHtmlConstant(prefix + "<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
+		shb.appendHtmlConstant("<div class=\"" + styleName+ "\" style=\"display:inline; position:absolute\"></div>");
 		shb.appendHtmlConstant("<span style=\"margin-left: 20px;\">"+description+"</span>");
 
 		//form the html
@@ -1598,5 +1960,348 @@ public class DisplayUtils {
 
 		return lc;
 	}
+	
+	public static Long getVersion(Entity entity) {
+		Long version = null;
+		if (entity != null && entity instanceof Versionable)
+			version = ((Versionable) entity).getVersionNumber();
+		return version;
+	}
+	
+	public static void updateWidgetSelectionState(WidgetSelectionState state, String text, int cursorPos) {
+		state.setWidgetSelected(false);
+		state.setWidgetStartIndex(-1);
+		state.setWidgetEndIndex(-1);
+		state.setInnerWidgetText(null);
 		
+		if (cursorPos > -1) {
+			//move back until I find a whitespace or the beginning
+			int startWord = cursorPos-1;
+			while(startWord > -1 && !Character.isSpace(text.charAt(startWord))) {
+				startWord--;
+			}
+			startWord++;
+			String possibleWidget = text.substring(startWord);
+			if (possibleWidget.startsWith(WidgetConstants.WIDGET_START_MARKDOWN)) {
+				//find the end
+				int endWord = cursorPos;
+				while(endWord < text.length() && !WidgetConstants.WIDGET_END_MARKDOWN.equals(String.valueOf(text.charAt(endWord)))) {
+					endWord++;
+				}
+				//invalid widget specification if we went all the way to the end of the markdown
+				if (endWord < text.length()) {
+					//it's a widget
+					//parse the type and descriptor
+					endWord++;
+					possibleWidget = text.substring(startWord, endWord);
+					//set editable
+					state.setWidgetSelected(true);
+					state.setInnerWidgetText(possibleWidget.substring(WidgetConstants.WIDGET_START_MARKDOWN.length(), possibleWidget.length() - WidgetConstants.WIDGET_END_MARKDOWN.length()));
+					state.setWidgetStartIndex(startWord);
+					state.setWidgetEndIndex(endWord);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Surround the selectedText with the given markdown.  Or, if the selected text is already surrounded by the markdown, then remove it.
+	 * @param text
+	 * @param markdown
+	 * @param startPos
+	 * @param selectionLength
+	 * @return
+	 */
+	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
+		if (text != null && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
+			if (endTag == null) 
+				endTag = "";
+			int startTagLength = startTag.length();
+			int endTagLength = endTag.length();
+
+			int eolPos = text.indexOf('\n', startPos);
+			if (eolPos < 0)
+				eolPos = text.length();
+			int endPos = startPos + selectionLength;
+			
+			if (eolPos < endPos && !isMultiline)
+				throw new IllegalArgumentException(DisplayConstants.SINGLE_LINE_COMMAND_MESSAGE);
+			
+			String selectedText = text.substring(startPos, endPos);
+			//check to see if this text is already surrounded by the markdown.
+			int beforeSelectedTextPos = startPos - startTagLength;
+			int afterSelectedTextPos = endPos + endTagLength;
+			if (beforeSelectedTextPos > -1 && afterSelectedTextPos <= text.length()) {
+					if (startTag.equals(text.substring(beforeSelectedTextPos, startPos)) && endTag.equals(text.substring(endPos, afterSelectedTextPos))) {
+					//strip off markdown instead
+					return text.substring(0, beforeSelectedTextPos) + selectedText + text.substring(afterSelectedTextPos);
+				}
+			}
+			return text.substring(0, startPos) + startTag + selectedText + endTag + text.substring(endPos);
+		}
+		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
+	}
+	
+	public static boolean isDefined(String testString) {
+		return testString != null && testString.trim().length() > 0;
+	}
+	
+	public static void addAnnotation(Annotations annos, String name, ANNOTATION_TYPE type) {
+		// Add a new annotation
+		if(ANNOTATION_TYPE.STRING == type){
+			annos.addAnnotation(name, "");
+		}else if(ANNOTATION_TYPE.DOUBLE == type){
+			annos.addAnnotation(name, 0.0);
+		}else if(ANNOTATION_TYPE.LONG == type){
+			annos.addAnnotation(name, 0l);
+		}else if(ANNOTATION_TYPE.DATE == type){
+			annos.addAnnotation(name, new Date());
+		}else{
+			throw new IllegalArgumentException("Unknown type: "+type);
+		}
+	}
+	
+	public static void surroundWidgetWithParens(Panel container, Widget widget) {
+		Text paren = new Text("(");
+		paren.addStyleName("inline-block margin-left-5");
+		container.add(paren);
+
+		widget.addStyleName("inline-block");
+		container.add(widget);
+
+		paren = new Text(")");
+		paren.addStyleName("inline-block margin-right-10");
+		container.add(paren);
+	}
+
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
+		final Dialog window = new Dialog();
+		// configure layout
+		int windowHeight = canChangePermission ? 552 : 282;
+		window.setSize(560, windowHeight);
+		window.setPlain(true);
+		window.setModal(true);
+		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
+		window.setLayout(new FitLayout());
+		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
+	    
+		// configure buttons
+		if (canChangePermission) {
+			window.okText = "Save";
+			window.cancelText = "Cancel";
+			window.setButtons(Dialog.OKCANCEL);
+		} else {
+			window.cancelText = "Close";
+			window.setButtons(Dialog.CANCEL);
+		}
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
+	    window.setHideOnButtonClick(false);
+		window.setResizable(true);
+		
+		if (canChangePermission) {
+			// "Apply" button
+			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+			Button applyButton = window.getButtonById(Dialog.OK);
+			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					// confirm close action if there are unsaved changes
+					if (accessControlListEditor.hasUnsavedChanges()) {
+						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								callback.invoke();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								//failure notification is handled by the acl editor view.
+							}
+						});
+					}
+					window.hide();
+				}
+		    });
+		}
+		
+		// "Close" button				
+		Button closeButton = window.getButtonById(Dialog.CANCEL);
+	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+			@Override
+			public void componentSelected(ButtonEvent ce) {
+				window.hide();
+			}
+	    });
+		
+		window.show();
+	}
+
+	public static LayoutContainer createRowContainer() {
+		LayoutContainer row;
+		row = new LayoutContainer();
+		row.setStyleName("row");
+		return row;
+}
+
+	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
+	public static enum BootstrapAlertType { SUCCESS, INFO, WARNING, DANGER }
+	
+	public static com.google.gwt.user.client.ui.Button createButton(String title) {
+		return createIconButton(title, ButtonType.DEFAULT, null);
+	}
+	
+	public static com.google.gwt.user.client.ui.Button createButton(String title, ButtonType type) {
+		return createIconButton(title, type, null);
+	}
+		
+	public static com.google.gwt.user.client.ui.Button createIconButton(String title, ButtonType type, String iconClass) {		
+		com.google.gwt.user.client.ui.Button btn = new com.google.gwt.user.client.ui.Button();
+		relabelIconButton(btn, title, iconClass);
+		btn.removeStyleName("gwt-Button");
+		btn.addStyleName("btn btn-" + type.toString().toLowerCase());
+		return btn;
+	}
+	
+	public static void relabelIconButton(com.google.gwt.user.client.ui.Button btn, String title, String iconClass) {
+		String style = iconClass == null ? "" : " class=\"glyphicon " + iconClass+ "\"" ;
+		btn.setHTML(SafeHtmlUtils.fromSafeConstant("<span" + style +"></span> " + title));
+	}
+	
+	public static String getIcon(String iconClass) {
+		return "<span class=\"glyphicon " + iconClass + "\"></span>";
+	}
+
+	public static String getFontelloIcon(String iconClass) {
+		return "<span class=\"icon-" + iconClass + "\"></span>";
+	}
+
+	public static EntityHeader getProjectHeader(EntityPath entityPath) {
+		if(entityPath == null) return null;
+		for(EntityHeader eh : entityPath.getPath()) {
+			if(Project.class.getName().equals(eh.getType())) {
+				return eh;
+			}
+		}
+		return null;
+	}
+	
+	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
+		FlowPanel panel = new FlowPanel();
+		panel.addStyleName("media");
+		String linkStyle = "";
+		if (clickHandler != null)
+			linkStyle = "link";
+		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
+		if (clickHandler != null)
+			headingHtml.addClickHandler(clickHandler);
+		
+		if (pictureUri != null) {
+			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+			profilePicture.addStyleName("pull-left media-object imageButton");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		} else {
+			//display default picture
+			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			profilePicture.addStyleName("pull-left media-object displayInline ");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		}
+		FlowPanel mediaBodyPanel = new FlowPanel();
+		mediaBodyPanel.addStyleName("media-body");
+		mediaBodyPanel.add(headingHtml);
+		if (description != null)
+			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+		panel.add(mediaBodyPanel);
+		return panel;
+	}
+	
+	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
+		final SimpleComboBox<String> cb = new SimpleComboBox<String>();
+		cb.add(values);
+		cb.setSimpleValue(defaultValue);
+		cb.setTypeAhead(false);
+		cb.setEditable(false);
+		cb.setForceSelection(true);
+		cb.setTriggerAction(TriggerAction.ALL);
+		return cb;
+	}
+	
+	public static HTML getNewLabel(boolean superScript) {		
+		final HTML label = new HTML(DisplayConstants.NEW);
+		label.addStyleName("label label-info margin-left-5");
+		if(superScript) label.addStyleName("tabLabel");
+		Timer t = new Timer() {
+		      @Override
+		      public void run() {
+					label.setVisible(false);
+		      }
+		    };
+		t.schedule(30000); // hide after 30 seconds
+	    return label;
+	}
+	
+	public static void setPlaceholder(Widget w, String placeholder) {
+		w.getElement().setAttribute("placeholder", placeholder);
+	}
+	
+	public static InlineHTML createFormHelpText(String text) {
+		InlineHTML label = new InlineHTML(text);
+		label.addStyleName("help-block");
+		return label;
+	}
+
+	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
+		//alternatively, could use the gwt I18n Messages class client side
+	}
+	
+	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
+		if (publicPrincipalIds == null) {
+			userAccountService.getPublicAndAuthenticatedGroupPrincipalIds(new AsyncCallback<PublicPrincipalIds>() {
+				@Override
+				public void onSuccess(PublicPrincipalIds result) {
+					publicPrincipalIds = result;
+					callback.onSuccess(result);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+			});
+		} else
+			callback.onSuccess(publicPrincipalIds);
+	}
+	
+	public static String getPreviewSuffix(Boolean isPreview) {
+		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
+	}
+	
+	 public static void showFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.addClassName("has-error");
+		 messageElement.removeClassName("hide");
+	 }
+	 
+	 public static void hideFormError(DivElement parentElement, DivElement messageElement) {
+		 parentElement.removeClassName("has-error");
+		 messageElement.addClassName("hide");
+	 }
+
+	 public static String getInfoHtml(String safeHtmlMessage) {
+		 return "<div class=\"alert alert-info\">"+safeHtmlMessage+"</div>";
+	 }
+
+	public static String getTableRowViewAreaToken(String id) {
+		return "row/" + id;
+	}
+
+	public static String getTableRowViewAreaToken(String id, String version) {
+		String str = "row/" + id;
+		if (version != null)
+			str += "/rowversion/" + version;
+		return str;
+	}
+
 }

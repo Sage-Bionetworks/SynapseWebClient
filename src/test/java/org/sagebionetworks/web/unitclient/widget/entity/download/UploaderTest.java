@@ -2,10 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,12 +25,13 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -41,6 +39,7 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
@@ -57,7 +56,6 @@ public class UploaderTest {
 	
 	UploaderView view;
 	AuthenticationController authenticationController; 
-	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
@@ -78,7 +76,6 @@ public class UploaderTest {
 	public void before() throws Exception {
 		view = mock(UploaderView.class);
 		authenticationController = mock(AuthenticationController.class); 
-		entityTypeProvider=mock(EntityTypeProvider.class);
 		synapseClient=mock(SynapseClientAsync.class);
 		jiraURLHelper=mock(JiraURLHelper.class);
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
@@ -112,7 +109,7 @@ public class UploaderTest {
 		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(completedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).completeUpload(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
 		
 		when(gwt.createXMLHttpRequest()).thenReturn(null);
 		cancelHandler = mock(CancelHandler.class);
@@ -123,10 +120,12 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
-				authenticationController, entityTypeProvider, synapseClient,
-				jiraURLHelper, jsonObjectAdapter, synapseJsniUtils,
-				adapterFactory, autogenFactory, gwt);
+				synapseClient,
+				jsonObjectAdapter, synapseJsniUtils,
+				gwt, authenticationController);
 		uploader.addCancelHandler(cancelHandler);
+		String parentEntityId = "syn1234";
+		uploader.asWidget(parentEntityId, null);
 	}
 	
 	@Test
@@ -229,12 +228,23 @@ public class UploaderTest {
 		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyInt(), anyInt(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
-		verify(synapseClient).completeUpload(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
+		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
+	}
+	
+	@Test
+	public void testDirectUploadTeamIconHappyCase() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		CallbackP callback = mock(CallbackP.class);
+		uploader.asWidget(null,  null, null, callback, false);
+		uploader.handleUpload("newFile.txt");
+		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		uploader.directUploadStep3(false, null, 1);
+		verify(callback).invoke(anyString());
 	}
 	
 	private void verifyUploadError() {
@@ -264,20 +274,34 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null, 1);
 		verifyUploadError();
 	}
 	
 	@Test
 	public void testDirectUploadStep3CompleteUploadFailure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).completeUpload(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null);
+		uploader.directUploadStep3(false, null,1);
 		verifyUploadError();
 	}
 
+	@Test
+	public void testDirectUploadStep3Retry() throws Exception {
+		//returned a failed status every time, and verify that we will eventually see an upload error (once the MAX_RETRY limit has been surpassed)
+		UploadDaemonStatus status = new UploadDaemonStatus();
+		status.setState(State.FAILED);
+		status.setFileHandleId("fake handle");
+		String failedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(failedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
+		
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		uploader.handleUpload("newFile.txt");
+		uploader.directUploadStep3(false, null,1);
+		verifyUploadError();
+	}
 	
 	@Test
 	public void testByteRange() {
@@ -301,6 +325,11 @@ public class UploaderTest {
 		range = uploader.getByteRange(2, Uploader.BYTES_PER_CHUNK + 1024);
 		assertEquals(Uploader.BYTES_PER_CHUNK, range.getStart());
 		assertEquals(Uploader.BYTES_PER_CHUNK+1024-1, range.getEnd());
+		
+		//verify byte range is valid in later chunk in large file
+		range = uploader.getByteRange(430, (long)(4 * ClientProperties.GB));
+		assertTrue(range.getStart() > -1);
+		assertTrue(range.getEnd() > -1);
 	}
 	
 	@Test

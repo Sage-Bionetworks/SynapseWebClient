@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.server;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.springframework.http.client.CommonsClientHttpRequestFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.inject.Inject;
@@ -30,18 +31,18 @@ public class RestTemplateProviderImpl implements RestTemplateProvider {
 	public RestTemplateProviderImpl(
 			@Named("org.sagebionetworks.rest.template.connection.timout") int connectionTimeout,
 			@Named("org.sagebionetworks.rest.template.max.total.connections") int maxTotalConnections) {
+	
 		// This connection manager allows us to have multiple thread
 		// making http calls.
 		// For now use the default values.
-		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-		HttpConnectionManagerParams connectionManagerParams = new HttpConnectionManagerParams();
-		connectionManagerParams.setConnectionTimeout(connectionTimeout);
-		connectionManagerParams.setMaxTotalConnections(maxTotalConnections);
-		connectionManager.setParams(connectionManagerParams);
-		HttpClient client = new HttpClient(connectionManager);
+		PoolingHttpClientConnectionManager poolingManager = new PoolingHttpClientConnectionManager();
+		poolingManager.setMaxTotal(maxTotalConnections);
+		HttpClientBuilder builder = HttpClientBuilder.create();
+		builder.setConnectionManager(poolingManager);
+		builder.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(connectionTimeout).build());
+		HttpClient client = builder.build();
 		// We can now use this manager to create our rest template
-		CommonsClientHttpRequestFactory factory = new CommonsClientHttpRequestFactory(
-				client);
+		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
 		tempalteSingleton = new RestTemplate(factory);
 	}
 

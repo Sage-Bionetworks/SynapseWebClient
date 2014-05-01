@@ -2,9 +2,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -25,14 +26,14 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	}
 	
 	@Override
-	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor) {
+	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
 		view.configure(wikiKey,
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-				synapseId, authenticationController.isLoggedIn());
+				synapseId, authenticationController.isLoggedIn(), wikiVersionInView);
 		//set up view based on descriptor parameters
 		descriptor = widgetDescriptor;
 	}

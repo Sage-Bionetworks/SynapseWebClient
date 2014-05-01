@@ -10,10 +10,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.message.ObjectType;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ProvenanceConfigEditorTest {
@@ -44,7 +44,7 @@ public class ProvenanceConfigEditorTest {
 		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entityToGraph);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);
-		editor.configure(wikiKey, descriptor);
+		editor.configure(wikiKey, descriptor, null);
 		verify(mockView).setEntityList(eq(entityToGraph));
 		verify(mockView).setIsExpanded(eq(Boolean.valueOf(showExpand)));
 		verify(mockView).setDepth(eq(Long.parseLong(d)));

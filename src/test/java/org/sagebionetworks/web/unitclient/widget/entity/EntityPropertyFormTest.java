@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
@@ -34,7 +35,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -71,7 +71,7 @@ public class EntityPropertyFormTest {
 				mockNodeModelCreator, mockSynapseClient, mockSynapseJSNIUtils,
 				mockWidgetRegistrar, mockGlobalApplicationState,
 				mockAuthenticationController);
-		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null,null, null, null);
+		EntityBundle bundle = new EntityBundle(new Project(), null, null,null,null, null, null);
 		
 		String entityId = "123";
 		entity = new ExampleEntity();
@@ -89,7 +89,7 @@ public class EntityPropertyFormTest {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
 		when(mockNodeModelCreator.createEntityBundle(any(EntityBundleTransport.class))).thenReturn(entityBundle);
 		
 		AdapterFactory factory = new AdapterFactoryImpl();

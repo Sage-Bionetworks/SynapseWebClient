@@ -11,21 +11,15 @@
 			<h2 style="margin-bottom: 0px;">
 			 	<g:Image ui:field="entityIcon" />
 			 	<g:Anchor ui:field="entityLink"/>
-			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;(<span ui:field="entityId"/>) <g:SimplePanel ui:field="favoritePanel"/>
+			 	<g:SimplePanel ui:field="downloadButtonContainer"/>&nbsp;<g:SimplePanel ui:field="favoritePanel"/>
 			</h2>
 			<g:HTMLPanel ui:field="fileNameContainer">
-				<span class="boldText">File:</span> <span ui:field="fileName"/><span style="margin-left: 5px;" class="file-size" ui:field="fileSize" /><g:SimplePanel ui:field="md5LinkContainer"/>
+				<span class="boldText">File:</span> <span ui:field="fileName"/><span style="margin-left: 5px;" class="file-size" ui:field="fileSize" /><g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
 			</g:HTMLPanel>
 		</g:HTMLPanel>
-		<g:HTMLPanel ui:field="noFileFoundContainer">
-			<div class="span-17 bordered-form notopmargin">
-				<div>
-					<h3><span style="margin-right: 10px;">No File Found</span><g:SimplePanel ui:field="uploadButtonContainer"/></h3>
-				</div>
-				<div>
-					It is recommended that you upload a file or link to an external location as this object is intended to reference a file.
-				</div>
-			</div>
+		<g:HTMLPanel ui:field="noFileFoundContainer" styleName="panel panel-body margin-top-15 text-danger">
+				<h3><span style="margin-right: 10px;"><span class="glyphicon glyphicon-exclamation-sign dropLargeIconText"/> No File Found</span><g:SimplePanel ui:field="uploadButtonContainer"/></h3>
+				It is recommended that you upload a file or link to an external location as this object is intended to reference a file.
 		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

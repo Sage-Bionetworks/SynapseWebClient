@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,7 +37,6 @@ public class TableOfContentsWidgetViewImpl extends LayoutContainer implements Ta
 		if (!hasLoaded) {
 			hasLoaded = true;
 			FlowPanel linkContainer = new FlowPanel();
-			linkContainer.add(new HTML("<h4>Table Of Contents</h4>"));
 			HTMLPanel parentPanel = (HTMLPanel)this.getParent();
 			//look for these special header ids (that were added by the markdown processor for us), and create links to them
 			String id = WidgetConstants.MARKDOWN_HEADING_ID_PREFIX;

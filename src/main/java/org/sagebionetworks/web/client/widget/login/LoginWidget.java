@@ -6,12 +6,14 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.TermsOfUseException;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -24,13 +26,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private NodeModelCreator nodeModelCreator;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator, GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.nodeModelCreator = nodeModelCreator;
+		this.globalApplicationState = globalApplicationState;
 	}
 
 	public Widget asWidget() {
@@ -43,37 +47,31 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 	
 	@Override
-	public void setUsernameAndPassword(final String username, final String password, final boolean explicitlyAcceptsTermsOfUse) {		
-		authenticationController.loginUser(username, password, explicitlyAcceptsTermsOfUse, new AsyncCallback<String>() {
+	public void setUsernameAndPassword(final String username, final String password) {		
+		authenticationController.loginUser(username, password, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				UserSessionData userSessionData = null;
+				view.clear();
+				UserSessionData toBeParsed = null;
 				if (result != null){
 					try {
-						userSessionData = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
+						toBeParsed = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}
-				fireUserChage(userSessionData);
+				final UserSessionData userSessionData = toBeParsed;
+				fireUserChange(userSessionData);
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {
-				if (caught instanceof TermsOfUseException) {
-					authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-						public void onSuccess(String termsOfUseContent) {	
-							view.showTermsOfUse(termsOfUseContent, 
-									new AcceptTermsOfUseCallback() {
-										public void accepted() {setUsernameAndPassword(username, password, true);}
-									});							
-						}
-						public void onFailure(Throwable t) {
-							view.showTermsOfUseDownloadFailed();							
-						}
-					});
-
-				} else {
+			public void onFailure(Throwable caught) {				
+				view.clear();
+				if(caught instanceof ReadOnlyModeException) {
+					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
+				} else if(caught instanceof SynapseDownException) {
+					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
+				} else {				
 					view.showAuthenticationFailed();
 				}
 			}
@@ -85,7 +83,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	// needed?
-	private void fireUserChage(UserSessionData user) {
+	private void fireUserChange(UserSessionData user) {
 		for(UserListener listener: listeners){
 			listener.userChanged(user);
 		}
@@ -110,9 +108,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 
 	@Override
-	public void acceptTermsOfUse() {
-		view.acceptTermsOfUse();
+	public void goTo(Place place) {
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-	
 	
 }

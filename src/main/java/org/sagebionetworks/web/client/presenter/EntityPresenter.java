@@ -5,18 +5,16 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -25,6 +23,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.EntityView;
@@ -50,6 +49,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String entityId;
 	private Long versionNumber;
 	private AdapterFactory adapterFactory;
+	private Synapse.EntityArea area;
+	private String areaToken;
 	
 	@Inject
 	public EntityPresenter(EntityView view,
@@ -63,7 +64,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.adapterFactory = adapterFactory;
-	
 		view.setPresenter(this);
 	}
 
@@ -78,11 +78,20 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.place = place;
 		this.view.setPresenter(this);		
 		
-		// token maps directly to entity id
 		this.entityId = place.getEntityId();
 		this.versionNumber = place.getVersionNumber();
-
+		this.area = place.getArea();
+		this.areaToken = place.getAreaToken();
 		refresh();
+	}
+	
+	public void updateArea(EntityArea area, String areaToken) {
+		this.area = area;
+		this.areaToken = areaToken;
+		place.setArea(area);
+		place.setAreaToken(areaToken);
+		place.setNoRestartActivity(true);
+		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 
 	@Override
@@ -99,9 +108,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | 
-		ENTITY_PATH | ENTITY_REFERENCEDBY | HAS_CHILDREN |
-			ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {				
@@ -124,8 +131,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 							view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 						}
 					} 					
-					
-					view.setEntityBundle(bundle, versionNumber);					
+					EntityHeader projectHeader = DisplayUtils.getProjectHeader(new EntityPath(adapterFactory.createNew(transport.getEntityPathJson()))); 					
+					if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);					
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					
 				}				
@@ -135,9 +143,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			public void onFailure(Throwable caught) {
 				if(caught instanceof NotFoundException) {
 					view.show404();
-				} else if(caught instanceof ForbiddenException) {
+				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {
 					view.show403();
-				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(DisplayConstants.ERROR_UNABLE_TO_LOAD);
 				}
 			}			

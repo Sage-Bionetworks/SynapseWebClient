@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -22,10 +20,8 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
-import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -80,9 +76,10 @@ public class EntityListUtil {
 			public void onFailure(Throwable caught) {
 				EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
 				errorDisplay.setEntityId(ref.getTargetId());
-				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(ref.getTargetVersionNumber().toString()));
+				String versionNumber = ref.getTargetVersionNumber() == null ? "" : ref.getTargetVersionNumber().toString();
+				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(versionNumber));
 				String msg = ref.getTargetId();
-				if(ref.getTargetVersionNumber() != null) msg += ", Version " + ref.getTargetVersionNumber();
+				if(ref.getTargetVersionNumber() != null) msg += ", Version " + versionNumber;
 				if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
 					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
 				} else if (caught instanceof NotFoundException) {
@@ -165,7 +162,8 @@ public class EntityListUtil {
 		// download
 		String downloadUrl = null;
 		if(!isLoggedIn) {				
-			downloadUrl = "#!" + nameLinkUrl;
+			if(bundle.getEntity() instanceof FileEntity || bundle.getEntity() instanceof Locationable)
+				downloadUrl = "#" + nameLinkUrl;
 		} else if(referencedEntity instanceof Locationable) {
 			List<LocationData> locations = ((Locationable) referencedEntity).getLocations();
 			if(locations != null && locations.size() > 0) {
@@ -200,7 +198,7 @@ public class EntityListUtil {
 				downloadUrl, descSafe,
 				SafeHtmlUtils.fromString(version),
 				referencedEntity.getModifiedOn(),
-				referencedEntity.getCreatedBy() == null ? SafeHtmlUtils.EMPTY_SAFE_HTML : SafeHtmlUtils.fromString(referencedEntity.getCreatedBy()),
+				referencedEntity.getCreatedBy() == null ? "" : referencedEntity.getCreatedBy(),
 				noteSafe);		
 	}
 
@@ -209,7 +207,7 @@ public class EntityListUtil {
 		return new EntityGroupRecordDisplay(
 				"",
 				SafeHtmlUtils.EMPTY_SAFE_HTML,
-				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML);
+				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, "", SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
 
 

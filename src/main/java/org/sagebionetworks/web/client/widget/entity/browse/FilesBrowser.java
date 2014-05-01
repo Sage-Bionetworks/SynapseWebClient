@@ -9,11 +9,15 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,6 +34,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	private EntityUpdatedHandler entityUpdatedHandler;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	CookieProvider cookies;
 	boolean canEdit = false;
 	
 	@Inject
@@ -38,7 +43,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			NodeModelCreator nodeModelCreator, AdapterFactory adapterFactory,
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			CookieProvider cookies) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -46,6 +52,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.autogenFactory = autogenFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.cookies = cookies;
 		view.setPresenter(this);
 	}	
 	
@@ -91,22 +98,54 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	}
 
 	@Override
-	public void createFolder(final String name) {
+	public void uploadButtonClicked() {
+		//is this a certified user?
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecord) {
+				view.showUploadDialog(configuredEntityId);
+			}
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
+					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked)
+								view.showUploadDialog(configuredEntityId);
+						}
+					});					
+				} else
+					view.showErrorMessage(t.getMessage());
+			}
+		};
+		//TODO:  only in test website until tutorial content is ready
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+		} else {
+			userCertifiedCallback.onSuccess("");
+		}
+	}
+	
+	@Override
+	public void addFolderClicked() {
+		createFolder();
+	}
+	
+	public void createFolder() {
 		Entity folder = createNewEntity(Folder.class.getName(), configuredEntityId);
-		folder.setName(name);
 		String entityJson;
 		try {
 			entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.createOrUpdateEntity(entityJson, null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String newId) {
-					view.showInfo("Folder '" + name + "' Added", "");
-					view.refreshTreeView(configuredEntityId);
+					view.showFolderEditDialog(newId);
 				}
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
 				}			
 			});
@@ -114,7 +153,65 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
 		}
 	}
+	
+	@Override
+	public void deleteFolder(String folderEntityId, boolean skipTrashCan) {
+		synapseClient.deleteEntityById(folderEntityId, skipTrashCan, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void na) {
+				//folder is deleted when folder creation is canceled.  refresh the tree for updated information 
+				view.refreshTreeView(configuredEntityId);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
+			}			
+		});
+	}
+	
+	public void updateFolderName(final Folder folder) {
+		try {
+			String entityJson = folder.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.updateEntity(entityJson, new AsyncCallback<EntityWrapper>() {
+				@Override
+				public void onSuccess(EntityWrapper result) {
+					view.showInfo("Folder '" + folder.getName() + "' Added", "");
+					view.refreshTreeView(configuredEntityId);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
+				}
+			});
+		} catch (JSONObjectAdapterException e) {			
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+		}
 
+	}
+	
+	@Override
+	public void updateFolderName(final String newFolderName, String folderEntityId) {
+		synapseClient.getEntity(folderEntityId, new AsyncCallback<EntityWrapper>() {
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				try {
+					Folder folder = nodeModelCreator.createJSONEntity(result.getEntityJson(), Folder.class);
+					folder.setName(newFolderName);
+					updateFolderName(folder);
+				} catch (JSONObjectAdapterException e) {			
+					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_FOLDER_CREATION_FAILED);
+			}			
+		});
+	}
+	
 	
 	/*
 	 * Private Methods

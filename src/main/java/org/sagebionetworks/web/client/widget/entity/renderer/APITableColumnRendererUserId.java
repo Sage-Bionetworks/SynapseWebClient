@@ -51,10 +51,11 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 		String emptyString = "";
 		userId2html = new HashMap<String, String>();
 		//get unique user ids, then ask for the user group headers
-		inputUserIds = columnData.get(inputColumnName);
+		inputUserIds = APITableWidget.getColumnValues(inputColumnName, columnData);
 		if (inputUserIds == null) {
 			//user defined an input column that doesn't exist in the service output
 			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
+			return;
 		}
 		
 		for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
@@ -78,9 +79,9 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 							html.append("\" style=\"width: 20px; height: 20px\"></img></span>");
 						}
 						else
-							html.append(DisplayUtils.getIconHtml(sageImageBundle.defaultProfilePicture20()));
+							html.append(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
 							
-						html.append("&nbsp;"+ugh.getDisplayName()+"</a>");
+						html.append("&nbsp;"+DisplayUtils.getDisplayName(ugh)+"</a>");
 						userId2html.put(ugh.getOwnerId(), html.toString());
 					}
 						
@@ -123,7 +124,4 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 			}
 		});
 	}
-	
-	
-
 }

@@ -1,10 +1,14 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
@@ -18,14 +22,11 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 @SuppressWarnings("unused")
 public class PasswordResetPresenter extends AbstractActivity implements PasswordResetView.Presenter, Presenter<PasswordReset> {
-	public static final String REGISTRATION_TOKEN_PREFIX = "register_";
-	public static final String CHANGE_EMAIL_TOKEN_PREFIX = "change_email_";
 	private PasswordReset place;	
 	private PasswordResetView view;
 	private CookieProvider cookieProvider;
@@ -36,15 +37,14 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	private GlobalApplicationState globalApplicationState;
 	private NodeModelCreator nodeModelCreator;
 	
-	private String registrationToken, changeEmailToken = null;
+	private String sessionToken = null;
 	
 	@Inject
 	public PasswordResetPresenter(PasswordResetView view,
 			CookieProvider cookieProvider, UserAccountServiceAsync userService,
 			AuthenticationController authenticationController,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
-			GlobalApplicationState globalApplicationState,
-			NodeModelCreator nodeModelCreator) {
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.userService = userService;
 		this.authenticationController = authenticationController;
@@ -53,7 +53,6 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		// Set the presenter on the view
 		this.cookieProvider = cookieProvider;
 		this.globalApplicationState = globalApplicationState;
-		this.nodeModelCreator=nodeModelCreator;
 		
 		view.setPresenter(this);
 	}
@@ -69,49 +68,24 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		this.place = place;
 		view.setPresenter(this);			
 		view.clear(); 
-		registrationToken = null;
-		changeEmailToken = null;
 		
-		// show proper view if token is present
-		if(ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
-			view.showRequestForm();
-		} else if (place.toToken().startsWith(REGISTRATION_TOKEN_PREFIX)) {
-			// if this is a registration token, we don't have enough information
-			// to log them in, but we can still set the password from this token
-			registrationToken = place.toToken();
-			view.showResetForm();
-		} else if (place.toToken().startsWith(CHANGE_EMAIL_TOKEN_PREFIX)) {
-			//this is a change email token.
-			//the user must be logged in for this to work.
-			if (!authenticationController.isLoggedIn()) {
-				view.showMessage("You must be logged in to change your email address.");
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			} else {
-				changeEmailToken = place.toToken();
-				view.showResetForm();
-			}
-		} else {
-			// Show password reset form
-			view.showMessage(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML() + " Loading Password Reset...");
-			
-			// show same error if service fails as with an invalid token					
-			final String errorMessage = "Password reset period has expired. <a href=\"#!PasswordReset:0\">Please request another Password Reset</a>.";
-			String sessionToken = place.toToken();
+		// Assume all tokens other than the default are session tokens
+		if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(place.toToken())) {
+			sessionToken = place.toToken();
+			// validate that session token is still valid before showing form
+			view.showLoading();
 			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					if(result != null) {
-						view.showResetForm();
-					} else {
-						view.showMessage(errorMessage);
-					}
+					view.showResetForm();	
 				}
-
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showMessage(errorMessage);
+					view.showExpiredRequest();
 				}
 			});
+		} else {
+			view.showRequestForm();
 		}
 	}
 
@@ -133,52 +107,45 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 	@Override
 	public void resetPassword(final String newPassword) {
-		if (registrationToken != null) {
-			userService.setRegistrationUserPassword(registrationToken,	newPassword, new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							view.showInfo(DisplayConstants.PASSWORD_SET_TEXT);
-							globalApplicationState.getPlaceChanger().goTo(
-									new LoginPlace(LoginPlace.LOGIN_TOKEN));
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(DisplayConstants.PASSWORD_SET_FAILED_TEXT);
-						}
-					});
-		} else if (changeEmailToken != null) {
-				userService.changeEmailAddress(changeEmailToken, newPassword, new AsyncCallback<Void>() {
-							@Override
-							public void onSuccess(Void result) {
-								view.showInfo(DisplayConstants.PASSWORD_AND_EMAIL_SET_TEXT);
-								globalApplicationState.getPlaceChanger().goTo(
-										new LoginPlace(LoginPlace.LOGIN_TOKEN));
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								view.showErrorMessage(DisplayConstants.EMAIL_SET_FAILED_TEXT);
-							}
-						});
-			
-		} else {
-			if (authenticationController.isLoggedIn()) {
-				userService.setPassword(
-						newPassword, new AsyncCallback<Void>() {
-							@Override
-							public void onSuccess(Void result) {
-								view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
-								view.showPasswordResetSuccess();
-								globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								view.showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
-							}
-						});
-			}
+		if (sessionToken == null && authenticationController.isLoggedIn()) {
+			sessionToken = authenticationController.getCurrentUserSessionToken();
 		}
+		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
+				view.showPasswordResetSuccess();
+				Session session = authenticationController.getCurrentUserSessionData().getSession();
+				UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+				if (session.getAcceptsTermsOfUse() && profile != null && profile.getUserName() != null && !DisplayUtils.isTemporaryUsername(profile.getUserName()))
+					//re-login like we do on the Settings page (when changing the password)
+					reloginUser(profile.getUserName(), newPassword);
+				else {
+					//pop up terms of service on re-login
+					authenticationController.logoutUser();
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to login page
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.PASSWORD_RESET_FAILED_TEXT);
+			}
+		});
+	}
+	
+	public void reloginUser(String username, String newPassword) {
+		// login user as session token has changed
+        authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                	globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
+                }
+                @Override
+                public void onFailure(Throwable caught) {
+                    // if login fails, simple send them to the login page to get a new session
+                    globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+                }
+        });
 	}
 }

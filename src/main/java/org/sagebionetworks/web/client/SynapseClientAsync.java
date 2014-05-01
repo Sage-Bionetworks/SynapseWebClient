@@ -2,15 +2,22 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
-import org.sagebionetworks.evaluation.model.UserEvaluationState;
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
+import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -53,13 +60,19 @@ public interface SynapseClientAsync {
 	void getEntityHeaderBatch(String referenceList,
 			AsyncCallback<String> callback);
 
+	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<List<String>> callback);
+	
 	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
+	
+	void deleteEntityById(String entityId, Boolean skipTrashCan, AsyncCallback<Void> callback);
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getUserProfile(AsyncCallback<String> callback);
 	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
+	
+	void getTeam(String teamId, AsyncCallback<String> callback);
 	
 	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
 	
@@ -83,8 +96,6 @@ public interface SynapseClientAsync {
 
 	public void getAllUsers(AsyncCallback<EntityWrapper> callback);
 	
-	public void getAllGroups(AsyncCallback<EntityWrapper> callback);
-	
 	public void createAccessRequirement(EntityWrapper arEW, AsyncCallback<EntityWrapper> callback);
 
 	public void createLockAccessRequirement(String entityId, AsyncCallback<EntityWrapper> callback);
@@ -97,6 +108,8 @@ public interface SynapseClientAsync {
 	 * @param callback returns VariableContentPaginatedResults<AccessRequirement> json
 	 */
 	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
+	
+	public void getUnmetTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
 
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
@@ -106,7 +119,7 @@ public interface SynapseClientAsync {
 	
 	public void createExternalFile(String parentEntityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback) throws RestServiceException;
 
-	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, AsyncCallback<String> callback);
+	public void markdown2Html(String markdown, Boolean isPreview, Boolean isAlpha, String clientHostString, AsyncCallback<String> callback);
 	
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 
@@ -128,6 +141,27 @@ public interface SynapseClientAsync {
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
 	public void getFileEndpoint(AsyncCallback<String> callback);
 
+	 // V2 Wiki crud
+    public void createV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void getV2WikiPage(WikiPageKey key, AsyncCallback<String> callback);
+    public void getVersionOfV2WikiPage(WikiPageKey key, Long version, AsyncCallback<String> callback);
+    public void updateV2WikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+    public void restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate, AsyncCallback<String> callback);
+    public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+    public void getV2WikiHeaderTree(String ownerId, String ownerType, AsyncCallback<String> callback);
+    public void getV2WikiAttachmentHandles(WikiPageKey key, AsyncCallback<String> callback);
+    public void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version, AsyncCallback<String> callback);
+    public void getV2WikiHistory(WikiPageKey key, Long limit, Long offset, AsyncCallback<String> callback);
+
+	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
+	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
+	public void zipAndUploadFile(String content, String fileName, AsyncCallback<String> callback);
+	
+	public void createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
+	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<String> callback);
+	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<String> callback);
+	
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 
 	void addFavorite(String entityId, AsyncCallback<String> callback);
@@ -136,24 +170,50 @@ public interface SynapseClientAsync {
 
 	void getFavorites(Integer limit, Integer offset, AsyncCallback<String> callback);
 	
+	/**
+	 * TEAMS
+	 */
+	/////////////////
+	void createTeam(String teamName,AsyncCallback<String> callback);
+	void deleteTeam(String teamId,AsyncCallback<Void> callback);
+	void getTeams(String userId, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getTeamsForUser(String userId, AsyncCallback<ArrayList<String>> callback);
+	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset, AsyncCallback<String> callback);
+	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
+	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
+
+	void getOpenInvitations(String userId, AsyncCallback<List<MembershipInvitationBundle>> callback);
+	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<List<MembershipInvitationBundle>> callback);
+	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
+	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
+	void updateTeam(String teamJson, AsyncCallback<String> callback);
+	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
+	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
+	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<String> callback);	
+//	void getTeamMembershipState(String currentUserId, String teamId, AsyncCallback<String> callback);
+	void requestMembership(String currentUserId, String teamId, String message, AsyncCallback<Void> callback);
+	
+	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
+	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
+	/////////////////
+	
+	/**
+	 * The PassingRecord that documents when a user was certified is returned.  Otherwise, a NotFoundException is thrown.
+	 * @param userId
+	 * @param callback
+	 */
+	void getCertifiedUserPassingRecord(String userId, AsyncCallback<String> callback);
+	void getCertificationQuiz(AsyncCallback<String> callback);
+	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
+	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
-	void getUserEvaluationState(String evaluationId, AsyncCallback<UserEvaluationState> callback) throws RestServiceException;
-
-	/**
-	 * Returns json string representation of created Participant
-	 * @param evaluationId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	void createParticipants(String[] evaluationIds, AsyncCallback<Void> callback) throws RestServiceException;
-	
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
 	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<String> callback) throws RestServiceException;
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
-	void completeUpload(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
+	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
 	
 	
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
@@ -162,8 +222,8 @@ public interface SynapseClientAsync {
 	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
 	void getEvaluations(List<String> evaluationIds, AsyncCallback<String> callback) throws RestServiceException;
 	void getAvailableEvaluations(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluationEntities(AsyncCallback<String> callback) throws RestServiceException;
-	void getAvailableEvaluationEntitiesList(AsyncCallback<ArrayList<String>> callback) throws RestServiceException;
+	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<String> callback) throws RestServiceException;
+	void getSharableEvaluations(String entityId, AsyncCallback<ArrayList<String>> callback);
 	
 	/**
 	 * Create a new Submission object.  Callback returning the updated version of the Submission object
@@ -172,6 +232,12 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	
+	
+	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
+	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
+	void updateEvaluationAcl(String aclJson, AsyncCallback<String> callback);
+	
 	
 	/**
 	 * Get all unique submission user aliases associated to the available evaluations (OPEN evaluations that the current user has joined).
@@ -198,4 +264,25 @@ public interface SynapseClientAsync {
 	void getSynapseProperty(String key, AsyncCallback<String> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
+
+	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<String>> asyncCallback);
+
+	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
+	
+	void sendMessage(Set<String> recipients, String subject, String message, AsyncCallback<String> callback);
+	
+	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
+
+	void executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount, AsyncCallback<QueryResult> callback);
+
+	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
+	
+	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
+
+	void deleteApiKey(AsyncCallback<String> callback);
+
+	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
+
+	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
+
 }

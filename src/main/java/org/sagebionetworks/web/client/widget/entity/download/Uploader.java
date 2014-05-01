@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -14,28 +13,26 @@ import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.MD5Callback;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -63,26 +60,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
-	public static final double OLD_BROWSER_MAX_SIZE = ClientProperties.MB * 5; //5MB
-	public static final int BYTES_PER_CHUNK = (int)ClientProperties.MB * 5; //5MB
+	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
+	public static final long BYTES_PER_CHUNK = (long)ClientProperties.MB * 5; //5MB
 	public static final int MAX_RETRY = 3;
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
-	private AuthenticationController authenticationController;
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
-	private EntityTypeProvider entityTypeProvider;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private AdapterFactory adapterFactory;
-	private AutoGenFactory autogenFactory;
-
+	private boolean isDirectUploading;
+	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
-	private JiraURLHelper jiraURLHelper;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
+	AuthenticationController authenticationController;
 	private ChunkedFileToken token;
 	private boolean isUploadRestricted;
 	NumberFormat percentFormat;
@@ -94,28 +88,20 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public Uploader(
 			UploaderView view, 			
 			NodeModelCreator nodeModelCreator, 
-			AuthenticationController authenticationController, 
-			EntityTypeProvider entityTypeProvider,
 			SynapseClientAsync synapseClient,
-			JiraURLHelper jiraURLHelper,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
-			AdapterFactory adapterFactory, 
-			AutoGenFactory autogenFactory,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			AuthenticationController authenticationController
 			) {
 	
 		this.view = view;		
 		this.nodeModelCreator = nodeModelCreator;
-		this.authenticationController = authenticationController;
-		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
-		this.jiraURLHelper = jiraURLHelper;
 		this.jsonObjectAdapter=jsonObjectAdapter;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.adapterFactory = adapterFactory;
-		this.autogenFactory = autogenFactory;
 		this.gwt = gwt;
+		this.authenticationController = authenticationController;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -124,18 +110,24 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}		
 		
 	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {
+		return asWidget(entity, null, accessRequirements, null, true);
+	}
+	
+	public Widget asWidget(String parentEntityId, List<AccessRequirement> accessRequirements) {
+		return asWidget((Entity)null, parentEntityId, accessRequirements, null, true);
+	}
+	
+	public Widget asWidget(Entity entity, String parentEntityId, List<AccessRequirement> accessRequirements, CallbackP<String> fileHandleIdCallback, boolean isEntity) {
 		this.view.setPresenter(this);
 		this.entity = entity;
+		this.parentEntityId = parentEntityId;
+		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.accessRequirements = accessRequirements;
-		this.view.createUploadForm(isDirectUploadSupported);
+		this.view.createUploadForm(isEntity, parentEntityId, isDirectUploadSupported);
+		view.showUploaderUI();
 		return this.view.asWidget();
 	}
 
-	public Widget asWidget(String parentEntityId, List<AccessRequirement> accessRequirements) {
-		this.parentEntityId = parentEntityId;
-		return asWidget((Entity)null, accessRequirements);
-	}
-	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
@@ -186,7 +178,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			//if using this method, block if file size is > MAX_SIZE
 			if (isFileEntity) {
 				try {
-					double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+					long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
 					//check
 					if (fileSize > OLD_BROWSER_MAX_SIZE) {
 						view.showErrorMessage(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
@@ -240,10 +232,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(String result) {
 					try {
 						token = nodeModelCreator.createJSONEntity(result, ChunkedFileToken.class);
-						double fileSize = synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
 						long totalChunkCount = (long)Math.ceil(fileSize / BYTES_PER_CHUNK);;
 						view.showProgressBar();
-						directUploadStep2(contentType, 1, 1, totalChunkCount, (int)fileSize, new ArrayList<String>());
+						directUploadStep2(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -265,7 +257,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param currentAttempt This is our nth attempt at uploading this chunk (starting at 1, trying up to MAX_RETRY times)
 	 * @param totalChunkCount The total number of chunks to complete upload of the file
 	 */
-	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final int fileSize, final List<String> requestList){
+	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<String> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
@@ -329,11 +321,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadSuccess(String requestJson, String contentType, int currentChunkNumber, long totalChunkCount, int fileSize, List<String> requestList){
+	public void chunkUploadSuccess(String requestJson, String contentType, int currentChunkNumber, long totalChunkCount, long fileSize, List<String> requestList){
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep3(view.isNewlyRestricted(), requestList);
+			directUploadStep3(false, requestList, 1);
 		else
 			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}
@@ -347,7 +339,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, int fileSize, List<String> requestList) {
+	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, long fileSize, List<String> requestList) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError("Exceeded the maximum number of attempts to upload a single file chunk.");
 		else //retry
@@ -355,28 +347,28 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public class ByteRange {
-		private int start, end;
-		public ByteRange(int start, int end) {
+		private long start, end;
+		public ByteRange(long start, long end) {
 			this.start = start;
 			this.end = end;
 		}
-		public int getEnd() {
+		public long getEnd() {
 			return end;
 		}
-		public int getStart() {
+		public long getStart() {
 			return start;
 		}
 	}
 	
-	public ByteRange getByteRange(int currentChunkNumber, int fileSize) {
-		int startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
-		int endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
+	public ByteRange getByteRange(int currentChunkNumber, Long fileSize) {
+		long startByte = (currentChunkNumber-1) * BYTES_PER_CHUNK;
+		long endByte = currentChunkNumber * BYTES_PER_CHUNK - 1;
 		if (endByte >= fileSize)
 			endByte = fileSize-1;
 		return new ByteRange(startByte, endByte);
 	}
 	
-	public void directUploadStep3(final boolean isNewlyRestricted, List<String> requestList){
+	public void directUploadStep3(final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt){
 		//complete the file upload, and refresh
 		try {
 			final String entityId = entity==null ? null : entity.getId();
@@ -388,7 +380,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					try {
 						UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
 						//if it's already done, then finish.  Otherwise keep checking back until it's complete.
-						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -403,25 +395,37 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void processDaemonStatus(UploadDaemonStatus status, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted){
+	public void processDaemonStatus(UploadDaemonStatus status, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted, List<String> requestList, int currentAttempt){
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			view.updateProgress(.99d, "99%");
-			completeUpload(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			if (entityId != null || parentEntityId != null)
+				setFileEntityFileHandle(status.getFileHandleId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			if (fileHandleIdCallback != null) {
+				fileHandleIdCallback.invoke(status.getFileHandleId());
+				uploadSuccess(false);
+			}
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
 			double currentProgress = ((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT;
 			String progressText = percentFormat.format(currentProgress*100.0) + "%";
 			view.updateProgress(currentProgress, progressText);
-			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 		}
 		else if (State.FAILED == state) {
-			uploadError(status.getErrorMessage());
+			combineChunksUploadFailure(isNewlyRestricted, requestList, currentAttempt, status.getErrorMessage());
 		}
 	}
 	
-	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted) {
+	public void combineChunksUploadFailure(boolean isNewlyRestricted, List<String> requestList, int currentAttempt, String errorMessage) {
+		if (currentAttempt >= MAX_RETRY)
+			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
+		else //retry
+			directUploadStep3(isNewlyRestricted, requestList, currentAttempt+1);
+	}
+	
+	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt) {
 		//in one second, do a web service call to check the status again
 		Timer t = new Timer() {
 		      public void run() {
@@ -432,7 +436,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							try {
 								UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
 								// if it's already done, then finish. Otherwise keep checking back until it's complete.
-								processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted);
+								processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 							} catch (JSONObjectAdapterException e) {
 								onFailure(e);
 							}
@@ -453,9 +457,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 	}
 	
-	public void completeUpload(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
+	public void setFileEntityFileHandle(String fileHandleId, final String entityId, String parentEntityId, boolean isUploadRestricted, final boolean isNewlyRestricted) {
 		try {
-			synapseClient.completeUpload(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, isUploadRestricted, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					//to new file handle id, or create new file entity with this file handle id
@@ -618,7 +622,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public boolean isRestricted() {
 		return GovernanceServiceHelper.entityRestrictionLevel(accessRequirements)!=RESTRICTION_LEVEL.OPEN;
 	}
-		public int getDisplayHeight() {
+
+	public int getDisplayHeight() {
 		return view.getDisplayHeight();
 	}
 	

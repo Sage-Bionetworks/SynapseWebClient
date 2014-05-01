@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.message.ObjectType;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -48,17 +50,19 @@ SynapseWidgetPresenter {
 	private WikiPage currentPage;
 	private boolean isEmbeddedInOwnerPage;
 	private AdapterFactory adapterFactory;
-	private String ownerObjectName; //used for linking back to the owner object
-	private int spanWidth;
 	private WikiPageWidgetView view; 
 	AuthenticationController authenticationController;
+	boolean isDescription = false;
+	private boolean isCurrentVersion;
+	private Long versionInView;
 	
 	public interface Callback{
 		public void pageUpdated();
+		public void noWikiFound();
 	}
 	
 	public interface OwnerObjectNameCallback{
-		public void ownerObjectNameInitialized();
+		public void ownerObjectNameInitialized(String ownerObjectName, boolean isDescription);
 	}
 	
 	@Inject
@@ -84,12 +88,12 @@ SynapseWidgetPresenter {
 		return view.asWidget();
 	}
 	
-	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, Callback callback, final boolean isEmbeddedInOwnerPage, final int spanWidth) {
+	public void configure(final WikiPageKey inWikiKey, final Boolean canEdit, final Callback callback, final boolean isEmbeddedInOwnerPage) {
 		this.canEdit = canEdit;
 		this.wikiKey = inWikiKey;
 		this.isEmbeddedInOwnerPage = isEmbeddedInOwnerPage;
-		this.spanWidth = spanWidth;
-		
+		this.isCurrentVersion = true;
+		this.versionInView = null;
 		//set up callback
 		if (callback != null)
 			this.callback = callback;
@@ -98,20 +102,24 @@ SynapseWidgetPresenter {
 				@Override
 				public void pageUpdated() {
 				}
+				@Override
+				public void noWikiFound() {
+				}
 			};
 		
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
-			public void ownerObjectNameInitialized() {
+			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
 				//get the wiki page
-				synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
+				synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
 						try {
 							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
 							wikiKey.setWikiPageId(currentPage.getId());
-							view.configure(currentPage, wikiKey, ownerObjectName, canEdit, isEmbeddedInOwnerPage, spanWidth);
-						} catch (JSONObjectAdapterException e) {
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+						} catch (Exception e) {
 							onFailure(e);
 						}
 					}
@@ -121,49 +129,25 @@ SynapseWidgetPresenter {
 						if (caught instanceof NotFoundException) {
 							//show insert wiki button if user can edit and it's embedded in another entity page
 							if (canEdit && isEmbeddedInOwnerPage)
-								view.showNoWikiAvailableUI();
+								view.showNoWikiAvailableUI(isDescription);
 							else if (!isEmbeddedInOwnerPage) //otherwise, if it's not embedded in the owner page, show a 404
 								view.show404();
+							
+							if (callback != null)
+								callback.noWikiFound();
 						}
 						else if (caught instanceof ForbiddenException) {
 							if (!isEmbeddedInOwnerPage) //if it's not embedded in the owner page, show a 403
 								view.show403();
 						}
 						else {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
 				});				
 			}
 		});
-	}
-	
-	@Override
-	public void refreshWikiAttachments(final String updatedTitle, final String updatedMarkdown, final Callback pageUpdatedCallback) {
-		//get the wiki page
-		synapseClient.getWikiPage(wikiKey, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				try {
-					currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-					//update with the most current markdown and title
-					currentPage.setMarkdown(updatedMarkdown);
-					if (updatedTitle != null && updatedTitle.length() > 0)
-						currentPage.setTitle(updatedTitle);
-					view.updateWikiPage(currentPage);
-					if (pageUpdatedCallback != null)
-						pageUpdatedCallback.pageUpdated();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
-			}
-		});				
 	}
 	
 	public void setOwnerObjectName(final OwnerObjectNameCallback callback) {
@@ -184,8 +168,9 @@ SynapseWidgetPresenter {
 							headers = nodeModelCreator.createBatchResults(result, EntityHeader.class);
 							if (headers.getTotalNumberOfResults() == 1) {
 								EntityHeader theHeader = headers.getResults().get(0);
-								ownerObjectName = theHeader.getName();
-								callback.ownerObjectNameInitialized();
+								isDescription = !(Project.class.getName().equals(theHeader.getType()));
+								String ownerObjectName = theHeader.getName();
+								callback.ownerObjectNameInitialized(ownerObjectName, isDescription);
 							} else {
 								view.show404();
 							}
@@ -196,7 +181,7 @@ SynapseWidgetPresenter {
 					
 					@Override
 					public void onFailure(Throwable caught) {					
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 							view.showErrorMessage(caught.getMessage());
 					}
 				});
@@ -205,47 +190,45 @@ SynapseWidgetPresenter {
 			}
 		}
 		else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString())) {
-			ownerObjectName = "";
-			callback.ownerObjectNameInitialized();
+			isDescription = true;
+			callback.ownerObjectNameInitialized("", isDescription);
 		}
 	}
 	
 	@Override
 	public void saveClicked(String title, String md) 
 	{
-		//before saving, we need to update the page first (widgets may have added/removed file handles from the list, like ImageConfigEditor)
-		refreshWikiAttachments(title, md, new Callback() {
-			@Override
-			public void pageUpdated() {
-				//after page attachments have been refreshed, send the update
-				JSONObjectAdapter json = jsonObjectAdapter.createNew();
-				try {
-					currentPage.writeToJSONObject(json);
-					synapseClient.updateWikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String result) {
-							//showDefaultViewWithWiki();
-							refresh();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-								view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		JSONObjectAdapter json = jsonObjectAdapter.createNew();
+		try {
+			currentPage.setTitle(title);
+			currentPage.setMarkdown(md);
+			currentPage.writeToJSONObject(json);
+			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					//we have successfully saved, so we are no longer editing
+					setIsEditing(false);
+					//now refresh the page
+					refresh();
 				}
-			}
-		});
+				@Override
+				public void onFailure(Throwable caught) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		}
 	}
 	
 	@Override
 	public void deleteButtonClicked() {
-		synapseClient.deleteWikiPage(wikiKey, new AsyncCallback<Void>() {
+		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
 			
 			@Override
 			public void onSuccess(Void result) {
+				setIsEditing(false);
 				//clear the now invalid page id from the wiki key
 				wikiKey.setWikiPageId(null);
 				if (isEmbeddedInOwnerPage)
@@ -256,7 +239,7 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});	
@@ -264,8 +247,19 @@ SynapseWidgetPresenter {
 	
 	@Override
 	public void cancelClicked() {
+		setIsEditing(false);
 		refresh();
 	}
+	
+	private void setIsEditing(boolean isEditing) {
+		globalApplicationState.setIsEditing(isEditing);
+	}
+	
+	@Override
+	public void editClicked() {
+		setIsEditing(true);
+	}
+	 
 
 	@Override
 	public void createPage(final String name) {
@@ -276,33 +270,118 @@ SynapseWidgetPresenter {
 		page.setTitle(name);
 		String wikiPageJson;
 		try {
-			wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createWikiPage(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					if (isCreatingWiki)
-						view.showInfo("Wiki Created", "");
-					else
-						view.showInfo("Page '" + name + "' Added", "");
-					
-					refresh();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {			
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);		
-		}
+            wikiPageJson = page.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+            synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    if (isCreatingWiki) {
+                        String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
+                        view.showInfo( type + " Created", "");
+                    } else {
+                        view.showInfo("Page '" + name + "' Added", "");
+                    }
+                    
+                    refresh();
+                }
+                
+                @Override
+                public void onFailure(Throwable caught) {
+                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+                        view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
+                }
+            });
+	    } catch (JSONObjectAdapterException e) {                        
+	            view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);                
+	    }
+			
 	}
 	
 	public void clear(){
 		view.clear();
 	}
 	private void refresh() {
-		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage, spanWidth);
+		configure(wikiKey, canEdit, callback, isEmbeddedInOwnerPage);
+	}
+
+	@Override
+	public void previewClicked(final Long versionToPreview, Long currentVersion) {
+		isCurrentVersion = versionToPreview.equals(currentVersion);
+		versionInView = versionToPreview;
+		setOwnerObjectName(new OwnerObjectNameCallback() {
+			@Override
+			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
+				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<String>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						if (caught instanceof NotFoundException) {
+							if (callback != null)
+								callback.noWikiFound();
+						}
+						else if (caught instanceof ForbiddenException) {
+							view.show403();
+						}
+						else {
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+						}
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						try {
+							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							wikiKey.setWikiPageId(currentPage.getId());
+							boolean isRootWiki = currentPage.getParentWikiId() == null;
+							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
+						} catch (Exception e) {
+							onFailure(e);
+						}
+					}
+					
+				});
+			}
+		});
+	}
+
+	@Override
+	public WikiPage getWikiPage() {
+		return currentPage;
+	}
+	
+	@Override
+    public void addFileHandles(List<String> fileHandleIds) {
+		//update file handle ids if set
+        if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	        HashSet<String> fileHandleIdsSet = new HashSet<String>();
+	        fileHandleIdsSet.addAll(currentPage.getAttachmentFileHandleIds());
+	        fileHandleIdsSet.addAll(fileHandleIds);
+	        currentPage.getAttachmentFileHandleIds().clear();
+	        currentPage.getAttachmentFileHandleIds().addAll(fileHandleIdsSet);
+        }
+	}
+	
+	@Override
+	public void removeFileHandles(List<String> fileHandleIds) {
+	    if (fileHandleIds != null && fileHandleIds.size() > 0 ) {
+	    	currentPage.getAttachmentFileHandleIds().removeAll(fileHandleIds);
+	    }	
+	}
+	
+	
+	@Override
+	public void restoreClicked(final Long wikiVersion) {
+		// User has confirmed. Restore and refresh the page to see the update.
+		synapseClient.restoreV2WikiPage(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), wikiKey.getWikiPageId(), wikiVersion, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				refresh();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 }

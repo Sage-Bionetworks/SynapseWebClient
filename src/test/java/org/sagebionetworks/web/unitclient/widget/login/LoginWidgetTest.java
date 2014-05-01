@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.login;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
@@ -21,12 +21,14 @@ public class LoginWidgetTest {
 	LoginWidgetView mockView;
 	AuthenticationController mockAuthController;
 	NodeModelCreator mockNodeModelCreator;
+	GlobalApplicationState mockGlobalApplicationState;
 	@Before
 	public void setup(){		
 		mockView = mock(LoginWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		loginWidget = new LoginWidget(mockView, mockAuthController, mockNodeModelCreator);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		loginWidget = new LoginWidget(mockView, mockAuthController, mockNodeModelCreator, mockGlobalApplicationState);
 		
 		verify(mockView).setPresenter(loginWidget);
 	}
@@ -40,9 +42,9 @@ public class LoginWidgetTest {
 	public void testSetUsernameAndPassword() {
 		String u = "user";
 		String p = "pass";
-		loginWidget.setUsernameAndPassword(u, p, true);
+		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), anyBoolean(), (AsyncCallback<String>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
 	}
 
 }

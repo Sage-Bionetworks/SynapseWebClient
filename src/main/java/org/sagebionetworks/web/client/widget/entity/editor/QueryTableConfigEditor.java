@@ -3,18 +3,20 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
-import org.sagebionetworks.web.client.widget.entity.registration.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
 public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, WidgetEditorPresenter {
 	
 	private QueryTableConfigView view;
 	private Map<String, String> descriptor;
+	private static final String DEFAULT_PAGE_SIZE = "100";
 	
 	@Inject
 	public QueryTableConfigEditor(QueryTableConfigView view) {
@@ -24,9 +26,15 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor) {
+	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Dialog window) {
 		descriptor = widgetDescriptor;
 		APITableConfig tableConfig = new APITableConfig(widgetDescriptor);
+		String uri = tableConfig.getUri();
+		if (uri != null && uri.startsWith(ClientProperties.QUERY_SERVICE_PREFIX)) {
+			//strip off prefix and decode query string
+			uri = URL.decodeQueryString(uri.substring(ClientProperties.QUERY_SERVICE_PREFIX.length()));
+			tableConfig.setUri(uri);
+		}
 		view.configure(tableConfig);
 	}
 	
@@ -44,8 +52,10 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/query?query=" + URL.encodeQueryString(view.getQueryString()));
-		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, Boolean.FALSE.toString());
+		descriptor.clear();
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, ClientProperties.QUERY_SERVICE_PREFIX + URL.encodeQueryString(view.getQueryString()));
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, view.isPaging().toString());
+		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_PAGESIZE_KEY, DEFAULT_PAGE_SIZE);
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY, view.isShowRowNumbers().toString());
 		updateDescriptor(WidgetConstants.API_TABLE_WIDGET_ROW_NUMBER_DISPLAY_NAME_KEY, view.getRowNumberColumnName());
 		List<APITableColumnConfig> configs = view.getConfigs();
@@ -69,6 +79,11 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	
 	@Override
 	public String getTextToInsert() {
+		return null;
+	}
+	
+	@Override
+	public List<String> getNewFileHandleIds() {
 		return null;
 	}
 	

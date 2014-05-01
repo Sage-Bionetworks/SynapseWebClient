@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,21 +12,20 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -34,8 +35,8 @@ public class ProfileFormPresenterTest {
 	ProfileFormWidget profileForm;
 	ProfileFormView mockView;
 	AuthenticationController mockAuthenticationController;
+	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GWTWrapper mockGWTWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	ProfileUpdatedCallback mockProfileUpdatedCallback;
@@ -44,31 +45,33 @@ public class ProfileFormPresenterTest {
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
 	String password = "password";
+	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(ProfileFormView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockProfileUpdatedCallback = mock(ProfileUpdatedCallback.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapter);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, mockGlobalApplicationState, adapterFactory);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);		
+		userProfile.writeToJSONObject(adapter.createNew());
+		String userProfileJson = adapter.toJSONString();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
 		testUser.setProfile(userProfile);
-		testUser.setSessionToken("token");
+		testUser.setSession(new Session());
+		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 		
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		testUser.writeToJSONObject(adapter);
+		testUser.writeToJSONObject(adapter.createNew());
 		testUserJson = adapter.toJSONString(); 
 	}
 	
@@ -86,7 +89,8 @@ public class ProfileFormPresenterTest {
 				userProfile.getEmail(), 
 				userProfile.getPic(), 
 				userProfile.getTeamName(), 
-				userProfile.getUrl());
+				userProfile.getUrl(),
+				userProfile.getUserName());
 		
 		verify(mockView).showUserUpdateSuccess();
 		verify(mockAuthenticationController).loginUser(anyString(), captor.capture());
@@ -112,7 +116,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null);
+				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}
@@ -128,7 +132,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null);
+				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}
