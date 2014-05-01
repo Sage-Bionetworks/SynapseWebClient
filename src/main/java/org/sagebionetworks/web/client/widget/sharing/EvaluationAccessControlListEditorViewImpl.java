@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -49,7 +48,6 @@ import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -89,6 +87,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
+		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
 		permissionDisplay.put(PermissionLevel.CAN_PARTICIPATE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_PARTICIPATE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
@@ -213,6 +212,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 
 		// permission level combobox
 		permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
 		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_PARTICIPATE_EVALUATION), PermissionLevel.CAN_PARTICIPATE_EVALUATION));
 		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_SCORE_EVALUATION), PermissionLevel.CAN_SCORE_EVALUATION));
 		permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER_EVALUATION), PermissionLevel.CAN_ADMINISTER_EVALUATION));			
@@ -321,6 +321,14 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		menu.setEnableScrolling(false);
 		MenuItem item;
 		
+		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
+		item.addSelectionListener(new SelectionListener<MenuEvent>() {
+			public void componentSelected(MenuEvent menuEvent) {
+				presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);
+			}
+		});
+		menu.add(item);
+
 		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_PARTICIPATE_EVALUATION));			
 		item.addSelectionListener(new SelectionListener<MenuEvent>() {
 			public void componentSelected(MenuEvent menuEvent) {
