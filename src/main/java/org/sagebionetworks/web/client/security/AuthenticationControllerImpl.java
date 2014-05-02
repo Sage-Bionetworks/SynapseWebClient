@@ -77,10 +77,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void logoutUser() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
+		String tokenCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
+		if(tokenCookieString != null) {
 			// don't actually terminate session, just remove the cookies			
-			cookies.removeCookie(CookieKeys.USER_LOGIN_DATA);
 			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 			currentUser = null;
 		}
@@ -97,8 +96,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
 						userSessionData.setIsSSO(isSSO);
-						
-						updateUserLoginDataCookie(userSessionData);
 						
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
@@ -123,17 +120,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
-			try {
-				updateUserLoginDataCookie(currentUser);
-			} catch (JSONObjectAdapterException e) {
-			}
 		}
-	}
-	
-	private void updateUserLoginDataCookie(UserSessionData userSessionData) throws JSONObjectAdapterException {
-		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
-		Date tomorrow = getDayFromNow();
-		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
 	}
 	
 	@Override
@@ -143,15 +130,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public boolean isLoggedIn() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			try {
-				currentUser = new UserSessionData(adapterFactory.createNew(loginCookieString));
-				if(currentUser != null) return true;				
-			} catch (JSONObjectAdapterException e) {				
-			}			
-		} 
-		return false;
+		return cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN) != null;
 	}
 
 	@Override
@@ -166,18 +145,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void reloadUserSessionData() {
+	public void reloadUserSessionData(AsyncCallback<String> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, new AsyncCallback<String>() {
-			@Override
-			public void onFailure(Throwable caught) {				
-			}
-
-			@Override
-			public void onSuccess(String result) {
-			}
-		}, getCurrentUserIsSSO());
-		
+		if (sessionToken != null) {
+			setUser(sessionToken, callback, getCurrentUserIsSSO());
+		}
+		else
+			callback.onSuccess(null);
 	}
 
 	@Override

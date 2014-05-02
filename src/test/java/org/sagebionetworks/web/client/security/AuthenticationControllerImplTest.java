@@ -44,23 +44,13 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testIsLoggedIn() throws Exception {
-		UserSessionData sessionData = new UserSessionData();
-		sessionData.setIsSSO(false);
-		sessionData.setProfile(new UserProfile());
-		sessionData.setSession(new Session());
-		sessionData.getSession().setSessionToken("1234");
-		
 		// logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		assertTrue(authenticationController.isLoggedIn());
 
 		// not logged in
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn(null);
+		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
 		assertFalse(authenticationController.isLoggedIn());
-		
-		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_DATA)).thenReturn("");
-		assertFalse(authenticationController.isLoggedIn());
-		
 	}
 
 	@SuppressWarnings("unchecked")

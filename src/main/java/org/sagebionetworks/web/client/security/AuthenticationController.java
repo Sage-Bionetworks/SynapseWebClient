@@ -67,7 +67,7 @@ public interface AuthenticationController {
 	/**
 	 * Redownload the user's session data 
 	 */
-	void reloadUserSessionData();
+	void reloadUserSessionData(AsyncCallback<String> callback);
 
 	public void getTermsOfUse(AsyncCallback<String> callback);
 	

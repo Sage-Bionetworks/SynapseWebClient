@@ -117,13 +117,6 @@ public interface SynapseClient extends RemoteService {
 	public String createOrUpdateEntity(String entityJson, String annoJson, boolean isNew) throws RestServiceException;
 
 	/**
-	 * Returns the user's profile object in json string
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public String getUserProfile() throws RestServiceException;
-	
-	/**
 	 * Returns the specified user's profile object in json string
 	 * @return
 	 * @throws RestServiceException

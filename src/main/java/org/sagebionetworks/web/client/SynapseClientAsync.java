@@ -68,8 +68,6 @@ public interface SynapseClientAsync {
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
-	void getUserProfile(AsyncCallback<String> callback);
-	
 	void getUserProfile(String userId, AsyncCallback<String> callback);
 	
 	void getTeam(String teamId, AsyncCallback<String> callback);

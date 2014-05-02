@@ -662,23 +662,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public String getUserProfile() throws RestServiceException {
-		try	{
-			//cached, in a cookie?
-			UserProfile profile = UserDataProvider.getThreadLocalUserProfile(this.getThreadLocalRequest());
-			if (profile == null){
-				org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-				profile = synapseClient.getMyProfile();
-			}
-			return EntityFactory.createJSONStringForEntity(profile);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
-	}
 	
 	@Override
 	public String getUserProfile(String userId) throws RestServiceException {
@@ -959,7 +942,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Entity e = synapseClient.getEntityById(entityId);
 			transport.setEntityString(EntityFactory.createJSONStringForEntity(e));
 			transport.setEntityClassAsString(e.getClass().getName());
-			transport.setUserProfileString(getUserProfile());
+			transport.setUserProfileString(getUserProfile(null));
 			return transport;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
