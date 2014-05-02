@@ -169,7 +169,6 @@ public class WebConstants {
 	public static final String MATHJAX_PREFIX = "\\[";
 	public static final String MATHJAX_SUFFIX = "\\]";
 	
-	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
 	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
@@ -192,6 +191,9 @@ public class WebConstants {
 	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
+	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";
+
+	public static final String CONTENT_TYPE_JNLP = "application/x-java-jnlp-file";
 	public static final String CONCRETE_TYPE_KEY = "concreteType";
 	public static final String NODE_TYPE_KEY = "nodeType";
 	
@@ -227,6 +229,5 @@ public class WebConstants {
 	public static final String TABLE_COLUMN_ID = "columnId";
 	public static final String TABLE_ROW_ID = "rowId";
 	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
-
 	
 }
