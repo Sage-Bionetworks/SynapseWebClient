@@ -169,9 +169,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
 			directUploadStep0(fileName);
-		} else if(isDirectUploadSupported) {
-			// show old browser & JavaWebStart link
-			
+//		} else if(isDirectUploadSupported) {
+//			// show old browser & JavaWebStart link
+//			
 		} else {
 			//use case A and B from above
 			//uses the default action url
