@@ -106,7 +106,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
 		
-		isDirectUploadSupported = !synapseJsniUtils.isDirectUploadSupported();
+		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
 	}		
 		
 	public Widget asWidget(Entity entity, List<AccessRequirement> accessRequirements) {

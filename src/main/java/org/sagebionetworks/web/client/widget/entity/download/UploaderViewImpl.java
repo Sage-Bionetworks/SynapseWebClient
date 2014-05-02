@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
@@ -31,9 +33,7 @@ import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -57,6 +57,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private boolean isEntity;
 	private String parentEntityId;
 	private FormPanel formPanel, externalLinkFormPanel;
+	LayoutContainer fileUploaderContainer;
 	
 	private FileUploadField fileUploadField;
 	private Button uploadBtn;
@@ -69,14 +70,16 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	LayoutContainer container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
-			SharingAndDataUseConditionWidget sharingDataUseWidget) {
+			SharingAndDataUseConditionWidget sharingDataUseWidget, PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
+		this.ginInjector = ginInjector;
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
@@ -88,6 +91,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
+		createSynapseFileUploaderContainer();
 	}
 
 	@Override
@@ -205,7 +209,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 			tab.addStyleName("pad-text");			
 			formPanel.removeFromParent();
 			
-			if(isDirectUploadSupported) {
+			// TODO : remove alwaysShowFileUploader. Just there to show file uploader in alpha mode
+			boolean alwaysShowFileUploader = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider());
+			if(isDirectUploadSupported && !alwaysShowFileUploader) {
 				tab.add(formPanel);			
 				tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
 		            public void handleEvent( TabPanelEvent be ) {
@@ -214,15 +220,17 @@ public class UploaderViewImpl extends LayoutContainer implements
 		        });
 			} else {
 				// Show Synapse Uploader and Disable upload button						
-				tab.add(createSynapseFileUploaderContainer(), new MarginData(5));
+				tab.add(fileUploaderContainer, new MarginData(5));
 				tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
 		            public void handleEvent( TabPanelEvent be ) {
 		            	configureUploadButton();
 		            	uploadBtn.disable();
 		            }	     
 		        });
+				tab.layout(true);
 			}
 			tabPanel.add(tab);
+			tabPanel.repaint();
 	
 			// External URL
 			tab = new TabItem(DisplayConstants.LINK_TO_URL);
@@ -427,8 +435,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		});
 	}
 
-	private LayoutContainer createSynapseFileUploaderContainer() {
-		LayoutContainer container = new LayoutContainer();
+	private void createSynapseFileUploaderContainer() {
+		fileUploaderContainer = new LayoutContainer();
 		
 		HTML oldBrowser = new HTML(
 				"<h4 class=\"display-inline\">You're using an old Browser</h4>" +
@@ -441,7 +449,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		
 		LayoutContainer right = new LayoutContainer();
 		right.addStyleName("span-7 last notopmargin");
-		com.google.gwt.user.client.ui.Button launchBtn = new com.google.gwt.user.client.ui.Button(DisplayConstants.LAUCH_FILE_UPLOADER);		
+		com.google.gwt.user.client.ui.Button launchBtn = DisplayUtils.createButton(DisplayConstants.LAUNCH_FILE_UPLOADER, ButtonType.PRIMARY);		
 		launchBtn.removeStyleName("gwt-Button");
 		launchBtn.addStyleName("btn btn-large btn-block");
 		launchBtn.addClickHandler(new ClickHandler() {			
@@ -451,13 +459,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 				if(url != null) Window.open(url, "_blank	", "");
 			}
 		});
-		right.add(launchBtn);		
+		right.add(launchBtn);	
+		right.layout(true);
 		
-		container.add(left);
-		container.add(right);
-		
-		
-		return container;
+		fileUploaderContainer.add(left);
+		fileUploaderContainer.add(right);
+		fileUploaderContainer.layout(true);		
 	}
 
 }

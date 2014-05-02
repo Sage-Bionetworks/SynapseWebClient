@@ -99,13 +99,16 @@ public class FileUploaderJnlp extends HttpServlet {
 				throw new ServletException(e);
 			}
 		
+		// TODO : remove this once deployment of the jar to artifactoryonline is complete
+		jarUrl = "https://s3.amazonaws.com/versions.synapse.sagebase.org/fileUploadClient-develop-SNAPSHOT-jar-with-dependencies.jar";
+		
 		response.setContentType(WebConstants.CONTENT_TYPE_JNLP);
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
 		    out.println(buildJnlp(
 		    		getFullURL(request),
-		    		"https://s3.amazonaws.com/versions.synapse.sagebase.org/fileUploadClient-develop-SNAPSHOT-jar-with-dependencies.jar",
+		    		jarUrl,
 		    		getSessionToken(request), 
 		    		entityId, 
 		    		isUpdate));
