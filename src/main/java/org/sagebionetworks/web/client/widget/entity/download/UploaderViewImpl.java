@@ -208,10 +208,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 			tab = new TabItem(DisplayConstants.UPLOAD_FILE);
 			tab.addStyleName("pad-text");			
 			formPanel.removeFromParent();
-			
-			// TODO : remove alwaysShowFileUploader. Just there to show file uploader in alpha mode
-			boolean alwaysShowFileUploader = DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider());
-			if(isDirectUploadSupported && !alwaysShowFileUploader) {
+						
+			if(!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) { // TODO : add logic that shows the FileUploader for only old browsers
 				tab.add(formPanel);			
 				tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
 		            public void handleEvent( TabPanelEvent be ) {
