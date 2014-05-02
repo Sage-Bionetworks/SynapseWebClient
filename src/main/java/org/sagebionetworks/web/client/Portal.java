@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
@@ -12,6 +13,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -65,25 +67,32 @@ public class Portal implements EntryPoint {
 
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
 						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
-						PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
+						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
 						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
 
-						GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
+						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
 						
-						//listen for window close (or navigating away)
-						registerWindowClosingHandler(globalApplicationState);
+						//Load user session based on the token in the cookie.  If invalid token (or any error occurs), log the user out (clear the token).  
+						//In any case, finish loading the app.
+						final AuthenticationController authController = ginjector.getAuthenticationController();
+						authController.reloadUserSessionData(new AsyncCallback<String>() {
+							@Override
+							public void onSuccess(String result) {
+								finishLoadingApp(globalApplicationState, historyHandler);
+							}
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								authController.logoutUser();
+								finishLoadingApp(globalApplicationState, historyHandler);
+							}
+						});
 						
-						// start version timer
-						ginjector.getVersionTimer().start();
-						
-						// Goes to place represented on URL or default place
-						historyHandler.handleCurrentHistory();
-						loading.hide();
 					} catch (Throwable e) {
 						onFailure(e);
 					}
@@ -91,6 +100,19 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	private void finishLoadingApp(GlobalApplicationState globalApplicationState, PlaceHistoryHandler historyHandler){
+
+		//listen for window close (or navigating away)
+		registerWindowClosingHandler(globalApplicationState);
+		
+		// start version timer
+		ginjector.getVersionTimer().start();
+		
+		// Goes to place represented on URL or default place
+		historyHandler.handleCurrentHistory();
+		loading.hide();
 	}
 	
 	private void registerWindowClosingHandler(final GlobalApplicationState globalApplicationState) {
