@@ -93,8 +93,16 @@
 						application crawl link</a>
 				</div>
 			</noscript>
-	
-			<!-- This is the GWT-generated body -->
+            
+            <div style="display:none;">
+              <form id="login_form" method="post" action="login">
+                <input id="synapse_username" name="username"/>
+                <input id="synapse_password" name="password" type="password"/>
+                <input id="synapse_signin_btn" name="signInBtn" type="submit" />
+              </form>
+            </div>
+            
+            <!-- This is the GWT-generated body -->
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>

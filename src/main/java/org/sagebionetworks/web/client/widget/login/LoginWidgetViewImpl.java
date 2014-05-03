@@ -20,14 +20,19 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.inject.Inject;
 
 public class LoginWidgetViewImpl extends Composite implements
@@ -36,37 +41,32 @@ public class LoginWidgetViewImpl extends Composite implements
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
 	
 	@UiField
+	FormPanel synapseLoginFieldsContainer;
+	
+	@UiField
 	SimplePanel googleSSOContainer;
 	@UiField
 	SpanElement messageLabel;
-	@UiField
 	Button signInBtn;
-	@UiField
 	Anchor forgotPasswordLink;
 	@UiField
 	Button registerBtn;
-	@UiField
-	TextBox username;
-	@UiField
+	
 	PasswordTextBox password;
+	TextBox username;
 	
 	private Presenter presenter;
-	private FormData formData;
 	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, IconsImageBundle iconsImageBundle) {
 		initWidget(binder.createAndBindUi(this));
 		this.iconsImageBundle = iconsImageBundle;		
-		
+		signInBtn = new SubmitButton();
+		signInBtn.addStyleName("btn btn-large btn-primary margin-top-10");
 		signInBtn.setText(DisplayConstants.SIGN_IN);
-		signInBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				loginUser();
-			}
-		});
-		
+		forgotPasswordLink = new Anchor();
+		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
 		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
 		forgotPasswordLink.addClickHandler(new ClickHandler() {			
 			@Override
@@ -82,15 +82,19 @@ public class LoginWidgetViewImpl extends Composite implements
 				presenter.goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
-		
-		username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
+		username = TextBox.wrap(DOM.getElementById("synapse_username"));
+	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
+	    username.addStyleName("form-control");
 		username.setFocus(true);
 		
+		password = PasswordTextBox.wrap(DOM.getElementById("synapse_password"));
 		password.getElement().setAttribute("placeholder", DisplayConstants.PASSWORD);
+		password.addStyleName("form-control");
 		password.addKeyDownHandler(new KeyDownHandler() {
 		    @Override
 		    public void onKeyDown(KeyDownEvent event) {
-		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {		        	
+		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+		        	synapseLoginFieldsContainer.submit();
 		        	signInBtn.fireEvent(new GwtEvent<ClickHandler>() {
 		                @Override
 		                public com.google.gwt.event.shared.GwtEvent.Type<ClickHandler> getAssociatedType() {
@@ -103,6 +107,18 @@ public class LoginWidgetViewImpl extends Composite implements
 		           });
 		        }
 		    }
+		});
+		FlowPanel loginFieldsPanel = new FlowPanel();
+		loginFieldsPanel.add(username);
+		loginFieldsPanel.add(password);
+		loginFieldsPanel.add(signInBtn);
+		loginFieldsPanel.add(forgotPasswordLink);
+		synapseLoginFieldsContainer.setWidget(loginFieldsPanel);
+		synapseLoginFieldsContainer.addSubmitHandler(new FormPanel.SubmitHandler() {
+			@Override
+			public void onSubmit(SubmitEvent event) {
+				loginUser();
+			}
 		});
 	}
 	
@@ -171,6 +187,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	@Override
 	public void clear() {		
 		password.setValue("");
+		username.setValue("");
 		signInBtn.setEnabled(true);
 		signInBtn.setText(DisplayConstants.SIGN_IN);
 	}
