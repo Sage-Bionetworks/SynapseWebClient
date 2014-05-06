@@ -17,9 +17,7 @@ import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class DisplayUtilsTest {
 	
@@ -373,31 +371,6 @@ public class DisplayUtilsTest {
 		int selectionLength = 0;
 		String result = DisplayUtils.surroundText("", markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 		assertEquals(markdownDelimiter + markdownDelimiter, result);
-	}
-
-	@Test
-	public void testNoCacheParam() {
-		//verify all url building utilities contain the nocache param (so that the browser does not cache a s3 url that will expire)
-		String baseFileHandleUrl = "http://mysynapse/";
-		String entityId = "syn1234";
-		Long versionNumber = 1L;
-		WikiPageKey wikiKey = new WikiPageKey();
-		String fileName = "myTestFile.png";
-		
-		TableCellFileHandle tableCellFileHandle = new TableCellFileHandle("myTableId", "myColumnId", "myRowId", "myVersion", "myFileHandleId");
-		
-		//all methods should contain the nocache param
-		//createWikiAttachmentUrl as preview = true, then preview = false
-		assertTrue(DisplayUtils.createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, true).contains(WebConstants.NOCACHE_PARAM));
-		assertTrue(DisplayUtils.createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, false).contains(WebConstants.NOCACHE_PARAM));
-		
-		//createFileEntityUrl as preview = true, then preview = false
-		assertTrue(DisplayUtils.createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, true).contains(WebConstants.NOCACHE_PARAM));
-		assertTrue(DisplayUtils.createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, false).contains(WebConstants.NOCACHE_PARAM));
-		
-		//createTableCellFileEntityUrl as preview = true, then preview = false
-		assertTrue(DisplayUtils.createTableCellFileEntityUrl(baseFileHandleUrl, tableCellFileHandle, true, false).contains(WebConstants.NOCACHE_PARAM));
-		assertTrue(DisplayUtils.createTableCellFileEntityUrl(baseFileHandleUrl, tableCellFileHandle, false, false).contains(WebConstants.NOCACHE_PARAM));
 	}
 }
 

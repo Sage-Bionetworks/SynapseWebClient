@@ -229,6 +229,11 @@ public class WebConstants {
 	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
 
 	public static final String NOCACHE_PARAM = "&nocache=";
-
 	
+	//servlet response header keys/values to instruct caching behavior
+	public static final String EXPIRES_KEY = "Expires";
+	public static final String NO_CACHE_VALUE = "no-cache";
+	public static final String PRAGMA_KEY = "Pragma";
+	public static final String CACHE_CONTROL_VALUE_NO_CACHE = "private, no-store, no-cache, must-revalidate";
+	public static final String CACHE_CONTROL_KEY = "Cache-Control";
 }
