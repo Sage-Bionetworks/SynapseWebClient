@@ -39,6 +39,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -55,7 +56,7 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class MarkdownEditorWidget extends LayoutContainer {
+public class MarkdownEditorWidget extends FlowPanel {
 	
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -120,6 +121,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			final CloseHandler saveHandler,
 			final ManagementHandler managementHandler) {
 		this.markdownTextArea = markdownTextArea;
+		resizeMarkdownTextArea();
 		this.wikiKey = wikiKey;
 		this.isWikiEditor = isWikiEditor;
 		this.callback = callback;
@@ -163,6 +165,7 @@ public class MarkdownEditorWidget extends LayoutContainer {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				updateEditWidget();
+				resizeMarkdownTextArea();
 			}
 		});
 		
@@ -385,6 +388,10 @@ public class MarkdownEditorWidget extends LayoutContainer {
 				}
 			}, isWikiEditor);	
 		}
+	}
+	
+	private void resizeMarkdownTextArea() {
+		markdownTextArea.setHeight(Integer.toString((int)(Window.getClientHeight() * .7)) + "px");
 	}
 	
 	private ClickHandler getBasicCommandClickHandler(final String startTag, final String endTag, final boolean isMultiline) {

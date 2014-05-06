@@ -406,7 +406,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				final TextArea mdField = new TextArea();
 				mdField.setValue(presenter.getWikiPage().getMarkdown());
 				mdField.addStyleName("markdownEditor");
-				mdField.setHeight("400px");
 				
 				LayoutContainer form = new LayoutContainer();
 				final TextBox titleField = new TextBox();
