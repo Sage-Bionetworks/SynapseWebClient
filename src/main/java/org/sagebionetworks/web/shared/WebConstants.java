@@ -228,5 +228,7 @@ public class WebConstants {
 	public static final String TABLE_ROW_ID = "rowId";
 	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
 
+	public static final String NOCACHE_PARAM = "&nocache=";
+
 	
 }
