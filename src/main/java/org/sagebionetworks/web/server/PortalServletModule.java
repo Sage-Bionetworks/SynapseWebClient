@@ -12,6 +12,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
+import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
 import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
@@ -105,6 +106,10 @@ public class PortalServletModule extends ServletModule {
 		bind(FileUpload.class).in(Singleton.class);
 		serve("/Portal/upload").with(FileUpload.class);
 
+		// Setup the File Uploader JNLP mapping
+		bind(FileUploaderJnlp.class).in(Singleton.class);
+		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
+		
 		// Attachments
 		bind(FileAttachmentServlet.class).in(Singleton.class);
 		serve("/Portal/attachment").with(FileAttachmentServlet.class);
@@ -134,7 +139,7 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);
 		serve("/Portal/rss").with(RssServiceImpl.class);
-		
+				
 		// Setup the OpenID service mapping
 		bind(OpenIDServlet.class).in(Singleton.class);
 		serve(WebConstants.OPEN_ID_URI).with(OpenIDServlet.class);

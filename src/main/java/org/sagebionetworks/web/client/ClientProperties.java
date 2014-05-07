@@ -56,7 +56,8 @@ public class ClientProperties {
 	
 	public static final String R_CLIENT_DOWNLOAD_CODE = "source('http://depot.sagebase.org/CRAN.R')<br/>pkgInstall(c(\"synapseClient\"))";
 	public static final String PYTHON_CLIENT_DOWNLOAD_CODE = "# From Terminal Prompt:<br/>pip install synapseclient<br/><br/># or<br/>easy_install synapseclient";
-	
+	public static final String FILE_UPLOADER_SERVLET_PATH = "fileUploaderJnlp";
+	public static final String PROFILE_ATTACHMENT_SERVLET_PATH = "profileAttachment";
 
 	
 	public static final String ERROR_OBJ_REASON_KEY = "reason";
