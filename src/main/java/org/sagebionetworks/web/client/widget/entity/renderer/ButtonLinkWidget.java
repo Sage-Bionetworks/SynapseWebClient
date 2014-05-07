@@ -3,8 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -14,10 +16,12 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	
 	private ButtonLinkWidgetView view;
 	private Map<String,String> descriptor;
+	private GWTWrapper gwt;
 	
 	@Inject
-	public ButtonLinkWidget(ButtonLinkWidgetView view) {
+	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
 		this.view = view;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 	
@@ -26,8 +30,18 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 		this.descriptor = widgetDescriptor;
 		String url = descriptor.get(WidgetConstants.LINK_URL_KEY);
 		String buttonText = descriptor.get(WidgetConstants.TEXT_KEY);
-		view.configure(wikiKey, buttonText, url);
+		boolean isHighlight = false;
+		if (descriptor.containsKey(WebConstants.HIGHLIGHT_KEY)){
+			isHighlight = Boolean.parseBoolean(descriptor.get(WebConstants.HIGHLIGHT_KEY));
+		}
+		boolean openInNewWindow = isOpenInNewWindow(url);
+		
+		view.configure(wikiKey, buttonText, url, isHighlight, openInNewWindow);
 		descriptor = widgetDescriptor;
+	}
+	
+	public boolean isOpenInNewWindow(String url) {
+		return url != null && !(url.startsWith("#!") || url.startsWith(gwt.getHostPrefix())); 
 	}
 	
 	@SuppressWarnings("unchecked")

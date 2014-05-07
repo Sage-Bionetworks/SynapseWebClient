@@ -8,7 +8,7 @@ public interface GWTWrapper {
 
 	String getModuleBaseURL();
 
-	void replaceThisWindowWith(String url);
+	void assignThisWindowWith(String url);
 
 	String encodeQueryString(String queryString);
 
