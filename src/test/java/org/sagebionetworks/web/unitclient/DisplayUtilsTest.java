@@ -372,7 +372,6 @@ public class DisplayUtilsTest {
 		String result = DisplayUtils.surroundText("", markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 		assertEquals(markdownDelimiter + markdownDelimiter, result);
 	}
-
 }
 
 

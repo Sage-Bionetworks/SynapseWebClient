@@ -123,6 +123,11 @@ public class FileHandleServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		//instruct not to cache
+		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
+		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
+		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
+
 		String token = getSessionToken(request);
 		SynapseClient client = createNewClient(token);
 		boolean isProxy = false;
