@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
@@ -203,4 +204,5 @@ public interface PortalGinInjector extends Ginjector {
 	public SimpleTableWidget getSimpleTableWidget();
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
+	public CookieProvider getCookieProvider();
 }

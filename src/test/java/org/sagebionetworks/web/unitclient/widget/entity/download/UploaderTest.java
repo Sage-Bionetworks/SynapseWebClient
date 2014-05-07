@@ -134,7 +134,7 @@ public class UploaderTest {
 		uploader.asWidget(parentEntityId, null);
 		
 		uploader.getDefaultUploadActionUrl(true);
-		verify(synapseJsniUtils).getBaseFileHandleUrl();
+		verify(gwt).getModuleBaseURL();
 	}
 	
 	@Test
@@ -142,7 +142,7 @@ public class UploaderTest {
 		FileEntity fileEntity = new FileEntity();
 		uploader.asWidget(fileEntity, null);
 		uploader.getDefaultUploadActionUrl(true);
-		verify(synapseJsniUtils).getBaseFileHandleUrl();
+		verify(gwt).getModuleBaseURL();
 	}
 	
 	@Test
@@ -222,6 +222,15 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		//initialize uploader
+		uploader = new Uploader(view, nodeModelCreator,
+				synapseClient,
+				jsonObjectAdapter, synapseJsniUtils,
+				gwt, authenticationController);
+		uploader.addCancelHandler(cancelHandler);
+		String parentEntityId = "syn1234";
+		uploader.asWidget(parentEntityId, null);
+
 		uploader.handleUpload("newFile.txt");
 		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
 		
