@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -72,8 +73,8 @@ public class MarkdownEditorWidget extends FlowPanel {
 	private WidgetSelectionState widgetSelectionState;
 	private ResourceLoader resourceLoader;
 	private GWTWrapper gwt;
-	private WikiPageWidget wikiPage;
-	private Map<String, WikiPageKey> pageName2WikiKeyMap;
+	private MarkdownWidget markdownWidget;
+	private WikiPageKey formattingGuideWikiPageKey;
 	
 	public interface CloseHandler{
 		public void saveClicked();
@@ -94,7 +95,7 @@ public class MarkdownEditorWidget extends FlowPanel {
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
 			GWTWrapper gwt,
-			WikiPageWidget wikiPage) {
+			MarkdownWidget markdownWidget) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -104,9 +105,8 @@ public class MarkdownEditorWidget extends FlowPanel {
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.gwt = gwt;
-		this.wikiPage = wikiPage;
+		this.markdownWidget = markdownWidget;
 		widgetSelectionState = new WidgetSelectionState();
-		initFormattingGuide();
 	}
 	
 	/**
@@ -124,6 +124,7 @@ public class MarkdownEditorWidget extends FlowPanel {
 			final WidgetDescriptorUpdatedHandler callback,
 			final CloseHandler saveHandler,
 			final ManagementHandler managementHandler) {
+		initFormattingGuide();
 		this.markdownTextArea = markdownTextArea;
 		resizeMarkdownTextArea();
 		this.wikiKey = wikiKey;
@@ -393,13 +394,13 @@ public class MarkdownEditorWidget extends FlowPanel {
 	}
 	public void initFormattingGuide() {
 		//configure the formatting guide wiki page
-		if (pageName2WikiKeyMap == null) {
+		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
 			synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
 				@Override
 				public void onSuccess(HashMap<String,WikiPageKey> result) {
-					pageName2WikiKeyMap = result;
-					initFormattingGuideStep2();
+					formattingGuideWikiPageKey = result.get(WebConstants.FORMATTING_GUIDE);
+					markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false);
 				};
 				@Override
 				public void onFailure(Throwable caught) {
@@ -407,19 +408,8 @@ public class MarkdownEditorWidget extends FlowPanel {
 				}
 			});
 		} else {
-			initFormattingGuideStep2();
+			markdownWidget.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, false);
 		}
-	}
-	
-	private void initFormattingGuideStep2() {
-		wikiPage.configure(pageName2WikiKeyMap.get(WebConstants.FORMATTING_GUIDE), false, new WikiPageWidget.Callback() {
-			@Override
-			public void pageUpdated() {
-			}
-			@Override
-			public void noWikiFound() {
-			}
-		}, false);
 	}
 	
 	private void resizeMarkdownTextArea() {
@@ -518,7 +508,7 @@ public class MarkdownEditorWidget extends FlowPanel {
 
         window.setLayout(new FitLayout());
         ScrollPanel wrapper = new ScrollPanel();
-        wrapper.add(wikiPage.asWidget());
+        wrapper.add(markdownWidget);
 	    window.add(wrapper);
         // show the window
 	    window.show();		
