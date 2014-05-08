@@ -263,6 +263,19 @@ public class FileHandleServletTest {
 			assertTrue(e.getMessage().contains("must be Long values"));
 		}
 	}
+	
+	@Test
+	public void testNoCacheHeaders() throws Exception {
+		setupFileEntity();
+		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
+		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, "fake")};
+		when(mockRequest.getCookies()).thenReturn(cookies);
+		servlet.doGet(mockRequest, mockResponse);
+		
+		verify(mockResponse).setHeader(eq(WebConstants.CACHE_CONTROL_KEY), eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE));
+		verify(mockResponse).setHeader(eq(WebConstants.PRAGMA_KEY), eq(WebConstants.NO_CACHE_VALUE));
+		verify(mockResponse).setDateHeader(eq(WebConstants.EXPIRES_KEY), eq(0L));
+	}
 
 
 	
