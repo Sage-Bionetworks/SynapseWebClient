@@ -579,4 +579,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void showLoading() {
 	}
+	
+	@Override
+	public Widget asWidget() {
+		return this;
+	}
 }

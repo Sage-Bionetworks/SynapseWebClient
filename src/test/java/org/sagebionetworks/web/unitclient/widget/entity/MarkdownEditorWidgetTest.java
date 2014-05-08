@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -10,7 +12,6 @@ import org.junit.Test;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresente
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -26,6 +28,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class MarkdownEditorWidgetTest {
 	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient; 
+	MarkdownEditorWidgetView mockView;
 	SynapseJSNIUtils mockSynapseJSNIUtils; 
 	WidgetRegistrar mockWidgetRegistrar;
 	MarkdownEditorWidget presenter;
@@ -46,7 +49,8 @@ public class MarkdownEditorWidgetTest {
 		mockResourceLoader = mock(ResourceLoader.class);
 		mockCookies = mock(CookieProvider.class);
 		mockGwt = mock(GWTWrapper.class);
-		presenter = new MarkdownEditorWidget(mockSynapseClient, mockSynapseJSNIUtils, mockWidgetRegistrar, mockIcons, mockBaseEditWidgetPresenter, mockCookies, mockResourceLoader, mockGwt);
+		mockView = mock(MarkdownEditorWidgetView.class);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt);
 	}
 	
 	@Test
@@ -62,5 +66,6 @@ public class MarkdownEditorWidgetTest {
 		
 		presenter.showPreview(testMarkdown, true);
 		verify(mockSynapseClient).markdown2Html(anyString(), anyBoolean(), anyBoolean(), anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
 	}
 }
