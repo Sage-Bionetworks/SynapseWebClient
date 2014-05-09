@@ -33,8 +33,17 @@ public class WikiTest {
 	}
 	
 	@Test
-	public void testMissingParam() {
+	public void testNullWikiId() {
 		String testToken = testOwnerId + Wiki.DELIMITER + testOwnerType;
+		Wiki place = tokenizer.getPlace(testToken);
+		Assert.assertEquals(testOwnerId, place.getOwnerId());
+		Assert.assertEquals(testOwnerType, place.getOwnerType());
+		Assert.assertNull(place.getWikiId());
+	}
+	
+	@Test
+	public void testMissingParams() {
+		String testToken = testOwnerId + Wiki.DELIMITER;
 		Wiki place = tokenizer.getPlace(testToken);
 		Assert.assertNull(place.getOwnerId());
 		Assert.assertNull(place.getOwnerType());

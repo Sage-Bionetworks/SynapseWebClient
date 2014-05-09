@@ -106,6 +106,8 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
+import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListView;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
@@ -633,6 +635,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ProvenanceWidget
 		bind(ProvenanceWidgetView.class).to(ProvenanceWidgetViewImpl.class);
+		
+		// MarkdownEditorWidget
+		bind(MarkdownEditorWidgetView.class).to(MarkdownEditorWidgetViewImpl.class);
 		
 		// FilesBrowser
 		bind(FilesBrowserView.class).to(FilesBrowserViewImpl.class);
