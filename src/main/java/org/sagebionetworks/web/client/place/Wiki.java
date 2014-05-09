@@ -14,16 +14,19 @@ public class Wiki extends Place{
 		this.token = token;
 		if(token.contains(DELIMITER)) {
 			String[] parts = token.split(DELIMITER);
-			if(parts.length == 3) {				
+			if(parts.length >= 2) {				
 				ownerId = parts[0];
 				ownerType = parts[1];
-				wikiId = parts[2];
+				if (parts.length == 3)
+					wikiId = parts[2];
 			} 		
 		} 
 	}
 
-	public Wiki(String ownerId, String ownerType, String wikiId) {		
-		this.token = ownerId + DELIMITER + ownerType + DELIMITER + wikiId;
+	public Wiki(String ownerId, String ownerType, String wikiId) {	
+		String wikiIdToken = wikiId != null ? DELIMITER + wikiId : ""; 
+		this.token = ownerId + DELIMITER + ownerType + wikiIdToken;
+			
 		this.ownerId = ownerId;
 		this.ownerType = ownerType;
 		this.wikiId = wikiId;

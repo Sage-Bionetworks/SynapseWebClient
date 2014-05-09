@@ -38,6 +38,7 @@ public class EntityBundleTransport implements IsSerializable {
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
 	private String fileHandlesJson;
+	private Boolean isWikiBasedEntity;
 	
 	public Boolean getHasChildren() {
 		return hasChildren;
@@ -101,6 +102,12 @@ public class EntityBundleTransport implements IsSerializable {
 		this.fileHandlesJson = fileHandlesJson;
 	}
 	
+	public Boolean getIsWikiBasedEntity() {
+		return isWikiBasedEntity;
+	}
+	public void setIsWikiBasedEntity(Boolean isWikiBasedEntity) {
+		this.isWikiBasedEntity = isWikiBasedEntity;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -20,6 +20,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -39,6 +40,7 @@ public class EntityPresenterTest {
 	AuthenticationController mockAuthenticationController;
 	SynapseClientAsync mockSynapseClient;
 	NodeModelCreator mockNodeModelCreator;
+	CookieProvider mockCookies;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
@@ -52,7 +54,8 @@ public class EntityPresenterTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapterFactory);
+		mockCookies = mock(CookieProvider.class);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapterFactory, mockCookies);
 
 		verify(mockView).setPresenter(entityPresenter);
 	}	
@@ -69,7 +72,7 @@ public class EntityPresenterTest {
 	@Test
 	public void testStart() {
 		resetMocks();
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapterFactory);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockNodeModelCreator, adapterFactory, mockCookies);
 		entityPresenter.setPlace(place);		
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
