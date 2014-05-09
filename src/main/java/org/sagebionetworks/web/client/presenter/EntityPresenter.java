@@ -139,8 +139,8 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 								// show error and then allow entity bundle to go to view
 								view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 							}
-						} 					
-						EntityHeader projectHeader = DisplayUtils.getProjectHeader(new EntityPath(adapterFactory.createNew(transport.getEntityPathJson()))); 					
+						}
+						EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath()); 					
 						if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 						view.setEntityBundle(bundle, versionNumber, projectHeader, area, areaToken);					
 					} catch (JSONObjectAdapterException ex) {					
