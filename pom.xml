@@ -304,7 +304,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2014-05-07-6ddd961-9</version>
+			<version>2014-05-09-d3a008c-10</version>
 		</dependency>
 		
 		
