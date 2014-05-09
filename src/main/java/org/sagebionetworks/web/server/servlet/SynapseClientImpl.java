@@ -140,41 +140,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
-	
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
 		}
-	
-	private static HashSet<String> wikiBasedEntities;
-	static {
-		wikiBasedEntities = new HashSet<String>();
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY));
-		wikiBasedEntities.add(PortalPropertiesHolder.getProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
-	}
-	
-	private static HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
-	static {
-		pageName2WikiKeyMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
-		pageName2WikiKeyMap.put(WebConstants.USER_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.GETTING_STARTED, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.CREATE_PROJECT, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
-		pageName2WikiKeyMap.put(WebConstants.FORMATTING_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(PortalPropertiesHolder.getProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), PortalPropertiesHolder.getProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
-	}
 	
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
 	
-	
+	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
+	private volatile HashSet<String> wikiBasedEntities;
 	
 	/**
 	 * Injected with Gin
@@ -2697,12 +2672,44 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
 			throws RestServiceException {
+		initHelpPagesMap();
 		return pageName2WikiKeyMap;
+	}
+	
+	private void initHelpPagesMap() {
+		if (pageName2WikiKeyMap == null) {
+			HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
+			tempMap.put(WebConstants.USER_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.USER_GUIDE_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.GETTING_STARTED, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.CREATE_PROJECT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.FORMATTING_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
+			pageName2WikiKeyMap = tempMap;
+		}
 	}
 	
 	public Set<String> getWikiBasedEntities()
 			throws RestServiceException {
+		initWikiEntities();
 		return wikiBasedEntities;
+	}
+	
+	private void initWikiEntities() {
+		if (wikiBasedEntities == null) {
+			HashSet<String> tempSet = new HashSet<String>();
+			tempSet.add(getSynapseProperty(WebConstants.USER_GUIDE_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY));
+			tempSet.add(getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
+			//because wikiBasedEntities is volatile, current state will be reflected in all threads
+			wikiBasedEntities = tempSet;
+		}
 	}
 
 	@Override
