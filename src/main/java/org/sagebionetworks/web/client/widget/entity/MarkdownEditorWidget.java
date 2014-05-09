@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -77,20 +78,30 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		
 		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
-			synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+			getFormattingGuideWikiKey(new CallbackP<WikiPageKey>() {
 				@Override
-				public void onSuccess(HashMap<String,WikiPageKey> result) {
-					formattingGuideWikiPageKey = result.get(WebConstants.FORMATTING_GUIDE);
+				public void invoke(WikiPageKey key) {
+					formattingGuideWikiPageKey = key;
 					view.configure(wikiKey, formattingGuideWikiPageKey, markdownTextArea, formPanel, showFieldLabel, isWikiEditor, callback, saveHandler, managementHandler);
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
 				}
 			});
 		} else {
 			view.configure(wikiKey, formattingGuideWikiPageKey, markdownTextArea, formPanel, showFieldLabel, isWikiEditor, callback, saveHandler, managementHandler);
 		}
+	}
+	
+	public void getFormattingGuideWikiKey(final CallbackP<WikiPageKey> callback) {
+		synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+			@Override
+			public void onSuccess(HashMap<String,WikiPageKey> result) {
+				callback.invoke(result.get(WebConstants.FORMATTING_GUIDE));
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+		
 	}
 	
 	@Override
