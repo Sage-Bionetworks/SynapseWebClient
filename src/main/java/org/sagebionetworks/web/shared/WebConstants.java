@@ -204,7 +204,8 @@ public class WebConstants {
 	public static final String TABLE_COLUMN_ID = "columnId";
 	public static final String TABLE_ROW_ID = "rowId";
 	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
-	
+
+
 	public static final String NOCACHE_PARAM = "&nocache=";
 	
 	//servlet response header keys/values to instruct caching behavior
