@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -46,6 +48,11 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public String getCurrentURL() {
 		return Window.Location.getHref();
+	}
+	
+	@Override
+	public DateTimeFormat getDateTimeFormat() {
+		return DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	}
 	
 	
