@@ -39,10 +39,11 @@ public class APITableColumnRendererSynapseID implements APITableColumnRenderer {
 		}
 		List<String> outputValues = new ArrayList<String>();
 		
-		for (Iterator iterator2 = colValues.iterator(); iterator2
-				.hasNext();) {
-			String colValue = (String) iterator2.next();
-			outputValues.add(getSynapseLinkHTML(colValue));
+		for (String colValue : colValues) {
+			if (colValue != null)
+				outputValues.add(getSynapseLinkHTML(colValue));
+			else
+				outputValues.add("");
 		}
 		outputColumnData.put(outputColumnName, outputValues);
 		

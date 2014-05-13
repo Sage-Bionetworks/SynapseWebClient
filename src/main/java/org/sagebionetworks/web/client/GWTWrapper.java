@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface GWTWrapper {
@@ -19,4 +21,6 @@ public interface GWTWrapper {
 	String getHostPrefix();
 	
 	String getCurrentURL();
+	
+	DateTimeFormat getDateTimeFormat();
 }
