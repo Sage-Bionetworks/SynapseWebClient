@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,21 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 		outputColumnData = new HashMap<String, List<String>>();
 		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
 		List<String> colValues = APITableWidget.getColumnValues(inputColumnName, columnData);
+		List<String> outputValues = new ArrayList<String>();
 		if (colValues == null) {
 			//user defined an input column that doesn't exist in the service output
 			callback.onFailure(new IllegalArgumentException(DisplayConstants.ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN + inputColumnName));
 			return;
+		} else {
+			//replace null values with empty string
+			for (String colValue : colValues) {
+				if (colValue != null)
+					outputValues.add(colValue);
+				else
+					outputValues.add("");
+			}
 		}
-		outputColumnData.put(outputColumnName, colValues);
+		outputColumnData.put(outputColumnName, outputValues);
 		
 
 		callback.onSuccess(new APITableInitializedColumnRenderer() {
