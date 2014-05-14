@@ -85,7 +85,7 @@
 			</div>
 			
 			
-			<div class="highlight-box" title="Synapse API Key">
+			<div class="highlight-box margin-bottom-40" title="Synapse API Key">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API
 					key with
