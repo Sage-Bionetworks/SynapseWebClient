@@ -195,7 +195,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
-	private void updateShowCreateSynapsePassword() {
+	public void updateShowCreateSynapsePassword() {
 		view.showCreateSynapsePassword(authenticationController.getCurrentUserIsSSO());
 	}
 	

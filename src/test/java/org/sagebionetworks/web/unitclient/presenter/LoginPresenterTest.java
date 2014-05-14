@@ -285,6 +285,28 @@ public class LoginPresenterTest {
 	}
 	
 	
+	@Test
+	public void testSetNewUserSSO() throws JSONObjectAdapterException {
+		UserSessionData sessionData = new UserSessionData();
+		Session session = new Session();
+		session.setSessionToken("my session token");
+		sessionData.setSession(session);
+		sessionData.setIsSSO(true);
+		loginPresenter.setNewUser(sessionData);
+		verify(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testSetNewUser() throws JSONObjectAdapterException {
+		UserSessionData sessionData = new UserSessionData();
+		Session session = new Session();
+		session.setSessionToken("my session token");
+		sessionData.setSession(session);
+		sessionData.setIsSSO(false);
+		loginPresenter.setNewUser(sessionData);
+		verify(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+	}
+	
 	@Test 
 	public void testSetPlaceSSOLoginNotSignedToU() throws JSONObjectAdapterException {
 		UserProfile profile = new UserProfile();

@@ -154,7 +154,7 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed();		
+		verify(mockView).passwordChangeFailed(anyString());		
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed();		
+		verify(mockView).passwordChangeFailed(anyString());		
 	}
 	
 	@Test
@@ -264,5 +264,20 @@ public class SettingsPresenterTest {
 		profilePresenter.updateMyNotificationSettings(true, true);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testUpdateShowCreateSynapsePasswordSSO() {
+		//show create synapse password if SSO (change password if not)
+		when(mockAuthenticationController.getCurrentUserIsSSO()).thenReturn(true);
+		profilePresenter.updateShowCreateSynapsePassword();
+		verify(mockView).showCreateSynapsePassword(eq(true));
+	}
+	
+	@Test
+	public void testUpdateShowCreateSynapsePasswordNotSSO() {
+		when(mockAuthenticationController.getCurrentUserIsSSO()).thenReturn(false);
+		profilePresenter.updateShowCreateSynapsePassword();
+		verify(mockView).showCreateSynapsePassword(eq(false));
 	}
 }
