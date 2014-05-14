@@ -138,7 +138,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						view.passwordChangeFailed("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
+						view.passwordChangeFailed("Incorrect password. Please enter your existing Synapse password.");
 					}
 				});
 				

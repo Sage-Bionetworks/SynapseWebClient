@@ -36,6 +36,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	DivElement setupSynapsePasswordUI;
 	
 	@UiField
+	DivElement changeSynapsePasswordUI;
+	
+	
+	@UiField
 	PasswordTextBox currentPasswordField;
 	@UiField
 	PasswordTextBox password1Field;
@@ -57,7 +61,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	DivElement password2Error;
 	
 	@UiField
-	Button submitBtn;
+	Button changePasswordBtn;
 	
 	@UiField
 	SimplePanel breadcrumbsPanel;
@@ -96,6 +100,32 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
+		
+		changePasswordBtn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//validate passwords are filled in and match
+				if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+					changePasswordBtn.setEnabled(false);
+					presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
+				}
+			}
+		});
+		
+		createPasswordButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				createPasswordButton.setEnabled(false);
+				presenter.createSynapsePassword();
+			}
+		});
+		
+		changeApiKey.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.changeApiKey();
+			}
+		});
 	}
 
 
@@ -117,44 +147,24 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
 		
-		submitBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//validate passwords are filled in and match
-				if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
-					submitBtn.setEnabled(false);
-					presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
-				}
-			}
-		});
+		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
+		password1Field.getElement().setAttribute("placeholder", "Enter new password");
+		password2Field.getElement().setAttribute("placeholder", "Confirm new password");
 		
-		createPasswordButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				createPasswordButton.setEnabled(false);
-				presenter.createSynapsePassword();
-			}
-		});
-		
-		changeApiKey.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.changeApiKey();
-			}
-		});
 		clear();
 	}
 
 	@Override
 	public void showPasswordChangeSuccess() {
-		clear();
+		resetChangePasswordUI();
 		showInfo("Password has been successfully changed", "");
 	}
 
 	@Override
 	public void passwordChangeFailed(String error) {
-		password2Error.setInnerHTML(error);
-		DisplayUtils.showFormError(password2, password2Error);
+		changePasswordBtn.setEnabled(true);
+		currentPasswordError.setInnerHTML(error);
+		DisplayUtils.showFormError(currentPassword, currentPasswordError);
 	}
 
 	@Override
@@ -208,10 +218,15 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void showCreateSynapsePassword(boolean visible) {
-		if (visible)
+		if (visible) {
 			setupSynapsePasswordUI.removeClassName("hide");
-		else
+			changeSynapsePasswordUI.addClassName("hide");
+		}			
+		else {
 			setupSynapsePasswordUI.addClassName("hide");
+			changeSynapsePasswordUI.removeClassName("hide");
+		}
+			
 	}
 	
 	private ClickHandler getNotificationsClickHandler() {
@@ -273,12 +288,16 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@Override
 	public void clear() {
+		resetChangePasswordUI();
+		storageUsageSpan.setInnerText("");
+		createPasswordButton.setEnabled(true);
+	}
+	
+	private void resetChangePasswordUI() {
 		currentPasswordField.setValue("");
 		password1Field.setValue("");
 		password2Field.setValue("");
-		storageUsageSpan.setInnerText("");
-		submitBtn.setEnabled(true);
-		createPasswordButton.setEnabled(true);
+		changePasswordBtn.setEnabled(true);
 		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
 		DisplayUtils.hideFormError(password1, password1Error);
 		DisplayUtils.hideFormError(password2, password2Error);

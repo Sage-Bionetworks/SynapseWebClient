@@ -29,11 +29,61 @@
 					<span ui:field="storageUsageSpan" />
 				</h4>
 			</div>
-			<g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box" title="Email Settings">
-			    <g:FlowPanel styleName="checkbox margin-left-10">
-			       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
-			    </g:FlowPanel>
-			</g:SimplePanel>
+			<div class="row">
+			    <div class="col-md-6">
+				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box" title="Email Settings">
+					    <g:FlowPanel styleName="checkbox margin-left-10">
+					       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
+					    </g:FlowPanel>
+					</g:SimplePanel>
+				</div>
+				<div class="col-md-6">
+				    <div ui:field="setupSynapsePasswordUI">
+					    <div class="highlight-box margin-bottom-40" title="Setup a Synapse Password">
+							<div>
+								<p>To login to this website without using a Google account or to
+									use the Synapse Programmatic Clients/REST API,
+									you will need to either have a Synapse specific password or use your
+									API key. To setup a Synapse password, click the button below. It
+									will send you an email
+									with instructions on how to complete the process.</p>
+									<g:Button ui:field="createPasswordButton" styleName="btn btn-default margin-top-10">Create Synapse Password</g:Button>
+							</div>
+						</div>
+					</div>
+					<div ui:field="changeSynapsePasswordUI">
+					    <div class="highlight-box margin-bottom-40" title="Change Synapse Password">
+					        <form class="form-horizontal" role="form">
+					   			  <div ui:field="currentPassword" class="form-group row">
+								    <label class="col-sm-3 control-label">Current password</label>
+								    <div class="col-sm-8">
+								      <g:PasswordTextBox ui:field="currentPasswordField" styleName="form-control"/>
+									  <div ui:field="currentPasswordError" class="help-block hide"></div>
+								    </div>
+								  </div>
+								  <div ui:field="password1" class="form-group row">
+								    <label class="col-sm-3 control-label">New password</label>
+								    <div class="col-sm-8">
+								      <g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
+									  <div ui:field="password1Error" class="help-block hide"></div>
+								    </div>
+								  </div>
+								  <div ui:field="password2" class="form-group row">
+								    <label class="col-sm-3 control-label">Confirm password</label>
+								    <div class="col-sm-8">
+								      <g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
+								      <div ui:field="password2Error" class="help-block hide"></div>
+								    </div>
+								  </div>
+								  <div class="col-sm-12">
+								      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
+								  </div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
 			
 			<div class="highlight-box" title="Synapse API Key">
 				<p>Using an API key allows you to authenticate your scripts for an
@@ -48,51 +98,6 @@
 				<g:Button ui:field="changeApiKey" styleName="btn btn-default margin-top-10">Change API Key</g:Button>
 			</div>
 
-			<div class="row margin-top-15">
-				<div class="col-md-6" ui:field="setupSynapsePasswordUI">
-				    <div class="highlight-box" title="Setup a Synapse Password">
-						<div>
-							<p>To login to this website without using a Google account or to
-								use the Synapse Programmatic Clients/REST API,
-								you will need to either have a Synapse specific password or use your
-								API key. To setup a Synapse password, click the button below. It
-								will send you an email
-								with instructions on how to complete the process.</p>
-								<g:Button ui:field="createPasswordButton" styleName="btn btn-default margin-top-10">Create Synapse Password</g:Button>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-6">
-				    <div class="highlight-box margin-bottom-40" title="Change Synapse Password">
-				        <form class="form-horizontal" role="form">
-				   			  <div ui:field="currentPassword" class="form-group row">
-							    <label class="col-sm-3 control-label">Current password</label>
-							    <div class="col-sm-8">
-							      <g:PasswordTextBox ui:field="currentPasswordField" styleName="form-control"/>
-								  <div ui:field="currentPasswordError" class="help-block hide"></div>
-							    </div>
-							  </div>
-							  <div ui:field="password1" class="form-group row">
-							    <label class="col-sm-3 control-label">New password</label>
-							    <div class="col-sm-8">
-							      <g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
-								  <div ui:field="password1Error" class="help-block hide"></div>
-							    </div>
-							  </div>
-							  <div ui:field="password2" class="form-group row">
-							    <label class="col-sm-3 control-label">Confirm password</label>
-							    <div class="col-sm-8">
-							      <g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
-							      <div ui:field="password2Error" class="help-block hide"></div>
-							    </div>
-							  </div>
-							  <div class="col-sm-12">
-							      <g:Button ui:field="submitBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
-							  </div>
-						</form>
-					</div>
-				</div>
-			</div>
 			<div class="clear"></div>
 		</div> <!-- close class="container" -->
 		<g:SimplePanel ui:field="footer" />
