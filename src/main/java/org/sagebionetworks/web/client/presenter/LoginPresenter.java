@@ -118,7 +118,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
 				token != null) {			
-			loginSSOUser(token);
+			loginUser(token, true);
 		} else {
 			// standard view
 			authenticationController.logoutUser();
@@ -181,7 +181,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void setNewUser(UserSessionData newUser) {
-		loginSSOUser(newUser.getSession().getSessionToken());
+		loginUser(newUser.getSession().getSessionToken(), newUser.getIsSSO());
 	}
 	
 	/**
@@ -343,13 +343,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		});
 	}
 	
-	private void loginSSOUser(String token) {
+	private void loginUser(String token, boolean isSSO) {
 		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 		// parse token
 		view.showLoggingInLoader();
 		if(token != null) {
-			final String sessionToken = token;	
-			authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
+			final String sessionToken = token;
+			
+			AsyncCallback<String> callback = new AsyncCallback<String>() {	
 				@Override
 				public void onSuccess(String result) {
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
@@ -423,7 +424,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);
 				}
-			});
+			};
+			
+			if(isSSO) {
+				authenticationController.loginUserSSO(sessionToken, callback);
+			} else {
+				authenticationController.loginUser(sessionToken, callback);
+			}
 		}
 	}
 	

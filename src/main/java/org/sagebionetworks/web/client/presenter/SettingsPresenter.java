@@ -131,16 +131,14 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 							@Override
 							public void onFailure(Throwable caught) {						
-								view.passwordChangeFailed();
-								view.showErrorMessage("Password Change failed. Please try again.");
+								view.passwordChangeFailed("Password Change failed. Please try again.");
 							}
 						});
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						view.passwordChangeFailed();
-						view.showErrorMessage("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
+						view.passwordChangeFailed("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
 					}
 				});
 				
@@ -148,7 +146,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		} else {
-			view.passwordChangeFailed();
 			view.showInfo("Error","Reset Password failed. Please Login again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
@@ -198,6 +195,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
+	private void updateShowCreateSynapsePassword() {
+		view.showCreateSynapsePassword(authenticationController.getCurrentUserIsSSO());
+	}
 	
 	@Override
     public String mayStop() {
@@ -258,6 +258,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
+		updateShowCreateSynapsePassword();
 	}
 
 	@Override

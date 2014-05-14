@@ -103,6 +103,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
+						userSessionData.writeToJSONObject(usdAdapter);
 						callback.onSuccess(usdAdapter.toJSONString());
 					} catch (JSONObjectAdapterException e){
 						callback.onFailure(e);

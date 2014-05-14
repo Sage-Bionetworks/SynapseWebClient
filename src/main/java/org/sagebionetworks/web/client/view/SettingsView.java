@@ -28,7 +28,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	/**
 	 * Alerts the view that the password change failed
 	 */
-	public void passwordChangeFailed();	
+	public void passwordChangeFailed(String error);	
 	
 	/**
 	 * Show the user that their email has been sent
@@ -47,6 +47,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 	public void refreshHeader();
 	
 	public void updateNotificationCheckbox(UserProfile profile);
+	
+	void showCreateSynapsePassword(boolean visible);
 	
 	public interface Presenter extends SynapsePresenter {
 
