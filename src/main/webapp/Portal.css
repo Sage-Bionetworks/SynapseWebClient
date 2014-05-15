@@ -1285,7 +1285,7 @@ ol.lowerroman {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    white-space: pre-wrap;
+    white-space: normal;
 }
 
 .highlight-box::after {

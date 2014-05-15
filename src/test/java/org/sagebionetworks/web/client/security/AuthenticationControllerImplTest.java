@@ -82,13 +82,13 @@ public class AuthenticationControllerImplTest {
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 		
 		// logged in
-		authenticationController.loginUser("token", callback);
+		authenticationController.revalidateSession("token", callback);
 		assertEquals(principalId, authenticationController.getCurrentUserPrincipalId());	
 		
 		// empty user profile
 		sessionData.setProfile(null);
 		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
-		authenticationController.loginUser("token", callback);
+		authenticationController.revalidateSession("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 		
 		

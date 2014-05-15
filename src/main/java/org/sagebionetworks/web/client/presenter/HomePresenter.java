@@ -145,11 +145,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		};
 		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
 		if (userSessionData != null) {
-			if(userSessionData.getIsSSO() != null && userSessionData.getIsSSO()) {
-				authenticationController.loginUserSSO(authenticationController.getCurrentUserSessionToken(), callback);
-			} else {
-				authenticationController.loginUser(authenticationController.getCurrentUserSessionToken(), callback);
-			}
+			authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), callback);
 		}
 	}
 	

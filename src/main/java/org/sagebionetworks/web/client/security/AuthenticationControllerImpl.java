@@ -54,7 +54,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					e.printStackTrace();
 				}
 				
-				loginUser(session.getSessionToken(), callback);
+				revalidateSession(session.getSessionToken(), callback);
 			}
 
 			
@@ -64,15 +64,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-		
-	@Override
-	public void loginUser(final String token, final AsyncCallback<String> callback) {
-		setUser(token, callback, false);
-	}
 	
 	@Override
-	public void loginUserSSO(final String token, final AsyncCallback<String> callback) {
-		setUser(token, callback, true);
+	public void revalidateSession(final String token, final AsyncCallback<String> callback) {
+		setUser(token, callback);
 	}
 
 	@Override
@@ -86,7 +81,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		}
 	}
 
-	private void setUser(String token, final AsyncCallback<String> callback, final boolean isSSO) {
+	private void setUser(String token, final AsyncCallback<String> callback) {
 		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		userAccountService.getUserSessionData(token, new AsyncCallback<String>() {
 			@Override
@@ -96,10 +91,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					try {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
-						userSessionData.setIsSSO(isSSO);
-						
 						updateUserLoginDataCookie(userSessionData);
-						
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
@@ -176,7 +168,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(String result) {
 			}
-		}, getCurrentUserIsSSO());
+		});
 		
 	}
 
@@ -194,12 +186,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		else return null;
 	}
 	
-	@Override
-	public boolean getCurrentUserIsSSO() {
-		if(currentUser != null) return currentUser.getIsSSO();
-		else return false;
-	}
-
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);

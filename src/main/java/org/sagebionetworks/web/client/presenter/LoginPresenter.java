@@ -89,11 +89,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
 		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {			
-			boolean isSso = false;
-			if(authenticationController.isLoggedIn())
-				isSso = authenticationController.getCurrentUserIsSSO();
-			authenticationController.logoutUser();
-			view.showLogout(isSso);
+			view.showLogout();
 		} else if (WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN.equals(token)) {
 			// User does not exist, redirect to Registration page
 			view.showErrorMessage(DisplayConstants.CREATE_ACCOUNT_MESSAGE_SSO);
@@ -118,7 +114,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
 				token != null) {			
-			loginSSOUser(token);
+			revalidateSession(token);
 		} else {
 			// standard view
 			authenticationController.logoutUser();
@@ -181,7 +177,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void setNewUser(UserSessionData newUser) {
-		loginSSOUser(newUser.getSession().getSessionToken());
+		revalidateSession(newUser.getSession().getSessionToken());
 	}
 	
 	/**
@@ -343,13 +339,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		});
 	}
 	
-	private void loginSSOUser(String token) {
+	private void revalidateSession(String token) {
 		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 		// parse token
 		view.showLoggingInLoader();
 		if(token != null) {
-			final String sessionToken = token;	
-			authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
+			final String sessionToken = token;
+			
+			AsyncCallback<String> callback = new AsyncCallback<String>() {	
 				@Override
 				public void onSuccess(String result) {
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
@@ -368,7 +365,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										public void onSuccess(Void result) {
 											// Have to get the UserSessionData again, 
 											// since it won't contain the UserProfile if the terms haven't been signed
-											authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+											authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
 
 												@Override
 												public void onFailure(
@@ -423,7 +420,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);
 				}
-			});
+			};
+			
+			authenticationController.revalidateSession(sessionToken, callback);
 		}
 	}
 	

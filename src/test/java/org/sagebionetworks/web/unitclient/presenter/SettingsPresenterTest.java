@@ -154,7 +154,7 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed();		
+		verify(mockView).passwordChangeFailed(anyString());		
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class SettingsPresenterTest {
 		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
-		verify(mockView).passwordChangeFailed();		
+		verify(mockView).passwordChangeFailed(anyString());		
 	}
 	
 	@Test
@@ -183,13 +183,6 @@ public class SettingsPresenterTest {
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));		
 	}
 	
-	@Test
-	public void testCreateSynapsePassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
-		profilePresenter.setPlace(place);
-
-		profilePresenter.createSynapsePassword();
-	}
 	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	

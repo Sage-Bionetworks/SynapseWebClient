@@ -1,43 +1,28 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.KeyNav;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FieldSet;
-import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.extjs.gxt.ui.client.widget.layout.FormLayout;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,10 +35,38 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
+	
 	@UiField
-	SimplePanel changePasswordPanel;
+	DivElement changeSynapsePasswordUI;
+	
 	@UiField
-	SimplePanel setupPasswordButtonPanel;
+	FlowPanel forgotPasswordContainer;
+	Anchor forgotPasswordLink;
+	
+	@UiField
+	PasswordTextBox currentPasswordField;
+	@UiField
+	PasswordTextBox password1Field;
+	@UiField
+	PasswordTextBox password2Field;
+	
+	@UiField
+	DivElement currentPassword;
+	@UiField
+	DivElement password1;
+	@UiField
+	DivElement password2;
+	
+	@UiField
+	DivElement currentPasswordError;
+	@UiField
+	DivElement password1Error;
+	@UiField
+	DivElement password2Error;
+	
+	@UiField
+	Button changePasswordBtn;
+	
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
@@ -66,29 +79,20 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	CheckBox emailNotificationsCheckbox;
 	@UiField
-	com.google.gwt.user.client.ui.Button changeApiKey;
+	Button changeApiKey;
 	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
-	private FormPanel resetFormPanel;
-	private Button createPasswordButton;
-	private SageImageBundle sageImageBundle;
-	private Button changePasswordButton;
-	private HTML changePasswordLabel;
 	private Breadcrumb breadcrumb;
 	private Footer footerWidget;
 	
 	@Inject
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, SageImageBundle sageImageBundle,Breadcrumb breadcrumb) {		
+			Header headerWidget, Footer footerWidget, Breadcrumb breadcrumb) {		
 		initWidget(binder.createAndBindUi(this));
 
-		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -97,6 +101,36 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
 		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
+		
+		changePasswordBtn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//validate passwords are filled in and match
+				if(checkCurrentPassword() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+					changePasswordBtn.setEnabled(false);
+					presenter.resetPassword(currentPasswordField.getValue(), password1Field.getValue());
+				}
+			}
+		});
+		
+		changeApiKey.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.changeApiKey();
+			}
+		});
+		
+		forgotPasswordLink = new Anchor();
+		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
+		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
+		forgotPasswordLink.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));				
+			}
+		});
+		forgotPasswordContainer.addStyleName("inline-block");
+		forgotPasswordContainer.add(forgotPasswordLink);
 	}
 
 
@@ -118,141 +152,26 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
 		
-		createResetForm();
+		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
+		password1Field.getElement().setAttribute("placeholder", "Enter new password");
+		password2Field.getElement().setAttribute("placeholder", "Confirm new password");
 		
-		changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
-		
-		changePasswordPanel.clear();
-		changePasswordPanel.add(resetFormPanel);
-		setChangePasswordDefaultIcon();
-		
-		createPasswordButton = new Button(DisplayConstants.BUTTON_SETUP_API_PASSWORD, AbstractImagePrototype.create(iconsImageBundle.addSquare16()), new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				createPasswordButton.setIcon(AbstractImagePrototype.create(sageImageBundle.loading16()));
-				createPasswordButton.disable();
-				presenter.createSynapsePassword();
-			}
-		});
-		createPasswordButton.enable();
-		
-		setupPasswordButtonPanel.clear();
-		setupPasswordButtonPanel.add(createPasswordButton);
-		
-		changeApiKey.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.changeApiKey();
-			}
-		});
+		clear();
 	}
 
 	@Override
 	public void showPasswordChangeSuccess() {
-		changePasswordButton.setText(DisplayConstants.BUTTON_CHANGE_PASSWORD);
-		changePasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.checkGreen16()));
-		changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.informationBalloon16()) + " Password Changed"));
+		resetChangePasswordUI();
+		showInfo("Password has been successfully changed", "");
 	}
 
 	@Override
-	public void passwordChangeFailed() {
-		changePasswordButton.setText(DisplayConstants.BUTTON_CHANGE_PASSWORD);
-		changePasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.error16()));		
+	public void passwordChangeFailed(String error) {
+		changePasswordBtn.setEnabled(true);
+		currentPasswordError.setInnerHTML(error);
+		DisplayUtils.showFormError(currentPassword, currentPasswordError);
 	}
 
-	@Override
-	public void showRequestPasswordEmailSent() {
-		createPasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.checkGreen16()));
-		createPasswordButton.setText("Email Sent");		
-	}
-	
-	@Override
-	public void requestPasswordEmailFailed() {
-		createPasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.error16()));
-		createPasswordButton.setText("Email Send Failed");
-	}
-
-	/*
-	 * Private Methods
-	 */	
-	 private void createResetForm() {  		 
-		 resetFormPanel = new FormPanel();
-		 FormData formData = new FormData("-20");
-		   
-	     resetFormPanel.setFrame(true);
-	     resetFormPanel.setHeaderVisible(false);  
-	     resetFormPanel.setWidth(350);  
-	     resetFormPanel.setLayout(new FlowLayout());  
-	   
-	     FieldSet fieldSet = new FieldSet();  
-	     fieldSet.setHeading(" ");  
-	     fieldSet.setCheckboxToggle(false);	    
-	     fieldSet.setCollapsible(false);
-	   
-	     FormLayout layout = new FormLayout();  
-	     layout.setLabelWidth(100);  
-	     fieldSet.setLayout(layout);  
-	   
-	     final TextField<String> currentPassword = new TextField<String>();  
-	     currentPassword.setFieldLabel("Current Password");  
-	     currentPassword.setAllowBlank(false);
-	     currentPassword.setPassword(true);
-	     fieldSet.add(currentPassword, formData);  
-	   
-	     final TextField<String> newPassword = new TextField<String>();  
-	     newPassword.setFieldLabel("New Password");  
-	     newPassword.setAllowBlank(false);
-	     newPassword.setPassword(true);
-	     fieldSet.add(newPassword, formData);  
-	   
-	     final TextField<String> newPasswordConfirm = new TextField<String>();  
-	     newPasswordConfirm.setFieldLabel("Confirm Password");  
-	     newPasswordConfirm.setAllowBlank(false);
-	     newPasswordConfirm.setPassword(true);
-	     fieldSet.add(newPasswordConfirm, formData);  
-
-	     changePasswordLabel = new HTML();
-	     fieldSet.add(changePasswordLabel);
-	     
-	     resetFormPanel.add(fieldSet);  
-	   
-	     resetFormPanel.setButtonAlign(HorizontalAlignment.CENTER);  
-	     changePasswordButton = new Button(DisplayConstants.BUTTON_CHANGE_PASSWORD);
-	     changePasswordButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
-	    	 @Override
-	    	 public void componentSelected(ButtonEvent ce) {
-	    		 if(newPassword.getValue() != null && newPasswordConfirm.getValue() != null && newPassword.getValue().equals(newPasswordConfirm.getValue())) {
-	    			 changePasswordLabel.setHTML(SafeHtmlUtils.fromSafeConstant(""));
-	    			 DisplayUtils.changeButtonToSaving(changePasswordButton, sageImageBundle);
-	    			 presenter.resetPassword(currentPassword.getValue(), newPassword.getValue());
-	    		 } else {
-	    			 MessageBox.alert("Error", "Passwords do not match. Please re-enter your new password.", null);
-	    		 }
-		
-	    	 }
-	     });	     
-	     setChangePasswordDefaultIcon();
-	     resetFormPanel.addButton(changePasswordButton);
-
-	     // Enter key submits
-	     new KeyNav<ComponentEvent>(resetFormPanel) {
-	    	 @Override
-	    	 public void onEnter(ComponentEvent ce) {
-	    		 super.onEnter(ce);
-	    		 if (changePasswordButton.isEnabled())
-	    			 changePasswordButton.fireEvent(Events.Select);
-	    	 }
-	     };
-
-	     // form binding so submit button is greyed out until all fields are filled 
-	     final FormButtonBinding binding = new FormButtonBinding(resetFormPanel);
-	     binding.addButton(changePasswordButton);
-	 }
-	 	 
-	 private void setChangePasswordDefaultIcon() {
-		 changePasswordButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.arrowCurve16()));			
-	 }
-	 
 	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
@@ -309,12 +228,60 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		DisplayUtils.showInfo(title, message);
 	}
 
-
+	private boolean checkCurrentPassword() {
+		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
+		if (!DisplayUtils.isDefined(currentPasswordField.getText())){
+			currentPasswordError.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			DisplayUtils.showFormError(currentPassword, currentPasswordError);
+			return false;
+		} else
+			return true;
+	}
+	
+	private boolean checkPassword1() {
+		DisplayUtils.hideFormError(password1, password1Error);
+		if (!DisplayUtils.isDefined(password1Field.getText())){
+			password1Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			DisplayUtils.showFormError(password1, password1Error);
+			return false;
+		} else
+			return true;
+	}
+	
+	private boolean checkPassword2() {
+		DisplayUtils.hideFormError(password2, password2Error);
+		if (!DisplayUtils.isDefined(password2Field.getText())){
+			password2Error.setInnerHTML(DisplayConstants.ERROR_ALL_FIELDS_REQUIRED);
+			DisplayUtils.showFormError(password2, password2Error);
+			return false;
+		} else
+			return true;
+	}
+	
+	private boolean checkPasswordMatch() {
+		DisplayUtils.hideFormError(password2, password2Error);
+		if (!password1Field.getValue().equals(password2Field.getValue())) {
+			password2Error.setInnerHTML(DisplayConstants.PASSWORDS_MISMATCH);
+			DisplayUtils.showFormError(password2, password2Error);
+			return false;
+		} else
+			return true;
+	}
+	
 	@Override
 	public void clear() {
-		changePasswordPanel.clear();
-		setupPasswordButtonPanel.clear();
+		resetChangePasswordUI();
 		storageUsageSpan.setInnerText("");
+	}
+	
+	private void resetChangePasswordUI() {
+		currentPasswordField.setValue("");
+		password1Field.setValue("");
+		password2Field.setValue("");
+		changePasswordBtn.setEnabled(true);
+		DisplayUtils.hideFormError(currentPassword, currentPasswordError);
+		DisplayUtils.hideFormError(password1, password1Error);
+		DisplayUtils.hideFormError(password2, password2Error);
 	}
 
 

@@ -170,7 +170,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 
 	@Override
-	public void showLogout(boolean isSsoLogout) {
+	public void showLogout() {
 		clear();
 		headerWidget.refresh();
 		
@@ -180,15 +180,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		cp.setBodyStyleName("lightGreyBackground");
 		
 		HTML message = new HTML();
-		if(isSsoLogout) {
-			message.setHTML("<h4>"				
-					+ DisplayConstants.LOGOUT_TEXT
-					+ "</h4><br/><br/>"
-					+ DisplayUtils.getIconHtml(iconsImageBundle.warning16())
-					+ " " + DisplayConstants.LOGOUT_SSO_TEXT);
-		} else {
-			message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
-		}
+		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
 		cp.add(message, new MarginData(0, 0, 0, 10));
 		
 		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);

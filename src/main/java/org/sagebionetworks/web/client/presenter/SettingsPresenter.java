@@ -131,16 +131,14 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 							@Override
 							public void onFailure(Throwable caught) {						
-								view.passwordChangeFailed();
-								view.showErrorMessage("Password Change failed. Please try again.");
+								view.passwordChangeFailed("Password Change failed. Please try again.");
 							}
 						});
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						view.passwordChangeFailed();
-						view.showErrorMessage("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
+						view.passwordChangeFailed("Incorrect password. Please enter your existing Synapse password.");
 					}
 				});
 				
@@ -148,36 +146,11 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		} else {
-			view.passwordChangeFailed();
 			view.showInfo("Error","Reset Password failed. Please Login again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
 
-	@Override
-	public void createSynapsePassword() {
-		if(authenticationController.isLoggedIn()) {
-			String primaryEmail = DisplayUtils.getPrimaryEmail(authenticationController.getCurrentUserSessionData().getProfile());
-			userService.sendPasswordResetEmail(primaryEmail, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showRequestPasswordEmailSent();
-					view.showInfo("Email Sent","You have been sent an email. Please check your inbox.");
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.requestPasswordEmailFailed();
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
-				}
-			});
-		} else {	
-			view.requestPasswordEmailFailed();
-			view.showInfo("Error", "Please Login Again.");
-			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}		
-	}
-	
 	private void updateUserStorage() {
 		userService.getStorageUsage(new AsyncCallback<String>(){
 			@Override
@@ -197,7 +170,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			}
 		});
 	}
-	
 	
 	@Override
     public String mayStop() {
