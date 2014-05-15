@@ -59,7 +59,11 @@ public class MarkdownEditorWidgetTest {
 		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt);
 	}
 	
-
+	@Test
+	public void testSetPresenter() throws Exception {
+		verify(mockView).setPresenter(eq(presenter));
+	}
+	
 	@Test
 	public void testGetFormattingGuide() throws Exception {
 		Map<String,WikiPageKey> testHelpPagesMap = new HashMap<String, WikiPageKey>();
