@@ -34,6 +34,7 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.menu.SeparatorMenuItem;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -124,7 +125,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		this.callback = callback;
 		
 		//Toolbar
-		HorizontalPanel mdCommands = new HorizontalPanel();
+		final HorizontalPanel mdCommands = new HorizontalPanel();
 		mdCommands.setSpacing(2);
 		mdCommands.addStyleName("view markdown-editor-commands-container");
 		editWidgetButton = getNewCommand("Edit Widget", "glyphicon-pencil",new ClickHandler() {
@@ -356,6 +357,15 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 
 		mdCommands.add(link);
 		formPanel.layout(true);
+		//defers code until after the browser redraws the page (because of the gxt LayoutContainer life cycle). 
+		//scrolls the browser window such that the markdown command bar is at the top of the screen
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override
+			public void execute() {
+				if (mdCommands != null && mdCommands.getElement() != null)
+					Window.scrollTo(0, mdCommands.getElement().getAbsoluteTop());
+			}
+		});
 	}
 	
 	public void handleEditWidgetCommand() {
