@@ -74,7 +74,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			sessionToken = place.toToken();
 			// validate that session token is still valid before showing form
 			view.showLoading();
-			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
+			authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					view.showResetForm();	

@@ -184,13 +184,6 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testCreateSynapsePassword() throws RestServiceException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
-		profilePresenter.setPlace(place);
-
-		profilePresenter.createSynapsePassword();
-	}
-	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory);	
 		
@@ -264,20 +257,5 @@ public class SettingsPresenterTest {
 		profilePresenter.updateMyNotificationSettings(true, true);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testUpdateShowCreateSynapsePasswordSSO() {
-		//show create synapse password if SSO (change password if not)
-		when(mockAuthenticationController.getCurrentUserIsSSO()).thenReturn(true);
-		profilePresenter.updateShowCreateSynapsePassword();
-		verify(mockView).showCreateSynapsePassword(eq(true));
-	}
-	
-	@Test
-	public void testUpdateShowCreateSynapsePasswordNotSSO() {
-		when(mockAuthenticationController.getCurrentUserIsSSO()).thenReturn(false);
-		profilePresenter.updateShowCreateSynapsePassword();
-		verify(mockView).showCreateSynapsePassword(eq(false));
 	}
 }

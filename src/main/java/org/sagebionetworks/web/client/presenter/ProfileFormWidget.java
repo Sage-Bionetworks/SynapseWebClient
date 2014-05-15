@@ -182,13 +182,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
 			}
 		};
-
-		if(currentUser.getIsSSO()) {
-			authenticationController.loginUserSSO(currentUser.getSession().getSessionToken(), callback);
-		} else {
-			authenticationController.loginUser(currentUser.getSession().getSessionToken(), callback);
-		}
-
+		authenticationController.revalidateSession(currentUser.getSession().getSessionToken(), callback);
 	}
 }
 	

@@ -16,7 +16,7 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void hideLoggingInLoader();
 	
-	void showLogout(boolean isSsoLogout);
+	void showLogout();
 	
 	void showLogin(String openIdActionUrl, String openIdReturnUrl);	
 	

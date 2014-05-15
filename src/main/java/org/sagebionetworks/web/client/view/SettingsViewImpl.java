@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -15,9 +17,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,11 +37,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	SimplePanel footer;
 	
 	@UiField
-	DivElement setupSynapsePasswordUI;
-	
-	@UiField
 	DivElement changeSynapsePasswordUI;
 	
+	@UiField
+	FlowPanel forgotPasswordContainer;
+	Anchor forgotPasswordLink;
 	
 	@UiField
 	PasswordTextBox currentPasswordField;
@@ -77,9 +81,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Button changeApiKey;
 	
-	@UiField
-	Button createPasswordButton;
-	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Breadcrumb breadcrumb;
@@ -112,20 +113,24 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			}
 		});
 		
-		createPasswordButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				createPasswordButton.setEnabled(false);
-				presenter.createSynapsePassword();
-			}
-		});
-		
 		changeApiKey.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.changeApiKey();
 			}
 		});
+		
+		forgotPasswordLink = new Anchor();
+		forgotPasswordLink.addStyleName("link movedown-4 margin-left-10");
+		forgotPasswordLink.setText(DisplayConstants.FORGOT_PASSWORD);
+		forgotPasswordLink.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new PasswordReset(ClientProperties.DEFAULT_PLACE_TOKEN));				
+			}
+		});
+		forgotPasswordContainer.addStyleName("inline-block");
+		forgotPasswordContainer.add(forgotPasswordLink);
 	}
 
 
@@ -168,16 +173,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 
 	@Override
-	public void showRequestPasswordEmailSent() {
-		createPasswordButton.setText("Email Sent");		
-	}
-	
-	@Override
-	public void requestPasswordEmailFailed() {
-		createPasswordButton.setText("Email Send Failed");
-	}
-
-	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
 	}
@@ -214,19 +209,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 				isNotify = profile.getNotificationSettings().getSendEmailNotifications();
 		}
 		emailNotificationsCheckbox.setValue(isNotify, false);
-	}
-	
-	@Override
-	public void showCreateSynapsePassword(boolean visible) {
-		if (visible) {
-			setupSynapsePasswordUI.removeClassName("hide");
-			changeSynapsePasswordUI.addClassName("hide");
-		}			
-		else {
-			setupSynapsePasswordUI.addClassName("hide");
-			changeSynapsePasswordUI.removeClassName("hide");
-		}
-			
 	}
 	
 	private ClickHandler getNotificationsClickHandler() {
@@ -290,7 +272,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		resetChangePasswordUI();
 		storageUsageSpan.setInnerText("");
-		createPasswordButton.setEnabled(true);
 	}
 	
 	private void resetChangePasswordUI() {

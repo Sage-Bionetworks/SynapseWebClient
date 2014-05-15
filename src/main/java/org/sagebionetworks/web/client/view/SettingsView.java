@@ -30,16 +30,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	 */
 	public void passwordChangeFailed(String error);	
 	
-	/**
-	 * Show the user that their email has been sent
-	 */
-	public void showRequestPasswordEmailSent();
-	
-	/**
-	 * Alerts the view that the password request email failed to send.
-	 */
-	public void requestPasswordEmailFailed();
-	
 	public void updateStorageUsage(Long grandTotal);
 
 	public void clearStorageUsageUI();
@@ -48,14 +38,10 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
-	void showCreateSynapsePassword(boolean visible);
-	
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);
 
-		void createSynapsePassword();
-		
 		void goTo(Place place);
 		
 		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);

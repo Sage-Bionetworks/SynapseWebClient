@@ -93,7 +93,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getUserName());
 		
 		verify(mockView).showUserUpdateSuccess();
-		verify(mockAuthenticationController).loginUser(anyString(), captor.capture());
+		verify(mockAuthenticationController).revalidateSession(anyString(), captor.capture());
 		//invoke the login callback to verify profile update success callback
 		captor.getValue().onSuccess("");
 		verify(mockProfileUpdatedCallback).profileUpdateSuccess();//successful update

@@ -150,8 +150,7 @@ public class HomePresenterTest {
 		testSessionData.setIsSSO(false);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
 		
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 	}	
 	
 	@Test
@@ -165,38 +164,18 @@ public class HomePresenterTest {
 	
 	@Test
 	public void testValidateTokenSSO() {
-		testSessionData.setIsSSO(true);
 		homePresenter.validateToken();
-
-		verify(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 	}
 	
-	@Test
-	public void testValidateTokenNotSSO() {
-		testSessionData.setIsSSO(false);
-		homePresenter.validateToken();
-
-		verify(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
-	}
 
 	@Test
-	public void testInvalidTokenSSO() {
-		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
-		testSessionData.setIsSSO(true);
+	public void testInvalidToken() {
+		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		homePresenter.validateToken();
-		verify(mockAuthenticationController).loginUserSSO(anyString(), any(AsyncCallback.class));
+		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
-	
-	@Test
-	public void testInvalidTokenNotSSO() {
-		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
-		testSessionData.setIsSSO(false);
-		homePresenter.validateToken();
-		verify(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-
 	
 	@Test
 	public void testNewsFeed() throws JSONObjectAdapterException {

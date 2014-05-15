@@ -151,30 +151,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		}
 	}
 
-	@Override
-	public void createSynapsePassword() {
-		if(authenticationController.isLoggedIn()) {
-			String primaryEmail = DisplayUtils.getPrimaryEmail(authenticationController.getCurrentUserSessionData().getProfile());
-			userService.sendPasswordResetEmail(primaryEmail, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showRequestPasswordEmailSent();
-					view.showInfo("Email Sent","You have been sent an email. Please check your inbox.");
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.requestPasswordEmailFailed();
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
-				}
-			});
-		} else {	
-			view.requestPasswordEmailFailed();
-			view.showInfo("Error", "Please Login Again.");
-			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}		
-	}
-	
 	private void updateUserStorage() {
 		userService.getStorageUsage(new AsyncCallback<String>(){
 			@Override
@@ -193,10 +169,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				view.clearStorageUsageUI();
 			}
 		});
-	}
-	
-	public void updateShowCreateSynapsePassword() {
-		view.showCreateSynapsePassword(authenticationController.getCurrentUserIsSSO());
 	}
 	
 	@Override
@@ -258,7 +230,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
-		updateShowCreateSynapsePassword();
 	}
 
 	@Override

@@ -16,17 +16,10 @@ public interface AuthenticationController {
 	public void loginUser(String username, String password, AsyncCallback<String> callback);
 	
 	/**
-	 * Logs in the user represented by the token
+	 * revalidates the given session token
 	 * @param token
 	 */
-	public void loginUser(String token, AsyncCallback<String> callback);
-	
-	/**
-	 * Sets the current user 
-	 * @param displayName
-	 * @param token
-	 */
-	public void loginUserSSO(String token, AsyncCallback<String> callback);
+	public void revalidateSession(String token, AsyncCallback<String> callback);
 	
 	/**
 	 * Terminates the session of the current user
@@ -51,12 +44,6 @@ public interface AuthenticationController {
 	 * @return
 	 */
 	public String getCurrentUserSessionToken();
-	
-	/**
-	 * Get the current SSO status
-	 * @return
-	 */
-	public boolean getCurrentUserIsSSO();		
 	
 	/**
 	 * Get the UserSessionData object 

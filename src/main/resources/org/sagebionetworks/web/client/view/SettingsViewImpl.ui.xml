@@ -38,19 +38,6 @@
 					</g:SimplePanel>
 				</div>
 				<div class="col-md-6">
-				    <div ui:field="setupSynapsePasswordUI">
-					    <div class="highlight-box margin-bottom-40" title="Setup a Synapse Password">
-							<div>
-								<p>To login to this website without using a Google account or to
-									use the Synapse Programmatic Clients/REST API,
-									you will need to either have a Synapse specific password or use your
-									API key. To setup a Synapse password, click the button below. It
-									will send you an email
-									with instructions on how to complete the process.</p>
-									<g:Button ui:field="createPasswordButton" styleName="btn btn-default margin-top-10">Create Synapse Password</g:Button>
-							</div>
-						</div>
-					</div>
 					<div ui:field="changeSynapsePasswordUI">
 					    <div class="highlight-box margin-bottom-40" title="Change Synapse Password">
 					        <form class="form-horizontal" role="form">
@@ -77,6 +64,7 @@
 								  </div>
 								  <div class="col-sm-12">
 								      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
+								      <g:FlowPanel ui:field="forgotPasswordContainer"/>
 								  </div>
 							</form>
 						</div>
