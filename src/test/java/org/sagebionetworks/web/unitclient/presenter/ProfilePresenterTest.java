@@ -86,7 +86,7 @@ public class ProfilePresenterTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
 		
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockUserService, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -161,33 +161,12 @@ public class ProfilePresenterTest {
 	}
 
 	@Test
-	public void testPublicViewMyProfileRedirect() {
-		//view another user profile
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(place.toToken()).thenReturn(Profile.VIEW_PROFILE_PLACE_TOKEN);
-		profilePresenter.setPlace(place);
-		verify(mockView).showErrorMessage(anyString());
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-	
-
-	@Test
-	public void testPublicEditMyProfileRedirect() {
-		//view another user profile
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		when(place.toToken()).thenReturn(Profile.EDIT_PROFILE_PLACE_TOKEN);
-		profilePresenter.setPlace(place);
-		verify(mockView).showErrorMessage(anyString());
-		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
-	}
-	
-	@Test
 	public void testViewMyProfileNoRedirect() {
 		//view another user profile
 		String myPrincipalId = "456";
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
-		when(place.toToken()).thenReturn(Profile.VIEW_PROFILE_PLACE_TOKEN);
+		when(place.toToken()).thenReturn(myPrincipalId);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
@@ -202,7 +181,8 @@ public class ProfilePresenterTest {
 	public void testEditMyProfileNoRedirect() {
 		//view another user profile
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(place.toToken()).thenReturn(Profile.EDIT_PROFILE_PLACE_TOKEN);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("1");
+		when(place.toToken()).thenReturn("2");
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}

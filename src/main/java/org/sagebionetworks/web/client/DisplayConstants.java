@@ -263,6 +263,7 @@ public class DisplayConstants {
 	public static final String LABEL_TEAM_CREATED = "Team Created";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
+	public static final String TEXT_USER_HOME = "Home";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String UPLOAD_FILE = "Upload File";
 	public static final String LINK_TO_URL = "Link to URL";

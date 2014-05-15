@@ -179,7 +179,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				if (profileUpdatedCallback != null)
 					profileUpdatedCallback.profileUpdateSuccess();
 				else 
-					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 			}
 		};
 		authenticationController.revalidateSession(currentUser.getSession().getSessionToken(), callback);

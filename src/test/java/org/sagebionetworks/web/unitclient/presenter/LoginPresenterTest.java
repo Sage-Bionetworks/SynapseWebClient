@@ -116,6 +116,7 @@ public class LoginPresenterTest {
 		LoginPlace place = new LoginPlace(LoginPlace.LOGOUT_TOKEN);
 		loginPresenter.setPlace(place);
 		verify(mockView).showLogout();
+		verify(mockAuthenticationController).logoutUser();
 	}
 
 	@Test 

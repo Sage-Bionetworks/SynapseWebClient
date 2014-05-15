@@ -34,9 +34,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 		
 		void redirectToLinkedIn();
 		
-		void redirectToEditProfile();
+		void showEditProfile();
 		
-		void redirectToViewProfile();
+		void showViewMyProfile();
 		
 		void goTo(Place place);
 		

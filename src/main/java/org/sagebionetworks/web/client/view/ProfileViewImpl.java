@@ -39,7 +39,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -175,7 +174,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 					@Override
 					public void invoke() {
 						//refresh the view after accepting/ignoring
-						presenter.redirectToViewProfile();
+						presenter.showViewMyProfile();
 					}
 				}, (CallbackP)null);
 				
@@ -196,7 +195,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editProfileButton.addClickHandler(new ClickHandler() {
 	    	@Override
 			public void onClick(ClickEvent event) {
-	    		presenter.redirectToEditProfile();
+	    		presenter.showEditProfile();
 	    	}
 	    });
 		editProfileButton.addStyleName("right btn-xs margin-left-5");
