@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -44,7 +43,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
@@ -57,7 +55,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
-			UserAccountServiceAsync userService,
 			LinkedInServiceAsync linkedInService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
@@ -68,7 +65,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
 		this.linkedInService = linkedInService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
@@ -125,13 +121,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	@Override
-	public void redirectToEditProfile() {
-		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_PLACE_TOKEN));
+	public void showEditProfile() {
+		updateProfileView(authenticationController.getCurrentUserPrincipalId(), true);
 	}
 	@Override
-	public void redirectToViewProfile() {
-		globalApplicationState.setIsEditing(false);
-		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+	public void showViewMyProfile() {
+		updateProfileView(authenticationController.getCurrentUserPrincipalId(), false);
 	}
 
 	@Override
@@ -175,23 +170,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	private void updateProfileView(boolean editable) {
-		globalApplicationState.setIsEditing(editable);
-		updateProfileView(null, editable);
-	}
-	
 	private void updateProfileView(final String userId, final boolean editable) {
 		view.clear();
-		final boolean isOwner = userId == null;
+		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
+		globalApplicationState.setIsEditing(editable);
 		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
 						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
-						if (isOwner)
+						if (isOwner) {
 							ownerProfile = profile;
-						profileForm.configure(profile, profileUpdatedCallback);
+							//only configure the profile form (editor) if owner of this profile
+							profileForm.configure(profile, profileUpdatedCallback);
+						}
 						
 						AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 							@Override
@@ -256,7 +249,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			public void continueToViewProfile() {
-				redirectToViewProfile();
+				showViewMyProfile();
 				view.refreshHeader();
 			}
 			
@@ -279,17 +272,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void showView(Profile place) {
 		setupProfileFormCallback();
 		String token = place.toToken();
-		if (Profile.VIEW_PROFILE_PLACE_TOKEN.equals(token)) {
-			//View (my) profile
-			//must be logged in
-			loggedInCheck();
-			updateProfileView(false);
-		}
-		else if (Profile.EDIT_PROFILE_PLACE_TOKEN.equals(token)) {
-			//Edit my profile (current user must equal the profile being displayed)
-			//must be logged in
-			loggedInCheck();
-			updateProfileView(true);
+		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(token)) {
+			//View my profile
+			updateProfileView(token, false);
 		}
 		else if(!"".equals(token) && token != null) {
 			//if this contains an oauth_token, it's from linkedin

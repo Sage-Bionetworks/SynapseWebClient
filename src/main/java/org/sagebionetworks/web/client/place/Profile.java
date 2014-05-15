@@ -7,9 +7,7 @@ import com.google.gwt.place.shared.Prefix;
 public class Profile extends Place{
 	
 	private String token;
-	public static final String EDIT_PROFILE_PLACE_TOKEN = "e";
-	public static final String VIEW_PROFILE_PLACE_TOKEN = "v";
-
+	
 	public Profile(String token) {
 		this.token = token;
 	}

@@ -188,7 +188,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 				}
 			});
 		}
@@ -224,9 +224,22 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 				}
 			});
-		 			
+        	
+        	HTML dashboard = new HTML(DisplayUtils.getIcon("glyphicon-home"));
+        	dashboard.addStyleName("displayInline imageButton margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, dashboard, DisplayConstants.TEXT_USER_HOME, TOOLTIP_POSITION.BOTTOM);
+        	dashboard.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+				}
+			});
+		 	boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+        	if (isInTestWebsite) 
+		 		userCommands.add(dashboard);
 			userCommands.add(userGuide);
-		 	userCommands.add(settings);
+			if (!isInTestWebsite) //settings will be in the dashboard, not in the header
+				userCommands.add(settings);
 		 	userCommands.add(logout);
 		}
 		

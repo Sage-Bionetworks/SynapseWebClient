@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -129,7 +130,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			EntityTreeBrowser favoritesTreeBrowser,
 			MyEvaluationEntitiesList myEvaluationsList,
 			CookieProvider cookies,
-			TeamListWidget teamsListWidget) {
+			TeamListWidget teamsListWidget,
+			final AuthenticationController authController) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -198,7 +200,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		userProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
 			}
 		});
 	}
