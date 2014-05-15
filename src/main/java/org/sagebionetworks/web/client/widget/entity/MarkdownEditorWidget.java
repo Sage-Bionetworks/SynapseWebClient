@@ -56,6 +56,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.cookies = cookies;
+		view.setPresenter(this);
 	}
 	
 	/**
