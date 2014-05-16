@@ -260,7 +260,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		bar.setAlignment(HorizontalAlignment.RIGHT);
 		bar.add(uploadBtn);
 		if(showCancelButton) {
-			cancelBtn = new Button(DisplayConstants.CLOSE);
+			cancelBtn = new Button(DisplayConstants.BUTTON_CANCEL);
 			cancelBtn.setHeight(BUTTON_HEIGHT_PX);
 			cancelBtn.setWidth(BUTTON_WIDTH_PX);			
 			cancelBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
