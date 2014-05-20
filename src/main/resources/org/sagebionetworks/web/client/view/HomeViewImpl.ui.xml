@@ -85,16 +85,6 @@
 				<g:SimplePanel ui:field="projectPanel" />
 			</div> <!-- end row -->				
 			
-			<!-- Heartbleed warning -->
-			<div class="row margin-top-15">				
-				<div class="alert alert-info">
-					<h5>
-						<span class="glyphicon glyphicon-exclamation-sign"></span>
-						<a href="#!Synapse:syn2400878"><strong>Security: Heartbleed vulnerability</strong> - Important information on the recent internet security vulnerability and what we're doing to address it.</a>
-					</h5>
-				</div>
-			</div>
-
 			<!-- SEARCH BOX -->
 			<div class="row margin-top-15">
 				<h3>Search Synapse</h3>
