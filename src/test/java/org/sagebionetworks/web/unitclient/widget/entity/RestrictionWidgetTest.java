@@ -9,8 +9,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.RSSFeed;
+import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -34,12 +38,14 @@ import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView;
+import org.sagebionetworks.web.shared.EntityWrapper;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RestrictionWidgetTest {
 
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	RestrictionWidgetView mockView;
 	EntitySchemaCache mockSchemaCache;
@@ -54,12 +60,11 @@ public class RestrictionWidgetTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<String> emailAddresses;
 	IconsImageBundle mockIcons;
-	
+	Long testAccessRequirementId = 92837L;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockIcons = mock(IconsImageBundle.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(RestrictionWidgetView.class);
@@ -94,7 +99,7 @@ public class RestrictionWidgetTest {
 
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setId(101L);
+		accessRequirement.setId(testAccessRequirementId);
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
 		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
@@ -159,6 +164,19 @@ public class RestrictionWidgetTest {
 		widget.showNextAccessRequirement(false, hasAdministrativeAccess, mockIconsImageBundle, emptyCallback, emptyCallback, null);
 		verify(mockView, never()).showAccessRequirement(any(RESTRICTION_LEVEL.class), any(APPROVAL_TYPE.class), anyBoolean(), anyBoolean(), anyBoolean(), any(IconsImageBundle.class), anyString(), any(Callback.class), any(Callback.class), any(Callback.class), any(Callback.class), anyString(), any(Callback.class));
 		verify(mockView).showVerifyDataSensitiveDialog(any(Callback.class));
+	}
+	
+	@Test
+	public void testAccessRequirementCallback() throws JSONObjectAdapterException {
+		Callback arCallback = widget.accessRequirementCallback(bundle.getAccessRequirements().get(0));
+		arCallback.invoke();
+		
+		ArgumentCaptor<EntityWrapper> entityWrapperCaptor = ArgumentCaptor.forClass(EntityWrapper.class);
+		verify(mockSynapseClient).createAccessApproval(entityWrapperCaptor.capture(), any(AsyncCallback.class));
+		EntityWrapper wrapper = entityWrapperCaptor.getValue();
+		String accessApprovalJson = wrapper.getEntityJson();
+		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval(adapterFactory.createNew(accessApprovalJson));
+		assertEquals(testAccessRequirementId, approval.getRequirementId());
 	}
 	
 	
