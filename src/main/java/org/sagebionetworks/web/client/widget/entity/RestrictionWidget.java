@@ -162,7 +162,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		currentAR = selectNextAccessRequirement();
 	}
 
-	public Callback accessRequirementCallback() {
+	public Callback accessRequirementCallback(final AccessRequirement ar) {
 		if (APPROVAL_TYPE.USER_AGREEMENT!=GovernanceServiceHelper.accessRequirementApprovalType(getAccessRequirement())) 
 			throw new IllegalStateException("not a 'User Agreement' requirement type");
 		return new Callback() {
@@ -170,7 +170,6 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			public void invoke() {
 				// create the self-signed access approval, then update this object
 				String principalId = getUserProfile().getOwnerId();
-				AccessRequirement ar = getAccessRequirement();
 				Callback onSuccess = new Callback() {
 					@Override
 					public void invoke() {
@@ -274,7 +273,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			if (approvalType!=APPROVAL_TYPE.NONE) {
 				accessRequirementText = accessRequirementText();
 				if (approvalType==APPROVAL_TYPE.USER_AGREEMENT) {
-					touAcceptanceCallback = accessRequirementCallback();
+					touAcceptanceCallback = accessRequirementCallback(currentAR);
 				} else { // APPROVAL_TYPE.ACT_APPROVAL
 					// get the Jira link for ACT approval
 					if (!isAnonymous) {
