@@ -203,6 +203,7 @@ public class LoginPresenterTest {
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
 		setMyProfile(profile);
 		loginPresenter.postLoginStep1();
+		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
 		verify(mockView).showLoggingInLoader();
 		verify(mockView).showSetUsernameUI();
 		verify(mockView).hideLoggingInLoader();
