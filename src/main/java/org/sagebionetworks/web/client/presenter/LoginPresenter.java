@@ -192,6 +192,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			public void onSuccess(UserProfile result) {
 				view.hideLoggingInLoader();
 				profile = result;
+				authenticationController.updateCachedProfile(profile);
 				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
 					//set your username
 					view.showSetUsernameUI();
