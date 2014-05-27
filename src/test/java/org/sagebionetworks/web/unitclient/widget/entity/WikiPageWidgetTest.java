@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -205,6 +206,15 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 	}
+	
+	@Test
+	public void testCreatePageWithCallback() throws JSONObjectAdapterException{
+		org.sagebionetworks.web.client.utils.Callback onSuccessCallback =  mock(org.sagebionetworks.web.client.utils.Callback.class);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		presenter.createPage("a new wiki page with this title", onSuccessCallback);
+		verify(onSuccessCallback).invoke();
+	}
+
 	
 	@Test
 	public void testCreatePageFailure() throws JSONObjectAdapterException{		
