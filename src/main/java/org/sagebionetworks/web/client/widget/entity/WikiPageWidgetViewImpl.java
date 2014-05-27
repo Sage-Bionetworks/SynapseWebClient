@@ -132,10 +132,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void showNoWikiAvailableUI(boolean isDescription) {
 		clear();
 		this.isDescription = isDescription;
-		SimplePanel createWikiButtonWrapper = new SimplePanel();		
-		Button insertBtn = createInsertOrAddPageButton(true);		
-		createWikiButtonWrapper.add(insertBtn);
-		add(createWikiButtonWrapper);
+		if (!isDescription) {
+			SimplePanel createWikiButtonWrapper = new SimplePanel();		
+			Button insertBtn = createInsertOrAddPageButton(true);		
+			createWikiButtonWrapper.add(insertBtn);
+			add(createWikiButtonWrapper);
+		}
 	}
 	
 	@Override
@@ -456,7 +458,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private String getInsertBtnText(final boolean isFirstPage) {
 		String buttonText;
 		if(isFirstPage) {
-			buttonText = isDescription ? DisplayConstants.ADD_DESCRIPTION : DisplayConstants.CREATE_WIKI;
+			buttonText = DisplayConstants.CREATE_WIKI;
 		} else {
 			buttonText = DisplayConstants.ADD_PAGE;
 		}

@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -387,7 +388,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, true, null);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Preview & Provenance Row
 		row = DisplayUtils.createRowContainer();
@@ -482,7 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, false));
 		// Wiki		
-		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, true, null);
+		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId,  null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
@@ -535,7 +536,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 
 		// Wiki Tab: Wiki
-		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, false, area);
+		addWikiPageWidget(wikiTabContainer, bundle, canEdit, wikiPageId, area);
 		// Padding Bottom
 		wikiTabContainer.add(createBottomPadding());
 		
@@ -616,14 +617,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		currentTabContainer.layout(true);							
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, boolean marginTop, final Synapse.EntityArea area) {
+	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
 			Widget wikiW = wikiPageWidget.asWidget();
 			final SimplePanel wrapper = new SimplePanel(wikiW);
 			wrapper.addStyleName("panel panel-default panel-body margin-bottom-0-imp");
-			if(marginTop) wrapper.addStyleName("margin-top-15");
+			if(!isProject) wrapper.addStyleName("margin-top-15");
 			container.add(wrapper);
 			wikiPageWidget.configure(new WikiPageKey(bundle.getEntity().getId(), ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, new WikiPageWidget.Callback() {
 				@Override
@@ -638,10 +639,23 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 							setTabSelected(Synapse.EntityArea.FILES, false);
 						}
 					} else {
-						if(!canEdit) {
-							// hide description area for those who can't edit
-							wrapper.setVisible(false);
-						}
+						// hide description area, and add description command in the Tools menu
+						wrapper.setVisible(false);
+						actionMenu.showAddDescriptionCommand(new Callback() {
+							@Override
+							public void invoke() {
+								wikiPageWidget.createPage(DisplayConstants.DEFAULT_ROOT_WIKI_NAME, new Callback() {
+									
+									@Override
+									public void invoke() {
+										//if successful, then show the wiki page and remove the special command from the action menu
+										wrapper.setVisible(true);
+										actionMenu.hideAddDescriptionCommand();
+									}
+								});
+								
+							}
+						});
 					}
 				}
 			}, true);
@@ -706,7 +720,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				
 		// Wiki
 		String wikiPageId = null; // TODO : pull from entity
-		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, true, null);
+		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Table
 		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();

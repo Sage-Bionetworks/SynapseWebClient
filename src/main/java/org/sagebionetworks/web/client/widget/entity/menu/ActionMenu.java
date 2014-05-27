@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
@@ -129,6 +130,13 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityBundle = null;		
 	}
 
+	public void showAddDescriptionCommand(Callback onClick) {
+		view.showAddDescriptionCommand(onClick);
+	}
+	public void hideAddDescriptionCommand() {
+		view.hideAddDescriptionCommand();
+	}
+	
 	/**
 	 * Does nothing. Use asWidget(Entity)
 	 */

@@ -260,9 +260,12 @@ SynapseWidgetPresenter {
 		setIsEditing(true);
 	}
 	 
-
 	@Override
 	public void createPage(final String name) {
+		createPage(name, null);
+	}
+	
+	public void createPage(final String name, final org.sagebionetworks.web.client.utils.Callback onSuccess) {
 		WikiPage page = new WikiPage();
 		//if this is creating the root wiki, then refresh the full page
 		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
@@ -274,13 +277,16 @@ SynapseWidgetPresenter {
             synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
                 @Override
                 public void onSuccess(String result) {
-                    if (isCreatingWiki) {
+                	if (isCreatingWiki) {
                         String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
                         view.showInfo( type + " Created", "");
                     } else {
                         view.showInfo("Page '" + name + "' Added", "");
                     }
-                    
+                	if (onSuccess != null) {
+                		onSuccess.invoke();
+                	}
+                        
                     refresh();
                 }
                 

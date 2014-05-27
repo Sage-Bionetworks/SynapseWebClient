@@ -11,9 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -51,37 +49,30 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
 	private Uploader uploader;
 	private EntityTypeProvider typeProvider;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
-	private EntityBundle entityBundle;
-	private Long versionNumber;
-	private boolean isInTestMode;
 	
 	private Button shareButton;	
 	private DropdownButton toolsButton;
 	private PublicPrivateBadge publicPrivateBadge;
 	private String typeDisplay;
+	private Anchor addDescriptionCommand;
+	private Callback addDescriptionCallback;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, 
 			AccessControlListEditor accessControlListEditor,
 			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
-			SynapseJSNIUtils synapseJSNIUtils,
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
 			PublicPrivateBadge publicPrivateBadge) {
 		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
 		this.typeProvider = typeProvider;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;
 	}
@@ -97,9 +88,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
 		if(shareButton != null) this.remove(shareButton);
-		this.versionNumber = versionNumber;
-		this.entityBundle = entityBundle;
-		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 		typeDisplay = typeProvider.getEntityDispalyName(entityType);
 				
@@ -188,6 +176,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		// upload
 		if(canEdit) {
 			addRenameItem(toolsButton);
+			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
@@ -377,6 +366,33 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		});
 		menuBtn.addMenuItem(a);	}
+
+	@Override
+	public void showAddDescriptionCommand(Callback onClick) {
+		addDescriptionCallback = onClick;
+		addDescriptionCommand.setVisible(true);
+	}
+	
+	@Override
+	public void hideAddDescriptionCommand() {
+		addDescriptionCommand.setVisible(false);
+	}
+
+	private void initAddDescriptionItem(DropdownButton menuBtn) {
+		addDescriptionCommand = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-plus") + " "
+				+ DisplayConstants.ADD_DESCRIPTION));
+
+		hideAddDescriptionCommand();
+		addDescriptionCallback = null;
+		addDescriptionCommand.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if (addDescriptionCallback != null)
+					addDescriptionCallback.invoke();
+			}
+		});
+		menuBtn.addMenuItem(addDescriptionCommand);
+	}
 }
 
 
