@@ -567,6 +567,11 @@ public class DisplayConstants {
 	public static final String ADD_FOLDER = "Add Folder";
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
+	public static final String PROJECTS = "Projects";
+	public static final String CHALLENGES = "Challenges";
+	public static final String TEAMS = "Teams";
+	public static final String MESSAGES = "Messages";
+	public static final String SETTINGS = "Settings";
 	public static final String CHALLENGE_ADMIN = "Challenge Admin";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String ERROR_FOLDER_RENAME_FAILED = "Setting the folder name failed.";

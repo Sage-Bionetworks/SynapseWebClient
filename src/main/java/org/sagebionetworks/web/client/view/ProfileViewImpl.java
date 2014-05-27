@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -27,6 +28,9 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -75,6 +79,34 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editPictureButtonPanel;
 	
+	//////Tabs
+	@UiField
+	Anchor projectsLink;
+	@UiField
+	LIElement projectsListItem;
+	@UiField
+	Anchor challengesLink;
+	@UiField
+	LIElement challengesListItem;
+	@UiField
+	Anchor teamsLink;
+	@UiField
+	LIElement teamsListItem;
+	@UiField
+	Anchor messagesLink;
+	@UiField
+	LIElement messagesListItem;
+	@UiField
+	Anchor settingsLink;
+	@UiField
+	LIElement settingsListItem;
+
+	@UiField
+	DivElement navtabContainer;
+	
+	private Synapse.ProfileArea currentArea;
+	
+	private SimplePanel currentTabContainer, projectsTabContainer, challengesTabContainer, teamsTabContainer, messagesTabContainer, settingsTabContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -129,9 +161,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createEditProfileCommandsPanel();
 		
 		picturePanel.clear();
+		initTabs();
 	}
 	
-			@Override
+	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
@@ -395,5 +428,102 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editPicturePanel.clear();
 		editPictureButtonPanel.clear();
 		certificatePanel.setVisible(false);
+	}
+	
+	
+	/**
+	 * Used only for setting the view's tab display
+	 * @param targetTab
+	 * @param userSelected 
+	 */
+	private void setTabSelected(Synapse.ProfileArea targetTab) {
+		// tell presenter what tab we're on only if the user clicked
+		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
+		
+		projectsListItem.removeClassName("active");
+		projectsLink.addStyleName("link");
+		challengesListItem.removeClassName("active");
+		challengesLink.addStyleName("link");
+		teamsListItem.removeClassName("active");
+		teamsLink.addStyleName("link");
+		messagesListItem.removeClassName("active");
+		messagesLink.addStyleName("link");
+		settingsListItem.removeClassName("active");
+		settingsLink.addStyleName("link");
+		
+		LIElement tab; 
+		Anchor link;
+		SimplePanel targetContainer;
+		
+		if (targetTab == Synapse.ProfileArea.PROJECTS) {
+			tab = projectsListItem;
+			link = projectsLink;
+			targetContainer = projectsTabContainer;
+		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
+			tab = challengesListItem;
+			link = challengesLink;
+			targetContainer = challengesTabContainer;
+		} else if(targetTab == Synapse.ProfileArea.TEAMS) {
+			tab = teamsListItem;
+			link = teamsLink;
+			targetContainer = teamsTabContainer;
+		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
+			tab = messagesListItem;
+			link = messagesLink;
+			targetContainer = messagesTabContainer;
+		} else if(targetTab == Synapse.ProfileArea.SETTINGS) {
+			tab = settingsListItem;
+			link = settingsLink;
+			targetContainer = settingsTabContainer;
+		} else {
+			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
+			return;
+		}
+		
+		link.removeStyleName("link");
+		tab.addClassName("active");
+		
+		currentTabContainer.clear();
+		currentTabContainer.setWidget(targetContainer);
+	}
+	
+	private void initTabs() {
+		currentTabContainer = new SimplePanel();
+		currentTabContainer.addStyleName("tab-background margin-left-neg-15 margin-right-neg-15");
+		projectsTabContainer = new SimplePanel();
+		projectsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
+		challengesTabContainer = new SimplePanel();
+		challengesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
+		teamsTabContainer = new SimplePanel();
+		teamsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
+		messagesTabContainer = new SimplePanel();
+		messagesTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
+		settingsTabContainer = new SimplePanel();
+		settingsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
+		
+		projectsLink.setText(DisplayConstants.PROJECTS);
+		projectsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
+		
+		challengesLink.setText(DisplayConstants.CHALLENGES);
+		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		
+		teamsLink.setText(DisplayConstants.TEAMS);
+		teamsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
+		
+		messagesLink.setText(DisplayConstants.MESSAGES);
+		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
+		
+		settingsLink.setText(DisplayConstants.SETTINGS);
+		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
+	}
+	
+	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				setTabSelected(targetTab);					
+				currentArea = targetTab;
+			}
+		};
 	}
 }

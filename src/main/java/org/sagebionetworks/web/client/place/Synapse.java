@@ -144,6 +144,7 @@ public class Synapse extends Place{
     }
 
 	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
+	public static enum ProfileArea { PROJECTS, CHALLENGES, TEAMS, MESSAGES, SETTINGS }
 
 	@Override
 	public int hashCode() {
