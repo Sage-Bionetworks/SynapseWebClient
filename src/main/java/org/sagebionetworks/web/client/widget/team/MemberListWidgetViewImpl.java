@@ -56,7 +56,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		memberSearchContainer = new SimplePanel();
 		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
-		mainContainer.setTitle(DisplayConstants.MEMBERS);
+		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.MEMBERS);
 	}
 	
 	@Override

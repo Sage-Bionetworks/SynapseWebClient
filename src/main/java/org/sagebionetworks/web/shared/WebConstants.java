@@ -215,4 +215,6 @@ public class WebConstants {
 	public static final String PRAGMA_KEY = "Pragma";
 	public static final String CACHE_CONTROL_VALUE_NO_CACHE = "private, no-store, no-cache, must-revalidate";
 	public static final String CACHE_CONTROL_KEY = "Cache-Control";
+
+	public static final String HIGHLIGHT_BOX_TITLE = "highlight-box-title";
 }

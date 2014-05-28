@@ -116,6 +116,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		
 		tutorialButton1.addClickHandler(gotoGettingStartedNewWindow);
 		tutorialButton2.addClickHandler(gotoGettingStarted);
+		quizHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Certification Quiz");
 	}
 
 	@Override
@@ -162,7 +163,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void showQuiz(Quiz quiz) {
 		hideAll();
 		if (quiz.getHeader() != null)
-			quizHighlightBox.setAttribute("title", quiz.getHeader());
+			quizHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, quiz.getHeader());
 		//clear old questions
 		clear();
 		List<Question> questions = quiz.getQuestions();

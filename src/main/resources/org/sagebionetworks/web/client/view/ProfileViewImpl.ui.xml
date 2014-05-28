@@ -34,7 +34,7 @@
 				</div>
 				<div class="col-md-9 col-sm-8 col-xs-12">
 					<g:SimplePanel ui:field="viewProfilePanel" />
-							<g:SimplePanel ui:field="myTeamsPanel" styleName="highlight-box" title="Teams"/>
+							<g:SimplePanel ui:field="myTeamsPanel" styleName="highlight-box"/>
 					<g:SimplePanel ui:field="myTeamInvitesPanel" />
 				</div>
 			</div>

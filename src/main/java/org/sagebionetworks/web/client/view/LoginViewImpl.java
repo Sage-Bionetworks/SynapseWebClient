@@ -19,6 +19,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -59,6 +60,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	//terms of service view
 	@UiField
 	HTMLPanel termsOfServiceView;
+	@UiField
+	DivElement termsOfServiceHighlightBox;
 	@UiField
 	CheckBox actEthicallyCb;
 	@UiField
@@ -143,6 +146,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			}
 		});
 		toUInitialized = false;
+		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
 
 	@Override

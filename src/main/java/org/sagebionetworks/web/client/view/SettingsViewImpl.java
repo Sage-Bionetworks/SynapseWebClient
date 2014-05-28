@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
@@ -38,6 +39,10 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	@UiField
 	DivElement changeSynapsePasswordUI;
+	@UiField
+	DivElement changeSynapsePasswordHighlightBox;
+	@UiField
+	DivElement apiKeyHighlightBox;
 	
 	@UiField
 	FlowPanel forgotPasswordContainer;
@@ -90,7 +95,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public SettingsViewImpl(SettingsViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, Breadcrumb breadcrumb) {		
 		initWidget(binder.createAndBindUi(this));
-
+		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.breadcrumb = breadcrumb;
@@ -131,6 +136,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		});
 		forgotPasswordContainer.addStyleName("inline-block");
 		forgotPasswordContainer.add(forgotPasswordLink);
+		notificationsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Email Settings");
+		changeSynapsePasswordHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
+		apiKeyHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 	}
 
 

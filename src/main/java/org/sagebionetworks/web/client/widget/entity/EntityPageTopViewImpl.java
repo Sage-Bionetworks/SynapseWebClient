@@ -445,7 +445,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		previewWidget.configure(bundle);
 		Widget preview = previewWidget.asWidget();
 		preview.addStyleName("highlight-box");
-		preview.setTitle(DisplayConstants.PREVIEW);
+		preview.getElement().setAttribute("highlight-box-title", DisplayConstants.PREVIEW);
 		preview.setHeight(WIDGET_HEIGHT_PX + "px");
 		SimplePanel wrapper = new SimplePanel(preview);
 		wrapper.addStyleName("col-md-6");
