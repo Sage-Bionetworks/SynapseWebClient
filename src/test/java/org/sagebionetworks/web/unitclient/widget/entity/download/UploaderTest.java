@@ -2,7 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.entity.download;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,7 +29,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -404,15 +406,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testChunkCount() {
-		long fileSize = 0L;
-		while(true) {
-			fileSize += 2500;
-			long right = uploader.getChunkCount(fileSize);
-			long wrong = uploader.getChunkCountWrong(fileSize);
-			if (right == wrong)
-				System.out.println("Right: " + fileSize);
-			else
-				System.out.println("Wrong: " + fileSize);
-		}
+		//see SWC-1436
+		assertEquals(2L, uploader.getChunkCount(8404992L));
 	}
 }
