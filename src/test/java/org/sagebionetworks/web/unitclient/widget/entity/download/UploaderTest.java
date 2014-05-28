@@ -401,4 +401,18 @@ public class UploaderTest {
 		inputFilename = "file.tsv";
 		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
 	}
+	
+	@Test
+	public void testChunkCount() {
+		long fileSize = 0L;
+		while(true) {
+			fileSize += 2500;
+			long right = uploader.getChunkCount(fileSize);
+			long wrong = uploader.getChunkCountWrong(fileSize);
+			if (right == wrong)
+				System.out.println("Right: " + fileSize);
+			else
+				System.out.println("Wrong: " + fileSize);
+		}
+	}
 }
