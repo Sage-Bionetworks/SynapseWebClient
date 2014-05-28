@@ -20,7 +20,7 @@
 				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 					    <g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default right" text="Open the Guide"/>
 					</div>
-					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10" title="Certification Quiz">
+					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
 						<form>
 						    <g:FlowPanel ui:field="testContainer">
 						    </g:FlowPanel>

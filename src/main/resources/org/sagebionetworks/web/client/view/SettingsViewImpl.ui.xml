@@ -31,7 +31,7 @@
 			</div>
 			<div class="row">
 			    <div class="col-md-6">
-				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box" title="Email Settings">
+				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box">
 					    <g:FlowPanel styleName="checkbox margin-left-10">
 					       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
 					    </g:FlowPanel>
@@ -39,7 +39,7 @@
 				</div>
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
-					    <div class="highlight-box margin-bottom-40" title="Change Synapse Password">
+					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-40">
 					        <form class="form-horizontal" role="form">
 					   			  <div ui:field="currentPassword" class="form-group row">
 								    <label class="col-sm-3 control-label">Current password</label>
@@ -73,7 +73,7 @@
 			</div>
 			
 			
-			<div class="highlight-box margin-bottom-40" title="Synapse API Key">
+			<div ui:field="apiKeyHighlightBox" class="highlight-box margin-bottom-40">
 				<p>Using an API key allows you to authenticate your scripts for an
 					indefinite amount of time. It is important that you treat your API
 					key with

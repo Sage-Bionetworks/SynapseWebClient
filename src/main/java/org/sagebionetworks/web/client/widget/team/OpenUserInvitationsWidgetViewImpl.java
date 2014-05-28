@@ -43,7 +43,7 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 		this.ginInjector = ginInjector;
 		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
-		mainContainer.setTitle(DisplayConstants.PENDING_INVITATIONS);
+		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 	}
 	
 	

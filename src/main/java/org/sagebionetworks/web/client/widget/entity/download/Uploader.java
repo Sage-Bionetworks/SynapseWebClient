@@ -233,7 +233,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					try {
 						token = nodeModelCreator.createJSONEntity(result, ChunkedFileToken.class);
 						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
-						long totalChunkCount = (long)Math.ceil(fileSize / BYTES_PER_CHUNK);;
+						long totalChunkCount = getChunkCount(fileSize);
 						view.showProgressBar();
 						directUploadStep2(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
@@ -250,6 +250,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	public long getChunkCount(long fileSize) {
+		return (long)Math.ceil((double)fileSize / (double)BYTES_PER_CHUNK);
+	}
 
 	/**
 	 * 

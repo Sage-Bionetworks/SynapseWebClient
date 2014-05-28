@@ -19,6 +19,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -178,9 +179,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 			annotationAnimation.setShowConfig(showConfig);
 			showAnnotations.setText(DisplayConstants.SHOW_LC);
 			
-			LayoutContainer wrap = new LayoutContainer();
+			FlowPanel wrap = new FlowPanel();
 			wrap.addStyleName("highlight-box margin-bottom-15");
-			wrap.setTitle(DisplayConstants.ANNOTATIONS);
+			wrap.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 			wrap.add(annotationsWidget.asWidget());
 			annotationsContent.add(wrap);
 			

@@ -29,7 +29,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 		this.sageImageBundle = sageImageBundle;
 		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
-		mainContainer.setTitle(DisplayConstants.PENDING_TEAM_INVITATIONS);
+		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_TEAM_INVITATIONS);
 	}
 	
 	@Override

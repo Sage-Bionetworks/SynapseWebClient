@@ -128,6 +128,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		createEditProfileCommandsPanel();
 		
+		myTeamsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
+		
 		picturePanel.clear();
 	}
 	

@@ -1289,7 +1289,7 @@ ol.lowerroman {
 }
 
 .highlight-box::after {
-    content: attr(title);
+    content: attr(highlight-box-title);
     position: absolute;
     top: 6px;
     left: 6px;
