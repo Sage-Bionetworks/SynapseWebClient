@@ -108,7 +108,15 @@ public class UserGroupSearchBox {
 				}
 			});
 		}
-		
+		loader.addListener(Loader.LoadException, new Listener<LoadEvent>() {
+			@Override
+			public void handleEvent(LoadEvent be) {
+				if (be.exception != null) {
+					DisplayUtils.showErrorMessage(be.exception.getMessage());
+				}
+				
+			}
+		});
 		ListStore<ModelData> store = new ListStore<ModelData>(loader);
 
 		ComboBox<ModelData> combo = new ComboBox<ModelData>();
@@ -175,9 +183,7 @@ public class UserGroupSearchBox {
 			    '</tpl>',
 				'<span class="search-item movedown-1 margin-right-5">',
 				'<span class="font-italic">{firstName} {lastName} </span> ',
-				'<tpl if="!userName.indexOf(\'TEMPORARY-\') == 0">',
-					'{userName}',
-				'</tpl>',
+				'<span>{userName} </span> ',
 				'</span>',
 				'<tpl if="!isIndividual">',
 			        '(Team)',
