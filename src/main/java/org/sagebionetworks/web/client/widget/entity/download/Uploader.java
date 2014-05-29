@@ -253,7 +253,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public long getChunkCount(long fileSize) {
 		return (long)Math.ceil((double)fileSize / (double)BYTES_PER_CHUNK);
 	}
-
 	/**
 	 * 
 	 * @param currentChunkNumber The chunk number that should be uploaded
