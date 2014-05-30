@@ -27,15 +27,12 @@ public interface LoginView extends IsWidget, SynapseView {
 	void showUsernameInvalid();
 	void showUsernameTaken();
 	
-	void showQuizInfoUI();
-	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		void goToLastPlace();
 		void setNewUser(UserSessionData newUser);
 		
 		void setUsername(String newUsername);
-		void setHideQuizReminder(boolean ignoreQuiz);
     }
 	
 }

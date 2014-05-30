@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -124,7 +125,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			loadProjectsAndFavorites();
 			//validate token
 			validateToken();
-		}		
+			//check for user certification
+			checkIfCertified();
+		}
 	}
 		
 	public void validateToken() {
@@ -405,6 +408,20 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}
+			}
+		});
+	}
+	
+	public void checkIfCertified() {
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecordJson) {
+				//show nothing
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) 
+					view.showCertificationReminder(true);
 			}
 		});
 	}
