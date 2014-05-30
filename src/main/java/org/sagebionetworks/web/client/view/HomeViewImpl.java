@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -32,6 +33,8 @@ import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -48,6 +51,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
@@ -105,6 +109,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Anchor restApiLink;
 	
+	@UiField
+	DivElement certificationReminderUI;
+	@UiField
+	SpanElement countdownUI;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -117,6 +126,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private CookieProvider cookies;
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
+	
+	private static final Date LOCKDOWN = new Date(114, 9, 1);; 
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -233,7 +244,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-
+		showCertificationReminder(false);
+		
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
 		if(isLoggedIn) {
@@ -244,7 +256,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 			whatIsSynapseContainer.setVisible(true);
 			getStartedContainer.setVisible(true);
 			projectPanel.clear();
-		}		
+		}
+		updateCountdownUI();
+	}
+
+	private int getDaysRemaining() {
+		return CalendarUtil.getDaysBetween(new Date(), LOCKDOWN);
+	}
+	private void updateCountdownUI() {
+		countdownUI.setInnerHTML(getDaysRemaining() + " days remaining");
 	}
 	
 	@Override
@@ -454,6 +474,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 
 	@Override
 	public void setFavoritesError(String string) {
+	}
+	
+	@Override
+	public void showCertificationReminder(boolean visible) {
+		if (visible && 
+			DisplayUtils.isInTestWebsite(cookies) && //remove line once internal testing has concluded
+			getDaysRemaining() > 0)
+			certificationReminderUI.removeClassName("hide");
+		else
+			certificationReminderUI.addClassName("hide");
 	}
 	
 	private void fillProgrammaticClientInstallCode() {

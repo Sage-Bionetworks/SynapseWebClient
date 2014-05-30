@@ -6,9 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
@@ -79,22 +77,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	
-	//quiz info view
-	@UiField
-	HTMLPanel quizInfoView;
-	@UiField
-	SpanElement quizInfoLabel;
-	@UiField
-	SpanElement moreQuizInfoLabel;
-	@UiField
-	CheckBox ignoreQuizCb;
-	@UiField
-	Button ignoreQuizButton;
-	@UiField
-	Button gotoQuizButton;
-
-	
-		private Presenter presenter;
+	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
@@ -129,22 +112,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 			}
 		});
 		
-		quizInfoLabel.setInnerHTML(DisplayConstants.QUIZ_INFO);
-		moreQuizInfoLabel.setInnerHTML(WebConstants.QUIZ_MORE_INFO);
-		gotoQuizButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.setHideQuizReminder(ignoreQuizCb.getValue());
-				presenter.goTo(new Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
-			}
-		});
-		ignoreQuizButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.setHideQuizReminder(ignoreQuizCb.getValue());
-				presenter.goToLastPlace();
-			}
-		});
 		toUInitialized = false;
 		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
@@ -288,7 +255,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginView.setVisible(false);
 		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
-		quizInfoView.setVisible(false);
 	}
 	
 	@Override
@@ -296,13 +262,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		hideViews();
 		username.setValue("");
 		changeUsernameView.setVisible(true);
-	}
-	
-	@Override
-	public void showQuizInfoUI() {
-		hideViews();
-		ignoreQuizCb.setValue(false);
-		quizInfoView.setVisible(true);
 	}
 	
 	@Override
