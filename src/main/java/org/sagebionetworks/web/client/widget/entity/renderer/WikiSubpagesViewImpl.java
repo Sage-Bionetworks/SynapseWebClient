@@ -29,9 +29,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private Presenter presenter;
 	private GlobalApplicationState globalAppState;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3";
-	private static final String SHOW_SUBPAGES_MD_STYLE="col-md-9";
-	private static final String HIDE_SUBPAGES_STYLE="col-xs-12 col-md-12";
-	private static final String HIDE_SUBPAGES_MD_STYLE="col-md-12";
+	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
+	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
+	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
 	
 	private Button showHideButton;
 	private LayoutContainer ulContainer;
