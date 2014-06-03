@@ -125,12 +125,17 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		changeUsernameButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				changeUsernameButton.addStyleName("disabled");
-				changeUsernameUi.removeClassName("hide");
+				showChangeUsernameUI();
 			}
 		});
 		changeUsernameUi.addClassName("hide");
 	 }
+	 
+	 private void showChangeUsernameUI(){
+		changeUsernameButton.addStyleName("disabled");
+		changeUsernameUi.removeClassName("hide");
+	 }
+	 
 	 @Override
 	 public void showInvalidUrlUi() {
 		 userUpdateFailed();
@@ -169,6 +174,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		 if (DisplayUtils.isTemporaryUsername(profile.getUserName())) {
 			 userNameField.setValue("");
 			 userNameHeading.setInnerText("");
+			 showChangeUsernameUI();
+			 showInvalidUsernameUi();
+			 
 		 } else {
 			 userNameField.setValue(profile.getUserName());
 			 userNameHeading.setInnerText(profile.getUserName());	 
