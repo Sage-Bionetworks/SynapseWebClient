@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -134,7 +133,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					@Override
 					public void onSuccess(Void result) {
 						view.showInfo("Successfully updated your username", "");
-						postLoginStep2();
+						goToLastPlace();
 					}
 					
 					@Override
@@ -198,86 +197,18 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showSetUsernameUI();
 				}
 				else {
-					postLoginStep2();
+					goToLastPlace();
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				//could not determine
-				postLoginStep2();
+				goToLastPlace();
 			}
 		});
 	}
 	
-	/**
-	 * Check to see if user is certified
-	 */
-	public void postLoginStep2(){
-		view.showLoggingInLoader();
-		if (!isHideQuizReminder()) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String passingRecordJson) {
-					goToLastPlace();
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if (caught instanceof NotFoundException) {
-						view.hideLoggingInLoader();
-						view.showQuizInfoUI();
-					} else
-						goToLastPlace();
-				}
-			});
-		} else {
-			//don't check, user previously indicated to ignore quiz
-			goToLastPlace();
-		}
-	}
-	
-	public boolean isHideQuizReminder() {
-		//TODO: currently only in test website until tutorial content is ready
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-//			if (profile != null) {
-//				if (profile.getPreferences() != null) {
-//					Boolean hideQuizReminder = profile.getPreferences().getDontShowCertifiedUserReminder();
-//					return hideQuizReminder != null ? hideQuizReminder : false;
-//				} else {
-//					//if the preferences have not been set, then show the certification reminder
-//					return false;
-//				}
-//			} else
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	
-	@Override
-	public void setHideQuizReminder(boolean hideQuizReminder) {
-		//update profile if hiding
-//		if (hideQuizReminder) {
-//			if (profile.getPreferences() == null) 
-//				profile.setPreferences(new UserPreferences());
-//			UserPreferences notificationSettings = profile.getPreferences();
-//			notificationSettings.setDontShowCertifiedUserReminder(hideQuizReminder);
-//			AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
-//				@Override
-//				public void onSuccess(Void result) {
-//					view.showInfo("Successfully updated your preferences", "");
-//				}
-//				
-//				@Override
-//				public void onFailure(Throwable caught) {
-//					view.showErrorMessage(caught.getMessage());
-//				}
-//			};
-//			updateProfile(profile, profileUpdatedCallback);
-//		}
-	}
-
 	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {
 		try { 
 			JSONObjectAdapter adapter = newProfile.writeToJSONObject(jsonObjectAdapter.createNew());

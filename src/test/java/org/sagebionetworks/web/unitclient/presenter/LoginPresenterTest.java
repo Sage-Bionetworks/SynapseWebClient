@@ -90,8 +90,6 @@ public class LoginPresenterTest {
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
-		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	
 	
 	private void setPlace() {
@@ -214,7 +212,7 @@ public class LoginPresenterTest {
 		setPlace();
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		loginPresenter.postLoginStep1();
-		verify(mockView, times(2)).showLoggingInLoader();
+		verify(mockView).showLoggingInLoader();
 		//hides loading UI and continue (go to last place) 
 		verify(mockView).hideLoggingInLoader();
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
@@ -257,7 +255,6 @@ public class LoginPresenterTest {
 		loginPresenter.setUsername("newname");
 		
 		verify(mockSynapseClient, times(2)).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	}
 
 	
@@ -330,75 +327,7 @@ public class LoginPresenterTest {
 		ArgumentCaptor<AcceptTermsOfUseCallback> argument = ArgumentCaptor.forClass(AcceptTermsOfUseCallback.class);
 		//shows terms of use
 		verify(mockView).showTermsOfUse(anyString(), argument.capture());
-		AcceptTermsOfUseCallback callback = argument.getValue();
-		
-		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).signTermsOfUse(anyBoolean(), any(AsyncCallback.class));
-		//user has not passed the certification quiz
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
-		
-		//accept
-		callback.accepted();
-		
-		//make sure we check for certification
-		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
-		//and show the quiz reminder
-		verify(mockView).showQuizInfoUI();
 	}
 
 	
-//	@Test 
-//	public void testIsHideQuizReminder(){
-//		//if not test website, then always hide the reminder (to be removed on initial rollout)
-//		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
-//		assertTrue(loginPresenter.isHideQuizReminder());
-//		
-//		//test website
-//		when(mockCookieProvier.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-//		//with null profile, should not hide
-//		assertFalse(loginPresenter.isHideQuizReminder());
-//
-//		//with profile with null preferences, should not hide
-//		UserProfile profile = new UserProfile();
-//		profile.setOwnerId("1233");
-//		profile.setUserName("valid-username");
-//		loginPresenter.setUserProfile(profile);
-//		assertFalse(loginPresenter.isHideQuizReminder());
-//
-//		//with profile with preferences, but value is not set
-//		UserPreferences preferences = new UserPreferences();
-//		profile.setPreferences(preferences);
-//		assertFalse(loginPresenter.isHideQuizReminder());
-//		
-//		//value is set, to false (so still show)
-//		preferences.setDontShowCertifiedUserReminder(false);
-//		assertFalse(loginPresenter.isHideQuizReminder());
-//		
-//		//finally, if value is set to true, then hide
-//		preferences.setDontShowCertifiedUserReminder(true);
-//		assertTrue(loginPresenter.isHideQuizReminder());
-//	}
-//	
-//	@Test 
-//	public void testSetHideQuizReminder() throws JSONObjectAdapterException{
-//		UserProfile profile = new UserProfile();
-//		profile.setOwnerId("1233");
-//		profile.setUserName("valid-username");
-//		//note that user preferences have not even been initialized
-//		loginPresenter.setUserProfile(profile);
-//		
-//		boolean hideQuizReminder = true;
-//		loginPresenter.setHideQuizReminder(hideQuizReminder);
-//		
-//		//get the user profile json
-//		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-//		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
-//		String profileJson = argument.getValue();
-//		
-//		UserProfile newProfile = new UserProfile(adapterFactory.createNew(profileJson));
-//		//assert user preferences have been initialized
-//		assertNotNull(newProfile.getPreferences());
-//		//and quiz reminder is in the expected state
-//		assertEquals(hideQuizReminder, newProfile.getPreferences().getDontShowCertifiedUserReminder());
-//		
-//	}
 }

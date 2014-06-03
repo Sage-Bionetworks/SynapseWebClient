@@ -14,8 +14,17 @@
 		<g:SimplePanel ui:field="header" styleName="container"/>
 		<div class="separator separator-header-home"></div>
 		
+		<!-- Certification reminder -->
+		<div ui:field="certificationReminderUI" class="row margin-left-15 margin-right-15 margin-top-10">
+	    	<div class="alert alert-info margin-bottom-0-imp">
+				<h5>
+					<span class="glyphicon glyphicon-info-sign"></span>
+					<a href="#!Help:Certification"><strong>Certification</strong> - User certification reminder will go here.  <span ui:field="countdownUI"></span></a>
+				</h5>
+			</div>
+		</div>
 		<!-- TOP 3 COLUMNS -->		
-		<div class="container">
+		<div class="container margin-top-30">
 			<div class="row">
 				<!-- What is Synapse -->
 				<g:HTMLPanel ui:field="whatIsSynapseContainer">
