@@ -8,14 +8,12 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.view.TermsOfUseHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,13 +24,13 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.inject.Inject;
 
 public class LoginWidgetViewImpl extends Composite implements
@@ -52,8 +50,8 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	Button registerBtn;
 	
-	PasswordTextBox password;
-	TextBox username;
+	PasswordTextBox password = null;
+	TextBox username = null;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -82,6 +80,7 @@ public class LoginWidgetViewImpl extends Composite implements
 				presenter.goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));
 			}
 		});
+		
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
 	    username.addStyleName("form-control");
@@ -95,19 +94,10 @@ public class LoginWidgetViewImpl extends Composite implements
 		    public void onKeyDown(KeyDownEvent event) {
 		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
 		        	synapseLoginFieldsContainer.submit();
-		        	signInBtn.fireEvent(new GwtEvent<ClickHandler>() {
-		                @Override
-		                public com.google.gwt.event.shared.GwtEvent.Type<ClickHandler> getAssociatedType() {
-		                	return ClickEvent.getType();
-		                }
-		                @Override
-		                protected void dispatch(ClickHandler handler) {
-		                    handler.onClick(null);
-		                }
-		           });
 		        }
 		    }
 		});
+	
 		FlowPanel loginFieldsPanel = new FlowPanel();
 		loginFieldsPanel.add(username);
 		loginFieldsPanel.add(password);
