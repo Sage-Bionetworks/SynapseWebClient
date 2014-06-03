@@ -210,7 +210,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		// Add the widget to the panel
 		loginWidgetPanel.clear();
 		loginWidgetPanel.add(loginWidget.asWidget());
-		loginWidget.addUserListener(new UserListener() {			
+		loginWidget.setUserListener(new UserListener() {			
 			@Override
 			public void userChanged(UserSessionData newUser) {
 				presenter.setNewUser(newUser);
