@@ -166,8 +166,13 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		 bioField.setValue(profile.getSummary());
 		 locationField.setValue(profile.getLocation());
 		 moreInfoField.setValue(profile.getUrl());
-		 userNameField.setValue(profile.getUserName());
-		 userNameHeading.setInnerText(profile.getUserName());
+		 if (DisplayUtils.isTemporaryUsername(profile.getUserName())) {
+			 userNameField.setValue("");
+			 userNameHeading.setInnerText("");
+		 } else {
+			 userNameField.setValue(profile.getUserName());
+			 userNameHeading.setInnerText(profile.getUserName());	 
+		 }
 	 }
 		 
 
