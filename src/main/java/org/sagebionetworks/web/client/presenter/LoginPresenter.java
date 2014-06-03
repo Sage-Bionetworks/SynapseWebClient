@@ -380,7 +380,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												public void onSuccess(
 														String result) {
 													// Signed ToU. Check for temp username, passing record, and then forward
-													postLoginStep1();
+//													postLoginStep1();
+													//SWC-1447: Instead of any post login checks, go to the last place
+													goToLastPlace();
 												}	
 												
 											});
@@ -410,7 +412,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-						postLoginStep1();
+//						postLoginStep1();
+						//SWC-1447: Instead of any post login checks, go to the last place
+						goToLastPlace();
 					}
 				}
 				@Override
