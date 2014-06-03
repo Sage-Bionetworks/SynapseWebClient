@@ -43,4 +43,6 @@ public interface HomeView extends IsWidget, SynapseView {
 	public void setMyChallengesError(String error);
 	
 	public void showOpenTeamInvitesMessage(Boolean visible);
+	
+	void showCertificationReminder(boolean visible);
 }
