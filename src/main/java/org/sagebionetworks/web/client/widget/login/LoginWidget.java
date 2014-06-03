@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -22,7 +19,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
-	private List<UserListener> listeners = new ArrayList<UserListener>();	
+	private UserListener listener;	
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
 	private NodeModelCreator nodeModelCreator;
@@ -42,8 +39,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		return view.asWidget();
 	}
 	
-	public void addUserListener(UserListener listener){
-		listeners.add(listener);
+	public void setUserListener(UserListener listener){
+		this.listener = listener;
 	}
 	
 	@Override
@@ -84,9 +81,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 
 	// needed?
 	private void fireUserChange(UserSessionData user) {
-		for(UserListener listener: listeners){
+		if (listener != null)
 			listener.userChanged(user);
-		}
 	}
 	
 	public void setOpenIdActionUrl(String url) {
