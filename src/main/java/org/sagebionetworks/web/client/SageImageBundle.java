@@ -94,4 +94,8 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("images/spotlight/TcgaPancancer.jpg")
 	ImageResource tcgaPancancer();
+	
+	@Source("images/certificate.png")
+	ImageResource certificate();
+
 }

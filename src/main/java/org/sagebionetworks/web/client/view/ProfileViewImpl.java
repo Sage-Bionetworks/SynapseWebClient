@@ -34,11 +34,12 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -302,17 +303,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		 if (passingRecord != null) {
-			 Anchor tutorialLink = new Anchor();
-			 tutorialLink.setHTML(DisplayUtils.getIcon("glyphicon-certificate margin-right-5 font-size-22"));
+			 Image tutorialLink = new Image(sageImageBundle.certificate().getSafeUri());
+			 tutorialLink.setHeight("32px");
+			 tutorialLink.setWidth("25px");
+			 tutorialLink.setPixelSize(25, 32);
+			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
 			 certificateWidget.configure(profile, passingRecord);
+			 final PopupPanel tooltip = DisplayUtils.addToolTip(tutorialLink, DisplayConstants.CERTIFIED_USER);
 			 tutorialLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					clear();
 					certificatePanel.setVisible(true);
+					tooltip.hide();
 				}
 			});
-			 
+			
 			profileWidget.add(tutorialLink);
 		 }
 			 

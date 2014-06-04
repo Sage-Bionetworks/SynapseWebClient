@@ -135,6 +135,7 @@ public class DisplayConstants {
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
+	public static final String CERTIFIED_USER="Certified User";
 	public static final String CERTIFICATION_MESSAGE_1="Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse.";
 	public static final String CERTIFICATION_MESSAGE_2="Certified Synapse users are allowed to upload content and access Client API.";
 	public static final String CERTIFICATION_MESSAGE_3="Individuals wishing to gain the certification must:";
