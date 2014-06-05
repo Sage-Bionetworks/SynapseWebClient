@@ -1203,7 +1203,7 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
 
-.bottomright {position:absolute; bottom:0;  margin-bottom:7px; margin:7px; right: 0;}
+.bottomright {position:absolute; bottom:0; right: 0; margin:7px;}
 
 .highlighted-version {
     font-size: 11px !important;
