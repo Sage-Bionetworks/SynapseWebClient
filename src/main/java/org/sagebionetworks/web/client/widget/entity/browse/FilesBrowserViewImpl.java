@@ -125,12 +125,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
 		final Window dialog = new Window();
 		dialog.setMaximizable(false);
-		dialog.setSize(550, 320);
+		dialog.setSize(420, 270);
 		dialog.setPlain(true);
 		dialog.setModal(true);
 		dialog.setLayout(new FitLayout());
 		dialog.setBorders(false);
-		dialog.setHeading("Certification");
+		dialog.setHeading("Join the Synapse Certified User Community");
 
 		quizInfoWidget.configure(new CallbackP<Boolean>() {
 			@Override
