@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -149,7 +150,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	
 	private Cache<MarkdownCacheRequest, String> markdown2HtmlCache = CacheBuilder.newBuilder()
-			.maximumSize(1000)
+			.maximumSize(30) 						//max of 30 pages
+			.expireAfterAccess(1L, TimeUnit.MINUTES)//that expire a minute after they were last accessed
 			.build(
 					new CacheLoader<MarkdownCacheRequest, String>() {
 						public String load(MarkdownCacheRequest key) throws IOException {
