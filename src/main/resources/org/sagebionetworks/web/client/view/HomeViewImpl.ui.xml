@@ -19,8 +19,11 @@
 	    	<div class="alert alert-info margin-bottom-0-imp">
 				<h5>
 					<span class="glyphicon glyphicon-info-sign"></span>
-					<a href="#!Help:Certification"><strong>Certification</strong> - User certification reminder will go here.  <span ui:field="countdownUI"></span></a>
+					<a href="#!Help:Certification"><strong>Join the Synapse Certified User Community today!</strong></a>
 				</h5>
+				<p>In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data. 
+				    Starting on <span ui:field="lockdownDate1" />, only users who have passed a short Certified User Quiz will be able to upload content into Synapse. Don’t wait for <span ui:field="lockdownDate2" /> — <a class="link" href="#!Quiz:Certification" target="_blank">get your certification today!</a>
+				</p>
 			</div>
 		</div>
 		<!-- TOP 3 COLUMNS -->		
