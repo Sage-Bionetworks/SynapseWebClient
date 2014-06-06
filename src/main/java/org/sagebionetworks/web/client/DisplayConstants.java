@@ -13,6 +13,7 @@ public class DisplayConstants {
 	/*
 	 * Text constants
 	 */
+	public static final String CERTIFIED_USER="Certified User";
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
