@@ -114,6 +114,7 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -127,6 +128,9 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheLoader;
 
 /**
  * Test for the SynapseClientImpl
@@ -164,6 +168,7 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
+	Cache<MarkdownCacheRequest, String> mockCache;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -179,10 +184,14 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
+		mockCache = Mockito.mock(Cache.class);
+		
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
 		synapseClient.setServiceUrlProvider(mockUrlProvider);
+		synapseClient.setMarkdown2HtmlCache(mockCache);
+		
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
@@ -1377,6 +1386,18 @@ public class SynapseClientImplTest {
 		String quizResponseJson = myResponse.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		synapseClient.submitCertificationQuizResponse(quizResponseJson);
 		verify(mockSynapse).submitCertifiedUserTestResponse(eq(myResponse));
-		
+	}
+	
+	@Test
+	public void testMarkdown2HtmlCache() throws Exception {
+		String markdown = "##test";
+		boolean isPreview = false;
+		boolean isAlphaMode = false;
+		String clientHostString = "http://myhost/";
+		String testHtmlResult = "<h2>test</h2>";
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(testHtmlResult);
+		String actualResult = synapseClient.markdown2Html(markdown, isPreview, isAlphaMode, clientHostString);
+		assertEquals(testHtmlResult, actualResult);
+		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 }

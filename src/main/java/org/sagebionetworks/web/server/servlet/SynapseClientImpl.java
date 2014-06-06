@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -131,6 +132,9 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -144,6 +148,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			SynapseMarkdownProcessor.getInstance();
 		}
 	
+	private Cache<MarkdownCacheRequest, String> markdown2HtmlCache = CacheBuilder.newBuilder()
+			.maximumSize(1000)
+			.build(
+					new CacheLoader<MarkdownCacheRequest, String>() {
+						public String load(MarkdownCacheRequest key) throws IOException {
+							return SynapseMarkdownProcessor.getInstance().markdown2Html(key.getMarkdown(), key.getIsPreview(), key.getClientHostString());
+						}
+					});
+    
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
@@ -187,6 +200,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
+	}
+	
+	public void setMarkdown2HtmlCache(Cache<MarkdownCacheRequest, String> markdown2HtmlCache) {
+		this.markdown2HtmlCache = markdown2HtmlCache;
 	}
 	
 	/**
@@ -1127,18 +1144,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode, String clientHostString) throws RestServiceException{
 		try {
 			long startTime = System.currentTimeMillis();
-			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview, clientHostString);
+			MarkdownCacheRequest mdCacheRequest = new MarkdownCacheRequest(markdown, clientHostString, isPreview);
+			String html = markdown2HtmlCache.get(mdCacheRequest);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime-startTime;
-			
 			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds.  In alpha mode? " + isAlphaMode);
-			
 			return html;
-		} catch (IOException e) {
+		} catch (ExecutionException e) {
 			throw new RestServiceException(e.getMessage());
 		}
 	}
 
+	
 	@Override
 	public String getActivityForEntity(String entityId)
 			throws RestServiceException {
