@@ -2,28 +2,36 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.Serializable;
 
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
+
 public class MarkdownCacheRequest implements Serializable {
-	private static final long serialVersionUID = -1906312264088602086L;
-	private String markdown, clientHostString;
-	private Boolean isPreview;
-	public MarkdownCacheRequest(String markdown, String clientHostString,
-			Boolean isPreview) {
+	private static final long serialVersionUID = -4204768923738949620L;
+	private WikiPageKey wikiPageKey;
+	private Long version;
+	public MarkdownCacheRequest(WikiPageKey wikiPageKey, Long version) {
 		super();
-		this.markdown = markdown;
-		this.clientHostString = clientHostString;
-		this.isPreview = isPreview;
+		this.wikiPageKey = wikiPageKey;
+		this.version = version;
+	}
+	public WikiPageKey getWikiPageKey() {
+		return wikiPageKey;
+	}
+	public void setWikiPageKey(WikiPageKey wikiPageKey) {
+		this.wikiPageKey = wikiPageKey;
+	}
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((clientHostString == null) ? 0 : clientHostString.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		result = prime * result
-				+ ((isPreview == null) ? 0 : isPreview.hashCode());
-		result = prime * result
-				+ ((markdown == null) ? 0 : markdown.hashCode());
+				+ ((wikiPageKey == null) ? 0 : wikiPageKey.hashCode());
 		return result;
 	}
 	@Override
@@ -35,41 +43,19 @@ public class MarkdownCacheRequest implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		MarkdownCacheRequest other = (MarkdownCacheRequest) obj;
-		if (clientHostString == null) {
-			if (other.clientHostString != null)
+		if (version == null) {
+			if (other.version != null)
 				return false;
-		} else if (!clientHostString.equals(other.clientHostString))
+		} else if (!version.equals(other.version))
 			return false;
-		if (isPreview == null) {
-			if (other.isPreview != null)
+		if (wikiPageKey == null) {
+			if (other.wikiPageKey != null)
 				return false;
-		} else if (!isPreview.equals(other.isPreview))
-			return false;
-		if (markdown == null) {
-			if (other.markdown != null)
-				return false;
-		} else if (!markdown.equals(other.markdown))
+		} else if (!wikiPageKey.equals(other.wikiPageKey))
 			return false;
 		return true;
 	}
-	public String getMarkdown() {
-		return markdown;
-	}
-	public void setMarkdown(String markdown) {
-		this.markdown = markdown;
-	}
-	public String getClientHostString() {
-		return clientHostString;
-	}
-	public void setClientHostString(String clientHostString) {
-		this.clientHostString = clientHostString;
-	}
-	public Boolean getIsPreview() {
-		return isPreview;
-	}
-	public void setIsPreview(Boolean isPreview) {
-		this.isPreview = isPreview;
-	}
 	
 	
+
 }

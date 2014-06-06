@@ -130,7 +130,6 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheLoader;
 
 /**
  * Test for the SynapseClientImpl
@@ -168,7 +167,6 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
-	Cache<MarkdownCacheRequest, String> mockCache;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -184,13 +182,11 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
-		mockCache = Mockito.mock(Cache.class);
 		
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
 		synapseClient.setServiceUrlProvider(mockUrlProvider);
-		synapseClient.setMarkdown2HtmlCache(mockCache);
 		
 		// Setup the the entity
 		entity = new ExampleEntity();
@@ -1389,15 +1385,24 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testMarkdown2HtmlCache() throws Exception {
-		String markdown = "##test";
-		boolean isPreview = false;
-		boolean isAlphaMode = false;
-		String clientHostString = "http://myhost/";
-		String testHtmlResult = "<h2>test</h2>";
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(testHtmlResult);
-		String actualResult = synapseClient.markdown2Html(markdown, isPreview, isAlphaMode, clientHostString);
-		assertEquals(testHtmlResult, actualResult);
+	public void testMarkdownCache() throws Exception {
+		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		synapseClient.setMarkdownCache(mockCache);
+		String pageJson = "test only";
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		String actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
+		assertEquals(pageJson, actualResult);
+		verify(mockCache).get(any(MarkdownCacheRequest.class));
+	}
+	
+	@Test
+	public void testMarkdownCacheWithVersion() throws Exception {
+		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		synapseClient.setMarkdownCache(mockCache);
+		String pageJson = "test only";
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		String actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
+		assertEquals(pageJson, actualResult);
 		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 }
