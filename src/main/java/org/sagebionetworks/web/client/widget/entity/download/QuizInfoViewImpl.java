@@ -1,54 +1,72 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
-public class QuizInfoViewImpl extends FlowPanel implements QuizInfoWidgetView {
+public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	private Presenter presenter;
 	
-	public QuizInfoViewImpl() {
+	@UiField
+	SpanElement beforeLockdownMessage;
+	@UiField
+	SpanElement lockdownDate1;
+	@UiField
+	SpanElement lockdownDate2;
+	
+	@UiField
+	Button remindMeLaterButton;
+	@UiField
+	Button becomeCertifiedButton;
+
+	public interface Binder extends UiBinder<Widget, QuizInfoViewImpl> {}
+	
+	@Inject
+	public QuizInfoViewImpl(Binder uiBinder) {
+		initWidget(uiBinder.createAndBindUi(this));
 		initializeUI();
+	}
+	
+	@Override
+	public void clear() {
 	}
 	
 	private void initializeUI() {
 		clear();
-		addStyleName("whiteBackground padding-left-10 padding-right-15 padding-top-15");
-		HTML html = new HTML("<h5>"+DisplayConstants.QUIZ_INFO+"</h5>" + WebConstants.QUIZ_MORE_INFO);
-		html.addStyleName("margin-bottom-40 margin-top-left-10 margin-right-10");
-		add(html);
-		FlowPanel buttonContainer = new FlowPanel();
+		int daysRemaining = HomeViewImpl.getDaysRemaining();
+		if (daysRemaining > 0) {
+			remindMeLaterButton.removeStyleName("hide");
+			remindMeLaterButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.cancelClicked();
+				}
+			});
+			beforeLockdownMessage.removeClassName("hide");
+			lockdownDate1.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
+			lockdownDate2.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
+		} else {
+			beforeLockdownMessage.addClassName("hide");
+			remindMeLaterButton.addStyleName("hide");
+		}
 		
-		com.google.gwt.user.client.ui.Button cancel = DisplayUtils.createButton(DisplayConstants.REMIND_ME_LATER, ButtonType.DEFAULT);
-		cancel.addStyleName("right margin-left-10");
-		buttonContainer.add(cancel);
-		cancel.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.cancelClicked();
-			}
-		});
-		com.google.gwt.user.client.ui.Button okButton = DisplayUtils.createButton(DisplayConstants.BECOME_CERTIFIED, ButtonType.PRIMARY);
-		okButton.addStyleName("right");
-		buttonContainer.add(okButton);
-		okButton.addClickHandler(new ClickHandler() {
+		becomeCertifiedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.continueClicked();
 				presenter.goTo(new Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
-		
-		add(buttonContainer);
 	}
 
 	@Override

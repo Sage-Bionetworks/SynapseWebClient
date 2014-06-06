@@ -37,6 +37,8 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -112,7 +114,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	DivElement certificationReminderUI;
 	@UiField
-	SpanElement countdownUI;
+	SpanElement lockdownDate1;
+	@UiField
+	SpanElement lockdownDate2;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -127,7 +131,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
 	
-	private static final Date LOCKDOWN = new Date(114, 9, 1);; 
+	private static final Date LOCKDOWN = new Date(114, 9, 1);
+	public static final String LOCKDOWN_DATE_STRING = DateTimeFormat.getFormat("MMMM d").format(LOCKDOWN);
 	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
@@ -257,14 +262,10 @@ public class HomeViewImpl extends Composite implements HomeView {
 			getStartedContainer.setVisible(true);
 			projectPanel.clear();
 		}
-		updateCountdownUI();
 	}
 
-	private int getDaysRemaining() {
+	public static int getDaysRemaining() {
 		return CalendarUtil.getDaysBetween(new Date(), LOCKDOWN);
-	}
-	private void updateCountdownUI() {
-		countdownUI.setInnerHTML(getDaysRemaining() + " days remaining");
 	}
 	
 	@Override
@@ -480,10 +481,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void showCertificationReminder(boolean visible) {
 		if (visible && 
 			DisplayUtils.isInTestWebsite(cookies) && //remove line once internal testing has concluded
-			getDaysRemaining() > 0)
+			getDaysRemaining() > 0) {
 			certificationReminderUI.removeClassName("hide");
-		else
+			lockdownDate1.setInnerHTML(LOCKDOWN_DATE_STRING);
+			lockdownDate2.setInnerHTML(LOCKDOWN_DATE_STRING);
+		} else {
 			certificationReminderUI.addClassName("hide");
+		}
 	}
 	
 	private void fillProgrammaticClientInstallCode() {

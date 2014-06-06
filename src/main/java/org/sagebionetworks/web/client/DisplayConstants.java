@@ -135,12 +135,6 @@ public class DisplayConstants {
 	public static final String DOWNLOAD_FILE_LOCAL = "Download file";
 	public static final String LOGIN_USERNAME_LABEL = "Email Address";
 	
-	public static final String CERTIFICATION_MESSAGE_1="Successfully completion of the Synapse certification demonstrates a solid understanding of the data organization, protection requirements and practices in Synapse.";
-	public static final String CERTIFICATION_MESSAGE_2="Certified Synapse users are allowed to upload content and access Client API.";
-	public static final String CERTIFICATION_MESSAGE_3="Individuals wishing to gain the certification must:";
-	public static final String CERTIFICATION_MESSAGE_4=	"Study the tutorial materials";
-	public static final String CERTIFICATION_MESSAGE_5=	"Complete a brief examination";
-	
 	/*
 	 * Service Constants (move to another file?)
 	 */
@@ -746,8 +740,6 @@ public class DisplayConstants {
 	public static final String ACCOUNT_CREATED = "Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then ";
 	public static final String LOGIN_HERE = "login here";
 	
-	//quiz
-	public static final String QUIZ_INFO = "The Synapse certification is designed for those who wish to contribute content and access controlled data on Synapse.";
 	public static final String ERROR_CREATING_COLUMN = "Error creating column";
 	public static final String API_KEY_CHANGED = "API Key successfully changed";
 	public static final String MAX_STRING_LENGTH = "Maximum String Length";
