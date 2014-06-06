@@ -1246,6 +1246,11 @@ ol.lowerroman {
 	background-clip: padding-box;
 }
 
+.moveup-8 {
+	position: relative;
+	top: -8px;
+}
+
 .moveup-5 {
 	position: relative;
 	top: -5px;
