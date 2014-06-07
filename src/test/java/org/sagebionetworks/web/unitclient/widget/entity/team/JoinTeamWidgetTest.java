@@ -110,7 +110,7 @@ public class JoinTeamWidgetTest {
 	@Test
 	public void testJoinRequestStep1() throws Exception {
 		joinWidget.sendJoinRequestStep1();
-		verify(mockView).showProfileForm(any(UserProfile.class), any(AsyncCallback.class));
+		verify(mockView).showChallengeInfoPage(any(UserProfile.class), any(AsyncCallback.class));
 	}
 	
 

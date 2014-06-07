@@ -38,7 +38,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
-	private boolean showUserProfileForm;
+	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -68,7 +68,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
-		this.showUserProfileForm = showUserProfileForm;
+		this.isChallengeSignup = showUserProfileForm;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
@@ -100,7 +100,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) 
 			this.teamId = descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY);
 		
-		this.showUserProfileForm = descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY) ? 
+		this.isChallengeSignup = descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY) ? 
 				Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY)) : 
 				false;
 		this.isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
@@ -122,7 +122,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -133,7 +133,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, showUserProfileForm, null, null, isMemberMessage, successMessage, buttonText);
+			configure(teamId, canPublicJoin, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText);
 		}
 	}
 	
@@ -141,7 +141,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
 		this.message = message;
 		this.isAcceptingInvite = isAcceptingInvite;
-		if (showUserProfileForm)
+		if (isChallengeSignup)
 			sendJoinRequestStep1();
 		else //skip to step 2
 			sendJoinRequestStep2();
@@ -155,7 +155,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		//pop up profile form.  user does not have to fill in info
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile profile = sessionData.getProfile();
-		view.showProfileForm(profile, new AsyncCallback<Void>() {
+		view.showChallengeInfoPage(profile, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				continueToStep2();

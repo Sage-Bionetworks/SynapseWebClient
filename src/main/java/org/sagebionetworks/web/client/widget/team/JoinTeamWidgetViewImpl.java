@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -8,11 +9,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.client.widget.entity.TutorialWizardViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
@@ -34,24 +38,26 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
 	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
-	private ProfileFormWidget profileForm;
+	
 	private JoinTeamWidgetView.Presenter presenter;
 	private AnimationProtector versionAnimation;
 	private LayoutContainer requestUIPanel;
 	private Button requestButton, acceptInviteButton, anonymousUserButton;
 	private HTML requestedMessage;
 	private TextArea messageArea;
+	private MarkdownWidget wikiPage;
 	
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, ProfileFormWidget profileForm) {
+	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage) {
 		this.sageImageBundle = sageImageBundle;
-		this.profileForm = profileForm;
+		this.wikiPage = wikiPage;
 	}
 	
 	@Override
@@ -193,47 +199,47 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 
-	public void showProfileForm(UserProfile profile, final AsyncCallback<Void> presenterCallback) {
-		profileForm.hideCancelButton();
+	public void showChallengeInfoPage(UserProfile profile, final AsyncCallback<Void> presenterCallback) {
 		final Window dialog = new Window();
-		
-		//hide the dialog when something happens, and call back to the presenter
-		ProfileUpdatedCallback profileUpdatedCallback = new ProfileUpdatedCallback() {
-			
-			@Override
-			public void profileUpdateSuccess() {
-				hideAndContinue();
-			}
-			
-			@Override
-			public void profileUpdateCancelled() {
-				hideAndContinue();
-			}
-			
-			public void hideAndContinue() {
-				dialog.hide();
-				presenterCallback.onSuccess(null);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				dialog.hide();
-				presenterCallback.onFailure(caught);
-			}
-		};
-		
-		profileForm.configure(profile, profileUpdatedCallback);
-     	dialog.setMaximizable(false);
+		dialog.addStyleName("whiteBackground");
+       	dialog.setMaximizable(false);
         dialog.setSize(640, 480);
         dialog.setPlain(true); 
         dialog.setModal(true); 
         dialog.setAutoHeight(true);
         dialog.setResizable(false);
-        dialog.add(profileForm.asWidget());
-        profileForm.setUpdateButtonText("Continue");
- 		dialog.setHeading("Please Update Your Public Profile");
- 		
-		dialog.show();
+        Widget wikiPageWidget = wikiPage.asWidget();
+        wikiPageWidget.addStyleName("min-height-500 whiteBackground");
+        dialog.add(wikiPageWidget);
+		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
+		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
+		dialog.setHeading("Challenges");
+		FlowPanel buttonPanel = new FlowPanel();
+		buttonPanel.addStyleName("bottomright");
+		Button cancelButton = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL);
+		cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+			}
+		});
+
+		Button continueButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
+		continueButton.addStyleName("right margin-bottom-10 margin-right-10");
+		continueButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+				presenterCallback.onSuccess(null);
+			}
+		});
+        
+		buttonPanel.add(continueButton);
+		buttonPanel.add(cancelButton);
+        
+        dialog.add(buttonPanel);
+		dialog.show();	
 	}
 	
 	@Override
