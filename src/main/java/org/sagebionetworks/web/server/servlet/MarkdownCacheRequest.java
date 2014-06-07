@@ -7,17 +7,28 @@ import org.sagebionetworks.repo.model.dao.WikiPageKey;
 public class MarkdownCacheRequest implements Serializable {
 	private static final long serialVersionUID = -4204768923738949620L;
 	private WikiPageKey wikiPageKey;
+	private String etag;
 	private Long version;
-	public MarkdownCacheRequest(WikiPageKey wikiPageKey, Long version) {
+	public MarkdownCacheRequest(WikiPageKey wikiPageKey, String etag, Long version) {
 		super();
 		this.wikiPageKey = wikiPageKey;
+		this.etag = etag;
 		this.version = version;
+		
 	}
 	public WikiPageKey getWikiPageKey() {
 		return wikiPageKey;
 	}
 	public void setWikiPageKey(WikiPageKey wikiPageKey) {
 		this.wikiPageKey = wikiPageKey;
+	}
+	
+	
+	public String getEtag() {
+		return etag;
+	}
+	public void setEtag(String etag) {
+		this.etag = etag;
 	}
 	public Long getVersion() {
 		return version;
@@ -29,6 +40,7 @@ public class MarkdownCacheRequest implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((etag == null) ? 0 : etag.hashCode());
 		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		result = prime * result
 				+ ((wikiPageKey == null) ? 0 : wikiPageKey.hashCode());
@@ -43,6 +55,11 @@ public class MarkdownCacheRequest implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		MarkdownCacheRequest other = (MarkdownCacheRequest) obj;
+		if (etag == null) {
+			if (other.etag != null)
+				return false;
+		} else if (!etag.equals(other.etag))
+			return false;
 		if (version == null) {
 			if (other.version != null)
 				return false;
@@ -55,6 +72,8 @@ public class MarkdownCacheRequest implements Serializable {
 			return false;
 		return true;
 	}
+	
+	
 	
 	
 
