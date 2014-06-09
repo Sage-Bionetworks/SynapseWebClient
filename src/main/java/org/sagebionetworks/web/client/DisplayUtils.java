@@ -41,6 +41,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -167,7 +168,11 @@ import com.google.gwt.user.client.ui.Widget;
 public class DisplayUtils {
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
-	
+	public static enum MessagePopup {  
+        INFO,
+        WARNING,
+        QUESTION
+	}
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -597,32 +602,105 @@ public class DisplayUtils {
 		d.show();
 	}
 	
+	public static void showInfoDialog(
+			String title, 
+			String message,
+			Callback okCallback
+			) {
+		showPopup(title, message, MessagePopup.INFO, 300, DisplayConstants.OK, okCallback, null, null);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback,
+			Callback noCallback
+			) {
+		showPopup(title, message, MessagePopup.QUESTION, 300, DisplayConstants.YES, yesCallback, DisplayConstants.NO, noCallback);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback
+			) {
+		showConfirmDialog(title, message, yesCallback, new Callback() {
+			@Override
+			public void invoke() {
+				//do nothing when No is clicked
+			}
+		});
+	}
+	
 	public static void showOkCancelMessage(
 			String title, 
 			String message, 
-			String iconStyle,
+			MessagePopup iconStyle,
 			int minWidth,
-			final Callback okCallback, 
-			final Callback cancelCallback) {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OKCANCEL);
-	    box.setIcon(iconStyle);
-	    box.setTitle(title);
-	    box.addCallback(new Listener<MessageBoxEvent>() {					
+			Callback okCallback,
+			Callback cancelCallback) {
+		showPopup(title, message, iconStyle, minWidth, DisplayConstants.OK, okCallback, DisplayConstants.BUTTON_CANCEL, cancelCallback);
+	}
+	
+	public static void showPopup(
+			String title, 
+			String message, 
+			DisplayUtils.MessagePopup iconStyle,
+			int minWidth,
+			String primaryButtonText,
+			final Callback primaryButtonCallback,
+			String secondaryButtonText,
+			final Callback secondaryButtonCallback) {
+		
+		final Window dialog = new Window();
+		dialog.setMaximizable(false);
+        dialog.setSize(minWidth, 100);
+        dialog.setPlain(true); 
+        dialog.setModal(true); 
+        dialog.setAutoHeight(true);
+        dialog.setResizable(false);
+        String iconHtml = "";
+        if (MessagePopup.INFO.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-info-sign font-size-22");
+        else if (MessagePopup.WARNING.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-exclamation-sign font-size-22");
+        else if (MessagePopup.QUESTION.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-question-sign font-size-22");	
+        
+        HTML content = new HTML("<div class=\"margin-bottom-60\">" + iconHtml + "<h6 class=\"displayInline margin-left-5\">" + SafeHtmlUtils.htmlEscape(message) + "</h6></div>");
+        content.addStyleName("whiteBackground padding-5");
+        dialog.add(content);
+		dialog.setHeading(title);
+		FlowPanel buttonPanel = new FlowPanel();
+		buttonPanel.addStyleName("bottomright");
+		
+		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+		continueButton.addStyleName("right margin-bottom-10 margin-right-10");
+		continueButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 												
-				Button btn = be.getButtonClicked();
-				if(Dialog.OK.equals(btn.getItemId())) {
-					okCallback.invoke();
-				} else {
-					cancelCallback.invoke();
-				}
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+				primaryButtonCallback.invoke();
 			}
 		});
-	    box.setMessage(message);
-	    box.setMinWidth(minWidth);
-	    box.show();
-
+        
+		buttonPanel.add(continueButton);
+		
+		if (secondaryButtonText != null) {
+			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils.createButton(secondaryButtonText);
+			cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
+			cancelButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					dialog.hide();
+					secondaryButtonCallback.invoke();
+				}
+			});
+			buttonPanel.add(cancelButton);
+		}
+        
+        dialog.add(buttonPanel);
+		dialog.show();
 	}
 	
 	public static String getPrimaryEmail(UserProfile userProfile) {

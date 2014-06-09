@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
@@ -92,19 +93,19 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	private void showAnonymousMessage() {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OK);
-	    box.setIcon(MessageBox.INFO);
-	    box.setTitle("Login or Register");
-	    box.addCallback(new Listener<MessageBoxEvent>() {
+		Callback okCallback = new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) {
+			public void invoke() {
 				presenter.gotoLoginPage();
 			}
-		});
-	    box.setMinWidth(320);
-	    box.setMessage(DisplayConstants.ANONYMOUS_JOIN);
-	    box.show();
+		};
+		Callback cancelCallback = new Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+
+		DisplayUtils.showOkCancelMessage("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, 320, okCallback, cancelCallback);
 	}
 	
 	private void initView(String joinButtonText) {

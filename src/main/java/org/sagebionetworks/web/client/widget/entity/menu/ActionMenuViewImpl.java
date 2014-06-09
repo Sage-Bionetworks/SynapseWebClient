@@ -215,13 +215,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Callback() {
+					
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteEntity();
-						}
+					public void invoke() {
+						presenter.deleteEntity();
 					}
 				});
 			}

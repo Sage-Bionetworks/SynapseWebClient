@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -553,7 +554,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			}	
 		};
 		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-				MessageBox.WARNING, 500, okCallback, cancelCallback);
+				MessagePopup.WARNING, 500, okCallback, cancelCallback);
 	}
 	
 	@Override
