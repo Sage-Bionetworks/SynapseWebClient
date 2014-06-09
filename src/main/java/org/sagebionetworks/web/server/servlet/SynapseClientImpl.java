@@ -150,7 +150,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	
 	private Cache<MarkdownCacheRequest, String> wiki2Markdown = CacheBuilder.newBuilder()
-			.maximumSize(500)
+			.maximumSize(35)
 			.expireAfterAccess(1, TimeUnit.HOURS)
 			.build(
 					new CacheLoader<MarkdownCacheRequest, String>() {
