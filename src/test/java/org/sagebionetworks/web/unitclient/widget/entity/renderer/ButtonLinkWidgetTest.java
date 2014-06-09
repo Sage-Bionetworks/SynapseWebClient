@@ -93,4 +93,21 @@ public class ButtonLinkWidgetTest {
 		assertFalse(widget.isOpenInNewWindow(subpage1Full));
 	}
 	
+	@Test
+	public void testOverrideOpenNewWindowTrue() {
+		Map<String, String> descriptor = getDefaultDescriptor();
+		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.TRUE.toString());
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(true));
+	}
+	
+	@Test
+	public void testOverrideOpenNewWindowFalse() {
+		Map<String, String> descriptor = getDefaultDescriptor();
+		descriptor.put(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW, Boolean.FALSE.toString());
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(wikiKey), eq(buttonText), eq(validExternalUrl), eq(false), eq(false));
+	}
+
+	
 }

@@ -170,10 +170,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	private void updateProfileView(final String userId, final boolean editable) {
+	private void updateProfileView(final String userId, final boolean isEditing) {
 		view.clear();
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
-		globalApplicationState.setIsEditing(editable);
+		globalApplicationState.setIsEditing(isEditing);
 		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override
@@ -193,7 +193,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							}
 							@Override
 							public void onSuccess(List<Team> teams) {
-								getIsCertifiedAndUpdateView(profile, teams, editable, isOwner);
+								getIsCertifiedAndUpdateView(profile, teams, isEditing, isOwner);
 							}
 						};
 						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, teamCallback);
@@ -208,13 +208,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			});
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean editable, final boolean isOwner) {
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean isEditing, final boolean isOwner) {
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, teams, editable, isOwner, passingRecord, profileForm.asWidget());
+					view.updateView(profile, teams, isEditing, isOwner, passingRecord, profileForm.asWidget());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -222,7 +222,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException)
-					view.updateView(profile, teams, editable, isOwner, null, profileForm.asWidget());
+					view.updateView(profile, teams, isEditing, isOwner, null, profileForm.asWidget());
 				else
 					view.showErrorMessage(caught.getMessage());
 			}
@@ -305,8 +305,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
-			}
-			else {
+			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
+				showEditProfile();
+			} else {
 				//otherwise, this is a user id
 				updateProfileView(token, false);
 			}

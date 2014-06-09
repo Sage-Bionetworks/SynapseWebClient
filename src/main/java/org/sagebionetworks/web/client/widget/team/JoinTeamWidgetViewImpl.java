@@ -209,7 +209,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         dialog.setAutoHeight(true);
         dialog.setResizable(false);
         Widget wikiPageWidget = wikiPage.asWidget();
-        wikiPageWidget.addStyleName("min-height-500 whiteBackground");
+        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5");
         dialog.add(wikiPageWidget);
 		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
 		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
