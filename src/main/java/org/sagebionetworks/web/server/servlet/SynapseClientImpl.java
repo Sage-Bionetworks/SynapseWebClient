@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -131,6 +133,9 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.inject.Inject;
 
@@ -143,6 +148,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	static {//kick off initialization (like pattern compilation) by referencing it
 			SynapseMarkdownProcessor.getInstance();
 		}
+	
+	private Cache<MarkdownCacheRequest, String> wiki2Markdown = CacheBuilder.newBuilder()
+			.maximumSize(35)
+			.expireAfterAccess(1, TimeUnit.HOURS)
+			.build(
+					new CacheLoader<MarkdownCacheRequest, String>() {
+						@Override
+						public String load(MarkdownCacheRequest key)
+								throws Exception {
+							try {
+								org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+								WikiPage returnPage = null;
+								 if (key.getVersion() == null)
+									 returnPage = synapseClient.getV2WikiPageAsV1(key.getWikiPageKey());
+								 else 
+									 returnPage = synapseClient.getVersionOfV2WikiPageAsV1(key.getWikiPageKey(), key.getVersion());
+
+								return EntityFactory.createJSONStringForEntity(returnPage);
+							} catch(SynapseException e) {
+								throw ExceptionUtil.convertSynapseException(e);
+							}
+						}
+					}
+				);
 	
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -187,6 +216,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
+	}
+	
+	public void setMarkdownCache(Cache<MarkdownCacheRequest, String> wikiToMarkdown) {
+		this.wiki2Markdown = wikiToMarkdown;
 	}
 	
 	/**
@@ -1130,15 +1163,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview, clientHostString);
 			long endTime = System.currentTimeMillis();
 			float elapsedTime = endTime-startTime;
-			
 			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds.  In alpha mode? " + isAlphaMode);
-			
 			return html;
 		} catch (IOException e) {
 			throw new RestServiceException(e.getMessage());
 		}
 	}
 
+	
 	@Override
 	public String getActivityForEntity(String entityId)
 			throws RestServiceException {
@@ -1641,46 +1673,63 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	        throw new UnknownErrorException(e.getMessage());
 	    }
     }
-
+	private String getWikiKeyId(org.sagebionetworks.client.SynapseClient synapseClient, org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException {
+		String wikiPageId = key.getWikiPageId();
+		if (wikiPageId == null) {
+			//asking for the root.  find the root id first
+			wikiPageId = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+         }
+		return wikiPageId;
+	}
 	@Override
     public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key)
                     throws RestServiceException, IOException {
-        org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-        try {
-            if (key.getWikiPageId() == null) {
-                //asking for the root.  find the root id first
-                String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-                key.setWikiPageId(rootWikiPage);
-            }
-            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-            WikiPage returnPage = synapseClient.getV2WikiPageAsV1(properKey);
-            return EntityFactory.createJSONStringForEntity(returnPage);
-        } catch (SynapseException e) {
-            throw ExceptionUtil.convertSynapseException(e);
-        } catch (JSONObjectAdapterException e) {
-            throw new UnknownErrorException(e.getMessage());
-        }
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		String etag = null;
+		try {
+			V2WikiPage page = synapseClient.getV2WikiPage(properKey);
+			etag = page.getEtag();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+        
+        MarkdownCacheRequest request = new MarkdownCacheRequest(properKey, etag, null);
+        return processMarkdownRequest(request);
     }
 
 	@Override
     public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
     	throws RestServiceException, IOException {
-    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-    	try {
-            if (key.getWikiPageId() == null) {
-	            //asking for the root.  find the root id first
-	            String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-	            key.setWikiPageId(rootWikiPage);
-            }
-            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-            WikiPage returnPage = synapseClient.getVersionOfV2WikiPageAsV1(properKey, version);
-            return EntityFactory.createJSONStringForEntity(returnPage);
-	    } catch (SynapseException e) {
-	        throw ExceptionUtil.convertSynapseException(e);
-	    } catch (JSONObjectAdapterException e) {
-	        throw new UnknownErrorException(e.getMessage());
-	    }
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		String etag = null;
+		try {
+			V2WikiPage page = synapseClient.getVersionOfV2WikiPage(properKey, version);
+			etag = page.getEtag();
+			key.setWikiPageId(page.getId());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+        
+        MarkdownCacheRequest request = new MarkdownCacheRequest(properKey, etag, version);
+        return processMarkdownRequest(request);
     }
+	
+	private String processMarkdownRequest(MarkdownCacheRequest request) throws RestServiceException {
+		try {
+			String markdown = wiki2Markdown.get(request);
+			return markdown;
+		} catch (ExecutionException e) {
+			if (e.getCause() != null && e.getCause() instanceof SynapseException)
+				throw ExceptionUtil.convertSynapseException((SynapseException)e.getCause());
+			else throw new RestServiceException(e.getMessage());
+		}
+	}
 	
 	@Override
 	public String addFavorite(String entityId) throws RestServiceException {
