@@ -179,6 +179,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		}
 		messageArea.setValue("");
 		currentWizardContent = new FlowPanel();
+		currentWizardContent.addStyleName("min-height-500 whiteBackground padding-5");
 	}	
 	@Override
 	public void showLoading() {
@@ -220,7 +221,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         joinWizard.setModal(true); 
         joinWizard.setAutoHeight(true);
         joinWizard.setResizable(false);
-        joinWizard.setHeading("Challenges");
+        joinWizard.setHeading("Join");
 		FlowPanel buttonPanel = new FlowPanel();
 		buttonPanel.addStyleName("bottomright");
 		Button cancelButton = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL);
@@ -245,18 +246,19 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		buttonPanel.add(cancelButton);
         
         joinWizard.add(buttonPanel);
+        joinWizard.add(currentWizardContent);
 		joinWizard.show();	
 	}
 	
 	public void showChallengeInfoPage(UserProfile profile, Callback presenterCallback, int totalPages) {
 		okButtonCallback = presenterCallback;
 		Widget wikiPageWidget = wikiPage.asWidget();
-        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5");
+        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.clear();
         currentWizardContent.add(wikiPageWidget);
-        joinWizard.add(currentWizardContent);
 		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
 		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
+		joinWizard.layout(true);
 	}
 	
 	@Override
@@ -268,8 +270,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
 		currentWizardContent.clear();
 		ScrollPanel panel = new ScrollPanel(new HTML(arText));
-		panel.addStyleName("min-height-500 whiteBackground padding-5");
+		panel.addStyleName("min-height-500 whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.add(panel);
+        joinWizard.layout(true);
         okButtonCallback = touAcceptanceCallback;
 	}
 	

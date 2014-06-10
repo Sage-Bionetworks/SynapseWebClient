@@ -100,6 +100,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
+				callback.invoke(null);
 			}
 		});
 		

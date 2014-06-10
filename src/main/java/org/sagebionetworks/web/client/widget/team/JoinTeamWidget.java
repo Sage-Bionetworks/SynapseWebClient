@@ -149,12 +149,17 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					onFailure(e);
 				}
 				//access requirements initialized, show the join wizard
-				view.showJoinWizard();
 				
-				if (isChallengeSignup)
+				
+				if (isChallengeSignup) {
+					view.showJoinWizard();
 					sendJoinRequestStep1();
-				else //skip to step 2
+				}
+				else { //skip to step 2
+					if (accessRequirements.size() > 0)
+						view.showJoinWizard();
 					sendJoinRequestStep2();
+				}
 
 			}
 			
@@ -191,6 +196,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	 */
 	public void sendJoinRequestStep2() {
 		if (currentAccessRequirement >= accessRequirements.size()) {
+			//done showing access requirements (and challenge info)
+			view.hideJoinWizard();
 			sendJoinRequestStep3();
 		} else {
 			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);

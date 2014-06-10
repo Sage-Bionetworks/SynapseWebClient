@@ -117,7 +117,8 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 			final WidgetDescriptorUpdatedHandler callback,
 			final CloseHandler saveHandler,
 			final ManagementHandler managementHandler) {
-		initFormattingGuide(formattingGuideWikiPageKey);
+		if (formattingGuideWikiPageKey != null)
+			initFormattingGuide(formattingGuideWikiPageKey);
 		this.markdownTextArea = markdownTextArea;
 		resizeMarkdownTextArea();
 		this.wikiKey = wikiKey;
