@@ -178,7 +178,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		currentWizardContent = new FlowPanel();
 		currentWizardContent.addStyleName("min-height-500 whiteBackground padding-5");
 		progressPanel = new FlowPanel();
-		progressPanel.addStyleName("whiteBackground");
+		progressPanel.addStyleName("whiteBackground center");
 	}	
 	@Override
 	public void showLoading() {
@@ -281,15 +281,19 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			for (int i = 0; i < totalPages; i++) {
 				if (i == currentPage) {
 					//current page
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-10\" style=\"color: white; background-color: #428bca;\">"+(i+1) +"</span>"));
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 5px; \">"+(i+1) +"</span>"));
 				} else if (i < currentPage) {
 					//page complete
-					Image tickImage = new Image(iconsImageBundle.checkGreen16());
-					tickImage.addStyleName("margin-10");
-					progressPanel.add(tickImage);
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 3px;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
 				} else {
 					//page incomplete
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-10\" style=\"color: dimgrey; background-color: darkgrey;\">"+(i+1) +"</span>"));
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 5px;\">"+(i+1) +"</span>"));
+				}
+				
+				if (i < totalPages-1) {
+					Image greyArrow = new Image(sageImageBundle.greyArrow());
+					greyArrow.addStyleName("margin-right-5 margin-left-5 moveup-2");
+					progressPanel.add(greyArrow);
 				}
 			}
 		}
