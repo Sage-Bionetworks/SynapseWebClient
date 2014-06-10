@@ -41,6 +41,7 @@ import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -197,7 +198,7 @@ public class FileHandleServlet extends HttpServlet {
 		if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
-			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(ownerId, type, wikiId);
 			String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
 			
 			// Redirect the user to the url
