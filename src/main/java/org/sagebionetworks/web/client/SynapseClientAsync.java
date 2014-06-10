@@ -110,7 +110,8 @@ public interface SynapseClientAsync {
 	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
 	
 	public void getUnmetTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
-
+	public void getTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
+	
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
 	public void updateExternalLocationable(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback);

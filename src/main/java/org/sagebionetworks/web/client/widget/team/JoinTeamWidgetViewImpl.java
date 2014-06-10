@@ -53,6 +53,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private HTML requestedMessage;
 	private TextArea messageArea;
 	private MarkdownWidget wikiPage;
+	private Window joinWizard;
+	private Button okButton;
+	private FlowPanel currentWizardContent;
+	private Callback okButtonCallback;
 	
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage) {
@@ -174,6 +178,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			requestUIPanel.add(sendRequestButton);
 		}
 		messageArea.setValue("");
+		currentWizardContent = new FlowPanel();
 	}	
 	@Override
 	public void showLoading() {
@@ -191,6 +196,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public void showErrorMessage(String message) {
 		clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)));
+		hideJoinWizard();
+	}
+	
+	@Override
+	public void hideJoinWizard() {
+		if (joinWizard != null && joinWizard.isVisible())
+			joinWizard.hide();
 	}
 
 	@Override
@@ -198,22 +210,17 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.presenter = presenter;
 	}
 	
-
-	public void showChallengeInfoPage(UserProfile profile, final AsyncCallback<Void> presenterCallback) {
-		final Window dialog = new Window();
-		dialog.addStyleName("whiteBackground");
-       	dialog.setMaximizable(false);
-        dialog.setSize(640, 480);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        Widget wikiPageWidget = wikiPage.asWidget();
-        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5");
-        dialog.add(wikiPageWidget);
-		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
-		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
-		dialog.setHeading("Challenges");
+	@Override
+	public void showJoinWizard() {
+		joinWizard = new Window();
+		joinWizard.addStyleName("whiteBackground");
+       	joinWizard.setMaximizable(false);
+        joinWizard.setSize(640, 480);
+        joinWizard.setPlain(true); 
+        joinWizard.setModal(true); 
+        joinWizard.setAutoHeight(true);
+        joinWizard.setResizable(false);
+        joinWizard.setHeading("Challenges");
 		FlowPanel buttonPanel = new FlowPanel();
 		buttonPanel.addStyleName("bottomright");
 		Button cancelButton = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL);
@@ -221,55 +228,49 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				dialog.hide();
+				joinWizard.hide();
 			}
 		});
-
-		Button continueButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
-		continueButton.addStyleName("right margin-bottom-10 margin-right-10");
-		continueButton.addClickHandler(new ClickHandler() {
+		
+		okButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
+		okButton.addStyleName("right margin-bottom-10 margin-right-10");
+		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				dialog.hide();
-				presenterCallback.onSuccess(null);
+				okButtonCallback.invoke();
 			}
 		});
         
-		buttonPanel.add(continueButton);
+		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
         
-        dialog.add(buttonPanel);
-		dialog.show();	
+        joinWizard.add(buttonPanel);
+		joinWizard.show();	
+	}
+	
+	public void showChallengeInfoPage(UserProfile profile, Callback presenterCallback, int totalPages) {
+		okButtonCallback = presenterCallback;
+		Widget wikiPageWidget = wikiPage.asWidget();
+        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5");
+        currentWizardContent.clear();
+        currentWizardContent.add(wikiPageWidget);
+        joinWizard.add(currentWizardContent);
+		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
+		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
 	}
 	
 	@Override
 	public void showAccessRequirement(
 			String arText,
-			final Callback touAcceptanceCallback) {
-		final Dialog dialog = new Dialog();
-       	dialog.setMaximizable(false);
-        dialog.setSize(640, 480);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        ScrollPanel panel = new ScrollPanel(new HTML(arText));
-        panel.addStyleName("margin-top-left-10");
-        panel.setSize("605px", "450px");
-        dialog.add(panel);
- 		dialog.setHeading("Agreement");
-		// agree to TOU, cancel
-        dialog.okText = DisplayConstants.ACCEPT;
-        dialog.setButtons(Dialog.OKCANCEL);
-        com.extjs.gxt.ui.client.widget.button.Button touButton = dialog.getButtonById(Dialog.OK);
-        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				touAcceptanceCallback.invoke();
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
+			final Callback touAcceptanceCallback,
+			int currentPage, 
+			int totalPages) {
+		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
+		currentWizardContent.clear();
+		ScrollPanel panel = new ScrollPanel(new HTML(arText));
+		panel.addStyleName("min-height-500 whiteBackground padding-5");
+        currentWizardContent.add(panel);
+        okButtonCallback = touAcceptanceCallback;
 	}
 	
 	

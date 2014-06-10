@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface JoinTeamWidgetView extends IsWidget, SynapseView {
@@ -17,11 +16,16 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	public void configure(boolean isLoggedIn, boolean canPublicJoin, TeamMembershipStatus teamMembershipStatus, String isMemberMessage, String buttonText);
-	void showChallengeInfoPage(UserProfile profile, AsyncCallback<Void> callback);
+	void showJoinWizard();
+	void hideJoinWizard();
+	
+	void showChallengeInfoPage(UserProfile profile, Callback callback, int totalPages);
 	
 	void showAccessRequirement(
 			String arText,
-			final Callback touAcceptanceCallback);
+			final Callback touAcceptanceCallback, 
+			int currentPage, 
+			int totalPages);
 	void showInfo(String title, String message);
 	public interface Presenter extends SynapsePresenter {
 		public void sendJoinRequest(String message, boolean isAcceptingInvite);
