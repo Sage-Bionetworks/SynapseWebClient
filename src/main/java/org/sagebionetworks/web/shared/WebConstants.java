@@ -210,4 +210,6 @@ public class WebConstants {
 	public static final String CACHE_CONTROL_KEY = "Cache-Control";
 
 	public static final String HIGHLIGHT_BOX_TITLE = "highlight-box-title";
+	
+	public static final String JOIN_WIDGET_IS_CHALLENGE_KEY = "isChallenge";
 }

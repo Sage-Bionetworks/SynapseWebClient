@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,7 +24,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -246,11 +244,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void goToLastPlace() {
 		view.hideLoggingInLoader();
-		Place forwardPlace = globalApplicationState.getLastPlace();
-		if(forwardPlace == null) {
-			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
+		DisplayUtils.goToLastPlace(globalApplicationState);
 	}
 	
 	/*

@@ -76,7 +76,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void setLastPlace(Place lastPlace) {
-		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
+		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
 		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 

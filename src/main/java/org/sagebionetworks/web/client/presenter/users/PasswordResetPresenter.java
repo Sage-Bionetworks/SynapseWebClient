@@ -21,6 +21,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -139,7 +141,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
         authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
                 @Override
                 public void onSuccess(String result) {
-                	globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
+                	DisplayUtils.goToLastPlace(globalApplicationState);// redirect to last place
                 }
                 @Override
                 public void onFailure(Throwable caught) {
