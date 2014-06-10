@@ -19,13 +19,13 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void showJoinWizard();
 	void hideJoinWizard();
 	
-	void showChallengeInfoPage(UserProfile profile, Callback callback, int totalPages);
+	void updateWizardProgress(int currentPage, int totalPages);
+	
+	void showChallengeInfoPage(UserProfile profile, Callback callback);
 	
 	void showAccessRequirement(
 			String arText,
-			final Callback touAcceptanceCallback, 
-			int currentPage, 
-			int totalPages);
+			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
 	public interface Presenter extends SynapsePresenter {
 		public void sendJoinRequest(String message, boolean isAcceptingInvite);

@@ -181,12 +181,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void sendJoinRequestStep1() {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile profile = sessionData.getProfile();
+		view.updateWizardProgress(currentPage, getTotalPageCount());
 		view.showChallengeInfoPage(profile, new Callback() {
 			@Override
 			public void invoke() {
+				currentPage++;
 				sendJoinRequestStep2();
 			}
-		}, getTotalPageCount());
+		});
 	}
 	
 	/**
@@ -211,9 +213,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					setLicenseAccepted(accessRequirement.getId());
 				}
 			};
-			
 			//pop up the requirement
-			view.showAccessRequirement(text, termsOfUseCallback, currentPage, getTotalPageCount());
+			view.updateWizardProgress(currentPage, getTotalPageCount());
+			view.showAccessRequirement(text, termsOfUseCallback);
 		}		
 	}
 	

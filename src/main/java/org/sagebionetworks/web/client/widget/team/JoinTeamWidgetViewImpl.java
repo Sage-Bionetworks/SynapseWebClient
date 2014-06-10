@@ -8,23 +8,18 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.TutorialWizardViewImpl;
-import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
@@ -32,11 +27,12 @@ import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,6 +41,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
+	private IconsImageBundle iconsImageBundle;
 	
 	private JoinTeamWidgetView.Presenter presenter;
 	private AnimationProtector versionAnimation;
@@ -55,12 +52,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private MarkdownWidget wikiPage;
 	private Window joinWizard;
 	private Button okButton;
-	private FlowPanel currentWizardContent;
+	private FlowPanel currentWizardContent, progressPanel;
 	private Callback okButtonCallback;
 	
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage) {
+	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, MarkdownWidget wikiPage) {
 		this.sageImageBundle = sageImageBundle;
+		this.iconsImageBundle = iconsImageBundle;
 		this.wikiPage = wikiPage;
 	}
 	
@@ -119,7 +117,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	private void initView(String joinButtonText) {
 		if (requestUIPanel == null) {
-			
 			anonymousUserButton = DisplayUtils.createButton(joinButtonText, ButtonType.PRIMARY);
 			anonymousUserButton.addStyleName("btn-lg");
 			anonymousUserButton.addClickHandler(new ClickHandler() {
@@ -180,6 +177,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		messageArea.setValue("");
 		currentWizardContent = new FlowPanel();
 		currentWizardContent.addStyleName("min-height-500 whiteBackground padding-5");
+		progressPanel = new FlowPanel();
+		progressPanel.addStyleName("whiteBackground");
 	}	
 	@Override
 	public void showLoading() {
@@ -244,13 +243,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
-        
-        joinWizard.add(buttonPanel);
+		joinWizard.add(progressPanel);
         joinWizard.add(currentWizardContent);
+        joinWizard.add(buttonPanel);
 		joinWizard.show();	
 	}
 	
-	public void showChallengeInfoPage(UserProfile profile, Callback presenterCallback, int totalPages) {
+	public void showChallengeInfoPage(UserProfile profile, Callback presenterCallback) {
 		okButtonCallback = presenterCallback;
 		Widget wikiPageWidget = wikiPage.asWidget();
         wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5 margin-bottom-60");
@@ -264,9 +263,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	@Override
 	public void showAccessRequirement(
 			String arText,
-			final Callback touAcceptanceCallback,
-			int currentPage, 
-			int totalPages) {
+			final Callback touAcceptanceCallback) {
 		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
 		currentWizardContent.clear();
 		ScrollPanel panel = new ScrollPanel(new HTML(arText));
@@ -274,6 +271,28 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         currentWizardContent.add(panel);
         joinWizard.layout(true);
         okButtonCallback = touAcceptanceCallback;
+	}
+	
+	@Override
+	public void updateWizardProgress(int currentPage, int totalPages) {
+		//only show progress if there's more than one page
+		progressPanel.clear();
+		if (totalPages > 1) {
+			for (int i = 0; i < totalPages; i++) {
+				if (i == currentPage) {
+					//current page
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-10\" style=\"color: white; background-color: #428bca;\">"+(i+1) +"</span>"));
+				} else if (i < currentPage) {
+					//page complete
+					Image tickImage = new Image(iconsImageBundle.checkGreen16());
+					tickImage.addStyleName("margin-10");
+					progressPanel.add(tickImage);
+				} else {
+					//page incomplete
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-10\" style=\"color: dimgrey; background-color: darkgrey;\">"+(i+1) +"</span>"));
+				}
+			}
+		}
 	}
 	
 	
