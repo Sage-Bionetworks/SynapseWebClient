@@ -69,6 +69,7 @@ import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
@@ -1280,7 +1281,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void deleteWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 			synapseClient.deleteWikiPage(properKey);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1331,7 +1332,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
-			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 			WikiPage returnPage = synapseClient.getWikiPage(properKey);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
@@ -1373,7 +1374,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
-			WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 			FileHandleResults results = synapseClient.getWikiAttachmenthHandles(properKey);
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
@@ -1424,7 +1425,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                             String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
                             key.setWikiPageId(rootWikiPage);
                     }
-                    WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
                     V2WikiPage returnPage = synapseClient.getV2WikiPage(properKey);
                     return EntityFactory.createJSONStringForEntity(returnPage);
             } catch (SynapseException e) {
@@ -1444,7 +1445,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                     String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
                     key.setWikiPageId(rootWikiPage);
             }
-            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+            WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
             V2WikiPage returnPage = synapseClient.getVersionOfV2WikiPage(properKey, version);
             return EntityFactory.createJSONStringForEntity(returnPage);
 	    } catch (SynapseException e) {
@@ -1491,7 +1492,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                     throws RestServiceException {
             org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
             try {
-                    WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
                     synapseClient.deleteV2WikiPage(properKey);
             } catch (SynapseException e) {
                     throw ExceptionUtil.convertSynapseException(e);
@@ -1523,7 +1524,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                             String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
                             key.setWikiPageId(rootWikiPage);
                     }
-                    WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
                     FileHandleResults results = synapseClient.getV2WikiAttachmentHandles(properKey);
                     return EntityFactory.createJSONStringForEntity(results);
             } catch (SynapseException e) {
@@ -1543,7 +1544,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                     String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
                     key.setWikiPageId(rootWikiPage);
             }
-            WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+            WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
             FileHandleResults results = synapseClient.getVersionOfV2WikiAttachmentHandles(properKey, version);
             return EntityFactory.createJSONStringForEntity(results);
 	    } catch (SynapseException e) {
@@ -1559,7 +1560,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
                     Long offset) throws RestServiceException {
             org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
             try {
-                    WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
                     PaginatedResults<V2WikiHistorySnapshot> results = synapseClient.getV2WikiHistory(properKey, limit, offset);
                     return EntityFactory.createJSONStringForEntity(results);
             } catch (SynapseException e) {
@@ -1572,7 +1573,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     @Override
 	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 		try {
 			return synapseClient.downloadV2WikiMarkdown(properKey);
 		} catch(SynapseException e) {
@@ -1583,7 +1584,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 		try {
 			return synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
 		}catch (SynapseException e) {
@@ -1685,7 +1686,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key)
                     throws RestServiceException, IOException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
 		String etag = null;
 		try {
 			V2WikiPage page = synapseClient.getV2WikiPage(properKey);
@@ -1704,7 +1705,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
     	throws RestServiceException, IOException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = new WikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
 		String etag = null;
 		try {
 			V2WikiPage page = synapseClient.getVersionOfV2WikiPage(properKey, version);
