@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +26,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -72,7 +69,7 @@ public class JoinTeamWidgetTest {
         requirements.setResults(ars);
         when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-        AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUnmetTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+        AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
 		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, mockJSONObjectAdapter);
@@ -105,12 +102,12 @@ public class JoinTeamWidgetTest {
 //		verify(mockView).showErrorMessage(anyString());
 //	}
 	
-
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep1() throws Exception {
-		joinWidget.sendJoinRequestStep1();
-		verify(mockView).showChallengeInfoPage(any(UserProfile.class), any(AsyncCallback.class));
+		WikiPageKey challengeInfoKey = mock(WikiPageKey.class);
+		joinWidget.sendJoinRequestStep0();
+		joinWidget.sendJoinRequestStep1(challengeInfoKey);
+		verify(mockView).showChallengeInfoPage(any(UserProfile.class), eq(challengeInfoKey), any(Callback.class));
 	}
 	
 
@@ -121,17 +118,17 @@ public class JoinTeamWidgetTest {
 		ars.add(new TermsOfUseAccessRequirement());
         requirements.setResults(ars);
         requirements.setTotalNumberOfResults(1);
-		
-		joinWidget.sendJoinRequestStep2();
-		verify(mockSynapseClient).getUnmetTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+        
+        joinWidget.sendJoinRequestStep0();
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2NoRestriction() throws Exception {
-		joinWidget.sendJoinRequestStep2();
-		verify(mockSynapseClient).getUnmetTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		joinWidget.sendJoinRequestStep0();
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		//no ARs shown...
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -140,9 +137,10 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2Failure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUnmetTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		joinWidget.sendJoinRequestStep0();
 		joinWidget.sendJoinRequestStep2();
-		verify(mockSynapseClient).getUnmetTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 
