@@ -2749,6 +2749,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			tempMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
 			tempMap.put(WebConstants.USER_CERTIFICATION_TUTORIAL, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.TRUSTED_USER_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.TRUSTED_USER_WIKI_ID_PROPERTY)));
 			tempMap.put(WebConstants.FORMATTING_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
+			tempMap.put(WebConstants.CHALLENGE_PARTICIPATION_INFO, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY)));
+			
 			pageName2WikiKeyMap = tempMap;
 		}
 	}

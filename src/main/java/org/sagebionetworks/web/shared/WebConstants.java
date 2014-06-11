@@ -156,6 +156,8 @@ public class WebConstants {
 	public static final String TRUSTED_USER_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_wiki_id";
 	public static final String FORMATTING_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_synapse_id";
 	public static final String FORMATTING_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_wiki_id";
+	public static final String CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_synapse_id";
+	public static final String CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_wiki_id";
 
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
@@ -178,6 +180,7 @@ public class WebConstants {
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
 	public static final String USER_CERTIFICATION_TUTORIAL = "Certification";
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
+	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";

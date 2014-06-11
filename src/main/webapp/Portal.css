@@ -528,6 +528,9 @@ a.shortBtn {
 .min-height-500 {
 	min-height: 500px;
 }
+.min-height-400 {
+	min-height: 400px;
+}
 
 .profile-image-40px {
 	width: 40px;	
@@ -1843,4 +1846,6 @@ td.datePickerMonth {
 .dateBoxPopup {
 }
 
-
+.border-bottom-1 {
+  border-bottom: 1px solid #dddddd;
+}

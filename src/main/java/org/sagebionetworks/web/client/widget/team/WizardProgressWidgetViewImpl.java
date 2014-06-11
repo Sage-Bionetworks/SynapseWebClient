@@ -16,7 +16,7 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 	@Inject
 	public WizardProgressWidgetViewImpl(SageImageBundle sageImageBundle) {
 		this.sageImageBundle = sageImageBundle;
-		addStyleName("whiteBackground center");
+		addStyleName("whiteBackground center border-bottom-1");
 	}
 	
 	
@@ -25,13 +25,14 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 		clear();
 		//only show progress if there's more than one page
 		if (total > 1) {
+			removeStyleName("hide");
 			for (int i = 0; i < total; i++) {
 				if (i == current) {
 					//current page
 					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
 				} else if (i < current) {
 					//page complete
-					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; padding: 3px 3px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
+					add(new InlineHTML("<span class=\"badge margin-top-10 movedown-2\" style=\"color: white; background-color: #06944e; padding: 3px 3px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
 				} else {
 					//page incomplete
 					add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
@@ -43,6 +44,8 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 					add(greyArrow);
 				}
 			}
+		} else {
+			addStyleName("hide");
 		}
 	}
 	

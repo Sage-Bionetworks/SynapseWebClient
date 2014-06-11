@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -156,19 +157,15 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				} catch (Throwable e) {
 					onFailure(e);
 				}
-				//access requirements initialized, show the join wizard
-				
-				
+				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
 				if (isChallengeSignup) {
-					view.showJoinWizard();
-					sendJoinRequestStep1();
+					startChallengeSignup();
 				}
 				else { //skip to step 2
 					if (accessRequirements.size() > 0)
 						view.showJoinWizard();
 					sendJoinRequestStep2();
 				}
-
 			}
 			
 			@Override
@@ -176,6 +173,33 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + caught.getMessage());
 			}
 		});
+	}
+	
+	public void startChallengeSignup() {
+		//first, get the challenge participation info wiki key, then show the join wizard
+		CallbackP<WikiPageKey> callback = new CallbackP<WikiPageKey>(){
+			@Override
+			public void invoke(WikiPageKey key) {
+				view.showJoinWizard();
+				sendJoinRequestStep1(key);
+			}
+		};
+		getChallengeParticipationInfoWikiKey(callback);
+	}
+	
+	public void getChallengeParticipationInfoWikiKey(final CallbackP<WikiPageKey> callback) {
+		synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+			@Override
+			public void onSuccess(HashMap<String,WikiPageKey> result) {
+				callback.invoke(result.get(WebConstants.CHALLENGE_PARTICIPATION_INFO));
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+				callback.invoke(null);
+			}
+		});
+		
 	}
 
 	private int getTotalPageCount() {
@@ -186,11 +210,11 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	/**
 	 * Gather additional info about the logged in user
 	 */
-	public void sendJoinRequestStep1() {
+	public void sendJoinRequestStep1(WikiPageKey challengeInfoWikiPageKey) {
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile profile = sessionData.getProfile();
 		view.updateWizardProgress(currentPage, getTotalPageCount());
-		view.showChallengeInfoPage(profile, new Callback() {
+		view.showChallengeInfoPage(profile, challengeInfoWikiPageKey, new Callback() {
 			@Override
 			public void invoke() {
 				currentPage++;

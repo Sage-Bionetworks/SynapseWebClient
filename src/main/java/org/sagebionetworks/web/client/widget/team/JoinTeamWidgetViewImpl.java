@@ -27,6 +27,7 @@ import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -41,7 +42,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	
 	private JoinTeamWidgetView.Presenter presenter;
 	private AnimationProtector versionAnimation;
@@ -57,9 +57,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private WizardProgressWidget progressWidget;
 	
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget) {
+	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget) {
 		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.wikiPage = wikiPage;
 		this.progressWidget = progressWidget;
 	}
@@ -178,7 +177,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		}
 		messageArea.setValue("");
 		currentWizardContent = new FlowPanel();
-		currentWizardContent.addStyleName("min-height-500 whiteBackground padding-5");
+		currentWizardContent.addStyleName("min-height-400 whiteBackground padding-5");
 	}	
 	@Override
 	public void showLoading() {
@@ -249,14 +248,15 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.show();	
 	}
 	
-	public void showChallengeInfoPage(UserProfile profile, Callback presenterCallback) {
+	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
 		okButtonCallback = presenterCallback;
 		Widget wikiPageWidget = wikiPage.asWidget();
-        wikiPageWidget.addStyleName("min-height-500 whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.clear();
-        currentWizardContent.add(wikiPageWidget);
-		WikiPageKey wikiKey = new WikiPageKey("syn2495968", ObjectType.ENTITY.toString(), null);
-		wikiPage.loadMarkdownFromWikiPage(wikiKey, true);
+        ScrollPanel panel = new ScrollPanel(wikiPageWidget);
+        panel.setHeight("400px");
+        panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
+        currentWizardContent.add(panel);
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
 		joinWizard.layout(true);
 	}
 	
@@ -267,7 +267,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
 		currentWizardContent.clear();
 		ScrollPanel panel = new ScrollPanel(new HTML(arText));
-		panel.addStyleName("min-height-500 whiteBackground padding-5 margin-bottom-60");
+		panel.setHeight("400px");
+		panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.add(panel);
         joinWizard.layout(true);
         okButtonCallback = touAcceptanceCallback;

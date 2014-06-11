@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
@@ -109,8 +110,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		if(historyValue != null) {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
-		}
-		return null;
+		} else return AppActivityMapper.getDefaultPlace();
 	}
 
 	@Override
