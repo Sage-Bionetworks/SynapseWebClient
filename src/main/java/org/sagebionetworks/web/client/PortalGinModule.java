@@ -268,6 +268,8 @@ import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetView;
+import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -709,6 +711,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
 
 		bind(SharingAndDataUseConditionWidgetView.class).to(SharingAndDataUseConditionWidgetViewImpl.class);
+		
+		bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 	}
 
 }

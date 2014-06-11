@@ -52,14 +52,16 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private MarkdownWidget wikiPage;
 	private Window joinWizard;
 	private Button okButton;
-	private FlowPanel currentWizardContent, progressPanel;
+	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
+	private WizardProgressWidget progressWidget;
 	
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, MarkdownWidget wikiPage) {
+	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.wikiPage = wikiPage;
+		this.progressWidget = progressWidget;
 	}
 	
 	@Override
@@ -177,8 +179,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		messageArea.setValue("");
 		currentWizardContent = new FlowPanel();
 		currentWizardContent.addStyleName("min-height-500 whiteBackground padding-5");
-		progressPanel = new FlowPanel();
-		progressPanel.addStyleName("whiteBackground center");
 	}	
 	@Override
 	public void showLoading() {
@@ -243,7 +243,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
-		joinWizard.add(progressPanel);
+		joinWizard.add(progressWidget.asWidget());
         joinWizard.add(currentWizardContent);
         joinWizard.add(buttonPanel);
 		joinWizard.show();	
@@ -275,28 +275,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	public void updateWizardProgress(int currentPage, int totalPages) {
-		//only show progress if there's more than one page
-		progressPanel.clear();
-		if (totalPages > 1) {
-			for (int i = 0; i < totalPages; i++) {
-				if (i == currentPage) {
-					//current page
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
-				} else if (i < currentPage) {
-					//page complete
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; padding: 3px 3px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
-				} else {
-					//page incomplete
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
-				}
-				
-				if (i < totalPages-1) {
-					Image greyArrow = new Image(sageImageBundle.greyArrow());
-					greyArrow.addStyleName("margin-10 moveup-2");
-					progressPanel.add(greyArrow);
-				}
-			}
-		}
+		progressWidget.configure(currentPage, totalPages);
 	}
 	
 	
