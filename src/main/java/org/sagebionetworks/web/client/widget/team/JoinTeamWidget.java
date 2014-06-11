@@ -70,11 +70,11 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 
-	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
+	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
-		this.isChallengeSignup = showUserProfileForm;
+		this.isChallengeSignup = isChallengeSignup;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
@@ -82,7 +82,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText);
 	};
 
-	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.widgetRefreshRequired = widgetRefreshRequired;
@@ -202,7 +201,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		
 	}
 
-	private int getTotalPageCount() {
+	public int getTotalPageCount() {
 		int challengeSignupPage = isChallengeSignup ? 1 : 0;
 		return accessRequirements.size() + challengeSignupPage;
 	}
@@ -314,4 +313,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		view.setPresenter(this);
 		return view.asWidget();
 	}
+	
+	public boolean isChallengeSignup() {
+		return isChallengeSignup;
+	}
+
 }

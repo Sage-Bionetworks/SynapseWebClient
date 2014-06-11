@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -136,6 +138,41 @@ public class JoinTeamWidgetTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
+	public void testGetTotalPageCount() throws Exception {
+		boolean isChallengeSignup = true;
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.sendJoinRequestStep0();
+        //one page for the AR
+        Assert.assertEquals(1, joinWidget.getTotalPageCount());
+        
+        isChallengeSignup = false;
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.sendJoinRequestStep0();
+        //0 pages
+        Assert.assertEquals(0, joinWidget.getTotalPageCount());
+		
+
+        //Now test with an access requirement.  First as part of a challenge, then outside of challenge 
+        List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
+		ars.add(new TermsOfUseAccessRequirement());
+        requirements.setResults(ars);
+        requirements.setTotalNumberOfResults(1);
+        
+        isChallengeSignup = true;
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.sendJoinRequestStep0();
+        //One page for challenge info, one page for the AR
+        Assert.assertEquals(2, joinWidget.getTotalPageCount());
+        
+        isChallengeSignup = false;
+        joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
+        joinWidget.sendJoinRequestStep0();
+        //One page for challenge info
+        Assert.assertEquals(1, joinWidget.getTotalPageCount());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
 	public void testJoinRequestStep2Failure() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		joinWidget.sendJoinRequestStep0();
@@ -178,5 +215,30 @@ public class JoinTeamWidgetTest {
 		//verify that wiki page refresh is invoked
 		verify(mockWidgetRefreshRequired).invoke();
 	}
+	
+	@Test
+	public void testShowChallengeInfoParam() throws Exception {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		descriptor.put(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY, teamId);
+		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.TRUE.toString());
+		Callback mockWidgetRefreshRequired = mock(Callback.class);
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
+		Assert.assertTrue(joinWidget.isChallengeSignup());
+		
+		descriptor.put(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY, Boolean.FALSE.toString());
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
+		Assert.assertFalse(joinWidget.isChallengeSignup());
+		
+		//if both params are defined, the new param is used
+		descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, Boolean.TRUE.toString());
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
+		Assert.assertTrue(joinWidget.isChallengeSignup());
+		
+		descriptor.remove(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY);
+		descriptor.put(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY, Boolean.FALSE.toString());
+		joinWidget.configure(null, descriptor, mockWidgetRefreshRequired, null);
+		Assert.assertFalse(joinWidget.isChallengeSignup());
+	}
+
 
 }
