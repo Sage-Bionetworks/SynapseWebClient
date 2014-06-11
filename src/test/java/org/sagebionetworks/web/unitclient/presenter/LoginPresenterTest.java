@@ -148,7 +148,7 @@ public class LoginPresenterTest {
 
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
-		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
+		verify(mockPlaceChanger).goTo(any(Place.class));
 	}
 	
 //	@Test 

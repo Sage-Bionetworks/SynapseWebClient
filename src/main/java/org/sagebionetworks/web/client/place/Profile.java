@@ -5,7 +5,7 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class Profile extends Place{
-	
+	public static final String EDIT_PROFILE_TOKEN="edit";
 	private String token;
 	
 	public Profile(String token) {

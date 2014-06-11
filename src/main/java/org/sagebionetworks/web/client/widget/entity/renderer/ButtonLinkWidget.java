@@ -17,6 +17,7 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	private ButtonLinkWidgetView view;
 	private Map<String,String> descriptor;
 	private GWTWrapper gwt;
+	public static final String LINK_OPENS_NEW_WINDOW = "openNewWindow";
 	
 	@Inject
 	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
@@ -34,7 +35,15 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 		if (descriptor.containsKey(WebConstants.HIGHLIGHT_KEY)){
 			isHighlight = Boolean.parseBoolean(descriptor.get(WebConstants.HIGHLIGHT_KEY));
 		}
-		boolean openInNewWindow = isOpenInNewWindow(url);
+		//determine if link should be opened in a new window
+		boolean openInNewWindow;
+		//check for optional parameter
+		if (descriptor.containsKey(LINK_OPENS_NEW_WINDOW)){
+			openInNewWindow = Boolean.parseBoolean(descriptor.get(LINK_OPENS_NEW_WINDOW));
+		} else {
+			//param not present, make a smart choice
+			openInNewWindow = isOpenInNewWindow(url);
+		}
 		
 		view.configure(wikiKey, buttonText, url, isHighlight, openInNewWindow);
 		descriptor = widgetDescriptor;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -38,7 +41,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
-	private boolean showUserProfileForm;
+	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -46,6 +49,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private String message, isMemberMessage, successMessage, buttonText;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
+	private List<TermsOfUseAccessRequirement> accessRequirements;
+	private int currentPage;
+	private int currentAccessRequirement;
 	
 	@Inject
 	public JoinTeamWidget(JoinTeamWidgetView view, 
@@ -64,35 +70,18 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.jsonObjectAdapter = jsonObjectAdapter;
 	}
 
-	public void configure(String teamId, boolean canPublicJoin, boolean showUserProfileForm, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
+	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
 		//set team id
 		this.teamId = teamId;
 		this.canPublicJoin = canPublicJoin;
-		this.showUserProfileForm = showUserProfileForm;
+		this.isChallengeSignup = isChallengeSignup;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		this.isMemberMessage = isMemberMessage;
 		this.successMessage = successMessage;
 		this.buttonText = buttonText;
 		view.configure(authenticationController.isLoggedIn(), canPublicJoin, teamMembershipStatus, isMemberMessage, buttonText);
 	};
-//	
-//	@Override
-//	public void deleteAllJoinRequests() {
-//		synapseClient.deleteOpenMembershipRequests(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Void>() {
-//			@Override
-//			public void onSuccess(Void result) {
-//				view.showInfo("Cancelled Request", "The request to join the team has been removed.");
-//				teamUpdatedCallback.invoke();
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-//					view.showErrorMessage(caught.getMessage());
-//				} 
-//			}
-//		});
-//	}
-	
+
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> descriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.widgetRefreshRequired = widgetRefreshRequired;
@@ -100,9 +89,16 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		if (descriptor.containsKey(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY)) 
 			this.teamId = descriptor.get(WidgetConstants.JOIN_WIDGET_TEAM_ID_KEY);
 		
-		this.showUserProfileForm = descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY) ? 
-				Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY)) : 
-				false;
+		//is the team associated with joining a challenge?
+		if (descriptor.containsKey(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY)) {
+			this.isChallengeSignup = Boolean.parseBoolean(descriptor.get(WebConstants.JOIN_WIDGET_IS_CHALLENGE_KEY));
+		} else {
+			//check for old param
+			this.isChallengeSignup = descriptor.containsKey(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY) ? 
+					Boolean.parseBoolean(descriptor.get(WidgetConstants.JOIN_WIDGET_SHOW_PROFILE_FORM_KEY)) : 
+					false;
+		}
+		
 		this.isMemberMessage = descriptor.get(WidgetConstants.IS_MEMBER_MESSAGE);
 		
 		this.successMessage = descriptor.get(WidgetConstants.JOIN_TEAM_SUCCESS_MESSAGE);
@@ -122,7 +118,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 						TeamMembershipStatus teamMembershipStatus = null;
 						if (result.getTeamMembershipStatusJson() != null)
 							teamMembershipStatus = nodeModelCreator.createJSONEntity(result.getTeamMembershipStatusJson(), TeamMembershipStatus.class);
-						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), showUserProfileForm, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
+						configure(team.getId(), TeamSearchPresenter.getCanPublicJoin(team), isChallengeSignup, teamMembershipStatus, null, isMemberMessage, successMessage, buttonText);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -133,7 +129,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				}
 			});
 		} else {
-			configure(teamId, canPublicJoin, showUserProfileForm, null, null, isMemberMessage, successMessage, buttonText);
+			configure(teamId, canPublicJoin, isChallengeSignup, null, null, isMemberMessage, successMessage, buttonText);
 		}
 	}
 	
@@ -141,69 +137,33 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
 		this.message = message;
 		this.isAcceptingInvite = isAcceptingInvite;
-		if (showUserProfileForm)
-			sendJoinRequestStep1();
-		else //skip to step 2
-			sendJoinRequestStep2();
+		sendJoinRequestStep0();
 	}
 	
 
-	/**
-	 * Gather additional info about the logged in user
-	 */
-	public void sendJoinRequestStep1() {
-		//pop up profile form.  user does not have to fill in info
-		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
-		UserProfile profile = sessionData.getProfile();
-		view.showProfileForm(profile, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				continueToStep2();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				continueToStep2();
-			}
-			
-			public void continueToStep2(){
-				sendJoinRequestStep2();	
-			}
-		});
-	}
-	
-
-	/**
-	 * Check for unmet access restrictions. As long as more exist, it will keep calling itself until all restrictions are approved.
-	 * Will not proceed to step3 (joining the team) until all have been approved.
-	 * @throws RestServiceException
-	 */
-	public void sendJoinRequestStep2() {
-		synapseClient.getUnmetTeamAccessRequirements(teamId, new AsyncCallback<String>() {
+	public void sendJoinRequestStep0() {
+		currentPage = 0;
+		currentAccessRequirement = 0;
+		//initialize the access requirements
+		accessRequirements = new ArrayList<TermsOfUseAccessRequirement>();
+		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				//are there unmet access restrictions?
+				//are there access restrictions?
 				try{
 					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
-					if (ar.getTotalNumberOfResults() > 0) {
-						//there are unmet access requirements.  user must accept all before joining the challenge
-						List<TermsOfUseAccessRequirement> unmetRequirements = ar.getResults();
-						final AccessRequirement firstUnmetAccessRequirement = unmetRequirements.get(0);
-						String text = GovernanceServiceHelper.getAccessRequirementText(firstUnmetAccessRequirement);
-						Callback termsOfUseCallback = new Callback() {
-							@Override
-							public void invoke() {
-								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement.getId());
-							}
-						};
-						//pop up the requirement
-						view.showAccessRequirement(text, termsOfUseCallback);
-					} else {
-						sendJoinRequestStep3();
-					}
-						
+					accessRequirements = ar.getResults();
 				} catch (Throwable e) {
 					onFailure(e);
+				}
+				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
+				if (isChallengeSignup) {
+					startChallengeSignup();
+				}
+				else { //skip to step 2
+					if (accessRequirements.size() > 0)
+						view.showJoinWizard();
+					sendJoinRequestStep2();
 				}
 			}
 			
@@ -212,6 +172,82 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + caught.getMessage());
 			}
 		});
+	}
+	
+	public void startChallengeSignup() {
+		//first, get the challenge participation info wiki key, then show the join wizard
+		CallbackP<WikiPageKey> callback = new CallbackP<WikiPageKey>(){
+			@Override
+			public void invoke(WikiPageKey key) {
+				view.showJoinWizard();
+				sendJoinRequestStep1(key);
+			}
+		};
+		getChallengeParticipationInfoWikiKey(callback);
+	}
+	
+	public void getChallengeParticipationInfoWikiKey(final CallbackP<WikiPageKey> callback) {
+		synapseClient.getHelpPages(new AsyncCallback<HashMap<String,WikiPageKey>>() {
+			@Override
+			public void onSuccess(HashMap<String,WikiPageKey> result) {
+				callback.invoke(result.get(WebConstants.CHALLENGE_PARTICIPATION_INFO));
+			};
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+				callback.invoke(null);
+			}
+		});
+		
+	}
+
+	public int getTotalPageCount() {
+		int challengeSignupPage = isChallengeSignup ? 1 : 0;
+		return accessRequirements.size() + challengeSignupPage;
+	}
+	
+	/**
+	 * Gather additional info about the logged in user
+	 */
+	public void sendJoinRequestStep1(WikiPageKey challengeInfoWikiPageKey) {
+		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
+		UserProfile profile = sessionData.getProfile();
+		view.updateWizardProgress(currentPage, getTotalPageCount());
+		view.showChallengeInfoPage(profile, challengeInfoWikiPageKey, new Callback() {
+			@Override
+			public void invoke() {
+				currentPage++;
+				sendJoinRequestStep2();
+			}
+		});
+	}
+	
+	/**
+	 * Check for unmet access restrictions. As long as more exist, it will keep calling itself until all restrictions are approved.
+	 * Will not proceed to step3 (joining the team) until all have been approved.
+	 * @throws RestServiceException
+	 */
+	public void sendJoinRequestStep2() {
+		if (currentAccessRequirement >= accessRequirements.size()) {
+			//done showing access requirements (and challenge info)
+			view.hideJoinWizard();
+			sendJoinRequestStep3();
+		} else {
+			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);
+			String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+			Callback termsOfUseCallback = new Callback() {
+				@Override
+				public void invoke() {
+					//agreed to terms of use.
+					currentAccessRequirement++;
+					currentPage++;
+					setLicenseAccepted(accessRequirement.getId());
+				}
+			};
+			//pop up the requirement
+			view.updateWizardProgress(currentPage, getTotalPageCount());
+			view.showAccessRequirement(text, termsOfUseCallback);
+		}		
 	}
 	
 	public void setLicenseAccepted(Long arId) {	
@@ -225,7 +261,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		Callback onSuccess = new Callback() {
 			@Override
 			public void invoke() {
-				//ToU signed, now try to register for the challenge (will check for other unmet access restrictions before join)
+				//ToU signed, now try to register for the challenge (will check for other access restrictions before join)
 				sendJoinRequestStep2();
 			}
 		};
@@ -268,7 +304,6 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
-
 	
 	public void clear() {
 		view.clear();
@@ -278,4 +313,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		view.setPresenter(this);
 		return view.asWidget();
 	}
+	
+	public boolean isChallengeSignup() {
+		return isChallengeSignup;
+	}
+
 }

@@ -13,13 +13,10 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -73,11 +70,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 	@Override
 	public void goToLastPlace() {
 		view.hideLoading();
-		Place forwardPlace = globalApplicationState.getLastPlace();
-		if(forwardPlace == null) {
-			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		}
-		goTo(forwardPlace);
+		DisplayUtils.goToLastPlace(globalApplicationState);
 	}
 	
 	@Override

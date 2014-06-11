@@ -66,7 +66,7 @@ public class Portal implements EntryPoint {
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
 						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
 						PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());						
+						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
 

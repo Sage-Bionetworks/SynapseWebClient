@@ -48,6 +48,7 @@ public class AppActivityMapper implements ActivityMapper {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
 	Activity lastActivity;
+	private static boolean isFirstTime = false;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -102,9 +103,11 @@ public class AppActivityMapper implements ActivityMapper {
 		Place storedCurrentPlace = globalApplicationState.getCurrentPlace(); 
 		// only update move storedCurrentPlace to storedLastPlace if storedCurrentPlace is  
 		if(storedCurrentPlace != null && !excludeFromLastPlace.contains(storedCurrentPlace.getClass())) {
+			if (!(isFirstTime && storedCurrentPlace.getClass().equals(AppActivityMapper.getDefaultPlace().getClass())))  //if first load, then do not set the last place (if it's the default place) 
 				globalApplicationState.setLastPlace(storedCurrentPlace);			
 		}
 		
+		isFirstTime = false;
 		globalApplicationState.setCurrentPlace(place);
 				
 		// If the user is not logged in then we redirect them to the login screen
@@ -147,7 +150,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 * Get the default place
 	 * @return
 	 */
-	public Place getDefaultPlace() {
+	public static Place getDefaultPlace() {
 		return new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 	}
 	
