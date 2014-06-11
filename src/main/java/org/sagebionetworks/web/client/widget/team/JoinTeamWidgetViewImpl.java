@@ -281,18 +281,18 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			for (int i = 0; i < totalPages; i++) {
 				if (i == currentPage) {
 					//current page
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 5px; \">"+(i+1) +"</span>"));
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #0d78b6; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
 				} else if (i < currentPage) {
 					//page complete
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 3px;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: white; background-color: #06944e; padding: 3px 3px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+DisplayUtils.getIcon("glyphicon-ok moveup-2") +"</span>"));
 				} else {
 					//page incomplete
-					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; border-width: 2px; border-style: solid; border-radius: 10px; border-color: #58585a; padding: 3px 5px;\">"+(i+1) +"</span>"));
+					progressPanel.add(new InlineHTML("<span class=\"badge margin-top-10\" style=\"color: #58585a; background-color: white; padding: 3px 5px; box-shadow: 0 0 0 1px #fff, 0 0 0 3px #58585a;\">"+(i+1) +"</span>"));
 				}
 				
 				if (i < totalPages-1) {
 					Image greyArrow = new Image(sageImageBundle.greyArrow());
-					greyArrow.addStyleName("margin-right-5 margin-left-5 moveup-2");
+					greyArrow.addStyleName("margin-10 moveup-2");
 					progressPanel.add(greyArrow);
 				}
 			}
