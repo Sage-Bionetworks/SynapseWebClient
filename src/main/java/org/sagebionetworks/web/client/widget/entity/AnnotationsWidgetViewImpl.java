@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
@@ -165,13 +166,10 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 	}
 	
 	private void handleDeleteClick(final EntityRow row) {
-		MessageBox.confirm(DisplayConstants.LABEL_DELETE +" \"" + row.getLabel()+"\"", DisplayConstants.PROMPT_SURE_DELETE + " annotation?", new Listener<MessageBoxEvent>() {					
+		DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" \"" + row.getLabel()+"\"", DisplayConstants.PROMPT_SURE_DELETE + " annotation?", new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 					
-				com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-				if(Dialog.YES.equals(btn.getItemId())) {
-					presenter.deleteAnnotation(row);
-				}
+			public void invoke() {
+				presenter.deleteAnnotation(row);
 			}
 		});
 	}

@@ -174,7 +174,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void showErrorMessage(String errorMessage) {
 		registerBtn.setEnabled(true);
-		MessageBox.info("Error", errorMessage, null);
+		DisplayUtils.showErrorMessage(errorMessage);
 	}
 
 	@Override

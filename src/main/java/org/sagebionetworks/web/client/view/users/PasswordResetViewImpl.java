@@ -246,7 +246,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@Override
 	public void showErrorMessage(String errorMessage) {
 		submitBtn.setEnabled(true);
-		MessageBox.info("Error", errorMessage, null);
+		DisplayUtils.showErrorMessage(errorMessage);
 	}
 
 

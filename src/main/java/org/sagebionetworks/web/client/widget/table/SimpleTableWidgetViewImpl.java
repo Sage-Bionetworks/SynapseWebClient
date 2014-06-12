@@ -621,15 +621,13 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		deleteRowBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm(DisplayConstants.DELETE_SELECTED, DisplayConstants.CONFIRM_DELETE_SELECTED, new Listener<MessageBoxEvent>() {					
-					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteRows(getSelectedRows());
-						}
-					}
-				});
+				DisplayUtils.showConfirmDialog(DisplayConstants.DELETE_SELECTED, DisplayConstants.CONFIRM_DELETE_SELECTED, 
+						new Callback() {
+							@Override
+							public void invoke() {
+								presenter.deleteRows(getSelectedRows());
+							}
+						});
 			}
 		});		
 		
@@ -708,33 +706,32 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			columnPanel.getDelete().addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					MessageBox.confirm("Confirm", DisplayConstants.CONFIRM_DELETE_COLUMN + col.getName(), new Listener<MessageBoxEvent>() {
-						public void handleEvent(MessageBoxEvent ce) {							
-							com.extjs.gxt.ui.client.widget.button.Button btn = ce.getButtonClicked();	
-							if (btn.getText().equals("Yes")) {
-								columnPanel.addStyleName("fade");
-								// allow for fade before removal
-								Timer t = new Timer() {								
-									@Override
-									public void run() {
-										allColumnsPanel.remove(columnPanel);
-										columnPanelOrder.remove(columnPanel);
-										
-										// update table entity
-										presenter.updateColumnOrder(TableViewUtils.extractColumns(columnPanelOrder));
-										
-										// update ends, if needed
-										int size = columnPanelOrder.size();
-										if(size > 0) {
-											TableViewUtils.setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
-											TableViewUtils.setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
+					DisplayUtils.showConfirmDialog("Confirm", DisplayConstants.CONFIRM_DELETE_COLUMN + col.getName(), 
+							new Callback() {
+								@Override
+								public void invoke() {
+									columnPanel.addStyleName("fade");
+									// allow for fade before removal
+									Timer t = new Timer() {								
+										@Override
+										public void run() {
+											allColumnsPanel.remove(columnPanel);
+											columnPanelOrder.remove(columnPanel);
+											
+											// update table entity
+											presenter.updateColumnOrder(TableViewUtils.extractColumns(columnPanelOrder));
+											
+											// update ends, if needed
+											int size = columnPanelOrder.size();
+											if(size > 0) {
+												TableViewUtils.setArrowVisibility(0, size, columnPanelOrder.get(0).getMoveUp(), columnPanelOrder.get(0).getMoveDown());
+												TableViewUtils.setArrowVisibility(size-1, size, columnPanelOrder.get(size-1).getMoveUp(), columnPanelOrder.get(size-1).getMoveDown());
+											}
 										}
-									}
-								};
-								t.schedule(250);
-							}
-						}
-					});
+									};
+									t.schedule(250);
+								}
+							});
 				}
 			});
 			if(i==0) columnPanel.getMoveUp().setVisible(false);

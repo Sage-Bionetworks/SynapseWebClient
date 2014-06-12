@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -159,7 +160,7 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showError(String message) {
-		com.google.gwt.user.client.Window.alert(message);
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override

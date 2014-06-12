@@ -55,7 +55,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -108,14 +107,12 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -157,8 +154,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -168,7 +165,11 @@ import com.google.gwt.user.client.ui.Widget;
 public class DisplayUtils {
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
-	
+	public static enum MessagePopup {  
+        INFO,
+        WARNING,
+        QUESTION
+	}
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -403,7 +404,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 */
 	public static boolean handleJSONAdapterException(JSONObjectAdapterException ex, PlaceChanger placeChanger, UserSessionData currentUser) {
-		MessageBox.info("Incompatible Client Version", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
+		DisplayUtils.showInfoDialog("Incompatible Client Version", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
 		placeChanger.goTo(new Home(DEFAULT_PLACE_TOKEN));
 		return true;
 	}
@@ -521,7 +522,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		com.google.gwt.user.client.Window.alert(message);  
+		showPopup("", message, MessagePopup.WARNING, 300, DisplayConstants.OK, null, null, null);
 	}
 
 	/**
@@ -598,32 +599,119 @@ public class DisplayUtils {
 		d.show();
 	}
 	
+	public static void showInfoDialog(
+			String title, 
+			String message,
+			Callback okCallback
+			) {
+		showPopup(title, message, MessagePopup.INFO, 300, DisplayConstants.OK, okCallback, null, null);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback,
+			Callback noCallback
+			) {
+		showPopup(title, message, MessagePopup.QUESTION, 300, DisplayConstants.YES, yesCallback, DisplayConstants.NO, noCallback);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback
+			) {
+		showConfirmDialog(title, message, yesCallback, new Callback() {
+			@Override
+			public void invoke() {
+				//do nothing when No is clicked
+			}
+		});
+	}
+	
 	public static void showOkCancelMessage(
 			String title, 
 			String message, 
-			String iconStyle,
+			MessagePopup iconStyle,
 			int minWidth,
-			final Callback okCallback, 
-			final Callback cancelCallback) {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OKCANCEL);
-	    box.setIcon(iconStyle);
-	    box.setTitle(title);
-	    box.addCallback(new Listener<MessageBoxEvent>() {					
+			Callback okCallback,
+			Callback cancelCallback) {
+		showPopup(title, message, iconStyle, minWidth, DisplayConstants.OK, okCallback, DisplayConstants.BUTTON_CANCEL, cancelCallback);
+	}
+	
+	public static void showPopup(
+			String title, 
+			String message, 
+			DisplayUtils.MessagePopup iconStyle,
+			int minWidth,
+			String primaryButtonText,
+			final Callback primaryButtonCallback,
+			String secondaryButtonText,
+			final Callback secondaryButtonCallback) {
+		
+		final Window dialog = new Window();
+		dialog.setMaximizable(false);
+        dialog.setSize(minWidth, 100);
+        dialog.setPlain(true); 
+        dialog.setModal(true); 
+        dialog.setAutoHeight(true);
+        dialog.setResizable(false);
+        String iconHtml = "";
+        if (MessagePopup.INFO.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
+        else if (MessagePopup.WARNING.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10");
+        else if (MessagePopup.QUESTION.equals(iconStyle))
+        	iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10");	
+        HorizontalPanel content = new HorizontalPanel();
+        if (iconHtml.length() > 0)
+        	content.add(new HTML(iconHtml));
+        HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
+        messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
+        content.add(messagePanel);
+        content.setWidth("100%");
+        content.addStyleName("whiteBackground padding-5");
+        dialog.add(content);
+		dialog.setHeading(title);
+		FlowPanel buttonPanel = new FlowPanel();
+		buttonPanel.setHeight("50px");
+		buttonPanel.addStyleName("whiteBackground");
+		boolean isSecondaryButton = secondaryButtonText != null;
+		
+		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+		continueButton.addStyleName("right margin-right-10 margin-bottom-10");
+		continueButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 												
-				Button btn = be.getButtonClicked();
-				if(Dialog.OK.equals(btn.getItemId())) {
-					okCallback.invoke();
-				} else {
-					cancelCallback.invoke();
-				}
+			public void onClick(ClickEvent event) {
+				dialog.hide();
+				if (primaryButtonCallback != null)
+					primaryButtonCallback.invoke();
 			}
 		});
-	    box.setMessage(message);
-	    box.setMinWidth(minWidth);
-	    box.show();
-
+        
+		buttonPanel.add(continueButton);
+		
+		if (isSecondaryButton) {
+			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils.createButton(secondaryButtonText);
+			cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
+			cancelButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					dialog.hide();
+					if (secondaryButtonCallback != null)
+						secondaryButtonCallback.invoke();
+				}
+			});
+			buttonPanel.add(cancelButton);
+		}
+        
+        dialog.add(buttonPanel);
+		dialog.show();
+		
+		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog.getOffsetWidth()) / 2;
+        int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog.getOffsetHeight()) / 2;
+        dialog.setPosition(left, top);
+		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
 	
 	public static String getPrimaryEmail(UserProfile userProfile) {

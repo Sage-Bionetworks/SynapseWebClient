@@ -46,7 +46,7 @@ public class Portal implements EntryPoint {
 				public void onFailure(Throwable reason) {
 					// Not sure what to do here.
 					loading.hide();
-					Window.alert(reason.getMessage());	
+					DisplayUtils.showErrorMessage(reason.getMessage());
 				}
 
 				@Override

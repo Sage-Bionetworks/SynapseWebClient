@@ -268,15 +268,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Callback() {
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.leaveTeam();
-						}
+					public void invoke() {
+						presenter.leaveTeam();
 					}
-				});
+				}); 
 			}
 		});				
 		menuBtn.addMenuItem(a);
@@ -288,13 +285,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" Team?", DisplayConstants.PROMPT_SURE_DELETE + " Team" +"?", new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" Team?", DisplayConstants.PROMPT_SURE_DELETE + " Team" +"?", new Callback() {
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteTeam();
-						}
+					public void invoke() {
+						presenter.deleteTeam();
 					}
 				});
 			}
