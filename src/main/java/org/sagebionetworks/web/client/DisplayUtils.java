@@ -638,47 +638,45 @@ public class DisplayUtils {
 			Callback cancelCallback) {
 		showPopup(title, message, iconStyle, minWidth, DisplayConstants.OK, okCallback, DisplayConstants.BUTTON_CANCEL, cancelCallback);
 	}
-	
-	public static void showPopup(
-			String title, 
-			String message, 
-			DisplayUtils.MessagePopup iconStyle,
-			int minWidth,
-			String primaryButtonText,
-			final Callback primaryButtonCallback,
-			String secondaryButtonText,
-			final Callback secondaryButtonCallback) {
-		
+
+	public static void showPopup(String title, String message,
+			DisplayUtils.MessagePopup iconStyle, int minWidth,
+			String primaryButtonText, final Callback primaryButtonCallback,
+			String secondaryButtonText, final Callback secondaryButtonCallback) {
+
 		final Window dialog = new Window();
 		dialog.setMaximizable(false);
-        dialog.setSize(minWidth, 100);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        String iconHtml = "";
-        if (MessagePopup.INFO.equals(iconStyle))
-        	iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
-        else if (MessagePopup.WARNING.equals(iconStyle))
-        	iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10");
-        else if (MessagePopup.QUESTION.equals(iconStyle))
-        	iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10");	
-        HorizontalPanel content = new HorizontalPanel();
-        if (iconHtml.length() > 0)
-        	content.add(new HTML(iconHtml));
-        HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
-        messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
-        content.add(messagePanel);
-        content.setWidth("100%");
-        content.addStyleName("whiteBackground padding-5");
-        dialog.add(content);
+		dialog.setSize(minWidth, 100);
+		dialog.setPlain(true);
+		dialog.setModal(true);
+		dialog.setAutoHeight(true);
+		dialog.setResizable(false);
+		String iconHtml = "";
+		if (MessagePopup.INFO.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
+		else if (MessagePopup.WARNING.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10");
+		else if (MessagePopup.QUESTION.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10");
+		HorizontalPanel content = new HorizontalPanel();
+		if (iconHtml.length() > 0)
+			content.add(new HTML(iconHtml));
+		HTMLPanel messagePanel = new HTMLPanel("h6",
+				SafeHtmlUtils.htmlEscape(message));
+		messagePanel
+				.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
+		content.add(messagePanel);
+		content.setWidth("100%");
+		content.addStyleName("whiteBackground padding-5");
+		dialog.add(content);
 		dialog.setHeading(title);
 		FlowPanel buttonPanel = new FlowPanel();
 		buttonPanel.setHeight("50px");
 		buttonPanel.addStyleName("whiteBackground");
 		boolean isSecondaryButton = secondaryButtonText != null;
-		
-		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+
+		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils
+				.createButton(primaryButtonText, ButtonType.PRIMARY);
 		continueButton.addStyleName("right margin-right-10 margin-bottom-10");
 		continueButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -688,11 +686,12 @@ public class DisplayUtils {
 					primaryButtonCallback.invoke();
 			}
 		});
-        
+
 		buttonPanel.add(continueButton);
-		
+
 		if (isSecondaryButton) {
-			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils.createButton(secondaryButtonText);
+			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils
+					.createButton(secondaryButtonText);
 			cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
 			cancelButton.addClickHandler(new ClickHandler() {
 				@Override
@@ -704,13 +703,15 @@ public class DisplayUtils {
 			});
 			buttonPanel.add(cancelButton);
 		}
-        
-        dialog.add(buttonPanel);
+
+		dialog.add(buttonPanel);
 		dialog.show();
-		
-		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog.getOffsetWidth()) / 2;
-        int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog.getOffsetHeight()) / 2;
-        dialog.setPosition(left, top);
+
+		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog
+				.getOffsetWidth()) / 2;
+		int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog
+				.getOffsetHeight()) / 2;
+		dialog.setPosition(left, top);
 		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
 	
