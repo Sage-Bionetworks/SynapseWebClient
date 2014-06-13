@@ -12,12 +12,14 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
@@ -507,17 +509,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			@Override
 			public void deleteClicked() {
 				//delete wiki
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE + " Page",
+				DisplayUtils.showConfirmDialog(
+						DisplayConstants.LABEL_DELETE + " Page",
 						DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
-						new Listener<MessageBoxEvent>() {
-					@Override
-					public void handleEvent(MessageBoxEvent be) {
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteButtonClicked();
-						}
-					}
-				});
+						new org.sagebionetworks.web.client.utils.Callback() {
+							@Override
+							public void invoke() {
+								presenter.deleteButtonClicked();
+							}
+						});
 			}
 		};
 	}
@@ -553,7 +553,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			}	
 		};
 		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-				MessageBox.WARNING, 500, okCallback, cancelCallback);
+				MessagePopup.WARNING, 500, okCallback, cancelCallback);
 	}
 	
 	@Override

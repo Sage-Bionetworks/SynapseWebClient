@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
@@ -101,19 +101,19 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	private void showAnonymousMessage() {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OK);
-	    box.setIcon(MessageBox.INFO);
-	    box.setTitle("Login or Register");
-	    box.addCallback(new Listener<MessageBoxEvent>() {
+		Callback okCallback = new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) {
+			public void invoke() {
 				presenter.gotoLoginPage();
 			}
-		});
-	    box.setMinWidth(320);
-	    box.setMessage(DisplayConstants.ANONYMOUS_JOIN);
-	    box.show();
+		};
+		Callback cancelCallback = new Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+
+		DisplayUtils.showOkCancelMessage("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, 320, okCallback, cancelCallback);
 	}
 	
 	private void initView(String joinButtonText) {
@@ -197,7 +197,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)));
 		hideJoinWizard();
 	}
-	
+
 	@Override
 	public void hideJoinWizard() {
 		if (joinWizard != null && joinWizard.isVisible())
@@ -209,7 +209,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.presenter = presenter;
 	}
 	
-	@Override
+			@Override
 	public void showJoinWizard() {
 		joinWizard = new Window();
 		joinWizard.addStyleName("whiteBackground");
@@ -230,7 +230,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				joinWizard.hide();
 			}
 		});
-		
+			
 		okButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
 		okButton.addStyleName("right margin-bottom-10 margin-right-10");
 		okButton.addClickHandler(new ClickHandler() {
@@ -239,15 +239,15 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 				okButtonCallback.invoke();
 			}
 		});
-        
+			
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
 		joinWizard.add(progressWidget.asWidget());
         joinWizard.add(currentWizardContent);
         joinWizard.add(buttonPanel);
 		joinWizard.show();	
-	}
-	
+			}
+			
 	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
 		okButtonCallback = presenterCallback;
 		Widget wikiPageWidget = wikiPage.asWidget();
@@ -258,15 +258,15 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         currentWizardContent.add(panel);
 		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
 		joinWizard.layout(true);
-	}
-	
+			}
+		
 	@Override
 	public void showAccessRequirement(
 			String arText,
 			final Callback touAcceptanceCallback) {
 		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
 		currentWizardContent.clear();
-		ScrollPanel panel = new ScrollPanel(new HTML(arText));
+        ScrollPanel panel = new ScrollPanel(new HTML(arText));
 		panel.setHeight("400px");
 		panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.add(panel);
@@ -274,10 +274,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         okButtonCallback = touAcceptanceCallback;
 	}
 	
-	@Override
+			@Override
 	public void updateWizardProgress(int currentPage, int totalPages) {
 		progressWidget.configure(currentPage, totalPages);
-	}
+			}
 	
 	
 }

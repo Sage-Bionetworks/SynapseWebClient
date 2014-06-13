@@ -157,7 +157,7 @@ public class QueryServiceTableViewImpl extends Composite implements QueryService
 
 	@Override
 	public void showMessage(String message) {
-		Window.alert(message);
+		DisplayUtils.showInfoDialog("", message, null);
 	}
 
 	@Override

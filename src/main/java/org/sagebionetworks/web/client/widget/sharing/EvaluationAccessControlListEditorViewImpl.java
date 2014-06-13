@@ -283,7 +283,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 
 	@Override
 	public void showErrorMessage(String message) {
-		MessageBox.info("Message", message, null);
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -398,17 +398,15 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	
 	@Override
 	public void alertUnsavedViewChanges(final Callback saveCallback) {
-		MessageBox.confirm(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, new Listener<MessageBoxEvent>() {					
-			@Override
-			public void handleEvent(MessageBoxEvent be) { 					
-				Button btn = be.getButtonClicked();
-				if(Dialog.YES.equals(btn.getItemId())) {
-					addPersonToAcl();
-					presenter.setUnsavedViewChanges(false);
-					saveCallback.invoke();
-				} 				
-			}
-		});
+		DisplayUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, 
+				new Callback() {
+					@Override
+					public void invoke() {
+						addPersonToAcl();
+						presenter.setUnsavedViewChanges(false);
+						saveCallback.invoke();
+					}
+				});
 	}
 
 	private void addPersonToAcl() {

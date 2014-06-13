@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -64,24 +65,18 @@ public class FooterViewImpl extends Composite implements FooterView {
 			public void onClick(ClickEvent event) {
 				if (!DisplayUtils.isInTestWebsite(cookies)) {
 					//verify
-					MessageBox box = new MessageBox();
-				    box.setButtons(MessageBox.YESNO);
-				    box.setIcon(MessageBox.WARNING);
-				    box.setTitle("Alpha Test Mode");
-				    box.addCallback(new Listener<MessageBoxEvent>() {					
-						@Override
-						public void handleEvent(MessageBoxEvent be) { 												
-							Button btn = be.getButtonClicked();
-							if(Dialog.YES.equals(btn.getItemId())) {
-								//switch to pre-release test website mode
-								DisplayUtils.setTestWebsite(true, cookies);
-								Window.scrollTo(0, 0);
-								Window.Location.reload();
-							}
-						}
-					});
-				    box.setMessage(DisplayConstants.TEST_MODE_WARNING);
-				    box.show();
+					DisplayUtils.showConfirmDialog(
+							"Alpha Test Mode", 
+							DisplayConstants.TEST_MODE_WARNING, 
+							new Callback() {
+								@Override
+								public void invoke() {
+									//switch to pre-release test website mode
+									DisplayUtils.setTestWebsite(true, cookies);
+									Window.scrollTo(0, 0);
+									Window.Location.reload();
+								}
+							});
 				} else {
 					//switch back to standard mode
 					DisplayUtils.setTestWebsite(false, cookies);

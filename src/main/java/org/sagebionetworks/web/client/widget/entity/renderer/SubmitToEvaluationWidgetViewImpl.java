@@ -4,6 +4,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.Listener;
@@ -69,19 +71,19 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 	
 	@Override
 	public void showAnonymousRegistrationMessage() {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OK);
-	    box.setIcon(MessageBox.INFO);
-	    box.setTitle("Login or Register");
-	    box.addCallback(new Listener<MessageBoxEvent>() {
+		Callback okCallback = new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) {
+			public void invoke() {
 				presenter.gotoLoginPage();
 			}
-		});
-	    box.setMinWidth(320);
-	    box.setMessage(DisplayConstants.ANONYMOUS_JOIN_EVALUATION);
-	    box.show();
+		};
+		Callback cancelCallback = new Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+
+		DisplayUtils.showOkCancelMessage("Login or Register", DisplayConstants.ANONYMOUS_JOIN_EVALUATION, MessagePopup.INFO, 320, okCallback, cancelCallback);
 	}
 	
 

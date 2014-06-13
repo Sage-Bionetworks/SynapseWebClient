@@ -103,14 +103,14 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 
 	@Override
 	public void showSubmissionAcknowledgement() {
-		Window.alert("Your submission has been received.");
+		DisplayUtils.showInfoDialog("Submission Received", "Your submission has been received.", null);
 	}
 
 
 
 	@Override
 	public void showSubmissionError() {
-		Window.alert("There was an error during submission.  Please try again or contact Sage Bionetworks.");
+		DisplayUtils.showErrorMessage("There was an error during submission.  Please try again or contact Sage Bionetworks.");
 	}
 
 }

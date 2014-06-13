@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.AnimationProtector;
 import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
@@ -423,19 +424,17 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 							new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+									DisplayUtils.showConfirmDialog(
+											DisplayConstants.LABEL_DELETE + " " + versionLabel,
 											DisplayConstants.PROMPT_SURE_DELETE + " version?",
-											new Listener<MessageBoxEvent>() {
-										@Override
-										public void handleEvent(MessageBoxEvent be) {
-											Button btn = be.getButtonClicked();
-											if(Dialog.YES.equals(btn.getItemId())) {
-												presenter.deleteVersion(
-														(String) model.get(VERSION_KEY_ID),
-														(Long) model.get(VERSION_KEY_NUMBER));
-											}
-										}
-									});
+											new Callback() {
+												@Override
+												public void invoke() {
+													presenter.deleteVersion(
+															(String) model.get(VERSION_KEY_ID),
+															(Long) model.get(VERSION_KEY_NUMBER));
+												}
+											});
 								}
 							});
 					if (currentVersion) {

@@ -78,7 +78,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		this.place = place;
 		this.view.setPresenter(this);
 		final String token = place.toToken();
-
+		view.showErrorMessage("Testing error message dialog look and feel.");
 		synapseClient.getEntity(token, new AsyncCallback<EntityWrapper>() {			
 			@Override
 			public void onSuccess(EntityWrapper result) {

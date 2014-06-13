@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
@@ -154,16 +155,13 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				leaveButton.addClickHandler(new ClickHandler() {			
 					@Override
 					public void onClick(ClickEvent event) {
-						MessageBox.confirm("Remove Member?", DisplayUtils.getDisplayName(member) + DisplayConstants.PROMPT_SURE_REMOVE_MEMBER, new Listener<MessageBoxEvent>() {					
-							@Override
-							public void handleEvent(MessageBoxEvent be) { 					
-								com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-								if(Dialog.YES.equals(btn.getItemId())) {
-									presenter.removeMember(member.getOwnerId());
-								}
-							}
-						});
-
+						DisplayUtils.showConfirmDialog("Remove Member?", DisplayUtils.getDisplayName(member) + DisplayConstants.PROMPT_SURE_REMOVE_MEMBER, 
+								new Callback() {
+									@Override
+									public void invoke() {
+										presenter.removeMember(member.getOwnerId());
+									}
+								});
 					}
 				});
 				right.add(leaveButton);

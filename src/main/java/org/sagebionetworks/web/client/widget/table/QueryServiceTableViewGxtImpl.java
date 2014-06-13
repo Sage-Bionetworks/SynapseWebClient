@@ -179,7 +179,7 @@ public class QueryServiceTableViewGxtImpl extends LayoutContainer implements Que
 
 	@Override
 	public void showMessage(String message) {
-		MessageBox.info("Message", message, null);
+		DisplayUtils.showInfoDialog("Message", message, null);
 	}
 
 	@Override
