@@ -9,6 +9,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
@@ -29,12 +30,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
 	
+	private ClientCache clientCache;
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private AdapterFactory adapterFactory;
 	
 	@Inject
-	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory){
+	public AuthenticationControllerImpl(ClientCache clientCache, CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory){
+		this.clientCache = clientCache;
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.adapterFactory = adapterFactory;
@@ -72,10 +75,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void logoutUser() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
+		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
 		if(loginCookieString != null) {
-			// don't actually terminate session, just remove the cookies			
-			cookies.removeCookie(CookieKeys.USER_LOGIN_DATA);
+			// don't actually terminate session, just remove the cookies
+			clientCache.remove(CookieKeys.USER_LOGIN_DATA);
 			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 			currentUser = null;
 		}
@@ -91,7 +94,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					try {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
-						updateUserLoginDataCookie(userSessionData);
+						updateCachedUserLoginData(userSessionData);
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
@@ -116,16 +119,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
 			try {
-				updateUserLoginDataCookie(currentUser);
+				updateCachedUserLoginData(currentUser);
 			} catch (JSONObjectAdapterException e) {
 			}
 		}
 	}
 	
-	private void updateUserLoginDataCookie(UserSessionData userSessionData) throws JSONObjectAdapterException {
+	private void updateCachedUserLoginData(UserSessionData userSessionData) throws JSONObjectAdapterException {
 		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
-		Date tomorrow = getDayFromNow();
-		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
+		clientCache.put(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString());
 	}
 	
 	@Override
@@ -135,15 +137,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public boolean isLoggedIn() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			try {
-				currentUser = new UserSessionData(adapterFactory.createNew(loginCookieString));
-				if(currentUser != null) return true;				
-			} catch (JSONObjectAdapterException e) {				
-			}			
-		} 
-		return false;
+		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
+		return token != null && currentUser != null;
 	}
 
 	@Override
@@ -158,18 +153,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void reloadUserSessionData() {
+	public void reloadUserSessionData(AsyncCallback<String> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, new AsyncCallback<String>() {
-			@Override
-			public void onFailure(Throwable caught) {				
-			}
-
-			@Override
-			public void onSuccess(String result) {
-			}
-		});
-		
+		setUser(sessionToken, callback);
 	}
 
 	@Override

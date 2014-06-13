@@ -19,6 +19,8 @@ public interface ClientCache {
 	void put(String key, String value);
 	void put(String key, String value, Long expireTime);
 	
+	void remove(String key);
+	
 	/**
 	 * Returns true iff storage is supported by this browser, the key/value pair was put into storage, and is not expired.
 	 * @param key
