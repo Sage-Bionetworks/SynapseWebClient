@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -75,13 +76,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void logoutUser() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		if(loginCookieString != null) {
-			// don't actually terminate session, just remove the cookies
-			clientCache.remove(CookieKeys.USER_LOGIN_DATA);
-			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-			currentUser = null;
-		}
+		// don't actually terminate session, just remove the cookies
+		clientCache.remove(WebConstants.USER_LOGIN_DATA);
+		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		currentUser = null;
 	}
 
 	private void setUser(String token, final AsyncCallback<String> callback) {
@@ -127,7 +125,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private void updateCachedUserLoginData(UserSessionData userSessionData) throws JSONObjectAdapterException {
 		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
-		clientCache.put(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString());
+		clientCache.put(WebConstants.USER_LOGIN_DATA, usdAdapter.toJSONString());
 	}
 	
 	@Override
@@ -138,7 +136,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public boolean isLoggedIn() {
 		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		return token != null && currentUser != null;
+		return token != null && !token.isEmpty() && currentUser != null;
 	}
 
 	@Override

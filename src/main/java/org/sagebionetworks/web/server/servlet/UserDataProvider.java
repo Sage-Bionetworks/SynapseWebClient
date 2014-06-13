@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -53,7 +54,7 @@ public class UserDataProvider {
 				}
 			}
 		}
-		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_DATA);
+		logger.info("Cannot find user login data in the cookies using cookie.name="	+ WebConstants.USER_LOGIN_DATA);
 		return null;
 	}
 	
