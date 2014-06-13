@@ -45,7 +45,13 @@ public class ClientCacheImpl implements ClientCache {
 			storage.setItem(key, value);
 		}
 	}
-
+	
+	@Override
+	public void remove(String key) {
+		if (storage.isStorageSupported()) {
+			storage.removeItem(key);
+		}
+	}
 	@Override
 	public boolean contains(String key) {
 		return get(key) != null;

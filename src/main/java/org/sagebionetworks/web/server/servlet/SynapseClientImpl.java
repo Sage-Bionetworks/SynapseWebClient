@@ -706,11 +706,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getUserProfile() throws RestServiceException {
 		try	{
 			//cached, in a cookie?
-			UserProfile profile = UserDataProvider.getThreadLocalUserProfile(this.getThreadLocalRequest());
-			if (profile == null){
-				org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-				profile = synapseClient.getMyProfile();
-			}
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			UserProfile profile = synapseClient.getMyProfile();
 			return EntityFactory.createJSONStringForEntity(profile);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());

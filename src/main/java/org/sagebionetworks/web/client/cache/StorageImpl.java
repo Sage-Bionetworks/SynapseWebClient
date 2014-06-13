@@ -6,7 +6,7 @@ public class StorageImpl implements StorageWrapper {
 
 	private Storage storage;
 	public StorageImpl() {
-		storage = Storage.getSessionStorageIfSupported();
+		storage = Storage.getLocalStorageIfSupported();
 	}
 
 	@Override
