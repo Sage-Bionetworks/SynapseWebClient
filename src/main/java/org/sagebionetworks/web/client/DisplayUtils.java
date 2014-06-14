@@ -651,6 +651,7 @@ public class DisplayUtils {
 		dialog.setModal(true);
 		dialog.setAutoHeight(true);
 		dialog.setResizable(false);
+		dialog.setClosable(false); //do not include x button in upper right
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
 			iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
@@ -661,10 +662,8 @@ public class DisplayUtils {
 		HorizontalPanel content = new HorizontalPanel();
 		if (iconHtml.length() > 0)
 			content.add(new HTML(iconHtml));
-		HTMLPanel messagePanel = new HTMLPanel("h6",
-				SafeHtmlUtils.htmlEscape(message));
-		messagePanel
-				.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
+		HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
+		messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
 		content.add(messagePanel);
 		content.setWidth("100%");
 		content.addStyleName("whiteBackground padding-5");
@@ -707,10 +706,8 @@ public class DisplayUtils {
 		dialog.add(buttonPanel);
 		dialog.show();
 
-		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog
-				.getOffsetWidth()) / 2;
-		int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog
-				.getOffsetHeight()) / 2;
+		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog.getOffsetWidth()) / 2;
+		int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog.getOffsetHeight()) / 2;
 		dialog.setPosition(left, top);
 		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
@@ -949,7 +946,6 @@ public class DisplayUtils {
 		}
 		return stub; 
 	}
-
 	
 	
 	/*
