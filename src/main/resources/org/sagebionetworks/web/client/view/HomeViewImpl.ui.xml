@@ -120,7 +120,7 @@
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
-			          <a href="#!Challenges:DREAM8"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
+			          <a href="#!Challenges:DREAM"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM">Learn More</a></p>
@@ -155,7 +155,7 @@
 			          <a href="#!Synapse:syn2384331"><g:Image resource='{sageImageBundle.dream9Broad}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			                <p><a class="btn btn-large btn-primary" style="position: relative; top: -64px;" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
+			                <p><a class="btn btn-large btn-primary" style="position: relative; top: -64px;" href="#!Synapse:syn2384331">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
