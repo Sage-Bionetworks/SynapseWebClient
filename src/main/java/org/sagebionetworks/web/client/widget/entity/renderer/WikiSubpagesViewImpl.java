@@ -34,9 +34,10 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
 	
 	private Button showHideButton;
-	private LayoutContainer ulContainer;
+	private FlowPanel ulContainer;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
+	boolean isShowingSubpages;
 	
 	@Inject
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
@@ -60,60 +61,50 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			ul.addStyleName("notopmargin nav bs-sidenav");
 			addTreeItemsRecursive(ul, root.getChildren());
 			showHideButton = DisplayUtils.createButton("");
-			ulContainer = new LayoutContainer();
+			ulContainer = new FlowPanel();
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 			ulContainer.add(ul);
 
-			AnimationProtectorViewImpl protector = new AnimationProtectorViewImpl(showHideButton, ulContainer);
-			protector.setContainerVisible(true);
-			showSubpages();
-			AnimationProtector animation = new AnimationProtector(protector);
-			animation.setOutDirection(Direction.LEFT);
-			animation.setInDirection(Direction.RIGHT);
+			showHideButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if (isShowingSubpages)
+						hideSubpages();
+					else
+						showSubpages();
+				}
+			});
 			
-			FxConfig hideConfig = new FxConfig(300);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					hideSubpages();
-				}
-			});
-			animation.setHideConfig(hideConfig);
-			//already jumpy when showing the hidden subpages (because of the container width change), so make this quick
-			FxConfig showConfig = new FxConfig(10);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					showSubpages();
-				}
-			});
-			animation.setShowConfig(showConfig);
+			showSubpages();
+			
 			add(ulContainer);
 			add(showHideButton);
 		}
 	}
 	
 	private void hideSubpages() {
+		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
 		if (wikiSubpagesContainer != null)
 			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
 		if (wikiPageContainer != null)
 			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
-		ulContainer.layout(true);
 		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
 		removeStyleName("well");
+		ulContainer.addStyleName("hide");
 		showHideButton.setStyleName("btn btn-default btn-xs left");
 	}
 	
 	private void showSubpages() {
+		isShowingSubpages = true;
 		if (wikiSubpagesContainer != null)
 			wikiSubpagesContainer.setStyleName(SHOW_SUBPAGES_STYLE);
 		if (wikiPageContainer != null)
 			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
-		ulContainer.layout(true);
 		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 		addStyleName("well");
+		ulContainer.removeStyleName("hide");
 		showHideButton.setStyleName("btn btn-default btn-xs right");
 	}
 	
