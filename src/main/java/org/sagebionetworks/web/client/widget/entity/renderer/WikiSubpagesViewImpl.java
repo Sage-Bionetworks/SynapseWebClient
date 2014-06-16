@@ -92,7 +92,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
 		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
 		removeStyleName("well");
-		ulContainer.addStyleName("hide");
+		DisplayUtils.hide(ulContainer);
 		showHideButton.setStyleName("btn btn-default btn-xs left");
 	}
 	
@@ -104,7 +104,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
 		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 		addStyleName("well");
-		ulContainer.removeStyleName("hide");
+		DisplayUtils.show(ulContainer);
 		showHideButton.setStyleName("btn btn-default btn-xs right");
 	}
 	

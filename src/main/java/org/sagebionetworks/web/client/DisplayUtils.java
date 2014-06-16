@@ -160,6 +160,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
@@ -2357,14 +2358,47 @@ public class DisplayUtils {
 		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
 	
+	public static void hide(UIObject uiObject) {
+		//set display none, reference size property, then remove (for Chrome bug)
+		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
+		uiObject.removeStyleName("hide");
+		uiObject.getOffsetHeight();
+		uiObject.addStyleName("hide");
+	}
+	
+	public static void show(UIObject uiObject) {
+		//set display none, reference size property, then remove (for Chrome bug)
+		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
+		uiObject.addStyleName("hide");
+		uiObject.getOffsetHeight();
+		uiObject.removeStyleName("hide");
+	}
+	
+	public static void hide(com.google.gwt.dom.client.Element uiObject) {
+		//set display none, reference size property, then remove (for Chrome bug)
+		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
+		uiObject.removeClassName("hide");
+		uiObject.getOffsetHeight();
+		uiObject.addClassName("hide");
+	}
+	
+	public static void show(com.google.gwt.dom.client.Element uiObject) {
+		//set display none, reference size property, then remove (for Chrome bug)
+		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
+		uiObject.addClassName("hide");
+		uiObject.getOffsetHeight();
+		uiObject.removeClassName("hide");
+	}
+
+	
 	 public static void showFormError(DivElement parentElement, DivElement messageElement) {
 		 parentElement.addClassName("has-error");
-		 messageElement.removeClassName("hide");
+		 DisplayUtils.show(messageElement);
 	 }
 	 
 	 public static void hideFormError(DivElement parentElement, DivElement messageElement) {
 		 parentElement.removeClassName("has-error");
-		 messageElement.addClassName("hide");
+		 DisplayUtils.hide(messageElement);
 	 }
 
 	 public static String getInfoHtml(String safeHtmlMessage) {
