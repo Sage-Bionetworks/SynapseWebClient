@@ -198,7 +198,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void showRequestForm() {
 		clear();
 		pageTitle.setInnerHTML(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
-		sendPasswordChangeForm.removeClassName("hide");
+		DisplayUtils.show(sendPasswordChangeForm);
 		isShowingResetUI = false;
 		submitBtn.setVisible(true);
 	}
@@ -208,7 +208,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void showResetForm() {
 		clear();
 		pageTitle.setInnerHTML(DisplayConstants.SET_PASSWORD);
-		resetPasswordForm.removeClassName("hide");
+		DisplayUtils.show(resetPasswordForm);
 		isShowingResetUI = true;
 		submitBtn.setVisible(true);
 	}
@@ -217,8 +217,8 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void clear() {
 		if(contentHtml != null) contentHtml.setInnerHTML("");
 		loadingPanel.setVisible(false);
-		sendPasswordChangeForm.addClassName("hide");
-		resetPasswordForm.addClassName("hide");
+		DisplayUtils.hide(sendPasswordChangeForm);
+		DisplayUtils.hide(resetPasswordForm);
 		submitBtn.setEnabled(true);
 		submitBtn.setVisible(false);
 		password1Field.setValue("");
