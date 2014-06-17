@@ -14,45 +14,38 @@
         <div class="clear"></div>
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
-    	<div class="container margin-top-15"> 		
+    	<div class="container margin-top-15">
+    	    <div ui:field="quizFailure" class="row hide">
+-				<div class="col-sm-offset-1 col-sm-10">
+				    <div class="panel panel-danger">
+					      <div class="panel-heading">
+							<h3 class="panel-title">Quiz failed</h3>
+					      </div>
+					      <div class="panel-body">
+								<p>Please review the items shown in red below, and <g:Anchor ui:field="tryAgainLink" styleName="link" text="try again"/>.</p>
+					      </div>
+					</div>
+    			</div>
+			</div>
 			<g:HTMLPanel ui:field="quizContainer" visible="false">
 				<div class="row">
-				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-					    <g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default right" text="Open the Guide"/>
-					</div>
-					<div ui:field="quizHighlightBox" class="highlight-box col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+				    <div class="highlight-box padding-top-15-imp col-sm-offset-1 col-sm-10">
+					    <div ui:field="quizHeader" class="margin-bottom-15 margin-right-10 markdown"></div>
+					    <div class="margin-bottom-15">
+							<g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default" text="Open the Guide"/>
+						</div>
 						<form>
 						    <g:FlowPanel ui:field="testContainer">
 						    </g:FlowPanel>
 		   				</form>
 					</div>
-					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+					<div class="col-sm-offset-1 col-sm-10">
 					    <g:Button ui:field="submitButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Submit"/>
 					</div>
 				</div>
 			</g:HTMLPanel>
 			<g:SimplePanel ui:field="successContainer" visible="false">
 			</g:SimplePanel>
-			
-			<g:HTMLPanel ui:field="failureContainer" visible="false">
-				<div class="row">
-				    <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-				        <div class="panel panel-danger">
-					      <div class="panel-heading">
-							<h3 class="panel-title">Try again</h3>
-					      </div>
-					      <div class="panel-body">
-								<p>All questions must be answered correctly in order to be granted certification.</p>
-								<p>Please review the tutorial, and try again.</p>
-					      </div>
-					    </div>
-				    </div>
-					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-					    <g:Button ui:field="tutorialButton2" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Back to the Guide"/>
-					</div>
-				</div>
-			</g:HTMLPanel>
-			
 			
 		</div> <!-- close class="container" -->
 <!-- start footer -->

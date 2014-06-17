@@ -98,7 +98,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 						if (passingRecord.getPassed())
 							view.showSuccess(authenticationController.getCurrentUserSessionData().getProfile(), passingRecord);
 						else
-							view.showFailure();
+							view.showFailure(passingRecord);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
