@@ -14,18 +14,22 @@
         <div class="clear"></div>
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
-    	<div class="container margin-top-15"> 		
-			<g:HTMLPanel ui:field="quizContainer" visible="false">
-				<div class="row">
-				    <div ui:field="quizFailure" class="panel panel-danger hide col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+    	<div class="container margin-top-15">
+    	    <div ui:field="quizFailure" class="row hide">
+-				<div class="col-sm-offset-1 col-sm-10">
+				    <div class="panel panel-danger">
 					      <div class="panel-heading">
 							<h3 class="panel-title">Quiz failed</h3>
 					      </div>
 					      <div class="panel-body">
-								<p>Please review the items shown in red below, and try again.</p>
+								<p>Please review the items shown in red below, and <g:Anchor ui:field="tryAgainLink" styleName="link" text="try again"/>.</p>
 					      </div>
 					</div>
-				    <div class="highlight-box padding-top-15-imp col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+    			</div>
+			</div>
+			<g:HTMLPanel ui:field="quizContainer" visible="false">
+				<div class="row">
+				    <div class="highlight-box padding-top-15-imp col-sm-offset-1 col-sm-10">
 					    <div ui:field="quizHeader" class="margin-bottom-15 margin-right-10 markdown"></div>
 					    <div class="margin-bottom-15">
 							<g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default" text="Open the Guide"/>
@@ -35,7 +39,7 @@
 						    </g:FlowPanel>
 		   				</form>
 					</div>
-					<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
+					<div class="col-sm-offset-1 col-sm-10">
 					    <g:Button ui:field="submitButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Submit"/>
 					</div>
 				</div>
