@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -213,7 +214,7 @@ public class QuizPresenterTest {
 		presenter.submitAnswers(new HashMap<Long, Set<Long>>());
 		
 		//since we set it up to return false, it should show the failed UI
-		verify(mockView).showFailure();
+		verify(mockView).showFailure(eq(pr));
 	}
 	
 	@Test
