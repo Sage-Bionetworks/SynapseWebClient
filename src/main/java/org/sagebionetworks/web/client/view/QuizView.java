@@ -17,7 +17,7 @@ public interface QuizView extends IsWidget, SynapseView {
 	void setPresenter(Presenter loginPresenter);	
 	void showQuiz(Quiz questions);
 	void showSuccess(UserProfile profile, PassingRecord passingRecord);
-	void showFailure();
+	void showFailure(PassingRecord passingRecord);
 	void hideLoading();
 	
 	public interface Presenter extends SynapsePresenter {

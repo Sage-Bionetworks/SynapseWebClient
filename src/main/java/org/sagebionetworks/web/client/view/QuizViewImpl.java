@@ -7,16 +7,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
 import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -30,11 +32,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,7 +55,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	HTMLPanel quizContainer;
 	
 	@UiField
-	DivElement quizHighlightBox;
+	DivElement quizHeader;
 	
 	@UiField
 	FlowPanel testContainer;
@@ -62,11 +66,9 @@ public class QuizViewImpl extends Composite implements QuizView {
 	SimplePanel successContainer;
 	
 	@UiField
-	HTMLPanel failureContainer;
+	DivElement quizFailure;
 	@UiField
 	Button tutorialButton1;
-	@UiField
-	Button tutorialButton2;
 
 	
 	
@@ -80,6 +82,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
 	Map<Long, Set<Long>> questionIndex2AnswerIndices; 
+	Map<Long, FlowPanel> questionIndex2QuestionUI;
 	private int currentQuestionCount;
 	
 	@Inject
@@ -100,13 +103,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		
 		isSubmitInitialized = false;
 		questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
-		ClickHandler gotoGettingStarted = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new Help(WebConstants.GETTING_STARTED));
-			}
-		};
-		
+		questionIndex2QuestionUI = new HashMap<Long, FlowPanel>();
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -115,8 +112,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		};
 		
 		tutorialButton1.addClickHandler(gotoGettingStartedNewWindow);
-		tutorialButton2.addClickHandler(gotoGettingStarted);
-		quizHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Certification Quiz");
+		quizHeader.setInnerHTML("<h3>Certification Quiz</h3>");
 	}
 
 	@Override
@@ -156,6 +152,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		hideAll();
 		testContainer.clear();
 		questionIndex2AnswerIndices.clear();
+		questionIndex2QuestionUI.clear();
 		hideLoading();
 	}
 	
@@ -163,14 +160,16 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public void showQuiz(Quiz quiz) {
 		hideAll();
 		if (quiz.getHeader() != null)
-			quizHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, quiz.getHeader());
+			quizHeader.setInnerHTML(SimpleHtmlSanitizer.sanitizeHtml(quiz.getHeader()).asString());
 		//clear old questions
 		clear();
 		List<Question> questions = quiz.getQuestions();
 		currentQuestionCount = questions.size();
 		int questionNumber = 1;
 		for (Question question : questions) {
-			testContainer.add(addQuestion(questionNumber++, question));
+			FlowPanel questionUI = addQuestion(questionNumber++, question);
+			questionIndex2QuestionUI.put(question.getQuestionIndex(), questionUI);
+			testContainer.add(questionUI);
 		}
 		
 		//initialize if necessary
@@ -188,6 +187,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 			});
 		}
 		quizContainer.setVisible(true);
+		submitButton.setEnabled(true);
     }
 	
 	@Override
@@ -198,9 +198,20 @@ public class QuizViewImpl extends Composite implements QuizView {
 	}
 	
 	@Override
-	public void showFailure() {
-		hideAll();
-		failureContainer.setVisible(true);
+	public void showFailure(PassingRecord passingRecord) {
+		submitButton.setEnabled(false);
+		//go through and highlight incorrect answers
+		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
+			//add has-error to appropriate question uis
+			if (correctness.getQuestion() != null && !correctness.getIsCorrect()) {
+				Long questionIndex = correctness.getQuestion().getQuestionIndex();
+				FlowPanel questionUI = questionIndex2QuestionUI.get(questionIndex);
+				if (questionUI != null) {
+					questionUI.addStyleName("has-error");
+				}
+			}
+		}
+		DisplayUtils.show(quizFailure);
 	}
 
 	private FlowPanel addQuestion(int questionNumber, Question question) {
@@ -208,14 +219,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 		if (question instanceof MultichoiceQuestion) {
 			final MultichoiceQuestion multichoiceQuestion = (MultichoiceQuestion)question;
 			questionContainer.addStyleName("margin-bottom-40 margin-left-15");
-			questionContainer.add(new HTMLPanel("<h5 class=\"inline-block\"><small>"+questionNumber+". </small>"+SimpleHtmlSanitizer.sanitizeHtml(question.getPrompt()).asString()+"</small></h5>"));
+			questionContainer.add(new InlineHTML("<h5 class=\"inline-block control-label\"><small class=\"margin-right-10\">"+questionNumber+".</small>"+SimpleHtmlSanitizer.sanitizeHtml(question.getPrompt()).asString()+"</small></h5>"));
 			//now add possible answers
-			
 			boolean isRadioButton = multichoiceQuestion.getExclusive();
 			if (isRadioButton) {
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
 					SimplePanel answerContainer = new SimplePanel();
-					answerContainer.addStyleName("radio margin-left-15");
+					answerContainer.addStyleName("radio padding-left-30 control-label");
 					RadioButton answerButton = new RadioButton("question-"+question.getQuestionIndex());
 					answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answer.getPrompt()));
 					answerButton.addClickHandler(new ClickHandler() {
@@ -233,7 +243,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 				//checkbox
 				for (final MultichoiceAnswer answer : multichoiceQuestion.getAnswers()) {
 					SimplePanel answerContainer = new SimplePanel();
-					answerContainer.addStyleName("checkbox margin-left-15");
+					answerContainer.addStyleName("checkbox padding-left-30 control-label");
 					final CheckBox checkbox= new CheckBox();
 					checkbox.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answer.getPrompt()));
 					checkbox.addClickHandler(new ClickHandler() {
@@ -253,6 +263,18 @@ public class QuizViewImpl extends Composite implements QuizView {
 					questionContainer.add(answerContainer);
 				}
 			}
+			
+			//add help reference
+			final WikiPageKey moreInfoKey = question.getReference();
+			if (moreInfoKey != null) {
+				Anchor moreInfoLink = new Anchor();
+				moreInfoLink.setHTML(DisplayUtils.getIcon("glyphicon-question-sign font-size-15") + "<span class=\"margin-left-5\">Need help answering this question?</span>");
+				moreInfoLink.setTarget("_blank");
+				moreInfoLink.addStyleName("margin-left-10");
+				Wiki place = new Wiki(moreInfoKey.getOwnerObjectId(), moreInfoKey.getOwnerObjectType().name(), moreInfoKey.getWikiPageId());
+				moreInfoLink.setHref("#!Wiki:" + place.toToken());
+				questionContainer.add(moreInfoLink);
+			}
 		}
 		return questionContainer;
 	}
@@ -269,7 +291,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private void hideAll() {
 		quizContainer.setVisible(false);
 		successContainer.setVisible(false);
-		failureContainer.setVisible(false);
+		DisplayUtils.hide(quizFailure);
 	}
 
 	@Override
