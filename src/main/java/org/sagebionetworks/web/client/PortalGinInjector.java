@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
-import org.sagebionetworks.web.client.presenter.GovernancePresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -118,8 +117,6 @@ public interface PortalGinInjector extends Ginjector {
 	public ChallengeOverviewPresenter getChallengeOverviewPresenter();
 	
 	public HelpPresenter getHelpPresenter();
-	
-	public GovernancePresenter getGovernancePresenter();
 	
 	public SearchPresenter getSearchPresenter();
 	

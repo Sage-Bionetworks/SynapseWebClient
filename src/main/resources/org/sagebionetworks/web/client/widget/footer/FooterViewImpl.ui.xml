@@ -62,7 +62,7 @@
 	                    <div class="col-md-8">
 	                    	<p class="right">
 		                    	<a href="#!Home:0">Home</a> / 
-								<a href="#!Governance:0">Governance</a> /
+								<a href="#!Help:Governance">Governance</a> /
 								<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
 								<g:FlowPanel ui:field="debugModePanel" />
 	                    	</p>

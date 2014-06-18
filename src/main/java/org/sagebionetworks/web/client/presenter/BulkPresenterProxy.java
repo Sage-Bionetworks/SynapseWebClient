@@ -108,11 +108,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 					presenter.setPlace((ComingSoon)place);
 					presenter.start(panel, eventBus);
-				} else if (place instanceof Governance) {
-					// user's profile page
-					GovernancePresenter presenter = ginjector.getGovernancePresenter();
-					presenter.setPlace((Governance)place);
-					presenter.start(panel, eventBus);
 				} else if (place instanceof Challenges) {
 					// user's profile page
 					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
