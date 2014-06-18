@@ -142,8 +142,6 @@ public class WebConstants {
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
 	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
-	public static final String USER_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.userguide_synapse_id";
-	public static final String USER_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.userguide_wiki_id";
 	public static final String GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_synapse_id";
 	public static final String GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_wiki_id";
 	public static final String CREATE_PROJECT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.createproject_synapse_id";
@@ -152,8 +150,6 @@ public class WebConstants {
 	public static final String R_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.rclient_wiki_id";
 	public static final String PYTHON_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_synapse_id";
 	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
-	public static final String TRUSTED_USER_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_synapse_id";
-	public static final String TRUSTED_USER_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.trusteduser_wiki_id";
 	public static final String FORMATTING_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_synapse_id";
 	public static final String FORMATTING_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_wiki_id";
 	public static final String CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_synapse_id";
@@ -172,15 +168,15 @@ public class WebConstants {
 	public static final String NODE_TYPE_KEY = "nodeType";
 	
 	
-	public static final String USER_GUIDE = "UserGuide";
 	public static final String GETTING_STARTED = "GettingStarted";
 	public static final String CREATE_PROJECT = "CreateProject";
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
-	public static final String USER_CERTIFICATION_TUTORIAL = "Certification";
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
+	
+	public static final String CERTIFICATION = "Certification";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";

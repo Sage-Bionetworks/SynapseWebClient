@@ -119,7 +119,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz("Certification"));
+				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.CERTIFICATION));
 			}
 		});
 	}
