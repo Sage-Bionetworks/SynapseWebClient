@@ -31,7 +31,6 @@ public class AuthenticationControllerImplTest {
 
 	AuthenticationController authenticationController;
 	CookieProvider mockCookieProvider;
-	ClientCache mockCache;
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	String sessionDataJson;
@@ -40,7 +39,6 @@ public class AuthenticationControllerImplTest {
 	public void before() throws JSONObjectAdapterException {
 		mockCookieProvider = mock(CookieProvider.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		mockCache = mock(ClientCache.class);
 		
 		//by default, return a valid user session data if asked
 		UserSessionData sessionData = new UserSessionData();
@@ -51,9 +49,7 @@ public class AuthenticationControllerImplTest {
 		sessionDataJson = sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(sessionDataJson).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		
-		when(mockCache.get(WebConstants.USER_LOGIN_DATA)).thenReturn(sessionDataJson);
-		
-		authenticationController = new AuthenticationControllerImpl(mockCache, mockCookieProvider, mockUserAccountService, adapterFactory);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory);
 	}
 	
 	@Test

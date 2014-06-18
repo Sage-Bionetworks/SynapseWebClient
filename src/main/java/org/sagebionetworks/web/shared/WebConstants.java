@@ -215,9 +215,4 @@ public class WebConstants {
 	public static final String HIGHLIGHT_BOX_TITLE = "highlight-box-title";
 	
 	public static final String JOIN_WIDGET_IS_CHALLENGE_KEY = "isChallenge";
-
-	/**
-	 * Login data
-	 */
-	public static String USER_LOGIN_DATA = "org.sagbionetworks.security.user.login.data";
 }
