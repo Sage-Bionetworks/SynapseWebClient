@@ -27,18 +27,15 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
-	
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
 	
-	private ClientCache clientCache;
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private AdapterFactory adapterFactory;
 	
 	@Inject
-	public AuthenticationControllerImpl(ClientCache clientCache, CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory){
-		this.clientCache = clientCache;
+	public AuthenticationControllerImpl(CookieProvider cookies, UserAccountServiceAsync userAccountService, AdapterFactory adapterFactory){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.adapterFactory = adapterFactory;
@@ -76,8 +73,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void logoutUser() {
-		// don't actually terminate session, just remove the cookies
-		clientCache.remove(WebConstants.USER_LOGIN_DATA);
+		// don't actually terminate session, just remove the cookie
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		currentUser = null;
 	}
@@ -92,7 +88,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					try {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
-						updateCachedUserLoginData(userSessionData);
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
@@ -116,16 +111,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
-			try {
-				updateCachedUserLoginData(currentUser);
-			} catch (JSONObjectAdapterException e) {
-			}
 		}
-	}
-	
-	private void updateCachedUserLoginData(UserSessionData userSessionData) throws JSONObjectAdapterException {
-		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
-		clientCache.put(WebConstants.USER_LOGIN_DATA, usdAdapter.toJSONString());
 	}
 	
 	@Override

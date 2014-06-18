@@ -54,7 +54,7 @@ public class UserDataProvider {
 				}
 			}
 		}
-		logger.info("Cannot find user login data in the cookies using cookie.name="	+ WebConstants.USER_LOGIN_DATA);
+		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_TOKEN);
 		return null;
 	}
 	
