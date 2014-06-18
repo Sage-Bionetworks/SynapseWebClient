@@ -2359,34 +2359,18 @@ public class DisplayUtils {
 	}
 	
 	public static void hide(UIObject uiObject) {
-		//set display none, reference size property, then remove (for Chrome bug)
-		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
-		uiObject.removeStyleName("hide");
-		uiObject.getOffsetHeight();
 		uiObject.addStyleName("hide");
 	}
 	
 	public static void show(UIObject uiObject) {
-		//set display none, reference size property, then remove (for Chrome bug)
-		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
-		uiObject.addStyleName("hide");
-		uiObject.getOffsetHeight();
 		uiObject.removeStyleName("hide");
 	}
 	
 	public static void hide(com.google.gwt.dom.client.Element uiObject) {
-		//set display none, reference size property, then remove (for Chrome bug)
-		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
-		uiObject.removeClassName("hide");
-		uiObject.getOffsetHeight();
 		uiObject.addClassName("hide");
 	}
 	
 	public static void show(com.google.gwt.dom.client.Element uiObject) {
-		//set display none, reference size property, then remove (for Chrome bug)
-		//http://stackoverflow.com/questions/3485365/how-can-i-force-webkit-to-redraw-repaint-to-propagate-style-changes
-		uiObject.addClassName("hide");
-		uiObject.getOffsetHeight();
 		uiObject.removeClassName("hide");
 	}
 
