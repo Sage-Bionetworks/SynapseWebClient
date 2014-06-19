@@ -245,8 +245,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.add(progressWidget.asWidget());
         joinWizard.add(currentWizardContent);
         joinWizard.add(buttonPanel);
-		joinWizard.show();	
-			}
+		joinWizard.show();
+		DisplayUtils.center(joinWizard);
+	}
 			
 	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
 		okButtonCallback = presenterCallback;
