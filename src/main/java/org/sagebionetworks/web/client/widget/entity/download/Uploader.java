@@ -71,7 +71,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private String parentEntityId;
 	private List<AccessRequirement> accessRequirements;
 	private JSONObjectAdapter jsonObjectAdapter;
-	private boolean isDirectUploading;
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJsniUtils;

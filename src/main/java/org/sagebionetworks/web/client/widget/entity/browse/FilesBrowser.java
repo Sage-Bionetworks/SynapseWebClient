@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -35,6 +37,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
+	EntityAccessRequirementsWidget accessRequirementsWidget;
 	boolean canEdit = false;
 	
 	@Inject
@@ -44,7 +47,8 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			AutoGenFactory autogenFactory,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			EntityAccessRequirementsWidget accessRequirementsWidget) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -53,6 +57,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
+		this.accessRequirementsWidget = accessRequirementsWidget;
 		view.setPresenter(this);
 	}	
 	
@@ -99,7 +104,22 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		//is this a certified user?
+		uploadButtonClickedStep1();
+	}
+	//any access requirements to accept?
+	public void uploadButtonClickedStep1() {
+		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean accepted) {
+				if (accepted)
+					uploadButtonClickedStep2();
+			}
+		};
+		accessRequirementsWidget.showAccessRequirements(false, ACCESS_TYPE.UPDATE, configuredEntityId, callback);
+	}
+
+	//is this a certified user?
+	public void uploadButtonClickedStep2() {
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecord) {

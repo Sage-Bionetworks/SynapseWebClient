@@ -1053,7 +1053,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
+	
 
+	@Override
+	public String getEntityAccessRequirements(String entityId, boolean unmetOnly) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(entityId);
+			subjectId.setType(RestrictableObjectType.ENTITY);
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements;
+			if (unmetOnly)
+				accessRequirements = synapseClient.getUnmetAccessRequirements(subjectId);
+			else
+				accessRequirements = synapseClient.getAccessRequirements(subjectId);
+			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+			return arJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
 	
 	@Override
 	public EntityWrapper createAccessApproval(EntityWrapper aaEW) throws RestServiceException {
