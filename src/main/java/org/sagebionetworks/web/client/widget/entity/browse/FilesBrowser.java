@@ -115,7 +115,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					uploadButtonClickedStep2();
 			}
 		};
-		accessRequirementsWidget.showAccessRequirements(false, ACCESS_TYPE.UPDATE, configuredEntityId, callback);
+		accessRequirementsWidget.showUploadAccessRequirements(configuredEntityId, callback);
 	}
 
 	//is this a certified user?

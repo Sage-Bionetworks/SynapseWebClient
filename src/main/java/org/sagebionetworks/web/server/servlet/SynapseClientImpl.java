@@ -1054,9 +1054,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 	
-
 	@Override
-	public String getEntityAccessRequirements(String entityId, boolean unmetOnly) throws RestServiceException {
+	public String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException {
+		//TODO: change ACCESS_TYPE to UPLOAD once available
+		return getEntityAccessRequirements(entityId, false, ACCESS_TYPE.UPDATE);
+	}
+
+	private String getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
@@ -1067,6 +1071,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				accessRequirements = synapseClient.getUnmetAccessRequirements(subjectId);
 			else
 				accessRequirements = synapseClient.getAccessRequirements(subjectId);
+			//filter to the targetAccessType
+			if (targetAccessType != null) {
+				List<AccessRequirement> filteredResults = filterAccessRequirements(accessRequirements.getResults(), targetAccessType);
+				accessRequirements.setResults(filteredResults);
+				accessRequirements.setTotalNumberOfResults(filteredResults.size());
+			}
+			
 			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
 		} catch (SynapseException e) {
@@ -1075,6 +1086,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
+	
+	public List<AccessRequirement> filterAccessRequirements(List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
+		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
+		for (AccessRequirement accessRequirement : unfilteredList) {
+			if (filter.equals(accessRequirement.getAccessType())) {
+				filteredAccessRequirements.add(accessRequirement);
+			}
+		}
+		return filteredAccessRequirements;
+	}
+	
 	
 	@Override
 	public EntityWrapper createAccessApproval(EntityWrapper aaEW) throws RestServiceException {

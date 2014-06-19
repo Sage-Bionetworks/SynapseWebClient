@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -28,8 +28,6 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private String entityId;
-	private boolean unmetOnly;
-	private ACCESS_TYPE accessType;
 	private CallbackP<Boolean> mainCallback;
 	private List<AccessRequirement> accessRequirements;
 	private int currentAccessRequirement;
@@ -56,9 +54,7 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 	 * @param entityId ask for access requirements associated with this entity id
 	 * @param acceptedAllCallback Will callback with true if all ARs have been accepted
 	 */
-	public void showAccessRequirements(boolean unmetOnly, ACCESS_TYPE accessType, String entityId, CallbackP<Boolean> acceptedAllCallback) {
-		this.unmetOnly = unmetOnly;
-		this.accessType = accessType;
+	public void showUploadAccessRequirements(String entityId, CallbackP<Boolean> acceptedAllCallback) {
 		this.mainCallback = acceptedAllCallback;
 		this.entityId = entityId;
 		//ask for access requirements of the specified type and show them
@@ -78,18 +74,13 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 		}
 	}
 	public void showAccessRequirementsStep2() {
-		synapseClient.getEntityAccessRequirements(entityId, unmetOnly, new AsyncCallback<String>() {
+		synapseClient.getAllEntityUploadAccessRequirements(entityId, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				//are there access restrictions?
 				try{
-					PaginatedResults<AccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, AccessRequirement.class);
-					List<AccessRequirement> unfilteredAccessRequirements = ar.getResults();
-					if (accessType != null)
-						accessRequirements = filterAccessRequirements(unfilteredAccessRequirements, accessType);
-					else
-						accessRequirements = unfilteredAccessRequirements;
-					
+					PaginatedResults<AccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
+					accessRequirements = ar.getResults();
 					//if there's anything to show, then show the wizard
 					if (accessRequirements.size() > 0)
 						view.showWizard();
@@ -105,16 +96,6 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
-	}
-	
-	public List<AccessRequirement> filterAccessRequirements(List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
-		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
-		for (AccessRequirement accessRequirement : unfilteredList) {
-			if (filter.equals(accessRequirement.getAccessType())) {
-				filteredAccessRequirements.add(accessRequirement);
-			}
-		}
-		return filteredAccessRequirements;
 	}
 	
 	/**

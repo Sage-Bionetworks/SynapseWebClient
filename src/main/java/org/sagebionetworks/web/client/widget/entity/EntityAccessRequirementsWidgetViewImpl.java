@@ -63,6 +63,7 @@ public class EntityAccessRequirementsWidgetViewImpl implements EntityAccessRequi
 	public void showWizard() {
 		wizard = new Window();
 		wizard.addStyleName("whiteBackground");
+		wizard.setHeaderVisible(false);
        	wizard.setClosable(false);
 		wizard.setMaximizable(false);
         wizard.setSize(640, 480);
@@ -90,13 +91,17 @@ public class EntityAccessRequirementsWidgetViewImpl implements EntityAccessRequi
 				okButtonCallback.invoke();
 			}
 		});
-			
+		currentWizardContent = new FlowPanel();
+		currentWizardContent.addStyleName("whiteBackground padding-bottom-15");
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
-		wizard.add(progressWidget.asWidget());
-        wizard.add(currentWizardContent);
+		Widget progress = progressWidget.asWidget();
+		progress.addStyleName("margin-top-5");
+		wizard.add(progress);
+		wizard.add(currentWizardContent);
         wizard.add(buttonPanel);
 		wizard.show();	
+		DisplayUtils.center(wizard);
 	}
 	
 	@Override
@@ -114,8 +119,9 @@ public class EntityAccessRequirementsWidgetViewImpl implements EntityAccessRequi
 			final Callback touAcceptanceCallback) {
 		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
 		currentWizardContent.clear();
-        ScrollPanel panel = new ScrollPanel(new HTML(arText));
-		panel.setHeight("400px");
+		HTML arTextHTML = new HTML(arText);
+		arTextHTML.addStyleName("margin-10");
+        ScrollPanel panel = new ScrollPanel(arTextHTML);
 		panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
         currentWizardContent.add(panel);
         wizard.layout(true);
