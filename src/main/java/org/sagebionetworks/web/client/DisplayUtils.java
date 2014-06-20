@@ -707,9 +707,13 @@ public class DisplayUtils {
 		dialog.add(buttonPanel);
 		dialog.show();
 
-		int left = (com.google.gwt.user.client.Window.getClientWidth() - dialog.getOffsetWidth()) / 2;
-		int top = (com.google.gwt.user.client.Window.getClientHeight() - dialog.getOffsetHeight()) / 2;
-		dialog.setPosition(left, top);
+		center(dialog);
+	}
+	
+	public static void center(Window window) {
+		int left = (com.google.gwt.user.client.Window.getClientWidth() - window.getOffsetWidth()) / 2;
+		int top = (com.google.gwt.user.client.Window.getClientHeight() - window.getOffsetHeight()) / 2;
+		window.setPosition(left, top);
 		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
 	

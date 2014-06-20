@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface FilesBrowserView extends IsWidget, SynapseView {
+public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 
 	/**
 	 * Set the presenter.

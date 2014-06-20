@@ -123,6 +123,10 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	
 	@Override
 	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
+	}
+	
+	public static void showQuizInfoDialog(final CallbackP<Boolean> callback, QuizInfoWidget quizInfoWidget) {
 		final Window dialog = new Window();
 		dialog.setMaximizable(false);
 		dialog.setSize(420, 270);
@@ -141,6 +145,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		});
 		dialog.add(quizInfoWidget.asWidget());
 		dialog.show();
+		DisplayUtils.center(dialog);
 	}
 	
 	@Override

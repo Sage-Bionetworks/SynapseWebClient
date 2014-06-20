@@ -12,6 +12,9 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UploadView;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -19,9 +22,14 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -45,7 +53,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, UploadView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -53,6 +61,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Uploader uploader;
 	private EntityTypeProvider typeProvider;
 	private EntityFinder entityFinder;
+	private QuizInfoWidget quizInfoWidget;
+	private EntityAccessRequirementsWidget accessRequirementsWidget;
+	private SynapseClientAsync synapseClient;
+	private CookieProvider cookies;
+	private AuthenticationController authenticationController;
 	
 	private Button shareButton;	
 	private DropdownButton toolsButton;
@@ -60,6 +73,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private String typeDisplay;
 	private Anchor addDescriptionCommand;
 	private Callback addDescriptionCallback;
+	private Window uploaderWindow;
+	private EntityBundle entityBundle;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -68,13 +83,23 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			EntityTypeProvider typeProvider,
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
-			PublicPrivateBadge publicPrivateBadge) {
+			PublicPrivateBadge publicPrivateBadge,
+			QuizInfoWidget quizInfoWidget,
+			EntityAccessRequirementsWidget accessRequirementsWidget,
+			SynapseClientAsync synapseClient,
+			CookieProvider cookies,
+			AuthenticationController authenticationController) {
 		this.sageImageBundle = sageImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
 		this.typeProvider = typeProvider;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;
+		this.quizInfoWidget = quizInfoWidget;
+		this.accessRequirementsWidget = accessRequirementsWidget;
+		this.synapseClient = synapseClient;
+		this.cookies = cookies;
+		this.authenticationController = authenticationController;
 	}
 
 	@Override
@@ -245,40 +270,51 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entityType 
 	 */
 	private void addUploadItem(DropdownButton menuBtn, final EntityBundle entityBundle, EntityType entityType) {
+		this.entityBundle = entityBundle;
 		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
-			final Window window = new Window();
+			uploaderWindow = new Window();
 			uploader.clearHandlers();
 			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
-					window.hide();
+					uploaderWindow.hide();
 					presenter.fireEntityUpdatedEvent();
 				}
 			});
 			uploader.addCancelHandler(new CancelHandler() {				
 				@Override
 				public void onCancel(CancelEvent event) {
-					window.hide();
+					uploaderWindow.hide();
 				}
 			});
 			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					window.removeAll();
-					window.setPlain(true);
-					window.setModal(true);		
-					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());			
-					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
-					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-					window.show();
+					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController);
 				}
 			});
 			menuBtn.addMenuItem(a);
 		}
+	}
+	
+	@Override
+	public void showUploadDialog(String entityId) {
+		uploaderWindow.removeAll();
+		uploaderWindow.setPlain(true);
+		uploaderWindow.setModal(true);		
+		uploaderWindow.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+		uploaderWindow.setLayout(new FitLayout());		
+		uploaderWindow.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+		uploaderWindow.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+		uploaderWindow.show();
+	}
+	
+	@Override
+	public void showQuizInfoDialog(CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
 	}
 		
 	/**
