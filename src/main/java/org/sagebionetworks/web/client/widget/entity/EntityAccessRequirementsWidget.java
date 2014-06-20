@@ -91,6 +91,7 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
+				mainCallback.invoke(false);
 			}
 		});
 	}
