@@ -1060,7 +1060,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return getEntityAccessRequirements(entityId, false, ACCESS_TYPE.UPDATE);
 	}
 
-	private String getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {
+	public String getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
@@ -1089,9 +1089,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	public List<AccessRequirement> filterAccessRequirements(List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
 		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
-		for (AccessRequirement accessRequirement : unfilteredList) {
-			if (filter.equals(accessRequirement.getAccessType())) {
-				filteredAccessRequirements.add(accessRequirement);
+		if (unfilteredList != null) {
+			for (AccessRequirement accessRequirement : unfilteredList) {
+				if (filter.equals(accessRequirement.getAccessType())) {
+					filteredAccessRequirements.add(accessRequirement);
+				}
 			}
 		}
 		return filteredAccessRequirements;
