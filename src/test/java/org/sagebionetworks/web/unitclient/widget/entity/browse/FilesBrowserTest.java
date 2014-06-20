@@ -148,16 +148,39 @@ public class FilesBrowserTest {
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_RENAME_FAILED);
 	}
 	
+
 	@Test
-	public void testUploadButtonClickedCertified(){
-		filesBrowser.uploadButtonClicked();
+	public void testUploadStep1ARsAccepted(){
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
+		CallbackP callback = arg.getValue();
+		callback.invoke(true);
+		//verify if accepted then it should continue (eventually showing the upload dialog)
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
 	@Test
-	public void testUploadButtonClickedNotCertified(){
+	public void testUploadStep1ARsNotAccepted(){
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
+		CallbackP callback = arg.getValue();
+		callback.invoke(false);
+		//verify if not accepted then the upload dialog is not shown
+		verify(mockView, never()).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadStep2Certified(){
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadStep2NotCertified(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		filesBrowser.uploadButtonClicked();
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
 		
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockView).showQuizInfoDialog(arg.capture());
@@ -171,9 +194,9 @@ public class FilesBrowserTest {
 	}
 	
 	@Test
-	public void testUploadButtonClickedFailure(){
+	public void testUploadStep2Failure(){
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		filesBrowser.uploadButtonClicked();
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
