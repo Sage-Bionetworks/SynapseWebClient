@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -104,26 +105,38 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1();
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, cookies, authenticationController);
 	}
+	
 	//any access requirements to accept?
-	public void uploadButtonClickedStep1() {
+	public static void uploadButtonClickedStep1(
+			EntityAccessRequirementsWidget accessRequirementsWidget, 
+			final String entityId, 
+			final UploadView view,
+			final SynapseClientAsync synapseClient,
+			final CookieProvider cookies,
+			final AuthenticationController authenticationController) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2();
+					uploadButtonClickedStep2(entityId, view, synapseClient, cookies, authenticationController);
 			}
 		};
-		accessRequirementsWidget.showUploadAccessRequirements(configuredEntityId, callback);
+		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
 	//is this a certified user?
-	public void uploadButtonClickedStep2() {
+	public static void uploadButtonClickedStep2(
+			final String entityId, 
+			final UploadView view,
+			SynapseClientAsync synapseClient,
+			CookieProvider cookies,
+			AuthenticationController authenticationController) {
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecord) {
-				view.showUploadDialog(configuredEntityId);
+				view.showUploadDialog(entityId);
 			}
 			@Override
 			public void onFailure(Throwable t) {
@@ -132,7 +145,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 						@Override
 						public void invoke(Boolean tutorialClicked) {
 							if (!tutorialClicked)
-								view.showUploadDialog(configuredEntityId);
+								view.showUploadDialog(entityId);
 						}
 					});					
 				} else

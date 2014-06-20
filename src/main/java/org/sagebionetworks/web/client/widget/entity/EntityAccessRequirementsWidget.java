@@ -48,9 +48,6 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 	}
 	
 	/**
-	 * 
-	 * @param unmetOnly set to true to show the unfulfilled access requirements only.
-	 * @param accessType only show access requirements of a particular type (like Upload when trying to upload)
 	 * @param entityId ask for access requirements associated with this entity id
 	 * @param acceptedAllCallback Will callback with true if all ARs have been accepted
 	 */

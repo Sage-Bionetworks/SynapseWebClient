@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -40,6 +41,7 @@ public class FilesBrowserTest {
 	FilesBrowser filesBrowser;
 	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
+	EntityAccessRequirementsWidget mockAccessRequirementsWidget;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -48,12 +50,13 @@ public class FilesBrowserTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockAccessRequirementsWidget = mock(EntityAccessRequirementsWidget.class);
 		adapterFactory = new AdapterFactoryImpl();
 		autoGenFactory = new AutoGenFactory();
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
 				mockNodeModelCreator, adapterFactory, autoGenFactory,
-				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
+				mockGlobalApplicationState, mockAuthenticationController, mockCookies, mockAccessRequirementsWidget);
 		verify(mockView).setPresenter(filesBrowser);
 		filesBrowser.configure(configuredEntityId);
 		String newId = "syn456";
