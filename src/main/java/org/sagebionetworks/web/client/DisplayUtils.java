@@ -706,7 +706,6 @@ public class DisplayUtils {
 
 		dialog.add(buttonPanel);
 		dialog.show();
-
 		center(dialog);
 	}
 	
