@@ -10,8 +10,10 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
 import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
+import org.sagebionetworks.repo.model.quiz.MultichoiceResponse;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Question;
+import org.sagebionetworks.repo.model.quiz.QuestionResponse;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.ResponseCorrectness;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -67,6 +69,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 	
 	@UiField
 	DivElement quizFailure;
+	
+	@UiField
+	DivElement scoreContainer;
+	
 	@UiField
 	Button tutorialButton1;
 	
@@ -83,7 +89,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	boolean isSubmitInitialized;
 	Map<Long, Set<Long>> questionIndex2AnswerIndices; 
-	Map<Long, FlowPanel> questionIndex2QuestionUI;
 	private int currentQuestionCount;
 	
 	@Inject
@@ -105,11 +110,10 @@ public class QuizViewImpl extends Composite implements QuizView {
 		
 		isSubmitInitialized = false;
 		questionIndex2AnswerIndices = new HashMap<Long, Set<Long>>();
-		questionIndex2QuestionUI = new HashMap<Long, FlowPanel>();
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.GETTING_STARTED), "", "");
+				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL), "", "");
 			}
 		};
 		
@@ -119,7 +123,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz("Certification"));
+				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
 			}
 		});
 	}
@@ -160,7 +164,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 		hideAll();
 		testContainer.clear();
 		questionIndex2AnswerIndices.clear();
-		questionIndex2QuestionUI.clear();
 		hideLoading();
 	}
 	
@@ -174,8 +177,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		currentQuestionCount = questions.size();
 		int questionNumber = 1;
 		for (Question question : questions) {
-			FlowPanel questionUI = addQuestion(questionNumber++, question);
-			questionIndex2QuestionUI.put(question.getQuestionIndex(), questionUI);
+			FlowPanel questionUI = addQuestion(questionNumber++, question, null);
 			testContainer.add(questionUI);
 		}
 		
@@ -197,24 +199,30 @@ public class QuizViewImpl extends Composite implements QuizView {
 			});
 		}
 		quizContainer.setVisible(true);
+		submitButton.setVisible(true);
 		submitButton.setEnabled(true);
     }
 	
 	@Override
 	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
 		hideAll();
+		scoreQuiz(passingRecord);
+		//show success UI (certificate) and quiz
 		certificateWidget.configure(profile, passingRecord);
 		successContainer.setVisible(true);
+		quizContainer.setVisible(true);
+		DisplayUtils.scrollToTop();
 	}
-	
-	@Override
-	public void showFailure(PassingRecord passingRecord) {
+	private void scoreQuiz(PassingRecord passingRecord) {
 		//go through and highlight correct/incorrect answers
+		testContainer.clear();
+		int questionNumber = 1;
 		for (ResponseCorrectness correctness : passingRecord.getCorrections()) {
 			//indicate success/failure
-			Long questionIndex = correctness.getQuestion().getQuestionIndex();
-			FlowPanel questionUI = questionIndex2QuestionUI.get(questionIndex);
-			if (questionUI != null && correctness.getQuestion() != null) {
+			if (correctness.getQuestion() != null) {
+				FlowPanel questionUI = addQuestion(questionNumber++, correctness.getQuestion(), (MultichoiceResponse)correctness.getResponse());
+				testContainer.add(questionUI);
+
 				HTML html = new InlineHTML();
 				html.addStyleName("margin-right-5");
 				if (correctness.getIsCorrect()) {
@@ -228,11 +236,23 @@ public class QuizViewImpl extends Composite implements QuizView {
 				questionUI.insert(html, 0);
 			}
 		}
+		//scored quiz cannot be resubmitted
+		submitButton.setVisible(false);
+		DisplayUtils.show(scoreContainer);
+		scoreContainer.setInnerHTML("Score: " + passingRecord.getScore() + "/" + passingRecord.getCorrections().size() );
+	}
+	
+	@Override
+	public void showFailure(PassingRecord passingRecord) {
+		hideAll();
+		scoreQuiz(passingRecord);
+		//show failure message and quiz
 		DisplayUtils.show(quizFailure);
 		quizFailure.scrollIntoView();
+		quizContainer.setVisible(true);
 	}
 
-	private FlowPanel addQuestion(int questionNumber, Question question) {
+	private FlowPanel addQuestion(int questionNumber, Question question, MultichoiceResponse response) {
 		FlowPanel parentQuestionContainer = new FlowPanel();
 		if (question instanceof MultichoiceQuestion) {
 			FlowPanel questionContainer = new FlowPanel();
@@ -257,6 +277,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 					});
 					answerContainer.add(answerButton);
 					questionContainer.add(answerContainer);
+					handleIfPreviouslyAnswered(answerButton, response, answer.getAnswerIndex());
 				}
 			} else {
 				//checkbox
@@ -279,12 +300,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 					});
 					answerContainer.add(checkbox);
 					questionContainer.add(answerContainer);
+					handleIfPreviouslyAnswered(checkbox, response, answer.getAnswerIndex());
 				}
 			}
 			
 			//add help reference
 			final WikiPageKey moreInfoKey = question.getReference();
-			if (moreInfoKey != null) {
+			if (moreInfoKey != null && moreInfoKey.getOwnerObjectId() != null) {
 				Anchor moreInfoLink = new Anchor();
 				moreInfoLink.setHTML(DisplayUtils.getIcon("glyphicon-question-sign font-size-15") + "<span class=\"margin-left-5\">Need help answering this question?</span>");
 				moreInfoLink.setTarget("_blank");
@@ -297,7 +319,13 @@ public class QuizViewImpl extends Composite implements QuizView {
 		}
 		return parentQuestionContainer;
 	}
-	
+	private void handleIfPreviouslyAnswered(CheckBox checkbox, MultichoiceResponse response, Long answerIndex) {
+		if (response != null) {
+			if (response.getAnswerIndex().contains(answerIndex))
+				checkbox.setValue(true);
+			checkbox.setEnabled(false);
+		}
+	}
 	private Set<Long> getAnswerIndexes(Long questionIndex) {
 		Set<Long> answers = questionIndex2AnswerIndices.get(questionIndex);
 		if (answers == null) {
@@ -311,6 +339,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		quizContainer.setVisible(false);
 		successContainer.setVisible(false);
 		DisplayUtils.hide(quizFailure);
+		DisplayUtils.hide(scoreContainer);
 	}
 
 	@Override

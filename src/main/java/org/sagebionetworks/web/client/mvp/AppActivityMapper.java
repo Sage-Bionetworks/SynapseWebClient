@@ -86,7 +86,8 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
-		excludeFromLastPlace.add(RegisterAccount.class);		
+		excludeFromLastPlace.add(RegisterAccount.class);
+		excludeFromLastPlace.add(Quiz.class);
 	}
 
 	@Override

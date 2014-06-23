@@ -15,6 +15,7 @@
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
     	<div class="container margin-top-15">
+    	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
     	    <div ui:field="quizFailure" class="row hide">
 -				<div class="col-sm-offset-1 col-sm-10">
 				    <div class="panel panel-danger">
@@ -30,6 +31,7 @@
 			<g:HTMLPanel ui:field="quizContainer" visible="false">
 				<div class="row">
 				    <div class="highlight-box padding-top-15-imp col-sm-offset-1 col-sm-10">
+				        <div ui:field="scoreContainer" class="margin-bottom-15 margin-right-10 markdown hide"></div>
 					    <div ui:field="quizHeader" class="margin-bottom-15 margin-right-10 markdown"></div>
 					    <div class="margin-bottom-15">
 							<g:Button ui:field="tutorialButton1" styleName="btn btn-large btn-default" text="Open the Tutorial"/>
@@ -44,9 +46,6 @@
 					</div>
 				</div>
 			</g:HTMLPanel>
-			<g:SimplePanel ui:field="successContainer" visible="false">
-			</g:SimplePanel>
-			
 		</div> <!-- close class="container" -->
 <!-- start footer -->
 		<div class="clear"></div>
