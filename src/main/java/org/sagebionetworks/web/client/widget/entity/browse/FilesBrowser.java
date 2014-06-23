@@ -152,12 +152,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		//TODO:  only in test website until tutorial content is ready
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
-		} else {
-			userCertifiedCallback.onSuccess("");
-		}
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	@Override
