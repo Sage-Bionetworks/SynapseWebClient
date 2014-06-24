@@ -21,22 +21,22 @@ public class CookieKeys {
 	/**
 	 * Login token
 	 */
-	public static String USER_LOGIN_TOKEN = "org.sagbionetworks.security.user.login.token";
+	public static String USER_LOGIN_TOKEN = "org.sagebionetworks.security.user.login.token";
 
 	/**
 	 * Login token
 	 */
-	public static String SHOW_DEMO = "org.sagbionetworks.synapse.show.demo";
+	public static String SHOW_DEMO = "org.sagebionetworks.synapse.show.demo";
 
 	/**
 	 * Last Place in the app
 	 */
-	public static String LAST_PLACE = "org.sagbionetworks.synapse.place.last.place";
+	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
 
 	/**
 	 * Current Place in the app
 	 */
-	public static String CURRENT_PLACE = "org.sagbionetworks.synapse.place.current.place";
+	public static String CURRENT_PLACE = "org.sagebionetworks.synapse.place.current.place";
 
 	/**
 	 * LinkedIn requestToken key
