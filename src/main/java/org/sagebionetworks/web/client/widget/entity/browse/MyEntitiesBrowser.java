@@ -93,6 +93,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadUserUpdateable() {
 		view.showLoading();
+		view.getEntityTreeBrowser().clear();
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
@@ -115,6 +116,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 
 	@Override
 	public void loadFavorites() {
+		view.getFavoritesTreeBrowser().clear();
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {

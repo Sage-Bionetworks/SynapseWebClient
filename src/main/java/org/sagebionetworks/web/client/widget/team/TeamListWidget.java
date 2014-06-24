@@ -95,5 +95,9 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		return view.asWidget();
 	}
 	
+	public void clear() {
+		view.clear();
+	}
+	
 
 }
