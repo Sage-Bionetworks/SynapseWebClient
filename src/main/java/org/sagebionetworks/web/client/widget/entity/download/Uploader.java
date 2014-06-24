@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
@@ -62,7 +63,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public static final double COMBINING_TOTAL_PERCENT = .1d;
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	public static final long BYTES_PER_CHUNK = (long)ClientProperties.MB * 5; //5MB
-	public static final int MAX_RETRY = 3;
+	public static final int MAX_RETRY = 5;
+	public static final int RETRY_DELAY = 1000;
 	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
@@ -282,7 +284,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 										chunkUploadSuccess(requestJson, contentType, currentChunkNumber, totalChunkCount, fileSize, requestList);
 									}
 									else {
-										chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList);
+										chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, xhr.getStatusText());
 									}
 								}
 							}
@@ -302,11 +304,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					uploadError(t.getMessage());		
+					chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, t.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError(e.getMessage());
+			chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, e.getMessage());
 		} catch (JSONObjectAdapterException e) {
 			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 			fireCancelEvent();
@@ -340,11 +342,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void chunkUploadFailure(String contentType, int currentChunkNumber, int currentAttempt, long totalChunkCount, long fileSize, List<String> requestList) {
+	public void chunkUploadFailure(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<String> requestList, String detailedMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError("Exceeded the maximum number of attempts to upload a single file chunk.");
-		else //retry
-			directUploadStep2(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+			uploadError("Exceeded the maximum number of attempts to upload a single file chunk. " + detailedMessage);
+		else { //retry
+			//sleep for a second on the client, then try again.
+			gwt.scheduleExecution(new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep2(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+				}
+			}, RETRY_DELAY);
+		}
 	}
 	
 	public class ByteRange {

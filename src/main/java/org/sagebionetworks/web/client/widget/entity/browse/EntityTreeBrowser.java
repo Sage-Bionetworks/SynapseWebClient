@@ -77,12 +77,17 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		// remove handlers
 		handlerManager = new HandlerManager(this);		
 	}
+	
+	public void clear() {
+		view.clear();
+	}
 
 	/**
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
 	public void configure(String entityId, final boolean sort) {
+		view.clear();
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {

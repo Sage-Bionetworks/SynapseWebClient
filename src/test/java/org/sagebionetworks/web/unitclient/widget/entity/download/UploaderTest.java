@@ -4,7 +4,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -36,11 +38,13 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
+import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -276,9 +280,30 @@ public class UploaderTest {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		uploader.directUploadStep2("", 0, 0, 1, 12345, new ArrayList<String>());
-		verifyUploadError();
+		executeScheduledCallback();
+		//should have called twice
+		verify(synapseClient, Mockito.times(2)).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 	}
 
+	/**
+	 * Verifies that gwt.scheduleExecution was called, and invokes the callback that it was given
+	 */
+	private void executeScheduledCallback() {
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(gwt).scheduleExecution(captor.capture(), anyInt());
+		Callback callback = captor.getValue();
+		callback.invoke();
+	}
+	
+	@Test
+	public void testDirectUploadStep2FailureFinalAttempt() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
+		int attempt = Uploader.MAX_RETRY;
+		uploader.directUploadStep2("", 0, attempt, 1, 12345, new ArrayList<String>());
+		verifyUploadError();
+	}
+	
 	@Test
 	public void testDirectUploadStep3Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
@@ -364,11 +389,11 @@ public class UploaderTest {
 	}
 	
 	@Test
-	public void testChunkUploadFailureFirstAttempt() throws RestServiceException {
+	public void testChunkUploadFailureFirstAttempt() throws RestServiceException, InterruptedException {
 		List<String> requestList = new ArrayList<String>();
 		int attempt = 1;
-		uploader.chunkUploadFailure("content type",2, attempt, 2, 1024, requestList);
-		//and it should retry to get the url for this chunk
+		uploader.chunkUploadFailure("content type",2, attempt, 2, 1024, requestList, "");
+		executeScheduledCallback();
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -376,7 +401,7 @@ public class UploaderTest {
 	public void testChunkUploadFailureFinalAttempt() throws RestServiceException {
 		List<String> requestList = new ArrayList<String>();
 		int attempt = Uploader.MAX_RETRY;
-		uploader.chunkUploadFailure("content type",2, attempt, 2, 1024, requestList);
+		uploader.chunkUploadFailure("content type",2, attempt, 2, 1024, requestList, "");
 		verifyUploadError();
 	}
 	
