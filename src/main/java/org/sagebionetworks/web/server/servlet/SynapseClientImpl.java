@@ -1056,8 +1056,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	
 	@Override
 	public String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException {
-		//TODO: change ACCESS_TYPE to UPLOAD once available
-		return getEntityAccessRequirements(entityId, false, ACCESS_TYPE.UPDATE);
+		return getEntityAccessRequirements(entityId, false, ACCESS_TYPE.UPLOAD);
 	}
 
 	public String getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {

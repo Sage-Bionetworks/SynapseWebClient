@@ -160,12 +160,13 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 
 	@Override
 	public void clear() {
+		if(store == null) createStore();
+		store.removeAll();
 	}
 
 	@Override
 	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {
-		if(store == null) createStore();
-		store.removeAll();
+		clear();
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
 		if(rootEntities.size() == 0) {

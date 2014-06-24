@@ -665,6 +665,7 @@ public class DisplayUtils {
 			content.add(new HTML(iconHtml));
 		HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
 		messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
+		messagePanel.setWidth((minWidth-75) + "px");
 		content.add(messagePanel);
 		content.setWidth("100%");
 		content.addStyleName("whiteBackground padding-5");
