@@ -250,6 +250,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		showCertificationReminder(false);
+		myProjectsTreeBrowser.clear();
+		favoritesTreeBrowser.clear();
+		teamsListWidget.clear();
 		
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
