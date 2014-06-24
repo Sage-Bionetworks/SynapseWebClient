@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -23,4 +25,6 @@ public interface GWTWrapper {
 	String getCurrentURL();
 	
 	DateTimeFormat getDateTimeFormat();
+	
+	void scheduleExecution(Callback callback, int delay);
 }
