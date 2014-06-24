@@ -713,6 +713,10 @@ public class DisplayUtils {
 		int left = (com.google.gwt.user.client.Window.getClientWidth() - window.getOffsetWidth()) / 2;
 		int top = (com.google.gwt.user.client.Window.getClientHeight() - window.getOffsetHeight()) / 2;
 		window.setPosition(left, top);
+		scrollToTop();
+	}
+	
+	public static void scrollToTop(){
 		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
 	
