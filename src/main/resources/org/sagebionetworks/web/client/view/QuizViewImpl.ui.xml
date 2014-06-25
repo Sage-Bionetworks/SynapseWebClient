@@ -15,7 +15,7 @@
 		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
     	<div class="container margin-top-15">
-    	    <div ui:field="quizFailure" class="row hide">
+    	    <div ui:field="quizFailure" style="display:none" class="row">
 -				<div class="col-sm-offset-1 col-sm-10">
 				    <div class="panel panel-danger">
 					      <div class="panel-heading">

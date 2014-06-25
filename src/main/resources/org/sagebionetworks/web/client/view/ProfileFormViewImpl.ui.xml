@@ -22,7 +22,7 @@
 					<label class="control-label">Username</label>
 					<input ui:field="userNameField" type="text" class="form-control"
 						placeholder="Enter username"></input>
-					<div ui:field="userNameError" class="help-block hide">Please enter a valid username</div>
+					<div ui:field="userNameError" style="display:none" class="help-block">Please enter a valid username</div>
 				</div>
 			</div>
 		</div>
@@ -81,7 +81,7 @@
 					<label class="control-label">Link to more info</label>
 					<input ui:field="moreInfoField" type="text" class="form-control"
 						placeholder="Enter link to more info"></input>
-					<div ui:field="urlError" class="help-block hide">Please enter a valid URL</div>
+					<div ui:field="urlError" style="display:none" class="help-block">Please enter a valid URL</div>
 				</div>
 			</div>
 			<div class="col-sm-6">
