@@ -224,10 +224,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 		fullWidthContainer.removeAll();
 		topFullWidthContainer.removeAll();
-		adminListItem.addClassName("hide");
+		DisplayUtils.hide(adminListItem);
 		
 		// disable tables completely for now
-		if (!DisplayUtils.isInTestWebsite(cookies)) tablesListItem.addClassName("hide");
+		if (!DisplayUtils.isInTestWebsite(cookies)) DisplayUtils.hide(tablesListItem);
 		//tablesListItem.addClassName("hide");
 		
 		currentTabContainer.removeAll();
@@ -560,7 +560,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			@Override
 			public void invoke(Boolean isVisible) {
 				if (isVisible)
-					adminListItem.removeClassName("hide");
+					DisplayUtils.show(adminListItem);
 			}
 		}));
 		adminTabContainer.add(row);

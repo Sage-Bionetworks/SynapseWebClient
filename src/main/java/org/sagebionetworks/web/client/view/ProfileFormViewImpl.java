@@ -128,12 +128,12 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 				showChangeUsernameUI();
 			}
 		});
-		changeUsernameUi.addClassName("hide");
+		DisplayUtils.hide(changeUsernameUi);
 	 }
 	 
 	 private void showChangeUsernameUI(){
 		changeUsernameButton.addStyleName("disabled");
-		changeUsernameUi.removeClassName("hide");
+		DisplayUtils.show(changeUsernameUi);
 	 }
 	 
 	 @Override

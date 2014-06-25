@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import java.util.Date;
+
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
@@ -11,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UploadView;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPresenter {
@@ -131,7 +134,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final String entityId, 
 			final UploadView view,
 			SynapseClientAsync synapseClient,
-			CookieProvider cookies,
+			final CookieProvider cookies,
 			AuthenticationController authenticationController) {
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
@@ -144,8 +147,14 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 					view.showQuizInfoDialog(new CallbackP<Boolean>() {
 						@Override
 						public void invoke(Boolean tutorialClicked) {
-							if (!tutorialClicked)
+							if (!tutorialClicked) {
+								//remind me later clicked
+								//do not pop this up for a day
+								Date date = new Date();
+								CalendarUtil.addDaysToDate(date, 1);
+								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
 								view.showUploadDialog(entityId);
+							}
 						}
 					});					
 				} else
@@ -153,7 +162,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			}
 		};
 		//TODO:  only in test website until tutorial content is ready
-		if (DisplayUtils.isInTestWebsite(cookies)) {
+		if (DisplayUtils.isInTestWebsite(cookies) && cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 		} else {
 			userCertifiedCallback.onSuccess("");

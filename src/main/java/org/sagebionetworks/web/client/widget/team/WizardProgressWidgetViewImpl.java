@@ -25,7 +25,7 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 		clear();
 		//only show progress if there's more than one page
 		if (total > 1) {
-			removeStyleName("hide");
+			DisplayUtils.show(this);
 			for (int i = 0; i < total; i++) {
 				if (i == current) {
 					//current page
@@ -45,7 +45,7 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 				}
 			}
 		} else {
-			addStyleName("hide");
+			DisplayUtils.hide(this);
 		}
 	}
 	

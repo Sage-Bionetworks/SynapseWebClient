@@ -47,4 +47,7 @@ public class CookieKeys {
 	 * Get Satisfaction fastpass key
 	 */
 	public static String FASTPASS = "fastpass";
+	
+	public static String IGNORE_CERTIFICATION_REMINDER = "org.sagebionetworks.synapse.ignore.certification.reminder";
+	
 }
