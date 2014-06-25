@@ -2367,31 +2367,30 @@ public class DisplayUtils {
 	}
 	
 	public static void hide(UIObject uiObject) {
-		uiObject.addStyleName("hide");
+		uiObject.setVisible(false);
 	}
 	
 	public static void show(UIObject uiObject) {
-		uiObject.removeStyleName("hide");
+		uiObject.setVisible(true);
 	}
 	
-	public static void hide(com.google.gwt.dom.client.Element uiObject) {
-		uiObject.addClassName("hide");
+	public static void hide(com.google.gwt.dom.client.Element elem) {
+		UIObject.setVisible(elem, false);
 	}
 	
-	public static void show(com.google.gwt.dom.client.Element uiObject) {
-		uiObject.removeClassName("hide");
+	public static void show(com.google.gwt.dom.client.Element elem) {
+		UIObject.setVisible(elem, true);
 	}
-
 	
-	 public static void showFormError(DivElement parentElement, DivElement messageElement) {
-		 parentElement.addClassName("has-error");
-		 DisplayUtils.show(messageElement);
-	 }
+	public static void showFormError(DivElement parentElement, DivElement messageElement) {
+		parentElement.addClassName("has-error");
+		DisplayUtils.show(messageElement);
+	}
 	 
-	 public static void hideFormError(DivElement parentElement, DivElement messageElement) {
-		 parentElement.removeClassName("has-error");
-		 DisplayUtils.hide(messageElement);
-	 }
+	public static void hideFormError(DivElement parentElement, DivElement messageElement) {
+		parentElement.removeClassName("has-error");
+		DisplayUtils.hide(messageElement);
+	}
 
 	 public static String getInfoHtml(String safeHtmlMessage) {
 		 return "<div class=\"alert alert-info\">"+safeHtmlMessage+"</div>";
