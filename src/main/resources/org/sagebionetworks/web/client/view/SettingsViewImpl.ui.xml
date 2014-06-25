@@ -45,21 +45,21 @@
 								    <label class="col-sm-3 control-label">Current password</label>
 								    <div class="col-sm-8">
 								      <g:PasswordTextBox ui:field="currentPasswordField" styleName="form-control"/>
-									  <div ui:field="currentPasswordError" class="help-block hide"></div>
+									  <div ui:field="currentPasswordError" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
 								  <div ui:field="password1" class="form-group row">
 								    <label class="col-sm-3 control-label">New password</label>
 								    <div class="col-sm-8">
 								      <g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
-									  <div ui:field="password1Error" class="help-block hide"></div>
+									  <div ui:field="password1Error" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
 								  <div ui:field="password2" class="form-group row">
 								    <label class="col-sm-3 control-label">Confirm password</label>
 								    <div class="col-sm-8">
 								      <g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
-								      <div ui:field="password2Error" class="help-block hide"></div>
+								      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
 								  <div class="col-sm-12">
