@@ -22,28 +22,28 @@
 							    <label class="col-sm-3 control-label">Username</label>
 							    <div class="col-sm-9">
 							      <g:TextBox ui:field="userNameField" styleName="form-control"/>
-								  <div ui:field="userNameError" class="help-block hide"></div>
+								  <div ui:field="userNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="emailAddress" class="form-group row">
 							    <label class="col-sm-3 control-label">Email</label>
 							    <div class="col-sm-9">
 							      <g:TextBox ui:field="emailAddressField" styleName="form-control"/>
-							      <div ui:field="emailAddressError" class="help-block hide"></div>
+							      <div ui:field="emailAddressError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="firstName" class="form-group row">
 							    <label class="col-sm-3 control-label">First name</label>
 							    <div class="col-sm-9">
 							       <g:TextBox ui:field="firstNameField" styleName="form-control"/>
-									<div ui:field="firstNameError" class="help-block hide"></div>
+									<div ui:field="firstNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>				        
 							<div ui:field="lastName" class="form-group row">
 							    <label class="col-sm-3 control-label">Last name</label>
 							    <div class="col-sm-9">
 							       <g:TextBox ui:field="lastNameField" styleName="form-control"/>
-							      <div ui:field="lastNameError" class="help-block hide"></div>
+							      <div ui:field="lastNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 						</form>

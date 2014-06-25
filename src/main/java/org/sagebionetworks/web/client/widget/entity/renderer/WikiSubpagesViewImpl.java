@@ -83,29 +83,44 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 	}
 	
-	private void hideSubpages() {
+	@Override
+	public void hideSubpages() {
 		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
 		if (wikiSubpagesContainer != null)
 			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
-		if (wikiPageContainer != null)
-			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
-		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
+		if (showHideButton != null) {
+			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
+			showHideButton.setStyleName("btn btn-default btn-xs left");
+		}
 		removeStyleName("well");
-		DisplayUtils.hide(ulContainer);
-		showHideButton.setStyleName("btn btn-default btn-xs left");
+		
+		if (ulContainer != null)
+			DisplayUtils.hide(ulContainer);
+		
+		if (wikiPageContainer != null) {
+			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);
+			wikiPageContainer.setVisible(false);
+			wikiPageContainer.setVisible(true);
+		}
+			
 	}
 	
-	private void showSubpages() {
+	@Override
+	public void showSubpages() {
 		isShowingSubpages = true;
 		if (wikiSubpagesContainer != null)
 			wikiSubpagesContainer.setStyleName(SHOW_SUBPAGES_STYLE);
 		if (wikiPageContainer != null)
 			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
-		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+		if (showHideButton != null) {
+			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+			showHideButton.setStyleName("btn btn-default btn-xs right");		
+		}
 		addStyleName("well");
-		DisplayUtils.show(ulContainer);
-		showHideButton.setStyleName("btn btn-default btn-xs right");
+		
+		if (ulContainer != null)
+			DisplayUtils.show(ulContainer);
 	}
 	
 	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {
