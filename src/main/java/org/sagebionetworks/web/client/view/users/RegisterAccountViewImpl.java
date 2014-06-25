@@ -159,7 +159,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void showDefault() {
 		this.clear();
-		registrationForm.removeClassName("hide");
+		DisplayUtils.show(registrationForm);
 		registerBtn.setVisible(true);
 	}
 
@@ -180,7 +180,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void clear() {		
 		if(contentHtml != null) contentHtml.setInnerHTML("");
-		registrationForm.addClassName("hide");
+		DisplayUtils.hide(registrationForm);
 		registerBtn.setVisible(false);
 		registerBtn.setEnabled(true);
 		firstNameField.setValue("");

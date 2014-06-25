@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -190,6 +192,18 @@ public class FilesBrowserTest {
 		verify(mockView, never()).showUploadDialog(anyString());
 		//but if the tutorial was not clicked, then it should show the upload dialog
 		callback.invoke(false);
+		verify(mockView).showUploadDialog(anyString());
+	}
+	
+	@Test
+	public void testUploadStep2NotCertifiedIgnore(){
+		//simulate that the dialog was previously ignored
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		when(mockCookies.getCookie(eq(CookieKeys.IGNORE_CERTIFICATION_REMINDER))).thenReturn("yes");
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		
+		//should not show the quiz info dialog, it should go directly to upload 
+		verify(mockView, Mockito.times(0)).showQuizInfoDialog(any(CallbackP.class));
 		verify(mockView).showUploadDialog(anyString());
 	}
 	

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -45,19 +46,19 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 		clear();
 		int daysRemaining = HomeViewImpl.getDaysRemaining();
 		if (daysRemaining > 0) {
-			remindMeLaterButton.removeStyleName("hide");
+			DisplayUtils.show(remindMeLaterButton);
 			remindMeLaterButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.cancelClicked();
 				}
 			});
-			beforeLockdownMessage.removeClassName("hide");
+			DisplayUtils.show(beforeLockdownMessage);
 			lockdownDate1.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
 			lockdownDate2.setInnerHTML(HomeViewImpl.LOCKDOWN_DATE_STRING);
 		} else {
-			beforeLockdownMessage.addClassName("hide");
-			remindMeLaterButton.addStyleName("hide");
+			DisplayUtils.hide(beforeLockdownMessage);
+			DisplayUtils.hide(remindMeLaterButton);
 		}
 		
 		becomeCertifiedButton.addClickHandler(new ClickHandler() {

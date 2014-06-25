@@ -485,11 +485,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 		if (visible && 
 			DisplayUtils.isInTestWebsite(cookies) && //remove line once internal testing has concluded
 			getDaysRemaining() > 0) {
-			certificationReminderUI.removeClassName("hide");
+			DisplayUtils.show(certificationReminderUI);
 			lockdownDate1.setInnerHTML(LOCKDOWN_DATE_STRING);
 			lockdownDate2.setInnerHTML(LOCKDOWN_DATE_STRING);
 		} else {
-			certificationReminderUI.addClassName("hide");
+			DisplayUtils.hide(certificationReminderUI);
 		}
 	}
 	
