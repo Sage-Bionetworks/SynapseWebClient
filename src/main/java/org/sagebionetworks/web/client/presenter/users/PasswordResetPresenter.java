@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -101,7 +102,11 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("An error occurred in sending your request. Please retry.");
+				if (caught instanceof NotFoundException) {
+					view.showErrorMessage(caught.getMessage());
+				} else if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage("An error occurred in sending your request. Please retry.");
+				}
 			}
 		});
 		
