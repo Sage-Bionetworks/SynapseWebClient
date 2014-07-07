@@ -166,6 +166,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 		} else {
 			userCertifiedCallback.onSuccess("");
+		}
 	}
 	
 	@Override

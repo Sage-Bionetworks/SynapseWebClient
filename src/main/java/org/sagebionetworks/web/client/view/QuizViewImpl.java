@@ -113,7 +113,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.CERTIFICATION), "", "");
+				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.GETTING_STARTED), "", "");
 			}
 		};
 		
