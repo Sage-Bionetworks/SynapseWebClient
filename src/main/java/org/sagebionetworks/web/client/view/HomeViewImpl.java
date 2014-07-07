@@ -483,7 +483,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Override
 	public void showCertificationReminder(boolean visible) {
 		if (visible && 
-			DisplayUtils.isInTestWebsite(cookies) && //remove line once internal testing has concluded
 			getDaysRemaining() > 0) {
 			DisplayUtils.show(certificationReminderUI);
 			lockdownDate1.setInnerHTML(LOCKDOWN_DATE_STRING);

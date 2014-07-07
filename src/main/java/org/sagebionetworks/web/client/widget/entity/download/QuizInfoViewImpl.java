@@ -65,7 +65,7 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.continueClicked();
-				presenter.goTo(new Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
+				presenter.goTo(new Quiz(WebConstants.CERTIFICATION));
 			}
 		});
 	}

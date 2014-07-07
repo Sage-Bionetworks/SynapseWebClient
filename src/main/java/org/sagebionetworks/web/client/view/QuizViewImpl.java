@@ -113,7 +113,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		ClickHandler gotoGettingStartedNewWindow = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.USER_CERTIFICATION_TUTORIAL), "", "");
+				DisplayUtils.newWindow(DisplayUtils.getHelpPlaceHistoryToken(WebConstants.CERTIFICATION), "", "");
 			}
 		};
 		
@@ -123,7 +123,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.USER_CERTIFICATION_TUTORIAL));
+				presenter.goTo(new org.sagebionetworks.web.client.place.Quiz(WebConstants.CERTIFICATION));
 			}
 		});
 	}

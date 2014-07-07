@@ -54,12 +54,12 @@ public class HelpPresenterTest {
 
 		verify(mockView).setPresenter(presenter);
 		place = Mockito.mock(Help.class);
-		when(place.toToken()).thenReturn(WebConstants.USER_GUIDE);
+		when(place.toToken()).thenReturn(WebConstants.GETTING_STARTED);
 		HashMap<String, WikiPageKey> pageName2WikiKeyMap = new HashMap<String, WikiPageKey>();
 		String userGuideEntity = "syn1113";
 		String userGuideWiki = "44442";
 		userGuideKey = new WikiPageKey(userGuideEntity, ObjectType.ENTITY.toString(), userGuideWiki);
-		pageName2WikiKeyMap.put(WebConstants.USER_GUIDE, userGuideKey);
+		pageName2WikiKeyMap.put(WebConstants.GETTING_STARTED, userGuideKey);
 		
 		AsyncMockStubber.callSuccessWith(pageName2WikiKeyMap).when(mockSynapseClient).getHelpPages(any(AsyncCallback.class));
 	}	
