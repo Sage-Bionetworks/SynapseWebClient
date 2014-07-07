@@ -66,7 +66,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		
 		// Install the view
 		panel.setWidget(view);
-		
+		updateView();
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		showView(place);
+		updateView();
 		
 		getAPIKey();
 		
@@ -226,10 +226,11 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
-	private void showView(Settings place) {
+	private void updateView() {
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
+		view.updateEmailAddress(DisplayUtils.getPrimaryEmail(authenticationController.getCurrentUserSessionData().getProfile()));
 	}
 
 	@Override
@@ -246,7 +247,21 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
-		
+	}
+	
+	@Override
+	public void addEmail(String emailAddress) {
+		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo(DisplayConstants.EMAIL_ADDED, "");
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		});
 	}
 }
 

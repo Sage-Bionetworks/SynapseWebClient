@@ -80,6 +80,8 @@ public interface SynapseClientAsync {
 	
 	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	
+	void additionalEmailValidation(String userId, String emailAddress, AsyncCallback<Void> callback);
+	
 	public void getNodeAcl(String id, AsyncCallback<EntityWrapper> callback);
 	
 	public void createAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
