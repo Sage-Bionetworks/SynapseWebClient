@@ -129,7 +129,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-	//is this a certified user?
+		//is this a certified user?
 	public static void uploadButtonClickedStep2(
 			final String entityId, 
 			final UploadView view,
@@ -154,15 +154,15 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 								CalendarUtil.addDaysToDate(date, 1);
 								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
 								view.showUploadDialog(entityId);
-							}
+						}
 						}
 					});					
 				} else
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		//TODO:  only in test website until tutorial content is ready
-		if (DisplayUtils.isInTestWebsite(cookies) && cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
+		//only if cookie is not set
+		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
 			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 		} else {
 			userCertifiedCallback.onSuccess("");
