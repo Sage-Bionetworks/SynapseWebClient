@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -239,14 +240,15 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	public void updateEmailAddress(String primaryEmail) {
 		emailsPanel.clear();
-		emailsPanel.add(new HTML(SafeHtmlUtils.htmlEscape(primaryEmail)));
-		Anchor changeEmail = new Anchor("change");
-		changeEmail.addStyleName("link");
+		emailsPanel.add(new InlineHTML("<h5>" + SafeHtmlUtils.htmlEscape(primaryEmail) + "</h5>"));
+		final Anchor changeEmail = new Anchor("change");
+		changeEmail.addStyleName("link margin-left-10");
 		emailsPanel.add(changeEmail);
 		changeEmail.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				fds
+				changeEmail.setVisible(false);
+				DisplayUtils.show(changeEmailUI);
 			}
 		});
 	}
@@ -330,6 +332,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		newEmailField.setValue("");
 		DisplayUtils.hide(newEmailError);
 		addEmailButton.setEnabled(true);
+		DisplayUtils.hide(changeEmailUI);
 	}
 	
 	private void resetChangePasswordUI() {
