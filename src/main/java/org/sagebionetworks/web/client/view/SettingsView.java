@@ -38,6 +38,10 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
+	void showNotificationEmailAddress(String primaryEmailAddress);
+	void showEmailChangeSuccess(String message);
+	void showEmailChangeFailed(String error);
+	
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);
@@ -47,6 +51,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 		void updateMyNotificationSettings(boolean sendEmailNotifications, boolean markEmailedMessagesAsRead);
 
 		void changeApiKey();
+		
+		void addEmail(String emailAddress);
 	}
 
 	public void setApiKey(String apiKey);

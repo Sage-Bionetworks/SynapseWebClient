@@ -229,11 +229,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	@Override
-	public String getEmailAddress() {
-		return ownerProfile != null ? DisplayUtils.getPrimaryEmail(ownerProfile) : null;
-	}
-	
 	private void setupProfileFormCallback() {
 		profileUpdatedCallback = new ProfileUpdatedCallback() {
 			

@@ -31,6 +31,20 @@
 			</div>
 			<div class="row">
 			    <div class="col-md-6">
+			        <div ui:field="emailSettingsPanel" class="highlight-box">
+					    <g:FlowPanel ui:field="emailsPanel" styleName="margin-left-10">
+					    </g:FlowPanel>
+					    <div ui:field="changeEmailUI" style="display:none" class="margin-top-10">
+						    <div class="input-group">
+						      <g:TextBox ui:field="newEmailField" styleName="form-control" />
+						      <span class="input-group-btn">
+						           <g:Button ui:field="addEmailButton" styleName="btn btn-default">Change Email</g:Button>
+						      </span>
+						    </div>
+						    <div ui:field="newEmailError" style="display:none" class="text-danger margin-left-5"></div>
+						</div>
+						<div ui:field="newEmailAlert" class="alert alert-info" style="display:none" role="alert"></div>
+					</div>
 				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box">
 					    <g:FlowPanel styleName="checkbox margin-left-10">
 					       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
@@ -39,7 +53,7 @@
 				</div>
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
-					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-40">
+					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-40" >
 					        <form class="form-horizontal" role="form">
 					   			  <div ui:field="currentPassword" class="form-group row">
 								    <label class="col-sm-3 control-label">Current password</label>

@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -36,7 +40,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	
+	private GWTWrapper gwt;
 	private String apiKey = null;
 	
 	@Inject
@@ -47,7 +51,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			CookieProvider cookieProvider,
 			NodeModelCreator nodeModelCreator,
 			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -56,6 +61,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -66,7 +72,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		
 		// Install the view
 		panel.setWidget(view);
-		
+		updateView();
 	}
 
 	@Override
@@ -74,7 +80,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		showView(place);
+		updateView();
 		
 		getAPIKey();
 		
@@ -150,7 +156,39 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
+	
+	public void getUserNotificationEmail() {
+		synapseClient.getNotificationEmail(new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String notificationEmail) {
+				view.showNotificationEmailAddress(notificationEmail);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
 
+	public void setUserNotificationEmail(final String email) {
+		synapseClient.setNotificationEmail(email, new AsyncCallback<Void>(){
+			@Override
+			public void onSuccess(Void callback) {
+				//success, update view
+				setPlace(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
 	private void updateUserStorage() {
 		userService.getStorageUsage(new AsyncCallback<String>(){
 			@Override
@@ -226,10 +264,11 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
-	private void showView(Settings place) {
+	private void updateView() {
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
+		getUserNotificationEmail();
 	}
 
 	@Override
@@ -246,7 +285,39 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		});
-		
+	}
+	
+	@Override
+	public void addEmail(String emailAddress) {
+		//Is this email already in the profile email list?
+		//If so, just update it as the new notification email.  Otherwise, kick off the verification process.
+		List<String> emailAddresses = authenticationController.getCurrentUserSessionData().getProfile().getEmails();
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		for (String email : emailAddresses) {
+			if (email.equalsIgnoreCase(emailAddress)) {
+				//update the notification email
+				setUserNotificationEmail(emailAddress);	
+				return;
+			}
+		}
+		//did not find in the list
+		additionalEmailValidation(emailAddress);
+	}
+	
+	public void additionalEmailValidation(String emailAddress) {
+		//need to validate
+		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
+		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showEmailChangeFailed(caught.getMessage());
+			}
+		});
+
 	}
 }
 

@@ -28,6 +28,8 @@ import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.view.AccountView;
+import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.ChallengeOverviewView;
@@ -450,6 +452,9 @@ public class PortalGinModule extends AbstractGinModule {
 		// Certificate
 		bind(CertificateView.class).to(CertificateViewImpl.class);		
 		
+		//Account
+		bind(AccountViewImpl.class).in(Singleton.class);
+		bind(AccountView.class).to(AccountViewImpl.class);
 		/*
 		 * Factories
 		 */
