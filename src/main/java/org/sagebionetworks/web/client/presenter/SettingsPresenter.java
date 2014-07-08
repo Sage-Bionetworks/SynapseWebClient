@@ -293,20 +293,15 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		//If so, just update it as the new notification email.  Otherwise, kick off the verification process.
 		List<String> emailAddresses = authenticationController.getCurrentUserSessionData().getProfile().getEmails();
 		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
-		boolean found = false;
 		for (String email : emailAddresses) {
 			if (email.equalsIgnoreCase(emailAddress)) {
-				found = true;
-				emailAddress = email; //match case for service
-				break;
+				//update the notification email
+				setUserNotificationEmail(emailAddress);	
+				return;
 			}
 		}
-		if (found) {
-			//update the notification email
-			setUserNotificationEmail(emailAddress);
-		} else {
-			additionalEmailValidation(emailAddress);
-		}
+		//did not find in the list
+		additionalEmailValidation(emailAddress);
 	}
 	
 	public void additionalEmailValidation(String emailAddress) {

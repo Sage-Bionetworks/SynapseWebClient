@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -28,17 +27,15 @@ public class AccountViewImpl extends Composite implements AccountView {
 	FlowPanel mainContainer;
 	
 	private Presenter presenter;
-	private IconsImageBundle icons;
 	private Header headerWidget;
 	private Footer footerWidget;
 	
 	@Inject
 	public AccountViewImpl(AccountViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
+			Header headerWidget, Footer footerWidget,
 			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
-
-		this.icons = icons;
+		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
@@ -68,7 +65,6 @@ public class AccountViewImpl extends Composite implements AccountView {
 	public void showErrorInPage(String title, String message) {
 		clear();
 		mainContainer.add(new HTML(DisplayUtils.getWarningHtml(title, message)));
-		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
