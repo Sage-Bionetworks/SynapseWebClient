@@ -841,7 +841,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String getUserNotificationEmail() throws RestServiceException {
+	public String getNotificationEmail() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getNotificationEmail();
@@ -851,7 +851,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void setUserNotificationEmail(String email) throws RestServiceException {
+	public void setNotificationEmail(String email) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.setNotificationEmail(email);

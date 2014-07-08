@@ -38,7 +38,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
-	void updateEmailAddress(String primaryEmailAddress);
+	void showNotificationEmailAddress(String primaryEmailAddress);
 	void showEmailChangeSuccess(String message);
 	void showEmailChangeFailed(String error);
 	

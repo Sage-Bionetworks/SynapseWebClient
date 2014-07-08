@@ -10,6 +10,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -96,6 +97,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
@@ -1462,5 +1464,36 @@ public class SynapseClientImplTest {
 		//verify it calls getAccessRequirements when unmet is false
 		synapseClient.getEntityAccessRequirements(entityId, false, null);
 		verify(mockSynapse).getAccessRequirements(any(RestrictableObjectDescriptor.class));
+	}
+	
+	//pass through tests for email validation
+	
+	@Test
+	public void testAdditionalEmailValidation() throws Exception {
+		Long userId = 992843l;
+		String emailAddress = "test@test.com";
+		String callbackUrl = "http://www.synapse.org/#!Account:";
+		synapseClient.additionalEmailValidation(userId.toString(), emailAddress, callbackUrl);
+		verify(mockSynapse).additionalEmailValidation(eq(userId), eq(emailAddress), eq(callbackUrl));
+	}
+	
+	@Test
+	public void testAddEmail() throws Exception {
+		String emailAddressToken = "long synapse email token";
+		synapseClient.addEmail(emailAddressToken);
+		verify(mockSynapse).addEmail(any(AddEmailInfo.class), anyBoolean());
+	}
+	
+	@Test
+	public void testGetNotificationEmail() throws Exception {
+		synapseClient.getNotificationEmail();
+		verify(mockSynapse).getNotificationEmail();
+	}
+	
+	@Test
+	public void testSetNotificationEmail() throws Exception {
+		String emailAddress = "test@test.com";
+		synapseClient.setNotificationEmail(emailAddress);
+		verify(mockSynapse).setNotificationEmail(eq(emailAddress));
 	}
 }

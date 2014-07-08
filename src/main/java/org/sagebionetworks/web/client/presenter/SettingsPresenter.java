@@ -157,11 +157,11 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		}
 	}
 	
-	private void getUserNotificationEmail() {
-		synapseClient.getUserNotificationEmail(new AsyncCallback<String>(){
+	public void getUserNotificationEmail() {
+		synapseClient.getNotificationEmail(new AsyncCallback<String>(){
 			@Override
 			public void onSuccess(String notificationEmail) {
-				view.updateEmailAddress(notificationEmail);
+				view.showNotificationEmailAddress(notificationEmail);
 			}
 			
 			@Override
@@ -173,8 +173,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	}
 	
 
-	private void setUserNotificationEmail(final String email) {
-		synapseClient.setUserNotificationEmail(email, new AsyncCallback<Void>(){
+	public void setUserNotificationEmail(final String email) {
+		synapseClient.setNotificationEmail(email, new AsyncCallback<Void>(){
 			@Override
 			public void onSuccess(Void callback) {
 				//success, update view
@@ -305,19 +305,24 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			//update the notification email
 			setUserNotificationEmail(emailAddress);
 		} else {
-			//need to validate
-			String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
-			synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showEmailChangeFailed(caught.getMessage());
-				}
-			});
+			additionalEmailValidation(emailAddress);
 		}
+	}
+	
+	public void additionalEmailValidation(String emailAddress) {
+		//need to validate
+		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
+		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showEmailChangeFailed(caught.getMessage());
+			}
+		});
+
 	}
 }
 

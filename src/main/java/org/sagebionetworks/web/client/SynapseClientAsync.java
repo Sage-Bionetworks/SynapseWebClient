@@ -84,9 +84,9 @@ public interface SynapseClientAsync {
 	
 	void addEmail(String emailValidationToken, AsyncCallback<Void> callback);
 	
-	void getUserNotificationEmail(AsyncCallback<String> callback);
+	void getNotificationEmail(AsyncCallback<String> callback);
 	
-	void setUserNotificationEmail(String email, AsyncCallback<Void> callback);
+	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	
 	public void getNodeAcl(String id, AsyncCallback<EntityWrapper> callback);
 	

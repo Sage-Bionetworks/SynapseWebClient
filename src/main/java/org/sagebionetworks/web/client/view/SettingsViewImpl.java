@@ -25,7 +25,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -240,7 +239,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		}
 	}
 	
-	public void updateEmailAddress(String primaryEmail) {
+	public void showNotificationEmailAddress(String primaryEmail) {
 		emailsPanel.clear();
 		emailsPanel.add(new InlineHTML("<h5 class=\"displayInline\">" + SafeHtmlUtils.htmlEscape(primaryEmail) + "</h5>"));
 		final Anchor changeEmail = new Anchor("change");

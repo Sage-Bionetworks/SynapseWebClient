@@ -47,6 +47,10 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 		this.place = place;
 		this.view.setPresenter(this);
 		String emailValidationToken = place.toToken();
+		validateToken(emailValidationToken);
+	}
+	
+	public void validateToken(String emailValidationToken) {
 		synapseClient.addEmail(emailValidationToken, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
