@@ -327,6 +327,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		resetAddEmailUI();
 	}
 	
+	@Override
+	public void showEmailChangeFailed(String error) {
+		addEmailButton.setEnabled(true);
+		DisplayUtils.show(newEmailError);
+		newEmailError.setInnerHTML(error);
+	}
+	
 	private void resetAddEmailUI() {
 		emailsPanel.clear();
 		newEmailField.setValue("");

@@ -742,6 +742,8 @@ public class DisplayConstants {
 	
 	public static final String ACCOUNT_CREATED = "Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then ";
 	public static final String EMAIL_ADDED = "We have sent you an email with instructions on how to verify the new email address.";
+	public static final String EMAIL_SUCCESS = "Successfully verified the email address";
+	public static final String EMAIL_FAILURE = "Unable to verify the email address:";
 	public static final String LOGIN_HERE = "login here";
 	
 	public static final String ERROR_CREATING_COLUMN = "Error creating column";

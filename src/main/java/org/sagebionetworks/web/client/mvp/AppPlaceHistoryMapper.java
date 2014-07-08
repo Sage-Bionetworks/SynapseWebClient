@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.mvp;
 
+import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
@@ -36,6 +37,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		Search.Tokenizer.class, Settings.Tokenizer.class,
 		Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class,
 		WikiPlace.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, 
-		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class})
+		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

@@ -156,6 +156,12 @@ public interface SynapseClient extends RemoteService {
 	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
 	
+	public void addEmail(String emailValidationToken) throws RestServiceException;
+	
+	public String getUserNotificationEmail() throws RestServiceException;
+	
+	public void setUserNotificationEmail(String email) throws RestServiceException;
+	
 	public EntityWrapper getNodeAcl(String id) throws RestServiceException;
 	
 	public EntityWrapper createAcl(EntityWrapper acl) throws RestServiceException;

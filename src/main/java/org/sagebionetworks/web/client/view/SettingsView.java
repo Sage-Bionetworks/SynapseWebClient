@@ -40,6 +40,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	void updateEmailAddress(String primaryEmailAddress);
 	void showEmailChangeSuccess(String message);
+	void showEmailChangeFailed(String error);
 	
 	public interface Presenter extends SynapsePresenter {
 
