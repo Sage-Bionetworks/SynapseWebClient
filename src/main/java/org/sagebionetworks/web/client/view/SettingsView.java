@@ -39,6 +39,8 @@ public interface SettingsView extends IsWidget, SynapseView {
 	public void updateNotificationCheckbox(UserProfile profile);
 	
 	void updateEmailAddress(String primaryEmailAddress);
+	void showEmailChangeSuccess(String message);
+	
 	public interface Presenter extends SynapsePresenter {
 
 		void resetPassword(String existingPassword, String newPassword);

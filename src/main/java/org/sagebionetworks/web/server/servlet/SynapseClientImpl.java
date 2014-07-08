@@ -817,11 +817,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void additionalEmailValidation(String userId, String emailAddress) throws RestServiceException {
+	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			synapseClient.additionalEmailValidation(userIdLong, emailAddress, "#!EmailValidation");
+			synapseClient.additionalEmailValidation(userIdLong, emailAddress, callbackUrl);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

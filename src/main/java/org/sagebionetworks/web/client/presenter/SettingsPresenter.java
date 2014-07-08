@@ -7,6 +7,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -36,7 +37,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private NodeModelCreator nodeModelCreator;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	
+	private GWTWrapper gwt;
 	private String apiKey = null;
 	
 	@Inject
@@ -47,7 +48,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			CookieProvider cookieProvider,
 			NodeModelCreator nodeModelCreator,
 			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -56,6 +58,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -251,10 +254,11 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	
 	@Override
 	public void addEmail(String emailAddress) {
-		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, new AsyncCallback<Void>() {
+		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
+		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DisplayConstants.EMAIL_ADDED, "");
+				view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

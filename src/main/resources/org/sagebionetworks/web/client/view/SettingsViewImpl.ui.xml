@@ -34,7 +34,7 @@
 			        <div ui:field="emailSettingsPanel" class="highlight-box">
 					    <g:FlowPanel ui:field="emailsPanel" styleName="margin-left-10">
 					    </g:FlowPanel>
-					    <div ui:field="changeEmailUI" style="display:none">
+					    <div ui:field="changeEmailUI" style="display:none" class="margin-top-10">
 						    <div class="input-group">
 						      <g:TextBox ui:field="newEmailField" styleName="form-control" />
 						      <span class="input-group-btn">
@@ -43,6 +43,7 @@
 						    </div>
 						    <div ui:field="newEmailError" style="display:none" class="text-danger margin-left-5"></div>
 						</div>
+						<div ui:field="newEmailAlert" class="alert alert-info" style="display:none" role="alert"></div>
 					</div>
 				    <g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box">
 					    <g:FlowPanel styleName="checkbox margin-left-10">

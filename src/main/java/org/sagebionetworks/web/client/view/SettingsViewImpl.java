@@ -64,6 +64,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	DivElement newEmailError;
 	@UiField
+	DivElement newEmailAlert;
+	@UiField
 	Button addEmailButton;
 
 	
@@ -240,7 +242,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	
 	public void updateEmailAddress(String primaryEmail) {
 		emailsPanel.clear();
-		emailsPanel.add(new InlineHTML("<h5>" + SafeHtmlUtils.htmlEscape(primaryEmail) + "</h5>"));
+		emailsPanel.add(new InlineHTML("<h5 class=\"displayInline\">" + SafeHtmlUtils.htmlEscape(primaryEmail) + "</h5>"));
 		final Anchor changeEmail = new Anchor("change");
 		changeEmail.addStyleName("link margin-left-10");
 		emailsPanel.add(changeEmail);
@@ -273,8 +275,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		};
 	}
 	
-	
-
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
@@ -333,6 +333,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		DisplayUtils.hide(newEmailError);
 		addEmailButton.setEnabled(true);
 		DisplayUtils.hide(changeEmailUI);
+		DisplayUtils.hide(newEmailAlert);
 	}
 	
 	private void resetChangePasswordUI() {
@@ -351,10 +352,17 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 			return true;
 		}
 		else {
-			newEmailError.setInnerHTML(WebConstants.INVALID_EMAIL_MESSAGE);
 			DisplayUtils.show(newEmailError);
+			newEmailError.setInnerHTML(WebConstants.INVALID_EMAIL_MESSAGE);
 			return false;
 		}
+	}
+	
+	@Override
+	public void showEmailChangeSuccess(String message) {
+		DisplayUtils.hide(changeEmailUI);
+		DisplayUtils.show(newEmailAlert);
+		newEmailAlert.setInnerHTML(message);
 	}
 
 	@Override
