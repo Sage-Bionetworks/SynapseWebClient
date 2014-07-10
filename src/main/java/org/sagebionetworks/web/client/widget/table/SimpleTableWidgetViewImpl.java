@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
-import org.sagebionetworks.web.client.widget.modal.BootStrapModal;
+import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -652,7 +652,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		FlowPanel p = new FlowPanel();
 		HTML content = new HTML("<h4 >Hello world!</h4>");
 		p.add(content);
-		final BootStrapModal testModal = new BootStrapModal("target123", "The title", p.asWidget(), "Save", "Cancel", new BootStrapModal.Callback() {
+		final BootstrapModal testModal = new BootstrapModal("target123", "The title", p.asWidget(), "Save", "Cancel", new BootstrapModal.Callback() {
 			
 			@Override
 			public void onPrimary() {

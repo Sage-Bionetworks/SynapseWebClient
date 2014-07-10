@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.modal;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -13,14 +13,18 @@ import com.google.gwt.user.client.ui.Widget;
  * href="http://getbootstrap.com/javascript/#modals"
  * >getbootstrap.com/javascript/#modals</a> Note: To use an instance of this
  * class, it must be added somewhere on the page where the dialog is to be
- * launched from. The dialog itself is a hidden <DIV> that is acted upon by the
+ * launched from. The dialog itself is a hidden <div> that is acted upon by the
  * bootstrap javascript. Once the dialog has been added to a page it can be
  * shown by calling {@link #show()}
+ * 
+ * This class is designed to be used like standard GWT widget without any dependencies.
+ * There is also zero business logic in this class therefore it is 100% "view" with no 
+ * presenter.
  * 
  * @author jmhill
  * 
  */
-public class BootStrapModal extends FlowPanel {
+public class BootstrapModal extends FlowPanel {
 
 	private String modalTargetId;
 	private String title;
@@ -32,15 +36,17 @@ public class BootStrapModal extends FlowPanel {
 	/**
 	 * Create a new Modal dialog.
 	 * 
+	 * Please do not add @inject to this constructor.  This class is designed to be used without any gin dependencies.
+	 * Keep it pure "bootstrap", it is the right thing to do.
 	 * 
-	 * @param modalTargetId
-	 * @param title
-	 * @param body
-	 * @param primaryButtonText
-	 * @param defaultButtonText
+	 * @param modalTargetId Give the dialog a unique ID.  This is used by the javascript to show and hide the dialog.
+	 * @param title The text shown in the title bar.
+	 * @param body This will be the main body of the dialog.  It can be any GWT widget.
+	 * @param primaryButtonText The text for the primary button (i.e "Save").  The primary button is highlighted.
+	 * @param defaultButtonText The text for the default button (i.e "Cancel").  The default button will not be highlighted.
 	 * @param callback
 	 */
-	public BootStrapModal(String modalTargetId, String title, Widget body,
+	public BootstrapModal(String modalTargetId, String title, Widget body,
 			String primaryButtonText, String defaultButtonText,
 			final Callback callback) {
 		super();
@@ -66,11 +72,11 @@ public class BootStrapModal extends FlowPanel {
 		// modal-content
 		FlowPanel modalContent = new FlowPanel();
 		modalContent.setStyleName("modal-content");
-		this.add(modalContent);
+		modalDialog.add(modalContent);
 		// modal-header
 		FlowPanel modalHeader = new FlowPanel();
 		modalHeader.setStyleName("modal-header");
-		this.add(modalHeader);
+		modalContent.add(modalHeader);
 		// Close button in the header
 		HTML headerCloseButton = new HTML("<button type=\"button\" class=\"close\" data-dismiss=\"modal\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button>");
 		headerCloseButton.addClickHandler(new ClickHandler() {
@@ -97,24 +103,20 @@ public class BootStrapModal extends FlowPanel {
 		modalFooter.setStyleName("modal-footer");
 		modalContent.add(modalFooter);
 		// default button
-		builder = new StringBuilder();
-		builder.append("<button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">");
-		builder.append(defaultButtonText);
-		builder.append("</button>");
-		HTML footerCloseButton = new HTML(builder.toString());
-		footerCloseButton.addClickHandler(new ClickHandler() {
+		Button footerDefaultButton = new Button(defaultButtonText);
+		footerDefaultButton.setStyleName("btn btn-default");
+		footerDefaultButton.getElement().setAttribute("data-dismiss", "modal");
+		footerDefaultButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				callback.onDefault();				
 			}
 		});
-		modalFooter.add(footerCloseButton);
+		modalFooter.add(footerDefaultButton);
 		// primary button
-		builder = new StringBuilder();
-		builder.append("<button type=\"button\" class=\"btn btn-primary\">");
-		builder.append(primaryButtonText);
-		builder.append("</button>");
-		HTML footerPrimaryButton = new HTML(builder.toString());
+		Button footerPrimaryButton = new Button(primaryButtonText);
+		footerPrimaryButton.addStyleName("btn btn-primary");
+		footerPrimaryButton.getElement().setAttribute("data-dismiss", "modal");
 		footerPrimaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
