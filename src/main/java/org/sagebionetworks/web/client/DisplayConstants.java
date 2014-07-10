@@ -641,7 +641,7 @@ public class DisplayConstants {
 	public static final String NEW_TEAM_NAME = "New Team Name";
 	public static final String SHORT_TEAM_DESCRIPTION = "Short Team Description";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
-	public static final String USER_GUIDE = "User Guide";
+	public static final String SYNAPSE_TUTORIAL = "Synapse Tutorial";
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
