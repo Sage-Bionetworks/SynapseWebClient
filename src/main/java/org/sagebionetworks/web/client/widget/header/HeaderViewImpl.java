@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
@@ -23,6 +24,7 @@ import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -197,11 +199,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	userCommands.addStyleName("view header-inner-commands-container");
         	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
         	userGuide.addStyleName("displayInline imageButton moveup-2 margin-left-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.SYNAPSE_TUTORIAL, TOOLTIP_POSITION.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(ClientProperties.USER_GUIDE_ID));
+					globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
 				}
 			});
     		
