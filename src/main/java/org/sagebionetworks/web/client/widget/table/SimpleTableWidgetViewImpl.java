@@ -656,14 +656,12 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 			
 			@Override
 			public void onPrimary() {
-				// TODO Auto-generated method stub
-				
+				showInfo("Info", "Primary pressed");
 			}
 			
 			@Override
 			public void onDefault() {
-				// TODO Auto-generated method stub
-				
+				showInfo("info", "Default pressed");
 			}
 		});
 		buttonToolbar.add(modelTest);
