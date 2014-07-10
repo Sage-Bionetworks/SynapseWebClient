@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
+import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -644,6 +645,36 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		buttonToolbar.add(addRowBtn);
 		buttonToolbar.add(viewRowBtn);
 		buttonToolbar.add(deleteRowBtn);
+		
+		Button modelTest = DisplayUtils.createButton("Show Modal", ButtonType.DEFAULT);
+		buttonToolbar.add(modelTest);
+		
+		FlowPanel p = new FlowPanel();
+		HTML content = new HTML("<h4 >Hello world!</h4>");
+		p.add(content);
+		final BootstrapModal testModal = new BootstrapModal("target123", "The title", p.asWidget(), "Save", "Cancel", new BootstrapModal.Callback() {
+			
+			@Override
+			public void onPrimary() {
+				showInfo("Info", "Primary pressed");
+			}
+			
+			@Override
+			public void onDefault() {
+				showInfo("info", "Default pressed");
+			}
+		});
+		buttonToolbar.add(modelTest);
+		buttonToolbar.add(testModal);
+		modelTest.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				testModal.show();
+				
+			}
+		});
+		
 	}
 	
 	/**
