@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
@@ -32,13 +31,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
@@ -70,7 +65,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 //	private Button editButton, addPageButton; 
-	private LayoutContainer commandBar;
+	private FlowPanel commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private Breadcrumb breadcrumb;
@@ -167,6 +162,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	private void showDefaultViewWithWiki() {
 		clear();
+		addStyleName("row");
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			FlowPanel noticePanel = createDifferentVersionNotice();
@@ -177,10 +173,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
 		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
-		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
 		wikiSubpagesPanel.add(widget.asWidget());
 		add(wikiSubpagesPanel);
 		add(wikiPagePanel);
+		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
 		
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
@@ -306,22 +302,23 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();			
 			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
-			commandBar = new LayoutContainer();
+			commandBar = new FlowPanel();
 			commandBarWrapper.add(commandBar);
 		} else {
-			commandBar.removeAll();
+			commandBar.clear();
 		}
 			
-		Button editButton = createEditButton();			
-		commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
+		Button editButton = createEditButton();
+		editButton.addStyleName("margin-left-10");
+		commandBar.add(editButton);			
 		
 		if(!isDescription) {
 			Button addPageButton = createInsertOrAddPageButton(false);
 			commandBar.add(addPageButton);
+			addPageButton.addStyleName("margin-left-5");
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
-		commandBar.layout(true);
 		return commandBarWrapper;
 	}
 

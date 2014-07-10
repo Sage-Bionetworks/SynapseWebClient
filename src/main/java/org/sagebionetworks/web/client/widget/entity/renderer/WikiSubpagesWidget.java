@@ -125,7 +125,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	}
 	
 	public void refreshTableOfContents() {
-		view.hideSubpages();
+		view.clear();
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String results) {

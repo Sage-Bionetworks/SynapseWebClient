@@ -536,6 +536,7 @@ public class DisplayUtils {
 	public static void showErrorMessage(final Throwable t,
 			final JiraURLHelper jiraHelper, boolean isLoggedIn,
 			String friendlyErrorMessage) {
+		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;
@@ -2226,7 +2227,14 @@ public class DisplayUtils {
 		row = new LayoutContainer();
 		row.setStyleName("row");
 		return row;
-}
+	}
+	
+	public static FlowPanel createRowContainerFlowPanel() {
+		FlowPanel row = new FlowPanel();
+		row.setStyleName("row");
+		return row;
+	}
+
 
 	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
 	public static enum BootstrapAlertType { SUCCESS, INFO, WARNING, DANGER }
@@ -2413,5 +2421,14 @@ public class DisplayUtils {
 		}
 		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
 	}
-
+	
+	public static String getStackTrace(Throwable t) {
+		StringBuilder stackTrace = new StringBuilder();
+		if (t != null) {
+			for (StackTraceElement element : t.getStackTrace()) {
+				stackTrace.append(element + "\n");
+			}
+		}
+		return stackTrace.toString();
+	}
 }

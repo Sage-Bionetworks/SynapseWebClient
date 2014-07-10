@@ -5,16 +5,9 @@ import java.util.List;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 
-import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -43,10 +36,16 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
 		this.globalAppState = globalAppState;
 	}
+	@Override
+	public void clear() {
+		super.clear();
+		removeStyleName("well");
+	}
 	
 	@Override
 	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
+		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
@@ -65,7 +64,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 			ulContainer.add(ul);
-
+			
 			showHideButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -76,10 +75,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				}
 			});
 			
-			showSubpages();
-			
 			add(ulContainer);
 			add(showHideButton);
+			
+			showSubpages();
+		} else {
+			hideSubpages();
 		}
 	}
 	
@@ -87,35 +88,42 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public void hideSubpages() {
 		isShowingSubpages = false;
 		// This call to layout is necessary to force the scroll bar to appear on page-load
-		if (wikiSubpagesContainer != null)
-			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
+		if (wikiSubpagesContainer != null){
+			wikiSubpagesContainer.removeStyleName(SHOW_SUBPAGES_STYLE);
+			wikiSubpagesContainer.addStyleName(HIDE_SUBPAGES_STYLE);
+		}
+				
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-			showHideButton.setStyleName("btn btn-default btn-xs left");
+			showHideButton.addStyleName("btn btn-default btn-xs left");
 		}
-		removeStyleName("well");
 		
 		if (ulContainer != null)
 			DisplayUtils.hide(ulContainer);
 		
 		if (wikiPageContainer != null) {
-			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);
-			wikiPageContainer.setVisible(false);
+			wikiPageContainer.removeStyleName(SHOW_SUBPAGES_MD_STYLE);
+			wikiPageContainer.addStyleName(HIDE_SUBPAGES_MD_STYLE);
 			wikiPageContainer.setVisible(true);
 		}
-			
 	}
 	
 	@Override
 	public void showSubpages() {
 		isShowingSubpages = true;
-		if (wikiSubpagesContainer != null)
-			wikiSubpagesContainer.setStyleName(SHOW_SUBPAGES_STYLE);
-		if (wikiPageContainer != null)
-			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
+		if (wikiSubpagesContainer != null) {
+			wikiSubpagesContainer.removeStyleName(HIDE_SUBPAGES_STYLE);
+			wikiSubpagesContainer.addStyleName(SHOW_SUBPAGES_STYLE);
+		}
+			
+		if (wikiPageContainer != null) {
+			wikiPageContainer.removeStyleName(HIDE_SUBPAGES_MD_STYLE);
+			wikiPageContainer.addStyleName(SHOW_SUBPAGES_MD_STYLE);
+		}
+				
 		if (showHideButton != null) {
 			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
-			showHideButton.setStyleName("btn btn-default btn-xs right");		
+			showHideButton.addStyleName("btn btn-default btn-xs right");		
 		}
 		addStyleName("well");
 		

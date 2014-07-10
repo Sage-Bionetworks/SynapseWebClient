@@ -54,7 +54,8 @@ public interface SynapseJSNIUtils {
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, MD5Callback callback);
 	public double getFileSize(String fileFieldId);
-
+	public void consoleLog(String message);
+	public void consoleError(String message);
 	public void uploadUrlToGenomeSpace(String url);	
 	public void uploadUrlToGenomeSpace(String url, String filename);
 	
