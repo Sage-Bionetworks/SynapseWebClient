@@ -126,6 +126,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
@@ -2430,5 +2432,20 @@ public class DisplayUtils {
 			}
 		}
 		return stackTrace.toString();
+	}
+	
+	/**
+	 * This is to work around a Chrome rendering bug, where some containers do not properly calculate their relative widths (in the dynamic bootstrap grid layout) when they are initially added.
+	 * The most visible of these cases is the Wiki Subpages panel (see SWC-1450). 
+	 * @param e
+	 */
+	public static void clearElementWidth(Element e) {
+		if ( e != null) {
+			Style style = e.getStyle();
+			if (style != null) {
+				style.setWidth(1, Unit.PX);
+				style.clearWidth();
+			}
+		}
 	}
 }

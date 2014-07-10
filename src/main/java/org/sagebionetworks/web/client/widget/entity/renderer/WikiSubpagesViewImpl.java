@@ -82,6 +82,20 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		} else {
 			hideSubpages();
 		}
+		clearWidths();
+	}
+	
+	/**
+	 * Work around the Chrome bug.  See DisplayUtils.clearElementWidth() for more info.
+	 */
+	private void clearWidths() {
+		DisplayUtils.clearElementWidth(getElement());
+		if (wikiSubpagesContainer != null) 
+			DisplayUtils.clearElementWidth(wikiSubpagesContainer.getElement());
+		if (ulContainer != null)
+			DisplayUtils.clearElementWidth(ulContainer.getElement());
+		if (wikiPageContainer != null)
+			DisplayUtils.clearElementWidth(wikiPageContainer.getElement());
 	}
 	
 	@Override
