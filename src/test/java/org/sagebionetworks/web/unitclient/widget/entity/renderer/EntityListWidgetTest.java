@@ -108,9 +108,6 @@ public class EntityListWidgetTest {
 		records.add(record456);
 		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
 		
-		// Only checking that this method is called, so it does not need to do anything.
-		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
-		
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
 					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
@@ -143,9 +140,6 @@ public class EntityListWidgetTest {
 		records.add(record789);
 		
 		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
-		
-		// Only checking that this method is called, so it does not need to do anything.
-		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
 
 		// Set up success for call to get wiki text.
 		String resultDescription = "Description =)";
