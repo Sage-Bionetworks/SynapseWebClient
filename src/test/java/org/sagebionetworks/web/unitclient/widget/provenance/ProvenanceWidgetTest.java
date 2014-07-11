@@ -488,6 +488,13 @@ public class ProvenanceWidgetTest {
 			public String getFileUrl(String fileFieldId) {
 				return null;
 			}
+			@Override
+			public void consoleError(String message) {
+			}
+			
+			@Override
+			public void consoleLog(String message) {
+			}
 		};
 	}
 
