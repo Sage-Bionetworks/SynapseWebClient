@@ -126,6 +126,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
@@ -536,6 +538,7 @@ public class DisplayUtils {
 	public static void showErrorMessage(final Throwable t,
 			final JiraURLHelper jiraHelper, boolean isLoggedIn,
 			String friendlyErrorMessage) {
+		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		if (!isLoggedIn) {
 			showErrorMessage(t.getMessage());
 			return;
@@ -2226,7 +2229,14 @@ public class DisplayUtils {
 		row = new LayoutContainer();
 		row.setStyleName("row");
 		return row;
-}
+	}
+	
+	public static FlowPanel createRowContainerFlowPanel() {
+		FlowPanel row = new FlowPanel();
+		row.setStyleName("row");
+		return row;
+	}
+
 
 	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
 	public static enum BootstrapAlertType { SUCCESS, INFO, WARNING, DANGER }
@@ -2413,5 +2423,29 @@ public class DisplayUtils {
 		}
 		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
 	}
-
+	
+	public static String getStackTrace(Throwable t) {
+		StringBuilder stackTrace = new StringBuilder();
+		if (t != null) {
+			for (StackTraceElement element : t.getStackTrace()) {
+				stackTrace.append(element + "\n");
+			}
+		}
+		return stackTrace.toString();
+	}
+	
+	/**
+	 * This is to work around a Chrome rendering bug, where some containers do not properly calculate their relative widths (in the dynamic bootstrap grid layout) when they are initially added.
+	 * The most visible of these cases is the Wiki Subpages panel (see SWC-1450). 
+	 * @param e
+	 */
+	public static void clearElementWidth(Element e) {
+		if ( e != null) {
+			Style style = e.getStyle();
+			if (style != null) {
+				style.setWidth(1, Unit.PX);
+				style.clearWidth();
+			}
+		}
+	}
 }

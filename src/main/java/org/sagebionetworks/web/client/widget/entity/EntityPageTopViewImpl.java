@@ -116,8 +116,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private EntityTreeBrowser entityTreeBrowser;
 	private Breadcrumb breadcrumb;
 	private AnnotationsWidget annotationsWidget;
-	private LayoutContainer fullWidthContainer;
-	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, tablesTabContainer, adminTabContainer;
+	private FlowPanel fullWidthContainer;
+	private FlowPanel topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, tablesTabContainer, adminTabContainer;
 	private Attachments attachmentsPanel;
 	private SnapshotWidget snapshotWidget;
 	private FileHistoryWidget fileHistoryWidget;
@@ -177,15 +177,15 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	private void initProjectLayout() {
-		currentTabContainer = new LayoutContainer();
+		currentTabContainer = new FlowPanel();
 		currentTabContainer.addStyleName("tab-background margin-left-neg-15 margin-right-neg-15");
-		wikiTabContainer = new LayoutContainer();
+		wikiTabContainer = new FlowPanel();
 		wikiTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		filesTabContainer = new LayoutContainer();
+		filesTabContainer = new FlowPanel();
 		filesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
-		tablesTabContainer = new LayoutContainer();
+		tablesTabContainer = new FlowPanel();
 		tablesTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		adminTabContainer = new LayoutContainer();
+		adminTabContainer = new FlowPanel();
 		adminTabContainer.addStyleName("margin-left-15 margin-right-15");
 		wikiLink.setText(DisplayConstants.WIKI);
 		wikiLink.addClickHandler(getTabClickHandler(Synapse.EntityArea.WIKI));
@@ -221,20 +221,21 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.currentArea = area;
 		fullWidthContainer = initContainerAndPanel(fullWidthContainer, fullWidthPanel);
 		topFullWidthContainer = initContainerAndPanel(topFullWidthContainer, topFullWidthPanel);
+		topFullWidthContainer.addStyleName("margin-10");
 
-		fullWidthContainer.removeAll();
-		topFullWidthContainer.removeAll();
+		fullWidthContainer.clear();
+		topFullWidthContainer.clear();
 		DisplayUtils.hide(adminListItem);
 		
 		// disable tables completely for now
 		if (!DisplayUtils.isInTestWebsite(cookies)) DisplayUtils.hide(tablesListItem);
 		//tablesListItem.addClassName("hide");
 		
-		currentTabContainer.removeAll();
-		wikiTabContainer.removeAll();
-		filesTabContainer.removeAll();
-		tablesTabContainer.removeAll();
-		adminTabContainer.removeAll();
+		currentTabContainer.clear();
+		wikiTabContainer.clear();
+		filesTabContainer.clear();
+		tablesTabContainer.clear();
+		adminTabContainer.clear();
 
 		// project header
 		fillProjectLink(projectHeader);
@@ -263,9 +264,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}
 		synapseJSNIUtils.setPageTitle(bundle.getEntity().getName() + " - " + bundle.getEntity().getId());
 		synapseJSNIUtils.setPageDescription(bundle.getEntity().getDescription());
-
-		fullWidthContainer.layout(true);
-		topFullWidthContainer.layout(true);
 	}
 
 
@@ -345,7 +343,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		locationableTitleBar.clearState();
 		fileTitleBar.clearState();
 		if (fullWidthContainer != null)
-			fullWidthContainer.removeAll();
+			fullWidthContainer.clear();
 	}
 
 
@@ -359,11 +357,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for file
 		
 		// ** LEFT/RIGHT
-		LayoutContainer row;
-		row = DisplayUtils.createRowContainer();
-		LayoutContainer left = new LayoutContainer();
+		FlowPanel row;
+		row = DisplayUtils.createRowContainerFlowPanel();
+		FlowPanel left = new FlowPanel();
 		left.addStyleName("col-md-8");
-		LayoutContainer right = new LayoutContainer();
+		FlowPanel right = new FlowPanel();
 		right.addStyleName("col-md-4");
 		row.add(left);
 		row.add(right);
@@ -372,13 +370,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		left.add(breadcrumb.asWidget(bundle.getPath(), EntityArea.FILES, false));
 		// File Title Bar
 		if (bundle.getEntity() instanceof FileEntity) {
-			left.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
+			left.add(fileTitleBar.asWidget(bundle, isAdmin, canEdit));
 		} else {
-			left.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit), new MarginData(0, 0, 0, 0));
+			left.add(locationableTitleBar.asWidget(bundle, isAdmin, canEdit));
 		}		
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		left.add(entityMetadata.asWidget());
+		left.add(wrap(entityMetadata.asWidget()));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 				
@@ -391,7 +389,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Preview & Provenance Row
-		row = DisplayUtils.createRowContainer();
+		row = DisplayUtils.createRowContainerFlowPanel();
 		boolean provFullWidth = true;
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {			
 			row.add(getFilePreview(bundle));
@@ -461,8 +459,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File tab: everything
 		// ** LEFT/RIGHT
-		LayoutContainer row;
-		row = DisplayUtils.createRowContainer();
+		FlowPanel row;
+		row = DisplayUtils.createRowContainerFlowPanel();
 		LayoutContainer left = new LayoutContainer();
 		left.addStyleName("col-md-8");
 		LayoutContainer right = new LayoutContainer();
@@ -476,7 +474,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		row = DisplayUtils.createRowContainer();		
+		row = DisplayUtils.createRowContainerFlowPanel();		
 		row.add(wrap(entityMetadata.asWidget(), "col-md-12"));
 		left.add(row);
 		
@@ -485,7 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Wiki		
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId,  null);
 		// Child Browser
-		row = DisplayUtils.createRowContainer();
+		row = DisplayUtils.createRowContainerFlowPanel();
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		filesTabContainer.add(row);		
 		// Created By/Modified By
@@ -494,9 +492,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 
-	private LayoutContainer wrap(Widget widget, String style) {
-		LayoutContainer wrap = new LayoutContainer();
-		wrap.addStyleName(style);
+	private FlowPanel wrap(Widget widget) {
+		return wrap(widget, null);
+	}
+	
+	private FlowPanel wrap(Widget widget, String style) {
+		FlowPanel wrap = new FlowPanel();
+		if (style != null)
+			wrap.addStyleName(style);
 		wrap.add(widget);
 		return wrap;
 	}
@@ -518,19 +521,19 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		projectTitleContainer.setVisible(false);
 		
 		// ** LEFT/RIGHT
-		LayoutContainer row;
-		row = DisplayUtils.createRowContainer();
-		LayoutContainer left = new LayoutContainer();
+		FlowPanel row;
+		row = DisplayUtils.createRowContainerFlowPanel();
+		FlowPanel left = new FlowPanel();
 		left.addStyleName("col-md-8");
-		LayoutContainer right = new LayoutContainer();
+		FlowPanel right = new FlowPanel();
 		right.addStyleName("col-md-4");
 		row.add(left);
 		row.add(right);
-		topFullWidthContainer.add(row, new MarginData(5, 0, 0, 0));		
+		topFullWidthContainer.add(row);		
 
 		// Project header: Metadata & Description
 		entityMetadata.setEntityBundle(bundle, versionNumber); 		
-		left.add(entityMetadata.asWidget());
+		left.add(wrap(entityMetadata.asWidget()));
 		left.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdmin, canEdit, versionNumber));
@@ -541,7 +544,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		wikiTabContainer.add(createBottomPadding());
 		
 		// File Tab: Files, Annotations & old
-		row = DisplayUtils.createRowContainer();		
+		row = DisplayUtils.createRowContainerFlowPanel();		
 		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
 		filesTabContainer.add(row);			
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false)); // Attachments (TODO : this should eventually be removed)
@@ -555,7 +558,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		tablesTabContainer.add(createBottomPadding());
 		
 		// Admin Tab: evaluations
-		row = DisplayUtils.createRowContainer();
+		row = DisplayUtils.createRowContainerFlowPanel();
 		row.add(createEvaluationAdminList(bundle, new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isVisible) {
@@ -589,7 +592,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		LIElement tab; 
 		Anchor link;
-		LayoutContainer targetContainer;
+		FlowPanel targetContainer;
 		
 		if (targetTab == Synapse.EntityArea.WIKI) {
 			tab = wikiListItem;
@@ -612,12 +615,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		link.removeStyleName("link");
 		tab.addClassName("active");
 		
-		currentTabContainer.removeAll();
+		currentTabContainer.clear();
 		currentTabContainer.add(targetContainer);
-		currentTabContainer.layout(true);							
 	}
 	
-	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, final Synapse.EntityArea area) {
+	private void addWikiPageWidget(FlowPanel container, EntityBundle bundle, final boolean canEdit, String wikiPageId, final Synapse.EntityArea area) {
 		wikiPageWidget.clear();
 		if (DisplayUtils.isWikiSupportedType(bundle.getEntity())) {
 			// Child Page Browser
@@ -671,13 +673,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.FILES, false); // select files tab for summary
 		
 		// File tab: everything
-		LayoutContainer row;
+		FlowPanel row;
 		entityMetadata.setEntityBundle(bundle, versionNumber);		
-		row = DisplayUtils.createRowContainer();		
+		row = DisplayUtils.createRowContainerFlowPanel();		
 		row.add(wrap(entityMetadata.asWidget(), "col-md-12"));
 		filesTabContainer.add(row);		
 		//File History
-		filesTabContainer.add(fileHistoryWidget.asWidget(), new MarginData(0));
+		filesTabContainer.add(fileHistoryWidget.asWidget());
 		// Description
 		filesTabContainer.add(createDescriptionWidget(bundle, entityTypeDisplay, true));
 
@@ -699,11 +701,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		setTabSelected(EntityArea.TABLES, false); 
 		
 		// ** LEFT/RIGHT
-		LayoutContainer row;
-		row = DisplayUtils.createRowContainer();
-		LayoutContainer left = new LayoutContainer();
+		FlowPanel row;
+		row = DisplayUtils.createRowContainerFlowPanel();
+		FlowPanel left = new FlowPanel();
 		left.addStyleName("col-md-8");
-		LayoutContainer right = new LayoutContainer();
+		FlowPanel right = new FlowPanel();
 		right.addStyleName("col-md-4");
 		row.add(left);
 		row.add(right);
@@ -714,7 +716,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// TODO: Add table name?
 		// Entity Metadata
 		entityMetadata.setEntityBundle(bundle, versionNumber);
-		left.add(entityMetadata.asWidget());
+		left.add(wrap(entityMetadata.asWidget()));
 		// ActionMenu
 		right.add(actionMenu.asWidget(bundle, isAdministrator, canEdit, null));
 				
@@ -869,12 +871,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return lc;
 	}
 
-	private LayoutContainer initContainerAndPanel(LayoutContainer container,
+	private FlowPanel initContainerAndPanel(FlowPanel container,
 			SimplePanel panel) {
 		if(container == null) {
-			container = new LayoutContainer();
-			container.setAutoHeight(true);
-			container.setAutoWidth(true);
+			container = new FlowPanel();
 			panel.clear();
 			panel.add(container);
 		}
