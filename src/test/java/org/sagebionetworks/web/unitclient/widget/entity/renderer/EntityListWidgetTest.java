@@ -159,5 +159,6 @@ public class EntityListWidgetTest {
 		
 		// syn789 was in fact sent to row details.		TODO: Is this proper reasoning/logic?
 		assertEquals("syn789", arg.getValue().getEntityId());
+		assertEquals(resultDescription, arg.getValue().getDescription().asString());
 	}
 }
