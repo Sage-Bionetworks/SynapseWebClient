@@ -104,7 +104,6 @@ public class EntityListWidgetTest {
 	
 	@Test
 	public void testUtilLoadIndividualRowDetailsDeprecatedDescriptionField() {
-		// TODO: This is at beginning of every test now. Add to @Before? Hmm...
 		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
 		records.add(record456);
 		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
@@ -124,10 +123,6 @@ public class EntityListWidgetTest {
 	
 	@Test
 	public void testUtilLoadIndividualRowDetailsWikiDescription() throws Exception {
-		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
-		records.add(record456);
-		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
-		
 		// create non-deprecated entity
 		FileEntity syn789 = new FileEntity();
 		syn789.setId("syn789");
@@ -137,6 +132,17 @@ public class EntityListWidgetTest {
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn789.getId()), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn789.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
+		
+		// create an entity group record for syn789
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		EntityGroupRecord record789 = new EntityGroupRecord();
+		Reference ref = new Reference();
+		ref.setTargetId(syn789.getId());
+		ref.setTargetVersionNumber(1L);
+		record789.setEntityReference(ref);
+		records.add(record789);
+		
+		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
 		
 		// Only checking that this method is called, so it does not need to do anything.
 		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
