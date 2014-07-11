@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Data;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityListWidgetTest {
@@ -138,7 +141,6 @@ public class EntityListWidgetTest {
 		// Only checking that this method is called, so it does not need to do anything.
 		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
 													
-		
 		// Set up success for call to get wiki text.
 		String resultDescription = "Description =)";
 		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -147,14 +149,15 @@ public class EntityListWidgetTest {
 					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
 
-		// Since syn789 is non-depracated (!(syn789 instanceof Locationable)), the call
-		// on getPlainTextWikiPage should have been made once.
+		// Since syn789 is non-deprecated, the call on
+		// getPlainTextWikiPage should have been made once.
 		verify(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 		// The wiki description was used.
-		// set up captor
-		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
-		// ^^^ not any. Specify captor
-		// look into EntityGroupRecordDisplay and verify that it is sent to row details
+		ArgumentCaptor<EntityGroupRecordDisplay> arg = ArgumentCaptor.forClass(EntityGroupRecordDisplay.class);
+		verify(handler).onLoaded(arg.capture());
+		
+		// syn789 was in fact sent to row details.		TODO: Is this proper reasoning/logic?
+		assertEquals("syn789", arg.getValue().getEntityId());
 	}
 }
