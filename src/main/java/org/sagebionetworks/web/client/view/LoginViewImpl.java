@@ -46,14 +46,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	SimplePanel logoutPanel;
 	@UiField
 	HTMLPanel loginView;
-	@UiField
-	HTMLPanel changeUsernameView;
-	@UiField
-	Button changeUsernameButton;
-	@UiField
-	TextBox username;
-	@UiField
-	SpanElement messageLabel;
 	
 	//terms of service view
 	@UiField
@@ -101,17 +93,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		username.getElement().setAttribute("placeholder", "Username");
-		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
-		changeUsernameButton.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				messageLabel.setInnerHTML("");
-				changeUsernameButton.setEnabled(false);
-				presenter.setUsername(username.getValue());
-			}
-		});
-		
 		toUInitialized = false;
 		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
@@ -211,7 +192,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
-		changeUsernameButton.setEnabled(true);
 	}
 	
 	@Override
@@ -253,25 +233,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	private void hideViews() {
 		loginView.setVisible(false);
-		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
-	}
-	
-	@Override
-	public void showSetUsernameUI() {
-		hideViews();
-		username.setValue("");
-		changeUsernameView.setVisible(true);
-	}
-	
-	@Override
-	public void showUsernameInvalid() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username format is invalid.</h4> <span class=\"text-warning\">"+DisplayConstants.USERNAME_FORMAT_ERROR+"</span>");
-		clear();
-	}
-	@Override
-	public void showUsernameTaken() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
-		clear();
 	}
 }
