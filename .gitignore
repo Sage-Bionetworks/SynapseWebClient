@@ -5,3 +5,4 @@ target
 /.settings
 /.gwt
 .DS_Store
+pom.xml
