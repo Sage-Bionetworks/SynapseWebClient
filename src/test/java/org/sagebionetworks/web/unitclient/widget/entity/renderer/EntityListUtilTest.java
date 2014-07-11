@@ -6,12 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
-import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 
 public class EntityListUtilTest {

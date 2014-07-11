@@ -146,11 +146,11 @@ public class EntityListWidgetTest {
 		
 		// Only checking that this method is called, so it does not need to do anything.
 		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
-													
+
 		// Set up success for call to get wiki text.
 		String resultDescription = "Description =)";
 		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		
+
 		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
 					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
 					records, 0, handler);
