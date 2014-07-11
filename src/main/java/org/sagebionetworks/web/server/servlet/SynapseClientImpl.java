@@ -25,6 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
@@ -1507,6 +1510,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	            throw new UnknownErrorException(e.getMessage());
 	    }
     }
+    
+    @Override
+    public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
+    			throws RestServiceException, IOException {
+    	String markdown = getMarkdown(key);
+    	String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, false, null);
+    	String plainText = Jsoup.clean(html,  "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+    	return plainText;
+    }
 
     @Override
     public String updateV2WikiPage(String ownerId, String ownerType,
@@ -1626,7 +1638,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
     @Override
 	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+		String wikiPageKeyId = getWikiKeyId(synapseClient, key);
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), wikiPageKeyId);
 		try {
 			return synapseClient.downloadV2WikiMarkdown(properKey);
 		} catch(SynapseException e) {
