@@ -14,8 +14,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -28,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -94,6 +97,64 @@ public class EntityListWidgetTest {
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
+	}
+	
+	@Test
+	public void testUtilLoadIndividualRowDetailsDeprecatedDescriptionField() {
+		// TODO: This is at beginning of every test now. Add to @Before? Hmm...
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		records.add(record456);
+		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
+		
+		// Only checking that this method is called, so it does not need to do anything.
+		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
+		
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
+					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+					records, 0, handler);
+		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
+		
+		// Since syn456 is depracated (syn456 instanceof locationable), the call
+		// on getPlainTextWikiPage should never have been made.
+		verify(mockSynapseClient, Mockito.never()).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUtilLoadIndividualRowDetailsWikiDescription() throws Exception {
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		records.add(record456);
+		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
+		
+		// create non-deprecated entity
+		FileEntity syn789 = new FileEntity();
+		syn789.setId("syn789");
+		syn789.setName(syn789.getId());
+		EntityBundle bundle = new EntityBundle(syn789, null, null, null, null, null, null);
+		EntityBundleTransport transport = new EntityBundleTransport();
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn789.getId()), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn789.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
+		
+		// Only checking that this method is called, so it does not need to do anything.
+		Mockito.doNothing().when(handler).onLoaded(any(EntityGroupRecordDisplay.class));
+													
+		
+		// Set up success for call to get wiki text.
+		String resultDescription = "Description =)";
+		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
+					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+					records, 0, handler);
 
+		// Since syn789 is non-depracated (!(syn789 instanceof Locationable)), the call
+		// on getPlainTextWikiPage should have been made once.
+		verify(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		// The wiki description was used.
+		// set up captor
+		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
+		// ^^^ not any. Specify captor
+		// look into EntityGroupRecordDisplay and verify that it is sent to row details
 	}
 }

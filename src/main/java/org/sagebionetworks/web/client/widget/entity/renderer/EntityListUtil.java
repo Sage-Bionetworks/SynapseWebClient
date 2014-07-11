@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.EntityGroupRecordDisplay;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
@@ -46,9 +48,9 @@ public class EntityListUtil {
 	public interface RowLoadedHandler {
 		public void onLoaded(EntityGroupRecordDisplay entityGroupRecordDisplay);
 	}
-	
+
 	public static void loadIndividualRowDetails(
-			SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
+			final SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
 			final NodeModelCreator nodeModelCreator, final boolean isLoggedIn,
 			List<EntityGroupRecord> records, final int rowIndex,
 			final RowLoadedHandler handler) throws IllegalArgumentException {
@@ -66,7 +68,18 @@ public class EntityListUtil {
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(result);
-					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils));									
+					// | | | Deprecated entities that do not get description
+					// v v v from wiki should be included in this conditional
+					if (bundle.getEntity() instanceof Locationable) {
+						// Locationable is deprecated — use description field
+						handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
+										synapseJSNIUtils, bundle.getEntity().getDescription()));
+					} else {
+						// Other entities are not deprecated — get description from wiki
+						createDisplayWithWikiDescription(
+								synapseClient, synapseJSNIUtils,
+								isLoggedIn, handler, bundle, record, ref);
+					}		
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -74,20 +87,7 @@ public class EntityListUtil {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
-				errorDisplay.setEntityId(ref.getTargetId());
-				String versionNumber = ref.getTargetVersionNumber() == null ? "" : ref.getTargetVersionNumber().toString();
-				errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(versionNumber));
-				String msg = ref.getTargetId();
-				if(ref.getTargetVersionNumber() != null) msg += ", Version " + versionNumber;
-				if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
-					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
-				} else if (caught instanceof NotFoundException) {
-					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.NOT_FOUND + ": " + msg));
-				} else {
-					errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOADING + ": " + msg));
-				}
-				handler.onLoaded(errorDisplay);
+				createFailureDisplay(caught, ref, handler);
 			}
 		};
 		int mask = ENTITY;
@@ -97,6 +97,37 @@ public class EntityListUtil {
 			// failsafe
 			synapseClient.getEntityBundle(ref.getTargetId(), mask, callback);
 		}
+	}
+	
+	/**
+	 * Gets a plain text description from the wiki associated with the Entity of the given
+	 * bundle. Creates a record display with that description.
+	 * 
+	 * Note: access modifier public for unit test
+	 */
+	public static void createDisplayWithWikiDescription(
+			final SynapseClientAsync synapseClient, final SynapseJSNIUtils synapseJSNIUtils,
+			final boolean isLoggedIn, final RowLoadedHandler handler,
+			final EntityBundle bundle, final EntityGroupRecord record,
+			final Reference ref) {
+		String entityId = bundle.getEntity().getId();
+		String objectType = ObjectType.ENTITY.toString();
+		WikiPageKey key = new WikiPageKey(entityId, objectType, null);
+		
+		synapseClient.getPlainTextWikiPage(key, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String resultDesc) {
+				try {
+					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils, resultDesc));
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				createFailureDisplay(caught, ref, handler);
+			}
+		});
 	}
 
 	public static String recordsToString(List<EntityGroupRecord> records) {		
@@ -148,10 +179,11 @@ public class EntityListUtil {
 	 */
 	private static EntityGroupRecordDisplay createRecordDisplay(
 			boolean isLoggedIn, EntityBundle bundle,
-			EntityGroupRecord record, SynapseJSNIUtils synapseJSNIUtils)
+			EntityGroupRecord record, SynapseJSNIUtils synapseJSNIUtils, 
+			String description)
 			throws JSONObjectAdapterException {
 		Entity referencedEntity = bundle.getEntity();
-				
+
 		String nameLinkUrl;
 		if(referencedEntity instanceof Versionable) {
 			nameLinkUrl = DisplayUtils.getSynapseHistoryTokenNoHash(referencedEntity.getId(), ((Versionable)referencedEntity).getVersionNumber());
@@ -180,7 +212,7 @@ public class EntityListUtil {
 		}							
 		
 		// desc
-		String description = referencedEntity.getDescription() == null ? "" : referencedEntity.getDescription();
+		if (description == null) description = "";
 		description = description.replaceAll("\\n", " "); // keep to 3 lines by removing new lines
 		if(description.length() > MAX_DESCRIPTION_CHARS) 
 			description = description.substring(0, MAX_DESCRIPTION_CHARS) + " ...";
@@ -201,7 +233,23 @@ public class EntityListUtil {
 				referencedEntity.getCreatedBy() == null ? "" : referencedEntity.getCreatedBy(),
 				noteSafe);		
 	}
-
+	
+	private static void createFailureDisplay(Throwable caught, Reference ref, final RowLoadedHandler handler) {
+		EntityGroupRecordDisplay errorDisplay = getEmptyDisplay();
+		errorDisplay.setEntityId(ref.getTargetId());
+		String versionNumber = ref.getTargetVersionNumber() == null ? "" : ref.getTargetVersionNumber().toString();
+		errorDisplay.setVersion(SafeHtmlUtils.fromSafeConstant(versionNumber));
+		String msg = ref.getTargetId();
+		if(ref.getTargetVersionNumber() != null) msg += ", Version " + versionNumber;
+		if(caught instanceof UnauthorizedException || caught instanceof ForbiddenException) {
+			errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.TITLE_UNAUTHORIZED + ": " + msg));
+		} else if (caught instanceof NotFoundException) {
+			errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.NOT_FOUND + ": " + msg));
+		} else {
+			errorDisplay.setName(SafeHtmlUtils.fromSafeConstant(DisplayConstants.ERROR_LOADING + ": " + msg));
+		}
+		handler.onLoaded(errorDisplay);
+	}
 	
 	private static EntityGroupRecordDisplay getEmptyDisplay() {
 		return new EntityGroupRecordDisplay(
