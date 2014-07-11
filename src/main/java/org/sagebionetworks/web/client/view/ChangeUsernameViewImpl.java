@@ -105,6 +105,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	}
 	@Override
 	public void showSetUsernameError(Throwable t) {
+		SynapseJSNIUtilsImpl._consoleError(DisplayUtils.getStackTrace(t));
 		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to set username: </h4> <span class=\"text-warning\">"+t.getMessage()+"</span>");
 		clear();
 	}

@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
@@ -151,121 +152,36 @@ public class LoginPresenterTest {
 		verify(mockPlaceChanger).goTo(any(Place.class));
 	}
 	
-//	@Test 
-//	public void testSetPlaceSSOLoginTempUsername() throws JSONObjectAdapterException {
-//		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-//		LoginPlace place = new LoginPlace(fakeToken);
-//		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
-//		
-//		UserProfile profile = new UserProfile();
-//		profile.setOwnerId("1233");
-//		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
-//		setMyProfile(profile);
-//		
-//		loginPresenter.setPlace(place);
-//		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
-//		verify(mockView).showSetUsernameUI();
-//	}
-	
-	
-	@Test
-	public void testUpdateProfile() {
-		setPlace();
+	@Test 
+	public void testCheckTempUsername() throws JSONObjectAdapterException {
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
-		loginPresenter.updateProfile(profile, mockCallback);
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-		verify(mockCallback).onSuccess(any(Void.class));
+		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
+		usd.setProfile(profile);
+		loginPresenter.checkForTempUsername();
+		verify(mockPlaceChanger).goTo(any(ChangeUsername.class));
 	}
 	
-	@Test
-	public void testUpdateProfileFailed() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		setPlace();
+	@Test 
+	public void testCheckTempUsernameNotTemp() throws JSONObjectAdapterException {
+		Place mockLastPlace = Mockito.mock(Place.class);
+		when(mockGlobalApplicationState.getLastPlace()).thenReturn(mockLastPlace);
+		
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
-		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
-		loginPresenter.updateProfile(profile, mockCallback);
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
-		verify(mockCallback).onFailure(any(Throwable.class));
+		profile.setUserName("not-temp");
+		usd.setProfile(profile);
+		loginPresenter.checkForTempUsername();
+		//should go to the last place, since this is not a temporary username
+		verify(mockPlaceChanger).goTo(eq(mockLastPlace));
 	}
 	
-//	@Test
-//	public void testSetNewUserTempUsername() throws JSONObjectAdapterException {
-//		//if the user has a temp username, then it should show the UI to set the username
-//		setPlace();
-//		UserProfile profile = new UserProfile();
-//		profile.setOwnerId("1233");
-//		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
-//		setMyProfile(profile);
-//		loginPresenter.postLoginStep1();
-//		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
-//		verify(mockView).showLoggingInLoader();
-//		verify(mockView).showSetUsernameUI();
-//		verify(mockView).hideLoggingInLoader();
-//	}
-	
-//	@Test
-//	public void testCheckForTempUsernameAndContinueFailure() throws JSONObjectAdapterException {
-//		setPlace();
-//		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-//		loginPresenter.postLoginStep1();
-//		verify(mockView, times(2)).showLoggingInLoader();
-//		//hides loading UI and continue (go to last place) 
-//		verify(mockView).hideLoggingInLoader();
-//		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
-//	}
 	
 	@Test 
 	public void testSetPlaceChangeUsername()throws JSONObjectAdapterException {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("222");
-		setMyProfile(profile);
 		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
 		loginPresenter.setPlace(place);
-		verify(mockView).showSetUsernameUI();
-	}
-	
-	@Test 
-	public void testSetPlaceChangeAnonymousUsername()throws JSONObjectAdapterException {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("222");
-		setMyProfile(profile);
-		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
-		loginPresenter.setPlace(place);
-		verify(mockView, never()).showSetUsernameUI();
-		verify(mockView).showLogin(anyString(), anyString());
-	}
-	
-	@Test 
-	public void testSetUsernameSuccess()throws JSONObjectAdapterException {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("222");
-		setMyProfile(profile);
-		loginPresenter.updateProfile(profile, mock(AsyncCallback.class));
-		//TODO: mock notification suppression setting for certification, once in place
-		loginPresenter.setUsername("newname");
-		
-		verify(mockSynapseClient, times(2)).updateUserProfile(anyString(), any(AsyncCallback.class));
-	}
-
-	
-	@Test 
-	public void testSetPlaceChangeUsernameFailure()throws JSONObjectAdapterException {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		String exceptionMessage = "unhandled";
-		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
-		loginPresenter.setPlace(place);
-		verify(mockView).showErrorMessage(eq(exceptionMessage));
+		verify(mockPlaceChanger).goTo(any(ChangeUsername.class));
 	}
 
 	@Test
