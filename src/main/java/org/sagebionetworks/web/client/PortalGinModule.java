@@ -34,6 +34,8 @@ import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.ChallengeOverviewView;
 import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
+import org.sagebionetworks.web.client.view.ChangeUsernameView;
+import org.sagebionetworks.web.client.view.ChangeUsernameViewImpl;
 import org.sagebionetworks.web.client.view.ColumnsPopupView;
 import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
@@ -455,6 +457,11 @@ public class PortalGinModule extends AbstractGinModule {
 		//Account
 		bind(AccountViewImpl.class).in(Singleton.class);
 		bind(AccountView.class).to(AccountViewImpl.class);
+		
+		//ChangeUsername
+		bind(ChangeUsernameViewImpl.class).in(Singleton.class);
+		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class);
+
 		/*
 		 * Factories
 		 */

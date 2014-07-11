@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,6 +12,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,11 +40,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private JSONObjectAdapter jsonObjectAdapter;
-	private SynapseClientAsync synapseClient;
-	private AdapterFactory adapterFactory;
-	private CookieProvider cookies;
-	private UserProfile profile;
 	
 	@Inject
 	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils, JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient, AdapterFactory adapterFactory){
@@ -52,10 +47,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils=synapseJSNIUtils;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
-		this.cookies = cookies;
 		view.setPresenter(this);
 	} 
 
@@ -97,17 +88,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			view.showErrorMessage(DisplayConstants.SSO_ERROR_UNKNOWN);
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
-			//get the current profile, and set the view to set username
-			ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile result) {
-					profile = result;
-					view.showSetUsernameUI();
-				}
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				};
-			});
+			//go to the change username page
+			gotoChangeUsernamePlace();
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
@@ -120,31 +102,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 	
-	@Override
-	public void setUsername(String newUsername) {
-		if (profile != null) {
-			//quick check to see if it's valid.
-			if (isValidUsername(newUsername)) {
-				profile.setUserName(newUsername);
-				
-				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
-					@Override
-					public void onSuccess(Void result) {
-						view.showInfo("Successfully updated your username", "");
-						goToLastPlace();
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showUsernameTaken();
-					}
-				};
-				updateProfile(profile, profileUpdatedCallback);
-			} else {
-				//invalid username
-				view.showUsernameInvalid();
-			}
-		}
+	private void gotoChangeUsernamePlace() {
+		globalApplicationState.getPlaceChanger().goTo(new ChangeUsername(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 	
 	public static boolean isValidUsername(String username) {
@@ -181,52 +140,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	/**
 	 * Check for temp username, and prompt for change if user has not set
 	 */
-	public void postLoginStep1(){
+	public void checkForTempUsername(){
 		//get my profile, and check for a default username
-		view.showLoggingInLoader();
-		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile result) {
-				view.hideLoggingInLoader();
-				profile = result;
-				authenticationController.updateCachedProfile(profile);
-				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-					//set your username
-					view.showSetUsernameUI();
-				}
-				else {
-					goToLastPlace();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//could not determine
-				goToLastPlace();
-			}
-		});
-	}
-	
-	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {
-		try { 
-			JSONObjectAdapter adapter = newProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-			String userProfileJson = adapter.toJSONString();
-	
-			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					profile = newProfile;
-					authenticationController.updateCachedProfile(profile);
-					callback.onSuccess(result);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		view.hideLoggingInLoader();
+		UserProfile userProfile = authenticationController.getCurrentUserSessionData().getProfile();
+		if (userProfile != null && DisplayUtils.isTemporaryUsername(userProfile.getUserName())) {
+			gotoChangeUsernamePlace();
+		} else {
+			goToLastPlace();
 		}
 	}
 	
@@ -305,9 +226,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												public void onSuccess(
 														String result) {
 													// Signed ToU. Check for temp username, passing record, and then forward
-//													postLoginStep1();
-													//SWC-1447: Instead of any post login checks, go to the last place
-													goToLastPlace();
+													checkForTempUsername();
 												}	
 												
 											});
@@ -337,9 +256,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-//						postLoginStep1();
-						//SWC-1447: Instead of any post login checks, go to the last place
-						goToLastPlace();
+						checkForTempUsername();
 					}
 				}
 				@Override
@@ -356,13 +273,4 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			authenticationController.revalidateSession(sessionToken, callback);
 		}
 	}
-	
-	/**
-	 * setter for user profile, for testing purposes only
-	 * @param profile
-	 */
-	public void setUserProfile(UserProfile profile) {
-		this.profile = profile;
-	}
-
 }

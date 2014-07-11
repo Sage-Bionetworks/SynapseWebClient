@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Challenges;
+import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
@@ -90,6 +91,7 @@ public class AppActivityMapper implements ActivityMapper {
 		excludeFromLastPlace.add(PasswordReset.class);
 		excludeFromLastPlace.add(RegisterAccount.class);
 		excludeFromLastPlace.add(Quiz.class);
+		excludeFromLastPlace.add(ChangeUsername.class);
 	}
 
 	@Override
