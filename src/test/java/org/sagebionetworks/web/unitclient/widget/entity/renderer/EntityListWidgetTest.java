@@ -157,7 +157,7 @@ public class EntityListWidgetTest {
 		ArgumentCaptor<EntityGroupRecordDisplay> arg = ArgumentCaptor.forClass(EntityGroupRecordDisplay.class);
 		verify(handler).onLoaded(arg.capture());
 		
-		// syn789 was in fact sent to row details.		TODO: Is this proper reasoning/logic?
+		// proper description was in fact sent to row details.
 		assertEquals("syn789", arg.getValue().getEntityId());
 		assertEquals(resultDescription, arg.getValue().getDescription().asString());
 	}
