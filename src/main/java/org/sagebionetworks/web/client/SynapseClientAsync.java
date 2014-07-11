@@ -164,8 +164,6 @@ public interface SynapseClientAsync {
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<String> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<String> callback);
 	
-	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
-	
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 
 	void addFavorite(String entityId, AsyncCallback<String> callback);

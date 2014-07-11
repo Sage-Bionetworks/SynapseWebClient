@@ -123,7 +123,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				//preview failed
 				view.showErrorMessage(DisplayConstants.PREVIEW_FAILED_TEXT + caught.getMessage());
 			}
-		});
+		});	
 	}
 	
 	public void insertMarkdown(String md) {
