@@ -338,7 +338,24 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	@Override
+	public void consoleLog(String message) {
+		_consoleLog(message);
+	}
 
+	public final static native void _consoleLog(String message) /*-{
+		console.log(message);
+	}-*/;
+
+	@Override
+	public void consoleError(String message) {
+		_consoleError(message);
+	}
+
+	public final static native void _consoleError(String message) /*-{
+		console.error(message);
+	}-*/;
+	
 	@Override
 	public void processWithMathJax(Element element) {
 		_processWithMathJax(element);		

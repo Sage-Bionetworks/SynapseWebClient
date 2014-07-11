@@ -207,12 +207,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 			AsyncCallback<Void> callback) {
 		Map<String, String> fieldValues = new HashMap<String, String>();
 		
-		StringBuilder stackTrace = new StringBuilder();
-		if (t != null) {
-			for (StackTraceElement element : t.getStackTrace()) {
-				stackTrace.append(element + "\n");
-			}
-		}
+		String stackTrace = DisplayUtils.getStackTrace(t);
 		
 		StringBuilder description = new StringBuilder(); 
 		
@@ -223,7 +218,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	    description.append("\n\n" + stepsToRepro);
 	    description.append("\n\n" + gwt.getCurrentURL());
 	    description.append("\n\n" + t.getMessage());
-	    description.append("\n" + stackTrace.toString());
+	    description.append("\n" + stackTrace);
 	    jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
 	}
 

@@ -595,6 +595,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// API Table Column manager	
 		bind(APITableColumnManagerView.class).to(APITableColumnManagerViewImpl.class);
 
+		//single subpages view
+		bind(WikiSubpagesViewImpl.class).in(Singleton.class);
+		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
+		
 		//Widget Registration
 		bind(WidgetRegistrarImpl.class).in(Singleton.class);
 		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class);
@@ -629,7 +633,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(APITableWidgetView.class).to(APITableWidgetViewImpl.class);
 		bind(TableOfContentsWidgetView.class).to(TableOfContentsWidgetViewImpl.class);
 		bind(WikiFilesPreviewWidgetView.class).to(WikiFilesPreviewWidgetViewImpl.class);
-		bind(WikiSubpagesView.class).to(WikiSubpagesViewImpl.class);
 		bind(ButtonLinkWidgetView.class).to(ButtonLinkWidgetViewImpl.class);
 		bind(EmptyWidgetView.class).to(EmptyWidgetViewImpl.class);
 		bind(VideoWidgetView.class).to(VideoWidgetViewImpl.class);
