@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -14,8 +15,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -28,8 +32,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityListWidgetTest {
@@ -94,6 +100,65 @@ public class EntityListWidgetTest {
 		
 		verify(mockView).configure();	
 		verify(mockView).setEntityGroupRecordDisplay(eq(0), any(EntityGroupRecordDisplay.class), eq(true));
+	}
+	
+	@Test
+	public void testUtilLoadIndividualRowDetailsDeprecatedDescriptionField() {
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		records.add(record456);
+		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
+		
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
+					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+					records, 0, handler);
+		verify(handler).onLoaded(any(EntityGroupRecordDisplay.class));
+		
+		// Since syn456 is depracated (syn456 instanceof locationable), the call
+		// on getPlainTextWikiPage should never have been made.
+		verify(mockSynapseClient, Mockito.never()).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUtilLoadIndividualRowDetailsWikiDescription() throws Exception {
+		// create non-deprecated entity
+		FileEntity syn789 = new FileEntity();
+		syn789.setId("syn789");
+		syn789.setName(syn789.getId());
+		EntityBundle bundle = new EntityBundle(syn789, null, null, null, null, null, null);
+		EntityBundleTransport transport = new EntityBundleTransport();
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn789.getId()), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn789.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createEntityBundle(transport)).thenReturn(bundle);
+		
+		// create an entity group record for syn789
+		List<EntityGroupRecord> records = new ArrayList<EntityGroupRecord>();
+		EntityGroupRecord record789 = new EntityGroupRecord();
+		Reference ref = new Reference();
+		ref.setTargetId(syn789.getId());
+		ref.setTargetVersionNumber(1L);
+		record789.setEntityReference(ref);
+		records.add(record789);
+		
+		EntityListUtil.RowLoadedHandler handler = mock(EntityListUtil.RowLoadedHandler.class);
 
+		// Set up success for call to get wiki text.
+		String resultDescription = "Description =)";
+		AsyncMockStubber.callSuccessWith(resultDescription).when(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+
+		EntityListUtil.loadIndividualRowDetails(mockSynapseClient, mockSynapseJSNIUtils,
+					mockNodeModelCreator, mockAuthenticationController.isLoggedIn(),
+					records, 0, handler);
+
+		// Since syn789 is non-deprecated, the call on
+		// getPlainTextWikiPage should have been made once.
+		verify(mockSynapseClient).getPlainTextWikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		// The wiki description was used.
+		ArgumentCaptor<EntityGroupRecordDisplay> arg = ArgumentCaptor.forClass(EntityGroupRecordDisplay.class);
+		verify(handler).onLoaded(arg.capture());
+		
+		// proper description was in fact sent to row details.
+		assertEquals("syn789", arg.getValue().getEntityId());
+		assertEquals(resultDescription, arg.getValue().getDescription().asString());
 	}
 }
