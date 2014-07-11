@@ -125,7 +125,16 @@ public class EntityListUtil {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				createFailureDisplay(caught, ref, handler);
+				if (caught instanceof NotFoundException) {
+					// No wiki found. Put in blank description.
+					try {
+						handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record, synapseJSNIUtils, ""));
+					} catch (JSONObjectAdapterException e) {
+						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+					}
+				} else {
+					createFailureDisplay(caught, ref, handler);
+				}
 			}
 		});
 	}
