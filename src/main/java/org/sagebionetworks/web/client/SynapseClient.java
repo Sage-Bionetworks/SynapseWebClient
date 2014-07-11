@@ -253,7 +253,6 @@ public interface SynapseClient extends RemoteService {
 	public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
-	// TODO: GET RID OF THIS COMMENT
 	public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	
 	public String getFileEndpoint() throws RestServiceException;
