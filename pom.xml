@@ -104,14 +104,14 @@
 	          <exclude>**/*.properties</exclude>
 	        </excludes>
 	      </resource>
-	    </resources>	    
+	    </resources>
 
     		<!-- Generate compiled stuff in the folder used for developing mode -->
 		<outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
 
 		<pluginManagement>
 			<plugins>
-				<!-- Tell the eclipse m2e plugin to execute these lifecycle mappings 
+				<!-- Tell the eclipse m2e plugin to execute these lifecycle mappings
 					See: http://wiki.eclipse.org/M2E_plugin_execution_not_covered -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -186,7 +186,7 @@
 						</goals>
 					</execution>
 				</executions>
-				<!-- Plugin configuration. There are many available options, see gwt-maven-plugin 
+				<!-- Plugin configuration. There are many available options, see gwt-maven-plugin
 					documentation at codehaus.org -->
 				<configuration>
 					<runTarget>Portal.html</runTarget>
@@ -202,7 +202,7 @@
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
 			        <extraJvmArgs>-Xmx1024m -Xms896m -XX:PermSize=64m -XX:MaxPermSize=128m</extraJvmArgs>
-					<!--           <fragmentCount>12</fragmentCount> -->					
+					<!--           <fragmentCount>12</fragmentCount> -->
 				</configuration>
 			</plugin>
 
@@ -226,7 +226,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- We use this assembly to package the GWT RPC dependencies so they 
+			<!-- We use this assembly to package the GWT RPC dependencies so they
 				are aviablible fore integration testing. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -293,7 +293,7 @@
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-logging</artifactId>
 			<version>${synapse.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-communicationUtilities</artifactId>
@@ -321,8 +321,8 @@
 			<artifactId>markdown</artifactId>
 			<version>2014-06-02-e29550a-12</version>
 		</dependency>
-		
-		
+
+
 		<!-- Make sure all the Jackson libraries are of the same version -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
@@ -361,7 +361,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aspects</artifactId>
 			<version>${org.springframework.version}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
@@ -371,7 +371,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
 			<version>${org.springframework.version}</version>
-		</dependency>				
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -380,13 +380,13 @@
 		</dependency>
 			<!-- Used for timer triggers (cron-like)
 			Note: spring-context-support also depends on this libary as an optional dependancy.
-			Since spring-context-support version 4.0.2-RELEASE uses quartz version 1.8.6 that 
+			Since spring-context-support version 4.0.2-RELEASE uses quartz version 1.8.6 that
 			is the version of quartz we are using.  See the  spring-context-support pom.xml.-->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>1.8.6</version>
-		</dependency>	
+		</dependency>
 		<!-- note: spring-web 4.0.2.RELEASE depends on httpclient 4.3.2 as an optional dependancy.
 		Since it is marked as optional we must explicitly add it as a dependency and match the
 		required version.  If we change the version of spring, then look at the sprint-web pom.xml
@@ -395,12 +395,12 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.3.2</version>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${org.springframework.version}</version>
-		</dependency>					
+		</dependency>
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -475,7 +475,7 @@
 			<version>0.2</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- We are using this to serialize column metadata. We can drop it when 
+		<!-- We are using this to serialize column metadata. We can drop it when
 			the API provides this functionality -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
@@ -494,7 +494,7 @@
 			<artifactId>schema-to-pojo-gwt</artifactId>
 			<version>${schema-to-pojo.version}</version>
 		</dependency>
-		
+
 		<!-- Rome for rss consumption -->
 		<dependency>
 			<groupId>rome</groupId>
