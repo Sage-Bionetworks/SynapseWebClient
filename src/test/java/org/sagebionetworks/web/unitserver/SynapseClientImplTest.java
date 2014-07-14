@@ -57,6 +57,8 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -156,6 +158,7 @@ public class SynapseClientImplTest {
 	UserEvaluationPermissions userEvaluationPermissions;
 	List<EntityHeader> batchHeaderResults;
 	
+	String testFileName = "testFileEntity.R";
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
@@ -308,6 +311,7 @@ public class SynapseClientImplTest {
 		handle = new S3FileHandle();
 		handle.setId("4422");
 		handle.setBucketName("bucket");
+		handle.setFileName(testFileName);
 		handle.setKey("key");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
 		when(mockSynapse.completeChunkFileUpload(any(CompleteChunkedFileRequest.class))).thenReturn(handle);
@@ -917,7 +921,7 @@ public class SynapseClientImplTest {
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();
 		testFileEntity.setId("5544");
-		testFileEntity.setName("testFileEntity.R");
+		testFileEntity.setName(testFileName);
 		return testFileEntity;
 	}
 	
@@ -974,14 +978,57 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
+		
+		//parent entity has no children
+		EntityIdList childEntities = new EntityIdList();
+		childEntities.setIdList(new ArrayList());
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyString())).thenReturn(childEntities);
+		
 		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
-		//and update the name
-		verify(mockSynapse).putEntity(any(FileEntity.class));
 		//and lock down
 		verify(mockSynapse).createLockAccessRequirement(anyString());
+	}
+	
+	@Test
+	public void testCompleteUploadFindChildToUpdate() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
+		boolean isRestricted = false;
+		
+		//parent entity has one child
+		String testChildEntityId = "syn6283185";
+		EntityIdList childEntities = new EntityIdList();
+		List<EntityId> childEntitiesList = new ArrayList<EntityId>();
+		EntityId childEntityId = new EntityId();
+		childEntityId.setId(testChildEntityId);
+		childEntitiesList.add(childEntityId);
+		childEntities.setIdList(childEntitiesList);
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyString())).thenReturn(childEntities);
+		
+		BatchResults<EntityHeader> childEntityHeaders = new BatchResults<EntityHeader>();
+		List<EntityHeader> childEntityHeaderList = new ArrayList<EntityHeader>();
+		EntityHeader header = new EntityHeader();
+		header.setName(testFileName);
+		header.setId(testChildEntityId);
+		header.setType(FileEntity.class.getName());
+		childEntityHeaderList.add(header);
+		childEntityHeaders.setResults(childEntityHeaderList);
+		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(childEntityHeaders);
+		
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
+		
+		//verify that it found and tried to update the child file entity
+		verify(mockSynapse).getEntityById(eq(testChildEntityId));
+		//update the data file handle id
+		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
+		//do not lock down (restricted=false)
+		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
+
 	}
 	
 	@Test
@@ -996,7 +1043,7 @@ public class SynapseClientImplTest {
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
-		//update the data file handle id, but not update the name
+		//update the data file handle id
 		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
 		//do not lock down (restricted=false)
 		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
