@@ -2417,8 +2417,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				//file entity not set
 				//determine if we should create a new file entity, or update an existing.
 				if (parentEntityId != null) {
-					//look for a child with the same file name
-					EntityIdList list = synapseClient.getDescendants(parentEntityId, Integer.MAX_VALUE, null);
+					//look for a child (1 generation away) with the same file name
+					EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
 					//get the EntityHeader for all children
 					List<Reference> references = new ArrayList<Reference>();
 					for (EntityId childEntityId : list.getIdList()) {

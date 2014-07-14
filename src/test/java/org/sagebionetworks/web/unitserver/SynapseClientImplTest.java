@@ -979,10 +979,10 @@ public class SynapseClientImplTest {
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
 		
-		//parent entity has no children
+		//parent entity has no immediate children
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
-		when(mockSynapse.getDescendants(anyString(), anyInt(), anyString())).thenReturn(childEntities);
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
 		
 		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
 		
@@ -1008,7 +1008,7 @@ public class SynapseClientImplTest {
 		childEntityId.setId(testChildEntityId);
 		childEntitiesList.add(childEntityId);
 		childEntities.setIdList(childEntitiesList);
-		when(mockSynapse.getDescendants(anyString(), anyInt(), anyString())).thenReturn(childEntities);
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
 		
 		BatchResults<EntityHeader> childEntityHeaders = new BatchResults<EntityHeader>();
 		List<EntityHeader> childEntityHeaderList = new ArrayList<EntityHeader>();
