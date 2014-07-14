@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -57,6 +58,7 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -2408,13 +2410,35 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			//create entity if we have to
 			FileEntity fileEntity = null;
-			
+			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			if (entityId == null) {
-				//create the file entity
-				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, synapseClient);
+				//file entity not set
+				//determine if we should create a new file entity, or update an existing.
+				if (parentEntityId != null) {
+					//look for a child with the same file name
+					EntityIdList list = synapseClient.getDescendants(parentEntityId, Integer.MAX_VALUE, null);
+					//get the EntityHeader for all children
+					List<Reference> references = new ArrayList<Reference>();
+					for (EntityId childEntityId : list.getIdList()) {
+						Reference r = new Reference();
+						r.setTargetId(childEntityId.getId());
+						references.add(r);
+					}
+					BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
+					for (EntityHeader childEntity : childEntities.getResults()) {
+						if (newHandle.getFileName().equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
+							//found!  add a new version for this file instead of creating a new file entity
+							entityId = childEntity.getId();
+							break;
+						}
+					}
+				}
+			}
+
+			if (entityId == null) {
+				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), synapseClient);
 			}
 			else {
 				//get the file entity to update
@@ -2424,8 +2448,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				fileEntity = (FileEntity)synapseClient.putEntity(fileEntity);
 			}
 			//fix name and lock down
-			boolean changeName = entityId == null && parentEntityId != null; // don't change entity name on update 
-			FileHandleServlet.fixNameAndLockDown(fileEntity, newHandle, isRestricted, synapseClient, changeName);
+			FileHandleServlet.lockDown(fileEntity, isRestricted, synapseClient);
 			return fileEntity.getId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
