@@ -9,10 +9,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -79,7 +77,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	private void setUser(String token, final AsyncCallback<String> callback) {
-		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+		if(token == null) {
+			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+			return;
+		}
 		userAccountService.getUserSessionData(token, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String userSessionJson) {
@@ -96,13 +97,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						callback.onFailure(e);
 					}
 				} else {
-					callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+				logoutUser();
+				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
 			}
 		});		
 	}
