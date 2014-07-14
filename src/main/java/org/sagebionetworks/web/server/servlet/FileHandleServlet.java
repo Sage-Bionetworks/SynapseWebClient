@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
-import java.util.Timer;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -46,7 +45,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
-import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.common.io.Files;
@@ -344,7 +342,7 @@ public class FileHandleServlet extends HttpServlet {
 				if (isCreateEntity) {
 					//create the file entity
 					String parentEntityId = request.getParameter(WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
-					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), newFileHandle.getFileName(), client);
+					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), null, client);
 					entityId = fileEntity.getId();
 				}
 				else if (entityId != null) {
@@ -359,6 +357,7 @@ public class FileHandleServlet extends HttpServlet {
 					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
+					fixName(fileEntity, newFileHandle, client);
 					lockDown(fileEntity, isRestricted, client);
 				}
 			}
@@ -410,7 +409,21 @@ public class FileHandleServlet extends HttpServlet {
 		fileEntity = (FileEntity)client.createEntity(fileEntity);
 		return fileEntity;
 	}
-	
+
+	public static void fixName(FileEntity fileEntity,
+			FileHandle newFileHandle,
+			SynapseClient client)
+			throws SynapseException {
+		String originalFileEntityName = fileEntity.getName();
+		try {
+			// and try to set the name to the filename
+			fileEntity.setName(newFileHandle.getFileName());
+			fileEntity = (FileEntity) client.putEntity(fileEntity);
+		} catch (Throwable t) {
+			fileEntity.setName(originalFileEntityName);
+		};
+	}
+		
 	public static void lockDown(FileEntity fileEntity, boolean isRestricted, SynapseClient client) throws SynapseException {
 		// now lock down restricted data
 		if (isRestricted) {
