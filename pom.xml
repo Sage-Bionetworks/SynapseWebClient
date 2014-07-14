@@ -615,6 +615,13 @@
 			<artifactId>jira-rest-java-client</artifactId>
 			<version>2.0.0-m2</version>
 		</dependency>
+
+    <!-- Better time support for the World Clock widget (SWC-1496) -->
+		<dependency>
+			<groupId>org.threeten</groupId>
+			<artifactId>threetenbp</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
