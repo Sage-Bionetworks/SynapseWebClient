@@ -2,7 +2,8 @@
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:c="urn:import:com.google.gwt.user.cellview.client">
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+  xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
   <ui:style>
     .cellTable {
@@ -14,7 +15,20 @@
 <g:HTMLPanel>	
 	<g:HTMLPanel>
   		<div class="alert alert-danger">Warning: The Table feature is in a test phase. <strong>All production data will be DELETED at a future date.</strong></div>
+  		<!-- model test  -->
   	    <g:HTMLPanel ui:field="buttonToolbar"/>
+  	    <b:Modal title="Cupcake ipsum" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="myModal">
+  			<b:ModalBody>
+    		<g:HTML>Modal body...</g:HTML>
+  			</b:ModalBody>
+  		<b:ModalFooter>
+    		<b:Button type="PRIMARY">Save</b:Button>
+    		<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+  		</b:ModalFooter>
+		</b:Modal>
+
+		<b:Button dataTarget="#myModal" dataToggle="MODAL" type="PRIMARY" size="LARGE">Click to show modal</b:Button>
+		
   	    <g:SimplePanel ui:field="columnEditorPanel" visible="false" styleName="margin-top-15 panel panel-default panel-body" />
   	    
 		<g:HTMLPanel ui:field="queryPanel" visible="false" styleName="margin-top-15">

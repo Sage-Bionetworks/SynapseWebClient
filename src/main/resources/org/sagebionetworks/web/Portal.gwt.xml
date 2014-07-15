@@ -17,7 +17,8 @@
 	<inherits name="com.google.gwt.junit.JUnit" />
 	<inherits name="com.google.gwt.logging.Logging" />
 	<inherits name="com.google.gwt.inject.Inject" />
-
+	
+	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.sagebionetworks.web.client.Portal' />
