@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -10,30 +9,20 @@ import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -44,7 +33,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private SageImageBundle sageImageBundle;
 	
 	private JoinTeamWidgetView.Presenter presenter;
-	private AnimationProtector versionAnimation;
 	private LayoutContainer requestUIPanel;
 	private Button requestButton, acceptInviteButton, anonymousUserButton;
 	private HTML requestedMessage;
@@ -140,25 +128,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			requestUIPanel = new LayoutContainer();
 			requestUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
 			requestButton = DisplayUtils.createIconButton("Request to Join Team", ButtonType.DEFAULT, "glyphicon-plus");
-			versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(requestButton, requestUIPanel));
-			FxConfig hideConfig = new FxConfig(400);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			requestButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
+				public void onClick(ClickEvent event) {
+					requestUIPanel.setVisible(!requestUIPanel.isVisible());
 					requestUIPanel.layout(true);
 				}
 			});
-			versionAnimation.setHideConfig(hideConfig);
-			FxConfig showConfig = new FxConfig(400);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
-					requestUIPanel.layout(true);
-				}
-			});
-			versionAnimation.setShowConfig(showConfig);
 			
 			messageArea = new TextArea();
 			messageArea.setWidth(FIELD_WIDTH);

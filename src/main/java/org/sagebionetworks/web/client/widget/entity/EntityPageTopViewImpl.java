@@ -115,7 +115,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private PortalGinInjector ginInjector;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Breadcrumb breadcrumb;
-	private AnnotationsWidget annotationsWidget;
 	private LayoutContainer fullWidthContainer;
 	private LayoutContainer topFullWidthContainer, currentTabContainer, wikiTabContainer, filesTabContainer, tablesTabContainer, adminTabContainer;
 	private Attachments attachmentsPanel;
@@ -157,7 +156,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.actionMenu = actionMenu;
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.breadcrumb = breadcrumb;
-		this.annotationsWidget = propertyWidget;
 		this.attachmentsPanel = attachmentsPanel;
 		this.snapshotWidget = snapshotWidget;
 		this.entityMetadata = entityMetadata;
@@ -316,7 +314,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		filesBrowser.setEntityUpdatedHandler(fileBrowserUpdateHandler);
 		entityMetadata.setEntityUpdatedHandler(handler);
-		annotationsWidget.setEntityUpdatedHandler(handler);
 		fileHistoryWidget.setEntityUpdatedHandler(handler);
 		actionMenu.setEntityDeletedHandler(new EntityDeletedHandler() {			
 			@Override
