@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.Messages;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Search;
@@ -160,6 +161,11 @@ public class BulkPresenterProxy extends AbstractActivity {
 					ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
 					presenter.setPlace((ChangeUsername)place);
 					presenter.start(panel, eventBus);
+				} else if (place instanceof Messages) {
+					MessagesPresenter presenter = ginjector.getMessagesPresenter();
+					presenter.setPlace((Messages)place);
+					presenter.start(panel,  eventBus);
+					
 				} else {
 					// Log that we have an unknown place but send the user to the default
 					log.log(Level.WARNING, "Unknown Place: "+place.getClass().getName());

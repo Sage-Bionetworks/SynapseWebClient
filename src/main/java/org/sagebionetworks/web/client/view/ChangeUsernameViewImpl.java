@@ -45,7 +45,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	@Inject
 	public ChangeUsernameViewImpl(ChangeUsernameViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle imageBundle) {		
+			SageImageBundle imageBundle) {		// TODO: Ask Jay if this SageImageBundle should be there? If so, why? (It isn't used anywhere).	
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
