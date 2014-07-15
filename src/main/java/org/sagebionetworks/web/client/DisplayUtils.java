@@ -151,6 +151,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.ButtonBase;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
@@ -158,6 +159,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -2447,5 +2449,22 @@ public class DisplayUtils {
 				style.clearWidth();
 			}
 		}
+	}
+	
+	public static void configureShowHide(final InlineLabel label, final LayoutContainer content) {
+		label.setText(DisplayConstants.SHOW_LC);
+		label.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (content.isVisible()) {
+					content.setVisible(false);
+					label.setText(DisplayConstants.SHOW_LC);
+				} else {
+					content.setVisible(true);
+					label.setText(DisplayConstants.HIDE_LC);
+				}
+				content.layout(true);
+			}
+		});
 	}
 }
