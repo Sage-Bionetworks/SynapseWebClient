@@ -2,6 +2,8 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.util.Set;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
 import org.sagebionetworks.web.shared.DateTime;
 import org.sagebionetworks.web.client.TimeService;
 
@@ -12,7 +14,7 @@ import org.threeten.bp.temporal.TemporalAccessor;
 
 import static org.threeten.bp.temporal.ChronoField.*;
 
-public class TimeServiceImpl implements TimeService {
+public class TimeServiceImpl extends RemoteServiceServlet implements TimeService {
 
     private static DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("eeee, MMMM dd, yyyy 'at' hh:mm:ss a");

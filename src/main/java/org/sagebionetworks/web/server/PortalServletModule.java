@@ -27,6 +27,7 @@ import org.sagebionetworks.web.server.servlet.SimpleFileHandleUploadServlet;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
+import org.sagebionetworks.web.server.servlet.TimeServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
@@ -139,7 +140,11 @@ public class PortalServletModule extends ServletModule {
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);
 		serve("/Portal/rss").with(RssServiceImpl.class);
-				
+
+    // Setup the Time service mapping
+    bind(TimeServiceImpl.class).in(Singleton.class);
+    serve("/Portal/time").with(TimeServiceImpl.class);
+
 		// Setup the OpenID service mapping
 		bind(OpenIDServlet.class).in(Singleton.class);
 		serve(WebConstants.OPEN_ID_URI).with(OpenIDServlet.class);
