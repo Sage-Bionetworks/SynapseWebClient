@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -47,6 +48,11 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	DivElement changeSynapsePasswordHighlightBox;
 	@UiField
 	DivElement apiKeyHighlightBox;
+	@UiField
+	DivElement colorLine;
+	@UiField
+	HeadingElement settingsHeading;
+
 	
 	@UiField
 	FlowPanel forgotPasswordContainer;
@@ -185,10 +191,21 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 	
 	@Override
-	public void render() {
+	public void render(boolean standAlonePlace) {
 		//set the Settings page breadcrumb
 		breadcrumbsPanel.clear();
-		breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
+		DisplayUtils.hide(header);
+		DisplayUtils.hide(footer);
+		DisplayUtils.hide(colorLine);
+		DisplayUtils.hide(settingsHeading);
+		
+		if (standAlonePlace) {
+			DisplayUtils.show(header);
+			DisplayUtils.show(footer);
+			breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
+			DisplayUtils.show(colorLine);
+			DisplayUtils.show(settingsHeading);
+		}
 		
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
 		password1Field.getElement().setAttribute("placeholder", "Enter new password");

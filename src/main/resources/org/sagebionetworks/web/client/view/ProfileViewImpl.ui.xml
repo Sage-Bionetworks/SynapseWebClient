@@ -2,17 +2,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-
-	<ui:style>
-		.important {
-		font-weight: bold;
-		}
-
-		.rowTop {
-		vertical-align: top;
-		}
-	</ui:style>
-
 	<g:HTMLPanel>
 
 		<div class="color-line"></div>
@@ -34,19 +23,21 @@
 				</div>
 				<div class="col-md-9 col-sm-8 col-xs-12">
 					<g:SimplePanel ui:field="viewProfilePanel" />
-							<g:SimplePanel ui:field="myTeamsPanel" styleName="highlight-box"/>
-					<g:SimplePanel ui:field="myTeamInvitesPanel" />
 				</div>
 				<div class="col-md-12 col-sm-12 col-xs-12">
-				    <div class="row margin-top-15" ui:field="navtabContainer">
-					    <ul class="nav nav-tabs entity-tabs">				        
+				    <div class="row" ui:field="navtabContainer">
+					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
-						    <li class="entity-tab hide" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li>
+						    <!--  <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li> -->
 						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="teamsLink"/></li>
-						    <li class="entity-tab hide" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li>
+						    <!--  <li class="entity-tab" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li> -->
 						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="settingsLink"/></li>
 					    </ul>
 					</div>
+					<div class="row">
+						<g:SimplePanel ui:field="currentTabContainer" styleName="tab-background padding-bottom-15"/>
+					</div>
+					
 				</div>
 			</div>
 			<div class="row margin-top-5">

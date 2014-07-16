@@ -46,7 +46,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
-	private UserProfile ownerProfile;
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
@@ -181,7 +180,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					try {
 						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 						if (isOwner) {
-							ownerProfile = profile;
 							//only configure the profile form (editor) if owner of this profile
 							profileForm.configure(profile, profileUpdatedCallback);
 						}
