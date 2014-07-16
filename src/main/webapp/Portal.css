@@ -124,7 +124,7 @@
   -moz-transition:.2s;
   -webkit-transition:.2s;
   transition:.2s; }
-.headerLink:hover { color: #BC3226; text-decoration:none; }
+.headerLink:hover { color: #3a5bdc; text-decoration:none; }
 
 .headerUsernameLink { 
 	font-weight: bold; 
@@ -1666,14 +1666,13 @@ a.projectTitle:hover {
 /* All levels of nav */
 .bs-sidebar .nav > li > a {
   display: block;
-  color: #BC3226;
   padding: 5px 20px;
 }
 .bs-sidebar .nav > li > a:hover,
 .bs-sidebar .nav > li > a:focus {
   text-decoration:underline;
   background-color: transparent;
-  border-right: 1px solid #BC3226;
+  border-right: 1px solid #3a5bdc;
 }
 .bs-sidebar .nav > .active > a,
 .bs-sidebar .nav > .active:hover > a,
