@@ -8,6 +8,7 @@ import java.util.Map;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class APITableColumnRendererNone implements APITableColumnRenderer {
@@ -23,6 +24,8 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 		outputColumnName = APITableWidget.getSingleOutputColumnName(config);
 		
 		outputColumnData = new HashMap<String, List<String>>();
+		
+		NumberFormat decimalFormat = getDecimalNumberFormat(config.getDecimalPlaces());
 		String inputColumnName = APITableWidget.getSingleInputColumnName(config);
 		List<String> colValues = APITableWidget.getColumnValues(inputColumnName, columnData);
 		List<String> outputValues = new ArrayList<String>();
@@ -34,14 +37,13 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 			//replace null values with empty string
 			for (String colValue : colValues) {
 				if (colValue != null)
-					outputValues.add(colValue);
+					outputValues.add(getColumnValue(colValue, decimalFormat));
 				else
 					outputValues.add("");
 			}
 		}
 		outputColumnData.put(outputColumnName, outputValues);
 		
-
 		callback.onSuccess(new APITableInitializedColumnRenderer() {
 			@Override
 			public Map<String, List<String>> getColumnData() {
@@ -53,5 +55,22 @@ public class APITableColumnRendererNone implements APITableColumnRenderer {
 				return APITableWidget.wrap(outputColumnName);
 			}
 		});
+	}
+	
+	public static NumberFormat getDecimalNumberFormat(Integer decimalPlaces) {
+		if (decimalPlaces == null)
+			return null;
+		else return NumberFormat.getDecimalFormat().overrideFractionDigits(decimalPlaces);
+	}
+	
+	public static String getColumnValue(String originalValue, NumberFormat decimalFormat) {
+		if (decimalFormat == null)
+			return originalValue;
+
+		try {
+			return decimalFormat.format(Double.parseDouble(originalValue));
+		} catch (NumberFormatException e) {
+			return originalValue;
+		}
 	}
 }

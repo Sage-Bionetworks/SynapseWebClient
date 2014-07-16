@@ -70,4 +70,6 @@ public class APITableColumnRendererNoneTest {
 		renderer.init(columnData, config, mockCallback);
 		verify(mockCallback).onFailure(any(IllegalArgumentException.class));
 	}
+	
+	/**  NumberFormat is gwt client specific, so testDecimalNumberFormat and testGetColumnValue are in GwtTestSuite **/
 }

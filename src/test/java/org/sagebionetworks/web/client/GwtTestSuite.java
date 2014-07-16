@@ -37,9 +37,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.junit.client.GWTTestCase;
 
 /**
@@ -341,6 +343,24 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(ars, results.getAccessRequirements());
 		assertEquals(ars, results.getUnmetAccessRequirements());
 		assertEquals(fileHandles, results.getFileHandles());
+	}
+	
+	@Test
+	public void testDecimalNumberFormat() {
+		assertNull(APITableColumnRendererNone.getDecimalNumberFormat(null));
+		NumberFormat formatter = APITableColumnRendererNone.getDecimalNumberFormat(1);
+		assertEquals("12.3",formatter.format(12.3456));
+		assertEquals("12.0",formatter.format(12));
+	}
+	
+	@Test
+	public void testGetColumnValue() {
+		assertEquals("abc", APITableColumnRendererNone.getColumnValue("abc", null));
+		assertEquals("13.456", APITableColumnRendererNone.getColumnValue("13.456", null));
+		assertEquals("13.456", APITableColumnRendererNone.getColumnValue("13.456", null));
+		NumberFormat formatter = APITableColumnRendererNone.getDecimalNumberFormat(4);
+		assertEquals("13.4567", APITableColumnRendererNone.getColumnValue("13.456789", formatter));
+		assertEquals("hello", APITableColumnRendererNone.getColumnValue("hello", formatter));
 	}
 	
 	public static String entityListToString(List<? extends JSONEntity> list) throws JSONObjectAdapterException {		
