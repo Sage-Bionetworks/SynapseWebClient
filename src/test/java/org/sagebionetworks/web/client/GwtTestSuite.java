@@ -357,7 +357,6 @@ public class GwtTestSuite extends GWTTestCase {
 	public void testGetColumnValue() {
 		assertEquals("abc", APITableColumnRendererNone.getColumnValue("abc", null));
 		assertEquals("13.456", APITableColumnRendererNone.getColumnValue("13.456", null));
-		assertEquals("13.456", APITableColumnRendererNone.getColumnValue("13.456", null));
 		NumberFormat formatter = APITableColumnRendererNone.getDecimalNumberFormat(4);
 		assertEquals("13.4567", APITableColumnRendererNone.getColumnValue("13.456789", formatter));
 		assertEquals("hello", APITableColumnRendererNone.getColumnValue("hello", formatter));
