@@ -16,6 +16,8 @@ public interface MessagesView extends IsWidget, SynapseView {
 	
 	
 	public interface Presenter extends SynapsePresenter {
-		// declare some methods and stuff.
+		// TODO: void sendMessage
+		// TODO: void forwardMessage
+		// TODO: void updateStatus
 	}
 }

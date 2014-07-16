@@ -42,7 +42,7 @@ public class MessagesPresenter extends AbstractActivity implements MessagesView.
 	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
-		// Install hte view
+		// Install the view
 		panel.setWidget(view);
 
 	}
