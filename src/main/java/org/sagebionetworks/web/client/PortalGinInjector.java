@@ -72,6 +72,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelForm;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -205,6 +206,7 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SimpleTableWidget getSimpleTableWidget();
+	public ColumnModelForm getColumnModelFormWidget();
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();

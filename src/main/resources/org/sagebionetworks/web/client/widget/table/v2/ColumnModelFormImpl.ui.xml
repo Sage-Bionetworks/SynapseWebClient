@@ -1,0 +1,28 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+
+	<g:HTMLPanel>
+		<b:Form visible="true">
+			<b:FieldSet>
+				<b:Legend>New Column</b:Legend>
+				<b:FormGroup>
+					<b:FormLabel for="formName">Column Name</b:FormLabel>
+					<b:TextBox text="" b:id="columName" ui:field="columnName" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel for="formName">Column Type</b:FormLabel>
+					<b:ButtonGroup b:id="columType" ui:field="columnType"
+						dataToggle="BUTTONS">
+						<b:RadioButton ui:field="stringButton">String</b:RadioButton>
+						<b:RadioButton ui:field="integerButton">Integer</b:RadioButton>
+						<b:RadioButton ui:field="doubleButton">Double</b:RadioButton>
+						<b:RadioButton ui:field="booleanButton">Boolean</b:RadioButton>
+						<b:RadioButton ui:field="dateButton">Date</b:RadioButton>
+						<b:RadioButton ui:field="fileButton">File</b:RadioButton>
+					</b:ButtonGroup>
+				</b:FormGroup>
+			</b:FieldSet>
+		</b:Form>
+	</g:HTMLPanel>	
+</ui:UiBinder>

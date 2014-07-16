@@ -102,6 +102,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	SimplePanel errorMessage;
 	@UiField
 	HTMLPanel allRowContainer;
+	@UiField
+	SimplePanel columnEditorModalPanel;
 
 	FlowPanel addColumnPanel;
 	List<ColumnDetailsPanel> columnPanelOrder;
@@ -141,6 +143,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 	    // setup DataProvider for pagination/sorting
 		dataProvider = createAsyncDataProvider();
+		
+		columnEditorModalPanel.add(ginInjector.getColumnModelFormWidget());
 
 	}
 	
