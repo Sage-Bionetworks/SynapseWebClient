@@ -265,6 +265,7 @@ public class UploaderTest {
 	private void verifyUploadError() {
 		verify(view).showErrorMessage(anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(synapseJsniUtils).consoleError(anyString());
 	}
 	
 	@Test

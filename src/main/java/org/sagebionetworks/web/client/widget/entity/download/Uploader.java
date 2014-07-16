@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -83,7 +84,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	NumberFormat percentFormat;
 	private boolean isDirectUploadSupported;
 	private boolean isFileEntity;
-	
+	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
+	private StringBuilder uploadLog;
 	
 	@Inject
 	public Uploader(
@@ -106,7 +108,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
-		
+		uploadLog = new StringBuilder();
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
 	}		
 		
@@ -214,6 +216,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 */
 	public void directUploadStep0(final String fileName) {
 		this.token = null;
+		uploadLog = new StringBuilder();
+		uploadLog.append(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
+		
 		//get the chunked file request (includes token)
 		//get the content type
 		final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID), fileName);
@@ -221,10 +226,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			
 			@Override
 			public void setMD5(String hexValue) {
+				uploadLog.append("MD5=" + hexValue+"\ncontentType="+contentType+"\n");
 				directUploadStep1(fileName, contentType, hexValue);
 			}
 		});
-		
 	}
 	public void directUploadStep1(final String fileName, final String contentType, String md5){
 		try {
@@ -236,6 +241,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
 						long totalChunkCount = getChunkCount(fileSize);
 						view.showProgressBar();
+						uploadLog.append("fileSize="+fileSize + " totalChunkCount=" + totalChunkCount+"\n");
 						directUploadStep2(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
@@ -265,6 +271,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//and upload the file
 		try {
 			//create a request for each chunk, and try to upload each one
+			uploadLog.append("directUploadStep2: currentChunkNumber="+currentChunkNumber + " currentAttempt=" + currentAttempt+"\n");
 			ChunkRequest request = new ChunkRequest();
 			request.setChunkedFileToken(token);
 			request.setChunkNumber((long) currentChunkNumber);
@@ -279,11 +286,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
 							@Override
 							public void onReadyStateChange(XMLHttpRequest xhr) {
+								uploadLog.append("XMLHttpRequest.setOnReadyStateChange:  readyState="+xhr.getReadyState() + " status=" + xhr.getStatus()+"\n");
 								if (xhr.getReadyState() == 4) { //XMLHttpRequest.DONE=4, posts suggest this value is not resolved in some browsers
 									if (xhr.getStatus() == 200) { //OK
+										uploadLog.append("XMLHttpRequest.setOnReadyStateChange: OK\n");
 										chunkUploadSuccess(requestJson, contentType, currentChunkNumber, totalChunkCount, fileSize, requestList);
-									}
-									else {
+									} else {
+										uploadLog.append("XMLHttpRequest.setOnReadyStateChange: Failure\n");
 										chunkUploadFailure(contentType, currentChunkNumber, currentAttempt, totalChunkCount, fileSize, requestList, xhr.getStatusText());
 									}
 								}
@@ -291,6 +300,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						});
 					}
 					ByteRange range = getByteRange(currentChunkNumber, fileSize);
+					uploadLog.append("directUploadStep2: uploading file chunk.  ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
 					synapseJsniUtils.uploadFileChunk(contentType, UploaderViewImpl.FILE_FIELD_ID, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 						@Override
 						public void updateProgress(double value) {
@@ -379,6 +389,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void directUploadStep3(final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt){
+		uploadLog.append("directUploadStep3: currentAttempt=" + currentAttempt+"\n");
 		//complete the file upload, and refresh
 		try {
 			final String entityId = entity==null ? null : entity.getId();
@@ -397,7 +408,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					uploadError(caught.getMessage());
+					combineChunksUploadFailure(isNewlyRestricted, requestList, currentAttempt, caught.getMessage());
 				}
 			});
 		} catch (RestServiceException e) {
@@ -692,10 +703,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		});
 	}
 	private void uploadError(String message) {
+		uploadLog.append(message+"\n");
 		String details = "";
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		//TODO: send full log to server logs (once service is available)
+		synapseJsniUtils.consoleError(uploadLog.toString());
+		uploadLog = new StringBuilder();
 		fireCancelEvent();
 	}
 	
