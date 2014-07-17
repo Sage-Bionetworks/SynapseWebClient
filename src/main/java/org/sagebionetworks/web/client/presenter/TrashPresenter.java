@@ -1,15 +1,22 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.repo.model.PaginatedResults;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -26,7 +33,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	//private JSONObjectAdapter jsonObjectAdapter;
-	private AdapterFactory adapterFactory;
+	private NodeModelCreator nodeModelCreator;
+	private Set<TrashedEntity> selectedTrash;
 	
 	// TODO:
 	//@Inject
@@ -36,16 +44,17 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController,
-			//JSONObjectAdapter jsonObjectAdapter,	// replace with adapterFactory
-			AdapterFactory adapterFactory){
+			//JSONObjectAdapter jsonObjectAdapter,	// replace with NodeModelCreator
+			NodeModelCreator nodeModelCreator){
 		// TODO: ALL of this is copied... pretty much.
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		//this.jsonObjectAdapter = jsonObjectAdapter;
-		this.adapterFactory = adapterFactory;
-
+		this.nodeModelCreator = nodeModelCreator;
+		selectedTrash = new HashSet<TrashedEntity>();
+		
 		view.setPresenter(this);
 		getTrash();		// TODO: Where to make this call? In constructor?
 	}
@@ -71,13 +80,16 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onSuccess(Void result) {
 				// show some method "Trash emptied."
+				view.showInfo("Trash Emptied!", "Your trash was successfully emptied.");
+				
+				// Get trash? Or just clear table?
+				view.clear();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				// TODO: Do this. Just show some method?
-				// Log something?
-				
+				// TODO: Some error.
+				view.showInfo("Trash Not Emptied!", "Your trash was not successfully emptied.");
 			}
 			
 		});
@@ -92,20 +104,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				// TODO: view.showTrash()
 				
 				try {
-					//PaginatedResults<TrashedEntity> trashedEntities = (PaginatedResults<TrashedEntity>) jsonObjectAdapter.get(result);
-					//PaginatedResults<TrashedEntity> header = new PaginatedResults<TrashedEntity>(adapterFactory.createNew(headerString))
-					//JSONObjectAdapter jsonObjectAdapter = adapterFactory.createNew(result);
-					//JSONArrayAdapter jsonArrayAdapter = jsonObjectAdapter.getJSONArray("results");
-					
-					//TrashedEntity result1 = (TrashedEntity) jsonArrayAdapter.get(0);
-					//TrashedEntity[] results = (PaginatedResults<TrashedEntity>) jsonObjectAdapter.get("results");
-					PaginatedResults<TrashedEntity> results = new PaginatedResults<TrashedEntity>(adapterFactory.createNew(result));
-					
-					String hello = "= > )";
+					PaginatedResults<TrashedEntity> trashedEntities = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
+					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
+						view.displayIndividualRow(trashedEntity);
+					}
 				} catch (JSONObjectAdapterException e) {
-					// Some error thing.
-					@SuppressWarnings("unused")
-					String hello = "= > )";
+					// TODO: Some error handling.
 				}
 				
 			}
@@ -116,5 +120,15 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			}
 			
 		});
+	}
+	
+	@Override
+	public void selectTrash(TrashedEntity trash) {
+		selectedTrash.add(trash);
+	}
+	
+	@Override
+	public void deselectTrash(TrashedEntity trash) {
+		selectedTrash.remove(trash);
 	}
 }

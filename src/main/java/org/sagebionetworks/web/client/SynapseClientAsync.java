@@ -307,6 +307,7 @@ public interface SynapseClientAsync {
 
 	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
 
-	void viewTrashForUser(long offset, long limit, AsyncCallback<String> callback);
+	void viewTrashForUser(long offset, long limit,
+			AsyncCallback<String> callback);
 
 }

@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -13,6 +15,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -69,7 +72,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		deleteAllButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				// TODO: DELETE ALL
+				presenter.deleteAll();
 			}
 		});
 		
@@ -97,8 +100,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 
 	@Override
 	public void showInfo(String title, String message) {
-		// TODO Auto-generated method stub
-		// IMPLEMENT!!
+		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
@@ -108,8 +110,31 @@ public class TrashViewImpl extends Composite implements TrashView {
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		// IMPLEMENT!!
+		trashList = initTable();
+		trashListPanel.clear();
+		trashListPanel.add(trashList);
+	}
+	
+	@Override
+	public void displayIndividualRow(TrashedEntity trashedEntity) {
+		int row = trashList.getRowCount();
+		
+//		trashList.addClickHandler(new ClickHandler() { 
+//            @Override 
+//            public void onClick(ClickEvent event) {  
+//                 int rowIndex = s.getCellForEvent(event).getRowIndex();
+//            } 
+//        }); 
+		
+		// Make checkbox.
+		CheckBox cb = new CheckBox();
+		
+		// Make button
+		
+		
+		trashList.setWidget(row, 0, cb);
+		trashList.setText(row, 1, trashedEntity.getEntityName());
+		trashList.setText(row, 2, trashedEntity.getOriginalParentId());
 	}
 	
 	/*
@@ -123,7 +148,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		headerRow.add(HEADER_CHECKBOX_IDX, HEADER_CHECKBOX);
 		headerRow.add(HEADER_NAME_IDX, HEADER_NAME);
 		headerRow.add(HEADER_LOCATION_IDX, HEADER_LOCATION);
-		headerRow.add(HEADER_RESTORE_IDX, HEADER_RESTORE);	
+		headerRow.add(HEADER_RESTORE_IDX, HEADER_RESTORE);
 
 		List<List<String>> trashListHeaderRows = new ArrayList<List<String>>();
 		trashListHeaderRows.add(headerRow);
