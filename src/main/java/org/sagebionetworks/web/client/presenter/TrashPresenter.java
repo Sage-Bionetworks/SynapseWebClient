@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -34,7 +35,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private AuthenticationController authController;
 	//private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
-	private Set<TrashedEntity> selectedTrash;
+	private List<TrashedEntity> selectedTrash;
 	
 	// TODO:
 	//@Inject
@@ -53,7 +54,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.authController = authController;
 		//this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
-		selectedTrash = new HashSet<TrashedEntity>();
+		selectedTrash = new ArrayList<TrashedEntity>();
 		
 		view.setPresenter(this);
 		getTrash();		// TODO: Where to make this call? In constructor?
