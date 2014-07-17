@@ -66,6 +66,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -703,6 +704,59 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			synapseClient.deleteEntityVersionById(entityId, versionNumber);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String viewTrashForUser(long offset, long limit) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			PaginatedResults<TrashedEntity> results = synapseClient.viewTrashForUser(offset, limit);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void restoreFromTrash(String entityId, String newParentId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.restoreFromTrash(entityId, newParentId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void moveToTrash(String entityId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.moveToTrash(entityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void purgeTrashForUser() throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.purgeTrashForUser();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void purgeTrashForUser(String entityId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.purgeTrashForUser(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

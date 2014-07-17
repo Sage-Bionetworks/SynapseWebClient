@@ -50,8 +50,8 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
-import org.sagebionetworks.web.client.view.MessagesView;
-import org.sagebionetworks.web.client.view.MessagesViewImpl;
+import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -464,9 +464,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChangeUsernameViewImpl.class).in(Singleton.class);
 		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class);
 		
-		// Messages
-		bind(MessagesViewImpl.class).in(Singleton.class);
-		bind(MessagesView.class).to(MessagesViewImpl.class);
+		// Trash
+		bind(TrashViewImpl.class).in(Singleton.class);
+		bind(TrashView.class).to(TrashViewImpl.class);
 		
 
 		/*

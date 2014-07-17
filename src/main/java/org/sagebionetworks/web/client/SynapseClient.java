@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -39,6 +41,16 @@ public interface SynapseClient extends RemoteService {
 	public void deleteEntityById(String entityId, Boolean skipTrashCan) throws RestServiceException;
 	
 	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
+	
+	public void moveToTrash(String entityId) throws RestServiceException;
+
+	public void restoreFromTrash(String entityId, String newParentId) throws RestServiceException;
+
+	public String viewTrashForUser(long offset, long limit) throws RestServiceException;
+	
+	public void purgeTrashForUser() throws RestServiceException;
+
+	public void purgeTrashForUser(String entityId) throws RestServiceException;
 	
 	public EntityWrapper getEntityPath(String entityId) throws RestServiceException;
 	

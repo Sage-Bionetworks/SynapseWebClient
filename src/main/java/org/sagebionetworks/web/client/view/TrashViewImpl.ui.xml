@@ -10,14 +10,11 @@
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 	        <div class="row">
 				<div class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
-					<h2>Message Inbox</h2>
-					<!--
+				    <g:Button ui:field="deleteAllButton" styleName="btn btn-primary btn-lg margin-top-10 right"/>
+					<h2>Trash Can</h2>
 					<div class="signin-panel panel panel-body margin-top-15">
-		   				<h4 class="form-signin-heading">Synapse now requires a username. Please take a moment to carefully choose yours.</h4>
-						<g:TextBox ui:field="username" styleName="form-control"/>
-						<g:Button ui:field="changeUsernameButton" styleName="btn btn-primary btn-lg margin-top-10 right" />
-						<span ui:field="messageLabel" />
-					</div> -->					
+						<g:SimplePanel ui:field="trashListPanel" />
+					</div>					
 				</div>
 		   	</div>
 	    	

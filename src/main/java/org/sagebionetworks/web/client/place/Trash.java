@@ -4,11 +4,11 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Messages extends Place{
+public class Trash extends Place{
 	
 	private String token;
 
-	public Messages(String token) {
+	public Trash(String token) {
 		this.token = token;
 	}
 
@@ -16,16 +16,16 @@ public class Messages extends Place{
 		return token;
 	}
 
-	@Prefix("!Messages")
-	public static class Tokenizer implements PlaceTokenizer<Messages> {
+	@Prefix("!Trash")
+	public static class Tokenizer implements PlaceTokenizer<Trash> {
 		@Override
-		public String getToken(Messages place) {
+		public String getToken(Trash place) {
 			return place.toToken();
 		}
 
 		@Override
-		public Messages getPlace(String token) {
-			return new Messages(token);
+		public Trash getPlace(String token) {
+			return new Trash(token);
 		}
 	}
 }

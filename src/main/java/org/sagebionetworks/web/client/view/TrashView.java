@@ -5,7 +5,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface MessagesView extends IsWidget, SynapseView {
+public interface TrashView extends IsWidget, SynapseView {
 	/**
 	 * Set this view's Presenter
 	 * @param presenter
@@ -16,8 +16,8 @@ public interface MessagesView extends IsWidget, SynapseView {
 	
 	
 	public interface Presenter extends SynapsePresenter {
-		// TODO: void sendMessage
-		// TODO: void forwardMessage
-		// TODO: void updateStatus
+		void deleteAll();
+		// TODO: void deleteSelected
+		
 	}
 }
