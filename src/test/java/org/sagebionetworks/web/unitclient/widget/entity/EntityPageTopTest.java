@@ -152,7 +152,7 @@ public class EntityPageTopTest {
 	public void testProjectInPageNoState() {		
 		// default project visit, no area, no area token
 		pageTop.configure(projectBundle, null, projectHeader, null, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 	}
 
@@ -178,11 +178,11 @@ public class EntityPageTopTest {
 	public void testWikiSubPageState() {
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// go to files tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// now lets go to a child file
 		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
@@ -200,12 +200,12 @@ public class EntityPageTopTest {
 	public void testGoingBackToProjectWikiWithSubPageState() {
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage token
 		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, EntityArea.WIKI, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to a child file
 		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
@@ -224,12 +224,12 @@ public class EntityPageTopTest {
 	public void testGoingBackToProjectWithSubPageState() {
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to the project WIKI area with no subpage 
 		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null);
 		pageTop.configure(projectBundle, entityVersion, projectHeader, null, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// now lets go to a child file
 		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
@@ -247,7 +247,7 @@ public class EntityPageTopTest {
 	public void testVisitNewProject() {
 		// create some state for the wiki tab on project
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// create some state for the files tab on project
 		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
@@ -262,7 +262,7 @@ public class EntityPageTopTest {
 		EntityHeader newProjectHeader = new EntityHeader();
 		newProjectHeader.setId(newProjectId);
 		pageTop.configure(projectBundle, entityVersion, newProjectHeader, EntityArea.WIKI, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 		// click files to test
 		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.WIKI);
@@ -272,7 +272,7 @@ public class EntityPageTopTest {
 		assertNull(gotoPlace.getVersionNumber());					
 		// visit wiki subpage and assure switch to default files view and back is not place change
 		pageTop.configure(projectBundle, entityVersion, newProjectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));
 
 	}	
@@ -285,11 +285,11 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// go to files root
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// go wiki tab
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, null);		
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// click files to test that there is no files tab state
 		pageTop.gotoProjectArea(EntityArea.FILES, EntityArea.WIKI);
@@ -303,11 +303,11 @@ public class EntityPageTopTest {
 	public void testRevisitWikiAfterFileStateAndFilesRootVisit_SWC_922() {
 		// create some state for wiki tab
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.WIKI, wikiSubpage);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// click on files tab
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// click on files child entity
 		pageTop.configure(entityBundle, entityVersion, projectHeader, null, null);
@@ -315,7 +315,7 @@ public class EntityPageTopTest {
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));		
 		// go to files root
 		pageTop.configure(projectBundle, null, projectHeader, EntityArea.FILES, null);
-		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.FILES));
+		assertFalse(pageTop.isPlaceChangeForArea(EntityArea.FILES));
 		assertTrue(pageTop.isPlaceChangeForArea(EntityArea.WIKI));				
 		// click on wiki tab
 		pageTop.gotoProjectArea(EntityArea.WIKI, EntityArea.FILES);

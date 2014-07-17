@@ -254,8 +254,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if(targetTab == EntityArea.FILES) {
 			// files area clicked in non-project entity requires goto root of files
 			// files area clicked with last-file-state requires goto
-			// caching caused SWC-1533, always reload Files area on tab change
-			return true;
+			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
+				return true;				
+			}
 		} else if(targetTab == EntityArea.WIKI) {
 			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
 				// wiki area clicked in non-project entity requires goto
