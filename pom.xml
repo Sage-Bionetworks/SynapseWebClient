@@ -274,6 +274,12 @@
 			<version>${gwtboostrap3.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3-extras</artifactId>
+			<version>${gwtboostrap3.version}</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-stackConfiguration</artifactId>
 			<version>${synapse.version}</version>

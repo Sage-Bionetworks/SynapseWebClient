@@ -2,15 +2,12 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.DropDown;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.Toggle;
+import org.gwtbootstrap3.extras.select.client.ui.Option;
+import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -97,18 +94,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		// Column type
 		TableData columnTypeData = new TableData();
 		if(isColumnEditable){
-			DropDown typeDropDown = new DropDown();
-			Anchor anchor = new Anchor();
-			anchor.setDataToggle(Toggle.DROPDOWN);
-			anchor.setText(column.getColumnType().name());
-			typeDropDown.add(anchor);
-			DropDownMenu menu = new DropDownMenu();
-			for(ColumnType type: ColumnType.values()){
-				AnchorListItem ali = new AnchorListItem(type.name());
-				menu.add(ali);
-			}
-			anchor.add(menu);
-			columnTypeData.add(typeDropDown);
+//			columnTypeData.add(buildColumnTypeSelect(column.getColumnType()));
 		}else{
 			columnTypeData.setText(column.getColumnType().name());
 		}
@@ -125,4 +111,23 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		cm.setColumnType(ColumnType.STRING);
 		addColumnToTable(cm, true);
 	}
+	
+	/**
+	 * Build a Selector for column types.
+	 * @param typeToSelect
+	 * @return
+	 */
+//	private Select buildColumnTypeSelect(ColumnType typeToSelect){
+//		Select select = new Select();
+//		for(ColumnType type: ColumnType.values()){
+//			Option option = new Option();
+//			option.setText(type.name());
+//			select.add(option);
+//			if(type.equals(typeToSelect)){
+//				select.setValue(option);
+//			}
+//		}
+//		//select.refresh();
+//		return select;
+//	}
 }
