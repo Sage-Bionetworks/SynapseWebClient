@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 
-public interface ColumnModelsView {
+import com.google.gwt.user.client.ui.IsWidget;
+
+public interface ColumnModelsView extends IsWidget {
 
 
 	/**

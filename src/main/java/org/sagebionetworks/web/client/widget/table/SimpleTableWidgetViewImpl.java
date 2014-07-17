@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelFormImpl;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -127,6 +128,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	Button addRowBtn;
 	Button deleteRowBtn;
 	Button viewRowBtn;
+	ColumnModelsView columnModelsView;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector) {
@@ -145,7 +147,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    // setup DataProvider for pagination/sorting
 		dataProvider = createAsyncDataProvider();
 		
-		columnEditorModalPanel.add(ginInjector.getColumnModelFormWidget());
+		columnModelsView = ginInjector.getColumnModelsViewWidget();
+		columnEditorModalPanel.add(columnModelsView);
 
 	}
 	
@@ -602,6 +605,8 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 */
 	private void setupTableEditorToolbar(final List<ColumnModel> columns) {
 		buttonToolbar.clear();
+		
+		this.columnModelsView.configure("Columns", columns, true);
 
 		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");
