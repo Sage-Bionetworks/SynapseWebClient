@@ -246,7 +246,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
-		//if the user id has changed, then we need to reload 
 		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
 		if(targetTab == EntityArea.ADMIN && !isProject) {
 			// admin area clicked outside of project requires goto
