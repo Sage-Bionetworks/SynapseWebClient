@@ -483,7 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId,  null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), canEdit));
 		filesTabContainer.add(row);		
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -539,7 +539,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File Tab: Files, Annotations & old
 		row = DisplayUtils.createRowContainer();		
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), false, canEdit));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), canEdit));
 		filesTabContainer.add(row);			
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
@@ -596,6 +596,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			tab = filesListItem;
 			link = fileLink;
 			targetContainer = filesTabContainer;
+			filesBrowser.refresh();
 		} else if(targetTab == Synapse.EntityArea.TABLES) {
 			tab = tablesListItem;
 			link = tablesLink;
@@ -611,7 +612,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		currentTabContainer.removeAll();
 		currentTabContainer.add(targetContainer);
-		currentTabContainer.layout(true);							
+		currentTabContainer.layout(true);
 	}
 	
 	private void addWikiPageWidget(LayoutContainer container, EntityBundle bundle, final boolean canEdit, String wikiPageId, final Synapse.EntityArea area) {
@@ -798,12 +799,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return wrapper;
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean showTitle, boolean canEdit) {
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canEdit) {
 		filesBrowser.setCanEdit(canEdit);
-		if(showTitle) 
-			filesBrowser.configure(entity.getId(), DisplayConstants.FILES);
-		else 
-			filesBrowser.configure(entity.getId());
+		filesBrowser.configure(entity.getId());
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("col-md-12 margin-top-10");
 		lc.add(filesBrowser.asWidget());

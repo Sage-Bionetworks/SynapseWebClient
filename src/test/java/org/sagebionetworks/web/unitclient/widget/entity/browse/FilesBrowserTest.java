@@ -73,12 +73,6 @@ public class FilesBrowserTest {
 		String entityId = "syn123";
 		filesBrowser.configure(entityId);
 		verify(mockView).configure(entityId, false);
-		reset(mockView);
-		
-		String title = "title";
-		filesBrowser.configure(entityId, title);
-		verify(mockView).configure(entityId, false, title);
-		reset(mockView);
 	}
 	
 	@SuppressWarnings("unchecked")
