@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.ButtonGroup;
+import static org.sagebionetworks.repo.model.table.ColumnType.DATE;
+import static org.sagebionetworks.repo.model.table.ColumnType.DOUBLE;
+import static org.sagebionetworks.repo.model.table.ColumnType.FILEHANDLEID;
+import static org.sagebionetworks.repo.model.table.ColumnType.LONG;
+import static org.sagebionetworks.repo.model.table.ColumnType.STRING;
+
+import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-
-import static org.sagebionetworks.repo.model.table.ColumnType.*;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,7 +29,7 @@ public class ColumnModelFormImpl extends Composite implements ColumnModelForm {
 	@UiField
 	TextBox columnName;
 	@UiField
-	ButtonGroup columnType;
+	InputGroup columnTypeGroup;
 	@UiField
 	RadioButton stringButton;
 	@UiField

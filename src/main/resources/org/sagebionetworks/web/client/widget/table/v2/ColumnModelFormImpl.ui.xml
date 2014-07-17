@@ -5,24 +5,24 @@
 	<g:HTMLPanel>
 		<b:Form visible="true">
 			<b:FieldSet>
-				<b:Legend>New Column</b:Legend>
-				<b:FormGroup>
-					<b:FormLabel for="formName">Column Name</b:FormLabel>
-					<b:TextBox text="" b:id="columName" ui:field="columnName" />
+				<b:FormGroup validationState="WARNING">
+					<b:FormLabel for="columnName">Column Name</b:FormLabel>
+					<b:TextBox text="" ui:field="columnName" />
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:FormLabel for="formName">Column Type</b:FormLabel>
-					<b:ButtonGroup b:id="columType" ui:field="columnType"
-						dataToggle="BUTTONS">
-						<b:RadioButton ui:field="stringButton">String</b:RadioButton>
-						<b:RadioButton ui:field="integerButton">Integer</b:RadioButton>
-						<b:RadioButton ui:field="doubleButton">Double</b:RadioButton>
-						<b:RadioButton ui:field="booleanButton">Boolean</b:RadioButton>
-						<b:RadioButton ui:field="dateButton">Date</b:RadioButton>
-						<b:RadioButton ui:field="fileButton">File</b:RadioButton>
-					</b:ButtonGroup>
+					<b:FormLabel for="columType">Column Type</b:FormLabel>
+					<b:InputGroup ui:field="columnTypeGroup">
+						<b:ButtonGroup dataToggle="BUTTONS">
+							<b:RadioButton ui:field="stringButton">String</b:RadioButton>
+							<b:RadioButton ui:field="integerButton">Integer</b:RadioButton>
+							<b:RadioButton ui:field="doubleButton">Double</b:RadioButton>
+							<b:RadioButton ui:field="booleanButton">Boolean</b:RadioButton>
+							<b:RadioButton ui:field="dateButton">Date</b:RadioButton>
+							<b:RadioButton ui:field="fileButton">File</b:RadioButton>
+						</b:ButtonGroup>
+					</b:InputGroup>
 				</b:FormGroup>
 			</b:FieldSet>
 		</b:Form>
-	</g:HTMLPanel>	
+	</g:HTMLPanel>
 </ui:UiBinder>

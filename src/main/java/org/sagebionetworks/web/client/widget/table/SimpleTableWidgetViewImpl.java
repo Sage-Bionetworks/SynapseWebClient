@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelFormImpl;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
