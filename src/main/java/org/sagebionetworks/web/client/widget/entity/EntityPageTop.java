@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -247,6 +246,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public boolean isPlaceChangeForArea(EntityArea targetTab) {
+		//if the user id has changed, then we need to reload 
 		boolean isProject = bundle.getEntity().getId().equals(projectAreaState.getProjectId());		
 		if(targetTab == EntityArea.ADMIN && !isProject) {
 			// admin area clicked outside of project requires goto
@@ -254,9 +254,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		} else if(targetTab == EntityArea.FILES) {
 			// files area clicked in non-project entity requires goto root of files
 			// files area clicked with last-file-state requires goto
-			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
-				return true;			
-			}	
+			// caching caused SWC-1533, always reload Files area on tab change
+			return true;
 		} else if(targetTab == EntityArea.WIKI) {
 			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
 				// wiki area clicked in non-project entity requires goto
