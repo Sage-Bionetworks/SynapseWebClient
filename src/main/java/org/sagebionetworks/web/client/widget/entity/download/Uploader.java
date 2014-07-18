@@ -215,6 +215,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 */
 	public void directUploadStep1(final String fileName) {
 		//set directUploadFileEntityId
+		directUploadFileEntityId = null;
 		if (entity != null) {
 			directUploadFileEntityId = entity.getId();
 			directUploadStep2(fileName);
