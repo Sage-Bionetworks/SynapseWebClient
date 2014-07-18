@@ -25,7 +25,6 @@
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
-		<gwtboostrap3.version>0.8-gwt-2.5.1</gwtboostrap3.version>
 	</properties>
 
 	<repositories>
@@ -263,15 +262,6 @@
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
-		</dependency>
-		<!-- Provides light-weight GWT wrappers for boostrap support
-			Currently, using a modified (forked from the origial) of this
-			libray to support gwt 2.5.1 as the origial libary requires 2.6+.
-			As soon as we move to GWT 2.6 we should use the origial libary. -->
-		<dependency>
-			<groupId>org.gwtbootstrap3</groupId>
-			<artifactId>gwtbootstrap3</artifactId>
-			<version>${gwtboostrap3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
