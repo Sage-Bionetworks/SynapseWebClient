@@ -68,18 +68,25 @@ public class EntityListUtil {
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(result);
-					// | | | Deprecated entities that do not get description
-					// v v v from wiki should be included in this conditional
-					if (bundle.getEntity() instanceof Locationable) {
-						// Locationable is deprecated — use description field
-						handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
-										synapseJSNIUtils, bundle.getEntity().getDescription()));
-					} else {
-						// Other entities are not deprecated — get description from wiki
-						createDisplayWithWikiDescription(
-								synapseClient, synapseJSNIUtils,
-								isLoggedIn, handler, bundle, record, ref);
-					}		
+					
+					// Old behavior.
+					handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
+							synapseJSNIUtils, bundle.getEntity().getDescription()));
+					
+					// | | | This grabs a description from the field or wiki depending on
+					// | | | whether or not the entity is deprecated. Commented out as
+					// | | | we are temporarily reverting to old behavior. Also, markdown
+					// V V V is not processed.
+//					if (bundle.getEntity() instanceof Locationable) {
+//						// Locationable is deprecated — use description field
+//						handler.onLoaded(createRecordDisplay(isLoggedIn, bundle, record,
+//										synapseJSNIUtils, bundle.getEntity().getDescription()));
+//					} else {
+//						// Other entities are not deprecated — get description from wiki
+//						createDisplayWithWikiDescription(
+//								synapseClient, synapseJSNIUtils,
+//								isLoggedIn, handler, bundle, record, ref);
+//					}
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
