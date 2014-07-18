@@ -2434,6 +2434,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					}
 				}
 			}
+			if (fileEntityId == null)
+				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
 			return fileEntityId;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

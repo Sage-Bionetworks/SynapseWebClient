@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -221,30 +222,30 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(final String result) {
-					if (result != null) {
-						//confirm we can overwrite
-						view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
-								new Callback() {
-									@Override
-									public void invoke() {
-										//yes, override
-										directUploadFileEntityId = result;
-										directUploadStep2(fileName);
-									}
-								},
-								new Callback() {
-									@Override
-									public void invoke() {
-										//no, cancel upload
-										fireCancelEvent();
-									}
-								});
-					} else
-						directUploadStep2(fileName);
+					//confirm we can overwrite
+					view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+							new Callback() {
+								@Override
+								public void invoke() {
+									//yes, override
+									directUploadFileEntityId = result;
+									directUploadStep2(fileName);
+								}
+							},
+							new Callback() {
+								@Override
+								public void invoke() {
+									//no, cancel upload
+									fireCancelEvent();
+								}
+							});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					uploadError(caught.getMessage());
+					if (caught instanceof NotFoundException)
+						directUploadStep2(fileName);
+					else
+						uploadError(caught.getMessage());
 				}
 			});
 		}
