@@ -22,6 +22,9 @@
 					<a href="#!Help:GettingStarted"><strong>Join the Synapse Certified User Community today!</strong></a>
 				</h5>
 				<p>In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data. 
+				    <a class="link margin-left-10" href="http://wp.me/p2En4A-5T" target="_blank">Learn more</a>
+				</p>
+				<p>
 				    Starting on <span ui:field="lockdownDate1" />, only users who have passed a short Certified User Quiz will be able to upload content into Synapse. Don’t wait for <span ui:field="lockdownDate2" /> — <a class="link" href="#!Quiz:Certification" target="_blank">get your certification today!</a>
 				</p>
 			</div>
