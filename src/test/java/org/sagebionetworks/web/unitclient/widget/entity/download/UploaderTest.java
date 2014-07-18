@@ -240,12 +240,12 @@ public class UploaderTest {
 		uploader.handleUpload("newFile.txt");
 		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
 		
-		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null, 1);
+		uploader.directUploadStep5(false, null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
@@ -257,8 +257,8 @@ public class UploaderTest {
 		CallbackP callback = mock(CallbackP.class);
 		uploader.asWidget(null,  null, null, callback, false);
 		uploader.handleUpload("newFile.txt");
-		uploader.directUploadStep1("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
-		uploader.directUploadStep3(false, null, 1);
+		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		uploader.directUploadStep5(false, null, 1);
 		verify(callback).invoke(anyString());
 	}
 	
@@ -272,7 +272,7 @@ public class UploaderTest {
 	public void testDirectUploadStep1Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep1("newFile.txt", "", "");
+		uploader.directUploadStep3("newFile.txt", "", "");
 		verifyUploadError();
 	}
 
@@ -280,7 +280,7 @@ public class UploaderTest {
 	public void testDirectUploadStep2Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		uploader.directUploadStep2("", 0, 0, 1, 12345, new ArrayList<String>());
+		uploader.directUploadStep4("", 0, 0, 1, 12345, new ArrayList<String>());
 		executeScheduledCallback();
 		//should have called twice
 		verify(synapseClient, Mockito.times(2)).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
@@ -301,7 +301,7 @@ public class UploaderTest {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		int attempt = Uploader.MAX_RETRY;
-		uploader.directUploadStep2("", 0, attempt, 1, 12345, new ArrayList<String>());
+		uploader.directUploadStep4("", 0, attempt, 1, 12345, new ArrayList<String>());
 		verifyUploadError();
 	}
 	
@@ -311,7 +311,7 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null, 1);
+		uploader.directUploadStep5(false, null, 1);
 		verifyUploadError();
 	}
 	
@@ -321,7 +321,7 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep3(false, null,1);
+		uploader.directUploadStep5(false, null,1);
 		verifyUploadError();
 	}
 
@@ -336,7 +336,7 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		uploader.handleUpload("newFile.txt");
-		uploader.directUploadStep3(false, null,1);
+		uploader.directUploadStep5(false, null,1);
 		verifyUploadError();
 	}
 	

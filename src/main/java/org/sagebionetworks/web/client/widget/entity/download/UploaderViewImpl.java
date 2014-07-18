@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -282,6 +283,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 		layout(true);
 	}
 	
+	@Override
+	public void showConfirmDialog(String title, String message, Callback yesCallback, Callback noCallback) {
+		DisplayUtils.showConfirmDialog(title, message, yesCallback, noCallback);
+	}
+	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
 		formPanel.removeAllListeners();
@@ -464,5 +470,5 @@ public class UploaderViewImpl extends LayoutContainer implements
 		fileUploaderContainer.add(right);
 		fileUploaderContainer.layout(true);		
 	}
-
+	
 }

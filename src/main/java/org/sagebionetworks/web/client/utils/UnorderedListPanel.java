@@ -6,6 +6,7 @@ import com.google.gwt.dom.client.UListElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class UnorderedListPanel extends ComplexPanel {
@@ -59,5 +60,15 @@ public class UnorderedListPanel extends ComplexPanel {
 			ul.removeChild(li);
 		}
 		return removed;
+	}
+	
+	@Override
+	public boolean isVisible() {
+		return UIObject.isVisible(ul);
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		UIObject.setVisible(ul, visible);
 	}
 }
