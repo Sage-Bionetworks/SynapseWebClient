@@ -258,12 +258,6 @@
 
 	<dependencies>
 
-		<!-- Sage Bionetworks Dependencies -->
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency>
 		<!-- Provides light-weight GWT wrappers for boostrap support
 			Currently, using a modified (forked from the origial) of this
 			libray to support gwt 2.5.1 as the origial libary requires 2.6+.
@@ -272,6 +266,17 @@
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3</artifactId>
 			<version>${gwtboostrap3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3-extras</artifactId>
+			<version>${gwtboostrap3.version}</version>
+		</dependency>		
+		<!-- Sage Bionetworks Dependencies -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>

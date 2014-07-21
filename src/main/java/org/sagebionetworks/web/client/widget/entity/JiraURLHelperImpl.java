@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -216,6 +217,8 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	    	description.append("Submitted by " + DisplayUtils.getDisplayName(profile));
 	    }
 	    description.append("\n\n" + stepsToRepro);
+	    description.append("\n\n" + gwt.getUserAgent());
+	    description.append("\n\n" + gwt.getAppVersion());
 	    description.append("\n\n" + gwt.getCurrentURL());
 	    description.append("\n\n" + t.getMessage());
 	    description.append("\n" + stackTrace);
