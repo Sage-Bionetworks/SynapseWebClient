@@ -1,18 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Trash;
@@ -35,7 +26,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private AuthenticationController authController;
 	//private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
-	private List<TrashedEntity> selectedTrash;
 	
 	// TODO:
 	//@Inject
@@ -54,7 +44,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.authController = authController;
 		//this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
-		selectedTrash = new ArrayList<TrashedEntity>();
 		
 		view.setPresenter(this);
 		getTrash();		// TODO: Where to make this call? In constructor?
@@ -76,7 +65,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	// TODO: EVERYTHING!!
 	@Override
-	public void deleteAll() {
+	public void purgeAll() {
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
 			@Override
 			public void onSuccess(Void result) {
@@ -107,7 +96,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				try {
 					PaginatedResults<TrashedEntity> trashedEntities = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
 					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
-						view.displayIndividualRow(trashedEntity);
+						view.displayTrashedEntity(trashedEntity);
 					}
 				} catch (JSONObjectAdapterException e) {
 					// TODO: Some error handling.
@@ -118,18 +107,65 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO: view.showErrorLoadingTrash();
+				view.showErrorMessage("Something went wrong! Was the parent directory deleted?");
+			}
+			
+		});
+	}
+
+	@Override
+	public void purgeEntity(final TrashedEntity trashedEntity) {
+		synapseClient.purgeTrashForUser(trashedEntity.getEntityId(), new AsyncCallback<Void>() {
+
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo("Purged: ", trashedEntity.getEntityName());
+				view.removeDisplayTrashedEntity(trashedEntity);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO: view.showErrorPurgingTrash();
 			}
 			
 		});
 	}
 	
 	@Override
-	public void selectTrash(TrashedEntity trash) {
-		selectedTrash.add(trash);
-	}
-	
-	@Override
-	public void deselectTrash(TrashedEntity trash) {
-		selectedTrash.remove(trash);
+	public void restoreEntity(final TrashedEntity trashedEntity) {
+		// TODO: check if original parent exists
+		// if not - prompt user for new parent.
+		
+		// Check if parent is not in trash.
+		// TODO: Better way to check if parent is not in trash??
+		synapseClient.getEntity(trashedEntity.getOriginalParentId(), new AsyncCallback<EntityWrapper>() {
+			
+			@Override
+			public void onSuccess(EntityWrapper result) {
+				synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId() , new AsyncCallback<Void>() {
+
+					@Override
+					public void onSuccess(Void result) {
+						// TODO: This code still runs, even if given parentId is in trash
+						view.showInfo("Restored: ", trashedEntity.getEntityName());
+						view.removeDisplayTrashedEntity(trashedEntity);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO: view.showErrorRestoringTrash();
+					}
+					
+				});
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				//System.out.println("Or here? Parent not found?");
+				view.showErrorMessage(caught.getMessage());
+			}
+			
+		});
 	}
 }

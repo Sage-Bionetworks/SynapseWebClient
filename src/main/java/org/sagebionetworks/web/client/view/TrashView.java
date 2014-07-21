@@ -14,13 +14,14 @@ public interface TrashView extends IsWidget, SynapseView {
 	void setPresenter(Presenter presenter);
 	
 	// TODO: Declare methods. Presenter methods like "setUsername".
-	void displayIndividualRow(TrashedEntity trashedEntity);
+	void displayTrashedEntity(TrashedEntity trashedEntity);
+	void removeDisplayTrashedEntity(TrashedEntity trashedEntity);
+	
 	
 	public interface Presenter extends SynapsePresenter {
-		void deleteAll();
-		void selectTrash(TrashedEntity trash);
-		void deselectTrash(TrashedEntity trash);
-		// TODO: void deleteSelected
+		void purgeAll();
+		void purgeEntity(TrashedEntity trashedEntity);
+		void restoreEntity(TrashedEntity trashedEntity);
 		
 	}
 }
