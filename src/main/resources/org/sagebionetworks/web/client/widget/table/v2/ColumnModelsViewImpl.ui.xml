@@ -7,14 +7,16 @@
 		<b:Panel>
 			<b:PanelHeader visible="false" ui:field="panelHeader"></b:PanelHeader>
 			<b:PanelBody>
-				<t:Table ui:field="table">
+				<t:Table ui:field="table" styleName="table table-striped">
 					<t:THead>
 						<t:TableRow>
 							<t:TableHeader>Column Name</t:TableHeader>
 							<t:TableHeader>Column Type</t:TableHeader>
+							<t:TableHeader>Max Length</t:TableHeader>
+							<t:TableHeader>Default Value</t:TableHeader>
 						</t:TableRow>
 					</t:THead>
-					<t:TBody ui:field="tableBody" visible="false"></t:TBody>
+					<t:TBody ui:field="tableBody" visible="false" styleName="table-striped"></t:TBody>
 				</t:Table>
 			</b:PanelBody>
 			<b:PanelFooter visible="false" ui:field="panelFooter">

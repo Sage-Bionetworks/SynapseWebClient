@@ -15,6 +15,5 @@ public class Table extends ComplexWidget {
 
     public Table() {
     	setElement(Document.get().createTableElement());
-        setStyleName(Styles.TABLE);
     }
 }
