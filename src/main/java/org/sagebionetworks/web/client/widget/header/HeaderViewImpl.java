@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
@@ -206,6 +207,16 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 					globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
 				}
 			});
+        	
+        	HTML trash = new HTML(DisplayUtils.getIcon("glyphicon-trash"));
+        	trash.addStyleName("displayInline imageButton margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, trash, DisplayConstants.TEXT_USER_TRASH, TOOLTIP_POSITION.BOTTOM);
+        	trash.addClickHandler(new ClickHandler() {
+        		@Override
+				public void onClick(ClickEvent event) {
+					globalApplicationState.getPlaceChanger().goTo(new Trash(ClientProperties.DEFAULT_PLACE_TOKEN));
+				}
+        	});
     		
         	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
         	settings.addStyleName("displayInline imageButton margin-left-5 font-size-17");
@@ -240,6 +251,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	if (isInTestWebsite) 
 		 		userCommands.add(dashboard);
 			userCommands.add(userGuide);
+			userCommands.add(trash);
 			if (!isInTestWebsite) //settings will be in the dashboard, not in the header
 				userCommands.add(settings);
 		 	userCommands.add(logout);

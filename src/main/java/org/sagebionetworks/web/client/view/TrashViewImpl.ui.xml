@@ -8,18 +8,17 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp "></div>
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
-	        <div class="row">
+	        <!-- <div class="row"> -->
 				<div class="well col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
-				    <g:Button ui:field="deleteAllButton" styleName="btn btn-primary btn-lg margin-top-10 right"/>
+				    <g:Button ui:field="deleteAllButton" styleName="btn btn-primary btn-lg margin-bottom-10 right"/>
 					<h2>Trash Can</h2>
 					<div class="signin-panel panel panel-body margin-top-15">
 						<g:SimplePanel ui:field="trashListPanel" />
 					</div>	
 					<g:Button ui:field="deleteSelectedButton" styleName="btn btn-primary btn-lg margin-top-10 left"/>				
 				</div>
-		   	</div>
-	    	
-		    <div class="clear"></div>
+		   	<!-- </div> -->
+		    <!-- <div class="clear"></div> -->
         </div>
 		
 		<g:SimplePanel ui:field="footer" />

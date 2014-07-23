@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view;
 
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
@@ -19,9 +21,27 @@ public interface TrashView extends IsWidget, SynapseView {
 	
 	
 	public interface Presenter extends SynapsePresenter {
+		/**
+		 * Permanently deletes all Entities in the trash.
+		 */
 		void purgeAll();
+		
+		/**
+		 * Permanently deletes the given trashed entity.
+		 * @param trashedEntity The entity to be deleted.
+		 */
 		void purgeEntity(TrashedEntity trashedEntity);
+		
+		/**
+		 * Restores the given entity from the trash.
+		 * @param trashedEntity The entity to be restored.
+		 */
 		void restoreEntity(TrashedEntity trashedEntity);
+
+		/**
+		 * Gets the trash.
+		 */
+		void getTrash();
 		
 	}
 }

@@ -1,7 +1,14 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.repo.model.BatchResults;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -24,29 +31,20 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
-	//private JSONObjectAdapter jsonObjectAdapter;
 	private NodeModelCreator nodeModelCreator;
-	
-	// TODO:
-	//@Inject
-	//big constructor.
+
 	@Inject
 	public TrashPresenter(TrashView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authController,
-			//JSONObjectAdapter jsonObjectAdapter,	// replace with NodeModelCreator
 			NodeModelCreator nodeModelCreator){
 		// TODO: ALL of this is copied... pretty much.
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
-		//this.jsonObjectAdapter = jsonObjectAdapter;
 		this.nodeModelCreator = nodeModelCreator;
-		
-		view.setPresenter(this);
-		getTrash();		// TODO: Where to make this call? In constructor?
 	}
 			
 	
@@ -54,7 +52,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
 		panel.setWidget(view);
-
 	}
 
 	@Override
@@ -85,19 +82,47 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		});
 	}
 	
-	// TODO: Where should this method go? How to "Show trash"?
+	// TODO: Where should this method go or be called?? How to "Show trash"?
+	@Override
 	public void getTrash() {
+		
 		synapseClient.viewTrashForUser(0, 10, new AsyncCallback<String>() {
-			
 			@Override
 			public void onSuccess(String result) {
-				// TODO: view.showTrash()
-				
 				try {
 					PaginatedResults<TrashedEntity> trashedEntities = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
 					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
 						view.displayTrashedEntity(trashedEntity);
 					}
+
+//					List<String> ids = new ArrayList<String>();
+//					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
+//						ids.add(trashedEntity.getEntityId());
+//					}
+//					// Get type information for the trashed entities.
+//					// TODO: Cannot get EntityHeaders since all entities are in trash.
+//					synapseClient.getEntityTypeBatch(ids, new AsyncCallback<String>() {
+//
+//						@Override
+//						public void onFailure(Throwable caught) {
+//							view.showErrorMessage("ERROR GETTING ENTITY HEADERS.");
+//						}
+//
+//						@Override
+//						public void onSuccess(String result) {
+//							try {
+//								BatchResults<EntityHeader> results = nodeModelCreator.createBatchResults(result, EntityHeader.class);
+//								assert(trashedEntities.getResults().size() == results.getResults().size());	// TODO: Remove.
+//								for (int i = 0; i < trashedEntities.getResults().size(); i++) {
+//									
+//								}
+//							} catch (JSONObjectAdapterException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//						}
+//						
+//					});
 				} catch (JSONObjectAdapterException e) {
 					// TODO: Some error handling.
 				}
@@ -107,10 +132,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO: view.showErrorLoadingTrash();
-				view.showErrorMessage("Something went wrong! Was the parent directory deleted?");
+				view.showErrorMessage("Something went wrong.");
 			}
 			
 		});
+		
+		
 	}
 
 	@Override
@@ -133,8 +160,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
-		// TODO: check if original parent exists
-		// if not - prompt user for new parent.
+		// TODO: check if original parent exists and is not in trash
+		// if not - prompt user for new parent... ???
 		
 		// Check if parent is not in trash.
 		// TODO: Better way to check if parent is not in trash??
@@ -153,7 +180,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						// TODO: view.showErrorRestoringTrash();
+						view.showErrorMessage("Error restoring " + trashedEntity.getEntityName() + " to original parent.");
 					}
 					
 				});
@@ -162,8 +189,11 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO Auto-generated method stub
-				//System.out.println("Or here? Parent not found?");
-				view.showErrorMessage(caught.getMessage());
+				if (caught instanceof NotFoundException) {
+					view.showErrorMessage("Original parent to " + trashedEntity.getEntityName() + " is either in trash or deleted.");
+				} else {
+					view.showErrorMessage("Something else went wrong!!");
+				}
 			}
 			
 		});
