@@ -484,6 +484,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
 		allVersions.setText(DisplayConstants.SHOW_LC);
+		previousVersions.layout(true);
 	}
 	
 
