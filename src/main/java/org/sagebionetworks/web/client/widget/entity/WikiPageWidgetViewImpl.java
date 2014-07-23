@@ -162,7 +162,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	private void showDefaultViewWithWiki() {
 		clear();
-		addStyleName("row margin-right-5 margin-left-5");
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			FlowPanel noticePanel = createDifferentVersionNotice();
