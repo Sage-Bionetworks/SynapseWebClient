@@ -193,7 +193,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		LayoutContainer overallRow = DisplayUtils.createRowContainer();
 		LayoutContainer row = DisplayUtils.createRowContainer();
 		FlowPanel commands = new FlowPanel();
-		commands.addStyleName("col-md-12");
+		commands.addStyleName("margin-top-5 col-md-12");
 		row.add(commands);
 		overallRow.add(row);
 		formPanel.add(overallRow, previewFormData);
