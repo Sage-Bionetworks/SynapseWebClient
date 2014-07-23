@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,7 +23,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	public void hideLoading();
 	public void updateProgress(double value, String text);
 	public void showProgressBar();
-	
+	public void showConfirmDialog(String title, String message, Callback yesCallback, Callback noCallback);
 	/**
 	 * Presenter interface
 	 */

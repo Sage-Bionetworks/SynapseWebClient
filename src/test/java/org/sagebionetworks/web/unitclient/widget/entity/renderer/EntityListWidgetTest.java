@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -119,6 +120,7 @@ public class EntityListWidgetTest {
 	}
 	
 	@Test
+	@Ignore	// Ignoring as we reverted to old behavior. Un-ignore when new behavoir is re-implemented.
 	public void testUtilLoadIndividualRowDetailsWikiDescription() throws Exception {
 		// create non-deprecated entity
 		FileEntity syn789 = new FileEntity();

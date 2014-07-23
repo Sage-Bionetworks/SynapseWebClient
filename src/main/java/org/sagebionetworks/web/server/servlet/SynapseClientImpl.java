@@ -2405,6 +2405,42 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 
 	}
+
+	@Override
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		String fileEntityId = null;
+		try {
+			// file entity not set
+			// determine if we should create a new file entity, or update an
+			// existing.
+			if (parentEntityId != null && fileName != null) {
+				// look for a child (1 generation away) with the same file name
+				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
+				// get the EntityHeader for all children
+				List<Reference> references = new ArrayList<Reference>();
+				for (EntityId childEntityId : list.getIdList()) {
+					Reference r = new Reference();
+					r.setTargetId(childEntityId.getId());
+					references.add(r);
+				}
+				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
+				for (EntityHeader childEntity : childEntities.getResults()) {
+					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
+						// found! add a new version for this file instead of
+						// creating a new file entity
+						fileEntityId = childEntity.getId();
+						break;
+					}
+				}
+			}
+			if (fileEntityId == null)
+				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
+			return fileEntityId;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 	
 	@Override
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
@@ -2413,30 +2449,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			//create entity if we have to
 			FileEntity fileEntity = null;
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
-			if (entityId == null) {
-				//file entity not set
-				//determine if we should create a new file entity, or update an existing.
-				if (parentEntityId != null) {
-					//look for a child (1 generation away) with the same file name
-					EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
-					//get the EntityHeader for all children
-					List<Reference> references = new ArrayList<Reference>();
-					for (EntityId childEntityId : list.getIdList()) {
-						Reference r = new Reference();
-						r.setTargetId(childEntityId.getId());
-						references.add(r);
-					}
-					BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
-					for (EntityHeader childEntity : childEntities.getResults()) {
-						if (newHandle.getFileName().equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
-							//found!  add a new version for this file instead of creating a new file entity
-							entityId = childEntity.getId();
-							break;
-						}
-					}
-				}
-			}
-
 			if (entityId == null) {
 				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), synapseClient);
 			}

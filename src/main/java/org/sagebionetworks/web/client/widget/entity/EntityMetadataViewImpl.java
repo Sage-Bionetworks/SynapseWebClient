@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -148,7 +149,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		// reset view
 		showAnnotations.setText(DisplayConstants.SHOW_LC);
 		annotationsContent.setVisible(false);
-				
+		annotationsContent.layout(true);
 		if(!annotationsFilled) {
 			DisplayUtils.configureShowHide(showAnnotations, annotationsContent);
 			FlowPanel wrap = new FlowPanel();
@@ -210,4 +211,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 	}
 
+	@Override
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		annotationsWidget.setEntityUpdatedHandler(handler);
+	}
 }

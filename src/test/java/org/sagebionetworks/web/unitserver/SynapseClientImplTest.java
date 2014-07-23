@@ -993,7 +993,7 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testCompleteUploadFindChildToUpdate() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+	public void testGetFileEntityIdWithSameName() throws JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
@@ -1020,15 +1020,10 @@ public class SynapseClientImplTest {
 		childEntityHeaders.setResults(childEntityHeaderList);
 		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(childEntityHeaders);
 		
-		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
+		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 		
-		//verify that it found and tried to update the child file entity
-		verify(mockSynapse).getEntityById(eq(testChildEntityId));
-		//update the data file handle id
-		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-		//do not lock down (restricted=false)
-		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
-
+		//verify that it found the target child entity id
+		assertEquals(testChildEntityId, fileEntityId);
 	}
 	
 	@Test
