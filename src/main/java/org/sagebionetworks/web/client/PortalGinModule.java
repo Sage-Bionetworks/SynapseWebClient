@@ -78,8 +78,6 @@ import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
-import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AnnotationsWidget;
@@ -89,6 +87,8 @@ import org.sagebionetworks.web.client.widget.entity.AttachmentsView;
 import org.sagebionetworks.web.client.widget.entity.AttachmentsViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -254,9 +254,9 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelForm;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelFormImpl;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBase;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBaseImpl;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
@@ -679,7 +679,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
 		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 		
-		bind(ColumnModelForm.class).to(ColumnModelFormImpl.class);
+		bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
 
 		/*

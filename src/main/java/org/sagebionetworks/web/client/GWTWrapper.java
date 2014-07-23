@@ -27,4 +27,8 @@ public interface GWTWrapper {
 	DateTimeFormat getDateTimeFormat();
 	
 	void scheduleExecution(Callback callback, int delay);
+	
+	String getUserAgent();
+	
+	String getAppVersion();
 }

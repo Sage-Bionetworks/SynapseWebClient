@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -255,8 +254,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			// files area clicked in non-project entity requires goto root of files
 			// files area clicked with last-file-state requires goto
 			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
-				return true;			
-			}	
+				return true;				
+			}
 		} else if(targetTab == EntityArea.WIKI) {
 			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
 				// wiki area clicked in non-project entity requires goto

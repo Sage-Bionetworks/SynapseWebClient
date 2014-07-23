@@ -1,19 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.PanelHeader;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.extras.select.client.ui.Option;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -41,93 +36,59 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	PanelFooter panelFooter;
 	@UiField
 	Button addColumnButton;
+	@UiField
+	Button upButton;
+	@UiField
+	Button downButton;
+	@UiField
+	Button deleteButton;
+	@UiField
+	DropDown selectDropDown;
+	ViewType viewType;
 	
-	private boolean isEditable = false;
+	ArrayList<ColumnModelView> columnData;
+	
+	Presenter presenter;
+	
 	
 	@Inject
 	public ColumnModelsViewImpl(final Binder uiBinder){
 		initWidget(uiBinder.createAndBindUi(this));
+		columnData = new ArrayList<ColumnModelView>();
+	}
+
+	@Override
+	public void setPresenter(Presenter setPresenter) {
+		this.presenter = setPresenter;
 		addColumnButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				addNewColumnModel();
+				presenter.addNewColumn();
 			}
 		});
 	}
 
 	@Override
-	public void configure(String headerText, List<ColumnModel> models,
-			boolean isEditable) {
-		this.isEditable = isEditable;
-		if(headerText != null){
-			panelHeader.setText(headerText);
-			panelHeader.setVisible(true);
-		}
-		// Add each model
-		for(ColumnModel cm: models){
-			// All existing columns are not editable.
-			addColumnToTable(cm, false);
-		}
-		// make the body visible
-		this.tableBody.setVisible(true);
-		if(isEditable){
-			this.panelFooter.setVisible(true);
-		}
-		
-	}
-	
-	/**
-	 * Add a column model to the table
-	 * @param column
-	 * @param isColumnEditable
-	 */
-	private void addColumnToTable(ColumnModel column, boolean isColumnEditable){
-		// Column name
-		TableData columnNameData = new TableData();
-		if(isColumnEditable){
-			TextBox nameEditor = new TextBox();
-			nameEditor.setText(column.getName());
-			columnNameData.add(nameEditor);
-		}else{
-			columnNameData.setText(column.getName());
-		}
-		// Column type
-		TableData columnTypeData = new TableData();
-		if(isColumnEditable){
-//			columnTypeData.add(buildColumnTypeSelect(column.getColumnType()));
-		}else{
-			columnTypeData.setText(column.getColumnType().name());
-		}
-		
-		TableRow tr = new TableRow();
-		tr.add(columnNameData);
-		tr.add(columnTypeData);
-		tableBody.add(tr);
+	public void addColumn(ColumnModel model, boolean isEditable) {
+		// Create a row
+		ColumnModelView cf= new ColumnModelView(this.viewType, model, isEditable);
+		tableBody.add(cf);
+		columnData.add(cf);
+		tableBody.setVisible(true);
 	}
 
-	
-	private void addNewColumnModel(){
-		ColumnModel cm = new ColumnModel();
-		cm.setColumnType(ColumnType.STRING);
-		addColumnToTable(cm, true);
+
+	@Override
+	public void configure(ViewType type, boolean isEditable) {
+		this.viewType = type;
+		if(ViewType.VIEWER.equals(type)){
+			panelHeader.setVisible(false);
+			addColumnButton.setEnabled(false);
+			selectDropDown.setVisible(false);
+		}else{
+			selectDropDown.setVisible(true);
+			panelHeader.setVisible(true);
+			addColumnButton.setEnabled(true);
+		}
 	}
-	
-	/**
-	 * Build a Selector for column types.
-	 * @param typeToSelect
-	 * @return
-	 */
-//	private Select buildColumnTypeSelect(ColumnType typeToSelect){
-//		Select select = new Select();
-//		for(ColumnType type: ColumnType.values()){
-//			Option option = new Option();
-//			option.setText(type.name());
-//			select.add(option);
-//			if(type.equals(typeToSelect)){
-//				select.setValue(option);
-//			}
-//		}
-//		//select.refresh();
-//		return select;
-//	}
 }

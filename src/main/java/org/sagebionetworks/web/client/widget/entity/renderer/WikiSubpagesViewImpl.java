@@ -162,6 +162,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private Widget getListItem(final TocItem treeItem) {
 		Anchor l = new Anchor(treeItem.getText());
+		l.addStyleName("link");
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

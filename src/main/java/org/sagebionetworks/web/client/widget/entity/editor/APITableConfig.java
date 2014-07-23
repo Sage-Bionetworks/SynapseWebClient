@@ -94,6 +94,11 @@ public class APITableConfig {
 				if (parts.length > 3) {
 					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3]));
 				} else config.setSort(COLUMN_SORT_TYPE.NONE);
+				
+				if (parts.length > 4) { 
+					//also has the number of decimal places that should be shown
+					config.setDecimalPlaces(Integer.parseInt(parts[4]));
+				}
 				columnConfigs.add(config);
 			} catch (Throwable t) {
 				throw new RuntimeException(WidgetConstants.API_TABLE_WIDGET_COLUMN_CONFIG_PREFIX + i+":"+t.getMessage(), t);

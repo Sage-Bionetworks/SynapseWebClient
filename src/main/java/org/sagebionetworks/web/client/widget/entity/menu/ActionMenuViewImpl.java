@@ -35,10 +35,6 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
@@ -404,12 +400,14 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	@Override
 	public void showAddDescriptionCommand(Callback onClick) {
 		addDescriptionCallback = onClick;
-		addDescriptionCommand.setVisible(true);
+		if (addDescriptionCommand != null)
+			addDescriptionCommand.setVisible(true);
 	}
 	
 	@Override
 	public void hideAddDescriptionCommand() {
-		addDescriptionCommand.setVisible(false);
+		if (addDescriptionCommand != null)
+			addDescriptionCommand.setVisible(false);
 	}
 
 	private void initAddDescriptionItem(DropdownButton menuBtn) {
