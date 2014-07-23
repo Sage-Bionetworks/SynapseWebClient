@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -38,6 +37,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -72,6 +72,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private HandlerManager handlerManager;
 	private Entity entity;
 	private String parentEntityId;
+	//set if we are uploading to an existing file entity
+	private String directUploadFileEntityId;
 	private List<AccessRequirement> accessRequirements;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private CallbackP<String> fileHandleIdCallback;
@@ -145,10 +147,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return null;
 	}
 
-	public Entity getEntity() {
-		return entity;
-	}
-	
 	@Override
 	public String getDefaultUploadActionUrl(boolean isRestricted) {
 		isUploadRestricted = isRestricted;
@@ -171,7 +169,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
-			directUploadStep0(fileName);
+			directUploadStep1(fileName);
 //		} else if(isDirectUploadSupported) {
 //			// show old browser & JavaWebStart link
 //			
@@ -210,11 +208,55 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 		return contentType;
 	}
+
+	/**
+	 * Look for a file with the same name (if we aren't uploading to an existing File already).
+	 * @param fileName
+	 */
+	public void directUploadStep1(final String fileName) {
+		//set directUploadFileEntityId
+		directUploadFileEntityId = null;
+		if (entity != null) {
+			directUploadFileEntityId = entity.getId();
+			directUploadStep2(fileName);
+		} else {
+			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(final String result) {
+					//confirm we can overwrite
+					view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+							new Callback() {
+								@Override
+								public void invoke() {
+									//yes, override
+									directUploadFileEntityId = result;
+									directUploadStep2(fileName);
+								}
+							},
+							new Callback() {
+								@Override
+								public void invoke() {
+									//no, cancel upload
+									fireCancelEvent();
+								}
+							});
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					if (caught instanceof NotFoundException)
+						directUploadStep2(fileName);
+					else
+						uploadError(caught.getMessage());
+				}
+			});
+		}
+	}
+	
 	/**
 	 * Get the md5
 	 * @param fileName
 	 */
-	public void directUploadStep0(final String fileName) {
+	public void directUploadStep2(final String fileName) {
 		this.token = null;
 		uploadLog = new StringBuilder();
 		uploadLog.append(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
@@ -227,11 +269,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			@Override
 			public void setMD5(String hexValue) {
 				uploadLog.append("MD5=" + hexValue+"\ncontentType="+contentType+"\n");
-				directUploadStep1(fileName, contentType, hexValue);
+				directUploadStep3(fileName, contentType, hexValue);
 			}
 		});
 	}
-	public void directUploadStep1(final String fileName, final String contentType, String md5){
+	public void directUploadStep3(final String fileName, final String contentType, String md5){
 		try {
 			synapseClient.getChunkedFileToken(fileName, contentType, md5, new AsyncCallback<String>() {
 				@Override
@@ -242,7 +284,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						long totalChunkCount = getChunkCount(fileSize);
 						view.showProgressBar();
 						uploadLog.append("fileSize="+fileSize + " totalChunkCount=" + totalChunkCount+"\n");
-						directUploadStep2(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
+						directUploadStep4(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -266,12 +308,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param currentAttempt This is our nth attempt at uploading this chunk (starting at 1, trying up to MAX_RETRY times)
 	 * @param totalChunkCount The total number of chunks to complete upload of the file
 	 */
-	public void directUploadStep2(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<String> requestList){
+	public void directUploadStep4(final String contentType, final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<String> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
 			//create a request for each chunk, and try to upload each one
-			uploadLog.append("directUploadStep2: currentChunkNumber="+currentChunkNumber + " currentAttempt=" + currentAttempt+"\n");
+			uploadLog.append("directUploadStep4: currentChunkNumber="+currentChunkNumber + " currentAttempt=" + currentAttempt+"\n");
 			ChunkRequest request = new ChunkRequest();
 			request.setChunkedFileToken(token);
 			request.setChunkNumber((long) currentChunkNumber);
@@ -338,9 +380,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		//are there more chunks to upload?
 		requestList.add(requestJson);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep3(false, requestList, 1);
+			directUploadStep5(false, requestList, 1);
 		else
-			directUploadStep2(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
+			directUploadStep4(contentType, currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}
 	
 	/**
@@ -360,7 +402,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			gwt.scheduleExecution(new Callback() {
 				@Override
 				public void invoke() {
-					directUploadStep2(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+					directUploadStep4(contentType, currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
 				}
 			}, RETRY_DELAY);
 		}
@@ -388,12 +430,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return new ByteRange(startByte, endByte);
 	}
 	
-	public void directUploadStep3(final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt){
-		uploadLog.append("directUploadStep3: currentAttempt=" + currentAttempt+"\n");
+	public void directUploadStep5(final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt){
+		uploadLog.append("directUploadStep5: currentAttempt=" + currentAttempt+"\n");
 		//complete the file upload, and refresh
 		try {
-			final String entityId = entity==null ? null : entity.getId();
-			
 			//start the daemon to complete the file upload, and continue to check back until it's complete
 			synapseClient.combineChunkedFileUpload(requestList, new AsyncCallback<String>() {
 				@Override
@@ -401,7 +441,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					try {
 						UploadDaemonStatus status = nodeModelCreator.createJSONEntity(result, UploadDaemonStatus.class);
 						//if it's already done, then finish.  Otherwise keep checking back until it's complete.
-						processDaemonStatus(status, entityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
+						processDaemonStatus(status, directUploadFileEntityId, parentEntityId, isUploadRestricted, isNewlyRestricted, requestList, currentAttempt);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
@@ -443,7 +483,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (currentAttempt >= MAX_RETRY)
 			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
 		else //retry
-			directUploadStep3(isNewlyRestricted, requestList, currentAttempt+1);
+			directUploadStep5(isNewlyRestricted, requestList, currentAttempt+1);
 	}
 	
 	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final boolean isUploadRestricted, final boolean isNewlyRestricted, final List<String> requestList, final int currentAttempt) {
@@ -736,4 +776,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return gwt.getModuleBaseURL() + "upload";
 	}
 
+	/**
+	 * For testing purposes
+	 * @return
+	 */
+	public String getDirectUploadFileEntityId() {
+		return directUploadFileEntityId;
+	}
 }
