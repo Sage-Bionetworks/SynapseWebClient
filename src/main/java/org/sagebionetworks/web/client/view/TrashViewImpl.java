@@ -9,9 +9,11 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
@@ -20,18 +22,25 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.EventListener;
 
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
+import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
@@ -60,6 +69,15 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private static final int HEADER_DELETED_ON_IDX = 2;
 	private static final int HEADER_RESTORE_IDX = 3;
 	
+	private static final String EMPTY_TRASH_BUTTON_TEXT = "Empty Trash";
+	private static final String RESTORE_BUTTON_TEXT = "Restore";
+	private static final String DELETE_SELECTED_BUTTON_TEXT = "Delete Selected";
+	
+	private static final String EMPTY_TRASH_TITLE = "Erase all items in your Trash?";
+	private static final String EMPTY_TRASH_MESSAGE = "You can't undo this action.";
+	
+	private static final int MAX_PAGES_IN_PAGINATION = 10;
+	
 	@UiField
 	SimplePanel header;
 	@UiField
@@ -70,53 +88,59 @@ public class TrashViewImpl extends Composite implements TrashView {
 	SimplePanel trashListPanel;
 	@UiField
 	Button deleteSelectedButton;
+	@UiField
+	SimplePanel paginationPanel;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
-	private IconsImageBundle iconsImageBundle;
+	private SageImageBundle sageImageBundle;
 	BootstrapTable trashList;
-	Map<CheckBox, TrashedEntity> checkBox2Trash;
 	Map<TrashedEntity, Integer> trash2Row;
-	Map<Button, TrashedEntity> restoreButton2Trash;
 	Set<TrashedEntity> selectedTrash;
+	Set<CheckBox> checkBoxes;
 	boolean selectAllChecked;		// TODO: hacky and wrong. How to get this info from checkbox "Event"?
 	
 	@Inject
 	public TrashViewImpl(TrashViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle) {
+			Header headerWidget, Footer footerWidget, SageImageBundle sageImageBundle) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
-		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		
-		checkBox2Trash = new HashMap<CheckBox, TrashedEntity>();
+		//checkBox2Trash = new HashMap<CheckBox, TrashedEntity>();
 		trash2Row = new HashMap<TrashedEntity, Integer>();
-		restoreButton2Trash = new HashMap<Button, TrashedEntity>();
+		//restoreButton2Trash = new HashMap<Button, TrashedEntity>();
 		selectedTrash = new HashSet<TrashedEntity>();
+		checkBoxes = new HashSet<CheckBox>();
 		
 		// Set up the delete all button.
-		deleteAllButton.setText("Delete All");
+		deleteAllButton.setText(EMPTY_TRASH_BUTTON_TEXT);
 		deleteAllButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.purgeAll();
+				DisplayUtils.showConfirmDialog(EMPTY_TRASH_TITLE, EMPTY_TRASH_MESSAGE, new Callback() {
+					
+					@Override
+					public void invoke() {
+						presenter.purgeAll();
+					}
+					
+				});
 			}
 		});
 		
-		
 		// Set up delete selected button.
-		deleteSelectedButton.setText("Delete Selected");
+		deleteSelectedButton.setText(DELETE_SELECTED_BUTTON_TEXT);
 		deleteSelectedButton.setEnabled(false);
 		deleteSelectedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				for (TrashedEntity entity : selectedTrash) {
-					presenter.purgeEntity(entity);
-				}
+				presenter.purgeEntities(selectedTrash);
 			}
 		});
 		
@@ -135,8 +159,23 @@ public class TrashViewImpl extends Composite implements TrashView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		clear();
-		presenter.getTrash();
+		//presenter.getTrash(presenter.getOffset());
 		Window.scrollTo(0, 0); // scroll user to top of page
+	}
+	
+	@Override
+	public void configure(List<TrashedEntity> trashedEntities) {
+//		mainContainer.clear();
+//		teamListWidget.configure(teams, true);
+		for (TrashedEntity trashedEntity : trashedEntities) {
+			displayTrashedEntity(trashedEntity);
+		}
+		int start = presenter.getOffset();
+		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
+		//String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";
+		//synapseJsniUtils.setPageTitle("Trash Can" + pageTitleStartNumber); TODO: Keep this?
+		//mainContainer.add(teamListWidget.asWidget());
+		createPagination();
 	}
 	
 	@Override
@@ -156,24 +195,25 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void clear() {
 		trashList = initTable();
+		selectedTrash.clear();
+		paginationPanel.clear();
 		trashListPanel.setWidget(trashList);
 	}
 	
 	@Override
-	public void displayTrashedEntity(TrashedEntity trashedEntity) {
+	public void displayTrashedEntity(final TrashedEntity trashedEntity) {
 		if (trashedEntity == null) throw new IllegalArgumentException("Cannot display null entity.");
 		
 		// Get current row.
 		int row = trashList.getRowCount();
 		
 		// Make checkbox.
-		CheckBox cb = new CheckBox();
+		final CheckBox cb = new CheckBox();
 		cb.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				boolean checked = ((CheckBox) event.getSource()).getValue();
-				TrashedEntity trashedEntity = checkBox2Trash.get(event.getSource());
+				boolean checked = cb.getValue();
 				if (checked) {
 					if (selectedTrash.isEmpty())
 						deleteSelectedButton.setEnabled(true);
@@ -188,20 +228,19 @@ public class TrashViewImpl extends Composite implements TrashView {
 		});
 		
 		// Make restore button.
-		Button restoreButton = DisplayUtils.createButton("Restore");
+		Button restoreButton = DisplayUtils.createButton(RESTORE_BUTTON_TEXT);
 		restoreButton.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.restoreEntity(restoreButton2Trash.get(event.getSource()));
+				presenter.restoreEntity(trashedEntity);
 			}
 			
 		});
 		
 		// Update fields.
 		trash2Row.put(trashedEntity, row);
-		checkBox2Trash.put(cb, trashedEntity);
-		restoreButton2Trash.put(restoreButton, trashedEntity);
+		checkBoxes.add(cb);
 		
 		// Add the row elements.
 		trashList.setWidget(row, HEADER_CHECKBOX_IDX, cb);
@@ -219,8 +258,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 			
 			// Update fields.
 			trash2Row.remove(trashedEntity);
-			checkBox2Trash.remove(trashList.getWidget(removeRow, HEADER_CHECKBOX_IDX));
-			restoreButton2Trash.remove(trashList.getWidget(removeRow, HEADER_RESTORE_IDX));
+			checkBoxes.remove(trashList.getWidget(removeRow, HEADER_CHECKBOX_IDX));
 			decrementBeyondRemovedRow(removeRow);
 			
 			// Remove row from trashList.
@@ -240,12 +278,13 @@ public class TrashViewImpl extends Composite implements TrashView {
 		
 		trashList = new BootstrapTable();
 		trashList.addStyleName("trashList-striped trashList-bordered trashList-condensed");
+		
+		// Set up table header.
 		List<String> headerRow = new ArrayList<String>();
-		headerRow.add(HEADER_CHECKBOX_IDX, HEADER_CHECKBOX);
+		headerRow.add(HEADER_CHECKBOX_IDX, HEADER_CHECKBOX);	// put in string of html. <span id="selectAllCheckBox" />
 		headerRow.add(HEADER_NAME_IDX, HEADER_NAME);
 		headerRow.add(HEADER_DELETED_ON_IDX, HEADER_DELETED_ON);
 		headerRow.add(HEADER_RESTORE_IDX, HEADER_RESTORE);
-
 		List<List<String>> trashListHeaderRows = new ArrayList<List<String>>();
 		trashListHeaderRows.add(headerRow);
 		trashList.setHeaders(trashListHeaderRows);	
@@ -260,17 +299,15 @@ public class TrashViewImpl extends Composite implements TrashView {
 		    @Override
 		    public void onBrowserEvent(Event event) {
 		        if (!selectAllChecked) {
-		        	// Select all of the trash.
-		        	for (CheckBox checkBox : checkBox2Trash.keySet()) {
+		        	// Select all of the trash entities.
+		        	for (CheckBox checkBox : checkBoxes) {
 		        		checkBox.setChecked(true);
-		        		selectedTrash.add(checkBox2Trash.get(checkBox));
 		        	}
 		        	deleteSelectedButton.setEnabled(true);
 		        } else {
 		        	// Deselect all of the trash.
-		        	for (CheckBox checkBox : checkBox2Trash.keySet()) {
+		        	for (CheckBox checkBox : checkBoxes) {
 		        		checkBox.setChecked(false);
-		        		selectedTrash.remove(checkBox2Trash.get(checkBox));
 		        	}
 		        	deleteSelectedButton.setEnabled(false);
 		        }
@@ -299,5 +336,33 @@ public class TrashViewImpl extends Composite implements TrashView {
 				trash2Row.put(entity, trash2Row.get(entity) - 1);
 			}
 		}
+	}
+	
+	private void createPagination() {
+		FlowPanel fp = new FlowPanel();
+		UnorderedListPanel ul = new UnorderedListPanel();
+		ul.setStyleName("pagination pagination-lg");
+		
+		List<PaginationEntry> entries = presenter.getPaginationEntries(TrashPresenter.TRASH_LIMIT, MAX_PAGES_IN_PAGINATION);
+		if(entries != null) {
+			for(PaginationEntry pe : entries) {
+				if(pe.isCurrent())
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+				else
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
+			}
+		}
+		
+		fp.add(ul);
+		paginationPanel.clear();
+		if (entries.size() > 1)
+			paginationPanel.add(fp);
+	}
+	
+	private Anchor createPaginationAnchor(String anchorName, final int newStart) {
+		Anchor a = new Anchor();
+		a.setHTML(anchorName);
+		a.setHref(DisplayUtils.getTrashHistoryToken("", newStart));		// TODO: Get rid of this param entirely?
+		return a;
 	}
 }

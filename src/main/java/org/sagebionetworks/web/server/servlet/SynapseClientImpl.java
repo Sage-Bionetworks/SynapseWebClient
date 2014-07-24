@@ -798,6 +798,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			for (String entityId : entityIds) {
+				synapseClient.purgeTrashForUser(entityId);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	@Override
 	public String getUserProfile() throws RestServiceException {

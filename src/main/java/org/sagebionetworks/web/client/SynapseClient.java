@@ -52,6 +52,8 @@ public interface SynapseClient extends RemoteService {
 
 	public void purgeTrashForUser(String entityId) throws RestServiceException;
 	
+	public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException;
+	
 	public EntityWrapper getEntityPath(String entityId) throws RestServiceException;
 	
 	public EntityWrapper search(String searchQueryJson) throws RestServiceException; 

@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.presenter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -17,6 +19,8 @@ import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.widget.search.PaginationEntry;
+import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -26,12 +30,16 @@ import com.google.inject.Inject;
 
 public class TrashPresenter extends AbstractActivity implements TrashView.Presenter, Presenter<Trash> {
 	
+	public static final int TRASH_LIMIT = 10;
+	
 	private Trash place;
 	private TrashView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private NodeModelCreator nodeModelCreator;
+	private PaginatedResults<TrashedEntity> trashList;
+	private int offset;
 
 	@Inject
 	public TrashPresenter(TrashView view,
@@ -58,6 +66,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public void setPlace(Trash place) {
 		this.place = place;
 		this.view.setPresenter(this);
+		showView(place);
+	}
+	
+	private void showView(Trash place) {
+		Integer offset = place.getStart();
+		getTrash(offset);
 	}
 	
 	// TODO: EVERYTHING!!
@@ -81,48 +95,23 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 		});
 	}
-	
-	// TODO: Where should this method go or be called?? How to "Show trash"?
+
 	@Override
-	public void getTrash() {
-		
-		synapseClient.viewTrashForUser(0, 10, new AsyncCallback<String>() {
+	public void getTrash(final Integer offset) {
+		if (offset == null)
+			this.offset = 0;
+		else
+			this.offset = offset;
+		synapseClient.viewTrashForUser(offset, TRASH_LIMIT, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
+				
 				try {
-					PaginatedResults<TrashedEntity> trashedEntities = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
-					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
-						view.displayTrashedEntity(trashedEntity);
-					}
-
-//					List<String> ids = new ArrayList<String>();
-//					for (TrashedEntity trashedEntity : trashedEntities.getResults()) {
-//						ids.add(trashedEntity.getEntityId());
+					trashList = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
+//					for (TrashedEntity trashedEntity : trashList.getResults()) {
+//						view.displayTrashedEntity(trashedEntity);
 //					}
-//					// Get type information for the trashed entities.
-//					// TODO: Cannot get EntityHeaders since all entities are in trash.
-//					synapseClient.getEntityTypeBatch(ids, new AsyncCallback<String>() {
-//
-//						@Override
-//						public void onFailure(Throwable caught) {
-//							view.showErrorMessage("ERROR GETTING ENTITY HEADERS.");
-//						}
-//
-//						@Override
-//						public void onSuccess(String result) {
-//							try {
-//								BatchResults<EntityHeader> results = nodeModelCreator.createBatchResults(result, EntityHeader.class);
-//								assert(trashedEntities.getResults().size() == results.getResults().size());	// TODO: Remove.
-//								for (int i = 0; i < trashedEntities.getResults().size(); i++) {
-//									
-//								}
-//							} catch (JSONObjectAdapterException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//						}
-//						
-//					});
+					view.configure(trashList.getResults());
 				} catch (JSONObjectAdapterException e) {
 					// TODO: Some error handling.
 				}
@@ -136,8 +125,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			}
 			
 		});
-		
-		
 	}
 
 	@Override
@@ -159,12 +146,41 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	}
 	
 	@Override
+	public void purgeEntities(Set<TrashedEntity> trashedEntities) {
+		final Set<String> entityIds = new HashSet<String>();
+		final Set<String> entityNames = new HashSet<String>();
+		for (TrashedEntity trashedEntity : trashedEntities) {
+			entityIds.add(trashedEntity.getEntityId());
+			entityNames.add(trashedEntity.getEntityName());
+		}
+		synapseClient.purgeMultipleTrashedEntitiesForUser(entityIds, new AsyncCallback<Void>() {
+
+			@Override
+			public void onSuccess(Void result) {
+				String entityNamesSet = entityNames.toString();
+				view.showInfo("Purged: ", entityNames.toString().
+											substring(1, entityNamesSet.length() - 1) + ".");
+				//view.removeDisplayTrashedEntity(trashedEntity);
+				// TODO: Refresh table.
+				view.clear();
+				getTrash(offset);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO: view.showErrorPurgingTrash();
+			}
+			
+		});
+	}
+	
+	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
 		// TODO: check if original parent exists and is not in trash
 		// if not - prompt user for new parent... ???
 		
 		// Check if parent is not in trash.
-		// TODO: Better way to check if parent is not in trash??
+		// TODO: Better way to check if parent is not in trash?? get rid of this.
 		synapseClient.getEntity(trashedEntity.getOriginalParentId(), new AsyncCallback<EntityWrapper>() {
 			
 			@Override
@@ -197,5 +213,18 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			}
 			
 		});
+	}
+	
+	@Override
+	public List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow) {
+		Long nResults = trashList.getTotalNumberOfResults();
+		if(nResults == null)
+			return null;
+		return PaginationUtil.getPagination(nResults.intValue(), offset, nPerPage, nPagesToShow);
+	}
+	
+	@Override
+	public int getOffset() {
+		return offset;
 	}
 }

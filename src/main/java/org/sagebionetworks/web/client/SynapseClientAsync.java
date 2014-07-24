@@ -310,4 +310,6 @@ public interface SynapseClientAsync {
 	void viewTrashForUser(long offset, long limit,
 			AsyncCallback<String> callback);
 
+	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
+
 }
