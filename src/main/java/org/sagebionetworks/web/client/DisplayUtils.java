@@ -528,7 +528,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		showPopup("", message, MessagePopup.WARNING, 300, null, null);
+		showPopup("", message, MessagePopup.WARNING, null, null);
 	}
 
 	/**
@@ -611,7 +611,7 @@ public class DisplayUtils {
 			String message,
 			Callback okCallback
 			) {
-		showPopup(title, message, MessagePopup.INFO, 300, okCallback, null);
+		showPopup(title, message, MessagePopup.INFO, okCallback, null);
 	}
 	
 	public static void showConfirmDialog(
@@ -620,7 +620,7 @@ public class DisplayUtils {
 			Callback yesCallback,
 			Callback noCallback
 			) {
-		showPopup(title, message, MessagePopup.QUESTION, 300, yesCallback, noCallback);
+		showPopup(title, message, MessagePopup.QUESTION, yesCallback, noCallback);
 	}
 	
 	public static void showConfirmDialog(
@@ -636,18 +636,8 @@ public class DisplayUtils {
 		});
 	}
 	
-	public static void showOkCancelMessage(
-			String title, 
-			String message, 
-			MessagePopup iconStyle,
-			int minWidth,
-			Callback okCallback,
-			Callback cancelCallback) {
-		showPopup(title, message, iconStyle, minWidth, okCallback, cancelCallback);
-	}
-
 	public static void showPopup(String title, String message,
-			DisplayUtils.MessagePopup iconStyle, int minWidth,
+			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
 		String iconHtml = "";
