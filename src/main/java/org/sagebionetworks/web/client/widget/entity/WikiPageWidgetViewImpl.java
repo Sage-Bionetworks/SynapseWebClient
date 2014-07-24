@@ -162,7 +162,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	private void showDefaultViewWithWiki() {
 		clear();
-		addStyleName("row margin-right-5 margin-left-5");
 		if(!isCurrentVersion) {
 			// Create warning that user is viewing a different version
 			FlowPanel noticePanel = createDifferentVersionNotice();
@@ -412,8 +411,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				final TextBox titleField = new TextBox();
 				if (!isRootWiki) {
 					titleField.setValue(presenter.getWikiPage().getTitle());
-					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
-					titleField.setHeight("35px");					
+					titleField.addStyleName("font-size-32 margin-bottom-10");
+					titleField.setHeight("45px");					
 					form.add(titleField);
 				}
 				//also add commands at the bottom

@@ -24,7 +24,7 @@ public class AppLoadingView extends PopupPanel {
 		final Image ajaxImage = new Image("images/main-page-load.gif");
 		final Grid grid = new Grid(1, 2);
 		grid.setWidget(0, 0, ajaxImage);
-		grid.setText(0, 1, "Loading...");
+		grid.setHTML(0, 1, "&nbsp;Loading...");
 		this.container.add(grid);
 		this.setStyleName("mainPageLoading");
 		add(this.container);

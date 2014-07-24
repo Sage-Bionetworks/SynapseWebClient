@@ -492,7 +492,7 @@ public class DisplayUtils {
 	}
 
 	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + message + "...";
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
 	}
 
 
