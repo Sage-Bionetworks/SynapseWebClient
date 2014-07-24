@@ -1213,7 +1213,13 @@ ol.lowerroman {
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
 
-.bottomright {position:absolute; bottom:0; right: 0; margin:7px;}
+.bottomright {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	margin-bottom: 15px;
+	margin-right: 5px;
+}
 
 .highlighted-version {
     font-size: 11px !important;
