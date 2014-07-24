@@ -26,10 +26,12 @@ public class ColumnTypeView implements IsWidget{
 		if(isEditable){
 			select = buildNewColumnTypeSelect();
 			select.setValue(type.name());
+			select.setWidth("100px");
 			this.widget = select;
 		}else{
 			controlStatic = new FormControlStatic();
 			controlStatic.setText(type.name());
+			controlStatic.setWidth("100px");
 			this.widget = controlStatic;
 		}
 	}
@@ -51,7 +53,7 @@ public class ColumnTypeView implements IsWidget{
 			op.setText(type.name());
 			select.add(op);
 		}
-		select.setWidth("100px");
+
 		return select;
 	}
 

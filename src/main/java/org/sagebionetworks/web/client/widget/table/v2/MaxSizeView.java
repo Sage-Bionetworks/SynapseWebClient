@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
@@ -33,13 +34,17 @@ public class MaxSizeView extends TableData {
 		if(isEditable){
 			// Add the editor
 			sizeEditor = new TextBox();
+			sizeEditor.setWidth("75px");
 			if(this.maxSize != null){
 				sizeEditor.setText(this.maxSize.toString());
 			}
 			add(sizeEditor);
 		}else{
 			if(this.maxSize != null){
-				this.setText(this.maxSize.toString());
+				FormControlStatic fs = new FormControlStatic();
+				fs.setText(this.maxSize.toString());
+				fs.setWidth("75px");
+				this.add(fs);
 			}
 		}
 	}

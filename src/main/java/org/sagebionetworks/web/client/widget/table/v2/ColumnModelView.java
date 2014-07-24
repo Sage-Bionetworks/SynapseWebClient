@@ -9,6 +9,9 @@ import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Event;
 
 /**
  * A view of a single ColumnModel.
@@ -31,7 +34,8 @@ class ColumnModelView extends TableRow {
 	 * @param model
 	 * @param isEditable
 	 */
-	public ColumnModelView(ViewType viewType, ColumnModel model, boolean isEditable) {
+	public ColumnModelView(String id, ViewType viewType, ColumnModel model, boolean isEditable) {
+		this.setId(id);
 		this.isEditable = isEditable;
 		ColumnTypeViewEnum columnTypeView = ColumnTypeViewEnum.getViewForType(model.getColumnType());
 		this.columnId = model.getId();
@@ -40,16 +44,19 @@ class ColumnModelView extends TableRow {
 		TableData columnType = new TableData();
 		this.columnMaxSize = new MaxSizeView(columnTypeView, isEditable, model.getMaximumSize());
 		TableData columnDefault = new TableData();
+		TableData controlls = new TableData();
 		this.add(select);
 		this.add(columnName);
 		this.add(columnType);
 		this.add(columnMaxSize);
 		this.add(columnDefault);
-		// All columns are can be selected for an edtior.
+		this.add(controlls);
+		// All columns are can be selected for an editor.
+		// Select
+		selectButton = new CheckBoxButton();
+		selectButton.setType(ButtonType.LINK);
 		if(ViewType.EDITOR.equals(viewType)){
-			// Select
-			selectButton = new CheckBoxButton();
-			selectButton.setType(ButtonType.LINK);
+			// Only add it if it is an editor
 			select.add(selectButton);
 		}
 
@@ -78,5 +85,30 @@ class ColumnModelView extends TableRow {
 		
 		return model;
 	}
+	
+	/**
+	 * Set the select state of this row.
+	 * @param selected
+	 */
+	public void select(boolean selected){
+		selectButton.setActive(selected);
+	}
+	
+	/**
+	 * Listen to selection changes.
+	 * @param hanlder
+	 * @return
+	 */
+	public HandlerRegistration addSelectionListener(ValueChangeHandler<Boolean> hanlder){
+		return selectButton.addValueChangeHandler(hanlder);
+	}
+	/**
+	 * Is this row selected?
+	 * @return
+	 */
+	public boolean isSelected(){
+		return selectButton.isActive();
+	}
+	
 
 }

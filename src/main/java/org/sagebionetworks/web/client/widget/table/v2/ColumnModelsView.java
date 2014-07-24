@@ -50,6 +50,18 @@ public interface ColumnModelsView extends IsWidget {
 		 * Add a new column to the table.
 		 */
 		public void addNewColumn();
+		
+		/**
+		 * Called when the edit button is pressed
+		 */
+		public void onEditColumns();
+
+		/**
+		 * Called when there is a selection change.
+		 * @param columnId
+		 * @param isSelected
+		 */
+		public void columnSelectionChanged(String columnId, Boolean isSelected);
 	}
 
 	/**

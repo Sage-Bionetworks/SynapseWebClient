@@ -47,7 +47,7 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Synap
 	@Override
 	public void configure(List<ColumnModel> models, boolean isEditable) {
 		this.isEditable = isEditable;
-		viewer.configure(ViewType.VIEWER, false);
+		viewer.configure(ViewType.VIEWER, this.isEditable);
 		editor.configure(ViewType.EDITOR, this.isEditable);
 		// If this is 
 		baseView.setEditable(isEditable);
@@ -88,5 +88,17 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Synap
 	@Override
 	public Widget asWidget() {
 		return baseView.asWidget();
+	}
+
+	@Override
+	public void onEditColumns() {
+		// Pass this to the base
+		baseView.showEditor();
+	}
+
+	@Override
+	public void columnSelectionChanged(String columnId, Boolean isSelected) {
+		// TODO Auto-generated method stub
+		
 	}
 }

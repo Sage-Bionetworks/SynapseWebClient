@@ -4,26 +4,18 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<g:HTMLPanel>
-		<b:Panel>
-			<b:PanelHeader visible="false" ui:field="panelHeader">
-			</b:PanelHeader>
-			<b:PanelBody ui:field="columnViewerPanel">
-			</b:PanelBody>
-			<b:PanelFooter visible="false" ui:field="panelFooter">
-				<!-- This modal dialog will contain the editor view -->
-				<b:Modal title="Edit Columns" closable="true" fade="true"
-					dataBackdrop="STATIC" dataKeyboard="true" b:id="editColumnsModal" width="750px">
-					<b:ModalBody ui:field="columnEditorModalPanel">
-					</b:ModalBody>
-					<b:ModalFooter>
-						<b:Button type="PRIMARY">Save</b:Button>
-						<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-					</b:ModalFooter>
-				</b:Modal>
-				<b:Button dataTarget="#editColumnsModal" dataToggle="MODAL" type="PRIMARY"
-					size="LARGE" icon="GEAR" ui:field="editColumnsButton">Edit Columns</b:Button>
-			</b:PanelFooter>
-		</b:Panel>
+	<g:SimplePanel ui:field="viewerPanel" />
+		<!-- This modal dialog will contain the editor view -->
+		<b:Modal ui:field="editModal" title="Edit Columns" closable="true" fade="true"
+			dataBackdrop="STATIC" dataKeyboard="true" b:id="editColumnsModal"
+			width="750px">
+			<b:ModalBody ui:field="columnEditorModalPanel">
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button type="PRIMARY">Save</b:Button>
+				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
 	</g:HTMLPanel>
 
 </ui:UiBinder>
