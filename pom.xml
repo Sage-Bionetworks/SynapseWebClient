@@ -573,8 +573,8 @@
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
-			<artifactId>guava-io</artifactId>
-			<version>r03</version>
+			<artifactId>guava-gwt</artifactId>
+			<version>17.0</version>
 		</dependency>
 		
 		<!-- Prov Tree layout -->
