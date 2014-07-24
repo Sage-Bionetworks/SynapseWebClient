@@ -16,14 +16,13 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.inject.Inject;
 
-public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadgeView {
+public class BigUserBadgeViewImpl extends FlowPanel implements BigUserBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
-	FlowPanel container;
 	
 	@Inject
 	public BigUserBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -33,14 +32,11 @@ public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadg
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		
-		container = new FlowPanel();
-		this.add(container);
 	}
 	
 	@Override
 	public void setProfile(final UserProfile profile, String description) {
-		container.clear();
+		clear();
 		if(profile == null)  throw new IllegalArgumentException("Profile is required");
 		String name = DisplayUtils.getDisplayName(profile);
 		ClickHandler clickHandler = new ClickHandler() {
@@ -57,19 +53,19 @@ public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadg
 		}
 		
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, true, 4);
-		container.add(mediaObjectPanel);				 
+		add(mediaObjectPanel);				 
 	}
 
 	@Override
 	public void showLoadError(String principalId) {
-		container.clear();
-		container.add(new HTML(DisplayConstants.ERROR_LOADING));		
+		clear();
+		add(new HTML(DisplayConstants.ERROR_LOADING));		
 	}
 	
 	@Override
 	public void showLoading() {
-		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		clear();
+		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
 	}
 
 	@Override
@@ -80,12 +76,6 @@ public class BigUserBadgeViewImpl extends LayoutContainer implements BigUserBadg
 
 	@Override
 	public void showErrorMessage(String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clear() {
 		// TODO Auto-generated method stub
 		
 	}
