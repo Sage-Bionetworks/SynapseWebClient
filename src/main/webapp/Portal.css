@@ -1616,8 +1616,11 @@ a.projectTitle:hover {
 }
 
 h1, .h1, h2, .h2, h3, .h3 {
-margin-top: 0px !important;
-margin-bottom: 10px;
+	margin-top: 0px !important;
+}
+
+ul, ol {
+	margin-bottom: 0px !important;
 }
 
 /*
