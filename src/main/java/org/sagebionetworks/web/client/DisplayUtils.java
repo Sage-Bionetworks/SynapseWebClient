@@ -1618,11 +1618,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
 	}
 	
 	public static String getWidgetMD(String attachmentName) {
@@ -1637,11 +1637,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**
