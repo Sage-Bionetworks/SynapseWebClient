@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2014-07-21-1335-5ba0df0</synapse.version>
+ 		<synapse.version>develop-SNAPSHOT</synapse.version>
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -271,7 +271,8 @@
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3-extras</artifactId>
 			<version>${gwtboostrap3.version}</version>
-		</dependency>		
+		</dependency>	
+			
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
 			<groupId>javax.mail</groupId>

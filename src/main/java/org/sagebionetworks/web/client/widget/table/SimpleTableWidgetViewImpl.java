@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Row;
@@ -24,13 +23,10 @@ import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
@@ -124,6 +120,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	Button addRowBtn;
 	Button deleteRowBtn;
 	Button viewRowBtn;
+	ColumnModelsViewWidget columnModelsWidget;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector) {
@@ -141,7 +138,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		
 	    // setup DataProvider for pagination/sorting
 		dataProvider = createAsyncDataProvider();
-
+		
+		columnModelsWidget = ginInjector.getColumnModelsViewWidget();
+		this.columnEditorPanel.add(columnModelsWidget.asWidget());
 	}
 	
 	@Override
@@ -597,13 +596,14 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 */
 	private void setupTableEditorToolbar(final List<ColumnModel> columns) {
 		buttonToolbar.clear();
+		
+		this.columnModelsWidget.configure(columns, true);
 
 		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");
 		showColumnsBtn.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				if(!columnEditorBuilt) columnEditorPanel.setWidget(buildColumnsEditor(columns));
 				columnEditorPanel.setVisible( columnEditorPanel.isVisible() ? false : true ); 
 			}
 		});
@@ -644,37 +644,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		buttonToolbar.add(showColumnsBtn);		
 		buttonToolbar.add(addRowBtn);
 		buttonToolbar.add(viewRowBtn);
-		buttonToolbar.add(deleteRowBtn);
-		
-		Button modelTest = DisplayUtils.createButton("Show Modal", ButtonType.DEFAULT);
-		buttonToolbar.add(modelTest);
-		
-		FlowPanel p = new FlowPanel();
-		HTML content = new HTML("<h4 >Hello world!</h4>");
-		p.add(content);
-		final BootstrapModal testModal = new BootstrapModal("target123", "The title", p.asWidget(), "Save", "Cancel", new BootstrapModal.Callback() {
-			
-			@Override
-			public void onPrimary() {
-				showInfo("Info", "Primary pressed");
-			}
-			
-			@Override
-			public void onDefault() {
-				showInfo("info", "Default pressed");
-			}
-		});
-		buttonToolbar.add(modelTest);
-		buttonToolbar.add(testModal);
-		modelTest.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				testModal.show();
-				
-			}
-		});
-		
+		buttonToolbar.add(deleteRowBtn);	
 	}
 	
 	/**
@@ -906,7 +876,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 				presenter.createColumn(col, new AsyncCallback<String> () {
 					@Override
 					public void onSuccess(String result) { 
-						columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
+//						columnEditorPanel.setVisible(false); // hide panel as it will now be rebuilt
 						refreshAddColumnPanel(); // clear aout add column view	
 					}					
 					@Override
