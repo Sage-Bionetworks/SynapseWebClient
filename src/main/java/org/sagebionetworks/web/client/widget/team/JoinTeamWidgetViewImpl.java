@@ -101,7 +101,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			}	
 		};
 
-		DisplayUtils.showOkCancelMessage("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, 320, okCallback, cancelCallback);
+		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, okCallback, cancelCallback);
 	}
 	
 	private void initView(String joinButtonText) {
