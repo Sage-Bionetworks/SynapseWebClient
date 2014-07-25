@@ -7,13 +7,15 @@ import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -69,8 +71,6 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				presenter.addNewColumn();
 			}
 		});
-		// This should enable jqueryui to allow reordering with a mouse drag.
-		enableDragging(tableBody.getId());
 	}
 
 	@Override
@@ -90,7 +90,9 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		columnData.add(cf);
 		tableBody.setVisible(true);
 		// This should enable jqueryui to allow reordering with a mouse drag.
-		enableDragging(tableBody.getId());
+		enableDragging("tbody");
+		enableDragging("dragTest");
+		enableDragging("sortable");
 	}
 
 
@@ -105,12 +107,21 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 			editColumnsButton.setVisible(false);
 			addColumnButton.setVisible(true);
 			buttonToolbar.setVisible(true);
+			final String tbodyId = "tableBodyId";
+			tableBody.setId(tbodyId);
+			tableBody.addAttachHandler(new Handler() {
+				@Override
+				public void onAttachOrDetach(AttachEvent event) {
+					// This should enable jqueryui to allow reordering with a mouse drag.
+					enableDragging(tbodyId);
+				}
+			});
 		}
 	}
 	
 	private static native void enableDragging(String targetId)/*-{
-		$wnd.$('#' + targetId).sortable();
-		$wnd.$('#' + targetId).disableSelection();
+		$wnd.jQuery('#' + targetId).sortable();
+		$wnd.jQuery('#' + targetId).disableSelection();
 	}-*/;
 	
 }
