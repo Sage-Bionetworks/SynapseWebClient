@@ -47,3 +47,12 @@ a.button_readmore:hover {
 .va-more{
 	background-color:#FFCC00;
 }
+
+/* Bootstrap overrides */
+.btn-primary {
+	color: #fff !important;
+}
+
+a.btn-primary {
+	color: #fff !important;
+}

@@ -21,6 +21,7 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -71,17 +72,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showSubmissionAcceptedDialogs(HashSet<String> receiptMessages) {
 		for (String message : receiptMessages) {
-			Dialog d = new Dialog();
-			d.setHeading(DisplayConstants.THANK_YOU_FOR_SUBMISSION);
-			d.addText(message);
-			d.setBodyStyle("padding:5px;");
-			//render like html coming from markdown
-			d.addStyleName("markdown");
-			d.setWidth(370);
-			d.setAutoHeight(true);
-			d.setHideOnButtonClick(true);
-			d.setButtons(Dialog.OK);
-			d.show();	
+			DisplayUtils.showInfoDialog(DisplayConstants.THANK_YOU_FOR_SUBMISSION, SafeHtmlUtils.htmlEscape(message), null);
 		}
 	}
 	
