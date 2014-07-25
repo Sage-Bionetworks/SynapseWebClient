@@ -18,7 +18,7 @@
 		<div class="container margin-top-30">
 		    
 		    <!-- Certification reminder -->
-			<div ui:field="certificationReminderUI" class="row margin-bottom-10">
+			<div ui:field="certificationReminderUI" class="row margin-bottom-40">
 			    <div class="col-sm-12">
 			    	<div class="alert alert-info margin-bottom-0-imp">
 						<h5>
