@@ -648,6 +648,11 @@ public class DisplayUtils {
 		else if (MessagePopup.QUESTION.equals(iconStyle))
 			iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10 margin-right-10");
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		if (DisplayUtils.isDefined(title)) {
+			builder.appendHtmlConstant("<h5>");
+			builder.appendEscaped(title);
+			builder.appendHtmlConstant("</h5>");
+		}
 		if (iconHtml.length() > 0)
 			builder.appendHtmlConstant(iconHtml);
 		builder.appendEscaped(message);
