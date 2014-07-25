@@ -84,7 +84,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
 			@Override
 			public void onSuccess(Void result) {
-				// TODO: Put this in Display Constants.
 				view.showInfo(TRASH_EMPTIED_TITLE, TRASH_EMPTIED_MESSAGE);
 				
 				// Get trash? Or just clear table?
@@ -198,7 +197,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 //			
 //			@Override
 //			public void onFailure(Throwable caught) {
-//				// TODO Auto-generated method stub
 //				if (caught instanceof NotFoundException) {
 //					view.showErrorMessage("Original parent to " + trashedEntity.getEntityName() + " is either in trash or deleted.");
 //				} else {

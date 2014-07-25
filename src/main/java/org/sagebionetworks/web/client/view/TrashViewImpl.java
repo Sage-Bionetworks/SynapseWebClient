@@ -347,7 +347,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		if(entries != null) {
 			for(PaginationEntry pe : entries) {
 				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "active");
 				else
 					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
 			}
