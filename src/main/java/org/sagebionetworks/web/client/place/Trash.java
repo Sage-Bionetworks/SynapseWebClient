@@ -11,13 +11,12 @@ public class Trash extends Place{
 	private String token;
 	private Integer start;
 	
-	// TODO: CHECK THIS!!! First string in parts ""?
 	public Trash(String token) {
 		this.token = token;
 		start = null;
-		if(token.contains(START_DELIMITER)) {
+		if (token.contains(START_DELIMITER)) {
 			String[] parts = token.split(START_DELIMITER);
-			if(parts.length == 2) {				
+			if (parts.length == 2) {				
 				start = Integer.parseInt(parts[1]);
 				return;
 			} 		

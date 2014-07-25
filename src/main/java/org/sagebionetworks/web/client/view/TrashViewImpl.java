@@ -171,7 +171,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 			displayTrashedEntity(trashedEntity);
 		}
 		int start = presenter.getOffset();
-		String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
+		//String pageTitleStartNumber = start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		//String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? " '"+searchTerm + "' " : "";
 		//synapseJsniUtils.setPageTitle("Trash Can" + pageTitleStartNumber); TODO: Keep this?
 		//mainContainer.add(teamListWidget.asWidget());

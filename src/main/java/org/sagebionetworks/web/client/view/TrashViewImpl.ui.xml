@@ -14,7 +14,7 @@
 					<h2>Trash Can</h2>
 					<div class="signin-panel panel panel-body margin-top-15">
 						<g:SimplePanel ui:field="trashListPanel" />
-						<g:SimplePanel ui:field="paginationPanel" />
+						<g:SimplePanel ui:field="paginationPanel" styleName="center"/>
 					</div>	
 					<g:Button ui:field="deleteSelectedButton" styleName="btn btn-primary btn-lg margin-top-10 left"/>				
 				</div>

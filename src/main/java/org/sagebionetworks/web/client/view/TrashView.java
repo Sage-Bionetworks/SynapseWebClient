@@ -29,13 +29,7 @@ public interface TrashView extends IsWidget, SynapseView {
 		 * Permanently deletes all Entities in the trash.
 		 */
 		void purgeAll();
-		
-		/**
-		 * Permanently deletes the given trashed entity.
-		 * @param trashedEntity The entity to be deleted.
-		 */
-		void purgeEntity(TrashedEntity trashedEntity);
-		
+				
 		/**
 		 * Permanently deletes each trashed entity in the given set.
 		 * @param trashedEntities The set containing the trashed entities to be deleted.
