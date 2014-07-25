@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -506,23 +508,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 
-		final Dialog javaWindow = new Dialog();
-		javaWindow.add(new HTML(ProgrammaticClientCode.getJavaClientInstallHTML()));
-		javaWindow.setSize(560, 287);
-		javaWindow.setPlain(true);
-		javaWindow.setModal(false);
-		javaWindow.setHeading(DisplayConstants.INSTALL_JAVA_MAVEN);
-		javaWindow.setLayout(new FitLayout());			    
-	    javaWindow.setButtons(Dialog.CLOSE);
-	    javaWindow.setButtonAlign(HorizontalAlignment.RIGHT);
-
 		Button showJava = new Button(DisplayConstants.SHOW);
 		showJava.removeStyleName("gwt-Button");
 		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
 		showJava.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				javaWindow.show();
+				Bootbox.alert("<h4>"+DisplayConstants.INSTALL_JAVA_MAVEN + "</h4>" + ProgrammaticClientCode.getJavaClientInstallHTML().asString(), new AlertCallback() {
+					@Override
+					public void callback() {
+					}
+				});
 			}
 		});	
 		javaClientInstallPanel.add(showJava);
