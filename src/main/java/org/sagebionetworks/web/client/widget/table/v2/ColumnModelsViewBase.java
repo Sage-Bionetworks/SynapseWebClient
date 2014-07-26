@@ -1,11 +1,28 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.table.ColumnModel;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ColumnModelsViewBase extends IsWidget {
 	
 	public interface Presenter {
 		
+		/**
+		 * Configure a newly created view.
+		 * 
+		 * @param headerText
+		 * @param models
+		 * @param isEditabl
+		 */
+		public void configure(String tableId, List<ColumnModel> models, boolean isEditable);
+		
+		/**
+		 * Called when the save button is pressed
+		 */
+		public void onSave();
 	}
 
 	public void setPresenter(Presenter presenter);
@@ -22,4 +39,6 @@ public interface ColumnModelsViewBase extends IsWidget {
 	 * Show the editor.
 	 */
 	public void showEditor();
+
+	public void hideEditor();
 }

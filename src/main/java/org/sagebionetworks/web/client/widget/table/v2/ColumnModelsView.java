@@ -20,14 +20,6 @@ public interface ColumnModelsView extends IsWidget {
 	 * 
 	 */
 	public interface Presenter {
-		/**
-		 * Configure a newly created view.
-		 * 
-		 * @param headerText
-		 * @param models
-		 * @param isEditabl
-		 */
-		public void configure(List<ColumnModel> models, boolean isEditable);
 
 		/**
 		 * Get the current list of ColumnModels.
@@ -97,6 +89,8 @@ public interface ColumnModelsView extends IsWidget {
 		VIEWER,
 		EDITOR
 	}
+
+	public void showError(String message);
 
 
 }

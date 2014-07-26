@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -327,6 +329,13 @@ public class GwtTestSuite extends GWTTestCase {
 		fh.setId("20");
 		fileHandles.add(fh);
 		
+		TableBundle tableBundle = new TableBundle();
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.BOOLEAN);
+		cm.setId("123");
+		tableBundle.setColumnModels(Arrays.asList(cm));
+		tableBundle.setMaxRowsPerPage(new Long(678));
+		
 		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
 		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
@@ -341,6 +350,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
 		transport.setFileHandlesJson(entityListToString(fileHandles));
+		transport.setTableData(factory.createJsonStringForEntity(tableBundle));
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));

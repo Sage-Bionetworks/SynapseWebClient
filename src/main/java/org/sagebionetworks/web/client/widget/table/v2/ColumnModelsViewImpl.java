@@ -128,5 +128,11 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		}
 		return list;
 	}
+
+	@Override
+	public void showError(String message) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

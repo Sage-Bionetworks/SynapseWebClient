@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -27,7 +30,11 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	Modal editModal;
 	@UiField
 	ModalBody columnEditorModalPanel;
-
+	@UiField
+	Button saveButton;
+	@UiField
+	Button cancelButton;
+	Presenter presenter;
 	
 	@Inject
 	public ColumnModelsViewBaseImpl(final Binder uiBinder){
@@ -35,8 +42,14 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		// TODO Auto-generated method stub
+	public void setPresenter(final Presenter presenter) {
+		this.presenter = presenter;
+		saveButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSave();
+			}
+		});
 		
 	}
 
@@ -63,6 +76,11 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 
 	@Override
 	public void showEditor() {
+		editModal.show();
+	}
+
+	@Override
+	public void hideEditor() {
 		editModal.show();
 	}
 

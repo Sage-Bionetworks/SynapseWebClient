@@ -154,7 +154,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		// Render Table			
 		columnEditorBuilt = false; // clear out old column editor view
-		setupTableEditorToolbar(columns);
+		setupTableEditorToolbar(tableEntityId, columns);
 		setDefaultToolbarButtonVisibility(canEdit);
 		
 		// special cases display user instructions instead of empty table
@@ -594,10 +594,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * Sets up the top level editing toolbar
 	 * @param columns
 	 */
-	private void setupTableEditorToolbar(final List<ColumnModel> columns) {
+	private void setupTableEditorToolbar(final String tableId, final List<ColumnModel> columns) {
 		buttonToolbar.clear();
 		
-		this.columnModelsWidget.configure(columns, true);
+		this.columnModelsWidget.configure(tableId, this.columns, true);
 
 		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");

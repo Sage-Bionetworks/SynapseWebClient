@@ -297,5 +297,16 @@ public interface SynapseClientAsync {
 	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
 
 	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
+	
+	/**
+	 * Set a table's schema. Any ColumnModel that does not have an ID will be
+	 * treated as a column add.
+	 * 
+	 * @param tableId
+	 * @param schemaJSON
+	 * @param callback
+	 */
+	void setTableSchema(String tableId, List<String> schemaJSON,
+			AsyncCallback<List<String>> callback);
 
 }
