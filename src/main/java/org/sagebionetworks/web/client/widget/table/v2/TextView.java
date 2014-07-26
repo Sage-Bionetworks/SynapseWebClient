@@ -16,13 +16,13 @@ public class TextView implements IsWidget, HasText {
 	
 	HasText hasText;
 	IsWidget widget;
-	
+
 	/**
-	 * New text view for text.
+	 * New text view.
 	 * @param text
 	 * @param isEditable
 	 */
-	public TextView(String text, boolean isEditable){
+	public TextView(String text, boolean isEditable) {
 		if(isEditable){
 			TextBox textBox = new TextBox();
 			textBox.setText(text);

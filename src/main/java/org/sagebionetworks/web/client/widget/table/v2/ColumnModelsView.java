@@ -84,6 +84,12 @@ public interface ColumnModelsView extends IsWidget {
 	void configure(ViewType type, boolean isEditable);
 	
 	/**
+	 * Extract the current ColumnModels from the view.
+	 * @return
+	 */
+	List<ColumnModel> getCurrentColumnModels();
+	
+	/**
 	 * The view can be used as a column viewer or as a column editor.
 	 *
 	 */

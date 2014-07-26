@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 /**
@@ -13,7 +11,7 @@ public class MaxSizeView extends TableData {
 	
 	ColumnTypeViewEnum type;
 	boolean isEditable;
-	TextBox sizeEditor;
+	TextView sizeTextView;
 	Long maxSize;
 	
 	
@@ -22,31 +20,29 @@ public class MaxSizeView extends TableData {
 		this.type = type;
 		this.isEditable = isEditable;
 		this.maxSize = maxSize;
-		if(ColumnTypeViewEnum.String.equals(type)){
-			convertToStringType();
-		}
+		setNewType(type, isEditable, maxSize);
 	}
 
 	/**
-	 * Convert the view to a string type.
+	 * @param type
+	 * @param isEditable
+	 * @param maxSize
 	 */
-	private void convertToStringType() {
-		if(isEditable){
-			// Add the editor
-			sizeEditor = new TextBox();
-			sizeEditor.setWidth("75px");
-			if(this.maxSize != null){
-				sizeEditor.setText(this.maxSize.toString());
+	public void setNewType(ColumnTypeViewEnum type, boolean isEditable,	Long maxSize) {
+		this.clear();
+		if(ColumnTypeViewEnum.String.equals(type)){
+			String maxString = null;
+			if(maxSize!= null){
+				maxString = maxSize.toString();
 			}
-			add(sizeEditor);
+			// Strings can be editable
+			sizeTextView = new TextView(maxString, isEditable);
 		}else{
-			if(this.maxSize != null){
-				FormControlStatic fs = new FormControlStatic();
-				fs.setText(this.maxSize.toString());
-				fs.setWidth("75px");
-				this.add(fs);
-			}
+			// For not text views just use an empty non-editable field
+			sizeTextView = new TextView(null, false);
 		}
+		sizeTextView.asWidget().setWidth("75px");
+		this.add(sizeTextView);
 	}
 	
 	/**
@@ -56,16 +52,18 @@ public class MaxSizeView extends TableData {
 	public void onTypeChanged(ColumnTypeViewEnum newType){
 		// Is this a type change?
 		if(!this.type.equals(newType)){
-			// If the type is not a string the just clear the view
-			if(!ColumnTypeViewEnum.String.equals(newType)){
-				this.clear();
-			}else{
-				// Convert the view to a string type.
-				convertToStringType();
-			}
+			// Set the new type
+			setNewType(newType, isEditable, maxSize);
 		}
 		// Save the new type
 		this.type = newType;
+	}
+	
+	/**
+	 * Get the text from this view.
+	 */
+	public String getText(){
+		return sizeTextView.getText();
 	}
 	
 }

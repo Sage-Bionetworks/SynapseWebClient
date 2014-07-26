@@ -14,24 +14,26 @@ import com.google.gwt.user.client.ui.Widget;
  * @author John
  *
  */
-public class ColumnTypeView implements IsWidget{
+public class ColumnTypeSelector implements IsWidget{
 
+	public static String FIXED_WIDTH = "100px";
+	
 	boolean isEditable;
 	IsWidget widget;
 	Select select;
 	FormControlStatic controlStatic;
 	
-	public ColumnTypeView(ColumnTypeViewEnum type, boolean isEditable){
+	public ColumnTypeSelector(ColumnTypeViewEnum type, boolean isEditable){
 		this.isEditable = isEditable;
 		if(isEditable){
 			select = buildNewColumnTypeSelect();
 			select.setValue(type.name());
-			select.setWidth("100px");
+			select.setWidth(FIXED_WIDTH);
 			this.widget = select;
 		}else{
 			controlStatic = new FormControlStatic();
 			controlStatic.setText(type.name());
-			controlStatic.setWidth("100px");
+			controlStatic.setWidth(FIXED_WIDTH);
 			this.widget = controlStatic;
 		}
 	}
@@ -53,10 +55,13 @@ public class ColumnTypeView implements IsWidget{
 			op.setText(type.name());
 			select.add(op);
 		}
-
 		return select;
 	}
 
+	/**
+	 * Listen to select changes on this widget.
+	 * @param handler
+	 */
     public void addChangeHandler(final ChangeHandler handler) {
         if(isEditable){
         	select.addChangeHandler(handler);

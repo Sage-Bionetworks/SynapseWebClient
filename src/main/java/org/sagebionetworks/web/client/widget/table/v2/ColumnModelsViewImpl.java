@@ -1,21 +1,22 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -39,19 +40,17 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button addColumnButton;
 	@UiField
 	Button editColumnsButton;
+	
 	private int idSequence;
-	
+	List<ColumnModelTableRow> tableRows;
 	ViewType viewType;
-	
-	ArrayList<ColumnModelView> columnData;
-	
 	Presenter presenter;
 	
 	
 	@Inject
 	public ColumnModelsViewImpl(final Binder uiBinder){
 		initWidget(uiBinder.createAndBindUi(this));
-		columnData = new ArrayList<ColumnModelView>();
+		tableRows = new ArrayList<ColumnModelTableRow>();
 	}
 
 	@Override
@@ -77,7 +76,7 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	public void addColumn(ColumnModel model, boolean isEditable) {
 		// Create a row
 		final String columnId = "c"+idSequence++;
-		ColumnModelView cf= new ColumnModelView(columnId, this.viewType, model, isEditable);
+		ColumnModelTableRow cf= new ColumnModelTableRow(columnId, this.viewType, model, isEditable);
 		cf.addSelectionListener(new ValueChangeHandler<Boolean>() {
 			
 			@Override
@@ -86,13 +85,9 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				
 			}
 		});
+		tableRows.add(cf);
 		tableBody.add(cf);
-		columnData.add(cf);
 		tableBody.setVisible(true);
-		// This should enable jqueryui to allow reordering with a mouse drag.
-		enableDragging("tbody");
-		enableDragging("dragTest");
-		enableDragging("sortable");
 	}
 
 
@@ -123,5 +118,15 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		$wnd.jQuery('#' + targetId).sortable();
 		$wnd.jQuery('#' + targetId).disableSelection();
 	}-*/;
+
+	@Override
+	public List<ColumnModel> getCurrentColumnModels() {
+		List<ColumnModel> list = new ArrayList<ColumnModel>(tableRows.size());
+		// Get the column from each view
+		for(ColumnModelTableRow cmtr: tableRows){
+			list.add(cmtr.getColumnModel());
+		}
+		return list;
+	}
 	
 }

@@ -11,21 +11,20 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Event;
 
 /**
- * A view of a single ColumnModel.
+ * A ColumnModel rendered as a table row <tr>
  * 
  * @author John
  *
  */
-class ColumnModelView extends TableRow {
+public class ColumnModelTableRow extends TableRow {
 	
 	CheckBoxButton selectButton;
 	String columnId;
 	boolean isEditable;
 	TextView nameField;
-	ColumnTypeView columnTypeEditor;
+	ColumnTypeSelector columnTypeEditor;
 	MaxSizeView columnMaxSize;
 	TextView defaultField;
 	
@@ -34,7 +33,7 @@ class ColumnModelView extends TableRow {
 	 * @param model
 	 * @param isEditable
 	 */
-	public ColumnModelView(String id, ViewType viewType, ColumnModel model, boolean isEditable) {
+	public ColumnModelTableRow(String id, ViewType viewType, ColumnModel model, boolean isEditable) {
 		this.setId(id);
 		this.isEditable = isEditable;
 		ColumnTypeViewEnum columnTypeView = ColumnTypeViewEnum.getViewForType(model.getColumnType());
@@ -65,7 +64,7 @@ class ColumnModelView extends TableRow {
 		columnName.add(nameField);
 		
 		// Type
-		columnTypeEditor = new ColumnTypeView(columnTypeView, isEditable);
+		columnTypeEditor = new ColumnTypeSelector(columnTypeView, isEditable);
 		columnType.add(columnTypeEditor);
 		columnTypeEditor.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -80,10 +79,32 @@ class ColumnModelView extends TableRow {
 		columnDefault.add(defaultField);
 	}
 	
-	public ColumnModel getModel(){
+	/**
+	 * Extract all of the data from the view and put it into an new instances of ColumnModel.
+	 * @return
+	 */
+	public ColumnModel getColumnModel(){
 		ColumnModel model = new ColumnModel();
-		
+		model.setName(emptyAsNull(nameField.getText()));
+		model.setId(this.columnId);
+		model.setColumnType(columnTypeEditor.getSelectedColumnType().getType());
+		String maxString = emptyAsNull(columnMaxSize.getText());
+		if(maxString != null){
+			model.setMaximumSize(Long.parseLong(maxString));
+		}
+		model.setDefaultValue(emptyAsNull(defaultField.getText()));
 		return model;
+	}
+	
+	/**
+	 * Helper to treat empty strings as null
+	 * @param in
+	 * @return
+	 */
+	private static String emptyAsNull(String in){
+		if(in == null) return null;
+		if("".equals(in.trim())) return null;
+		return in;
 	}
 	
 	/**

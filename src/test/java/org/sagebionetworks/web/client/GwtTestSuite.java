@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -27,6 +28,8 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -38,9 +41,18 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeSelector;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeViewEnum;
+import org.sagebionetworks.web.client.widget.table.v2.MaxSizeView;
+import org.sagebionetworks.web.client.widget.table.v2.TextView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.junit.client.GWTTestCase;
 
@@ -52,6 +64,7 @@ import com.google.gwt.junit.client.GWTTestCase;
  */
 public class GwtTestSuite extends GWTTestCase {
 
+	static PortalGinInjector ginjector;
 	/**
 	 * Must refer to a valid module that sources this class.
 	 */
@@ -372,11 +385,123 @@ public class GwtTestSuite extends GWTTestCase {
 		return aa.toJSONString();
 	}
 	
+	/**
+	 * Tests that we can get the text from a table TextView for both editors and viewers.
+	 */
+	@Test
+	public void testTableTextView(){
+		// null viewer
+		TextView view = new TextView(null, false);
+		assertEquals("", view.getText());
+		// null editor
+		view =new TextView(null, true);
+		assertEquals("", view.getText());
+		// non-null viewer
+		view =new TextView("one", false);
+		assertEquals("one", view.getText());
+		// non-null editor
+		view =new TextView("one", true);
+		assertEquals("one", view.getText());
+	}
+	
+	/**
+	 * The max size view changes behavior depending on the type and isEditable.
+	 */
+	@Test
+	public void testTableMaxSizeView(){
+		// editor
+		boolean isEditable = true;
+		//String
+		MaxSizeView msv = new MaxSizeView(ColumnTypeViewEnum.String, isEditable, null);
+		assertEquals("", msv.getText());
+		// non-string
+		msv = new MaxSizeView(ColumnTypeViewEnum.Double, isEditable, null);
+		assertEquals("", msv.getText());
+		// String non-null
+		msv = new MaxSizeView(ColumnTypeViewEnum.String, isEditable, 123L);
+		assertEquals("123", msv.getText());
+		// non-string
+		msv = new MaxSizeView(ColumnTypeViewEnum.Double, isEditable, 123L);
+		assertEquals("", msv.getText());
+		
+		// viewer
+		isEditable = false;
+		// String
+		msv = new MaxSizeView(ColumnTypeViewEnum.String, isEditable, null);
+		assertEquals("", msv.getText());
+		// non-string
+		msv = new MaxSizeView(ColumnTypeViewEnum.Double, isEditable, null);
+		assertEquals("", msv.getText());
+		// String non-null
+		msv = new MaxSizeView(ColumnTypeViewEnum.String, isEditable, 123L);
+		assertEquals("123", msv.getText());
+		// non-string
+		msv = new MaxSizeView(ColumnTypeViewEnum.Double, isEditable, 123L);
+		assertEquals("", msv.getText());
+	}
+	
+	@Test
+	public void testTableMaxSizeViewChangeType(){
+		boolean isEditable = true;
+		//String
+		MaxSizeView msv = new MaxSizeView(ColumnTypeViewEnum.String, isEditable, 123L);
+		assertEquals("123", msv.getText());
+		// change the type
+		msv.onTypeChanged(ColumnTypeViewEnum.Double);
+		assertEquals("", msv.getText());
+		// Changing back to string should keep the original value
+		msv.onTypeChanged(ColumnTypeViewEnum.String);
+		assertEquals("123", msv.getText());
+	}
+	
+	@Test
+	public void testTableColumnTypeSelector(){
+		// editor
+		// We can only test strings since the Selector uses Scheduler.get().scheduleDeferred() 
+		// to set values.
+		ColumnTypeSelector selector = new ColumnTypeSelector(ColumnTypeViewEnum.String, true);
+		assertEquals(ColumnTypeViewEnum.String, selector.getSelectedColumnType());
+
+		// viewer
+		selector = new ColumnTypeSelector(ColumnTypeViewEnum.String, false);
+		assertEquals(ColumnTypeViewEnum.String, selector.getSelectedColumnType());
+	}
+	
+	@Test
+	public void testColumnModelTableRowRoundTrip(){
+		ColumnModel original = new ColumnModel();
+		original.setId("456");
+		original.setColumnType(ColumnType.STRING);
+		original.setMaximumSize(99L);
+		original.setName("a name");
+		original.setDefaultValue("some default");
+		ColumnModelTableRow cmrow = new ColumnModelTableRow("id123", ViewType.EDITOR, original, true);
+		// Get the value out of the row
+		ColumnModel clone = cmrow.getColumnModel();
+		assertFalse("A copy should have been created",clone == original);
+		assertEquals("Did not get the same column out as was put in", original, clone);
+		
+		// Viewer
+		cmrow = new ColumnModelTableRow("id123", ViewType.VIEWER, original, true);
+		clone = cmrow.getColumnModel();
+		assertEquals("Did not get the same column out as was put in", original, clone);
+		
+		// Non-editable
+		cmrow = new ColumnModelTableRow("id123", ViewType.VIEWER, original, false);
+		clone = cmrow.getColumnModel();
+		assertEquals("Did not get the same column out as was put in", original, clone);
+		
+		// null fields
+		original = new ColumnModel();
+		original.setColumnType(ColumnType.STRING);
+		cmrow = new ColumnModelTableRow("id123", ViewType.EDITOR, original, true);
+		clone = cmrow.getColumnModel();
+		assertEquals("Did not get the same column out as was put in", original, clone);
+	}
 
 	@Override
 	public String toString() {
 		return "GwtTestSuite for Module: "+getModuleName();
 	}
-	
 
 }
