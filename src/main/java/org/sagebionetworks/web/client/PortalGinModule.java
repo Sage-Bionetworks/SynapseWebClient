@@ -254,6 +254,10 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewerImpl;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBase;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBaseImpl;
@@ -679,8 +683,13 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
 		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 		
+		/*
+		 * TableEntity related bindings
+		 */
 		bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
+		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
+		bind(ColumnModelTableRowViewer.class).to(ColumnModelTableRowViewerImpl.class);
 
 		/*
 		 * Teams Places

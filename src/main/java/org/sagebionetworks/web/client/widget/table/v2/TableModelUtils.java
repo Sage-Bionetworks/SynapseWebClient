@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.entity;
+package org.sagebionetworks.web.client.widget.table.v2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,8 +113,5 @@ public class TableModelUtils {
 		TableBundle tableBundle = tableBundleFromJSON(transport.getEntityJson());
 		return new EntityBundle(entity, null, null, null, null, null, null, tableBundle);
 	}
-	
-	
-	
 	
 }

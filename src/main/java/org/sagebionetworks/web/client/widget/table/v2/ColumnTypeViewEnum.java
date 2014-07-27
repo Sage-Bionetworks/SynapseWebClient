@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 public enum ColumnTypeViewEnum {
 	
 	String(ColumnType.STRING),
+	Boolean(ColumnType.BOOLEAN),
 	Integer(ColumnType.LONG),
 	Double(ColumnType.DOUBLE),
 	Date(ColumnType.DATE),

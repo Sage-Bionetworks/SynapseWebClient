@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -8,7 +9,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.table.entity.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,7 +31,7 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	TableModelUtils tableModelUtils;
 	SynapseClientAsync synapseClient;
 	String tableId;
-	
+	List<ColumnModelTableRow> editorRows;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -52,20 +52,32 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 		this.baseView.setEditor(this.editor);
 		this.synapseClient = synapseClient;
 		this.tableModelUtils = tableModelUtils;
+		this.editorRows = new LinkedList<ColumnModelTableRow>();
 	}
 
 	@Override
 	public void configure(String tableId, List<ColumnModel> models, boolean isEditable) {
 		this.tableId = tableId;
 		this.isEditable = isEditable;
+		this.editorRows.clear();
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		editor.configure(ViewType.EDITOR, this.isEditable);
 		// If this is 
 		baseView.setEditable(isEditable);
 		for(ColumnModel cm: models){
-			// Add each column to the viewer.
-			this.viewer.addColumn(cm, false);
-			this.editor.addColumn(cm, false);
+			// Create a viewer
+			ColumnModelTableRowViewer rowViewer = ginInjector.createColumnModelTableRowViewer();
+			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
+			rowViewer.setSelectable(false);
+			viewer.addColumn(rowViewer);
+			// If this is editable then also build up the editor
+			if(isEditable){
+				ColumnModelTableRowViewer rowEditor = ginInjector.createColumnModelTableRowViewer();
+				ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
+				rowEditor.setSelectable(true);
+				editor.addColumn(rowEditor);
+				this.editorRows.add(rowEditor);
+			}
 		}
 	}
 
@@ -91,8 +103,12 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 		cm.setColumnType(ColumnType.STRING);
 		cm.setMaximumSize(50L);
 		// Assign an id to this column
-		// New columns are editable
-		editor.addColumn(cm, true);
+		ColumnModelTableRowEditor rowEditor = ginInjector.createColumnModelTableRowEditor();
+		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
+		editor.addColumn(rowEditor);
+		this.editorRows.add(rowEditor);
+		// Setup a presenter for this row
+		new ColumnModelTableRowEditorPresenter(rowEditor);
 	}
 	
 
@@ -116,7 +132,7 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	@Override
 	public void onSave() {
 		// Get the models from the view and save them
-		List<ColumnModel> newSchema = editor.getCurrentColumnModels();
+		List<ColumnModel> newSchema = ColumnModelUtils.extractColumnModels(this.editorRows);
 		List<String> json;
 		try {
 			json = tableModelUtils.toJSONList(newSchema);

@@ -81,7 +81,7 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 
 	@Override
 	public void hideEditor() {
-		editModal.show();
+		editModal.hide();
 	}
 
 }

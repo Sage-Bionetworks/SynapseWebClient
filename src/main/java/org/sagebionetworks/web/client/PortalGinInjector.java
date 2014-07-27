@@ -72,6 +72,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
@@ -203,12 +205,17 @@ public interface PortalGinInjector extends Ginjector {
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	
+	// TableEntit V2
+	public ColumnModelsView getColumnModelsView();
+	public ColumnModelsViewWidget getColumnModelsViewWidget();
+	public ColumnModelTableRowViewer createColumnModelTableRowViewer();
+	public ColumnModelTableRowEditor createColumnModelTableRowEditor();
+	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SimpleTableWidget getSimpleTableWidget();
-	public ColumnModelsView getColumnModelsView();
-	public ColumnModelsViewWidget getColumnModelsViewWidget();
+
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();

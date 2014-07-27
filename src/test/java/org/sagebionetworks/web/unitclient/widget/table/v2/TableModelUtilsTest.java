@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.table.entity;
+package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
 
@@ -12,10 +12,9 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.widget.table.entity.TableModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 
 public class TableModelUtilsTest {
 	

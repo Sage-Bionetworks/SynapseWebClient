@@ -63,24 +63,17 @@ public interface ColumnModelsView extends IsWidget {
 	public void setPresenter(Presenter presenter);
 	
 	/**
-	 * Add a column to the view.
-	 * @param model
-	 * @param isEditable
+	 * Add a row to the table.
+	 * @param row
 	 */
-	void addColumn(ColumnModel model, boolean isEditable);
+	void addColumn(ColumnModelTableRow row);
 	
 	/**
 	 * Set the view editable
 	 * @param isEditable
 	 */
 	void configure(ViewType type, boolean isEditable);
-	
-	/**
-	 * Extract the current ColumnModels from the view.
-	 * @return
-	 */
-	List<ColumnModel> getCurrentColumnModels();
-	
+
 	/**
 	 * The view can be used as a column viewer or as a column editor.
 	 *
@@ -91,6 +84,5 @@ public interface ColumnModelsView extends IsWidget {
 	}
 
 	public void showError(String message);
-
 
 }
