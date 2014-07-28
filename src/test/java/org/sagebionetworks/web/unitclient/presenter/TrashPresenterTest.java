@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
@@ -25,7 +24,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -81,7 +79,7 @@ public class TrashPresenterTest {
 	@Test
 	public void testGetTrashFailure() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapse).viewTrashForUser(
-				anyInt(), anyInt(), any(AsyncCallback.class));
+				anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.getTrash(ARBITRARY_OFFSET);
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -91,8 +89,6 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).purgeTrashForUser(
 				any(AsyncCallback.class));
 		presenter.purgeAll();
-		// TODO: Change this to configure if
-		// that change is made in presenter.
 		verify(mockView).showInfo(anyString(), anyString());
 	}
 	
@@ -124,6 +120,8 @@ public class TrashPresenterTest {
 	public void testRestore() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
+				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showInfo(anyString(), anyString());
 	}
@@ -132,20 +130,23 @@ public class TrashPresenterTest {
 	public void testRestoreFailure() {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
+				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
 	@Test
-	public void testRestoreParentNotFoundFailure() {
+	public void testRestoreParentNotFoundFailureRestoreCall() {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
-	
-	/* Private Methods */
+	/* 
+	 * Private Methods
+	  */
 
 	private static PaginatedResults<TrashedEntity> getTestTrash() {
 		PaginatedResults<TrashedEntity> trashedEntities = new PaginatedResults<TrashedEntity>();

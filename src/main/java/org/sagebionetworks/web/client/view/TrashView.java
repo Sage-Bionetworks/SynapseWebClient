@@ -19,10 +19,11 @@ public interface TrashView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	
-	// TODO: Declare methods. Presenter methods like "setUsername".
 	void displayTrashedEntity(TrashedEntity trashedEntity);
 	void removeDisplayTrashedEntity(TrashedEntity trashedEntity);
 	void configure(List<TrashedEntity> trashedEntities);
+	void displayEmptyTrash();
+	void refreshTable();
 	
 	public interface Presenter extends SynapsePresenter {
 		/**
@@ -43,7 +44,7 @@ public interface TrashView extends IsWidget, SynapseView {
 		void restoreEntity(TrashedEntity trashedEntity);
 
 		/**
-		 * Gets the trash.
+		 * Fetches and displays the trash.
 		 */
 		void getTrash(Integer offset);
 		
@@ -53,6 +54,12 @@ public interface TrashView extends IsWidget, SynapseView {
 		 */
 		int getOffset();
 		
+		/**
+		 * Gets the pagination entries of trashed entities.
+		 * @param nPerPage
+		 * @param nPagesToShow
+		 * @return
+		 */
 		List<PaginationEntry> getPaginationEntries(int nPerPage, int nPagesToShow);
 		
 	}

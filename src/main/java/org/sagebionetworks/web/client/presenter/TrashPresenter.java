@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
-
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -29,8 +28,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	public static final int TRASH_LIMIT = 10;
 	
-	public static final String TRASH_RESTORED_TITLE = "Restored: ";
-	public static final String TRASH_PURGED_TITLE = "Purged: ";
+	public static final String TRASH_RESTORED_TITLE = "Restored";
+	public static final String TRASH_PURGED_TITLE = "Permanently Removed";
 	public static final String TRASH_EMPTIED_TITLE = "Trash Emptied!";
 	public static final String TRASH_EMPTIED_MESSAGE = "Your trash was successfully emptied.";
 	
@@ -69,7 +68,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public void setPlace(Trash place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		// TODO: VVV Keep this?
 		this.view.clear();
 		showView(place);
 	}
@@ -85,16 +83,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(TRASH_EMPTIED_TITLE, TRASH_EMPTIED_MESSAGE);
-				
-				// Get trash? Or just clear table?
-				view.clear();
+				view.refreshTable();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-                    view.showErrorMessage(caught.getMessage());
-                }
+				createFailureDisplay(caught);
 			}
 			
 		});
@@ -112,9 +106,12 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				
 				try {
 					trashList = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
-					view.configure(trashList.getResults());
+					if (trashList.getTotalNumberOfResults() > 0) {
+						view.configure(trashList.getResults());
+					} else {
+						view.displayEmptyTrash();
+					}
 				} catch (JSONObjectAdapterException e) {
-					// TODO: Correct error message?
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
 				}
 				
@@ -122,9 +119,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-                    view.showErrorMessage(caught.getMessage());
-                }
+				createFailureDisplay(caught);
 			}
 			
 		});
@@ -153,9 +148,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-                    view.showErrorMessage(caught.getMessage());
-                }
+				createFailureDisplay(caught);
 			}
 			
 		});
@@ -163,48 +156,24 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
-		// TODO: check if original parent exists and is not in trash
-		// if not - prompt user for new parent... ???
-		
-		// Check if parent is not in trash.
-		// TODO: Better way to check if parent is not in trash?? get rid of this.
-//		synapseClient.getEntity(trashedEntity.getOriginalParentId(), new AsyncCallback<EntityWrapper>() {
-//			
-//			@Override
-//			public void onSuccess(EntityWrapper result) {
 				synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId(), new AsyncCallback<Void>() {
 
 					@Override
 					public void onSuccess(Void result) {
-						// TODO: This code still runs, even if given parentId is in trash
 						view.showInfo(TRASH_RESTORED_TITLE, trashedEntity.getEntityName());
-						view.removeDisplayTrashedEntity(trashedEntity);
+						view.refreshTable();
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						if(!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-							if (caught instanceof NotFoundException) {
-								view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
-							} else {
-								view.showErrorMessage(caught.getMessage());
-							}
+						if (caught instanceof NotFoundException) {
+							view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
+						} else {
+							createFailureDisplay(caught);
 						}
 					}
 					
 				});
-//			}
-//			
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				if (caught instanceof NotFoundException) {
-//					view.showErrorMessage("Original parent to " + trashedEntity.getEntityName() + " is either in trash or deleted.");
-//				} else {
-//					view.showErrorMessage("Something else went wrong!!");
-//				}
-//			}
-//			
-//		});
 	}
 	
 	@Override
@@ -218,5 +187,17 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	@Override
 	public int getOffset() {
 		return offset;
+	}
+
+	/**
+	 * Handles a failure in server call.
+	 * 
+	 * Note: public for testing.
+	 * @param caught
+	 */
+	public void createFailureDisplay(Throwable caught) {
+		if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
+			view.showErrorMessage(caught.getMessage());
+		}
 	}
 }
