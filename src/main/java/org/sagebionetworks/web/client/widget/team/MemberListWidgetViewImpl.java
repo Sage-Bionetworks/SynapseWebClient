@@ -127,7 +127,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		for (TeamMember teamMember : members) {
 			FlowPanel mediaContainer = new FlowPanel();
 			mediaContainer.addStyleName("col-xs-12 col-md-6");
-			mediaContainer.setHeight("90px");
+			mediaContainer.setHeight("120px");
 			FlowPanel left = new FlowPanel();
 			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
 			FlowPanel right = new FlowPanel();

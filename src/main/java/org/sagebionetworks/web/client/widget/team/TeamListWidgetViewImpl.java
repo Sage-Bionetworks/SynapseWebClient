@@ -75,7 +75,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 				teamRenderer.configure(team, team.getDescription());
 				Widget teamRendererWidget = teamRenderer.asWidget();
 				teamRendererWidget.addStyleName("col-sm-12 col-md-6 margin-top-15");
-				teamRendererWidget.setHeight("90px");
+				teamRendererWidget.setHeight("120px");
 				add(teamRendererWidget);
 			} else {
 				FlowPanel teamPanel = new FlowPanel();
