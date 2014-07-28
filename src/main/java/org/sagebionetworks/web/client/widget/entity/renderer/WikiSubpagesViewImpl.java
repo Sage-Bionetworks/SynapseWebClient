@@ -107,7 +107,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-			showHideButton.addStyleName("btn btn-default btn-xs left");
+			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
 		}
 		
 		if (ulContainer != null)
