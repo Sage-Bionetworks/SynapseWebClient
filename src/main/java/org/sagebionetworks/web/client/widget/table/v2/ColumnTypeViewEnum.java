@@ -12,7 +12,7 @@ public enum ColumnTypeViewEnum {
 	
 	String(ColumnType.STRING),
 	Boolean(ColumnType.BOOLEAN),
-	Integer(ColumnType.LONG),
+	Integer(ColumnType.INTEGER),
 	Double(ColumnType.DOUBLE),
 	Date(ColumnType.DATE),
 	File(ColumnType.FILEHANDLEID);

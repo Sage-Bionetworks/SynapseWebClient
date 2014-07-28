@@ -903,7 +903,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		FlowPanel columnTypeRadio = new FlowPanel();
 		columnTypeRadio.addStyleName("btn-group");
 		final List<Button> groupBtns = new ArrayList<Button>(); 
-		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.LONG, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE , ColumnType.FILEHANDLEID }) {			
+		for(final ColumnType type : new ColumnType[] { ColumnType.STRING, ColumnType.INTEGER, ColumnType.DOUBLE, ColumnType.BOOLEAN, ColumnType.DATE , ColumnType.FILEHANDLEID }) {			
 			String radioLabel = TableViewUtils.getColumnDisplayName(type);
 			final Button btn = DisplayUtils.createButton(radioLabel);
 			btn.addClickHandler(new ClickHandler() {			

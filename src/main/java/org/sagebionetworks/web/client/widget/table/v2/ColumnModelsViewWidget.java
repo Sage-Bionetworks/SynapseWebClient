@@ -31,6 +31,7 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	TableModelUtils tableModelUtils;
 	SynapseClientAsync synapseClient;
 	String tableId;
+	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
 	/**
 	 * New presenter with its view.
@@ -60,31 +61,23 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 		this.tableId = tableId;
 		this.isEditable = isEditable;
 		this.editorRows.clear();
+		this.startingModels = models;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
-		editor.configure(ViewType.EDITOR, this.isEditable);
-		// If this is 
-		baseView.setEditable(isEditable);
 		for(ColumnModel cm: models){
 			// Create a viewer
 			ColumnModelTableRowViewer rowViewer = ginInjector.createColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
 			rowViewer.setSelectable(false);
 			viewer.addColumn(rowViewer);
-			// If this is editable then also build up the editor
-			if(isEditable){
-				ColumnModelTableRowViewer rowEditor = ginInjector.createColumnModelTableRowViewer();
-				ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
-				rowEditor.setSelectable(true);
-				editor.addColumn(rowEditor);
-				this.editorRows.add(rowEditor);
-			}
 		}
 	}
 
 	@Override
-	public List<ColumnModel> getCurrentModels() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ColumnModel> getEditedColumnModels() {
+		if(!isEditable){
+			throw new IllegalStateException("Can only be called on an editable view.");
+		}
+		return ColumnModelUtils.extractColumnModels(this.editorRows);
 	}
 
 	@Override
@@ -95,9 +88,6 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 
 	@Override
 	public void addNewColumn() {
-		if(!isEditable){
-			baseView.showError("This view is not editable");
-		}
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(ColumnType.STRING);
@@ -119,8 +109,26 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 
 	@Override
 	public void onEditColumns() {
+		if(!this.isEditable){
+			throw new IllegalStateException("Cannot call onEditColumns() for a read-only widget");
+		}
+		// reset the editor to the starting state
+		resetEditor();
 		// Pass this to the base
 		baseView.showEditor();
+	}
+	/**
+	 * Reset the 
+	 */
+	private void resetEditor(){
+		editor.configure(ViewType.EDITOR, this.isEditable);
+		for(ColumnModel cm: this.startingModels){
+			ColumnModelTableRowViewer rowEditor = ginInjector.createColumnModelTableRowViewer();
+			ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
+			rowEditor.setSelectable(true);
+			editor.addColumn(rowEditor);
+			this.editorRows.add(rowEditor);
+		}
 	}
 
 	@Override
@@ -131,16 +139,18 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 
 	@Override
 	public void onSave() {
+		
 		// Get the models from the view and save them
-		List<ColumnModel> newSchema = ColumnModelUtils.extractColumnModels(this.editorRows);
+		List<ColumnModel> newSchema = getEditedColumnModels();
 		List<String> json;
 		try {
+			baseView.setLoading();
 			json = tableModelUtils.toJSONList(newSchema);
 			synapseClient.setTableSchema(tableId, json, new AsyncCallback<List<String>>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
-					editor.showError(caught.getMessage());
+					baseView.showError(caught.getMessage());
 				}
 
 				@Override
@@ -153,13 +163,11 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 						// Reconfigure the view
 						configure(tableId, results, isEditable);
 					} catch (JSONObjectAdapterException e) {
-						editor.showError(e.getMessage());
+						baseView.showError(e.getMessage());
 					}
-					
 				}});
 		} catch (JSONObjectAdapterException e) {
-			editor.showError(e.getMessage());
+			baseView.showError(e.getMessage());
 		}
-		
 	}
 }

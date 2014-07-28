@@ -50,8 +50,6 @@
 			Column</b:Button>
 		<b:Button ui:field="editColumnsButton" icon="GEAR" type="INFO">Edit
 			Columns</b:Button>
-		<b:Alert type="DANGER" ui:field="alert" visible="false">
-		</b:Alert>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

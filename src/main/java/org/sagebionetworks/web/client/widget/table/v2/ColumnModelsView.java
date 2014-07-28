@@ -26,7 +26,7 @@ public interface ColumnModelsView extends IsWidget {
 		 * 
 		 * @return
 		 */
-		public List<ColumnModel> getCurrentModels();
+		public List<ColumnModel> getEditedColumnModels();
 		
 		/**
 		 * Validate the column models for this view. If there are any errors they
@@ -82,7 +82,5 @@ public interface ColumnModelsView extends IsWidget {
 		VIEWER,
 		EDITOR
 	}
-
-	public void showError(String message);
 
 }

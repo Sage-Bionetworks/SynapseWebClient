@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -33,8 +32,6 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button addColumnButton;
 	@UiField
 	Button editColumnsButton;
-	@UiField
-	Alert alert;
 	
 	ViewType viewType;
 	Presenter presenter;
@@ -91,15 +88,6 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void addColumn(ColumnModelTableRow row) {
 		tableBody.add(row);
-	}
-
-	@Override
-	public void showError(String message) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<strong>Error</strong>");
-		builder.append(message);
-		alert.setText(builder.toString());
-		
 	}
 	
 }

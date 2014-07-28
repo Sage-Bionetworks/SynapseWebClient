@@ -27,18 +27,28 @@ public interface ColumnModelsViewBase extends IsWidget {
 
 	public void setPresenter(Presenter presenter);
 
-	public void showError(String string);
-
 	public void setViewer(ColumnModelsView viewer);
 
 	public void setEditor(ColumnModelsView editor);
-
-	public void setEditable(boolean isEditable);
 
 	/**
 	 * Show the editor.
 	 */
 	public void showEditor();
 
+	/**
+	 * Hide the editor
+	 */
 	public void hideEditor();
+	
+	/**
+	 * Called before any service call.
+	 */
+	public void setLoading();
+
+	/**
+	 * Show error message.
+	 * @param message
+	 */
+	void showError(String message);
 }

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
@@ -29,11 +30,13 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	@UiField
 	Modal editModal;
 	@UiField
-	ModalBody columnEditorModalPanel;
+	SimplePanel columnEditorModalPanel;
 	@UiField
 	Button saveButton;
 	@UiField
 	Button cancelButton;
+	@UiField
+	Alert alert;
 	Presenter presenter;
 	
 	@Inject
@@ -50,13 +53,6 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 				presenter.onSave();
 			}
 		});
-		
-	}
-
-	@Override
-	public void showError(String string) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -70,18 +66,32 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	}
 
 	@Override
-	public void setEditable(boolean isEditable) {
-
-	}
-
-	@Override
 	public void showEditor() {
+		saveButton.state().reset();
+		alert.setVisible(false);
 		editModal.show();
 	}
 
 	@Override
 	public void hideEditor() {
 		editModal.hide();
+	}
+
+	@Override
+	public void setLoading() {
+		saveButton.state().loading();
+	}
+	
+	@Override
+	public void showError(String message) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<strong>Error</strong>");
+		builder.append(message);
+		alert.clear();
+		alert.setText(builder.toString());
+		alert.setVisible(true);
+		// enable the save button after an error
+		saveButton.state().reset();
 	}
 
 }
