@@ -506,6 +506,11 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-right-40 {
+	margin-right: 40px;
+}
+
+
 .margin-0-imp-before:before {
 	margin: 0px !important;
 }
