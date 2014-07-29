@@ -53,6 +53,9 @@
 									</div>
 								</div>
 								<div class="col-xs-12 col-sm-6" />
+								<div class="col-xs-12 left">
+								    <a href="#!ProjectsHome:0">What's a Project?</a>
+								</div>
 							</div>
 							<g:FlowPanel ui:field="projectsTabContent" />
 						</div>
