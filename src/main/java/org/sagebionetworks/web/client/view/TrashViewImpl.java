@@ -284,6 +284,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 		selectAllChecked = false;
 		CheckBox selectAllCheckBox = new CheckBox();
 		Element selectAllElement = selectAllCheckBox.getElement();
+		
+		// Note: This line is very unstable. Temporarily ignoring, as the table is going to be entirely reimplemented.
 		DOM.appendChild(DOM.getChild(DOM.getChild(DOM.getChild(trashList.getElement(), 0), 0), 0), selectAllElement);
 		DOM.sinkEvents(selectAllElement, Event.ONCLICK);
 		DOM.setEventListener(selectAllElement, new EventListener() {

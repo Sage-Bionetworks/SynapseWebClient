@@ -248,10 +248,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				}
 			});
 		 	boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-        	if (isInTestWebsite) 
+        	if (isInTestWebsite)
 		 		userCommands.add(dashboard);
 			userCommands.add(userGuide);
-			userCommands.add(trash);
+			if (isInTestWebsite)
+				userCommands.add(trash);
 			if (!isInTestWebsite) //settings will be in the dashboard, not in the header
 				userCommands.add(settings);
 		 	userCommands.add(logout);
