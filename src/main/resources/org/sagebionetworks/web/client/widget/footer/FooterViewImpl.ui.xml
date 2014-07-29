@@ -8,7 +8,7 @@
 	<g:HTMLPanel>
 
 		<!-- FOOTER -->		
-		<div class="footer-line-top-wrapper">
+		<div class="margin-top-10 footer-line-top-wrapper">
             <div class="footer-container">
                 <div class="footer-top-line">
             	</div>
