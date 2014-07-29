@@ -24,6 +24,7 @@ public interface TrashView extends IsWidget, SynapseView {
 	void configure(List<TrashedEntity> trashedEntities);
 	void displayEmptyTrash();
 	void refreshTable();
+	void alertErrorMessage(String message);
 	
 	public interface Presenter extends SynapsePresenter {
 		/**

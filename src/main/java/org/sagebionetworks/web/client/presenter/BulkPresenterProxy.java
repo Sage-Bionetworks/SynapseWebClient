@@ -70,10 +70,8 @@ public class BulkPresenterProxy extends AbstractActivity {
 			@Override
 			public void onSuccess() {
 				// detect prefetch
-				if (panel == null && eventBus == null)
-					return;
-				if (loading != null)
-					loading.hide();
+				if (panel == null && eventBus == null) return;
+				if (loading != null) loading.hide();
 
 				if (place instanceof Synapse) {
 					EntityPresenter presenter = ginjector.getEntityPresenter();
@@ -81,8 +79,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 				} else if (place instanceof ProjectsHome) {
 					// Projects Home
-					ProjectsHomePresenter presenter = ginjector
-							.getProjectsHomePresenter();
+					ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
 					presenter.setPlace((ProjectsHome) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof LoginPlace) {
@@ -92,38 +89,32 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 				} else if (place instanceof PasswordReset) {
 					// reset passwords
-					PasswordResetPresenter presenter = ginjector
-							.getPasswordResetPresenter();
+					PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
 					presenter.setPlace((PasswordReset) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof RegisterAccount) {
 					// register for a new account
-					RegisterAccountPresenter presenter = ginjector
-							.getRegisterAccountPresenter();
+					RegisterAccountPresenter presenter = ginjector.getRegisterAccountPresenter();
 					presenter.setPlace((RegisterAccount) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Profile) {
 					// user's profile page
-					ProfilePresenter presenter = ginjector
-							.getProfilePresenter();
+					ProfilePresenter presenter = ginjector.getProfilePresenter();
 					presenter.setPlace((Profile) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Settings) {
 					// user's profile page
-					SettingsPresenter presenter = ginjector
-							.getSettingsPresenter();
+					SettingsPresenter presenter = ginjector.getSettingsPresenter();
 					presenter.setPlace((Settings) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof ComingSoon) {
 					// user's profile page
-					ComingSoonPresenter presenter = ginjector
-							.getComingSoonPresenter();
+					ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 					presenter.setPlace((ComingSoon) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Challenges) {
 					// user's profile page
-					ChallengeOverviewPresenter presenter = ginjector
-							.getChallengeOverviewPresenter();
+					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
 					presenter.setPlace((Challenges) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Help) {
@@ -141,8 +132,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((WikiPlace) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Wiki) {
-					SynapseWikiPresenter presenter = ginjector
-							.getSynapseWikiPresenter();
+					SynapseWikiPresenter presenter = ginjector.getSynapseWikiPresenter();
 					presenter.setPlace((Wiki) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Down) {
@@ -156,8 +146,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 				} else if (place instanceof TeamSearch) {
 					// Team Search page
-					TeamSearchPresenter presenter = ginjector
-							.getTeamSearchPresenter();
+					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
 					presenter.setPlace((TeamSearch) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Quiz) {
@@ -166,13 +155,11 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.setPlace((Quiz) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Account) {
-					AccountPresenter presenter = ginjector
-							.getAccountPresenter();
+					AccountPresenter presenter = ginjector.getAccountPresenter();
 					presenter.setPlace((Account) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof ChangeUsername) {
-					ChangeUsernamePresenter presenter = ginjector
-							.getChangeUsernamePresenter();
+					ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
 					presenter.setPlace((ChangeUsername) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Trash) {
@@ -183,8 +170,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 				} else {
 					// Log that we have an unknown place but send the user to
 					// the default
-					log.log(Level.WARNING, "Unknown Place: "
-							+ place.getClass().getName());
+					log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());
 					// Go to the default place
 					place = getDefaultPlace();
 					onSuccess();

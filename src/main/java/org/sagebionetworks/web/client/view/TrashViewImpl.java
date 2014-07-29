@@ -54,9 +54,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private static final int HEADER_DELETED_ON_IDX = 2;
 	private static final int HEADER_RESTORE_IDX = 3;
 	
-	private static final String EMPTY_TRASH_BUTTON_TEXT = "Empty Trash";
 	private static final String RESTORE_BUTTON_TEXT = "Restore";
-	private static final String DELETE_SELECTED_BUTTON_TEXT = "Delete Selected";
 	
 	private static final String EMPTY_TRASH_TITLE = "Erase all items in your Trash?";
 	private static final String EMPTY_TRASH_MESSAGE = "You can't undo this action.";
@@ -106,7 +104,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 		checkBoxes = new HashSet<CheckBox>();
 		
 		// Set up the delete all button.
-		deleteAllButton.setText(EMPTY_TRASH_BUTTON_TEXT);
 		deleteAllButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -122,7 +119,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 		});
 		
 		// Set up delete selected button.
-		deleteSelectedButton.setText(DELETE_SELECTED_BUTTON_TEXT);
 		deleteSelectedButton.setEnabled(false);
 		deleteSelectedButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -177,6 +173,11 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void alertErrorMessage(String message) {
+		Window.alert(message + " Click \"OK\" to reload page.");
 	}
 
 	@Override
@@ -256,6 +257,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 			trashList.removeRow(removeRow);
 		}
 	}
+
 
 	/*
 	 * Private Methods

@@ -161,7 +161,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
-					view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
+					//view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
+					view.alertErrorMessage(caught.getMessage());
 				} else {
 					createFailureDisplay(caught);
 				}
