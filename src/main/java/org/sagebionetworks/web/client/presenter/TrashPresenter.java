@@ -55,8 +55,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.nodeModelCreator = nodeModelCreator;
 		
 		this.view.setPresenter(this);
-	}
-			
+	}	
 	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
@@ -156,24 +155,24 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	@Override
 	public void restoreEntity(final TrashedEntity trashedEntity) {
-				synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId(), new AsyncCallback<Void>() {
+		synapseClient.restoreFromTrash(trashedEntity.getEntityId(), trashedEntity.getOriginalParentId(), new AsyncCallback<Void>() {
 
-					@Override
-					public void onSuccess(Void result) {
-						view.showInfo(TRASH_RESTORED_TITLE, trashedEntity.getEntityName());
-						view.refreshTable();
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NotFoundException) {
-							view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
-						} else {
-							createFailureDisplay(caught);
-						}
-					}
-					
-				});
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo(TRASH_RESTORED_TITLE, trashedEntity.getEntityName());
+				view.refreshTable();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
+				} else {
+					createFailureDisplay(caught);
+				}
+			}
+			
+		});
 	}
 	
 	@Override
