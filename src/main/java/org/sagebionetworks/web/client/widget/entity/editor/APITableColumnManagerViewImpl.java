@@ -94,7 +94,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 				showAddColumnDialog();
 			}
 		});
-        c.add(addBtn, new HBoxLayoutData(new Margins(0)));
+        c.add(addBtn, new HBoxLayoutData(new Margins(10, 0, 0, 0)));
 		
         mainPanel.add(c);
 	    List<ColumnConfig> configs = new ArrayList<ColumnConfig>();  
