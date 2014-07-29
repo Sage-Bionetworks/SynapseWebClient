@@ -227,6 +227,7 @@ public interface SynapseClientAsync {
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
+	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
 	
 	

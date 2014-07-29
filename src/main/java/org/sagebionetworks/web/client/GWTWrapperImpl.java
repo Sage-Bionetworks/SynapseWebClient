@@ -9,6 +9,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class GWTWrapperImpl implements GWTWrapper {
@@ -68,5 +69,14 @@ public class GWTWrapperImpl implements GWTWrapper {
 		timer.schedule(delayMillis);
 	}
 	
+	@Override
+	public String getUserAgent() {
+		return Navigator.getUserAgent();
+	}
+	
+	@Override
+	public String getAppVersion() {
+		return Navigator.getAppVersion();
+	}
 	
 }

@@ -5,14 +5,9 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.UserGroupSearchBox;
 
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -32,7 +27,6 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	
 	private UrlCache urlCache;
 	private InviteWidgetView.Presenter presenter;
-	private AnimationProtector versionAnimation;
 	private LayoutContainer inviteUIPanel;
 	private Button inviteButton;
 	private TextArea messageArea;
@@ -60,25 +54,13 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 			inviteUIPanel = new LayoutContainer();
 			inviteUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
 			inviteButton = DisplayUtils.createIconButton("Invite Members", ButtonType.DEFAULT, "glyphicon-plus");
-			versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(inviteButton, inviteUIPanel));
-			FxConfig hideConfig = new FxConfig(400);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			inviteButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
+				public void onClick(ClickEvent event) {
+					inviteUIPanel.setVisible(!inviteUIPanel.isVisible());
 					inviteUIPanel.layout(true);
 				}
 			});
-			versionAnimation.setHideConfig(hideConfig);
-			FxConfig showConfig = new FxConfig(400);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
-					inviteUIPanel.layout(true);
-				}
-			});
-			versionAnimation.setShowConfig(showConfig);
 			
 			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
 			peopleCombo.setEmptyText("Enter a user name...");

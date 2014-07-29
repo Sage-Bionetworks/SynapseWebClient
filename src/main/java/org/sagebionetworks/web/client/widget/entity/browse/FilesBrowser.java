@@ -74,9 +74,9 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		view.configure(entityId, canEdit);
 	}
 	
-	public void configure(String entityId, String title) {
-		this.configuredEntityId = entityId;
-		view.configure(entityId, canEdit, title);
+	public void refresh() {
+		if (configuredEntityId != null)
+			view.configure(configuredEntityId, canEdit);
 	}
 	
 	public void setCanEdit(boolean canEdit) {

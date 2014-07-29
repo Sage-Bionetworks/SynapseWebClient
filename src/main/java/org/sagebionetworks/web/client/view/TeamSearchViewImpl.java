@@ -173,7 +173,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		if(entries != null) {
 			for(PaginationEntry pe : entries) {
 				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()), "current");
+					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()), "active");
 				else
 					ul.add(createPaginationAnchor(pe.getLabel(), searchTerm, pe.getStart()));
 			}

@@ -187,7 +187,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		if(entries != null && entries.size() > 1) {
 			for(PaginationEntry pe : entries) {
 				if(pe.isCurrent())
-					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "current");
+					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()), "active");
 				else
 					ul.add(createPaginationAnchor(pe.getLabel(), pe.getStart()));
 			}

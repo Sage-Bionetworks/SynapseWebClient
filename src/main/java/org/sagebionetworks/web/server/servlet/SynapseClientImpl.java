@@ -2842,6 +2842,45 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
+<<<<<<< HEAD
+=======
+	@Override
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		String fileEntityId = null;
+		try {
+			// file entity not set
+			// determine if we should create a new file entity, or update an
+			// existing.
+			if (parentEntityId != null && fileName != null) {
+				// look for a child (1 generation away) with the same file name
+				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
+				// get the EntityHeader for all children
+				List<Reference> references = new ArrayList<Reference>();
+				for (EntityId childEntityId : list.getIdList()) {
+					Reference r = new Reference();
+					r.setTargetId(childEntityId.getId());
+					references.add(r);
+				}
+				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
+				for (EntityHeader childEntity : childEntities.getResults()) {
+					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
+						// found! add a new version for this file instead of
+						// creating a new file entity
+						fileEntityId = childEntity.getId();
+						break;
+					}
+				}
+			}
+			if (fileEntityId == null)
+				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
+			return fileEntityId;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+>>>>>>> develop
 	@Override
 	public String setFileEntityFileHandle(String fileHandleId, String entityId,
 			String parentEntityId, boolean isRestricted)
@@ -2852,6 +2891,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			FileEntity fileEntity = null;
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			if (entityId == null) {
+<<<<<<< HEAD
 				// file entity not set
 				// determine if we should create a new file entity, or update an
 				// existing.
@@ -2888,6 +2928,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						fileHandleId, newHandle.getFileName(), synapseClient);
 			} else {
 				// get the file entity to update
+=======
+				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), synapseClient);
+			}
+			else {
+				//get the file entity to update
+>>>>>>> develop
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				// update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);

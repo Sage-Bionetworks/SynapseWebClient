@@ -71,6 +71,7 @@ public class EntityMetadata implements Presenter {
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		view.setEntityUpdatedHandler(handler);
 	}
 
 }
