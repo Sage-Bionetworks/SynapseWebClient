@@ -74,7 +74,7 @@ public class ActionMenuTest {
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
 		entity.setId("file entity test id");
-		bundle = new EntityBundle(entity, null, null, null, null, null, null);
+		bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
 		actionMenu.asWidget(bundle, true, true, null);
 	}

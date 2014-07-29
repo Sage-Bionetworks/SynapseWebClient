@@ -61,7 +61,7 @@ public class EntityListConfigEditorTest {
 		syn456 = new Data();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
 		EntityBundleTransport transport = new EntityBundleTransport();
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));

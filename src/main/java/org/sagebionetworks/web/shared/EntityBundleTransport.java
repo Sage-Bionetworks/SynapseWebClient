@@ -25,6 +25,7 @@ public class EntityBundleTransport implements IsSerializable {
 	public static int ACCESS_REQUIREMENTS		= EntityBundle.ACCESS_REQUIREMENTS;
 	public static int UNMET_ACCESS_REQUIREMENTS	= EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 	public static int FILE_HANDLES				= EntityBundle.FILE_HANDLES;
+	public static int TABLE_DATA				= EntityBundle.TABLE_DATA;
 	
 	public static String HELLO = ":)";
 
@@ -38,6 +39,8 @@ public class EntityBundleTransport implements IsSerializable {
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
 	private String fileHandlesJson;
+	private String tableData;
+	
 	private Boolean isWikiBasedEntity;
 	
 	public Boolean getHasChildren() {
@@ -108,6 +111,13 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setIsWikiBasedEntity(Boolean isWikiBasedEntity) {
 		this.isWikiBasedEntity = isWikiBasedEntity;
 	}
+	
+	public String getTableData() {
+		return tableData;
+	}
+	public void setTableData(String tableData) {
+		this.tableData = tableData;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -131,8 +141,14 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ((fileHandlesJson == null) ? 0 : fileHandlesJson.hashCode());
 		result = prime * result
 				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
+		result = prime
+				* result
+				+ ((isWikiBasedEntity == null) ? 0 : isWikiBasedEntity
+						.hashCode());
 		result = prime * result
 				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
+		result = prime * result
+				+ ((tableData == null) ? 0 : tableData.hashCode());
 		result = prime
 				* result
 				+ ((unmetAccessRequirementsJson == null) ? 0
@@ -188,10 +204,20 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!hasChildren.equals(other.hasChildren))
 			return false;
+		if (isWikiBasedEntity == null) {
+			if (other.isWikiBasedEntity != null)
+				return false;
+		} else if (!isWikiBasedEntity.equals(other.isWikiBasedEntity))
+			return false;
 		if (permissionsJson == null) {
 			if (other.permissionsJson != null)
 				return false;
 		} else if (!permissionsJson.equals(other.permissionsJson))
+			return false;
+		if (tableData == null) {
+			if (other.tableData != null)
+				return false;
+		} else if (!tableData.equals(other.tableData))
 			return false;
 		if (unmetAccessRequirementsJson == null) {
 			if (other.unmetAccessRequirementsJson != null)
@@ -201,6 +227,7 @@ public class EntityBundleTransport implements IsSerializable {
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return "EntityBundleTransport [entityJson=" + entityJson
@@ -211,7 +238,8 @@ public class EntityBundleTransport implements IsSerializable {
 				+ ", accessRequirementsJson=" + accessRequirementsJson
 				+ ", unmetAccessRequirementsJson="
 				+ unmetAccessRequirementsJson + ", fileHandlesJson="
-				+ fileHandlesJson + "]";
+				+ fileHandlesJson + ", tableData=" + tableData
+				+ ", isWikiBasedEntity=" + isWikiBasedEntity + "]";
 	}
 	
 	

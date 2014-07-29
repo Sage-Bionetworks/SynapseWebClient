@@ -104,7 +104,7 @@ public class EvaluationSubmitterTest {
 		entity = new FileEntity();
 		entity.setVersionNumber(5l);
 		entity.setId("file entity test id");
-		bundle = new EntityBundle(entity, null, null, null, null, null, null);
+		bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(any(EntityWrapper.class))).thenReturn(entity);

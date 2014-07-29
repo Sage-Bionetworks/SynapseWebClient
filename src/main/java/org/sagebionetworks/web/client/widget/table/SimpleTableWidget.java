@@ -199,7 +199,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
     	for(ColumnModel columnModel : tableColumns) {	
     		String value = null;
     		if(columnModel.getDefaultValue() != null) {
-    			if(columnModel.getColumnType() == ColumnType.LONG) {
+    			if(columnModel.getColumnType() == ColumnType.INTEGER) {
     				value = columnModel.getDefaultValue();
     			} else if(columnModel.getColumnType() == ColumnType.DOUBLE) {
     				value = columnModel.getDefaultValue(); 
