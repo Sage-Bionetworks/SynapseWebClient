@@ -640,23 +640,27 @@ public class DisplayUtils {
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
+		
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10 margin-right-10");
+			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10 margin-right-10");
+			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10 margin-right-10");
+			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		if (DisplayUtils.isDefined(title)) {
 			builder.appendHtmlConstant("<h5>");
 			builder.appendEscaped(title);
 			builder.appendHtmlConstant("</h5>");
 		}
+		builder.appendHtmlConstant("<div class=\"row\">");
 		if (iconHtml.length() > 0)
 			builder.appendHtmlConstant(iconHtml);
+		String messageWidth = DisplayUtils.isDefined(iconHtml) ? "col-xs-11" : "col-xs-12";
+		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
 		builder.appendEscaped(message);
-		
+		builder.appendHtmlConstant("</div></div>");
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
 		if (isSecondaryButton) {
