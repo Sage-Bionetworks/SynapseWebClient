@@ -71,11 +71,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		showView(place);
 	}
 	
-	private void showView(Trash place) {
-		Integer offset = place.getStart();
-		getTrash(offset);
-	}
-	
 	@Override
 	public void purgeAll() {
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
@@ -188,13 +183,17 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		return offset;
 	}
 
-	/**
-	 * Handles a failure in server call.
-	 * 
-	 * Note: public for testing.
-	 * @param caught
+	
+	/*
+	 * Private Methods
 	 */
-	public void createFailureDisplay(Throwable caught) {
+	
+	private void showView(Trash place) {
+		Integer offset = place.getStart();
+		getTrash(offset);
+	}
+	
+	private void createFailureDisplay(Throwable caught) {
 		if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
 			view.showErrorMessage(caught.getMessage());
 		}
