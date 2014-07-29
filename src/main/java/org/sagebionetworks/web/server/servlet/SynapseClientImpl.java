@@ -2842,8 +2842,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
-<<<<<<< HEAD
-=======
 	@Override
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2880,66 +2878,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 	
->>>>>>> develop
 	@Override
-	public String setFileEntityFileHandle(String fileHandleId, String entityId,
-			String parentEntityId, boolean isRestricted)
-			throws RestServiceException {
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			// create entity if we have to
+		try{
+			//create entity if we have to
 			FileEntity fileEntity = null;
 			FileHandle newHandle = synapseClient.getRawFileHandle(fileHandleId);
 			if (entityId == null) {
-<<<<<<< HEAD
-				// file entity not set
-				// determine if we should create a new file entity, or update an
-				// existing.
-				if (parentEntityId != null) {
-					// look for a child (1 generation away) with the same file
-					// name
-					EntityIdList list = synapseClient.getDescendants(
-							parentEntityId, 1, Integer.MAX_VALUE, null);
-					// get the EntityHeader for all children
-					List<Reference> references = new ArrayList<Reference>();
-					for (EntityId childEntityId : list.getIdList()) {
-						Reference r = new Reference();
-						r.setTargetId(childEntityId.getId());
-						references.add(r);
-					}
-					BatchResults<EntityHeader> childEntities = synapseClient
-							.getEntityHeaderBatch(references);
-					for (EntityHeader childEntity : childEntities.getResults()) {
-						if (newHandle.getFileName().equals(
-								childEntity.getName())
-								&& FileEntity.class.getName().equals(
-										childEntity.getType())) {
-							// found! add a new version for this file instead of
-							// creating a new file entity
-							entityId = childEntity.getId();
-							break;
-						}
-					}
-				}
-			}
-
-			if (entityId == null) {
-				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId,
-						fileHandleId, newHandle.getFileName(), synapseClient);
-			} else {
-				// get the file entity to update
-=======
 				fileEntity = FileHandleServlet.getNewFileEntity(parentEntityId, fileHandleId, newHandle.getFileName(), synapseClient);
 			}
 			else {
 				//get the file entity to update
->>>>>>> develop
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
-				// update data file handle id
+				//update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
-				fileEntity = (FileEntity) synapseClient.putEntity(fileEntity);
+				fileEntity = (FileEntity)synapseClient.putEntity(fileEntity);
 			}
-			// fix name and lock down
+			//fix name and lock down
 			FileHandleServlet.lockDown(fileEntity, isRestricted, synapseClient);
 			return fileEntity.getId();
 		} catch (SynapseException e) {
