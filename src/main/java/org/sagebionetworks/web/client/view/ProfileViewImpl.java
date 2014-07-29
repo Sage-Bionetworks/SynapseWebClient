@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -78,6 +80,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editPictureButtonPanel;
 	
+	@UiField
+	Anchor showProfileLink;
+	
 	//////Tabs
 	@UiField
 	Anchor projectsLink;
@@ -128,6 +133,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TeamListWidget myTeamsWidget;
 	private CertificateWidget certificateWidget;
 	private SettingsPresenter settingsPresenter;
+	private EntityTreeBrowser myProjectsTreeBrowser;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -140,7 +146,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			TeamListWidget myTeamsWidget,
 			CookieProvider cookies,
 			CertificateWidget certificateWidget,
-			SettingsPresenter settingsPresenter) {		
+			SettingsPresenter settingsPresenter,
+			EntityTreeBrowser myProjectsTreeBrowser) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -152,6 +159,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.cookies = cookies;
 		this.certificateWidget = certificateWidget;
 		this.settingsPresenter = settingsPresenter;
+		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
 		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
@@ -165,6 +173,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		picturePanel.clear();
 		initTabs();
+		
+		showProfileLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.show(viewProfilePanel);
+				DisplayUtils.show(picturePanel);
+				DisplayUtils.hide(showProfileLink);
+			}
+		});
 	}
 	
 	@Override
@@ -176,6 +193,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
+		myProjectsTreeBrowser.clear();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
@@ -198,22 +216,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsWidget.configure(teams, true);
 			teamsTabContainer.clear();
 			settingsTabContainer.clear();
+			projectsTabContainer.clear();
 			FlowPanel teamsContent = new FlowPanel();
 			DisplayUtils.hide(settingsListItem);
 //			DisplayUtils.hide(messagesListItem);
 //			DisplayUtils.hide(challengesListItem);
 			
+			updateViewProfile(profile, passingRecord);
+			viewProfilePanel.add(profileWidget);
+			
 			if (isOwner) {
+				DisplayUtils.show(showProfileLink);
 				DisplayUtils.show(settingsListItem);
 				settingsTabContainer.add(settingsPresenter.asWidget());
 //				DisplayUtils.show(messagesListItem);
 //				DisplayUtils.show(challengesListItem);
-			}
-			
-			if (!isOwner) {
-				updateViewProfile(profile, passingRecord);
-				viewProfilePanel.add(profileWidget);
-			} else {
+				
 				//if owner, show Edit button too (which redirects to the edit version of the Profile place)
 				editProfileButtonPanel.add(editProfileButton);
 				openInvitesWidget.configure(new Callback() {
@@ -225,7 +243,32 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}, (CallbackP)null);
 				
 				teamsContent.add(openInvitesWidget.asWidget());
+				
+				//hide my profile by default, and provide link to show it
+				DisplayUtils.hide(viewProfilePanel);
+				DisplayUtils.hide(picturePanel);
 			}
+			
+			//Projects
+			FlowPanel projectsPanel = new FlowPanel();
+			projectsPanel.addStyleName("row");
+			if (isOwner) {
+				//add create project UI
+				FlowPanel createProjectUI = new FlowPanel();
+				createProjectUI.addStyleName("col-xs-12");
+				createProjectUI.add()
+				<div class="input-group">
+			      <input type="text" class="form-control">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="button">Go!</button>
+			      </span>
+			}
+			Widget projectTreeBrowser = myProjectsTreeBrowser.asWidget();
+			projectTreeBrowser.addStyleName("col-xs-12");
+			projectsPanel.add(projectTreeBrowser);
+			projectsTabContainer.add(projectsPanel);
+			
+			//Teams
 			SimplePanel wrapper = new SimplePanel();
 			wrapper.add(myTeamsWidget.asWidget());
 			wrapper.addStyleName("highlight-box");
@@ -236,6 +279,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			DisplayUtils.show(navtabContainer);
 			DisplayUtils.show(currentTabContainer);
 		}
+	}
+	
+	@Override
+	public void setMyProjects(List<EntityHeader> myProjects) {
+		myProjectsTreeBrowser.configure(myProjects, true);
+	}
+
+	@Override
+	public void setMyProjectsError(String string) {
 	}
 	
 	@Override
@@ -454,6 +506,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		DisplayUtils.hide(currentTabContainer);
+		myProjectsTreeBrowser.clear();
+		DisplayUtils.hide(showProfileLink);
 	}
 	
 	

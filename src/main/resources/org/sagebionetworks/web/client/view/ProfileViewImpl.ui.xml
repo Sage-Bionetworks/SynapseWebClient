@@ -7,7 +7,7 @@
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
-		<div class="container">
+		<div class="margin-10">
 			<div class="row margin-top-5">
 				<div class="col-md-3" style="white-space: normal;">
 					<g:SimplePanel ui:field="breadcrumbsPanel" />
@@ -24,7 +24,14 @@
 				<div class="col-md-9 col-sm-8 col-xs-12">
 					<g:SimplePanel ui:field="viewProfilePanel" />
 				</div>
-				<div class="col-md-12 col-sm-12 col-xs-12">
+			</div>
+			<div class="row margin-top-5">
+				<div class="col-xs-12">
+					<g:Anchor ui:field="showProfileLink" text="Show my profile" />
+				</div>
+			</div>
+			<div class="row margin-top-5">
+			    <div class="col-xs-12">
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
@@ -37,7 +44,6 @@
 					<div class="row">
 						<g:SimplePanel ui:field="currentTabContainer" styleName="tab-background padding-bottom-15"/>
 					</div>
-					
 				</div>
 			</div>
 			<div class="row margin-top-5">
