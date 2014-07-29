@@ -181,10 +181,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 
 	@Override
 	public void clear() {
-		trashList = initTable();
+		trashList.removeAllRows();
 		selectedTrash.clear();
-		paginationPanel.clear();
-		trashListPanel.setWidget(trashList);
 	}
 	
 	@Override
