@@ -253,6 +253,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void createProject(final String name) {
+		//validate project name
+		if (!DisplayUtils.isDefined(name)) {
+			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			return;
+		}
+		
 		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
@@ -276,6 +282,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void createTeam(final String teamName) {
+		//validate project name
+		if (!DisplayUtils.isDefined(teamName)) {
+			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			return;
+		}
+
 		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newTeamId) {

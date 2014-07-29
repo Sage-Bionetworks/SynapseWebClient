@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -111,9 +112,36 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Synapse.ProfileArea currentArea;
 	
 	@UiField
-	SimplePanel currentTabContainer;
+	DivElement projectsTabContainer;
+	@UiField
+	FlowPanel challengesTabContainer;
+	@UiField
+	DivElement teamsTabContainer;
+	@UiField
+	FlowPanel messagesTabContainer;
+	@UiField
+	FlowPanel settingsTabContainer;
 	
-	private SimplePanel projectsTabContainer, challengesTabContainer, teamsTabContainer, messagesTabContainer, settingsTabContainer;
+	
+	//Project tab
+	@UiField
+	TextBox createProjectTextBox;
+	@UiField
+	Button createProjectButton;
+	@UiField
+	DivElement createProjectUI;
+	@UiField
+	FlowPanel projectsTabContent;
+	
+	//Teams tab
+	@UiField
+	TextBox createTeamTextBox;
+	@UiField
+	Button createTeamButton;
+	@UiField
+	DivElement createTeamUI;
+	@UiField
+	FlowPanel teamsTabContent;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -182,6 +210,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				DisplayUtils.hide(showProfileLink);
 			}
 		});
+		
+		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		createProjectButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createProject(createProjectTextBox.getValue());
+			}
+		});
+		
+		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		createTeamButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createTeam(createTeamTextBox.getValue());
+			}
+		});
 	}
 	
 	@Override
@@ -214,10 +258,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		{
 			//view only
 			myTeamsWidget.configure(teams, true);
-			teamsTabContainer.clear();
+			teamsTabContent.clear();
 			settingsTabContainer.clear();
-			projectsTabContainer.clear();
-			FlowPanel teamsContent = new FlowPanel();
+			projectsTabContent.clear();
 			DisplayUtils.hide(settingsListItem);
 //			DisplayUtils.hide(messagesListItem);
 //			DisplayUtils.hide(challengesListItem);
@@ -242,42 +285,32 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 					}
 				}, (CallbackP)null);
 				
-				teamsContent.add(openInvitesWidget.asWidget());
+				teamsTabContent.add(openInvitesWidget.asWidget());
 				
 				//hide my profile by default, and provide link to show it
 				DisplayUtils.hide(viewProfilePanel);
 				DisplayUtils.hide(picturePanel);
+				
+				//show create project and team UI
+				DisplayUtils.show(createProjectUI);
+				DisplayUtils.show(createTeamUI);
+			} else {
+				DisplayUtils.show(viewProfilePanel);
+				DisplayUtils.show(picturePanel);
 			}
 			
-			//Projects
-			FlowPanel projectsPanel = new FlowPanel();
-			projectsPanel.addStyleName("row");
-			if (isOwner) {
-				//add create project UI
-				FlowPanel createProjectUI = new FlowPanel();
-				createProjectUI.addStyleName("col-xs-12");
-				createProjectUI.add()
-				<div class="input-group">
-			      <input type="text" class="form-control">
-			      <span class="input-group-btn">
-			        <button class="btn btn-default" type="button">Go!</button>
-			      </span>
-			}
 			Widget projectTreeBrowser = myProjectsTreeBrowser.asWidget();
-			projectTreeBrowser.addStyleName("col-xs-12");
-			projectsPanel.add(projectTreeBrowser);
-			projectsTabContainer.add(projectsPanel);
+			projectsTabContent.add(projectTreeBrowser);
 			
 			//Teams
 			SimplePanel wrapper = new SimplePanel();
 			wrapper.add(myTeamsWidget.asWidget());
 			wrapper.addStyleName("highlight-box");
 			wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
-			teamsContent.add(wrapper);
-			teamsTabContainer.add(teamsContent);
+			teamsTabContent.add(wrapper);
+			
 			setTabSelected(ProfileArea.PROJECTS);
 			DisplayUtils.show(navtabContainer);
-			DisplayUtils.show(currentTabContainer);
 		}
 	}
 	
@@ -505,11 +538,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editPictureButtonPanel.clear();
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
-		DisplayUtils.hide(currentTabContainer);
 		myProjectsTreeBrowser.clear();
 		DisplayUtils.hide(showProfileLink);
+		
+		hideTabContainers();
+		DisplayUtils.hide(createProjectUI);
+		DisplayUtils.hide(createTeamUI);
 	}
 	
+	private void hideTabContainers() {
+		//hide all tab containers
+		DisplayUtils.hide(projectsTabContainer);
+		DisplayUtils.hide(challengesTabContainer);
+		DisplayUtils.hide(teamsTabContainer);
+		DisplayUtils.hide(messagesTabContainer);
+		DisplayUtils.hide(settingsTabContainer);
+	}
 	
 	
 	/**
@@ -520,7 +564,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private void setTabSelected(Synapse.ProfileArea targetTab) {
 		// tell presenter what tab we're on only if the user clicked
 		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
-		
+		hideTabContainers();
 		projectsListItem.removeClassName("active");
 		projectsLink.addStyleName("link");
 		teamsListItem.removeClassName("active");
@@ -534,28 +578,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		LIElement tab; 
 		Anchor link;
-		SimplePanel targetContainer;
 		
 		if (targetTab == Synapse.ProfileArea.PROJECTS) {
 			tab = projectsListItem;
 			link = projectsLink;
-			targetContainer = projectsTabContainer;
+			DisplayUtils.show(projectsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.TEAMS) {
 			tab = teamsListItem;
 			link = teamsLink;
-			targetContainer = teamsTabContainer;
+			DisplayUtils.show(teamsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.SETTINGS) {
 			tab = settingsListItem;
 			link = settingsLink;
-			targetContainer = settingsTabContainer;
+			DisplayUtils.show(settingsTabContainer);
 //		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
 //			tab = challengesListItem;
 //			link = challengesLink;
-//			targetContainer = challengesTabContainer;
+//			DisplayUtils.show(challengesTabContainer);
 //		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
 //			tab = messagesListItem;
 //			link = messagesLink;
-//			targetContainer = messagesTabContainer;
+//			DisplayUtils.show(messagesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
@@ -563,23 +606,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		link.removeStyleName("link");
 		tab.addClassName("active");
-		
-		currentTabContainer.clear();
-		currentTabContainer.setWidget(targetContainer);
 	}
 	
 	private void initTabs() {
-		projectsTabContainer = new SimplePanel();
-		projectsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		challengesTabContainer = new SimplePanel();
-		challengesTabContainer.addStyleName("margin-left-15 margin-right-15 fileTabTopPadding");
-		teamsTabContainer = new SimplePanel();
-		teamsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		messagesTabContainer = new SimplePanel();
-		messagesTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		settingsTabContainer = new SimplePanel();
-		settingsTabContainer.addStyleName("margin-left-15 margin-right-15 padding-top-15");
-		
 		projectsLink.setText(DisplayConstants.PROJECTS);
 		projectsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
 		

@@ -27,7 +27,7 @@
 			</div>
 			<div class="row margin-top-5">
 				<div class="col-xs-12">
-					<g:Anchor ui:field="showProfileLink" text="Show my profile" />
+					<g:Anchor ui:field="showProfileLink" text="Show my full profile" />
 				</div>
 			</div>
 			<div class="row margin-top-5">
@@ -42,7 +42,38 @@
 					    </ul>
 					</div>
 					<div class="row">
-						<g:SimplePanel ui:field="currentTabContainer" styleName="tab-background padding-bottom-15"/>
+						<div class="tab-background padding-15" ui:field="projectsTabContainer">
+							<div ui:field="createProjectUI" class="margin-bottom-10 row">
+							    <div class="col-xs-12 col-sm-6">
+									<div class="input-group">
+										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
+										<span class="input-group-btn">
+											<g:Button ui:field="createProjectButton" styleName="btn btn-default">Create Project</g:Button>
+										</span>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6" />
+							</div>
+							<g:FlowPanel ui:field="projectsTabContent" />
+						</div>
+					    <g:FlowPanel styleName="tab-background padding-15" ui:field="challengesTabContainer" />
+						<div class="tab-background padding-15" ui:field="teamsTabContainer">
+							<div ui:field="createTeamUI" class="margin-bottom-10 row">
+							    <div class="col-xs-12 col-sm-6">
+									<div class="input-group">
+										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
+										<span class="input-group-btn">
+											<g:Button ui:field="createTeamButton" styleName="btn btn-default">Create Team</g:Button>
+										</span>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6" />
+							</div>
+							<g:FlowPanel ui:field="teamsTabContent" />
+						</div>
+					    <g:FlowPanel styleName="tab-background padding-15" ui:field="messagesTabContainer" />
+					    <g:FlowPanel styleName="tab-background padding-15" ui:field="settingsTabContainer" />
+						
 					</div>
 				</div>
 			</div>
