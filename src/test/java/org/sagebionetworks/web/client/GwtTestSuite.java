@@ -56,7 +56,6 @@ import com.google.gwt.junit.client.GWTTestCase;
  */
 public class GwtTestSuite extends GWTTestCase {
 
-	static PortalGinInjector ginjector;
 	/**
 	 * Must refer to a valid module that sources this class.
 	 */

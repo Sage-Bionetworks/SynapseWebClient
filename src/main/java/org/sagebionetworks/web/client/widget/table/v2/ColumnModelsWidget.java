@@ -21,8 +21,10 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, SynapseWidgetPresenter{
+public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, SynapseWidgetPresenter{
 	
+	public static final ColumnType DEFAULT_NEW_COLUMN_TYPE = ColumnType.STRING;
+	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
 	PortalGinInjector ginInjector;
 	ColumnModelsViewBase baseView;
 	ColumnModelsView viewer;
@@ -38,15 +40,15 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	 * @param view
 	 */
 	@Inject
-	public ColumnModelsViewWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
+	public ColumnModelsWidget(ColumnModelsViewBase baseView, PortalGinInjector ginInjector, SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
 		this.baseView.setPresenter(this);
 		// We need two copies of the view, one as an editor, and the other as a viewer.
-		this.viewer = ginInjector.getColumnModelsView();
+		this.viewer = ginInjector.createNewColumnModelsView();
 		this.viewer.setPresenter(this);
-		this.editor = ginInjector.getColumnModelsView();
+		this.editor = ginInjector.createNewColumnModelsView();
 		this.editor.setPresenter(this);
 		// Add all of the parts
 		this.baseView.setViewer(this.viewer);
@@ -60,12 +62,11 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	public void configure(String tableId, List<ColumnModel> models, boolean isEditable) {
 		this.tableId = tableId;
 		this.isEditable = isEditable;
-		this.editorRows.clear();
 		this.startingModels = models;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		for(ColumnModel cm: models){
 			// Create a viewer
-			ColumnModelTableRowViewer rowViewer = ginInjector.createColumnModelTableRowViewer();
+			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
 			rowViewer.setSelectable(false);
 			viewer.addColumn(rowViewer);
@@ -90,10 +91,10 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	public void addNewColumn() {
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
-		cm.setColumnType(ColumnType.STRING);
-		cm.setMaximumSize(50L);
+		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
+		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
 		// Assign an id to this column
-		ColumnModelTableRowEditor rowEditor = ginInjector.createColumnModelTableRowEditor();
+		ColumnModelTableRowEditor rowEditor = ginInjector.createNewColumnModelTableRowEditor();
 		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
@@ -121,9 +122,10 @@ public class ColumnModelsViewWidget implements ColumnModelsView.Presenter, Colum
 	 * Reset the 
 	 */
 	private void resetEditor(){
+		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, this.isEditable);
 		for(ColumnModel cm: this.startingModels){
-			ColumnModelTableRowViewer rowEditor = ginInjector.createColumnModelTableRowViewer();
+			ColumnModelTableRowViewer rowEditor = ginInjector.createNewColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
 			rowEditor.setSelectable(true);
 			editor.addColumn(rowEditor);

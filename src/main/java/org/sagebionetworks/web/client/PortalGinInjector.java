@@ -75,7 +75,7 @@ import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -206,10 +206,10 @@ public interface PortalGinInjector extends Ginjector {
 	public Md5Link getMd5Link();
 	
 	// TableEntit V2
-	public ColumnModelsView getColumnModelsView();
-	public ColumnModelsViewWidget getColumnModelsViewWidget();
-	public ColumnModelTableRowViewer createColumnModelTableRowViewer();
-	public ColumnModelTableRowEditor createColumnModelTableRowEditor();
+	public ColumnModelsView createNewColumnModelsView();
+	public ColumnModelsWidget createNewColumnModelsWidget();
+	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
+	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
 	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();

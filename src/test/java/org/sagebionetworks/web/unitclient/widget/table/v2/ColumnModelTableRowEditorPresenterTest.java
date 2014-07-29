@@ -27,13 +27,13 @@ public class ColumnModelTableRowEditorPresenterTest {
 	public void testTypeChange(){
 		// Change from a string to a boolean
 		when(mockEditor.getColumnType()).thenReturn(ColumnTypeViewEnum.Boolean);
-		presenter.onTypeChagned();
+		presenter.onTypeChanged();
 		verify(mockEditor, times(1)).setSizeFieldVisible(false);
 		verify(mockEditor, times(1)).setMaxSize(null);
 		
 		// Now toggle it back to a string
 		when(mockEditor.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		presenter.onTypeChagned();
+		presenter.onTypeChanged();
 		verify(mockEditor, times(1)).setSizeFieldVisible(true);
 		// It should keep the original value
 		verify(mockEditor, times(1)).setMaxSize("15");
@@ -45,7 +45,7 @@ public class ColumnModelTableRowEditorPresenterTest {
 	public void testNoChange(){
 		// The type starts as a string so toggle should do nothing
 		when(mockEditor.getColumnType()).thenReturn(ColumnTypeViewEnum.String);
-		presenter.onTypeChagned();
+		presenter.onTypeChanged();
 		verify(mockEditor, never()).setSizeFieldVisible(anyBoolean());
 		// It should keep the original value
 		verify(mockEditor, never()).setMaxSize(anyString());

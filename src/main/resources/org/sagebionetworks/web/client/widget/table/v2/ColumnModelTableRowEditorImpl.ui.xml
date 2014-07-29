@@ -6,10 +6,10 @@
 
 	<t:TableRow>
 		<t:TableData>
-			<b:CheckBoxButton ui:field="select" type="LINK"></b:CheckBoxButton>
+			<b:CheckBoxButton ui:field="select" type="LINK"/>
 		</t:TableData>
 		<t:TableData>
-			<b:TextBox ui:field="name" placeholder="Column Name"></b:TextBox>
+			<b:TextBox ui:field="name" placeholder="Column Name"/>
 		</t:TableData>
 		<t:TableData>
 			<b.select:Select ui:field="type" width="100px">
@@ -22,10 +22,10 @@
 			</b.select:Select>
 		</t:TableData>
 		<t:TableData>
-			<b:TextBox ui:field="maxSize" placeholder="Size" width="75px"></b:TextBox>
+			<b:TextBox ui:field="maxSize" placeholder="Size" width="75px"/>
 		</t:TableData>
 		<t:TableData>
-			<b:TextBox ui:field="defaultValue" placeholder="Default Value"></b:TextBox>
+			<b:TextBox ui:field="defaultValue" placeholder="Default Value"/>
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

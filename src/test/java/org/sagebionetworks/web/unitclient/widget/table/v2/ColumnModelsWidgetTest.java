@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBase;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -36,7 +36,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author jmhill
  *
  */
-public class ColumnModelsViewWidgetTest {
+public class ColumnModelsWidgetTest {
 
 	AdapterFactory adapterFactory;
 	ColumnModelsViewBase mockBaseView;
@@ -45,7 +45,7 @@ public class ColumnModelsViewWidgetTest {
 	PortalGinInjector mockGinInjector;
 	SynapseClientAsync mockSynapseClient;
 	TableModelUtils tableModelUtils;
-	ColumnModelsViewWidget widget;
+	ColumnModelsWidget widget;
 	
 	@Before
 	public void before(){
@@ -56,22 +56,22 @@ public class ColumnModelsViewWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		tableModelUtils = new TableModelUtils(adapterFactory);
-		when(mockGinInjector.getColumnModelsView()).thenReturn(mockViewer, mockEditor);
-		when(mockGinInjector.createColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
+		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockViewer, mockEditor);
+		when(mockGinInjector.createNewColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
 			@Override
 			public ColumnModelTableRowEditor answer(InvocationOnMock invocation)
 					throws Throwable {
 				return new ColumnModelTableRowEditorStub();
 			}
 		});
-		when(mockGinInjector.createColumnModelTableRowViewer()).thenAnswer(new Answer<ColumnModelTableRowViewer>() {
+		when(mockGinInjector.createNewColumnModelTableRowViewer()).thenAnswer(new Answer<ColumnModelTableRowViewer>() {
 			@Override
 			public ColumnModelTableRowViewer answer(InvocationOnMock invocation)
 					throws Throwable {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
-		widget = new ColumnModelsViewWidget(mockBaseView, mockGinInjector, mockSynapseClient, tableModelUtils);
+		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, tableModelUtils);
 		verify(mockBaseView, times(1)).setViewer(mockViewer);
 		verify(mockBaseView, times(1)).setEditor(mockEditor);
 	}
@@ -121,8 +121,8 @@ public class ColumnModelsViewWidgetTest {
 		widget.addNewColumn();
 		// A string should be added...
 		ColumnModel newModel = new ColumnModel();
-		newModel.setColumnType(ColumnType.STRING);
-		newModel.setMaximumSize(50L);
+		newModel.setColumnType(ColumnModelsWidget.DEFAULT_NEW_COLUMN_TYPE);
+		newModel.setMaximumSize(ColumnModelsWidget.DEFAULT_STRING_MAX_SIZE);
 		schema.add(newModel);
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();

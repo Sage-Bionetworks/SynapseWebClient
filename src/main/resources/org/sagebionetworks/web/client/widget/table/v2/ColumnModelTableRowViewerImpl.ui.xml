@@ -9,16 +9,16 @@
 			<b:CheckBoxButton ui:field="select" type="LINK"></b:CheckBoxButton>
 		</t:TableData>
 		<t:TableData>
-			<b:FormControlStatic ui:field="name"></b:FormControlStatic>
+			<b:FormControlStatic ui:field="name"/>
 		</t:TableData>
 		<t:TableData>
-			<b:FormControlStatic ui:field="type"></b:FormControlStatic>
+			<b:FormControlStatic ui:field="type" width="100px" />
 		</t:TableData>
 		<t:TableData>
-			<b:FormControlStatic ui:field="maxSize"></b:FormControlStatic>
+			<b:FormControlStatic ui:field="maxSize" width="75px"/>
 		</t:TableData>
 		<t:TableData>
-			<b:FormControlStatic ui:field="defaultValue"></b:FormControlStatic>
+			<b:FormControlStatic ui:field="defaultValue"/>
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

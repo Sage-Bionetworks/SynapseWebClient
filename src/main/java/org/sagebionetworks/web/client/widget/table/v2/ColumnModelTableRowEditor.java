@@ -18,7 +18,7 @@ public interface ColumnModelTableRowEditor extends ColumnModelTableRow {
 		/**
 		 * Called when the type changes.
 		 */
-		public void onTypeChagned();
+		public void onTypeChanged();
 	}
 	
 	/**

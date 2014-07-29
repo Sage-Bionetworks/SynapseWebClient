@@ -23,7 +23,7 @@ import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
 import org.sagebionetworks.web.client.widget.modal.BootstrapModal;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryDetails.SortDirection;
 
@@ -120,7 +120,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	Button addRowBtn;
 	Button deleteRowBtn;
 	Button viewRowBtn;
-	ColumnModelsViewWidget columnModelsWidget;
+	ColumnModelsWidget columnModelsWidget;
 	
 	@Inject
 	public SimpleTableWidgetViewImpl(final Binder uiBinder, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils, PortalGinInjector ginInjector) {
@@ -139,7 +139,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	    // setup DataProvider for pagination/sorting
 		dataProvider = createAsyncDataProvider();
 		
-		columnModelsWidget = ginInjector.getColumnModelsViewWidget();
+		columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnEditorPanel.add(columnModelsWidget.asWidget());
 	}
 	
@@ -154,7 +154,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 
 		// Render Table			
 		columnEditorBuilt = false; // clear out old column editor view
-		setupTableEditorToolbar(tableEntityId, columns);
+		setupTableEditorToolbar(tableEntityId, columns, canEdit);
 		setDefaultToolbarButtonVisibility(canEdit);
 		
 		// special cases display user instructions instead of empty table
@@ -594,10 +594,10 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	 * Sets up the top level editing toolbar
 	 * @param columns
 	 */
-	private void setupTableEditorToolbar(final String tableId, final List<ColumnModel> columns) {
+	private void setupTableEditorToolbar(final String tableId, final List<ColumnModel> columns, boolean canEdit) {
 		buttonToolbar.clear();
 		
-		this.columnModelsWidget.configure(tableId, this.columns, true);
+		this.columnModelsWidget.configure(tableId, this.columns, canEdit);
 
 		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");

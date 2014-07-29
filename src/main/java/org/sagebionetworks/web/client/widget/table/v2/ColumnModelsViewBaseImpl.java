@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.ModalBody;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -84,11 +84,8 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 	
 	@Override
 	public void showError(String message) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<strong>Error</strong>");
-		builder.append(message);
 		alert.clear();
-		alert.setText(builder.toString());
+		alert.setText(SafeHtmlUtils.fromString(message).asString());
 		alert.setVisible(true);
 		// enable the save button after an error
 		saveButton.state().reset();

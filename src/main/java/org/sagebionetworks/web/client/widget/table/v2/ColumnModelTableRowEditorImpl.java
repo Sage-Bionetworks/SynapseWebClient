@@ -85,7 +85,7 @@ public class ColumnModelTableRowEditorImpl implements ColumnModelTableRowEditor 
 		type.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
-				presenter.onTypeChagned();
+				presenter.onTypeChanged();
 			}
 		});
 	}

@@ -20,7 +20,7 @@ public class ColumnModelTableRowEditorPresenter implements ColumnModelTableRowEd
 	}
 	
 	@Override
-	public void onTypeChagned() {
+	public void onTypeChanged() {
 		// Is this a change
 		ColumnTypeViewEnum newType = editor.getColumnType();
 		if(!currentType.equals(newType)){
