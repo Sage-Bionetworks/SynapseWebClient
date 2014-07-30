@@ -7,7 +7,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,7 +21,6 @@ import com.google.inject.Inject;
  * 
  */
 public class Dialog extends Composite {
-
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {}
 	
 	private Callback callback;
@@ -38,6 +36,9 @@ public class Dialog extends Composite {
 	
 	@UiField
 	Modal modal;
+
+	//add enum with 3 values for modal size
+	
 	
 	/**
 	 * Create a new Modal dialog.
@@ -63,6 +64,10 @@ public class Dialog extends Composite {
 					hide();
 			}
 		});
+	}
+	
+	public void setSize(DialogSize modalSize) {
+		modal.setWidth(modalSize.getSize());
 	}
 	
 	/**

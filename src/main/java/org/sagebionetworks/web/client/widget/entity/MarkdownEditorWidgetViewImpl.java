@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHa
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
+import org.sagebionetworks.web.client.widget.modal.DialogSize;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -93,6 +94,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
 		this.dialog = dialog;
+		dialog.setSize(DialogSize.LARGE);
 		markdownWidget.addStyleName("margin-10");
 		widgetSelectionState = new WidgetSelectionState();
 	}
