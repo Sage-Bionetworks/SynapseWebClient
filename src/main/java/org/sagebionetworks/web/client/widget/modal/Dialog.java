@@ -34,6 +34,8 @@ public class Dialog extends Composite {
 	@UiField
 	Button defaultButton;
 	
+	boolean autoHide;
+	
 	@UiField
 	Modal modal;
 	
@@ -48,6 +50,8 @@ public class Dialog extends Composite {
 			public void onClick(ClickEvent event) {
 				if (callback != null)
 					callback.onPrimary();
+				if (autoHide)
+					hide();
 			}
 		});
 		defaultButton.addClickHandler(new ClickHandler() {
@@ -55,6 +59,8 @@ public class Dialog extends Composite {
 			public void onClick(ClickEvent event) {
 				if (callback != null)
 					callback.onDefault();
+				if (autoHide)
+					hide();
 			}
 		});
 	}
@@ -65,11 +71,14 @@ public class Dialog extends Composite {
 	 * @param primaryButtonText The text for the primary button (i.e "Save").  The primary button is highlighted.
 	 * @param defaultButtonText The text for the default button (i.e "Cancel").  The default button will not be highlighted.  If null, will hide default button.
 	 * @param callback
+	 * @param autoHide if true, will hide the dialog on primary or default button click.
 	 */
-	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback) {
+	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
+		this.autoHide = autoHide;
 		mainContent.clear();
 		this.callback = callback;
 		primaryButton.setText(primaryButtonText);
+		
 		boolean isDefaultButtonVisible = defaultButtonText != null;
 		defaultButton.setVisible(isDefaultButtonVisible);
 		if (isDefaultButtonVisible)
