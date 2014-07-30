@@ -26,7 +26,6 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
 		<gwtboostrap3.version>0.8.1-gwt-2.5.1</gwtboostrap3.version>
-		<gwtboostrap3-extras.version>0.8-gwt-2.5.1</gwtboostrap3-extras.version>
 	</properties>
 
 	<repositories>
@@ -271,7 +270,7 @@
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3-extras</artifactId>
-			<version>${gwtboostrap3-extras.version}</version>
+			<version>${gwtboostrap3.version}</version>
 		</dependency>		
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
