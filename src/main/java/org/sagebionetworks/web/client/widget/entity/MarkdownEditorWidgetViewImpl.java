@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHa
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.client.widget.modal.DialogSize;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -94,7 +94,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
 		this.dialog = dialog;
-		dialog.setSize(DialogSize.LARGE);
+		dialog.setSize(ModalSize.LARGE);
 		markdownWidget.addStyleName("margin-10");
 		widgetSelectionState = new WidgetSelectionState();
 	}

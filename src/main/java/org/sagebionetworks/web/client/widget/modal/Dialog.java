@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.modal;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,8 +64,8 @@ public class Dialog extends Composite {
 		});
 	}
 	
-	public void setSize(DialogSize modalSize) {
-		modal.setWidth(modalSize.getSize());
+	public void setSize(ModalSize modalSize) {
+		modal.setSize(modalSize);
 	}
 	
 	/**
