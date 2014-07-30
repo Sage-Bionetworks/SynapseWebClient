@@ -60,8 +60,9 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 	public void configure(List<UserProfile> profiles, List<String> requestMessages) {
 		clear();
 		mainContainer.clear();
+		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		for (int i = 0; i < profiles.size(); i++) {
-			LayoutContainer lc = DisplayUtils.createRowContainer();
+			FlowPanel lc = new FlowPanel();
 			final UserProfile profile = profiles.get(i);
 			BigUserBadge renderer = ginInjector.getBigUserBadgeWidget();
 			renderer.configure(profile, requestMessages.get(i));
@@ -76,14 +77,15 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 					presenter.acceptRequest(profile.getOwnerId());
 				}
 			});
-			LayoutContainer buttonContainer = new LayoutContainer();
+			FlowPanel buttonContainer = new FlowPanel();
 			buttonContainer.addStyleName("col-xs-4 col-sm-3 col-md-2");
 			buttonContainer.add(joinButton);
 			lc.add(rendererWidget);
 			lc.add(buttonContainer);
 			
-			mainContainer.add(lc);
+			singleRow.add(lc);
 		}
+		mainContainer.add(singleRow);
 		if (profiles.size() > 0)
 			add(mainContainer);
 	}

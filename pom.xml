@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2014-07-14-1325-fefce47</synapse.version>
+ 		<synapse.version>2014-07-22-1340-782fe24</synapse.version>
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -25,6 +25,7 @@
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
+		<gwtboostrap3.version>0.8-gwt-2.5.1</gwtboostrap3.version>
 	</properties>
 
 	<repositories>
@@ -257,6 +258,21 @@
 
 	<dependencies>
 
+		<!-- Provides light-weight GWT wrappers for boostrap support
+			Currently, using a modified (forked from the origial) of this
+			libray to support gwt 2.5.1 as the origial libary requires 2.6+.
+			As soon as we move to GWT 2.6 we should use the origial libary. -->
+		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3</artifactId>
+			<version>${gwtboostrap3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gwtbootstrap3</groupId>
+			<artifactId>gwtbootstrap3-extras</artifactId>
+			<version>${gwtboostrap3.version}</version>
+		</dependency>	
+			
 		<!-- Sage Bionetworks Dependencies -->
 		<dependency>
 			<groupId>javax.mail</groupId>

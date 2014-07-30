@@ -72,12 +72,14 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations) {
 		clear();
 		mainContainer.clear();
+		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
+		
 		for (int i = 0; i < profiles.size(); i++) {
-			LayoutContainer rowPanel = DisplayUtils.createRowContainer();
+			FlowPanel rowPanel = new FlowPanel();
 			rowPanel.addStyleName("col-md-12");
-			LayoutContainer left = new LayoutContainer();
+			FlowPanel left = new FlowPanel();
 			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
-			LayoutContainer right = new LayoutContainer();
+			FlowPanel right = new FlowPanel();
 			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
 			rowPanel.add(left);
 			rowPanel.add(right);
@@ -103,8 +105,9 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 			});
 			right.add(leaveButton);
 			
-			mainContainer.add(rowPanel);
+			singleRow.add(rowPanel);
 		}
+		mainContainer.add(singleRow);
 		ulPanel = new UnorderedListPanel();
 		if (profiles.size() > 0) {
 			ulPanel.addStyleName("pager");

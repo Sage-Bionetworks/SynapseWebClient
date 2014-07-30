@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +39,7 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class MarkdownWidget extends LayoutContainer implements SynapseView {
+public class MarkdownWidget extends FlowPanel implements SynapseView {
 	
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -125,7 +124,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					removeAll();
+					clear();
 					String content = "";
 					
 					if(result == null || result.isEmpty()) {
@@ -139,8 +138,8 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 					add(wikiSubpagesPanel);
 
 					HTMLPanel panel = new HTMLPanel(content);
+					panel.addStyleName("margin-right-40 margin-left-10");
 					add(panel);
-					layout();
 					synapseJSNIUtils.highlightCodeBlocks();
 					DisplayUtils.loadTableSorters(panel, synapseJSNIUtils);
 					MarkdownWidget.loadMath(panel, synapseJSNIUtils, isPreview, resourceLoader);
@@ -158,7 +157,7 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				removeAll();
+				clear();
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					showErrorMessage(DisplayConstants.ERROR_LOADING_MARKDOWN_FAILED+caught.getMessage());
 			}
@@ -270,9 +269,5 @@ public class MarkdownWidget extends LayoutContainer implements SynapseView {
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void clear() {
 	}
 }

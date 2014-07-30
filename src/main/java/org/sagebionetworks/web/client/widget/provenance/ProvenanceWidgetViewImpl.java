@@ -90,7 +90,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	protected void onRender(Element parent, int index) {
 		// TODO Auto-generated method stub
 		super.onRender(parent, index);
-		initJsPlumb();
 		this.add(container);
 		createGraph();
 	}
@@ -150,8 +149,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		prov = new LayoutContainer();
 		prov.setStyleAttribute("position", "relative");		
 		prov.setHeight(height);				
-		
-		if(graph != null) {			
+		if(graph != null) {
 			container.removeAll();			
 			if(!inFullScreen) addFullScreenAnchor();			
 			// add nodes to graph
@@ -165,10 +163,11 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		
 		container.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
-		container.layout(true);
 		
+		container.layout(true);
 		if(graph != null) {			
 			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
+			beforeJSPlumbLoad(prov.getId());
 			Set<ProvGraphEdge> edges = graph.getEdges();
 			for(ProvGraphEdge edge : edges) {
 				connect(edge.getSink().getId(), edge.getSource().getId());
@@ -176,8 +175,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 			// look for old versions
 			presenter.findOldVersions();
+			afterJSPlumbLoad();
 		}
-		
 	}
 	
 	/**
@@ -250,18 +249,20 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	
 	private static native void connect(String parentId, String childId) /*-{
-		var jsPlumb = $wnd.jsPlumb;		
-		jsPlumb.connect({source:parentId, target:childId, overlays:jsP_overlays	});
+		jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
 	}-*/;
 	
-	private static native void initJsPlumb() /*-{
+	/**
+	 * Call before connecting divs. Suspends drawing graph until bulk operation is complete (call afterJSPlumbLoad)
+	 * @param parentContainerId
+	 */
+	private static native void beforeJSPlumbLoad(String containerId) /*-{
 		;(function() {
-					
 			$wnd.jsPlumbDemo = {					
 				init : function() {					
 					var color = "gray";
-					var jsPlumb = $wnd.jsPlumb;		
-					jsPlumb.importDefaults({
+					jsPlumbInstance = $wnd.jsPlumb.getInstance();		
+					jsPlumbInstance.importDefaults({
 						// notice the 'curviness' argument to this Bezier curve.  the curves on this page are far smoother
 						// than the curves on the first demo, which use the default curviness value.			
 						Connector : [ "Straight" ],
@@ -289,14 +290,23 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		$wnd.jsPlumb.bind("ready", function() {
 			// chrome fix.
 			document.onselectstart = function () { return false; };
-			$wnd.jsPlumb.setRenderMode($wnd.jsPlumb.SVG);
 			$wnd.jsPlumbDemo.init();
+			jsPlumbInstance.setRenderMode($wnd.jsPlumb.SVG);
+			jsPlumbInstance.setSuspendDrawing(true);
+			jsPlumbInstance.setContainer(containerId);
 		});
-
-	
+		
+		
 	}-*/;
-
 	
+	/**
+	 * Call after connecting divs.
+	 */
+	private static native void afterJSPlumbLoad() /*-{
+		jsPlumbInstance.setSuspendDrawing(false, true);
+	}-*/;
+	
+		
 	private void createFullScreenButton(IconsImageBundle iconsImageBundle) {
 		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
 		//fullSizeButton.setStyleName("z-index-10");
