@@ -371,7 +371,6 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 			}
 		});
 		
-		dialog.removeFromParent();
 		mdCommands.add(dialog);
 	}
 	
