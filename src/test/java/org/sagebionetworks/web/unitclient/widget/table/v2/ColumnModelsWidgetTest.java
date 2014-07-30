@@ -1,5 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
+import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Before;
@@ -7,25 +13,22 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBase;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -135,10 +138,44 @@ public class ColumnModelsWidgetTest {
 		String tableId = "syn123";
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		widget.configure(tableId, schema, isEdtiable);
-		List<String> results = tableModelUtils.toJSONList(schema);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add a column
+		ColumnModelTableRowEditor editor = widget.addNewColumn();
+		editor.setColumnName("a name");
+		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
+		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
+		List<String> results = tableModelUtils.toJSONList(expectedNewScheam);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
+		verify(mockBaseView).hideEditor();
+		// the view should be configured with original columns, then again 
+		// with the original columns after the save plus one new column
+		verify(mockViewer, times(schema.size()*2+1)).addColumn(any(ColumnModelTableRow.class));
+	}
+	
+	@Test
+	public void testOnSaveFailure() throws JSONObjectAdapterException{
+		boolean isEdtiable = true;
+		String tableId = "syn123";
+		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+		widget.configure(tableId, schema, isEdtiable);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add a column
+		ColumnModelTableRowEditor editor = widget.addNewColumn();
+		editor.setColumnName("a name");
+		String errorMessage = "Something went wrong";
+		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
+		// Now call save
+		widget.onSave();
+		verify(mockBaseView, times(1)).setLoading();
+		// The editor must not be hidden on an error.
+		verify(mockBaseView, never()).hideEditor();
+		verify(mockBaseView).showError(errorMessage);
+		// only the original columns should be applied to the view.
+		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 	}
 }

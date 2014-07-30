@@ -62,9 +62,7 @@
 	
 	<!-- Limit build permuatations (testing only)  -->
  	
-<!-- 	
 	<set-property name="user.agent" value="safari"/>
- -->
 	
 	
 </module>

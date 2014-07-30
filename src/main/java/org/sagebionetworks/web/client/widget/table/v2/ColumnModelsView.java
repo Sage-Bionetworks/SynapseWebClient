@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -40,20 +39,45 @@ public interface ColumnModelsView extends IsWidget {
 		
 		/**
 		 * Add a new column to the table.
+		 * @return 
 		 */
-		public void addNewColumn();
+		public ColumnModelTableRowEditor addNewColumn();
 		
 		/**
 		 * Called when the edit button is pressed
 		 */
 		public void onEditColumns();
 
+
 		/**
-		 * Called when there is a selection change.
-		 * @param columnId
-		 * @param isSelected
+		 * Toggle the selection.
 		 */
-		public void columnSelectionChanged(String columnId, Boolean isSelected);
+		public void toggleSelect();
+		
+		/**
+		 * On select all.
+		 */
+		public void selectAll();
+
+		/**
+		 * Select none
+		 */
+		public void selectNone();
+
+		/**
+		 * Move the selected item up.
+		 */
+		public void onMoveUp();
+
+		/**
+		 * Move the selected item down.
+		 */
+		public void onMoveDown();
+
+		/**
+		 * Delete the selected columns.
+		 */
+		public void deleteSelected();
 	}
 
 	/**
@@ -69,10 +93,38 @@ public interface ColumnModelsView extends IsWidget {
 	void addColumn(ColumnModelTableRow row);
 	
 	/**
+	 * 
+	 * @param row
+	 * @param index
+	 */
+	void moveColumn(ColumnModelTableRow row, int index);
+	
+	/**
 	 * Set the view editable
 	 * @param isEditable
 	 */
 	void configure(ViewType type, boolean isEditable);
+	
+
+	/**
+	 * Determines the state of the delete button
+	 * @param b
+	 */
+	public void setCanDelete(boolean canDelete);
+
+	/**
+	 * Determines the state of the move up button.
+	 * 
+	 * @param b
+	 */
+	public void setCanMoveUp(boolean canMoveUp);
+	
+	/**
+	 * Determines the state of the move down button.
+	 * 
+	 * @param canMoveDown
+	 */
+	public void setCanMoveDown(boolean canMoveDown);
 
 	/**
 	 * The view can be used as a column viewer or as a column editor.

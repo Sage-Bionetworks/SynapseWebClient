@@ -9,11 +9,11 @@ import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
  */
 public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub implements ColumnModelTableRowEditor {
 
-	Presenter presenter;
+	TypePresenter presenter;
 	boolean sizeFieldVisible;
 	
 	@Override
-	public void setPresenter(Presenter presenter) {
+	public void setTypePresenter(TypePresenter presenter) {
 		this.presenter = presenter;
 	}
 

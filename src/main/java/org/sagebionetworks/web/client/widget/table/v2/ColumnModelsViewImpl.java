@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
@@ -24,6 +26,20 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 
 	@UiField
 	ButtonToolBar buttonToolbar;
+	@UiField
+	Button selectTogglebutton;
+	@UiField
+	Button selectDropDown;
+	@UiField
+	AnchorListItem selectAllItem;
+	@UiField
+	AnchorListItem selectNoneItem;
+	@UiField
+	Button moveUpButton;
+	@UiField
+	Button moveDownButton;
+	@UiField
+	Button deleteSelectedButton;
 	@UiField
 	Table table;
 	@UiField
@@ -59,6 +75,48 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 				presenter.addNewColumn();
 			}
 		});
+		// Toggle select
+		this.selectTogglebutton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.toggleSelect();
+			}
+		});
+		// Select all
+		this.selectAllItem.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectAll();
+			}
+		});
+		// select none
+		this.selectNoneItem.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.selectNone();
+			}
+		});
+		// move up
+		this.moveUpButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onMoveUp();
+			}
+		});
+		// move down
+		this.moveDownButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onMoveDown();
+			}
+		});
+		// delete selected
+		this.deleteSelectedButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteSelected();
+			}
+		});
 	}
 
 
@@ -66,15 +124,15 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	public void configure(ViewType type, boolean isEditable) {
 		// Clear any rows
 		tableBody.clear();
+		// hide the toolbar until data is added
+		buttonToolbar.setVisible(false);
 		this.viewType = type;
 		if(ViewType.VIEWER.equals(type)){
 			editColumnsButton.setVisible(isEditable);
 			addColumnButton.setVisible(false);
-			buttonToolbar.setVisible(false);
 		}else{
 			editColumnsButton.setVisible(false);
 			addColumnButton.setVisible(true);
-			buttonToolbar.setVisible(true);
 			final String tbodyId = "tableBodyId";
 			tableBody.setId(tbodyId);
 		}
@@ -88,6 +146,46 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void addColumn(ColumnModelTableRow row) {
 		tableBody.add(row);
+		if(ViewType.EDITOR.equals(this.viewType))
+		if(!this.buttonToolbar.isVisible()){
+			this.buttonToolbar.setVisible(true);
+		}
+	}
+
+	@Override
+	public void setCanDelete(boolean canDelete) {
+		this.deleteSelectedButton.setEnabled(canDelete);
+		if(canDelete){
+			this.deleteSelectedButton.setType(ButtonType.DANGER);
+		}else{
+			this.deleteSelectedButton.setType(ButtonType.DEFAULT);
+		}
+	}
+
+	@Override
+	public void setCanMoveUp(boolean canMoveUp) {
+		this.moveUpButton.setEnabled(canMoveUp);
+		if(canMoveUp){
+			this.moveUpButton.setType(ButtonType.INFO);
+		}else{
+			this.moveUpButton.setType(ButtonType.DEFAULT);
+		}
+	}
+
+	@Override
+	public void setCanMoveDown(boolean canMoveDown) {
+		this.moveDownButton.setEnabled(canMoveDown);
+		if(canMoveDown){
+			this.moveDownButton.setType(ButtonType.INFO);
+		}else{
+			this.moveDownButton.setType(ButtonType.DEFAULT);
+		}
+	}
+
+	@Override
+	public void moveColumn(ColumnModelTableRow row, int index) {
+		this.tableBody.remove(row);
+		this.tableBody.insert(row.asWidget(), index);
 	}
 	
 }

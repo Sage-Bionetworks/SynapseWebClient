@@ -108,5 +108,15 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 			return false;
 		return true;
 	}
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setSelectionPresenter(SelectionPresenter selectionPresenter) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

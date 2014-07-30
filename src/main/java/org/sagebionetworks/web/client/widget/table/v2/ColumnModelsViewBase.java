@@ -51,4 +51,5 @@ public interface ColumnModelsViewBase extends IsWidget {
 	 * @param message
 	 */
 	void showError(String message);
+	
 }

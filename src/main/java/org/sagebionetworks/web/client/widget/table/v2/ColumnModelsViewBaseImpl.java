@@ -90,5 +90,4 @@ public class ColumnModelsViewBaseImpl extends Composite implements ColumnModelsV
 		// enable the save button after an error
 		saveButton.state().reset();
 	}
-
 }

@@ -10,6 +10,19 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface ColumnModelTableRow extends IsWidget {
 	
 	/**
+	 * Control for this view.
+	 * @author John
+	 *
+	 */
+	public interface SelectionPresenter{
+		
+		/**
+		 * Called when selection changes.
+		 */
+		public void selectionChanged(boolean isSelected);
+	}
+	
+	/**
 	 * ColumnModel.id
 	 * @return
 	 */
@@ -74,4 +87,15 @@ public interface ColumnModelTableRow extends IsWidget {
 	 * Is this row selected?
 	 */
 	public boolean isSelected();
+
+	/**
+	 * Delete this row.
+	 */
+	public void delete();
+	
+	/**
+	 * Set the selection presenter for this view.
+	 * @param selectionPresenter
+	 */
+	public void setSelectionPresenter(SelectionPresenter selectionPresenter);
 }
