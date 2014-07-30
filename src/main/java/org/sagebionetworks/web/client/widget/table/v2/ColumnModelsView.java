@@ -111,6 +111,12 @@ public interface ColumnModelsView extends IsWidget {
 	 * @param b
 	 */
 	public void setCanDelete(boolean canDelete);
+	
+	/**
+	 * Is the delete button enabled?
+	 * @return
+	 */
+	public boolean isDeleteEnabled();
 
 	/**
 	 * Determines the state of the move up button.
@@ -120,11 +126,24 @@ public interface ColumnModelsView extends IsWidget {
 	public void setCanMoveUp(boolean canMoveUp);
 	
 	/**
+	 * Is the move down button enabled.
+	 * @return 
+	 */
+	public boolean isMoveUpEnabled();
+	
+	/**
 	 * Determines the state of the move down button.
 	 * 
 	 * @param canMoveDown
 	 */
 	public void setCanMoveDown(boolean canMoveDown);
+	
+	/**
+	 * Is the move down button enabled?
+	 * 
+	 * @return
+	 */
+	public boolean isMoveDownEnabled();
 
 	/**
 	 * The view can be used as a column viewer or as a column editor.

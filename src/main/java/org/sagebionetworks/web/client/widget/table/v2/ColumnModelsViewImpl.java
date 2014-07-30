@@ -187,5 +187,20 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		this.tableBody.remove(row);
 		this.tableBody.insert(row.asWidget(), index);
 	}
+
+	@Override
+	public boolean isDeleteEnabled() {
+		return this.deleteSelectedButton.isEnabled();
+	}
+
+	@Override
+	public boolean isMoveUpEnabled() {
+		return this.moveUpButton.isEnabled();
+	}
+
+	@Override
+	public boolean isMoveDownEnabled() {
+		return this.moveDownButton.isEnabled();
+	}
 	
 }

@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -177,5 +182,101 @@ public class ColumnModelsWidgetTest {
 		verify(mockBaseView).showError(errorMessage);
 		// only the original columns should be applied to the view.
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
+	}
+	
+	@Test
+	public void testSelectAll(){
+		boolean isEdtiable = true;
+		String tableId = "syn123";
+		List<ColumnModel> schema = new LinkedList<ColumnModel>();
+		widget.configure(tableId, schema, isEdtiable);
+		// Show the dialog
+		widget.onEditColumns();
+		verify(mockEditor).setCanDelete(false);
+		verify(mockEditor).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveUp(false);
+		
+		// Add three columns
+		ColumnModelTableRowEditor one = widget.addNewColumn();
+		verify(mockEditor, times(2)).setCanDelete(false);
+		verify(mockEditor, times(2)).setCanMoveUp(false);
+		verify(mockEditor, times(2)).setCanMoveUp(false);
+		
+		ColumnModelTableRowEditor two = widget.addNewColumn();
+		// Start with two selected
+		two.setSelected(true);
+		verify(mockEditor).setCanDelete(true);
+		verify(mockEditor, times(3)).setCanMoveUp(false);
+		verify(mockEditor, times(3)).setCanMoveUp(false);
+		
+		ColumnModelTableRowEditor three = widget.addNewColumn();
+		// With a new row the second row can move down.
+		verify(mockEditor, times(2)).setCanDelete(true);
+		verify(mockEditor, times(3)).setCanMoveUp(false);
+		verify(mockEditor, times(3)).setCanMoveUp(false);;
+		
+		// select all
+		widget.selectAll();
+		assertTrue(one.isSelected());
+		assertTrue(two.isSelected());
+		assertTrue(three.isSelected());
+		// The select all must not attempt to change the state
+		// of the buttons for each selection and instead 
+		// update the state at the end of the selection.
+		verify(mockEditor, times(3)).setCanDelete(true);
+		verify(mockEditor, times(4)).setCanMoveUp(false);
+		verify(mockEditor, times(4)).setCanMoveUp(false);
+	}
+	
+	@Test
+	public void testSelectNone(){
+		boolean isEdtiable = true;
+		String tableId = "syn123";
+		List<ColumnModel> schema = new LinkedList<ColumnModel>();
+		widget.configure(tableId, schema, isEdtiable);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add three columns
+		ColumnModelTableRowEditor one = widget.addNewColumn();
+		ColumnModelTableRowEditor two = widget.addNewColumn();
+		// Start with two selected
+		two.setSelected(true);
+		ColumnModelTableRowEditor three = widget.addNewColumn();
+		// select all
+		widget.selectNone();
+		assertFalse(one.isSelected());
+		assertFalse(two.isSelected());
+		assertFalse(three.isSelected());
+		
+		assertFalse(mockEditor.isDeleteEnabled());
+		assertFalse(mockEditor.isMoveDownEnabled());
+		assertFalse(mockEditor.isMoveUpEnabled());
+		
+	}
+	
+	@Test
+	public void testToggleSelect(){
+		boolean isEdtiable = true;
+		String tableId = "syn123";
+		List<ColumnModel> schema = new LinkedList<ColumnModel>();
+		widget.configure(tableId, schema, isEdtiable);
+		// Show the dialog
+		widget.onEditColumns();
+		// Add three columns
+		ColumnModelTableRowEditor one = widget.addNewColumn();
+		ColumnModelTableRowEditor two = widget.addNewColumn();
+		// Start with two selected
+		two.setSelected(true);
+		ColumnModelTableRowEditor three = widget.addNewColumn();
+		// select all
+		widget.toggleSelect();
+		assertFalse(one.isSelected());
+		assertFalse(two.isSelected());
+		assertFalse(three.isSelected());
+		// do it again
+		widget.toggleSelect();
+		assertTrue(one.isSelected());
+		assertTrue(two.isSelected());
+		assertTrue(three.isSelected());
 	}
 }
