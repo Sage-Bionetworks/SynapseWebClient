@@ -37,9 +37,6 @@ public class Dialog extends Composite {
 	@UiField
 	Modal modal;
 
-	//add enum with 3 values for modal size
-	
-	
 	/**
 	 * Create a new Modal dialog.
 	 */
