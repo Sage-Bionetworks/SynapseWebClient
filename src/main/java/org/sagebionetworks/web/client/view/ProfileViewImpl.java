@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -22,7 +23,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -109,8 +111,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement navtabContainer;
 	
-	private Synapse.ProfileArea currentArea;
-	
 	@UiField
 	DivElement projectsTabContainer;
 	@UiField
@@ -161,7 +161,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private TeamListWidget myTeamsWidget;
 	private CertificateWidget certificateWidget;
 	private SettingsPresenter settingsPresenter;
-	private EntityTreeBrowser myProjectsTreeBrowser;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -175,7 +175,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			CookieProvider cookies,
 			CertificateWidget certificateWidget,
 			SettingsPresenter settingsPresenter,
-			EntityTreeBrowser myProjectsTreeBrowser) {		
+			PortalGinInjector ginInjector) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -187,8 +187,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.cookies = cookies;
 		this.certificateWidget = certificateWidget;
 		this.settingsPresenter = settingsPresenter;
-		this.myProjectsTreeBrowser = myProjectsTreeBrowser;
-		
+		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -237,7 +236,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-		myProjectsTreeBrowser.clear();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
@@ -299,9 +297,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				DisplayUtils.show(picturePanel);
 			}
 			
-			Widget projectTreeBrowser = myProjectsTreeBrowser.asWidget();
-			projectsTabContent.add(projectTreeBrowser);
-			
 			//Teams
 			SimplePanel wrapper = new SimplePanel();
 			wrapper.add(myTeamsWidget.asWidget());
@@ -316,7 +311,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setMyProjects(List<EntityHeader> myProjects) {
-		myProjectsTreeBrowser.configure(myProjects, true);
+		for (EntityHeader entityHeader : myProjects) {
+			FlowPanel panel = new FlowPanel();
+			projectsTabContent.add(panel);
+			EntityBadge teamRenderer = ginInjector.getEntityBadgeWidget();
+			teamRenderer.configure(entityHeader);
+			Widget teamRendererWidget = teamRenderer.asWidget();
+			teamRendererWidget.addStyleName("margin-top-5 inline-block");
+			panel.add(teamRendererWidget);
+		}
+		if (myProjects.isEmpty())
+			projectsTabContent.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
 	}
 
 	@Override
@@ -538,7 +543,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		editPictureButtonPanel.clear();
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
-		myProjectsTreeBrowser.clear();
+		projectsTabContent.clear();
 		DisplayUtils.hide(showProfileLink);
 		
 		hideTabContainers();
@@ -629,7 +634,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				setTabSelected(targetTab);					
-				currentArea = targetTab;
 			}
 		};
 	}
