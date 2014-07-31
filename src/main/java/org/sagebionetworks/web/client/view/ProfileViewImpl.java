@@ -311,17 +311,20 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setMyProjects(List<EntityHeader> myProjects) {
+		FlowPanel wrapper = new FlowPanel();
+		wrapper.addStyleName("highlight-box");
+		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Projects");
+		projectsTabContent.add(wrapper);
+		
 		for (EntityHeader entityHeader : myProjects) {
-			FlowPanel panel = new FlowPanel();
-			projectsTabContent.add(panel);
 			EntityBadge teamRenderer = ginInjector.getEntityBadgeWidget();
 			teamRenderer.configure(entityHeader);
 			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("margin-top-5 inline-block");
-			panel.add(teamRendererWidget);
+			teamRendererWidget.addStyleName("margin-top-5");
+			wrapper.add(teamRendererWidget);
 		}
 		if (myProjects.isEmpty())
-			projectsTabContent.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+			wrapper.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
 	}
 
 	@Override
