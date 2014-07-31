@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -14,17 +15,21 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
+import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -46,10 +51,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
-	private UserProfile ownerProfile;
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
+	private SearchServiceAsync searchService;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	
 	@Inject
@@ -62,7 +67,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			CookieProvider cookieProvider,
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SearchServiceAsync searchService) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.linkedInService = linkedInService;
@@ -73,6 +79,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
+		this.searchService = searchService;
 		view.setPresenter(this);
 	}
 
@@ -181,7 +188,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					try {
 						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
 						if (isOwner) {
-							ownerProfile = profile;
 							//only configure the profile form (editor) if owner of this profile
 							profileForm.configure(profile, profileUpdatedCallback);
 						}
@@ -215,6 +221,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, teams, isEditing, isOwner, passingRecord, profileForm.asWidget());
+					getUserProjects(profile.getOwnerId());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -225,6 +232,78 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.updateView(profile, teams, isEditing, isOwner, null, profileForm.asWidget());
 				else
 					view.showErrorMessage(caught.getMessage());
+				
+				getUserProjects(profile.getOwnerId());
+			}
+		});
+	}
+	
+	public void getUserProjects(String userId) {
+		EntityBrowserUtils.loadUserUpdateable(userId, searchService, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> result) {
+				view.setMyProjects(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setMyProjectsError("Could not load Projects");
+			}
+		});
+	}
+	
+	@Override
+	public void createProject(final String name) {
+		//validate project name
+		if (!DisplayUtils.isDefined(name)) {
+			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			return;
+		}
+		
+		CreateEntityUtil.createProject(name, synapseClient, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newProjectId) {
+				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
+				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof ConflictException) {
+					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+				} else {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+					} 
+				}
+			}
+		});
+	}
+	
+
+	@Override
+	public void createTeam(final String teamName) {
+		//validate project name
+		if (!DisplayUtils.isDefined(teamName)) {
+			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			return;
+		}
+
+		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String newTeamId) {
+				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(caught instanceof ConflictException) {
+					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+				} else {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
 			}
 		});
 	}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -26,11 +25,20 @@ public class EntityBrowserUtils {
 			final GlobalApplicationState globalApplicationState,
 			final AuthenticationController authenticationController,			
 			final AsyncCallback<List<EntityHeader>> callback) {
-		//first, load the projects that the user created
 		if(authenticationController.isLoggedIn()) {
-			
+			loadUserUpdateable(authenticationController.getCurrentUserPrincipalId(), searchService, adapterFactory, globalApplicationState, callback);
+		}
+	}
+	
+	public static void loadUserUpdateable(String userId,
+			SearchServiceAsync searchService,
+			final AdapterFactory adapterFactory,
+			final GlobalApplicationState globalApplicationState,
+			final AsyncCallback<List<EntityHeader>> callback) {
+		//first, load the projects that the user created
+		if(userId!=null) {
 			List<WhereCondition> where = new ArrayList<WhereCondition>();
-			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, authenticationController.getCurrentUserPrincipalId()));
+			where.add(new WhereCondition(WebConstants.ENTITY_CREATEDBYPRINCIPALID_KEY, WhereOperator.EQUALS, userId));
 			searchService.searchEntities("project", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
 				@Override
 				public void onSuccess(List<String> result) {
