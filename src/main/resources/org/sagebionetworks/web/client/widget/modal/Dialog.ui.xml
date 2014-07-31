@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+	<g:HTMLPanel>
+		<b:Modal ui:field="modal" title="title" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		  <b:ModalBody>
+		    <g:FlowPanel ui:field="mainContent" />
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="primaryButton" type="PRIMARY">OK</b:Button>
+		    <b:Button ui:field="defaultButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
+	</g:HTMLPanel>
+</ui:UiBinder> 

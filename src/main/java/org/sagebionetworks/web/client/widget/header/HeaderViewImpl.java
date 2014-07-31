@@ -198,7 +198,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userCommands = new FlowPanel();
         	userCommands.addStyleName("view header-inner-commands-container");
         	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
-        	userGuide.addStyleName("displayInline imageButton moveup-2 margin-left-5 font-size-17");
+        	userGuide.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.SYNAPSE_TUTORIAL, TOOLTIP_POSITION.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
@@ -208,7 +208,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
     		
         	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
-        	settings.addStyleName("displayInline imageButton margin-left-5 font-size-17");
+        	settings.addStyleName("displayInline imageButton movedown-3 margin-left-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
         	settings.addClickHandler(new ClickHandler() {
 				@Override
@@ -218,7 +218,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
 		 	
         	HTML logout = new HTML(DisplayUtils.getFontelloIcon("logout"));
-        	logout.addStyleName("displayInline imageButton moveup-2 margin-left-5 margin-right-5 font-size-17");
+        	logout.addStyleName("displayInline imageButton movedown-2 margin-left-5 margin-right-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
         	logout.addClickHandler(new ClickHandler() {
 				@Override
@@ -228,7 +228,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			});
         	
         	HTML dashboard = new HTML(DisplayUtils.getIcon("glyphicon-home"));
-        	dashboard.addStyleName("displayInline imageButton margin-left-5 font-size-17");
+        	dashboard.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
         	DisplayUtils.addTooltip(this.synapseJSNIUtils, dashboard, DisplayConstants.TEXT_USER_HOME, TOOLTIP_POSITION.BOTTOM);
         	dashboard.addClickHandler(new ClickHandler() {
 				@Override

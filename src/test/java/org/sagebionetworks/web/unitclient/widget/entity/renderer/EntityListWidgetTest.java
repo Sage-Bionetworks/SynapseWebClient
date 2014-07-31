@@ -65,7 +65,7 @@ public class EntityListWidgetTest {
 		syn456 = new Data();
 		syn456.setId("syn456");
 		syn456.setName(syn456.getId());
-		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(syn456, null, null, null, null, null, null, null);
 		EntityBundleTransport transport = new EntityBundleTransport();
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn456.getId()), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn456.getId()), eq(1L), anyInt(), any(AsyncCallback.class));
@@ -126,7 +126,7 @@ public class EntityListWidgetTest {
 		FileEntity syn789 = new FileEntity();
 		syn789.setId("syn789");
 		syn789.setName(syn789.getId());
-		EntityBundle bundle = new EntityBundle(syn789, null, null, null, null, null, null);
+		EntityBundle bundle = new EntityBundle(syn789, null, null, null, null, null, null, null);
 		EntityBundleTransport transport = new EntityBundleTransport();
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(eq(syn789.getId()), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundleForVersion(eq(syn789.getId()), eq(1L), anyInt(), any(AsyncCallback.class));

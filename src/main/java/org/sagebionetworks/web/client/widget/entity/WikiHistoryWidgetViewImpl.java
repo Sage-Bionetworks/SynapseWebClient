@@ -298,7 +298,7 @@ public class WikiHistoryWidgetViewImpl extends LayoutContainer implements WikiHi
 			public void invoke() {
 			}	
 		};
-		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, MessagePopup.WARNING, 500, okCallback, cancelCallback);
+		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, MessagePopup.WARNING, okCallback, cancelCallback);
 	}
 	
 	private SimplePanel wrapWidget(Widget widget, String styleNames) {

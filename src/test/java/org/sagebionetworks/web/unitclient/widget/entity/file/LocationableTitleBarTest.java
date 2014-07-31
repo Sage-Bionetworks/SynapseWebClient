@@ -50,13 +50,13 @@ public class LocationableTitleBarTest {
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testIsDataInLocationableFail() {
-		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null, null, null);
+		EntityBundle bundle = new EntityBundle(new Project(), null, null, null,null, null, null, null);
 		LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, true);
 	}
 	
 	@Test
 	public void testIsDataInLocationableAnonymous() {
-		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, null, null);
+		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, null, null, null);
 		boolean isLoggedIn = false;
 		Assert.assertTrue(LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, isLoggedIn));
 	}
@@ -65,7 +65,7 @@ public class LocationableTitleBarTest {
 	public void testIsDataInLocationableUnmetAcccess() {
 		List<AccessRequirement> unmetAccessRequirements = new ArrayList<AccessRequirement>();
 		unmetAccessRequirements.add(new ACTAccessRequirement());
-		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, unmetAccessRequirements, null);
+		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, unmetAccessRequirements, null, null);
 		Assert.assertTrue(LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, true));
 	}
 	
@@ -75,12 +75,12 @@ public class LocationableTitleBarTest {
 		List<LocationData> locations = new ArrayList<LocationData>();
 		locations.add(new LocationData());
 		code.setLocations(locations);
-		EntityBundle bundle = new EntityBundle(code, null, null, null,null, null, null);
+		EntityBundle bundle = new EntityBundle(code, null, null, null,null, null, null, null);
 		Assert.assertTrue(LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, true));
 	}
 	@Test
 	public void testIsDataInLocationableNoLocations() {
-		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, null, null);
+		EntityBundle bundle = new EntityBundle(new Code(), null, null, null,null, null, null, null);
 		Assert.assertFalse(LocationableTitleBar.isDataPossiblyWithinLocationable(bundle, true));
 	}
 }

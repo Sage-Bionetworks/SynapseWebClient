@@ -83,7 +83,7 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 			}	
 		};
 
-		DisplayUtils.showOkCancelMessage("Login or Register", DisplayConstants.ANONYMOUS_JOIN_EVALUATION, MessagePopup.INFO, 320, okCallback, cancelCallback);
+		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN_EVALUATION, MessagePopup.INFO, okCallback, cancelCallback);
 	}
 	
 
