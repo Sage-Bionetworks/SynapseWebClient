@@ -474,6 +474,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.base.ComplexWidget;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -503,6 +504,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -542,7 +544,9 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@UiField
 	Button deleteAllButton;
 	@UiField
-	SimplePanel trashListPanel;
+	SimplePanel mainPanel;
+	@UiField
+	FlowPanel trashTableAndPaginationPanel;
 	@UiField
 	Button deleteSelectedButton;
 	@UiField
@@ -559,11 +563,17 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private Footer footerWidget;
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJsniUtils;
-	Map<TrashedEntity, Integer> trash2Row;
-	Set<TrashedEntity> selectedTrash;
-	Set<CheckBox> checkBoxes;
-	boolean selectAllChecked;		// TODO: hacky and wrong. How to get this info from checkbox "Event"?
-									// Psych I'm not gonna worry about it since I'm redoing the whole table.
+	private Map<TrashedEntity, Integer> trash2Row;
+	private Set<TrashedEntity> selectedTrash;
+	private Set<CheckBox> checkBoxes;
+	
+	// TODO: Where do I put this? Doesn't work in presenter?
+	public List<TrashedEntity> fetchedEntities;
+	
+	public List<TrashedEntity> getFetchedEntitiesList() {
+		return fetchedEntities;
+	}
+	
 	@Inject
 	public TrashViewImpl(TrashViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
@@ -580,6 +590,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		trash2Row = new HashMap<TrashedEntity, Integer>();
 		selectedTrash = new HashSet<TrashedEntity>();
 		checkBoxes = new HashSet<CheckBox>();
+		fetchedEntities = new ArrayList<TrashedEntity>();
 		
 		// Set up the delete all button.
 		deleteAllButton.addClickHandler(new ClickHandler() {
@@ -649,6 +660,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	@Override
 	public void configure(List<TrashedEntity> trashedEntities) {
+		mainPanel.setWidget(trashTableAndPaginationPanel);
 		for (TrashedEntity trashedEntity : trashedEntities) {
 			displayTrashedEntity(trashedEntity);
 		}
@@ -660,7 +672,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	@Override
 	public void displayEmptyTrash() {
-		trashListPanel.setWidget(new Label(TRASH_IS_EMPTY_DISPLAY));
+		mainPanel.setWidget(new Label(TRASH_IS_EMPTY_DISPLAY));
 	}
 	
 	@Override
@@ -693,6 +705,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	public void refreshTable() {
 		clear();
 		presenter.getTrash(presenter.getOffset());
+		deleteSelectedButton.setEnabled(false);
 	}
 	
 	@Override
@@ -785,6 +798,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 			trash2Row.remove(trashedEntity);
 			checkBoxes.remove(checkBox);
 			decrementBeyondRemovedRow(removeRowIndex);
+			
+			selectedTrash.remove(trashedEntity);
+			if (selectedTrash.isEmpty())
+				deleteSelectedButton.setEnabled(false);
 	
 			
 			// Remove that row from the table

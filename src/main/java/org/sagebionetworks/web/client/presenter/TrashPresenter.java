@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -18,6 +20,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,7 +42,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private NodeModelCreator nodeModelCreator;
-	private PaginatedResults<TrashedEntity> trashList;
+	private PaginatedResults<TrashedEntity> trashList;	// TODO: Delete.
 	private int offset;
 
 	@Inject
@@ -53,7 +56,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		this.globalAppState = globalAppState;
 		this.authController = authController;
 		this.nodeModelCreator = nodeModelCreator;
-		
 		this.view.setPresenter(this);
 	}	
 	
@@ -89,11 +91,40 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	}
 
 	@Override
-	public void getTrash(final Integer offset) {
-		if (offset == null)
+	public void getTrash(Integer offset) {
+		if (offset == null) {
 			this.offset = 0;
-		else
+		} else {
 			this.offset = offset;
+		}
+//		final Integer nonNullOffset = this.offset;
+//		
+//		// Add enough nulls to the end of fetched entities.
+//		while (view.getFetchedEntitiesList().size() < this.offset + TRASH_LIMIT) {
+//			view.getFetchedEntitiesList().add(null);
+//		}
+//		
+//		// Check if you have encountered the trash at given offset.
+//		List<TrashedEntity> alreadyFetched = new ArrayList<TrashedEntity>();
+//		for (int i = 0; i < TRASH_LIMIT; i++) {
+//			if (this.offset + i >= view.getFetchedEntitiesList().size()) {
+//				// Haven't fetched trash with this large of offset.
+//				break;
+//			}
+//			TrashedEntity currEntity = view.getFetchedEntitiesList().get(this.offset + i);
+//			if (currEntity == null) {
+//				// Haven't fetched this trash.
+//				break;
+//			}
+//			alreadyFetched.add(currEntity);
+//		}
+//		
+//		if (alreadyFetched.size() == TRASH_LIMIT) {
+//			// All entities have already been fetched. Display them and return.
+//			view.configure(alreadyFetched);
+//			return;
+//		}
+		
 		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
@@ -101,6 +132,11 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				try {
 					trashList = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
 					if (trashList.getTotalNumberOfResults() > 0) {
+//						// Add them to fetched entities.
+//						List<TrashedEntity> results = trashList.getResults();
+//						for (int i = 0; i < results.size(); i++) {
+//							view.getFetchedEntitiesList().set(nonNullOffset + i, results.get(i));
+//						}
 						view.configure(trashList.getResults());
 					} else {
 						view.displayEmptyTrash();
@@ -136,8 +172,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				view.showInfo(TRASH_PURGED_TITLE, entityNames.toString().
 											substring(1, entityNamesSet.length() - 1) + ".");
 				// Refresh table.
-				view.clear();
-				getTrash(offset);
+				view.refreshTable();
 			}
 			
 			@Override
@@ -160,7 +195,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException) {
+				if (caught instanceof ForbiddenException) {
 					//view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
 					view.alertErrorMessage(caught.getMessage());
 				} else {

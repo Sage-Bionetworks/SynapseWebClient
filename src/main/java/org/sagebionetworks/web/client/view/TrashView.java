@@ -26,6 +26,8 @@ public interface TrashView extends IsWidget, SynapseView {
 	void refreshTable();
 	void alertErrorMessage(String message);
 	
+	List<TrashedEntity> getFetchedEntitiesList();
+	
 	public interface Presenter extends SynapsePresenter {
 		/**
 		 * Permanently deletes all Entities in the trash.
