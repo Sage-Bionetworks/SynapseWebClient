@@ -26,6 +26,9 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -151,13 +154,11 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.ButtonBase;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
@@ -492,7 +493,7 @@ public class DisplayUtils {
 	}
 
 	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + message + "...";
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
 	}
 
 
@@ -527,7 +528,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		showPopup("", message, MessagePopup.WARNING, 300, DisplayConstants.OK, null, null, null);
+		showPopup("", message, MessagePopup.WARNING, null, null);
 	}
 
 	/**
@@ -610,7 +611,7 @@ public class DisplayUtils {
 			String message,
 			Callback okCallback
 			) {
-		showPopup(title, message, MessagePopup.INFO, 300, DisplayConstants.OK, okCallback, null, null);
+		showPopup(title, message, MessagePopup.INFO, okCallback, null);
 	}
 	
 	public static void showConfirmDialog(
@@ -619,7 +620,7 @@ public class DisplayUtils {
 			Callback yesCallback,
 			Callback noCallback
 			) {
-		showPopup(title, message, MessagePopup.QUESTION, 300, DisplayConstants.YES, yesCallback, DisplayConstants.NO, noCallback);
+		showPopup(title, message, MessagePopup.QUESTION, yesCallback, noCallback);
 	}
 	
 	public static void showConfirmDialog(
@@ -635,84 +636,55 @@ public class DisplayUtils {
 		});
 	}
 	
-	public static void showOkCancelMessage(
-			String title, 
-			String message, 
-			MessagePopup iconStyle,
-			int minWidth,
-			Callback okCallback,
-			Callback cancelCallback) {
-		showPopup(title, message, iconStyle, minWidth, DisplayConstants.OK, okCallback, DisplayConstants.BUTTON_CANCEL, cancelCallback);
-	}
-
 	public static void showPopup(String title, String message,
-			DisplayUtils.MessagePopup iconStyle, int minWidth,
-			String primaryButtonText, final Callback primaryButtonCallback,
-			String secondaryButtonText, final Callback secondaryButtonCallback) {
-
-		final Window dialog = new Window();
-		dialog.setMaximizable(false);
-		dialog.setSize(minWidth, 100);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setAutoHeight(true);
-		dialog.setResizable(false);
-		dialog.setClosable(false); //do not include x button in upper right
+			DisplayUtils.MessagePopup iconStyle,
+			final Callback primaryButtonCallback,
+			final Callback secondaryButtonCallback) {
+		
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
+			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10");
+			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10");
-		HorizontalPanel content = new HorizontalPanel();
+			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		if (DisplayUtils.isDefined(title)) {
+			builder.appendHtmlConstant("<h5>");
+			builder.appendEscaped(title);
+			builder.appendHtmlConstant("</h5>");
+		}
+		builder.appendHtmlConstant("<div class=\"row\">");
 		if (iconHtml.length() > 0)
-			content.add(new HTML(iconHtml));
-		HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
-		messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
-		messagePanel.setWidth((minWidth-75) + "px");
-		content.add(messagePanel);
-		content.setWidth("100%");
-		content.addStyleName("whiteBackground padding-5");
-		dialog.add(content);
-		dialog.setHeading(title);
-		FlowPanel buttonPanel = new FlowPanel();
-		buttonPanel.setHeight("50px");
-		buttonPanel.addStyleName("whiteBackground");
-		boolean isSecondaryButton = secondaryButtonText != null;
-
-		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils
-				.createButton(primaryButtonText, ButtonType.PRIMARY);
-		continueButton.addStyleName("right margin-right-10 margin-bottom-10");
-		continueButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialog.hide();
-				if (primaryButtonCallback != null)
-					primaryButtonCallback.invoke();
-			}
-		});
-
-		buttonPanel.add(continueButton);
-
+			builder.appendHtmlConstant(iconHtml);
+		String messageWidth = DisplayUtils.isDefined(iconHtml) ? "col-xs-11" : "col-xs-12";
+		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
+		builder.appendEscaped(message);
+		builder.appendHtmlConstant("</div></div>");
+		boolean isSecondaryButton = secondaryButtonCallback != null;
+		
 		if (isSecondaryButton) {
-			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils
-					.createButton(secondaryButtonText);
-			cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
-			cancelButton.addClickHandler(new ClickHandler() {
+			Bootbox.confirm(builder.toSafeHtml().asString(), new ConfirmCallback() {
 				@Override
-				public void onClick(ClickEvent event) {
-					dialog.hide();
-					if (secondaryButtonCallback != null)
-						secondaryButtonCallback.invoke();
+				public void callback(boolean isConfirmed) {
+					if (isConfirmed) {
+						if (primaryButtonCallback != null)
+							primaryButtonCallback.invoke();
+					} else {
+						if (secondaryButtonCallback != null)
+							secondaryButtonCallback.invoke();
+					}
 				}
 			});
-			buttonPanel.add(cancelButton);
+		} else {
+			Bootbox.alert(builder.toSafeHtml().asString(), new AlertCallback() {
+				@Override
+				public void callback() {
+					if (primaryButtonCallback != null)
+						primaryButtonCallback.invoke();
+				}
+			});
 		}
-
-		dialog.add(buttonPanel);
-		dialog.show();
-		center(dialog);
 	}
 	
 	public static void center(Window window) {
@@ -1650,11 +1622,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
 	}
 	
 	public static String getWidgetMD(String attachmentName) {
@@ -1669,11 +1641,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**

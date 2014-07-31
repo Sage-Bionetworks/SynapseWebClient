@@ -4,18 +4,16 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIR
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_PATH;
-import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY_REFERENCEDBY;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.FILE_HANDLES;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.HAS_CHILDREN;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.PERMISSIONS;
+import static org.sagebionetworks.web.shared.EntityBundleTransport.TABLE_DATA;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -113,7 +111,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		// We want the entity, permissions and path.
 		// TODO : add REFERENCED_BY
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | TABLE_DATA;
 		AsyncCallback<EntityBundleTransport> callback = new AsyncCallback<EntityBundleTransport>() {
 			@Override
 			public void onSuccess(EntityBundleTransport transport) {				

@@ -80,7 +80,7 @@ public class EntityPresenterTest {
 		ebt = new EntityBundleTransport();
 		ebt.setIsWikiBasedEntity(false);
 		Entity testEntity = new Project();
-		eb = new EntityBundle(testEntity, null, null, null, null, null, null);
+		eb = new EntityBundle(testEntity, null, null, null, null, null, null, null);
 		EntityPath path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
 		eb.setPath(path);

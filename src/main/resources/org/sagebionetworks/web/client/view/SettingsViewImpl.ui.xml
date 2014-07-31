@@ -53,7 +53,7 @@
 				</div>
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
-					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-40" >
+					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-20" >
 					        <form class="form-horizontal" role="form">
 					   			  <div ui:field="currentPassword" class="form-group row">
 								    <label class="col-sm-3 control-label">Current password</label>
@@ -76,10 +76,12 @@
 								      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
-								  <div class="col-sm-12">
-								      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
-								      <g:FlowPanel ui:field="forgotPasswordContainer"/>
-								  </div>
+								  <div class="form-group row">
+									  <div class="col-sm-12">
+									      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
+									      <g:FlowPanel ui:field="forgotPasswordContainer"/>
+									  </div>
+								 </div>
 							</form>
 						</div>
 					</div>

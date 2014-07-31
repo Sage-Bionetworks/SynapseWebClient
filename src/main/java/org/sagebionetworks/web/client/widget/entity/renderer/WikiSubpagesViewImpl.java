@@ -21,7 +21,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	private Presenter presenter;
 	private GlobalApplicationState globalAppState;
-	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3";
+	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
 	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
 	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
@@ -39,7 +39,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void clear() {
 		super.clear();
-		removeStyleName("well");
 	}
 	
 	@Override
@@ -52,7 +51,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
 			return;
-		addStyleName("bs-sidebar");
 		//only show the tree if the root has children
 		if (mainPage.getChildCount() > 0) {
 			//traverse the tree, and create anchors
@@ -109,7 +107,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				
 		if (showHideButton != null) {
 			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-			showHideButton.addStyleName("btn btn-default btn-xs left");
+			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
 		}
 		
 		if (ulContainer != null)
@@ -139,7 +137,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
 			showHideButton.addStyleName("btn btn-default btn-xs right");		
 		}
-		addStyleName("well");
 		
 		if (ulContainer != null)
 			DisplayUtils.show(ulContainer);
