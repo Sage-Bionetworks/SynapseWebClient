@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 
@@ -133,8 +134,6 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 		}else{
 			editColumnsButton.setVisible(false);
 			addColumnButton.setVisible(true);
-			final String tbodyId = "tableBodyId";
-			tableBody.setId(tbodyId);
 		}
 	}
 	
@@ -146,40 +145,26 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void addColumn(ColumnModelTableRow row) {
 		tableBody.add(row);
-		if(ViewType.EDITOR.equals(this.viewType))
-		if(!this.buttonToolbar.isVisible()){
-			this.buttonToolbar.setVisible(true);
+		if(ViewType.EDITOR.equals(this.viewType)){
+			if(!this.buttonToolbar.isVisible()){
+				this.buttonToolbar.setVisible(true);
+			}
 		}
 	}
 
 	@Override
 	public void setCanDelete(boolean canDelete) {
-		this.deleteSelectedButton.setEnabled(canDelete);
-		if(canDelete){
-			this.deleteSelectedButton.setType(ButtonType.DANGER);
-		}else{
-			this.deleteSelectedButton.setType(ButtonType.DEFAULT);
-		}
+		ButtonUtils.setEnabledAndType(canDelete, this.deleteSelectedButton, ButtonType.DANGER);
 	}
 
 	@Override
 	public void setCanMoveUp(boolean canMoveUp) {
-		this.moveUpButton.setEnabled(canMoveUp);
-		if(canMoveUp){
-			this.moveUpButton.setType(ButtonType.INFO);
-		}else{
-			this.moveUpButton.setType(ButtonType.DEFAULT);
-		}
+		ButtonUtils.setEnabledAndType(canMoveUp, this.moveUpButton, ButtonType.INFO);
 	}
 
 	@Override
 	public void setCanMoveDown(boolean canMoveDown) {
-		this.moveDownButton.setEnabled(canMoveDown);
-		if(canMoveDown){
-			this.moveDownButton.setType(ButtonType.INFO);
-		}else{
-			this.moveDownButton.setType(ButtonType.DEFAULT);
-		}
+		ButtonUtils.setEnabledAndType(canMoveDown, this.moveDownButton, ButtonType.INFO);
 	}
 
 	@Override

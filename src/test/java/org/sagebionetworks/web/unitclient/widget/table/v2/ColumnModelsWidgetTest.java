@@ -8,7 +8,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -194,28 +194,32 @@ public class ColumnModelsWidgetTest {
 		widget.onEditColumns();
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
-		verify(mockEditor).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveDown(false);
 		
 		// Add three columns
+		reset(mockEditor);
 		ColumnModelTableRowEditor one = widget.addNewColumn();
-		verify(mockEditor, times(2)).setCanDelete(false);
-		verify(mockEditor, times(2)).setCanMoveUp(false);
-		verify(mockEditor, times(2)).setCanMoveUp(false);
+		verify(mockEditor).setCanDelete(false);
+		verify(mockEditor).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveDown(false);
 		
 		ColumnModelTableRowEditor two = widget.addNewColumn();
 		// Start with two selected
+		reset(mockEditor);
 		two.setSelected(true);
 		verify(mockEditor).setCanDelete(true);
-		verify(mockEditor, times(3)).setCanMoveUp(false);
-		verify(mockEditor, times(3)).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveUp(true);
+		verify(mockEditor).setCanMoveDown(false);
 		
+		reset(mockEditor);
 		ColumnModelTableRowEditor three = widget.addNewColumn();
 		// With a new row the second row can move down.
-		verify(mockEditor, times(2)).setCanDelete(true);
-		verify(mockEditor, times(3)).setCanMoveUp(false);
-		verify(mockEditor, times(3)).setCanMoveUp(false);;
+		verify(mockEditor).setCanDelete(true);
+		verify(mockEditor).setCanMoveUp(true);
+		verify(mockEditor).setCanMoveDown(true);;
 		
 		// select all
+		reset(mockEditor);
 		widget.selectAll();
 		assertTrue(one.isSelected());
 		assertTrue(two.isSelected());
@@ -223,9 +227,9 @@ public class ColumnModelsWidgetTest {
 		// The select all must not attempt to change the state
 		// of the buttons for each selection and instead 
 		// update the state at the end of the selection.
-		verify(mockEditor, times(3)).setCanDelete(true);
-		verify(mockEditor, times(4)).setCanMoveUp(false);
-		verify(mockEditor, times(4)).setCanMoveUp(false);
+		verify(mockEditor).setCanDelete(true);
+		verify(mockEditor).setCanMoveUp(false);
+		verify(mockEditor).setCanMoveDown(false);
 	}
 	
 	@Test
@@ -247,11 +251,6 @@ public class ColumnModelsWidgetTest {
 		assertFalse(one.isSelected());
 		assertFalse(two.isSelected());
 		assertFalse(three.isSelected());
-		
-		assertFalse(mockEditor.isDeleteEnabled());
-		assertFalse(mockEditor.isMoveDownEnabled());
-		assertFalse(mockEditor.isMoveUpEnabled());
-		
 	}
 	
 	@Test
