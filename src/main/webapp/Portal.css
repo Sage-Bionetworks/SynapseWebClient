@@ -1117,6 +1117,9 @@ ol.lowerroman {
 	padding-top: 15px !important;
 }
 
+.padding-top-bottom-15-left-right-25 {
+	padding: 15px 25px 15px 25px;
+}
 
 .padding-bottom-15 {
 	padding-bottom: 15px;

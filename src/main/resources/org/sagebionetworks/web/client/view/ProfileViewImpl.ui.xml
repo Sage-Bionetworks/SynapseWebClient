@@ -42,7 +42,7 @@
 					    </ul>
 					</div>
 					<div class="row">
-						<div class="tab-background padding-15" ui:field="projectsTabContainer">
+						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div ui:field="createProjectUI" class="margin-bottom-10 row">
 							    <div class="col-xs-12 col-sm-6">
 									<div class="input-group">
@@ -59,7 +59,7 @@
 							</div>
 							<g:FlowPanel ui:field="projectsTabContent" />
 						</div>
-					    <g:FlowPanel styleName="tab-background padding-15" ui:field="challengesTabContainer" />
+					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer" />
 						<div class="tab-background padding-15" ui:field="teamsTabContainer">
 							<div ui:field="createTeamUI" class="margin-bottom-10 row">
 							    <div class="col-xs-12 col-sm-6">
@@ -74,8 +74,8 @@
 							</div>
 							<g:FlowPanel ui:field="teamsTabContent" />
 						</div>
-					    <g:FlowPanel styleName="tab-background padding-15" ui:field="messagesTabContainer" />
-					    <g:FlowPanel styleName="tab-background padding-15" ui:field="settingsTabContainer" />
+					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="messagesTabContainer" />
+					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer" />
 						
 					</div>
 				</div>
