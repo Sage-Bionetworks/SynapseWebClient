@@ -18,6 +18,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	private String maxSize;
 	private String defaultValue;
 	private boolean isSelected;
+	private SelectionPresenter selectionPresenter;
 	public String getColumnName() {
 		return columnName;
 	}
@@ -47,6 +48,8 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	}
 	public void setSelected(boolean isSelected) {
 		this.isSelected = isSelected;
+		// notify the presenter.
+		this.selectionPresenter.selectionChanged(isSelected);
 	}
 	public String getId() {
 		return id;
@@ -107,6 +110,15 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 		} else if (!maxSize.equals(other.maxSize))
 			return false;
 		return true;
+	}
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setSelectionPresenter(SelectionPresenter selectionPresenter) {
+		this.selectionPresenter = selectionPresenter;
 	}
 	
 }

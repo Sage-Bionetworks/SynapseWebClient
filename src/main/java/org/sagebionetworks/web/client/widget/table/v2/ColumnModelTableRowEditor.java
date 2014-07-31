@@ -13,7 +13,7 @@ public interface ColumnModelTableRowEditor extends ColumnModelTableRow {
 	 * @author John
 	 *
 	 */
-	public interface Presenter{
+	public interface TypePresenter{
 		
 		/**
 		 * Called when the type changes.
@@ -26,7 +26,7 @@ public interface ColumnModelTableRowEditor extends ColumnModelTableRow {
 	 * 
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
+	public void setTypePresenter(TypePresenter presenter);
 	
 	/**
 	 * Set the size field to be visible

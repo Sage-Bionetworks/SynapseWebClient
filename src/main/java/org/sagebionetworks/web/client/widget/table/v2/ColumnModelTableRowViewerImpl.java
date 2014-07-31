@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.CheckBoxButton;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
@@ -15,15 +15,10 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer {
+public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowViewer {
 	
 	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowViewerImpl> {	}
-	/*
-	 * The actual <tr> for this editor.
-	 */
-	TableRow row;
-	@UiField
-	CheckBoxButton select;
+
 	@UiField
 	FormControlStatic name;
 	@UiField
@@ -65,16 +60,6 @@ public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer 
 	}
 
 	@Override
-	public void setSelected(boolean select) {
-		this.select.setActive(select);
-	}
-
-	@Override
-	public boolean isSelected() {
-		return this.select.isActive();
-	}
-
-	@Override
 	public Widget asWidget() {
 		return row;
 	}
@@ -108,5 +93,6 @@ public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer 
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue.setText(defaultValue);
 	}
+
 
 }
