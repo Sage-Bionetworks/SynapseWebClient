@@ -408,7 +408,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 	
-	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin) {
+	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin)  {
+		return createModifiedAndCreatedWidget(entity, ginInjector, addTopMargin);
+	}
+	
+	public static Widget createModifiedAndCreatedWidget(Entity entity, PortalGinInjector ginInjector, boolean addTopMargin) {
 		FlowPanel attributionPanel = new FlowPanel();
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(entity.getCreatedBy());
