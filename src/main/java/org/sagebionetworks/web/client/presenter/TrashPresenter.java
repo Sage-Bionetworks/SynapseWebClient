@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
