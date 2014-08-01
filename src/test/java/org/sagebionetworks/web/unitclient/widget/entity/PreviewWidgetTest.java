@@ -56,7 +56,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setId(mainFileId);
 		testFileHandleList.add(mainFileHandle);
 		testEntity.setDataFileHandleId(mainFileId);
-		testBundle = new EntityBundle(testEntity, null,null,null,null,null,testFileHandleList);
+		testBundle = new EntityBundle(testEntity, null,null,null,null,null,testFileHandleList, null);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);

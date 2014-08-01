@@ -37,7 +37,7 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 		mp4Entity = new TextBox();
 		oggEntity = new TextBox();
 		webmEntity = new TextBox();
-		add(new HTML("<h5 class=\"margin-top-left-10\">The browser viewing the video will use the first format that it recognizes. "+
+		add(new HTML("<h5 class=\"margin-10\">The browser viewing the video will use the first format that it recognizes. "+
 				"<small>(<a class=\"link\" target=\"_blank\" href=\""+ClientProperties.VIDEO_HTML5_BROWSER_LINK+"\">more information</a>)</small></h5>"));
 		
 		add(initTextBox(mp4Entity, "Find MP4", "MPEG 4 files with H264 video codec and AAC audio codec"));
@@ -47,7 +47,7 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 
 	private Widget initTextBox(final TextBox textBox, String label, String tooltip){
 		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("row margin-top-left-10");
+		horizontalTable.addStyleName("margin-top-left-10");
 		
 		textBox.addStyleName("form-control inline-block");
 		textBox.setWidth("200px");
@@ -115,11 +115,11 @@ public class VideoConfigViewImpl extends FlowPanel implements VideoConfigView {
 
 	@Override
 	public int getDisplayHeight() {
-		return 200;
+		return 250;
 	}
 	@Override
 	public int getAdditionalWidth() {
-		return 0;
+		return 20;
 	}
 	
 	@Override

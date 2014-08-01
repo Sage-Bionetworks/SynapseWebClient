@@ -77,7 +77,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}
@@ -100,7 +100,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}
@@ -118,7 +118,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}

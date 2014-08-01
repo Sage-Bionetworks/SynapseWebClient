@@ -15,7 +15,25 @@
 		<div class="separator separator-header-home"></div>
 		
 		<!-- TOP 3 COLUMNS -->		
-		<div class="container">
+		<div class="container margin-top-30">
+		    
+		    <!-- Certification reminder -->
+			<div ui:field="certificationReminderUI" class="row margin-bottom-40">
+			    <div class="col-sm-12">
+			    	<div class="alert alert-info margin-bottom-0-imp">
+						<h5>
+							<span class="glyphicon glyphicon-info-sign"></span>
+							<a href="#!Help:GettingStarted"><strong>Join the Synapse Certified User Community today!</strong></a>
+						</h5>
+						<p>In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data. 
+						    <a class="link margin-left-10" href="http://wp.me/p2En4A-5T" target="_blank">Learn more</a>
+						</p>
+						<p>
+						    Starting on <span ui:field="lockdownDate1" />, only users who have passed a short Certified User Quiz will be able to upload content into Synapse. Don’t wait for <span ui:field="lockdownDate2" /> — <a class="link" href="#!Quiz:Certification" target="_blank">get your certification today!</a>
+						</p>
+					</div>
+				</div>
+			</div>
 			<div class="row">
 				<!-- What is Synapse -->
 				<g:HTMLPanel ui:field="whatIsSynapseContainer">
@@ -49,12 +67,8 @@
 						<h3>How to Use Synapse</h3>
 						<ul class="list arrow-list">
 							<li>
-								<a class="link howToUseLink" href="#!Help:GettingStarted" target="_blank">Getting Started Guide</a><br/>
-								A quick start guide to using Synapse
-							</li>
-							<li>
-								<a class="link howToUseLink" href="#!Help:UserGuide" target="_blank">Synapse User Guide</a><br/>
-								Using Synapse via the Web and programmatic clients
+								<a class="link howToUseLink" href="#!Help:GettingStarted" target="_blank">Synapse Tutorial</a><br/>
+								A guide to using Synapse
 							</li>
 							<li>
 								<a class="link howToUseLink" href="http://support.sagebase.org/sagebase" target="_blank">Support Forums</a><br/>
@@ -84,7 +98,7 @@
 				<!-- START PROJECT & MY PROJECTS -->
 				<g:SimplePanel ui:field="projectPanel" />
 			</div> <!-- end row -->				
-
+			
 			<!-- SEARCH BOX -->
 			<div class="row margin-top-15">
 				<h3>Search Synapse</h3>
@@ -108,7 +122,7 @@
 				  </ol>
 			      <div class="carousel-inner">
 			        <div class="item active">
-			          <a href="#!Challenges:DREAM8"><img src="images/spotlight/Dream85_Banner.jpg" alt="DREAM Challenges"/></a>
+			          <a href="#!Challenges:DREAM"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM">Learn More</a></p>
@@ -116,7 +130,7 @@
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn312572"><img src="images/spotlight/Dream85_SM.jpg" alt="ICGC-TCGA DREAM Somatic Mutation Calling Challenge"/></a>
+			          <a href="#!Synapse:syn312572"><g:Image resource='{sageImageBundle.dream85SM}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">			              
 			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn312572">Challenge Details &amp; Registration</a></p>
@@ -124,23 +138,32 @@
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn1734172"><img src="images/spotlight/Dream85_RA.jpg" alt="The Rheumatoid Arthritis Responder DREAM Challenge"/></a>
+			          <a href="#!Synapse:syn2455683"><g:Image resource='{sageImageBundle.dream9AML}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn1734172">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: -45px; left: 200px;" href="#!Synapse:syn2455683">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn2290704"><img src="images/spotlight/Dream85_AD.jpg" alt="The Big Data Alzheimer's Disease DREAM Challenge"/></a>
+			          <a href="#!Synapse:syn2290704"><g:Image resource='{sageImageBundle.dream9AD}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
-			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
+			              <p><a class="btn btn-large btn-primary" style="position: relative; top: -60px;" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
 			            </div>
 			          </div>
 			        </div>
 			        <div class="item">
-			          <a href="#!Synapse:syn300013"><img src="images/spotlight/TcgaPancancer.jpg" alt="TCGA Pancancer Project"/></a>
+			          <a href="#!Synapse:syn2384331"><g:Image resource='{sageImageBundle.dream9Broad}' /></a>
+			          <div class="container">
+			            <div class="carousel-caption">
+			                <p><a class="btn btn-large btn-primary" style="position: relative; top: -64px;" href="#!Synapse:syn2384331">Challenge Details &amp; Registration</a></p>
+			            </div>
+			          </div>
+			        </div>
+			        
+			        <div class="item">
+			          <a href="#!Synapse:syn300013"><g:Image resource='{sageImageBundle.tcgaPancancer}' /></a>
 			          <div class="container">
 			            <div class="carousel-caption">
 			              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn300013">TCGA Pancancer Project</a></p>
@@ -222,13 +245,11 @@
 					<div class="col-md-3">
 						<h3>Terms of Use</h3>
 						<div class="well">
-							<p>There are times where human data can only be shared with certain
-								restrictions. Learn what the rules are and how to apply and comply
-								with data privacy levels.</p>
+							<p>Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, 
+							    guidelines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews.</p>
 							<div style="margin-top: 10px;">
 								<h4>
-									<a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the
-										Rules for Sharing And Using Human Data</a>
+									<a href="#!Help:Governance" class="service-tipsy north link">Learn about Synapse Use and Oversight</a>
 								</h4>
 							</div>
 						</div>				

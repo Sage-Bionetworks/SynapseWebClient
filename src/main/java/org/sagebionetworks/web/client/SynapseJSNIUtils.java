@@ -47,13 +47,15 @@ public interface SynapseJSNIUtils {
 
 	public boolean isDirectUploadSupported();
 	
-	public void uploadFileChunk(String contentType, String fileFieldId, int startByte, int endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
+	public void uploadFileChunk(String contentType, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
 	
 	public String getContentType(String fileFieldId);
 	
+	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(String fileFieldId, MD5Callback callback);
 	public double getFileSize(String fileFieldId);
-
+	public void consoleLog(String message);
+	public void consoleError(String message);
 	public void uploadUrlToGenomeSpace(String url);	
 	public void uploadUrlToGenomeSpace(String url, String filename);
 	

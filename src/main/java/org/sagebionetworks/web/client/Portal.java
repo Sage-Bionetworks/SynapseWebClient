@@ -12,6 +12,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -46,7 +47,7 @@ public class Portal implements EntryPoint {
 				public void onFailure(Throwable reason) {
 					// Not sure what to do here.
 					loading.hide();
-					Window.alert(reason.getMessage());	
+					DisplayUtils.showErrorMessage(reason.getMessage());
 				}
 
 				@Override
@@ -65,8 +66,8 @@ public class Portal implements EntryPoint {
 
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
 						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
-						PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
-						historyHandler.register(placeController, eventBus, activityMapper.getDefaultPlace());						
+						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
+						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
 
@@ -81,9 +82,25 @@ public class Portal implements EntryPoint {
 						// start version timer
 						ginjector.getVersionTimer().start();
 						
-						// Goes to place represented on URL or default place
-						historyHandler.handleCurrentHistory();
-						loading.hide();
+						AsyncCallback<String> sessionLoadedCallback = new AsyncCallback<String>() {
+							@Override
+							public void onSuccess(String result) {
+								proceed();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								proceed();
+							}
+							
+							private void proceed() {
+								// Goes to place represented on URL or default place
+								historyHandler.handleCurrentHistory();
+								loading.hide();		
+							}
+						};
+						
+						// load the previous session, if there is one
+						ginjector.getAuthenticationController().reloadUserSessionData(sessionLoadedCallback);
 					} catch (Throwable e) {
 						onFailure(e);
 					}

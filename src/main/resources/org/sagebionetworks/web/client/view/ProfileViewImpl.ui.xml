@@ -2,59 +2,69 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-		
+
 	<ui:style>
 		.important {
-			font-weight: bold;
+		font-weight: bold;
 		}
-		
+
 		.rowTop {
-			vertical-align: top;
+		vertical-align: top;
 		}
 	</ui:style>
-		
+
 	<g:HTMLPanel>
 
-        <div class="color-line"></div>
-			<g:SimplePanel ui:field="header" />
+		<div class="color-line"></div>
+		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<div class="container">
-			<div class="row" style="margin-top: 5px !important">
-				<div class="col-md-9" style="white-space: normal;">
-							<g:SimplePanel ui:field="breadcrumbsPanel"/>
-						</div>
-				<div class="col-md-3 user-profile-linkedin-bar">
-							<g:SimplePanel ui:field="editProfileButtonPanel" />
-						</div>
-					</div>
-					
+			<div class="row margin-top-5">
+				<div class="col-md-3" style="white-space: normal;">
+					<g:SimplePanel ui:field="breadcrumbsPanel" />
+				</div>
+				<div class="col-md-9">
+					<g:FlowPanel ui:field="editProfileButtonPanel" />
+				</div>
+			</div>
+
 			<div class="row">
 				<div class="col-md-3 col-sm-4 col-xs-12">
-						<g:SimplePanel ui:field="pictureCanvasPanel"/>
+						<g:SimplePanel ui:field="picturePanel"/>
 				</div>
 				<div class="col-md-9 col-sm-8 col-xs-12">
-							<g:SimplePanel ui:field="viewProfilePanel" />
-							<g:SimplePanel ui:field="myTeamsPanel" styleName="highlight-box" title="Teams"/>
-							<g:SimplePanel ui:field="myTeamInvitesPanel" />
-							<g:SimplePanel ui:field="notificationsPanel" styleName="highlight-box" title="Email Settings">
-							    <g:FlowPanel styleName="checkbox margin-left-10">
-							       <g:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" /> 
-							    </g:FlowPanel>
-							</g:SimplePanel>
-						</div>
-					</div>
-			<div class="user-profile-linkedin-bar">
-						<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-					</div>
-						<g:SimplePanel ui:field="updateUserInfoPanel" />
-					
-					<p>&nbsp;</p>
+					<g:SimplePanel ui:field="viewProfilePanel" />
+							<g:SimplePanel ui:field="myTeamsPanel" styleName="highlight-box"/>
+					<g:SimplePanel ui:field="myTeamInvitesPanel" />
 				</div>
-					
-<!-- start footer -->
-            <div class="clear"></div>
+			</div>
+			<div class="row margin-top-5">
+			    <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-20">
+				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+			</div>
+				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-10">
+					<g:SimplePanel ui:field="editPicturePanel"/>
+				</div>
+				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-20">
+					<g:SimplePanel ui:field="editPictureButtonPanel"/>
+				</div>
+				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+					<g:SimplePanel ui:field="updateUserInfoPanel" />
+				</div>
+				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+					<g:SimplePanel ui:field="certificatePanel" />
+				</div>
+			</div>
+			<div class="row margin-top-5">				
+				
+			</div>
+			<p>&nbsp;</p>
+		</div>
+
+		<!-- start footer -->
+		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
-<!-- end footer -->
+		<!-- end footer -->
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

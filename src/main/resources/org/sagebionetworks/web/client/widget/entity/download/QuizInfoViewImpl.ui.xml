@@ -1,0 +1,25 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.widget"
+	xmlns:gxt="urn:import:com.extjs.gxt.ui.client.widget">
+
+	<g:HTMLPanel>
+		<div class="margin-10">
+			<h6>
+			    In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data. 
+			    <span ui:field="beforeLockdownMessage">
+			        Starting on <span ui:field="lockdownDate1" />, only users who have passed a short Certified User Quiz will be able to upload content into Synapse. Don’t wait for <span ui:field="lockdownDate2" /> - get your certification today! 
+			    </span>
+			</h6>
+		</div>
+	    <div class="bottomright">
+			<g:Button ui:field="becomeCertifiedButton"
+				styleName="btn btn-large btn-primary margin-bottom-10 margin-right-10 right"
+				text="Become Certified today!" />
+			<g:Button ui:field="remindMeLaterButton"
+				styleName="btn btn-large btn-default margin-bottom-10 margin-right-10 right"
+				text="Remind me later" />
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder>

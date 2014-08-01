@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -53,42 +54,9 @@ public class UserDataProvider {
 				}
 			}
 		}
-		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_DATA);
+		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_TOKEN);
 		return null;
 	}
-
-	public static UserProfile getThreadLocalUserProfile(HttpServletRequest threadLocalRequest) {
-		UserProfile currentUser = null;
-		if (threadLocalRequest == null)	return null;
-		Cookie[] cookies = threadLocalRequest.getCookies();
-		if (cookies != null) {
-			// Find the cookie
-			for (Cookie cookie : cookies) {
-				if (CookieKeys.USER_LOGIN_DATA.equals(cookie.getName())) {
-					String value = cookie.getValue();
-					if (value == null)
-						return null;
-					try {
-						String userSessionDataJson = URLDecoder.decode(value, "UTF-8");
-						if(userSessionDataJson != null) {
-								UserSessionData userSessionData = EntityFactory.createEntityFromJSONString(userSessionDataJson, UserSessionData.class);
-								if (userSessionData != null && userSessionData.getProfile() != null){
-									currentUser = userSessionData.getProfile();
-									break;
-								}
-						}
-					} catch (Throwable e) {
-						//invalid user
-						e.printStackTrace();
-					}
-
-				}
-			}
-		}
-		return currentUser;
-	}
-
-	
 	
 	/**
 	 * Add the user data to the header if it exists.

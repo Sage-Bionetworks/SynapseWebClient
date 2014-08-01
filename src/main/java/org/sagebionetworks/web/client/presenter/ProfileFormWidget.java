@@ -7,7 +7,9 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -25,18 +27,21 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	private JSONObjectAdapter jsonObjectAdapter;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private AdapterFactory adapterFactory;
+	private GlobalApplicationState globalApplicationState;
 	
 	@Inject
 	public ProfileFormWidget(ProfileFormView view,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
+			GlobalApplicationState globalApplicationState,
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
+		this.globalApplicationState = globalApplicationState;
 		view.setPresenter(this);
 	}
 	
@@ -61,9 +66,20 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	@Override
-	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url) {				
+	public void updateProfile(final String firstName, final String lastName, final String summary, final String position, final String location, final String industry, final String company, final String email, final AttachmentData pic, final String teamName, final String url, final String userName) {				
 		final UserSessionData currentUser = authenticationController.getCurrentUserSessionData();			
 		if(currentUser != null) {
+				//check for valid url
+				if (!LoginPresenter.isValidUrl(url, true)) {
+					view.showInvalidUrlUi();
+					return;
+				}
+				//will only update username if it is set.  if cleared out it will keep the existing username
+				if (userName != null && !LoginPresenter.isValidUsername(userName)) {
+					view.showInvalidUsernameUi();
+					return;
+				}
+				
 				//get the owner profile (may or may not be currently set
 				ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 					@Override
@@ -82,6 +98,8 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 								ownerProfile.setTeamName(teamName);
 							if (url != null)
 								ownerProfile.setUrl(url);
+							if (userName != null)
+								ownerProfile.setUserName(userName);
 							final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
 							if (isUpdatingEmail) {
 								ownerProfile.setEmail(email);
@@ -158,16 +176,13 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 			}
 			
 			public void sendSuccessMessageBackToOwner() {
-				profileUpdatedCallback.profileUpdateSuccess();
+				if (profileUpdatedCallback != null)
+					profileUpdatedCallback.profileUpdateSuccess();
+				else 
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 			}
 		};
-
-		if(currentUser.getIsSSO()) {
-			authenticationController.loginUserSSO(currentUser.getSession().getSessionToken(), callback);
-		} else {
-			authenticationController.loginUser(currentUser.getSession().getSessionToken(), callback);
-		}
-
+		authenticationController.revalidateSession(currentUser.getSession().getSessionToken(), callback);
 	}
 }
 	

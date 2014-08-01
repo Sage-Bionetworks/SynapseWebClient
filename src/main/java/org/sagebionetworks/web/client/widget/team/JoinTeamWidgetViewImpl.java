@@ -7,51 +7,48 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
-import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
 	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
-	private ProfileFormWidget profileForm;
+	
 	private JoinTeamWidgetView.Presenter presenter;
-	private AnimationProtector versionAnimation;
 	private LayoutContainer requestUIPanel;
 	private Button requestButton, acceptInviteButton, anonymousUserButton;
 	private HTML requestedMessage;
 	private TextArea messageArea;
+	private MarkdownWidget wikiPage;
+	private Window joinWizard;
+	private Button okButton;
+	private FlowPanel currentWizardContent;
+	private Callback okButtonCallback;
+	private WizardProgressWidget progressWidget;
 	
 	@Inject
-	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, ProfileFormWidget profileForm) {
+	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget) {
 		this.sageImageBundle = sageImageBundle;
-		this.profileForm = profileForm;
+		this.wikiPage = wikiPage;
+		this.progressWidget = progressWidget;
 	}
 	
 	@Override
@@ -92,24 +89,23 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 	
 	private void showAnonymousMessage() {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OK);
-	    box.setIcon(MessageBox.INFO);
-	    box.setTitle("Login or Register");
-	    box.addCallback(new Listener<MessageBoxEvent>() {
+		Callback okCallback = new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) {
+			public void invoke() {
 				presenter.gotoLoginPage();
 			}
-		});
-	    box.setMinWidth(320);
-	    box.setMessage(DisplayConstants.ANONYMOUS_JOIN);
-	    box.show();
+		};
+		Callback cancelCallback = new Callback() {
+			@Override
+			public void invoke() {
+			}	
+		};
+
+		DisplayUtils.showPopup("Login or Register", DisplayConstants.ANONYMOUS_JOIN, MessagePopup.INFO, okCallback, cancelCallback);
 	}
 	
 	private void initView(String joinButtonText) {
 		if (requestUIPanel == null) {
-			
 			anonymousUserButton = DisplayUtils.createButton(joinButtonText, ButtonType.PRIMARY);
 			anonymousUserButton.addStyleName("btn-lg");
 			anonymousUserButton.addClickHandler(new ClickHandler() {
@@ -132,25 +128,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			requestUIPanel = new LayoutContainer();
 			requestUIPanel.addStyleName("margin-top-0 highlight-box highlight-line-min");
 			requestButton = DisplayUtils.createIconButton("Request to Join Team", ButtonType.DEFAULT, "glyphicon-plus");
-			versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(requestButton, requestUIPanel));
-			FxConfig hideConfig = new FxConfig(400);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			requestButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
+				public void onClick(ClickEvent event) {
+					requestUIPanel.setVisible(!requestUIPanel.isVisible());
 					requestUIPanel.layout(true);
 				}
 			});
-			versionAnimation.setHideConfig(hideConfig);
-			FxConfig showConfig = new FxConfig(400);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
-					requestUIPanel.layout(true);
-				}
-			});
-			versionAnimation.setShowConfig(showConfig);
 			
 			messageArea = new TextArea();
 			messageArea.setWidth(FIELD_WIDTH);
@@ -168,6 +152,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 			requestUIPanel.add(sendRequestButton);
 		}
 		messageArea.setValue("");
+		currentWizardContent = new FlowPanel();
+		currentWizardContent.addStyleName("min-height-400 whiteBackground padding-5");
 	}	
 	@Override
 	public void showLoading() {
@@ -185,6 +171,13 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	public void showErrorMessage(String message) {
 		clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(message)));
+		hideJoinWizard();
+	}
+
+	@Override
+	public void hideJoinWizard() {
+		if (joinWizard != null && joinWizard.isVisible())
+			joinWizard.hide();
 	}
 
 	@Override
@@ -192,79 +185,76 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.presenter = presenter;
 	}
 	
-
-	public void showProfileForm(UserProfile profile, final AsyncCallback<Void> presenterCallback) {
-		profileForm.hideCancelButton();
-		final Window dialog = new Window();
-		
-		//hide the dialog when something happens, and call back to the presenter
-		ProfileUpdatedCallback profileUpdatedCallback = new ProfileUpdatedCallback() {
-			
 			@Override
-			public void profileUpdateSuccess() {
-				hideAndContinue();
-			}
-			
+	public void showJoinWizard() {
+		joinWizard = new Window();
+		joinWizard.addStyleName("whiteBackground");
+       	joinWizard.setMaximizable(false);
+        joinWizard.setSize(640, 480);
+        joinWizard.setPlain(true); 
+        joinWizard.setModal(true); 
+        joinWizard.setAutoHeight(true);
+        joinWizard.setResizable(false);
+        joinWizard.setHeading("Join");
+		FlowPanel buttonPanel = new FlowPanel();
+		buttonPanel.addStyleName("bottomright");
+		Button cancelButton = DisplayUtils.createButton(DisplayConstants.BUTTON_CANCEL);
+		cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
+		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void profileUpdateCancelled() {
-				hideAndContinue();
+			public void onClick(ClickEvent event) {
+				joinWizard.hide();
 			}
+		});
 			
-			public void hideAndContinue() {
-				dialog.hide();
-				presenterCallback.onSuccess(null);
-			}
-			
+		okButton = DisplayUtils.createButton("Continue", ButtonType.PRIMARY);
+		okButton.addStyleName("right margin-bottom-10 margin-right-10");
+		okButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onFailure(Throwable caught) {
-				dialog.hide();
-				presenterCallback.onFailure(caught);
+			public void onClick(ClickEvent event) {
+				okButtonCallback.invoke();
 			}
-		};
-		
-		profileForm.configure(profile, profileUpdatedCallback);
-     	dialog.setMaximizable(false);
-        dialog.setSize(640, 480);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
-        dialog.add(profileForm.asWidget());
-        profileForm.setUpdateButtonText("Continue");
- 		dialog.setHeading("Please Update Your Public Profile");
- 		
-		dialog.show();
+		});
+			
+		buttonPanel.add(okButton);
+		buttonPanel.add(cancelButton);
+		joinWizard.add(progressWidget.asWidget());
+        joinWizard.add(currentWizardContent);
+        joinWizard.add(buttonPanel);
+		joinWizard.show();
+		DisplayUtils.center(joinWizard);
 	}
-	
+			
+	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
+		okButtonCallback = presenterCallback;
+		Widget wikiPageWidget = wikiPage.asWidget();
+        currentWizardContent.clear();
+        ScrollPanel panel = new ScrollPanel(wikiPageWidget);
+        panel.setHeight("400px");
+        panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
+        currentWizardContent.add(panel);
+		wikiPage.loadMarkdownFromWikiPage(challengeInfoWikiPageKey, true);
+		joinWizard.layout(true);
+	}
+		
 	@Override
 	public void showAccessRequirement(
 			String arText,
 			final Callback touAcceptanceCallback) {
-		final Dialog dialog = new Dialog();
-       	dialog.setMaximizable(false);
-        dialog.setSize(640, 480);
-        dialog.setPlain(true); 
-        dialog.setModal(true); 
-        dialog.setAutoHeight(true);
-        dialog.setResizable(false);
+		DisplayUtils.relabelIconButton(okButton, DisplayConstants.ACCEPT, null);
+		currentWizardContent.clear();
         ScrollPanel panel = new ScrollPanel(new HTML(arText));
-        panel.addStyleName("margin-top-left-10");
-        panel.setSize("605px", "450px");
-        dialog.add(panel);
- 		dialog.setHeading("Agreement");
-		// agree to TOU, cancel
-        dialog.okText = DisplayConstants.ACCEPT;
-        dialog.setButtons(Dialog.OKCANCEL);
-        com.extjs.gxt.ui.client.widget.button.Button touButton = dialog.getButtonById(Dialog.OK);
-        touButton.addSelectionListener(new SelectionListener<ButtonEvent>(){
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				touAcceptanceCallback.invoke();
-			}
-        });
-        dialog.setHideOnButtonClick(true);		
-		dialog.show();		
+		panel.setHeight("400px");
+		panel.addStyleName("whiteBackground padding-5 margin-bottom-60");
+        currentWizardContent.add(panel);
+        joinWizard.layout(true);
+        okButtonCallback = touAcceptanceCallback;
 	}
+	
+			@Override
+	public void updateWizardProgress(int currentPage, int totalPages) {
+		progressWidget.configure(currentPage, totalPages);
+			}
 	
 	
 }

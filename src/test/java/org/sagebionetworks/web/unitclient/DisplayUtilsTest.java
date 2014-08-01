@@ -355,6 +355,23 @@ public class DisplayUtilsTest {
 		String result = DisplayUtils.surroundText(text, markdownDelimiter, markdownDelimiter, true, startPos, selectionLength);
 		assertEquals(markdownDelimiter+text+markdownDelimiter, result);
 	}
+
+	@Test
+	public void testSurroundTextMarkdownEndOfText() {
+		String textWithMarkdown = "end";
+		int startPos = textWithMarkdown.length();
+		int selectionLength = 0;
+		String result = DisplayUtils.surroundText(textWithMarkdown, markdownDelimiter2, markdownDelimiter2, true, startPos, selectionLength);
+		assertEquals(textWithMarkdown+markdownDelimiter2+markdownDelimiter2, result);
+	}
+	
+	@Test
+	public void testSurroundTextNoText() {
+		int startPos = 0;
+		int selectionLength = 0;
+		String result = DisplayUtils.surroundText("", markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
+		assertEquals(markdownDelimiter + markdownDelimiter, result);
+	}
 }
 
 

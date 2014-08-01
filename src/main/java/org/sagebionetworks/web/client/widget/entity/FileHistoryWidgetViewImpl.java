@@ -12,8 +12,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.GridFineSelectionModel;
 import org.sagebionetworks.web.client.widget.IconMenu;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
@@ -31,17 +30,11 @@ import com.extjs.gxt.ui.client.data.PagingLoadConfig;
 import com.extjs.gxt.ui.client.data.PagingLoadResult;
 import com.extjs.gxt.ui.client.data.RpcProxy;
 import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FxEvent;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
-import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
@@ -125,7 +118,6 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	// Widget variables
 	private PagingToolBar vToolbar;
 	private Grid<BaseModelData> vGrid;
-	private AnimationProtector versionAnimation;
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
 	private static final int GRID_MARGIN = 0;
 	
@@ -146,33 +138,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		this.ginInjector = ginInjector;
 		initWidget(uiBinder.createAndBindUi(this));
 //		this.addStyleName("span-24 notopmargin last");
+		DisplayUtils.configureShowHide(allVersions, previousVersions);
 		
-		versionAnimation = new AnimationProtector(new AnimationProtectorViewImpl(allVersions, previousVersions));
-		FxConfig hideConfig = new FxConfig(400);
-		hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-			@Override
-			public void handleEvent(FxEvent be) {
-				// This call to layout is necessary to force the scroll bar to appear on page-load
-				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.SHOW_LC);
-			}
-		});
-		versionAnimation.setHideConfig(hideConfig);
-		FxConfig showConfig = new FxConfig(400);
-		showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-			@Override
-			public void handleEvent(FxEvent be) {
-				// This call to layout is necessary to force the scroll bar to appear on page-load
-				previousVersions.layout(true);
-				allVersions.setText(DisplayConstants.HIDE_LC);
-				if (scrollToElement != null)
-					scrollToElement.scrollIntoView();
-			}
-		});
-		versionAnimation.setShowConfig(showConfig);
-
-		allVersions.setText(DisplayConstants.SHOW_LC);
-
 		vToolbar = new PagingToolBar(VERSION_LIMIT);
 		vToolbar.setSpacing(2);
 		vToolbar.insert(new SeparatorToolItem(), vToolbar.getItemCount() - 2);
@@ -226,7 +193,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		if (e instanceof Versionable) {
 			setVersionsVisible(true);
 			Versionable vb = (Versionable) e;
-			versionAnimation.hide();
+			setFileHistoryVisible(false);
 			setEntityVersions(vb);
 		}
 	}
@@ -423,19 +390,17 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 							new ClickHandler() {
 								@Override
 								public void onClick(ClickEvent event) {
-									MessageBox.confirm(DisplayConstants.LABEL_DELETE + " " + versionLabel,
+									DisplayUtils.showConfirmDialog(
+											DisplayConstants.LABEL_DELETE + " " + versionLabel,
 											DisplayConstants.PROMPT_SURE_DELETE + " version?",
-											new Listener<MessageBoxEvent>() {
-										@Override
-										public void handleEvent(MessageBoxEvent be) {
-											Button btn = be.getButtonClicked();
-											if(Dialog.YES.equals(btn.getItemId())) {
-												presenter.deleteVersion(
-														(String) model.get(VERSION_KEY_ID),
-														(Long) model.get(VERSION_KEY_NUMBER));
-											}
-										}
-									});
+											new Callback() {
+												@Override
+												public void invoke() {
+													presenter.deleteVersion(
+															(String) model.get(VERSION_KEY_ID),
+															(Long) model.get(VERSION_KEY_NUMBER));
+												}
+											});
 								}
 							});
 					if (currentVersion) {
@@ -490,15 +455,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 
 	@Override
 	public void setFileHistoryVisible(boolean v) {
-		boolean isV = versionAnimation.isVisible();
-		//Only do the action if it's not already in that state.
-		//That is, if v=true and isV=true, then do nothing.  if v=false and isV=false, do nothing.  Only do something if they differ (v=T and isV=F, or v=F and isV=T).
-		if (isV ^ v) {
-			if (v) {
-				versionAnimation.show();
-			} else
-				versionAnimation.hide();
-		}
+		String text = v ? DisplayConstants.HIDE_LC : DisplayConstants.SHOW_LC;
+		allVersions.setText(text);
+		previousVersions.setVisible(v);
 	}
 	
 	@Override
@@ -525,6 +484,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		setVersionsVisible(false);
 		previousVersions.setVisible(false);
 		allVersions.setText(DisplayConstants.SHOW_LC);
+		previousVersions.layout(true);
 	}
 	
 

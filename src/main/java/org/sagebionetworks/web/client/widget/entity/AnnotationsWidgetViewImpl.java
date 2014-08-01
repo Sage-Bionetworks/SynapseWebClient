@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
@@ -14,11 +15,8 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogUtils;
 import org.sagebionetworks.web.client.widget.entity.row.EntityRow;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.FormButtonBinding;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -28,7 +26,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -165,13 +162,10 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 	}
 	
 	private void handleDeleteClick(final EntityRow row) {
-		MessageBox.confirm(DisplayConstants.LABEL_DELETE +" \"" + row.getLabel()+"\"", DisplayConstants.PROMPT_SURE_DELETE + " annotation?", new Listener<MessageBoxEvent>() {					
+		DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" \"" + row.getLabel()+"\"", DisplayConstants.PROMPT_SURE_DELETE + " annotation?", new Callback() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 					
-				com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-				if(Dialog.YES.equals(btn.getItemId())) {
-					presenter.deleteAnnotation(row);
-				}
+			public void invoke() {
+				presenter.deleteAnnotation(row);
 			}
 		});
 	}

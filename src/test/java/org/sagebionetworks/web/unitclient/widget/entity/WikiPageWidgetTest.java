@@ -46,6 +46,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel.Callback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -106,6 +107,8 @@ public class WikiPageWidgetTest {
 		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -205,6 +208,15 @@ public class WikiPageWidgetTest {
 	}
 	
 	@Test
+	public void testCreatePageWithCallback() throws JSONObjectAdapterException{
+		org.sagebionetworks.web.client.utils.Callback onSuccessCallback =  mock(org.sagebionetworks.web.client.utils.Callback.class);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		presenter.createPage("a new wiki page with this title", onSuccessCallback);
+		verify(onSuccessCallback).invoke();
+	}
+
+	
+	@Test
 	public void testCreatePageFailure() throws JSONObjectAdapterException{		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		AsyncMockStubber.callFailureWith(new RuntimeException("creation failed")).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -224,6 +236,15 @@ public class WikiPageWidgetTest {
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
 		presenter.saveClicked("", "");
 		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
+	
+	@Test
+	public void testSaveFailure() throws JSONObjectAdapterException{
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), true, null, true);
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		presenter.saveClicked("", "");
+		
+		verify(mockGlobalApplicationState, Mockito.times(0)).setIsEditing(anyBoolean());
 	}
 	
 	@Test

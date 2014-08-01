@@ -54,7 +54,7 @@ public interface LicensedDownloaderView extends IsWidget, SynapseView {
 	@Deprecated
 	public void setDownloadLocations(List<LocationData> locations, String md5);
 	
-	public void setDownloadLocation(String fileName, String entityId, Long versionNumber, String md5);
+	public void setDownloadLocation(String fileName, String entityId, Long versionNumber, String md5, String externalUrl);
 	
 	/**
 	 * If no access restrictions are present, then this will return the download url for the FileEntity FileHandle.  Otherwise, it will return null.

@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
@@ -45,6 +46,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
@@ -83,6 +85,7 @@ public class ProvenanceWidgetTest {
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
 	LayoutServiceAsync mockLayoutService;
+	ClientCache mockClientCache;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	
 	Data outputEntity;
@@ -96,6 +99,7 @@ public class ProvenanceWidgetTest {
 	JsoProvider jsoProvider;
 	Map<String, String> descriptor;
 	Activity act;
+	UserProfile modifiedByUserProfile;
 	
 	@SuppressWarnings("unchecked")
 	@Before
@@ -107,8 +111,8 @@ public class ProvenanceWidgetTest {
 		mockLayoutService = mock(LayoutServiceAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
-
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider);
+		mockClientCache = mock(ClientCache.class);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
@@ -165,6 +169,13 @@ public class ProvenanceWidgetTest {
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);		
 		descriptor.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
+		
+		modifiedByUserProfile = new UserProfile();
+		modifiedByUserProfile.setUserName("007");
+		modifiedByUserProfile.setFirstName("James");
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(UserProfile.class))).thenReturn(modifiedByUserProfile);
+
 	}
 	
 	@Test
@@ -434,7 +445,7 @@ public class ProvenanceWidgetTest {
 			}
 			@Override
 			public void uploadFileChunk(String contentType, String fileFieldId,
-					int startByte, int endByte, String url, XMLHttpRequest xhr,
+					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
 					ProgressCallback callback) {
 				// TODO Auto-generated method stub
 				
@@ -472,6 +483,17 @@ public class ProvenanceWidgetTest {
 			public void loadCss(String url, Callback<Void, Exception> callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			@Override
+			public String getFileUrl(String fileFieldId) {
+				return null;
+			}
+			@Override
+			public void consoleError(String message) {
+			}
+			
+			@Override
+			public void consoleLog(String message) {
 			}
 		};
 	}

@@ -5,8 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ANNOTATIONS;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
@@ -49,6 +57,8 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -61,7 +71,6 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -85,12 +94,15 @@ import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
 import org.sagebionetworks.repo.model.file.CompleteChunkedFileRequest;
 import org.sagebionetworks.repo.model.file.CreateChunkedFileTokenRequest;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.message.MessageToUser;
+import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
+import org.sagebionetworks.repo.model.quiz.Quiz;
+import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -106,6 +118,8 @@ import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -115,11 +129,12 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
+
+import com.google.common.cache.Cache;
 
 /**
  * Test for the SynapseClientImpl
@@ -144,6 +159,7 @@ public class SynapseClientImplTest {
 	UserEvaluationPermissions userEvaluationPermissions;
 	List<EntityHeader> batchHeaderResults;
 	
+	String testFileName = "testFileEntity.R";
 	EntityPath path;
 	org.sagebionetworks.repo.model.PaginatedResults<UserGroup> pgugs;
 	org.sagebionetworks.repo.model.PaginatedResults<UserProfile> pgups;
@@ -157,6 +173,7 @@ public class SynapseClientImplTest {
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
 	MessageToUser sentMessage;
+	TableModelUtils tableModelUtils;
 	
 	private static final String EVAL_ID_1 = "eval ID 1";
 	private static final String EVAL_ID_2 = "eval ID 2";
@@ -172,10 +189,14 @@ public class SynapseClientImplTest {
 		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
+		tableModelUtils = new TableModelUtils(adapterFactory);
+		
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
 		synapseClient.setServiceUrlProvider(mockUrlProvider);
+		synapseClient.setTableModelUtils(tableModelUtils);
+		
 		// Setup the the entity
 		entity = new ExampleEntity();
 		entity.setId(entityId);
@@ -263,13 +284,7 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(batchHeaders);
 		
 		List<AccessRequirement> accessRequirements= new ArrayList<AccessRequirement>();
-		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirements.add(accessRequirement);
-		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
-		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
-		descriptor.setId("101");
-		descriptor.setType(RestrictableObjectType.ENTITY);
-		accessRequirement.setSubjectIds(Arrays.asList(new RestrictableObjectDescriptor[]{descriptor}));
+		accessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
 		
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | 
 		HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
@@ -296,9 +311,11 @@ public class SynapseClientImplTest {
 		page.setTitle("A Title");
 		v2Page = new V2WikiPage();
 		v2Page.setId("v2TestId");
+		v2Page.setEtag("122333");
 		handle = new S3FileHandle();
 		handle.setId("4422");
 		handle.setBucketName("bucket");
+		handle.setFileName(testFileName);
 		handle.setKey("key");
 		when(mockSynapse.getRawFileHandle(anyString())).thenReturn(handle);
 		when(mockSynapse.completeChunkFileUpload(any(CompleteChunkedFileRequest.class))).thenReturn(handle);
@@ -306,6 +323,7 @@ public class SynapseClientImplTest {
 		ars.setTotalNumberOfResults(0);
 		ars.setResults(new ArrayList<AccessRequirement>());
 		when(mockSynapse.getAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
+		when(mockSynapse.getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class))).thenReturn(ars);
 		mockEvaluation = Mockito.mock(Evaluation.class);
 		when(mockEvaluation.getStatus()).thenReturn(EvaluationStatus.OPEN);
 		when(mockSynapse.getEvaluation(anyString())).thenReturn(mockEvaluation);
@@ -349,6 +367,17 @@ public class SynapseClientImplTest {
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
 		when(mockSynapse.sendStringMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
+	}
+	
+	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
+		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
+		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
+		descriptor.setId("101");
+		descriptor.setType(RestrictableObjectType.ENTITY);
+		accessRequirement.setSubjectIds(Arrays.asList(new RestrictableObjectDescriptor[]{descriptor}));
+		accessRequirement.setAccessType(type);
+		return accessRequirement;
 	}
 	
 	private void setupTeamInvitations() throws SynapseException{
@@ -800,12 +829,20 @@ public class SynapseClientImplTest {
  	@Test
  	public void getV2WikiPageAsV1() throws Exception {
  		Mockito.when(mockSynapse.getV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
+ 		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
         synapseClient.getV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
         verify(mockSynapse).getV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
+        //asking for the same page twice should result in a cache hit, and it should not ask for it from the synapse client
+        synapseClient.getV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
+        verify(mockSynapse, Mockito.times(1)).getV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
         
         Mockito.when(mockSynapse.getVersionOfV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class))).thenReturn(page);
+        Mockito.when(mockSynapse.getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), anyLong())).thenReturn(v2Page);
         synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
         verify(mockSynapse).getVersionOfV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
+        //asking for the same page twice should result in a cache hit, and it should not ask for it from the synapse client
+        synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
+        verify(mockSynapse, Mockito.times(1)).getVersionOfV2WikiPageAsV1(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), any(Long.class));
  	}
  	
 	private void resetUpdateExternalFileHandleMocks(String testId, FileEntity file, ExternalFileHandle handle) throws SynapseException, JSONObjectAdapterException {
@@ -888,7 +925,7 @@ public class SynapseClientImplTest {
 	private FileEntity getTestFileEntity() {
 		FileEntity testFileEntity = new FileEntity();
 		testFileEntity.setId("5544");
-		testFileEntity.setName("testFileEntity.R");
+		testFileEntity.setName(testFileName);
 		return testFileEntity;
 	}
 	
@@ -945,14 +982,52 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		boolean isRestricted = true;
+		
+		//parent entity has no immediate children
+		EntityIdList childEntities = new EntityIdList();
+		childEntities.setIdList(new ArrayList());
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
+		
 		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
-		//and update the name
-		verify(mockSynapse).putEntity(any(FileEntity.class));
 		//and lock down
 		verify(mockSynapse).createLockAccessRequirement(anyString());
+	}
+	
+	@Test
+	public void testGetFileEntityIdWithSameName() throws JSONObjectAdapterException, SynapseException, RestServiceException {
+		FileEntity testFileEntity = getTestFileEntity();
+		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
+		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
+		boolean isRestricted = false;
+		
+		//parent entity has one child
+		String testChildEntityId = "syn6283185";
+		EntityIdList childEntities = new EntityIdList();
+		List<EntityId> childEntitiesList = new ArrayList<EntityId>();
+		EntityId childEntityId = new EntityId();
+		childEntityId.setId(testChildEntityId);
+		childEntitiesList.add(childEntityId);
+		childEntities.setIdList(childEntitiesList);
+		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
+		
+		BatchResults<EntityHeader> childEntityHeaders = new BatchResults<EntityHeader>();
+		List<EntityHeader> childEntityHeaderList = new ArrayList<EntityHeader>();
+		EntityHeader header = new EntityHeader();
+		header.setName(testFileName);
+		header.setId(testChildEntityId);
+		header.setType(FileEntity.class.getName());
+		childEntityHeaderList.add(header);
+		childEntityHeaders.setResults(childEntityHeaderList);
+		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(childEntityHeaders);
+		
+		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
+		
+		//verify that it found the target child entity id
+		assertEquals(testChildEntityId, fileEntityId);
 	}
 	
 	@Test
@@ -967,7 +1042,7 @@ public class SynapseClientImplTest {
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
-		//update the data file handle id, but not update the name
+		//update the data file handle id
 		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
 		//do not lock down (restricted=false)
 		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
@@ -1327,5 +1402,144 @@ public class SynapseClientImplTest {
 		assertEquals(recipients, toSendMessage.getRecipients());
 	}
 
+	@Test
+	public void testGetCertifiedUserPassingRecord() throws RestServiceException, SynapseException, JSONObjectAdapterException{
+		PassingRecord passingRecord = new PassingRecord();
+		passingRecord.setPassed(true);
+		passingRecord.setQuizId(1238L);
+		String passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenReturn(passingRecord);
+		String returnedPassingRecordJson = synapseClient.getCertifiedUserPassingRecord("123");
+		verify(mockSynapse).getCertifiedUserPassingRecord(anyString());
+		assertEquals(passingRecordJson, returnedPassingRecordJson);
+	}
 	
+	@Test (expected=NotFoundException.class)
+	public void testUserNeverAttemptedCertification() throws RestServiceException, SynapseException{
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenThrow(new SynapseNotFoundException("PassingRecord not found"));
+		synapseClient.getCertifiedUserPassingRecord("123");
+	}
+	
+	@Test (expected=NotFoundException.class)
+	public void testUserFailedCertification() throws RestServiceException, SynapseException{
+		PassingRecord passingRecord = new PassingRecord();
+		passingRecord.setPassed(false);
+		passingRecord.setQuizId(1238L);
+		when(mockSynapse.getCertifiedUserPassingRecord(anyString())).thenReturn(passingRecord);
+		synapseClient.getCertifiedUserPassingRecord("123");
+	}
+	
+	@Test
+	public void testGetCertificationQuiz() throws RestServiceException, SynapseException{
+		when(mockSynapse.getCertifiedUserTest()).thenReturn(new Quiz());
+		synapseClient.getCertificationQuiz();
+		verify(mockSynapse).getCertifiedUserTest();
+	}
+	
+	@Test
+	public void testSubmitCertificationQuizResponse() throws RestServiceException, SynapseException, JSONObjectAdapterException{
+		PassingRecord mockPassingRecord = new PassingRecord();
+		when(mockSynapse.submitCertifiedUserTestResponse(any(QuizResponse.class))).thenReturn(mockPassingRecord);
+		QuizResponse myResponse = new QuizResponse();
+		myResponse.setId(837L);
+		String quizResponseJson = myResponse.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+		synapseClient.submitCertificationQuizResponse(quizResponseJson);
+		verify(mockSynapse).submitCertifiedUserTestResponse(eq(myResponse));
+	}
+	
+	@Test
+	public void testMarkdownCache() throws Exception {
+		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		synapseClient.setMarkdownCache(mockCache);
+		String pageJson = "test only";
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
+		String actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
+		assertEquals(pageJson, actualResult);
+		verify(mockCache).get(any(MarkdownCacheRequest.class));
+	}
+	
+	@Test
+	public void testMarkdownCacheWithVersion() throws Exception {
+		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		synapseClient.setMarkdownCache(mockCache);
+		String pageJson = "test only";
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		Mockito.when(mockSynapse.getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), anyLong())).thenReturn(v2Page);
+		String actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
+		assertEquals(pageJson, actualResult);
+		verify(mockCache).get(any(MarkdownCacheRequest.class));
+	}
+	
+	@Test
+	public void testFilterAccessRequirements() throws Exception {
+		List<AccessRequirement> unfilteredAccessRequirements = new ArrayList<AccessRequirement>();
+		List<AccessRequirement> filteredAccessRequirements;
+		//filter empty list should not result in failure
+		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		assertTrue(filteredAccessRequirements.isEmpty());
+		
+		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
+		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
+		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
+		//no requirements of type UPDATE
+		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		assertTrue(filteredAccessRequirements.isEmpty());
+		//1 download
+		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.DOWNLOAD);
+		assertEquals(1, filteredAccessRequirements.size());
+		//2 submit
+		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.SUBMIT);
+		assertEquals(2, filteredAccessRequirements.size());
+		
+		//finally, filter null list - result will be an empty list
+		filteredAccessRequirements = synapseClient.filterAccessRequirements(null, ACCESS_TYPE.SUBMIT);
+		assertNotNull(filteredAccessRequirements);
+		assertTrue(filteredAccessRequirements.isEmpty());
+	}
+	
+	@Test
+	public void testGetEntityUnmetAccessRequirements() throws Exception {
+		//verify it calls getUnmetAccessRequirements when unmet is true
+		synapseClient.getEntityAccessRequirements(entityId, true, null);
+		verify(mockSynapse).getUnmetAccessRequirements(any(RestrictableObjectDescriptor.class));
+	}
+	
+	@Test
+	public void testGetAllEntityAccessRequirements() throws Exception {
+		//verify it calls getAccessRequirements when unmet is false
+		synapseClient.getEntityAccessRequirements(entityId, false, null);
+		verify(mockSynapse).getAccessRequirements(any(RestrictableObjectDescriptor.class));
+	}
+	
+	//pass through tests for email validation
+	
+	@Test
+	public void testAdditionalEmailValidation() throws Exception {
+		Long userId = 992843l;
+		String emailAddress = "test@test.com";
+		String callbackUrl = "http://www.synapse.org/#!Account:";
+		synapseClient.additionalEmailValidation(userId.toString(), emailAddress, callbackUrl);
+		verify(mockSynapse).additionalEmailValidation(eq(userId), eq(emailAddress), eq(callbackUrl));
+	}
+	
+	@Test
+	public void testAddEmail() throws Exception {
+		String emailAddressToken = "long synapse email token";
+		synapseClient.addEmail(emailAddressToken);
+		verify(mockSynapse).addEmail(any(AddEmailInfo.class), anyBoolean());
+	}
+	
+	@Test
+	public void testGetNotificationEmail() throws Exception {
+		synapseClient.getNotificationEmail();
+		verify(mockSynapse).getNotificationEmail();
+	}
+	
+	@Test
+	public void testSetNotificationEmail() throws Exception {
+		String emailAddress = "test@test.com";
+		synapseClient.setNotificationEmail(emailAddress);
+		verify(mockSynapse).setNotificationEmail(eq(emailAddress));
+	}
 }

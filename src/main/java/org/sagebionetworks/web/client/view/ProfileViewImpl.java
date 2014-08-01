@@ -4,19 +4,22 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -24,26 +27,19 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -59,6 +55,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel updateUserInfoPanel;
 	@UiField
+	SimplePanel certificatePanel;
+	@UiField
 	SimplePanel updateWithLinkedInPanel;
 	@UiField
 	SimplePanel viewProfilePanel;
@@ -68,60 +66,48 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel myTeamInvitesPanel;
 	
 	@UiField
-	SimplePanel notificationsPanel;
-	@UiField
-	CheckBox emailNotificationsCheckbox;
-
-	@UiField
-	SimplePanel editProfileButtonPanel;
+	FlowPanel editProfileButtonPanel;
 	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
-	SimplePanel pictureCanvasPanel;
+	SimplePanel picturePanel;
+	@UiField
+	SimplePanel editPicturePanel;
+	@UiField
+	SimplePanel editPictureButtonPanel;
 	
-	private LayoutContainer pictureCanvasContainer;
-	private LayoutContainer profilePictureContainer;
-	private LayoutContainer editPhotoButtonContainer;
+	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
-	private FormPanel userFormPanel;
-	private HorizontalPanel linkedInPanelForViewProfile;
-	private HorizontalPanel linkedInPanelForEditProfile;
-	private HorizontalPanel editProfileCommandPanel;
+	private Button linkedInButtonEditProfile;
+	private Button linkedInButtonViewProfile;
 	private Button editProfileButton;
-	private Anchor editPhotoLink;
 	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
-	private Html profileWidget;
-	private Image defaultProfilePicture;
-	private Html profilePictureHtml;
+	private FlowPanel profileWidget;
+	private HTML defaultProfilePicture;
 	
-	private HandlerRegistration editPhotoHandler = null;
-
 	private Footer footerWidget;
 	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
+	private CertificateWidget certificateWidget;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget, 
 			Footer footerWidget, 
-			IconsImageBundle icons,
-			SageImageBundle imageBundle, 
 			SageImageBundle sageImageBundle,
 			Breadcrumb breadcrumb, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			CookieProvider cookies) {		
+			CookieProvider cookies,
+			CertificateWidget certificateWidget) {		
 		initWidget(binder.createAndBindUi(this));
-
-		this.iconsImageBundle = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
@@ -130,48 +116,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.cookies = cookies;
+		this.certificateWidget = certificateWidget;
+		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-		
+		certificatePanel.setWidget(certificateWidget.asWidget());
 		createViewProfile();
-		linkedInPanelForViewProfile = createLinkedInPanel();
-		linkedInPanelForEditProfile = createLinkedInPanel();
+		linkedInButtonEditProfile = createLinkedInButton();
+		linkedInButtonViewProfile = createLinkedInButton();
 		
 		createEditProfileCommandsPanel();
 		
-	    editPhotoLink = new Anchor();
-	    editPhotoLink.addStyleName("user-profile-change-photo");
-	    editPhotoLink.setText("Edit Photo");
-	    pictureCanvasContainer = new LayoutContainer();
-	    pictureCanvasContainer.setStyleName("inner-6 view notopmargin");
-	    pictureCanvasPanel.clear();
-	    pictureCanvasPanel.add(pictureCanvasContainer);
-	    
-	    profilePictureContainer = new LayoutContainer();
-	    profilePictureContainer.addStyleName("center");
-		editPhotoButtonContainer = new LayoutContainer();
-		editPhotoButtonContainer.setStyleName("center notopmargin");
+		myTeamsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
 		
-		pictureCanvasContainer.add(profilePictureContainer);
-		pictureCanvasContainer.add(editPhotoButtonContainer);
-		ClickHandler notificationsClickHandler = getNotificationsClickHandler();
-		emailNotificationsCheckbox.addClickHandler(notificationsClickHandler);
+		picturePanel.clear();
 	}
 	
-	private ClickHandler getNotificationsClickHandler() {
-		return new ClickHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
-				//update notification settings
-				presenter.updateMyNotificationSettings(emailNotificationsCheckbox.getValue(), false);
-			}
-		};
-	}
-
-
-	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
@@ -184,13 +147,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
 		{
+			Widget profilePicture = getProfilePicture(profile, profile.getPic());
+			profilePicture.addStyleName("left");
+			editPicturePanel.add(profilePicture);
+			editPictureButtonPanel.add(getEditPictureButton(profile));
 			updateUserInfoPanel.add(profileFormWidget);
-		 	updateWithLinkedInPanel.add(linkedInPanelForEditProfile);
+		 	updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 		}
 		else
 		{
@@ -200,31 +167,24 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			myTeamsPanel.setVisible(true);
 		
 			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, isOwner);
+			updateViewProfile(profile, passingRecord, isOwner);
 			viewProfilePanel.add(profileWidget);
-			notificationsPanel.setVisible(isOwner);
+			
 			if (isOwner) {
-				editPhotoButtonContainer.add(editPhotoLink);
-				editPhotoButtonContainer.layout();
-				editProfileButtonPanel.add(editProfileCommandPanel);
+				editProfileButtonPanel.add(editProfileButton);
+				editProfileButtonPanel.add(linkedInButtonViewProfile);
 				openInvitesWidget.configure(new Callback() {
 					@Override
 					public void invoke() {
 						//refresh the view after accepting/ignoring
-						presenter.redirectToViewProfile();
+						presenter.showViewMyProfile();
 					}
 				}, (CallbackP)null);
 				
 				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
-				
-				boolean isNotify = true;
-				if(profile.getNotificationSettings() != null) {
-					isNotify = profile.getNotificationSettings().getSendEmailNotifications();
 				}
-				emailNotificationsCheckbox.setValue(isNotify, false);
 			}
 		}
-	}
 	
 	@Override
 	public void render() {
@@ -234,49 +194,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	private void createEditProfileCommandsPanel() {
-		editProfileCommandPanel = new HorizontalPanel();
-		
-		editProfileButton = new Button(DisplayConstants.BUTTON_EDIT, AbstractImagePrototype.create(iconsImageBundle.editGrey16()));
-	    editProfileButton.setHeight(25);
-	    editProfileButton.setBorders(false);
-	    editProfileButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
+		editProfileButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_PROFILE, ButtonType.DEFAULT, "glyphicon-pencil");
+		editProfileButton.addClickHandler(new ClickHandler() {
 	    	@Override
-	    	public void componentSelected(ButtonEvent ce) {
-	    		presenter.redirectToEditProfile();
+			public void onClick(ClickEvent event) {
+	    		presenter.showEditProfile();
 	    	}
 	    });
-	    
-		editProfileCommandPanel.add(linkedInPanelForViewProfile);
-		editProfileCommandPanel.add(editProfileButton);
-		editProfileCommandPanel.setCellWidth(editProfileButton, "15%");
+		editProfileButton.addStyleName("right btn-xs margin-left-5");
 	}
 	 
-	private HorizontalPanel createLinkedInPanel() {
-		HorizontalPanel linkedInPanel = new HorizontalPanel();
-		Anchor linkedInImportLink = new Anchor();
-		linkedInImportLink.addStyleName("user-profile-linkedin");
-		linkedInImportLink.setText("Import from ");
-		Button linkedInButton = new Button();
-	    linkedInButton.setIcon(AbstractImagePrototype.create(sageImageBundle.linkedinsmall()));
-	    linkedInButton.setSize(sageImageBundle.linkedinsmall().getWidth() + 1, sageImageBundle.linkedinsmall().getHeight() + 1);
-	    linkedInButton.setBorders(false);
-	    linkedInButton.addSelectionListener(new SelectionListener<ButtonEvent>() {				
+	private Button createLinkedInButton() {
+		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
+		command.addClickHandler(new ClickHandler() {
 	    	@Override
-	    	public void componentSelected(ButtonEvent ce) {
-	    		linkedInClicked();
-	    	}
-	    });
-	    
-	    linkedInImportLink.addClickHandler(new ClickHandler() {
-			@Override
 			public void onClick(ClickEvent event) {
 				linkedInClicked();
 			}
 		});
 	    
-	    linkedInPanel.add(linkedInImportLink);
-	    linkedInPanel.add(linkedInButton);
-	    return linkedInPanel;
+		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
+		command.addStyleName("right btn-xs");
+		
+	    return command;
 	}
 	
 	private void linkedInClicked()
@@ -285,9 +225,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	 private void createViewProfile() {
-		 profileWidget = new Html();
-		 profilePictureHtml = new Html();
-		 defaultProfilePicture = new Image(sageImageBundle.defaultProfilePicture());
+		 profileWidget = new FlowPanel();
+		 defaultProfilePicture = new HTML(DisplayUtils.getFontelloIcon("user font-size-150 lightGreyText"));
 	 }
 	 
 	 /**
@@ -300,7 +239,58 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else return s;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, boolean isOwner) {
+	 private Widget getProfilePicture(UserProfile profile, AttachmentData pic) {
+		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
+			 //use preview
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
+			 return new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
+					 + "<img style=\"margin:auto; display:block;\" src=\"" 
+					 + url+ "\"/>"
+					 + "</div>"));
+		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
+			 //use token
+			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
+			 return new FitImage(url, 150, 150);
+		 }
+		 else {
+			 //use default picture
+			 return defaultProfilePicture;
+		 }
+	 }
+	 
+	 private Button getEditPictureButton(final UserProfile profile) {
+		 String userId = profile.getOwnerId();
+		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
+		 Button editPictureButton = DisplayUtils.createButton("Upload new picture");
+		 editPictureButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
+						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+							@Override
+							public void onSaveAttachment(UploadResult result) {
+								if(result != null){
+									if(UploadStatus.SUCCESS == result.getUploadStatus()){
+										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
+										editPicturePanel.clear();
+										Widget profilePicture = getProfilePicture(profile, result.getAttachmentData());
+										profilePicture.addStyleName("left");
+										editPicturePanel.add(profilePicture);
+									}else{
+										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
+									}
+								}
+							}
+						});
+			}
+		});
+		return editPictureButton;
+	 }
+	 
+	 private void updateViewProfile(UserProfile profile, PassingRecord passingRecord, boolean isOwner) {
+		 profileWidget.clear();
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
 		 
@@ -312,15 +302,34 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		 if (passingRecord != null) {
+			 Image tutorialLink = new Image(sageImageBundle.certificate().getSafeUri());
+			 tutorialLink.setHeight("32px");
+			 tutorialLink.setWidth("25px");
+			 tutorialLink.setPixelSize(25, 32);
+			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
+			 certificateWidget.configure(profile, passingRecord);
+			 final PopupPanel tooltip = DisplayUtils.addToolTip(tutorialLink, DisplayConstants.CERTIFIED_USER);
+			 tutorialLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					clear();
+					certificatePanel.setVisible(true);
+					tooltip.hide();
+				}
+			});
+			
+			profileWidget.add(tutorialLink);
+		 }
+			 
 		 builder.appendHtmlConstant("<h2>");
 		 builder.appendEscapedLines(name);
-		 
-		 //add a change username link if owner
-		 if (isOwner) {
-			 builder.appendHtmlConstant("<small class=\"smallestText\"> (<a class=\"link\" href=\""+DisplayUtils.getLoginPlaceHistoryToken(LoginPlace.CHANGE_USERNAME)+"\">change username</a>)</small>");	 
-		 }
-		 
 		 builder.appendHtmlConstant("</h2>");
+		 
+		 HTML headlineHtml = new HTML(builder.toSafeHtml());
+		 headlineHtml.addStyleName("inline-block");
+		 profileWidget.add(headlineHtml);
+		 builder = new SafeHtmlBuilder();
 		 
 		 if (position.length()>0 || company.length()>0) {
 			 builder.appendHtmlConstant("<h4 class=\"user-profile-headline\">");
@@ -355,50 +364,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 // Account number
 		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
+		 
+		 HTML profileHtml = new HTML(builder.toSafeHtml());
+		 profileWidget.add(profileHtml);
 
-		 profileWidget.setHtml(builder.toSafeHtml().asString());
+		 picturePanel.add(getProfilePicture(profile, profile.getPic()));
+	}
 		 
-		 if (profile.getPic() != null && profile.getPic().getPreviewId() != null && profile.getPic().getPreviewId().length() > 0) {
-			 profilePictureContainer.add(profilePictureHtml);
-			 profilePictureHtml.setHtml(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
-			    		+ "<img style=\"margin:auto; display:block;\" src=\"" 
-			    		+ DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null) + "\"/>"
-			    		+ "</div>").asString());
-		 }
-		 else {
-			 profilePictureContainer.add(defaultProfilePicture);
-		 }
-		 profilePictureContainer.layout();
-		 pictureCanvasContainer.setVisible(true);
-		 
-		 String userId = profile.getOwnerId();
-		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
-		 if (editPhotoHandler != null)
-			 editPhotoHandler.removeHandler();
-		 editPhotoHandler = editPhotoLink.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
-	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
-						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
-								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
-							@Override
-							public void onSaveAttachment(UploadResult result) {
-								if(result != null){
-									if(UploadStatus.SUCCESS == result.getUploadStatus()){
-										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
-									}else{
-										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
-									}
-								}
-								presenter.redirectToViewProfile();
-							}
-						});
-			}
-		});
-	 }
-	 
-	@Override
 	public void refreshHeader() {
 		headerWidget.refresh();
 	}
@@ -426,9 +399,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		myTeamInvitesPanel.clear();
 		myTeamsPanel.clear();
 		myTeamsPanel.setVisible(false);
-		editPhotoButtonContainer.removeAll();
-		profilePictureContainer.removeAll();
-		pictureCanvasContainer.setVisible(false);
-		notificationsPanel.setVisible(false);
+		picturePanel.clear();
+		editPicturePanel.clear();
+		editPictureButtonPanel.clear();
+		certificatePanel.setVisible(false);
 	}
 }

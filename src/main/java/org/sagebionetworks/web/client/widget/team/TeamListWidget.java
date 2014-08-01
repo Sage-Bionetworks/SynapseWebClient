@@ -83,7 +83,7 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}
@@ -93,6 +93,10 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();
+	}
+	
+	public void clear() {
+		view.clear();
 	}
 	
 

@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -34,11 +35,14 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
@@ -145,7 +149,12 @@ public class HomePresenterTest {
 		Session testSession = new Session();
 		testSession.setAcceptsTermsOfUse(true);
 		testSessionData.setSession(testSession);
+		testSessionData.setIsSSO(false);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testSessionData);
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}	
 	
 	@Test
@@ -154,6 +163,22 @@ public class HomePresenterTest {
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
 		verify(mockView).refreshMyTeams(any(List.class));
+		
+	}
+	
+	@Test
+	public void testValidateTokenSSO() {
+		homePresenter.validateToken();
+		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+	}
+	
+
+	@Test
+	public void testInvalidToken() {
+		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		homePresenter.validateToken();
+		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 	
 	@Test
@@ -303,5 +328,18 @@ public class HomePresenterTest {
 		verify(mockAuthenticationController).logoutUser();
 	}
 
+	@Test
+	public void testIsCertified() {
+		//user has not passed the certification quiz
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(),  any(AsyncCallback.class));
+		homePresenter.checkIfCertified();
+		verify(mockView).showCertificationReminder(eq(true));
+	}
+	
+	@Test
+	public void testIsNotCertified() {
+		homePresenter.checkIfCertified();
+		verify(mockView, times(0)).showCertificationReminder(anyBoolean());
+	}
 
 }

@@ -13,7 +13,9 @@ import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -35,7 +37,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,6 +47,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
 	private Uploader uploader;
+	private QuizInfoWidget quizInfoWidget;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	
 	@Inject
@@ -54,10 +56,12 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			Uploader uploader,
 			EntityTreeBrowser entityTreeBrowser, 
 			CookieProvider cookies,
-			SharingAndDataUseConditionWidget sharingAndDataUseWidget) {
+			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
+			QuizInfoWidget quizInfoWidget) {
 		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
+		this.quizInfoWidget = quizInfoWidget;
 		this.setLayout(new FitLayout());
 	}
 	
@@ -95,7 +99,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 				@Override
 				public void onClick(ClickEvent event) {
 					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
-					presenter.createFolder();
+					presenter.addFolderClicked();
 				}
 			});
 		
@@ -115,6 +119,72 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		lc.layout();
 		this.add(lc);
 		this.layout(true);
+	}
+	
+	@Override
+	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
+	}
+	
+	public static void showQuizInfoDialog(final CallbackP<Boolean> callback, QuizInfoWidget quizInfoWidget) {
+		final Window dialog = new Window();
+		dialog.setMaximizable(false);
+		dialog.setSize(420, 270);
+		dialog.setPlain(true);
+		dialog.setModal(true);
+		dialog.setLayout(new FitLayout());
+		dialog.setBorders(false);
+		dialog.setHeading("Join the Synapse Certified User Community");
+
+		quizInfoWidget.configure(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean tutorialClicked) {
+				dialog.hide();
+				callback.invoke(tutorialClicked);
+			}
+		});
+		dialog.add(quizInfoWidget.asWidget());
+		dialog.show();
+		DisplayUtils.center(dialog);
+	}
+	
+	@Override
+	public void showUploadDialog(String entityId){
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		};
+
+		final Window window = new Window();
+		uploader.clearHandlers();
+		// add user defined handler
+		uploader.addPersistSuccessHandler(handler);
+		
+		// add handlers for closing the window
+		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				window.hide();
+			}
+		});
+		uploader.addCancelHandler(new CancelHandler() {				
+			@Override
+			public void onCancel(CancelEvent event) {
+				window.hide();
+			}
+		});
+		
+		//let the uploader create the FileEntity
+		window.removeAll();
+		window.setPlain(true);
+		window.setModal(true);
+		window.setLayout(new FitLayout());
+		window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+		window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+		window.show();
+		window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 	}
 	
 	@Override
@@ -242,51 +312,19 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	 * an entity and upload file in a single transaction it modified to create a new 
 	 */
 	private Button getUploadButton(final String entityId) {
-		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				presenter.fireEntityUpdatedEvent();
-			}
-		};
-		// AbstractImagePrototype.create(iconsImageBundle.NavigateUp16())
 		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
 		uploadButton.addStyleName("left display-inline");
-		final Window window = new Window();
-		uploader.clearHandlers();
-		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
-		
-		// add handlers for closing the window
-		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-			}
-		});
-		uploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
 		
 		uploadButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				//let the uploader create the FileEntity
-				window.removeAll();
-				window.setPlain(true);
-				window.setModal(true);
-				window.setLayout(new FitLayout());
-				window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-				window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
-				window.show();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-				
+				presenter.uploadButtonClicked();
 			}
 		});
 		return uploadButton;
 	}
+	
+	
 
 }

@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RSSEntry;
 import org.sagebionetworks.repo.model.RSSFeed;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -27,14 +28,17 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -119,9 +123,35 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Things to load for authenticated users
 		if(showLoggedInDetails()) {
 			loadProjectsAndFavorites();
-		}		
+			//validate token
+			validateToken();
+			//check for user certification
+			checkIfCertified();
+		}
 	}
 		
+	public void validateToken() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				//do nothing
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				//token is invalid
+				if (ex instanceof AuthenticationException) {
+					// send user to login page						
+					view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
+					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				}
+			}
+		};
+		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
+		if (userSessionData != null) {
+			authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), callback);
+		}
+	}
+	
 	public void loadNewsFeed(){
 		rssService.getCachedContent(ClientProperties.NEWS_FEED_PROVIDER_ID, new AsyncCallback<String>() {
 			@Override
@@ -258,7 +288,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				onFailure(caught);
+				callback.onFailure(caught);
 			}
 		});		
 	}
@@ -374,10 +404,24 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 					} 
 				}
+			}
+		});
+	}
+	
+	public void checkIfCertified() {
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecordJson) {
+				//show nothing
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) 
+					view.showCertificationReminder(true);
 			}
 		});
 	}
@@ -396,7 +440,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {					
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 						view.showErrorMessage(caught.getMessage());
 					}
 				}

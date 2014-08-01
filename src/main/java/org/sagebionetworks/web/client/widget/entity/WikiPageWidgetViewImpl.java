@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -30,13 +31,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
@@ -68,7 +65,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 //	private Button editButton, addPageButton; 
-	private LayoutContainer commandBar;
+	private FlowPanel commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
 	private Breadcrumb breadcrumb;
@@ -114,7 +111,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		this.widgetRegistrar = widgetRegistrar;
 		this.historyWidget = historyWidget;
 		this.ginInjector = ginInjector;
-		addStyleName("min-height-500");
 	}
 	
 	@Override
@@ -133,10 +129,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void showNoWikiAvailableUI(boolean isDescription) {
 		clear();
 		this.isDescription = isDescription;
-		SimplePanel createWikiButtonWrapper = new SimplePanel();		
-		Button insertBtn = createInsertOrAddPageButton(true);		
-		createWikiButtonWrapper.add(insertBtn);
-		add(createWikiButtonWrapper);
+		if (!isDescription) {
+			SimplePanel createWikiButtonWrapper = new SimplePanel();		
+			Button insertBtn = createInsertOrAddPageButton(true);		
+			createWikiButtonWrapper.add(insertBtn);
+			add(createWikiButtonWrapper);
+		}
 	}
 	
 	@Override
@@ -174,10 +172,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		FlowPanel wikiSubpagesPanel = new FlowPanel();
 		WikiSubpagesWidget widget = ginInjector.getWikiSubpagesRenderer();
 		//subpages widget is special in that it applies styles to the markdown html panel (if there are subpages)
-		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
 		wikiSubpagesPanel.add(widget.asWidget());
 		add(wikiSubpagesPanel);
 		add(wikiPagePanel);
+		widget.configure(wikiKey, new HashMap<String, String>(), null, wikiSubpagesPanel, wikiPagePanel, isEmbeddedInOwnerPage);
 		
 		wikiPagePanel.add(getBreadCrumbs());
 		SimplePanel topBarWrapper = new SimplePanel();
@@ -303,22 +301,23 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		if (commandBarWrapper == null) {
 			commandBarWrapper = new SimplePanel();			
 			commandBarWrapper.addStyleName("margin-bottom-20 margin-top-10");
-			commandBar = new LayoutContainer();
+			commandBar = new FlowPanel();
 			commandBarWrapper.add(commandBar);
 		} else {
-			commandBar.removeAll();
+			commandBar.clear();
 		}
 			
-		Button editButton = createEditButton();			
-		commandBar.add(editButton, new MarginData(0, 5, 0, 0));			
+		Button editButton = createEditButton();
+		editButton.addStyleName("margin-left-10");
+		commandBar.add(editButton);			
 		
 		if(!isDescription) {
 			Button addPageButton = createInsertOrAddPageButton(false);
 			commandBar.add(addPageButton);
+			addPageButton.addStyleName("margin-left-5");
 		}
 		
 		commandBarWrapper.setVisible(canEdit);
-		commandBar.layout(true);
 		return commandBarWrapper;
 	}
 
@@ -407,14 +406,13 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				final TextArea mdField = new TextArea();
 				mdField.setValue(presenter.getWikiPage().getMarkdown());
 				mdField.addStyleName("markdownEditor");
-				mdField.setHeight("400px");
 				
 				LayoutContainer form = new LayoutContainer();
 				final TextBox titleField = new TextBox();
 				if (!isRootWiki) {
 					titleField.setValue(presenter.getWikiPage().getTitle());
-					titleField.addStyleName("font-size-32 margin-left-10 margin-bottom-10");
-					titleField.setHeight("35px");					
+					titleField.addStyleName("font-size-32 margin-bottom-10");
+					titleField.setHeight("45px");					
 					form.add(titleField);
 				}
 				//also add commands at the bottom
@@ -458,7 +456,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private String getInsertBtnText(final boolean isFirstPage) {
 		String buttonText;
 		if(isFirstPage) {
-			buttonText = isDescription ? DisplayConstants.ADD_DESCRIPTION : DisplayConstants.CREATE_WIKI;
+			buttonText = DisplayConstants.CREATE_WIKI;
 		} else {
 			buttonText = DisplayConstants.ADD_PAGE;
 		}
@@ -507,17 +505,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			@Override
 			public void deleteClicked() {
 				//delete wiki
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE + " Page",
+				DisplayUtils.showConfirmDialog(
+						DisplayConstants.LABEL_DELETE + " Page",
 						DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
-						new Listener<MessageBoxEvent>() {
-					@Override
-					public void handleEvent(MessageBoxEvent be) {
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteButtonClicked();
-						}
-					}
-				});
+						new org.sagebionetworks.web.client.utils.Callback() {
+							@Override
+							public void invoke() {
+								presenter.deleteButtonClicked();
+							}
+						});
 			}
 		};
 	}
@@ -552,8 +548,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 			public void invoke() {
 			}	
 		};
-		DisplayUtils.showOkCancelMessage(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
-				MessageBox.WARNING, 500, okCallback, cancelCallback);
+		DisplayUtils.showPopup(DisplayConstants.RESTORING_WIKI_VERSION_WARNING_TITLE, DisplayConstants.RESTORING_WIKI_VERSION_WARNING_MESSAGE, 
+				MessagePopup.WARNING, okCallback, cancelCallback);
 	}
 	
 	@Override
@@ -580,5 +576,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	@Override
 	public void showLoading() {
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return this;
 	}
 }

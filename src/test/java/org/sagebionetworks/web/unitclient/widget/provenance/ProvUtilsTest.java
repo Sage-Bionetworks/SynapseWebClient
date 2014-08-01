@@ -360,7 +360,7 @@ public class ProvUtilsTest {
 			}
 			@Override
 			public void uploadFileChunk(String contentType, String fileFieldId,
-					int startByte, int endByte, String url, XMLHttpRequest xhr,
+					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
 					ProgressCallback callback) {
 				// TODO Auto-generated method stub
 			}
@@ -398,6 +398,19 @@ public class ProvUtilsTest {
 			public void loadCss(String url, Callback<Void, Exception> callback) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			@Override
+			public String getFileUrl(String fileFieldId) {
+				return null;
+			}
+			
+			@Override
+			public void consoleError(String message) {
+			}
+			
+			@Override
+			public void consoleLog(String message) {
 			}
 		};
 	}

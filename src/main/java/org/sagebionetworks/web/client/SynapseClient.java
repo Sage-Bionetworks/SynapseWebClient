@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -18,8 +19,9 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -152,6 +154,14 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public void updateUserProfile(String userProfileJson) throws RestServiceException;
 	
+	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
+	
+	public void addEmail(String emailValidationToken) throws RestServiceException;
+	
+	public String getNotificationEmail() throws RestServiceException;
+	
+	public void setNotificationEmail(String email) throws RestServiceException;
+	
 	public EntityWrapper getNodeAcl(String id) throws RestServiceException;
 	
 	public EntityWrapper createAcl(EntityWrapper acl) throws RestServiceException;
@@ -190,6 +200,8 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 
 	String getUnmetTeamAccessRequirements(String teamId) throws RestServiceException;
+	String getTeamAccessRequirements(String teamId) throws RestServiceException;
+	String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
 	EntityWrapper createAccessApproval(EntityWrapper aaEW)
 			throws RestServiceException;
@@ -249,6 +261,8 @@ public interface SynapseClient extends RemoteService {
 	public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
+	public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
+	
 	public String getFileEndpoint() throws RestServiceException;
 	
 	public String addFavorite(String entityId) throws RestServiceException;
@@ -276,6 +290,10 @@ public interface SynapseClient extends RemoteService {
 	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException;
 	
+	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
+	public String getCertificationQuiz() throws RestServiceException;
+	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException; 
+	
 	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException;
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
@@ -284,6 +302,7 @@ public interface SynapseClient extends RemoteService {
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
 	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
 	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
 	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
@@ -322,8 +341,29 @@ public interface SynapseClient extends RemoteService {
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
 		
-	public String executeTableQuery(String query) throws RestServiceException;
+	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException;
+	
+	public String sendRowsToTable(String rowSet) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
 
+	public String deleteApiKey() throws RestServiceException;
+	
+	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
+	
+	public String getTableFileHandle(String fileHandlesToFindRowReferenceSet) throws RestServiceException;
+	
+	/**
+	 * Set a table's schema. Any ColumnModel that does not have an ID will be
+	 * treated as a column add.
+	 * 
+	 * @param The
+	 *            ID of the table that will be updated.
+	 * @param schema
+	 *            Each string in the list must be a ColumnModel JSON string.
+	 * @return The list of ColumnModel JSON strings.
+	 * @throws RestServiceException
+	 */
+	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+			throws RestServiceException;
 }

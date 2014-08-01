@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.HasDirection.Direction;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 
 public class DisplayConstants {
@@ -11,6 +13,7 @@ public class DisplayConstants {
 	/*
 	 * Text constants
 	 */
+	public static final String CERTIFIED_USER="Certified User";
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
@@ -151,6 +154,9 @@ public class DisplayConstants {
 	public static final String BUTTON_LOGIN_AGAIN = "Go to Synapse Login Page";
 	public static final String LABEL_LOGOUT_TEXT = "Logout";
 	public static final String BUTTON_CANCEL = "Cancel";
+	public static final String REMIND_ME_LATER = "Remind me later";
+	public static final String BUTTON_CONTINUE = "Continue";
+	public static final String BECOME_CERTIFIED = "Become Certified";
 	public static final String BUTTON_ADD_ANNOTATION = "Add Annotation";
 	public static final String TEXT_NO_DOWNLOADS = "There are no downloads available.";
 	public static final String TEXT_UNAUTH_DOWNLOADS = "Please login or sign the End User License Agreement to see downloads.";
@@ -187,6 +193,7 @@ public class DisplayConstants {
 	public static final String ERROR_LOGIN_REQUIRED = "You will need to login for access to that resource.";
 	public static final String ERROR_TITLE_VALIDATION_ERROR = "Validation Error";
 	public static final String ERROR_ALL_FIELDS_REQUIRED = "All fields must first be properly fill in.";
+	public static final String ERROR_ALL_QUESTIONS_REQUIRED = "Please answer all of the questions and try again.";
 	public static final String TITLE_ADD_ANNOTATION = "Add Annotation";
 	public static final String BUTTON_RETURN_TO_LAYER = "Return to Layer";
 	public static final String LABEL_GOTO_SYNAPSE_ID = "Enter a Synapse Id...";
@@ -212,11 +219,13 @@ public class DisplayConstants {
 	public static final String BUTTON_TOOLS_MENU = "Tools";
 	public static final String BUTTON_ADD = "Add";
 	public static final String BUTTON_EDIT = "Edit";
+	public static final String BUTTON_EDIT_PROFILE = "Edit Your Profile";
 	public static final String BUTTON_EDIT_WIKI = "Edit Wiki";
 	public static final String EDIT_DESCRIPTION = "Edit Description";	
 	public static final String BUTTON_DELETE_WIKI = "Delete&nbspPage";
 	public static final String BUTTON_WIKI_ATTACHMENTS = "Attachments";
 	public static final String BUTTON_SHARE = "Share";
+	public static final String BUTTON_SHARING = "Sharing";
 	public static final String BUTTON_LEAVE_TEAM = "Leave Team";
 	public static final String BUTTON_DOWNLOAD = "Download";
 	public static final String LABEL_DELETE = "Delete";
@@ -249,6 +258,7 @@ public class DisplayConstants {
 	public static final String LABEL_TEAM_CREATED = "Team Created";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
+	public static final String TEXT_USER_HOME = "Home";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String UPLOAD_FILE = "Upload File";
 	public static final String LINK_TO_URL = "Link to URL";
@@ -306,6 +316,7 @@ public class DisplayConstants {
 	public static final String LABEL_DELETED = "deleted";
 	public static final String ERROR_LOADING_DESCRIPTION_FAILED = "Failed to load the description: ";
 	public static final String ERROR_LOADING_MARKDOWN_FAILED = "Failed to load the markdown: ";
+	public static final String ERROR_SAVING_WIKI = "Could not save your changes.\nIt is recommended that you copy your version of the wiki text so that it is not lost.\n";
 	public static final String ERROR_LOADING_WIKI_FAILED = "Failed to load the wiki page: ";
 	public static final String ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED = "Failed to load the history of the wiki page.";
 	public static final String ERROR_WIKI_MODIFIED = "Sorry, another process has made changes to this wiki while you were editing.  Please reload the page, merge in your changes, and try saving again.";
@@ -340,6 +351,8 @@ public class DisplayConstants {
 	public static final String ERROR_INVALID_VERSION_FORMAT = "Invalid version format.";
 	public static final String DESCRIPTION = "Description";
 	public static final String OK = "OK";
+	public static final String YES = "Yes";
+	public static final String NO = "No";
 	public static final String ERROR_IN_READ_ONLY_MODE = "Sorry, that operation is not allowed in read only mode.";
 	public static final String WHY_VERSION_READ_ONLY_MODE = "You are not allowed to modify an Entity when viewing a particular version.";
 	public static final String READ_ONLY = "READ ONLY";	
@@ -420,6 +433,7 @@ public class DisplayConstants {
 	public static final String SYNAPSE_API_CALL_COL_CONFIGS_COL_NAME = "Column Configurations:";
 	
 	public static final String INVALID_URL_MESSAGE = "Please enter a valid URL";
+	public static final String INVALID_USERNAME_MESSAGE = "Please enter a valid username";
 	public static final String SHOW_EXPAND = "Show Expand";
 	public static final String INVALID_NUMBER_MESSAGE = "Please enter a valid number";
 	public static final String DEPTH_LABEL = "Depth";
@@ -483,6 +497,8 @@ public class DisplayConstants {
 	public static final String TEXT_EDIT_ANNOTATION = "Edit Annotation";
 	public static final String BUTTON_TEXT_REQUEST_ACCESS_FROM_ACT = "Request Access";
 	public static final String BUTTON_TEXT_ACCEPT_TERMS_OF_USE = "Accept Terms of Use";
+	public static final String SEND_BUG_REPORT = "Send Error Report";
+	public static final String DO_NOT_SEND_BUG_REPORT = "Don't Send";
 	public static final String BUTTON_TEXT_LOGIN = "Login";
 	public static final String FLAG_DIALOG_TITLE = "Flag Data";
 	public static String UNRESTRICTED_DATA_DIALOG_TITLE = "Unrestricted Data";
@@ -625,7 +641,7 @@ public class DisplayConstants {
 	public static final String NEW_TEAM_NAME = "New Team Name";
 	public static final String SHORT_TEAM_DESCRIPTION = "Short Team Description";
 	public static final String WHAT_IS_A_PROJECT = "What's a Project?";
-	public static final String USER_GUIDE = "User Guide";
+	public static final String SYNAPSE_TUTORIAL = "Synapse Tutorial";
 	public static final String ADD_ACL_UNSAVED_CHANGES = "You have modified the Add People fields but not clicked the 'Add' button to grant the permission. Would you like to add these changes?";
 	
 	public static final String EVALUATION_REGISTRATION_ERROR = "Unable to register for the evaluation: ";
@@ -656,6 +672,7 @@ public class DisplayConstants {
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 	public static final String API_DOCUMENTATION = "API Documentation";
 	public static final String EXAMPLE_CODE = "Example Code";
+	public static final String LAUNCH_FILE_UPLOADER = "Launch File Uploader";
 	public static final String MORE_DETAILS_SYNAPSE = "Read more about Synapse";
 	public static final String REST_API_DOCUMENTATION = "REST API documentation";
 	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
@@ -709,6 +726,44 @@ public class DisplayConstants {
 	public static final String TABLE_NAME = "Table Name";
 	public static final String TABLE_CREATED = "Table Created";
 	public static final String ERROR_LOADING_QUERY_PLEASE_RETRY = "An error occured trying to load your query. Please reload the page and try again";
+	public static final String EXECUTING_QUERY = "Executing Query";
+	public static final String TABLE_UNAVAILABLE = "Table Unavailable";
+	public static final String TABLE_UNAVAILABLE_GENERIC = "This table is not currently available for query. Please try again later.";
+	public static final String TABLE_PROCESSING_DESCRIPTION = "This table is processing an update. To avoid displaying stale data, query is temporarily unavailable until the processing has completed.";
+	public static final String TRY_NOW = "Try Now";
+	public static final String WAITING = "Waiting";
+	public static final String ROW_UPDATE_FAILED = "An error occurred updating the row. Please reload the page and try again.";
+	public static final String NUMBER_NOT_VALID = "Number not valid";
+	public static final String REASON = "Reason";
+	
+	public static final String PASSWORD_HAS_BEEN_CHANGED = "Your password has been changed.";
+	public static final String PASSWORD_RESET_SENT = "Your password reset request has been sent. Please check your email.";
+	public static final String PASSWORDS_MISMATCH = "Passwords do not match. Please re-enter your new password.";
+	
+	public static final String ACCOUNT_CREATED = "Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then ";
+	public static final String EMAIL_ADDED = "We have sent you an email with instructions on how to verify the new email address.";
+	public static final String EMAIL_SUCCESS = "Successfully verified the email address";
+	public static final String EMAIL_FAILURE = "Unable to verify the email address:";
+	public static final String LOGIN_HERE = "login here";
+	
+	public static final String ERROR_CREATING_COLUMN = "Error creating column";
+	public static final String API_KEY_CHANGED = "API Key successfully changed";
+	public static final String MAX_STRING_LENGTH = "Maximum String Length";
+	public static final String MAX_LENGTH_REASON = "The smaller the maximum length, the more columns you can include in your table.";
+	public static final String BACK_TO_TABLE = "Back to Table";
+	public static final String ROW_IS_EMPTY = "Row is empty";
+	public static final String ROW = "Row";
+	public static final String COLUMN = "Column";
+	public static final String VALUE = "Value";
+	public static final String DELETE_SELECTED = "Delete Selected";
+	public static final String ERROR_DELETE_ROWS = "Error deleting rows";
+	public static final String ROWS_DELETED = "Rows Deleted";
+	public static final String VIEW_ROW = "View Row";
+	public static final String CONFIRM_DELETE_SELECTED = "Are you sure you want to delete the selected rows?";
+	public static final String DOWNLOAD = "Download";
+	public static final String UPDATE_FILE = "Update File";
+	public static final String SESSION_TIMEOUT = "Session Timeout";
+	public static final String SESSION_HAS_TIMED_OUT = "Your session has timed out. Please login again.";
 
 }
 

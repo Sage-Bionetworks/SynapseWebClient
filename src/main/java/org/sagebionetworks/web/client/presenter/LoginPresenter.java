@@ -4,7 +4,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,7 +12,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -25,7 +24,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,10 +40,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	private String openIdReturnUrl;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private JSONObjectAdapter jsonObjectAdapter;
-	private SynapseClientAsync synapseClient;
-	private AdapterFactory adapterFactory;
-	private UserProfile profile;
 	
 	@Inject
 	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState, NodeModelCreator nodeModelCreator, CookieProvider cookies, GWTWrapper gwtWrapper, SynapseJSNIUtils synapseJSNIUtils, JSONObjectAdapter jsonObjectAdapter, SynapseClientAsync synapseClient, AdapterFactory adapterFactory){
@@ -53,9 +47,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils=synapseJSNIUtils;
-		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.synapseClient = synapseClient;
-		this.adapterFactory = adapterFactory;
 		view.setPresenter(this);
 	} 
 
@@ -85,12 +76,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 
 	public void showView(final LoginPlace place) {
 		String token = place.toToken();
-		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {			
-			boolean isSso = false;
-			if(authenticationController.isLoggedIn())
-				isSso = authenticationController.getCurrentUserIsSSO();
+		if(LoginPlace.LOGOUT_TOKEN.equals(token)) {
 			authenticationController.logoutUser();
-			view.showLogout(isSso);
+			view.showLogout();
 		} else if (WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN.equals(token)) {
 			// User does not exist, redirect to Registration page
 			view.showErrorMessage(DisplayConstants.CREATE_ACCOUNT_MESSAGE_SSO);
@@ -100,22 +88,13 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 			view.showErrorMessage(DisplayConstants.SSO_ERROR_UNKNOWN);
 			view.showLogin(openIdActionUrl, openIdReturnUrl);
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
-			//get the current profile, and set the view to set username
-			ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile result) {
-					profile = result;
-					view.showSetUsernameUI();
-				}
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				};
-			});
+			//go to the change username page
+			gotoChangeUsernamePlace();
 		} else if (!ClientProperties.DEFAULT_PLACE_TOKEN.equals(token) && 
 				!LoginPlace.CHANGE_USERNAME.equals(token) && 
 				!"".equals(token) && 
 				token != null) {			
-			loginSSOUser(token);
+			revalidateSession(token);
 		} else {
 			// standard view
 			authenticationController.logoutUser();
@@ -123,18 +102,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		}
 	}
 	
-	@Override
-	public void setUsername(String newUsername) {
-		if (profile != null) {
-			//quick check to see if it's valid.
-			if (isValidUsername(newUsername)) {
-				profile.setUserName(newUsername);
-				updateProfile(profile);
-			} else {
-				//invalid username
-				view.showUsernameInvalid();
-			}
-		}
+	private void gotoChangeUsernamePlace() {
+		globalApplicationState.getPlaceChanger().goTo(new ChangeUsername(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 	
 	public static boolean isValidUsername(String username) {
@@ -153,57 +122,32 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		return (matchResult != null && email.equals(matchResult.getGroup(0))); 
 	}
 	
+	public static boolean isValidUrl(String url, boolean isUndefinedUrlValid) {
+		if (url == null || url.trim().length() == 0) {
+			//url is undefined
+			return isUndefinedUrlValid;
+		}
+		RegExp regEx = RegExp.compile(WebConstants.VALID_URL_REGEX, "gm");
+		MatchResult matchResult = regEx.exec(url);
+		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
+	}
+	
 	@Override
 	public void setNewUser(UserSessionData newUser) {
-		loginSSOUser(newUser.getSession().getSessionToken());
+		revalidateSession(newUser.getSession().getSessionToken());
 	}
 	
-	public void checkForTempUsernameAndContinue(){
+	/**
+	 * Check for temp username, and prompt for change if user has not set
+	 */
+	public void checkForTempUsername(){
 		//get my profile, and check for a default username
-		view.showLoggingInLoader();
-		ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile result) {
-				view.hideLoggingInLoader();
-				profile = result;
-				if (profile != null && DisplayUtils.isTemporaryUsername(profile.getUserName())) {
-					//set your username
-					view.showSetUsernameUI();
-				}
-				else {
-					goToLastPlace();
-				}
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//could not determine
-				goToLastPlace();
-			}
-		});
-
-	}
-
-	public void updateProfile(final UserProfile profile) {
-		try { 
-			JSONObjectAdapter adapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
-			String userProfileJson = adapter.toJSONString();
-	
-			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated your username", "");
-					authenticationController.updateCachedProfile(profile);
-					goToLastPlace();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showUsernameTaken();
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+		view.hideLoggingInLoader();
+		UserProfile userProfile = authenticationController.getCurrentUserSessionData().getProfile();
+		if (userProfile != null && DisplayUtils.isTemporaryUsername(userProfile.getUserName())) {
+			gotoChangeUsernamePlace();
+		} else {
+			goToLastPlace();
 		}
 	}
 	
@@ -221,11 +165,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	@Override
 	public void goToLastPlace() {
 		view.hideLoggingInLoader();
-		Place forwardPlace = globalApplicationState.getLastPlace();
-		if(forwardPlace == null) {
-			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-		}
-		bus.fireEvent(new PlaceChangeEvent(forwardPlace));
+		DisplayUtils.goToLastPlace(globalApplicationState);
 	}
 	
 	/*
@@ -247,13 +187,14 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		});
 	}
 	
-	private void loginSSOUser(String token) {
+	private void revalidateSession(String token) {
 		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 		// parse token
 		view.showLoggingInLoader();
 		if(token != null) {
-			final String sessionToken = token;	
-			authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {	
+			final String sessionToken = token;
+			
+			AsyncCallback<String> callback = new AsyncCallback<String>() {	
 				@Override
 				public void onSuccess(String result) {
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
@@ -272,7 +213,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										public void onSuccess(Void result) {
 											// Have to get the UserSessionData again, 
 											// since it won't contain the UserProfile if the terms haven't been signed
-											authenticationController.loginUserSSO(sessionToken, new AsyncCallback<String>() {
+											authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
 
 												@Override
 												public void onFailure(
@@ -284,8 +225,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												@Override
 												public void onSuccess(
 														String result) {
-													// All setup complete, so forward the user
-													goToLastPlace();
+													// Signed ToU. Check for temp username, passing record, and then forward
+													checkForTempUsername();
 												}	
 												
 											});
@@ -315,7 +256,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-						checkForTempUsernameAndContinue();
+						checkForTempUsername();
 					}
 				}
 				@Override
@@ -327,8 +268,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 					view.showErrorMessage("An error occurred. Please try logging in again.");
 					view.showLogin(openIdActionUrl, openIdReturnUrl);
 				}
-			});
+			};
+			
+			authenticationController.revalidateSession(sessionToken, callback);
 		}
 	}
-
 }

@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
+import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
@@ -54,6 +55,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
 	private ProjectAreaState projectAreaState;
+	
+	public static final String TABLE_QUERY_PREFIX = "query/";
+	public static final String TABLE_ROW_PREFIX = "row/";
+	public static final String TABLE_ROW_VERSION_DELIMITER = "/rowversion/";
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -249,8 +254,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			// files area clicked in non-project entity requires goto root of files
 			// files area clicked with last-file-state requires goto
 			if(!isProject || projectAreaState.getLastFileAreaEntity() != null) {				
-				return true;			
-			}	
+				return true;				
+			}
 		} else if(targetTab == EntityArea.WIKI) {
 			if(!isProject || (isProject && projectAreaState.getLastWikiSubToken() != null)) {
 				// wiki area clicked in non-project entity requires goto
@@ -271,14 +276,58 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	 */
 	@Override
 	public void entityDeleted(EntityDeletedEvent event) {
-		if (event != null
-				&& event.getDeletedId() != null
-				&& projectAreaState != null
-				&& projectAreaState.getLastFileAreaEntity() != null
-				&& event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) {
-			// remove file state if entity was deleted
-			projectAreaState.setLastFileAreaEntity(null);
+		if (event != null && event.getDeletedId() != null && projectAreaState != null) {			
+			if(projectAreaState.getLastTableAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastTableAreaEntity().getId())) {
+				// remove table state
+				projectAreaState.setLastTableAreaEntity(null);
+			} else if(projectAreaState.getLastFileAreaEntity() != null && event.getDeletedId().equals(projectAreaState.getLastFileAreaEntity().getId())) { 
+				// remove file state
+				projectAreaState.setLastFileAreaEntity(null);
+			}
 		}
+	}
+
+	@Override
+	public void setTableQuery(String newQuery) {
+		setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + newQuery);
+	}
+
+	@Override
+	public void setTableRow(TableRowHeader rowHeader) {
+		if(rowHeader != null && rowHeader.getRowId() != null) {
+			String rowStr = rowHeader.getRowId();
+			if(rowHeader.getVersion() != null) rowStr += TABLE_ROW_VERSION_DELIMITER + rowHeader.getVersion();
+			setArea(EntityArea.TABLES, TABLE_ROW_PREFIX + rowStr);			
+		}
+	}
+
+	@Override
+	public TableRowHeader getTableRowHeader() {		
+		if(areaToken != null && areaToken.startsWith(TABLE_ROW_PREFIX)) {
+			TableRowHeader rowHeader = new TableRowHeader();
+			String rowHeaderStr = areaToken.substring(TABLE_ROW_PREFIX.length(), areaToken.length());
+			if(rowHeaderStr.contains(TABLE_ROW_VERSION_DELIMITER)) {					
+				String[] versionParts = rowHeaderStr.split(TABLE_ROW_VERSION_DELIMITER);
+				if(versionParts.length == 2) {
+					rowHeader.setRowId(versionParts[0]);
+					rowHeader.setVersion(versionParts[1]);
+				} else {
+					return null; // malformed
+				}
+			} else {
+				rowHeader.setRowId(rowHeaderStr);					
+			}
+			return rowHeader;
+		}
+		return null;
+	}
+
+	@Override
+	public String getTableQuery() {
+		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
+			return areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
+		}
+		return null;
 	}
 
 	

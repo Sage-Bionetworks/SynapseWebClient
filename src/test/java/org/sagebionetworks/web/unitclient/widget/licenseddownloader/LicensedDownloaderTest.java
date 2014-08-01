@@ -3,6 +3,8 @@ package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -30,6 +32,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -39,7 +42,9 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCacheImpl;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -108,8 +113,10 @@ public class LicensedDownloaderTest {
 		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
 		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
-
-		jiraURLHelper  = new JiraURLHelperImpl(gc);
+		JiraClientAsync mockJiraClient = mock(JiraClientAsync.class);
+		GWTWrapper mockGWTWrapper = mock(GWTWrapper.class);
+		AuthenticationController mockAuthController = mock(AuthenticationController.class);
+		jiraURLHelper  = new JiraURLHelperImpl(gc, mockJiraClient, mockGWTWrapper, mockAuthController);
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
 				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator);
@@ -133,7 +140,7 @@ public class LicensedDownloaderTest {
 		entity.setMd5(md5sum);
 		entity.setContentType(contentType);
 		
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
 		// path for entity
 		entityPath = new EntityPath();
@@ -220,7 +227,7 @@ public class LicensedDownloaderTest {
 		entity.setId("myFileEntityId");
 		entity.setVersionNumber(4l);
 		resetMocks();
-		entityBundle = new EntityBundle(entity, null, null, null, null, null, null);
+		entityBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
 		// Null locations
 		resetMocks();			
@@ -251,9 +258,26 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5());
+		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5(), null);
+		
+		// Success Test: External file
+		resetMocks();			
+		
+		ExternalFileHandle externalFileHandle = new ExternalFileHandle();
+		externalFileHandle.setFileName("myExternalFileName.png");
+		externalFileHandle.setId(fileHandleId);
+		externalFileHandle.setExternalURL("http://getbootstrap.com/javascript/");
+		
+		fileHandles = new ArrayList<FileHandle>();
+		fileHandles.add(externalFileHandle);
+		((FileEntity)entityBundle.getEntity()).setDataFileHandleId(fileHandleId);
+		entityBundle.setFileHandles(fileHandles);
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		licensedDownloader.loadDownloadUrl(entityBundle);
+		verify(mockView).showDownloadsLoading();		
+		verify(mockView).setDownloadLocation(externalFileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), null, externalFileHandle.getExternalURL());
 	}
-
+	
 
 	@Test
 	public void testAsWidget(){

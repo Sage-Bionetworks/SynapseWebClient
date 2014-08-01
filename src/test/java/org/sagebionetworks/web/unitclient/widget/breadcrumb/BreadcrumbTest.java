@@ -5,7 +5,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNotNull;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -53,7 +52,6 @@ public class BreadcrumbTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
-	EntityTypeProvider entityTypeProvider;
 	IconsImageBundle mockIconsImageBundle;
 	
 	@SuppressWarnings("unchecked")
@@ -65,12 +63,10 @@ public class BreadcrumbTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
-				
-		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
-		
+						
 		breadcrumb = new Breadcrumb(mockView, mockSynapseClient,
 				mockGlobalApplicationState, mockAuthenticationController,
-				mockNodeModelCreator, entityTypeProvider, mockIconsImageBundle);
+				mockNodeModelCreator, mockIconsImageBundle);
 		
 		
 		verify(mockView).setPresenter(breadcrumb);

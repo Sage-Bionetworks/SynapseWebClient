@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -263,19 +264,16 @@ public class WikiAttachmentsViewImpl extends LayoutContainer implements WikiAtta
 	public void deleteAttachmentAt(int rowIndex) {
 		final BaseModelData model = grid.getStore().getAt(rowIndex);
 		if (model != null) {
-			MessageBox.confirm(
+			DisplayUtils.showConfirmDialog(
 					DisplayConstants.LABEL_DELETE + " "
 							+ model.get(ATTACHMENT_NAME_KEY),
 					DisplayConstants.PROMPT_SURE_DELETE + " "
 							+ model.get(ATTACHMENT_NAME_KEY) + "?",
-					new Listener<MessageBoxEvent>() {
+					new Callback() {
 						@Override
-						public void handleEvent(MessageBoxEvent be) {
-							Button btn = be.getButtonClicked();
-							if (Dialog.YES.equals(btn.getItemId())) {
-								presenter.deleteAttachment((String) model
-										.get(ATTACHMENT_NAME_KEY));
-							}
+						public void invoke() {
+							presenter.deleteAttachment((String) model
+									.get(ATTACHMENT_NAME_KEY));							
 						}
 					});
 		}

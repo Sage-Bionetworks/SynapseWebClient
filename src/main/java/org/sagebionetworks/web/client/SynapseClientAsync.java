@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -15,6 +16,8 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.table.QueryDetails;
+import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -77,6 +80,14 @@ public interface SynapseClientAsync {
 	
 	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	
+	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
+	
+	void addEmail(String emailValidationToken, AsyncCallback<Void> callback);
+	
+	void getNotificationEmail(AsyncCallback<String> callback);
+	
+	void setNotificationEmail(String email, AsyncCallback<Void> callback);
+	
 	public void getNodeAcl(String id, AsyncCallback<EntityWrapper> callback);
 	
 	public void createAcl(EntityWrapper acl, AsyncCallback<EntityWrapper> callback);
@@ -107,7 +118,9 @@ public interface SynapseClientAsync {
 	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
 	
 	public void getUnmetTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
-
+	public void getTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
+	public void getAllEntityUploadAccessRequirements(String entityId, AsyncCallback<String> callback);
+	
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);
 
 	public void updateExternalLocationable(String entityId, String externalUrl, String name, AsyncCallback<EntityWrapper> callback);
@@ -159,6 +172,8 @@ public interface SynapseClientAsync {
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<String> callback);
 	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<String> callback);
 	
+	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
+	
 	void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<String> callback);
 
 	void addFavorite(String entityId, AsyncCallback<String> callback);
@@ -194,6 +209,15 @@ public interface SynapseClientAsync {
 	void inviteMember(String userGroupId, String teamId, String message, AsyncCallback<Void> callback);
 	/////////////////
 	
+	/**
+	 * The PassingRecord that documents when a user was certified is returned.  Otherwise, a NotFoundException is thrown.
+	 * @param userId
+	 * @param callback
+	 */
+	void getCertifiedUserPassingRecord(String userId, AsyncCallback<String> callback);
+	void getCertificationQuiz(AsyncCallback<String> callback);
+	void submitCertificationQuizResponse(String quizResponseJson, AsyncCallback<String> callback);
+	
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
@@ -201,6 +225,7 @@ public interface SynapseClientAsync {
 	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
+	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
 	
 	
@@ -261,8 +286,27 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void executeTableQuery(String query, AsyncCallback<String> callback);
+	void executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount, AsyncCallback<QueryResult> callback);
+
+	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
 	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
+
+	void deleteApiKey(AsyncCallback<String> callback);
+
+	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
+
+	void getTableFileHandle(String fileHandlesToFindRowReferenceSet, AsyncCallback<String> callback);
+	
+	/**
+	 * Set a table's schema. Any ColumnModel that does not have an ID will be
+	 * treated as a column add.
+	 * 
+	 * @param tableId
+	 * @param schemaJSON
+	 * @param callback
+	 */
+	void setTableSchema(String tableId, List<String> schemaJSON,
+			AsyncCallback<List<String>> callback);
 
 }

@@ -25,7 +25,6 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
-	
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
 	private static UserSessionData currentUser;
 	
@@ -54,7 +53,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					e.printStackTrace();
 				}
 				
-				loginUser(session.getSessionToken(), callback);
+				revalidateSession(session.getSessionToken(), callback);
 			}
 
 			
@@ -64,30 +63,24 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-		
-	@Override
-	public void loginUser(final String token, final AsyncCallback<String> callback) {
-		setUser(token, callback, false);
-	}
 	
 	@Override
-	public void loginUserSSO(final String token, final AsyncCallback<String> callback) {
-		setUser(token, callback, true);
+	public void revalidateSession(final String token, final AsyncCallback<String> callback) {
+		setUser(token, callback);
 	}
 
 	@Override
 	public void logoutUser() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			// don't actually terminate session, just remove the cookies			
-			cookies.removeCookie(CookieKeys.USER_LOGIN_DATA);
-			cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
-			currentUser = null;
-		}
+		// don't actually terminate session, just remove the cookie
+		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
+		currentUser = null;
 	}
 
-	private void setUser(String token, final AsyncCallback<String> callback, final boolean isSSO) {
-		if(token == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+	private void setUser(String token, final AsyncCallback<String> callback) {
+		if(token == null) {
+			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+			return;
+		}
 		userAccountService.getUserSessionData(token, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String userSessionJson) {
@@ -96,10 +89,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					try {
 						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
 						userSessionData = new UserSessionData(usdAdapter);
-						userSessionData.setIsSSO(isSSO);
-						
-						updateUserLoginDataCookie(userSessionData);
-						
 						Date tomorrow = getDayFromNow();
 						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 						currentUser = userSessionData;
@@ -108,13 +97,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 						callback.onFailure(e);
 					}
 				} else {
-					callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+				logoutUser();
+				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
 			}
 		});		
 	}
@@ -123,17 +113,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
-			try {
-				updateUserLoginDataCookie(currentUser);
-			} catch (JSONObjectAdapterException e) {
-			}
 		}
-	}
-	
-	private void updateUserLoginDataCookie(UserSessionData userSessionData) throws JSONObjectAdapterException {
-		JSONObjectAdapter usdAdapter = userSessionData.writeToJSONObject(adapterFactory.createNew());
-		Date tomorrow = getDayFromNow();
-		cookies.setCookie(CookieKeys.USER_LOGIN_DATA, usdAdapter.toJSONString(), tomorrow);
 	}
 	
 	@Override
@@ -143,15 +123,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public boolean isLoggedIn() {
-		String loginCookieString = cookies.getCookie(CookieKeys.USER_LOGIN_DATA);
-		if(loginCookieString != null) {
-			try {
-				currentUser = new UserSessionData(adapterFactory.createNew(loginCookieString));
-				if(currentUser != null) return true;				
-			} catch (JSONObjectAdapterException e) {				
-			}			
-		} 
-		return false;
+		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
+		return token != null && !token.isEmpty() && currentUser != null;
 	}
 
 	@Override
@@ -166,18 +139,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void reloadUserSessionData() {
+	public void reloadUserSessionData(AsyncCallback<String> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		setUser(sessionToken, new AsyncCallback<String>() {
-			@Override
-			public void onFailure(Throwable caught) {				
-			}
-
-			@Override
-			public void onSuccess(String result) {
-			}
-		}, getCurrentUserIsSSO());
-		
+		setUser(sessionToken, callback);
 	}
 
 	@Override
@@ -194,12 +158,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		else return null;
 	}
 	
-	@Override
-	public boolean getCurrentUserIsSSO() {
-		if(currentUser != null) return currentUser.getIsSSO();
-		else return false;
-	}
-
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);

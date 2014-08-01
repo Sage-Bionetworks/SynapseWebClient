@@ -23,6 +23,7 @@
 
 .header-inner-commands-container {
 	border-radius: 0.2em;
+	height: 23px;
 }
 .header-inner-commands-container td {
 	padding: 3px 7px 3px 7px;
@@ -123,7 +124,7 @@
   -moz-transition:.2s;
   -webkit-transition:.2s;
   transition:.2s; }
-.headerLink:hover { color: #BC3226; text-decoration:none; }
+.headerLink:hover { color: #3a5bdc; text-decoration:none; }
 
 .headerUsernameLink { 
 	font-weight: bold; 
@@ -148,11 +149,7 @@
 }
 
 .userProfileImage {
-	margin:auto; 
-	display:block;
 	border-radius: 3px;
-	margin-right: 5px;
-	box-shadow: 0 1px 2px #000000;
 }
 
 /* Search loading image */
@@ -474,6 +471,13 @@ a.shortBtn {
 	float: right;
 }
 
+.autoheight {
+	height: auto;
+}
+
+.autowidth {
+	width: auto;
+}
 
 .clearleft {
 	clear:left;	
@@ -491,13 +495,6 @@ a.shortBtn {
 	clear: both;
 }
 
-.user-profile-linkedin {
-	margin-right: 3px;
-}
-.user-profile-linkedin-bar {
-	margin-bottom: 3px !important;
-}
-
 .user-profile-change-photo {
 }
 	
@@ -509,6 +506,14 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
+.margin-right-40 {
+	margin-right: 40px;
+}
+
+
+.margin-0-imp-before:before {
+	margin: 0px !important;
+}
 
 .user-profile-edit-table td {
 	padding-bottom: 5px;
@@ -527,6 +532,9 @@ a.shortBtn {
 
 .min-height-500 {
 	min-height: 500px;
+}
+.min-height-400 {
+	min-height: 400px;
 }
 
 .profile-image-40px {
@@ -560,6 +568,9 @@ a.shortBtn {
 	margin-top: 10px;
 	margin-left: 10px;
 }
+.margin-left-9 {
+	margin-left: 9px;
+}
 .margin-left-10 {
 	margin-left: 10px;
 }
@@ -584,7 +595,7 @@ a.shortBtn {
 	margin-top: 10px !important;
 }
 
-.margin-top-0 {
+.margin-top-0, .margin-top-0-radio input[type=radio], .margin-top-0-checkbox input[type=checkbox] {
 	margin-top: 0px !important;
 }
 
@@ -593,6 +604,17 @@ a.shortBtn {
 }
 .margin-top-15 {
 	margin-top: 15px;
+}
+
+.margin-top-30 {
+	margin-top: 30px;
+}
+
+.margin-top-60 {
+	margin-top: 60px;
+}
+.margin-top-60-imp {
+	margin-top: 60px !important;
 }
 .margin-top-100 {
 	margin-top: 100px;
@@ -607,6 +629,9 @@ a.shortBtn {
 }
 
 
+.margin-bottom-60 {
+	margin-bottom: 60px;
+}
 .margin-bottom-40 {
 	margin-bottom: 40px;
 }
@@ -720,6 +745,7 @@ a.shortBtn {
     padding: 0 5px 2px;
     overflow:auto;
     white-space:pre;
+    word-wrap: normal;
 }
 
 .apitable label {
@@ -760,8 +786,30 @@ a.shortBtn {
 	font-family: Yanone Kaffeesatz;
 }
 
+.font-size-150 {
+	font-size: 150px;
+}
+
+.font-size-90 {
+	font-size: 90px;
+}
+
+.font-size-58 {
+	font-size: 58px;
+}
+.font-size-22 {
+	font-size: 22px;
+}
+
+.font-size-17 {
+	font-size: 17px;
+}
+
 .font-size-15 {
 	font-size: 15px;
+}
+.font-size-13 {
+	font-size: 13px;
 }
 
 .vertical-align-bottom {
@@ -790,6 +838,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .scroll-auto {
 	overflow: auto;
+}
+
+.maxWidth100 {
+	max-width: 100%;
 }
 
 .markdown {
@@ -1043,6 +1095,10 @@ ol.lowerroman {
     color: #717171 !important;
 }
 
+.lightGreyText {
+	color: #909090;
+}
+
 
 .pagesTree {
 	overflow: hidden !important;	
@@ -1057,9 +1113,23 @@ ol.lowerroman {
 	padding-top: 15px;
 }
 
+.padding-top-15-imp {
+	padding-top: 15px !important;
+}
+
+
 .padding-bottom-15 {
 	padding-bottom: 15px;
 }
+
+.padding-5 {
+	padding: 5px;
+}
+
+.padding-2 {
+	padding: 2px;
+}
+
 
 .howToUseLink {
 	font-size: 16px;
@@ -1124,6 +1194,8 @@ ol.lowerroman {
 .inlineWidgetContainer {
 	overflow-x: auto;
 	display: inline-block;
+	position: relative;
+	top: 4px;
 }
 
 .myEvaluationListContainer {
@@ -1147,6 +1219,14 @@ ol.lowerroman {
 
 .align-center {display: block; margin-left: auto; margin-right: auto;}
 .text-align-center { text-align: center;}
+
+.bottomright {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	margin-bottom: 15px;
+	margin-right: 5px;
+}
 
 .highlighted-version {
     font-size: 11px !important;
@@ -1189,6 +1269,11 @@ ol.lowerroman {
 	background-clip: padding-box;
 }
 
+.moveup-8 {
+	position: relative;
+	top: -8px;
+}
+
 .moveup-5 {
 	position: relative;
 	top: -5px;
@@ -1214,7 +1299,10 @@ ol.lowerroman {
 	position: relative;
 	top: 2px;
 }
-
+.movedown-3 {
+	position: relative;
+	top: 3px;
+}
 .movedown-4 {
 	position: relative;
 	top: 4px;
@@ -1230,11 +1318,11 @@ ol.lowerroman {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    white-space: pre-wrap;
+    white-space: normal;
 }
 
 .highlight-box::after {
-    content: attr(title);
+    content: attr(highlight-box-title);
     position: absolute;
     top: 6px;
     left: 6px;
@@ -1253,6 +1341,10 @@ ol.lowerroman {
 
 .highlight-line-min {
     padding: 5px;
+}
+
+.line-height-1-7em-imp {
+	line-height:1.7em !important;	
 }
 
 
@@ -1311,7 +1403,7 @@ ol.lowerroman {
 
 .separator-margin {	margin-top: 40px; margin-bottom: 40px; }
 .separator-margin-top {	margin-top: 40px; }
-.separator-header-home { margin-top: 20px; margin-bottom: 40px !important; }
+.separator-header-home { margin-top: 20px; }
 .separator-header-page { margin-top: 3px; }
 
 /*============================*/
@@ -1502,6 +1594,24 @@ a.projectTitle:hover {
   z-index: 2;
 }
 
+.overflow-x-auto {
+	overflow-x: auto;
+
+}
+.double-border {
+	border: 1px double #000;
+	outline: 2px solid #717171;
+	outline-offset: -9px;
+}
+
+.font-family-cursive {
+	font-family: "Brush Script MT", cursive;
+}
+
+.fullOpacityImp {
+	opacity: 1 !important;
+}
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
@@ -1514,8 +1624,16 @@ a.projectTitle:hover {
 .entity-tabs > li.active > a,
 .entity-tabs > li.active > a:hover,
 .entity-tabs > li.active > a:focus {
-	background-color: #f9f9f9;
-	cursor: pointer;
+	background-color: #f9f9f9 !important;
+	cursor: pointer !important;
+}
+
+h1, .h1, h2, .h2, h3, .h3 {
+	margin-top: 0px !important;
+}
+
+ul, ol {
+	margin-bottom: 0px !important;
 }
 
 /*
@@ -1565,55 +1683,48 @@ a.projectTitle:hover {
   text-shadow: 0 1px 0 #fff;
 }
 
-.bs-sidebar {
+.bs-sidebar div {
   padding: 5px 10px 30px 0px;
 }
 
 /* All levels of nav */
-.bs-sidebar .nav > li > a {
-  display: block;
-  color: #BC3226;
-  padding: 5px 20px;
+.bs-sidenav > li > a {
+  padding: 5px 20px !important;
 }
-.bs-sidebar .nav > li > a:hover,
-.bs-sidebar .nav > li > a:focus {
-  text-decoration:underline;
-  background-color: transparent;
-  border-right: 1px solid #BC3226;
-}
-.bs-sidebar .nav > .active > a,
-.bs-sidebar .nav > .active:hover > a,
-.bs-sidebar .nav > .active:focus > a {
+
+.nav > .active > a,
+.nav > .active:hover > a,
+.nav > .active:focus > a {
   font-weight: bold;
-  color: black;
+  color: black !important;
   text-decoration:none;
   background-color: transparent;
   border-right: 0px;
 }
 
-.bs-sidebar .nav .nav > li > a {
+.bs-sidenav .nav > li > a {
   padding-top:    3px;
   padding-bottom: 3px;
   padding-left: 30px;
   font-size: 90%;
 }
-.bs-sidebar .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav > li > a {
   padding-left: 40px;
   font-size: 80%;
 }
-.bs-sidebar .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav > li > a {
   padding-left: 50px;
 }
-.bs-sidebar .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav > li > a {
   padding-left: 60px;
 }
-.bs-sidebar .nav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav > li > a {
   padding-left: 70px;
 }
-.bs-sidebar .nav .nav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav .nav > li > a {
   padding-left: 80px;
 }
-.bs-sidebar .nav .nav .nav .nav .nav .nav .nav .nav > li > a {
+.bs-sidenav .nav .nav .nav .nav .nav .nav .nav > li > a {
   padding-left: 90px;
 }
 /*===========*/
@@ -1647,3 +1758,114 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     background-image: none !important;
 }
 
+
+/* --- Date Picker Styles --- */
+.gwt-DatePicker {
+  border: 1px solid #ccc;
+  border-top:1px solid #999;
+  cursor: default;
+}
+.gwt-DatePicker td,
+.datePickerMonthSelector td:focus {
+  outline: none;
+}
+.datePickerMonthSelector td:focus {
+  outline: none;
+}
+.datePickerDays {
+  width: 100%;
+  background: white;
+}
+.datePickerDay,
+.datePickerWeekdayLabel,
+.datePickerWeekendLabel {
+  font-size: 85%;
+  text-align: center;
+  padding: 4px;
+  outline: none;
+  font-weight:bold;
+  color:#333;
+  border-right: 1px solid #EDEDED;
+  border-bottom: 1px solid #EDEDED;
+}
+.datePickerWeekdayLabel,
+.datePickerWeekendLabel {
+  background: #fff;
+  padding: 0px 4px 2px;
+  cursor: default;
+  color:#666;
+  font-size:70%;
+  font-weight:normal;
+}
+.datePickerDay {
+  padding: 4px 7px;
+  cursor: hand;
+  cursor: pointer;
+}
+.datePickerDayIsWeekend {
+  background: #f7f7f7;
+}
+.datePickerDayIsFiller {
+  color: #999;
+  font-weight:normal;
+}
+.datePickerDayIsValue {
+  background: #d7dfe8;
+}
+.datePickerDayIsDisabled {
+  color: #AAAAAA;
+  font-style: italic;
+}
+.datePickerDayIsHighlighted {
+  background: #F0E68C;
+}
+.datePickerDayIsValueAndHighlighted {
+  background: #d7dfe8;
+}
+.datePickerDayIsToday {
+  padding: 3px;
+  color: #fff;
+  background: url(images/hborder.png) repeat-x 0px -2607px;
+}
+.datePickerMonthSelector {
+  width: 100%;
+  padding: 1px 0 5px 0;
+  background: #fff;
+}
+.datePickerPreviousButton,
+.datePickerNextButton {
+  font-size: 120%;
+  line-height: 1em;
+  color: #3a6aad;
+  cursor: hand;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0px 4px;
+  outline: none;
+}
+td.datePickerMonth {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 100%;
+  font-weight: bold;
+  color: #333;
+}
+.gwt-DateBox {
+  padding: 5px 4px;
+  border: 1px solid #ccc;
+  border-top: 1px solid #999;
+  font-size: 100%;
+}
+.gwt-DateBox input {
+  width: 8em;
+}
+.dateBoxFormatError {
+  background: #ffcccc;
+}
+.dateBoxPopup {
+}
+
+.border-bottom-1 {
+  border-bottom: 1px solid #dddddd;
+}

@@ -11,9 +11,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.EntityTypeProvider;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.UploadView;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -21,19 +22,19 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
+import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
@@ -48,44 +49,53 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, UploadView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private AccessControlListEditor accessControlListEditor;
 	private Uploader uploader;
 	private EntityTypeProvider typeProvider;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private EntityFinder entityFinder;
-	private EntityBundle entityBundle;
-	private Long versionNumber;
-	private boolean isInTestMode;
+	private QuizInfoWidget quizInfoWidget;
+	private EntityAccessRequirementsWidget accessRequirementsWidget;
+	private SynapseClientAsync synapseClient;
+	private CookieProvider cookies;
+	private AuthenticationController authenticationController;
 	
 	private Button shareButton;	
 	private DropdownButton toolsButton;
 	private PublicPrivateBadge publicPrivateBadge;
 	private String typeDisplay;
+	private Anchor addDescriptionCommand;
+	private Callback addDescriptionCallback;
+	private Window uploaderWindow;
+	private EntityBundle entityBundle;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
-			IconsImageBundle iconsImageBundle, 
-			AccessMenuButton accessMenuButton,
 			AccessControlListEditor accessControlListEditor,
 			Uploader locationableUploader, 
 			EntityTypeProvider typeProvider,
-			SynapseJSNIUtils synapseJSNIUtils,
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
-			PublicPrivateBadge publicPrivateBadge) {
+			PublicPrivateBadge publicPrivateBadge,
+			QuizInfoWidget quizInfoWidget,
+			EntityAccessRequirementsWidget accessRequirementsWidget,
+			SynapseClientAsync synapseClient,
+			CookieProvider cookies,
+			AuthenticationController authenticationController) {
 		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
 		this.typeProvider = typeProvider;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;
+		this.quizInfoWidget = quizInfoWidget;
+		this.accessRequirementsWidget = accessRequirementsWidget;
+		this.synapseClient = synapseClient;
+		this.cookies = cookies;
+		this.authenticationController = authenticationController;
 	}
 
 	@Override
@@ -99,9 +109,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
 		if(shareButton != null) this.remove(shareButton);
-		this.versionNumber = versionNumber;
-		this.entityBundle = entityBundle;
-		this.isInTestMode = isInTestMode;
 		Entity entity = entityBundle.getEntity();
 		typeDisplay = typeProvider.getEntityDispalyName(entityType);
 				
@@ -151,27 +158,28 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	/*
 	 * Private Methods
 	 */	
-	private void configureShareButton(Entity entity, boolean isAdministrator) { 
+	private void configureShareButton(Entity entity, final boolean isAdministrator) { 
+		final String shareButtonText = isAdministrator ? DisplayConstants.BUTTON_SHARE : DisplayConstants.BUTTON_SHARING;
 		publicPrivateBadge.configure(entity, new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isPublic) {
 				if(isPublic) {
-					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-globe");
+					DisplayUtils.relabelIconButton(shareButton, shareButtonText, "glyphicon-globe");
 				} else {
-					DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, "glyphicon-lock");
+					DisplayUtils.relabelIconButton(shareButton, shareButtonText, "glyphicon-lock");
 				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.relabelIconButton(shareButton, DisplayConstants.BUTTON_SHARE, null);
+				DisplayUtils.relabelIconButton(shareButton, shareButtonText, null);
 			}
 		});
-		shareButton.setVisible(isAdministrator);
-		accessControlListEditor.setResource(entity);  
+		
+		accessControlListEditor.setResource(entity, isAdministrator);  
 		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(accessControlListEditor, new Callback() {
+				DisplayUtils.showSharingDialog(accessControlListEditor, isAdministrator, new Callback() {
 					@Override
 					public void invoke() {
 						presenter.fireEntityUpdatedEvent();
@@ -189,6 +197,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		// upload
 		if(canEdit) {
 			addRenameItem(toolsButton);
+			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
@@ -227,13 +236,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" " + typeDisplay, DisplayConstants.PROMPT_SURE_DELETE + " " + typeDisplay +"?", new Callback() {
+					
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteEntity();
-						}
+					public void invoke() {
+						presenter.deleteEntity();
 					}
 				});
 			}
@@ -259,40 +266,51 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	 * @param entityType 
 	 */
 	private void addUploadItem(DropdownButton menuBtn, final EntityBundle entityBundle, EntityType entityType) {
+		this.entityBundle = entityBundle;
 		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
-			final Window window = new Window();
+			uploaderWindow = new Window();
 			uploader.clearHandlers();
 			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
 				@Override
 				public void onPersistSuccess(EntityUpdatedEvent event) {
-					window.hide();
+					uploaderWindow.hide();
 					presenter.fireEntityUpdatedEvent();
 				}
 			});
 			uploader.addCancelHandler(new CancelHandler() {				
 				@Override
 				public void onCancel(CancelEvent event) {
-					window.hide();
+					uploaderWindow.hide();
 				}
 			});
 			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					window.removeAll();
-					window.setPlain(true);
-					window.setModal(true);		
-					window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-					window.setLayout(new FitLayout());			
-					window.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
-					window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-					window.show();
+					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController);
 				}
 			});
 			menuBtn.addMenuItem(a);
 		}
+	}
+	
+	@Override
+	public void showUploadDialog(String entityId) {
+		uploaderWindow.removeAll();
+		uploaderWindow.setPlain(true);
+		uploaderWindow.setModal(true);		
+		uploaderWindow.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
+		uploaderWindow.setLayout(new FitLayout());		
+		uploaderWindow.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+		uploaderWindow.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+		uploaderWindow.show();
+	}
+	
+	@Override
+	public void showQuizInfoDialog(CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
 	}
 		
 	/**
@@ -378,6 +396,35 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		});
 		menuBtn.addMenuItem(a);	}
+
+	@Override
+	public void showAddDescriptionCommand(Callback onClick) {
+		addDescriptionCallback = onClick;
+		if (addDescriptionCommand != null)
+			addDescriptionCommand.setVisible(true);
+	}
+	
+	@Override
+	public void hideAddDescriptionCommand() {
+		if (addDescriptionCommand != null)
+			addDescriptionCommand.setVisible(false);
+	}
+
+	private void initAddDescriptionItem(DropdownButton menuBtn) {
+		addDescriptionCommand = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-plus") + " "
+				+ DisplayConstants.ADD_DESCRIPTION));
+
+		hideAddDescriptionCommand();
+		addDescriptionCallback = null;
+		addDescriptionCommand.addClickHandler(new ClickHandler() {			
+			@Override
+			public void onClick(ClickEvent event) {
+				if (addDescriptionCallback != null)
+					addDescriptionCallback.invoke();
+			}
+		});
+		menuBtn.addMenuItem(addDescriptionCommand);
+	}
 }
 
 

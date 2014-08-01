@@ -104,7 +104,7 @@ public class PasswordResetPresenterTest {
 	
 	@Test
 	public void testSetPasswordLoad() {
-		AsyncMockStubber.callSuccessWith("tokenIsValid").when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("tokenIsValid").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		PasswordReset place = new PasswordReset("someSessionToken");
 		presenter.setPlace(place);		
 		verify(mockView).showResetForm();
@@ -112,7 +112,7 @@ public class PasswordResetPresenterTest {
 
 	@Test
 	public void testSetPasswordLoadFail() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		PasswordReset place = new PasswordReset("someSessionToken");
 		presenter.setPlace(place);		
 		verify(mockView).showExpiredRequest();

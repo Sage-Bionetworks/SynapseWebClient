@@ -5,16 +5,9 @@ import java.util.List;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 
-import com.extjs.gxt.ui.client.Style.Direction;
 import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
@@ -28,31 +21,36 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 
 	private Presenter presenter;
 	private GlobalApplicationState globalAppState;
-	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3";
-	private static final String SHOW_SUBPAGES_MD_STYLE="col-md-9";
-	private static final String HIDE_SUBPAGES_STYLE="col-xs-12 col-md-12";
-	private static final String HIDE_SUBPAGES_MD_STYLE="col-md-12";
+	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
+	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
+	private static final String HIDE_SUBPAGES_STYLE="col-xs-12";
+	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
 	
 	private Button showHideButton;
-	private LayoutContainer ulContainer;
+	private FlowPanel ulContainer;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
+	boolean isShowingSubpages;
 	
 	@Inject
 	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
 		this.globalAppState = globalAppState;
 	}
+	@Override
+	public void clear() {
+		super.clear();
+	}
 	
 	@Override
 	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
+		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
 		TocItem mainPage = (TocItem) root.getChild(0);
 		if (mainPage.getChildCount() == 0)
 			return;
-		addStyleName("bs-sidebar");
 		//only show the tree if the root has children
 		if (mainPage.getChildCount() > 0) {
 			//traverse the tree, and create anchors
@@ -60,61 +58,88 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			ul.addStyleName("notopmargin nav bs-sidenav");
 			addTreeItemsRecursive(ul, root.getChildren());
 			showHideButton = DisplayUtils.createButton("");
-			ulContainer = new LayoutContainer();
+			ulContainer = new FlowPanel();
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 			ulContainer.add(ul);
-
-			AnimationProtectorViewImpl protector = new AnimationProtectorViewImpl(showHideButton, ulContainer);
-			protector.setContainerVisible(true);
-			showSubpages();
-			AnimationProtector animation = new AnimationProtector(protector);
-			animation.setOutDirection(Direction.LEFT);
-			animation.setInDirection(Direction.RIGHT);
 			
-			FxConfig hideConfig = new FxConfig(300);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
+			showHideButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void handleEvent(FxEvent be) {
-					hideSubpages();
+				public void onClick(ClickEvent event) {
+					if (isShowingSubpages)
+						hideSubpages();
+					else
+						showSubpages();
 				}
 			});
-			animation.setHideConfig(hideConfig);
-			//already jumpy when showing the hidden subpages (because of the container width change), so make this quick
-			FxConfig showConfig = new FxConfig(10);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					showSubpages();
-				}
-			});
-			animation.setShowConfig(showConfig);
+			
 			add(ulContainer);
 			add(showHideButton);
+			
+			showSubpages();
+		} else {
+			hideSubpages();
+		}
+		clearWidths();
+	}
+	
+	/**
+	 * Work around the Chrome bug.  See DisplayUtils.clearElementWidth() for more info.
+	 */
+	private void clearWidths() {
+		DisplayUtils.clearElementWidth(getElement());
+		if (wikiSubpagesContainer != null) 
+			DisplayUtils.clearElementWidth(wikiSubpagesContainer.getElement());
+		if (ulContainer != null)
+			DisplayUtils.clearElementWidth(ulContainer.getElement());
+		if (wikiPageContainer != null)
+			DisplayUtils.clearElementWidth(wikiPageContainer.getElement());
+	}
+	
+	@Override
+	public void hideSubpages() {
+		isShowingSubpages = false;
+		// This call to layout is necessary to force the scroll bar to appear on page-load
+		if (wikiSubpagesContainer != null){
+			wikiSubpagesContainer.removeStyleName(SHOW_SUBPAGES_STYLE);
+			wikiSubpagesContainer.addStyleName(HIDE_SUBPAGES_STYLE);
+		}
+				
+		if (showHideButton != null) {
+			showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
+			showHideButton.addStyleName("btn btn-default btn-xs left margin-right-40");
+		}
+		
+		if (ulContainer != null)
+			DisplayUtils.hide(ulContainer);
+		
+		if (wikiPageContainer != null) {
+			wikiPageContainer.removeStyleName(SHOW_SUBPAGES_MD_STYLE);
+			wikiPageContainer.addStyleName(HIDE_SUBPAGES_MD_STYLE);
+			wikiPageContainer.setVisible(true);
 		}
 	}
 	
-	private void hideSubpages() {
-		// This call to layout is necessary to force the scroll bar to appear on page-load
-		if (wikiSubpagesContainer != null)
-			wikiSubpagesContainer.setStyleName(HIDE_SUBPAGES_STYLE);	
-		if (wikiPageContainer != null)
-			wikiPageContainer.setStyleName(HIDE_SUBPAGES_MD_STYLE);	
-		ulContainer.layout(true);
-		showHideButton.setText("Show Pages " + DisplayConstants.RIGHT_ARROWS);
-		removeStyleName("well");
-		showHideButton.setStyleName("btn btn-default btn-xs left");
-	}
-	
-	private void showSubpages() {
-		if (wikiSubpagesContainer != null)
-			wikiSubpagesContainer.setStyleName(SHOW_SUBPAGES_STYLE);
-		if (wikiPageContainer != null)
-			wikiPageContainer.setStyleName(SHOW_SUBPAGES_MD_STYLE);	
-		ulContainer.layout(true);
-		showHideButton.setText(DisplayConstants.LEFT_ARROWS);
-		addStyleName("well");
-		showHideButton.setStyleName("btn btn-default btn-xs right");
+	@Override
+	public void showSubpages() {
+		isShowingSubpages = true;
+		if (wikiSubpagesContainer != null) {
+			wikiSubpagesContainer.removeStyleName(HIDE_SUBPAGES_STYLE);
+			wikiSubpagesContainer.addStyleName(SHOW_SUBPAGES_STYLE);
+		}
+			
+		if (wikiPageContainer != null) {
+			wikiPageContainer.removeStyleName(HIDE_SUBPAGES_MD_STYLE);
+			wikiPageContainer.addStyleName(SHOW_SUBPAGES_MD_STYLE);
+		}
+				
+		if (showHideButton != null) {
+			showHideButton.setText(DisplayConstants.LEFT_ARROWS);
+			showHideButton.addStyleName("btn btn-default btn-xs right");		
+		}
+		
+		if (ulContainer != null)
+			DisplayUtils.show(ulContainer);
 	}
 	
 	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {
@@ -134,6 +159,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	private Widget getListItem(final TocItem treeItem) {
 		Anchor l = new Anchor(treeItem.getText());
+		l.addStyleName("link");
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

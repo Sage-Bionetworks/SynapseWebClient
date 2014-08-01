@@ -17,8 +17,7 @@ public class LinkedInServiceImplTest {
 	
 	@Test
 	public void testLinkedInParsing() throws JSONObjectAdapterException {
-		String userProfileJson = LinkedInServiceImpl.parseLinkedInResponse(MOCK_LINKEDIN_RESPONSE);
-		UserProfile userProfile = EntityFactory.createEntityFromJSONString(userProfileJson, UserProfile.class);
+		UserProfile userProfile = LinkedInServiceImpl.parseLinkedInResponse(MOCK_LINKEDIN_RESPONSE);
 		Assert.assertEquals("First name does not match", TEST_FIRST_NAME, userProfile.getFirstName());
 		Assert.assertEquals("Last name does not match", TEST_LAST_NAME, userProfile.getLastName());
 		Assert.assertEquals("Summary does not match", TEST_SUMMARY, userProfile.getSummary());

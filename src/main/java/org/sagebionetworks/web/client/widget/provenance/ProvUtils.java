@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
@@ -21,7 +22,9 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -174,7 +177,7 @@ public class ProvUtils {
 		return refToHeader;
 	}
 
-	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity) {
+	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
@@ -186,7 +189,7 @@ public class ProvUtils {
 			map.put("Version", DisplayUtils.getVersionDisplay((Versionable)entity));
 		}
 		order.add("Modified By");
-		map.put("Modified By", entity.getModifiedBy());
+		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
 		map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
@@ -197,7 +200,7 @@ public class ProvUtils {
 		return new KeyValueDisplay<String>(map, order);
 	}
 
-	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity) {
+	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 			
@@ -208,7 +211,7 @@ public class ProvUtils {
 		map.put("Activity id", activity.getId());				
 		
 		order.add("Modified By");
-		map.put("Modified By", activity.getModifiedBy());
+		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
 		map.put("Modified On", DisplayUtils.converDataToPrettyString(activity.getModifiedOn()));		
@@ -243,6 +246,7 @@ public class ProvUtils {
 	public static void getInfo(String nodeId,			
 			SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			ClientCache clientCache,
 			Map<String, ProvGraphNode> idToNode,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
 		if(callback == null) return;
@@ -252,9 +256,9 @@ public class ProvUtils {
 		if(node == null) callback.onFailure(null);
 		
 		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, nodeModelCreator, callback, (EntityGraphNode)node);
+			getInfoEntityTreeNode(synapseClient, nodeModelCreator, clientCache, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
-			getInfoActivityTreeNode(synapseClient, nodeModelCreator, callback, (ActivityGraphNode)node);
+			getInfoActivityTreeNode(synapseClient, nodeModelCreator, clientCache, callback, (ActivityGraphNode)node);
 		} else if(node instanceof ExternalGraphNode) {
 			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
 		}
@@ -265,16 +269,28 @@ public class ProvUtils {
 	 * Private Methods
 	 */
 	private static void getInfoActivityTreeNode(
-			SynapseClientAsync synapseClient,
+			final SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			ActivityGraphNode atNode) {
 		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
 				try {
-					Activity activity = nodeModelCreator.createJSONEntity(result, Activity.class);
-					callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity));			
+					final Activity activity = nodeModelCreator.createJSONEntity(result, Activity.class);
+					UserBadge.getUserProfile(activity.getModifiedBy(), nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+						@Override
+						public void onSuccess(UserProfile profile) {
+							callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							callback.onFailure(caught);
+						}
+					});
+								
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -286,17 +302,28 @@ public class ProvUtils {
 		});
 	}
 
-	private static void getInfoEntityTreeNode(SynapseClientAsync synapseClient,
+	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			EntityGraphNode etNode) {
 		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<EntityWrapper>() {
 			@Override
 			public void onSuccess(EntityWrapper result) {
-				Entity entity;
 				try {
-					entity = nodeModelCreator.createEntity(result);
-					callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity));
+					final Entity entity = nodeModelCreator.createEntity(result);
+					UserBadge.getUserProfile(entity.getModifiedBy(), nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+						@Override
+						public void onSuccess(UserProfile profile) {
+							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
+						}
+						@Override
+						public void onFailure(Throwable caught) {
+							callback.onFailure(caught);
+						}
+					});
+						
+					
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}

@@ -1,5 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.JiraClientAsync;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+
+import com.google.gwt.user.client.Window.Navigator;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 
@@ -28,7 +39,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	
 	private static final String CREATE_JIRA_ISSUE_URI = "/secure/CreateIssueDetails!init.jspa";
 	private static final String ISSUE_FIELD_DESCRIPTION = "description";
-
+	
 	private static final String FLAG_ISSUE_SUMMARY = "Request for ACT to review data";
 	private static final String ACCESS_RESTRCTION_ISSUE_SUMMARY = "Request for ACT to add data restriction";
 	private static final String ACCESS_REQUEST_ISSUE_SUMMARY = "Request for ACT to grant access to data";
@@ -70,10 +81,20 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static int major_priority; 
 
 	private int jiraProjectId;
+	public JiraClientAsync jiraClient;
+	public GWTWrapper gwt;
+	public AuthenticationController authenticationController;
 	
 	@Inject
-	public JiraURLHelperImpl(JiraGovernanceConstants constants) {
-		
+	public JiraURLHelperImpl(
+			JiraGovernanceConstants constants, 
+			JiraClientAsync jiraClient,
+			GWTWrapper gwt, 
+			AuthenticationController authenticationController
+			) {
+		this.jiraClient = jiraClient;
+		this.gwt = gwt;
+		this.authenticationController = authenticationController;
 		jiraProjectId = constants.jiraProjectId();
 		confluence_endpoint = constants.confluenceEndpoint();
 		flag_issue_type = constants.flagIssueType();
@@ -86,7 +107,6 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 		issue_field_user_email = constants.issueFieldUserEmail();
 		issue_field_access_requirement_object_id = constants.issueFieldAccessRequirementObjectId();
 		major_priority = constants.majorPriority(); 
-		
 	}
 	
 
@@ -179,5 +199,30 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 				accessRequirementId);		
 	}
 	
+	
+	@Override
+	public void createIssueOnBackend(
+			String stepsToRepro,
+			Throwable t,
+			String errorMessage,
+			AsyncCallback<Void> callback) {
+		Map<String, String> fieldValues = new HashMap<String, String>();
+		
+		String stackTrace = DisplayUtils.getStackTrace(t);
+		
+		StringBuilder description = new StringBuilder(); 
+		
+	    if (authenticationController.isLoggedIn()) {
+	    	UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+	    	description.append("Submitted by " + DisplayUtils.getDisplayName(profile));
+	    }
+	    description.append("\n\n" + stepsToRepro);
+	    description.append("\n\n" + gwt.getUserAgent());
+	    description.append("\n\n" + gwt.getAppVersion());
+	    description.append("\n\n" + gwt.getCurrentURL());
+	    description.append("\n\n" + t.getMessage());
+	    description.append("\n" + stackTrace);
+	    jiraClient.createJiraIssue(errorMessage, description.toString(), default_issue_reporter, fieldValues, callback);
+	}
 
 }

@@ -15,14 +15,13 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.inject.Inject;
 
-public class BigTeamBadgeViewImpl extends LayoutContainer implements BigTeamBadgeView {
+public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
-	FlowPanel container;
 	
 	@Inject
 	public BigTeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -32,14 +31,11 @@ public class BigTeamBadgeViewImpl extends LayoutContainer implements BigTeamBadg
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		
-		container = new FlowPanel();
-		this.add(container);
 	}
 	
 	@Override
 	public void setTeam(final Team team, String description) {
-		container.clear();
+		clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
 		
 		String name = team.getName();
@@ -49,27 +45,25 @@ public class BigTeamBadgeViewImpl extends LayoutContainer implements BigTeamBadg
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
 			}
 		};
-		String pictureUrl;
+		String pictureUrl = null;
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
-		} else {
-			pictureUrl = sageImageBundle.defaultProfilePicture().getSafeUri().asString();
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, 5);
-		container.add(mediaObjectPanel);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5);
+		add(mediaObjectPanel);
 	}
 
 	@Override
 	public void showLoadError(String principalId) {
-		container.clear();
-		container.add(new HTML(DisplayConstants.ERROR_LOADING));		
+		clear();
+		add(new HTML(DisplayConstants.ERROR_LOADING));		
 	}
 	
 	@Override
 	public void showLoading() {
-		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		clear();
+		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
 	}
 
 	@Override
@@ -78,10 +72,6 @@ public class BigTeamBadgeViewImpl extends LayoutContainer implements BigTeamBadg
 
 	@Override
 	public void showErrorMessage(String message) {
-	}
-
-	@Override
-	public void clear() {
 	}
 
 	@Override

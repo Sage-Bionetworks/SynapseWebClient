@@ -8,10 +8,12 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.logging.s3.LogDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,6 +43,10 @@ public class PortalLoggingIntegrationTest {
 	
 	@Before
 	public void before() throws InterruptedException{
+		// This is a slow test so we do not make developers run it.
+		// However, if it fails on hudson, then set this true to run the test
+		// in a developer stack.
+		Assume.assumeTrue(!StackConfiguration.isDevelopStack());
 		// clear all s3 log data before we start		
 		logDAO.deleteAllStackInstanceLogs();
 		log.info("Sleeping after delete for 30 seconds");

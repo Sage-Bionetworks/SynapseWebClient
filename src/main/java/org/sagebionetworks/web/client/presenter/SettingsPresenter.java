@@ -1,9 +1,16 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -31,8 +38,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
 	private NodeModelCreator nodeModelCreator;
+	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	
+	private GWTWrapper gwt;
 	private String apiKey = null;
 	
 	@Inject
@@ -42,7 +50,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookieProvider,
 			NodeModelCreator nodeModelCreator,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			AdapterFactory adapterFactory,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -50,6 +60,8 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.cookieProvider = cookieProvider;
 		this.nodeModelCreator = nodeModelCreator;
 		this.synapseClient = synapseClient;
+		this.adapterFactory = adapterFactory;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -60,7 +72,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		
 		// Install the view
 		panel.setWidget(view);
-		
+		updateView();
 	}
 
 	@Override
@@ -68,8 +80,14 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.place = place;
 		this.view.setPresenter(this);
 		this.view.clear();
-		showView(place);
+		updateView();
 		
+		getAPIKey();
+		
+		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
+	}
+
+	private void getAPIKey() {
 		// lookup API key
 		if(apiKey == null) {			
 			synapseClient.getAPIKey(new AsyncCallback<String>() {
@@ -80,7 +98,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view)) {
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
 						view.setApiKey(DisplayConstants.ERROR_LOADING);
 					}
 				}
@@ -119,16 +137,14 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 
 							@Override
 							public void onFailure(Throwable caught) {						
-								view.passwordChangeFailed();
-								view.showErrorMessage("Password Change failed. Please try again.");
+								view.passwordChangeFailed("Password Change failed. Please try again.");
 							}
 						});
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						view.passwordChangeFailed();
-						view.showErrorMessage("Incorrect username or password. Please enter your existing Synapse password.<br/><br/>If you have not setup a Synapse password, please see your Settings page to do so.");
+						view.passwordChangeFailed("Incorrect password. Please enter your existing Synapse password.");
 					}
 				});
 				
@@ -136,34 +152,41 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 			}
 		} else {
-			view.passwordChangeFailed();
 			view.showInfo("Error","Reset Password failed. Please Login again.");
 			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}
 	}
+	
+	public void getUserNotificationEmail() {
+		synapseClient.getNotificationEmail(new AsyncCallback<String>(){
+			@Override
+			public void onSuccess(String notificationEmail) {
+				view.showNotificationEmailAddress(notificationEmail);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+	
 
-	@Override
-	public void createSynapsePassword() {
-		if(authenticationController.isLoggedIn()) {
-			String primaryEmail = DisplayUtils.getPrimaryEmail(authenticationController.getCurrentUserSessionData().getProfile());
-			userService.sendPasswordResetEmail(primaryEmail, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.showRequestPasswordEmailSent();
-					view.showInfo("Email Sent","You have been sent an email. Please check your inbox.");
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.requestPasswordEmailFailed();
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
-				}
-			});
-		} else {	
-			view.requestPasswordEmailFailed();
-			view.showInfo("Error", "Please Login Again.");
-			goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-		}		
+	public void setUserNotificationEmail(final String email) {
+		synapseClient.setNotificationEmail(email, new AsyncCallback<Void>(){
+			@Override
+			public void onSuccess(Void callback) {
+				//success, update view
+				setPlace(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	private void updateUserStorage() {
@@ -186,7 +209,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
-	
 	@Override
     public String mayStop() {
         view.clear();
@@ -198,10 +220,104 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	private void showView(Settings place) {
+	@Override
+	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead){
+		//get my profile
+		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String userProfileJson) {
+				try {
+					final UserProfile myProfile = new UserProfile(adapterFactory.createNew(userProfileJson));
+					org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
+					if (settings == null) {
+						settings = new org.sagebionetworks.repo.model.message.Settings();
+						settings.setMarkEmailedMessagesAsRead(false);
+						settings.setSendEmailNotifications(true);
+						myProfile.setNotificationSettings(settings);
+					}
+					settings.setSendEmailNotifications(sendEmailNotifications);
+					settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
+					JSONObjectAdapter adapter = myProfile.writeToJSONObject(adapterFactory.createNew());
+					userProfileJson = adapter.toJSONString();
+					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
+						@Override
+						public void onSuccess(Void result) {
+							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+							authenticationController.updateCachedProfile(myProfile);
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							view.showErrorMessage(caught.getMessage());
+						}
+					});
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				}    				
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			}
+		});
+	}
+	
+	private void updateView() {
 		//String token = place.toToken();
 		//Support other tokens?
 		updateUserStorage();
+		getUserNotificationEmail();
+	}
+
+	@Override
+	public void changeApiKey() {
+		synapseClient.deleteApiKey(new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.showInfo(DisplayConstants.API_KEY_CHANGED, "");
+				view.setApiKey(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
+			}
+		});
+	}
+	
+	@Override
+	public void addEmail(String emailAddress) {
+		//Is this email already in the profile email list?
+		//If so, just update it as the new notification email.  Otherwise, kick off the verification process.
+		List<String> emailAddresses = authenticationController.getCurrentUserSessionData().getProfile().getEmails();
+		if (emailAddresses == null || emailAddresses.isEmpty()) throw new IllegalStateException("UserProfile email list is empty");
+		for (String email : emailAddresses) {
+			if (email.equalsIgnoreCase(emailAddress)) {
+				//update the notification email
+				setUserNotificationEmail(emailAddress);	
+				return;
+			}
+		}
+		//did not find in the list
+		additionalEmailValidation(emailAddress);
+	}
+	
+	public void additionalEmailValidation(String emailAddress) {
+		//need to validate
+		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
+		synapseClient.additionalEmailValidation(authenticationController.getCurrentUserPrincipalId(), emailAddress, callbackUrl, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showEmailChangeFailed(caught.getMessage());
+			}
+		});
+
 	}
 }
 

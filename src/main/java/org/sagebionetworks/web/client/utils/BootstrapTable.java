@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.HTMLTable;
 public class BootstrapTable extends FlexTable {
 
 	public BootstrapTable() {
-		this.setStyleName("table table-striped table-bordered table-condensed");
+		this.setStyleName("table");
 	}
 	
 	public void setHeaders(List<List<String>> headerRows) {

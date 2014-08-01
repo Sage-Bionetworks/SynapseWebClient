@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,9 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -37,9 +41,11 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.junit.client.GWTTestCase;
 
 /**
@@ -312,6 +318,13 @@ public class GwtTestSuite extends GWTTestCase {
 		fh.setId("20");
 		fileHandles.add(fh);
 		
+		TableBundle tableBundle = new TableBundle();
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.BOOLEAN);
+		cm.setId("123");
+		tableBundle.setColumnModels(Arrays.asList(cm));
+		tableBundle.setMaxRowsPerPage(new Long(678));
+		
 		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
 		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
@@ -326,6 +339,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
 		transport.setFileHandlesJson(entityListToString(fileHandles));
+		transport.setTableData(factory.createJsonStringForEntity(tableBundle));
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
@@ -343,6 +357,23 @@ public class GwtTestSuite extends GWTTestCase {
 		assertEquals(fileHandles, results.getFileHandles());
 	}
 	
+	@Test
+	public void testDecimalNumberFormat() {
+		assertNull(APITableColumnRendererNone.getDecimalNumberFormat(null));
+		NumberFormat formatter = APITableColumnRendererNone.getDecimalNumberFormat(1);
+		assertEquals("12.3",formatter.format(12.3456));
+		assertEquals("12.0",formatter.format(12));
+	}
+	
+	@Test
+	public void testGetColumnValue() {
+		assertEquals("abc", APITableColumnRendererNone.getColumnValue("abc", null));
+		assertEquals("13.456", APITableColumnRendererNone.getColumnValue("13.456", null));
+		NumberFormat formatter = APITableColumnRendererNone.getDecimalNumberFormat(4);
+		assertEquals("13.4567", APITableColumnRendererNone.getColumnValue("13.456789", formatter));
+		assertEquals("hello", APITableColumnRendererNone.getColumnValue("hello", formatter));
+	}
+	
 	public static String entityListToString(List<? extends JSONEntity> list) throws JSONObjectAdapterException {		
 		JSONArrayAdapter aa = JSONObjectGwt.createNewAdapter().createNewArray();
 		for (int i=0; i<list.size(); i++) {
@@ -353,11 +384,9 @@ public class GwtTestSuite extends GWTTestCase {
 		return aa.toJSONString();
 	}
 	
-
 	@Override
 	public String toString() {
 		return "GwtTestSuite for Module: "+getModuleName();
 	}
-	
 
 }

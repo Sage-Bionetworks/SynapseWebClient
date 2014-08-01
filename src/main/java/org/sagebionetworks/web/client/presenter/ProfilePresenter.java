@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.message.Settings;
+import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -26,6 +25,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -43,7 +43,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private SynapseClientAsync synapseClient;
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
-	private UserAccountServiceAsync userService;
 	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookieProvider;
@@ -56,7 +55,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
-			UserAccountServiceAsync userService,
 			LinkedInServiceAsync linkedInService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
@@ -67,7 +65,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.userService = userService;
 		this.linkedInService = linkedInService;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
@@ -117,20 +114,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage("An error occurred. Please try reloading the page.");					
 			}
 		});
 	}
 	
 	@Override
-	public void redirectToEditProfile() {
-		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_PLACE_TOKEN));
+	public void showEditProfile() {
+		updateProfileView(authenticationController.getCurrentUserPrincipalId(), true);
 	}
 	@Override
-	public void redirectToViewProfile() {
-		globalApplicationState.setIsEditing(false);
-		globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+	public void showViewMyProfile() {
+		updateProfileView(authenticationController.getCurrentUserPrincipalId(), false);
 	}
 
 	@Override
@@ -159,7 +155,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						 profileForm.updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
 						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
 						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
-						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic(), null, null);
+						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic(), null, null, null);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
@@ -167,96 +163,70 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 						view.showErrorMessage("An error occurred. Please try reloading the page.");									
 				}
 			});
 		}
 	}
 	
-	@Override
-	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead){
-		//get my profile
-		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String userProfileJson) {
-				try {
-					UserProfile myProfile = new UserProfile(adapterFactory.createNew(userProfileJson));
-					Settings settings = myProfile.getNotificationSettings();
-					if (settings == null) {
-						settings = new Settings();
-						settings.setMarkEmailedMessagesAsRead(false);
-						settings.setSendEmailNotifications(true);
-						myProfile.setNotificationSettings(settings);
-					}
-					settings.setSendEmailNotifications(sendEmailNotifications);
-					settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
-					JSONObjectAdapter adapter = myProfile.writeToJSONObject(adapterFactory.createNew());
-					userProfileJson = adapter.toJSONString();
-					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				profileUpdatedCallback.onFailure(caught);
-			}
-		});
-	}
-	
-	private void updateProfileView(boolean editable) {
-		globalApplicationState.setIsEditing(editable);
-		updateProfileView(null, editable);
-	}
-	
-	private void updateProfileView(final String userId, final boolean editable) {
+	private void updateProfileView(final String userId, final boolean isEditing) {
 		view.clear();
-		final boolean isOwner = userId == null;
+		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
+		globalApplicationState.setIsEditing(isEditing);
 		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
 						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
-						if (isOwner)
+						if (isOwner) {
 							ownerProfile = profile;
-						profileForm.configure(profile, profileUpdatedCallback);
+							//only configure the profile form (editor) if owner of this profile
+							profileForm.configure(profile, profileUpdatedCallback);
+						}
 						
-						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, new AsyncCallback<List<Team>>() {
+						AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
 							@Override
 							public void onFailure(Throwable caught) {
 								view.showErrorMessage(caught.getMessage());
 							}
 							@Override
 							public void onSuccess(List<Team> teams) {
-								view.updateView(profile, teams, editable, isOwner, profileForm.asWidget());		
+								getIsCertifiedAndUpdateView(profile, teams, isEditing, isOwner);
 							}
-						});
+						};
+						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, teamCallback);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}    				
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);    					    				
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
 				}
 			});
 	}
 	
-	@Override
-	public String getEmailAddress() {
-		return ownerProfile != null ? DisplayUtils.getPrimaryEmail(ownerProfile) : null;
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean isEditing, final boolean isOwner) {
+		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecordJson) {
+				try {
+					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
+					view.updateView(profile, teams, isEditing, isOwner, passingRecord, profileForm.asWidget());
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException)
+					view.updateView(profile, teams, isEditing, isOwner, null, profileForm.asWidget());
+				else
+					view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	private void setupProfileFormCallback() {
@@ -274,13 +244,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			public void continueToViewProfile() {
-				redirectToViewProfile();
+				showViewMyProfile();
 				view.refreshHeader();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(caught.getMessage());
+				}
 			}
 		};
 	}
@@ -295,17 +267,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void showView(Profile place) {
 		setupProfileFormCallback();
 		String token = place.toToken();
-		if (Profile.VIEW_PROFILE_PLACE_TOKEN.equals(token)) {
-			//View (my) profile
-			//must be logged in
-			loggedInCheck();
-			updateProfileView(false);
-		}
-		else if (Profile.EDIT_PROFILE_PLACE_TOKEN.equals(token)) {
-			//Edit my profile (current user must equal the profile being displayed)
-			//must be logged in
-			loggedInCheck();
-			updateProfileView(true);
+		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(token)) {
+			//View my profile
+			updateProfileView(token, false);
 		}
 		else if(!"".equals(token) && token != null) {
 			//if this contains an oauth_token, it's from linkedin
@@ -336,8 +300,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
-			}
-			else {
+			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
+				showEditProfile();
+			} else {
 				//otherwise, this is a user id
 				updateProfileView(token, false);
 			}

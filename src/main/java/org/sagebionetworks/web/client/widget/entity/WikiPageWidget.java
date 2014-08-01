@@ -141,7 +141,7 @@ SynapseWidgetPresenter {
 								view.show403();
 						}
 						else {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
@@ -181,7 +181,7 @@ SynapseWidgetPresenter {
 					
 					@Override
 					public void onFailure(Throwable caught) {					
-						if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+						if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 							view.showErrorMessage(caught.getMessage());
 					}
 				});
@@ -198,7 +198,6 @@ SynapseWidgetPresenter {
 	@Override
 	public void saveClicked(String title, String md) 
 	{
-		setIsEditing(false);
 		JSONObjectAdapter json = jsonObjectAdapter.createNew();
 		try {
 			currentPage.setTitle(title);
@@ -207,13 +206,15 @@ SynapseWidgetPresenter {
 			synapseClient.updateV2WikiPageWithV1(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), json.toJSONString(), new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
-					//showDefaultViewWithWiki();
+					//we have successfully saved, so we are no longer editing
+					setIsEditing(false);
+					//now refresh the page
 					refresh();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(caught.getMessage());
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+						view.showErrorMessage(DisplayConstants.ERROR_SAVING_WIKI + caught.getMessage());
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
@@ -238,7 +239,7 @@ SynapseWidgetPresenter {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});	
@@ -259,9 +260,12 @@ SynapseWidgetPresenter {
 		setIsEditing(true);
 	}
 	 
-
 	@Override
 	public void createPage(final String name) {
+		createPage(name, null);
+	}
+	
+	public void createPage(final String name, final org.sagebionetworks.web.client.utils.Callback onSuccess) {
 		WikiPage page = new WikiPage();
 		//if this is creating the root wiki, then refresh the full page
 		final boolean isCreatingWiki = wikiKey.getWikiPageId() ==null;
@@ -273,19 +277,22 @@ SynapseWidgetPresenter {
             synapseClient.createV2WikiPageWithV1(wikiKey.getOwnerObjectId(),  wikiKey.getOwnerObjectType(), wikiPageJson, new AsyncCallback<String>() {
                 @Override
                 public void onSuccess(String result) {
-                    if (isCreatingWiki) {
+                	if (isCreatingWiki) {
                         String type = isDescription ? DisplayConstants.DESCRIPTION : DisplayConstants.WIKI;
                         view.showInfo( type + " Created", "");
                     } else {
                         view.showInfo("Page '" + name + "' Added", "");
                     }
-                    
+                	if (onSuccess != null) {
+                		onSuccess.invoke();
+                	}
+                        
                     refresh();
                 }
                 
                 @Override
                 public void onFailure(Throwable caught) {
-                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+                    if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
                         view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED);
                 }
             });
@@ -321,7 +328,7 @@ SynapseWidgetPresenter {
 							view.show403();
 						}
 						else {
-							if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+							if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 								view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
 						}
 					}
@@ -378,7 +385,7 @@ SynapseWidgetPresenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view))
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
 					view.showErrorMessage(caught.getMessage());
 			}
 		});

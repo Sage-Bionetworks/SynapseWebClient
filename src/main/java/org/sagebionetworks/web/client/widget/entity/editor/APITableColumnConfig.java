@@ -30,6 +30,8 @@ public class APITableColumnConfig {
 
 	private COLUMN_SORT_TYPE sort;
 	
+	private Integer decimalPlaces;
+	
 	public APITableColumnConfig() {
 	}
 
@@ -115,11 +117,21 @@ public class APITableColumnConfig {
 	public void setSort(COLUMN_SORT_TYPE sort) {
 		this.sort = sort;
 	}
+	
+	public Integer getDecimalPlaces() {
+		return decimalPlaces;
+	}
+	
+	public void setDecimalPlaces(Integer decimalPlaces) {
+		this.decimalPlaces = decimalPlaces;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((decimalPlaces == null) ? 0 : decimalPlaces.hashCode());
 		result = prime
 				* result
 				+ ((displayColumnName == null) ? 0 : displayColumnName
@@ -132,6 +144,7 @@ public class APITableColumnConfig {
 		result = prime * result + ((sort == null) ? 0 : sort.hashCode());
 		return result;
 	}
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -142,6 +155,11 @@ public class APITableColumnConfig {
 		if (getClass() != obj.getClass())
 			return false;
 		APITableColumnConfig other = (APITableColumnConfig) obj;
+		if (decimalPlaces == null) {
+			if (other.decimalPlaces != null)
+				return false;
+		} else if (!decimalPlaces.equals(other.decimalPlaces))
+			return false;
 		if (displayColumnName == null) {
 			if (other.displayColumnName != null)
 				return false;
@@ -166,9 +184,7 @@ public class APITableColumnConfig {
 	public String toString() {
 		return "APITableColumnConfig [displayColumnName=" + displayColumnName
 				+ ", inputColumnNames=" + inputColumnNames + ", rendererName="
-				+ rendererName + ", sort=" + sort + "]";
+				+ rendererName + ", sort=" + sort + ", decimalPlaces="
+				+ decimalPlaces + "]";
 	}
-	
-	
-
 }

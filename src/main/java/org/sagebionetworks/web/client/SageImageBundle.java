@@ -38,15 +38,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/headerSearchButtonIcon.png")
 	ImageResource searchButtonHeaderIcon();
 	
-	@Source("images/linkedin-small.png")
-	ImageResource linkedinsmall();
-	
-	@Source("images/defaultProfilePicture.png")
-	ImageResource defaultProfilePicture();
-	
-	@Source("images/defaultProfilePicture-20.png")
-	ImageResource defaultProfilePicture20();
-	
 	@Source("images/expand.png")
 	ImageResource expand();
 
@@ -77,5 +68,39 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/SynapseLogo-small.png")
 	ImageResource synapseLogoSmall();
 	
+	@Source("images/NCI_logo.jpg")
+	ImageResource nciLogo();
+
+	@Source("images/LSDF_logo.jpg")
+	ImageResource lsdfLogo();
+
+	@Source("images/NHLBI_logo.jpg")
+	ImageResource nhlbiLogo();
+
+	@Source("images/Sloan_logo.jpg")
+	ImageResource sloanLogo();
+
+	@Source("images/spotlight/Dream9_AD.png")
+	ImageResource dream9AD();
 	
+	@Source("images/spotlight/Dream85_Banner.jpg")
+	ImageResource dream85Banner();
+	
+	@Source("images/spotlight/Dream9_AML.png")
+	ImageResource dream9AML();
+	
+	@Source("images/spotlight/Dream9_BROAD.jpg")
+	ImageResource dream9Broad();
+	
+	@Source("images/spotlight/Dream85_SM.jpg")
+	ImageResource dream85SM();
+	
+	@Source("images/spotlight/TcgaPancancer.jpg")
+	ImageResource tcgaPancancer();
+	
+	@Source("images/certificate.png")
+	ImageResource certificate();
+
+	@Source("images/greyArrow.png")
+	ImageResource greyArrow();
 }

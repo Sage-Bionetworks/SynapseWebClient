@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -36,6 +37,9 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			boolean canEdit, 
 			Long versionNumber, 
 			boolean isInTestMode);
+	
+	void showAddDescriptionCommand(Callback onClick);
+	void hideAddDescriptionCommand();
 	
 	/**
 	 * Presenter interface

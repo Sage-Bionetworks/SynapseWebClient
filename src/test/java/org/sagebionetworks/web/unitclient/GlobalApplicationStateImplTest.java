@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -27,6 +28,7 @@ public class GlobalApplicationStateImplTest {
 	ActivityMapper mockMapper;
 	EventBus mockEventBus;
 	GlobalApplicationStateImpl globalApplicationState;
+	JiraURLHelper mockJiraURLHelper;
 	
 	@Before
 	public void before(){
@@ -34,7 +36,8 @@ public class GlobalApplicationStateImplTest {
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockMapper = Mockito.mock(ActivityMapper.class);
 		mockEventBus = Mockito.mock(EventBus.class);
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider, mockEventBus);
+		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
+		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setActivityMapper(mockMapper);
 	}

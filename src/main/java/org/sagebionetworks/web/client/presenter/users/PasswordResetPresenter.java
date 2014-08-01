@@ -18,9 +18,12 @@ import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -74,7 +77,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			sessionToken = place.toToken();
 			// validate that session token is still valid before showing form
 			view.showLoading();
-			authenticationController.loginUser(sessionToken, new AsyncCallback<String>() {
+			authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
 					view.showResetForm();	
@@ -99,7 +102,11 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage("An error occurred in sending your request. Please retry.");
+				if (caught instanceof NotFoundException) {
+					view.showErrorMessage(caught.getMessage());
+				} else if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage("An error occurred in sending your request. Please retry.");
+				}
 			}
 		});
 		
@@ -139,7 +146,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
         authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
                 @Override
                 public void onSuccess(String result) {
-                	globalApplicationState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN)); // redirect to home page
+                	DisplayUtils.goToLastPlace(globalApplicationState);// redirect to last place
                 }
                 @Override
                 public void onFailure(Throwable caught) {

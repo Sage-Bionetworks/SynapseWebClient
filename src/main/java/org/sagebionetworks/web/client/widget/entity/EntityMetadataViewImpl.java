@@ -5,13 +5,9 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.utils.AnimationProtector;
-import org.sagebionetworks.web.client.utils.AnimationProtectorViewImpl;
 
-import com.extjs.gxt.ui.client.event.FxEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.fx.FxConfig;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -19,6 +15,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -31,7 +28,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 
 	private FavoriteWidget favoriteWidget;
 	private DoiWidget doiWidget;
-	AnimationProtector annotationAnimation;
 	
 	interface EntityMetadataViewImplUiBinder extends UiBinder<Widget, EntityMetadataViewImpl> {
 	}
@@ -153,39 +149,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		// reset view
 		showAnnotations.setText(DisplayConstants.SHOW_LC);
 		annotationsContent.setVisible(false);
-				
+		annotationsContent.layout(true);
 		if(!annotationsFilled) {
-			annotationAnimation = new AnimationProtector(new AnimationProtectorViewImpl(showAnnotations, annotationsContent));
-			FxConfig hideConfig = new FxConfig(400);
-			hideConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
-					annotationsContent.layout(true);
-					showAnnotations.setText(DisplayConstants.SHOW_LC);
-				}
-			});
-			annotationAnimation.setHideConfig(hideConfig);
-			FxConfig showConfig = new FxConfig(400);
-			showConfig.setEffectCompleteListener(new Listener<FxEvent>() {
-				@Override
-				public void handleEvent(FxEvent be) {
-					// This call to layout is necessary to force the scroll bar to appear on page-load
-					annotationsContent.layout(true);
-					showAnnotations.setText(DisplayConstants.HIDE_LC);
-				}
-			});
-			annotationAnimation.setShowConfig(showConfig);
-			showAnnotations.setText(DisplayConstants.SHOW_LC);
-			
-			LayoutContainer wrap = new LayoutContainer();
+			DisplayUtils.configureShowHide(showAnnotations, annotationsContent);
+			FlowPanel wrap = new FlowPanel();
 			wrap.addStyleName("highlight-box margin-bottom-15");
-			wrap.setTitle(DisplayConstants.ANNOTATIONS);
+			wrap.getElement().setAttribute("highlight-box-title", DisplayConstants.ANNOTATIONS);
 			wrap.add(annotationsWidget.asWidget());
 			annotationsContent.add(wrap);
 			
 			annotationsFilled = true;
 		}
+		DisplayUtils.clearElementWidth(annotationsContent.getElement());
 	}
 	
 	private void clearmeta() {
@@ -236,4 +211,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		clearmeta();
 	}
 
+	@Override
+	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
+		annotationsWidget.setEntityUpdatedHandler(handler);
+	}
 }

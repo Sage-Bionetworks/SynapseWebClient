@@ -14,7 +14,7 @@ public class EntityDeletedEvent extends GwtEvent<EntityDeletedHandler> {
 	public String getDeletedId() {
 		return deletedId;
 	}
-
+	
 	public static Type<EntityDeletedHandler> getType() {
 		return TYPE;
 	}

@@ -9,10 +9,13 @@ import java.util.logging.Logger;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.TableQueryUtilService;
 import org.sagebionetworks.web.server.servlet.FileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.FileUpload;
+import org.sagebionetworks.web.server.servlet.FileUploaderJnlp;
+import org.sagebionetworks.web.server.servlet.JiraClientImpl;
+import org.sagebionetworks.web.server.servlet.JiraJavaClient;
+import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
@@ -24,7 +27,6 @@ import org.sagebionetworks.web.server.servlet.SimpleFileHandleUploadServlet;
 import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
-import org.sagebionetworks.web.server.servlet.TableQueryUtilServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
@@ -79,11 +81,6 @@ public class PortalServletModule extends ServletModule {
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);
 		serve("/Portal/layout").with(LayoutServiceImpl.class);
-			
-		// setup the TableQueryUtilServcie service
-		bind(TableQueryUtilServiceImpl.class).in(Singleton.class);
-		serve("/Portal/tablequeryutil").with(TableQueryUtilServiceImpl.class);
-
 		
 		// Setup the License service mapping
 		bind(LicenseServiceImpl.class).in(Singleton.class);
@@ -109,6 +106,10 @@ public class PortalServletModule extends ServletModule {
 		bind(FileUpload.class).in(Singleton.class);
 		serve("/Portal/upload").with(FileUpload.class);
 
+		// Setup the File Uploader JNLP mapping
+		bind(FileUploaderJnlp.class).in(Singleton.class);
+		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
+		
 		// Attachments
 		bind(FileAttachmentServlet.class).in(Singleton.class);
 		serve("/Portal/attachment").with(FileAttachmentServlet.class);
@@ -130,10 +131,15 @@ public class PortalServletModule extends ServletModule {
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
 		serve("/Portal/linkedin").with(LinkedInServiceImpl.class);
 		
+		//Jira client service mapping
+		bind(JiraClientImpl.class).in(Singleton.class);
+		serve("/Portal/jira").with(JiraClientImpl.class);
+		bind(JiraJavaClient.class).to(JiraJavaClientImpl.class);
+		
 		// Setup the Rss service mapping
 		bind(RssServiceImpl.class).in(Singleton.class);
 		serve("/Portal/rss").with(RssServiceImpl.class);
-		
+				
 		// Setup the OpenID service mapping
 		bind(OpenIDServlet.class).in(Singleton.class);
 		serve(WebConstants.OPEN_ID_URI).with(OpenIDServlet.class);

@@ -43,7 +43,7 @@ public class QueryFilterViewImpl extends Composite implements QueryFilterView {
 
 	@Override
 	public void showError(String message) {
-		Window.alert(message);
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override

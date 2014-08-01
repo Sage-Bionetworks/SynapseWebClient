@@ -23,8 +23,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
@@ -83,6 +85,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Set<Reference> noExpandNode;
 	Stack<String> lookupVersion;
 	ProvGraph currentGraph;
+	ClientCache clientCache;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -91,7 +94,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			LayoutServiceAsync layoutService, 
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
-			JsoProvider jsoProvider) {
+			JsoProvider jsoProvider, 
+			ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -101,6 +105,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
+		this.clientCache = clientCache;
 		view.setPresenter(this);
 	}	
 	
@@ -181,7 +186,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, idToNode, callback);
+		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, clientCache, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -543,7 +548,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), authenticationController.isLoggedIn(), view);
+					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 				}
 			});
 		} catch (JSONObjectAdapterException e) {

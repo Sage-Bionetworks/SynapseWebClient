@@ -9,7 +9,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Challenges;
+import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Governance;
@@ -108,11 +110,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					ComingSoonPresenter presenter = ginjector.getComingSoonPresenter();
 					presenter.setPlace((ComingSoon)place);
 					presenter.start(panel, eventBus);
-				} else if (place instanceof Governance) {
-					// user's profile page
-					GovernancePresenter presenter = ginjector.getGovernancePresenter();
-					presenter.setPlace((Governance)place);
-					presenter.start(panel, eventBus);
 				} else if (place instanceof Challenges) {
 					// user's profile page
 					ChallengeOverviewPresenter presenter = ginjector.getChallengeOverviewPresenter();
@@ -154,6 +151,14 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// Test page
 					QuizPresenter presenter = ginjector.getQuizPresenter();
 					presenter.setPlace((Quiz)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Account) {
+					AccountPresenter presenter = ginjector.getAccountPresenter();
+					presenter.setPlace((Account)place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof ChangeUsername) {
+					ChangeUsernamePresenter presenter = ginjector.getChangeUsernamePresenter();
+					presenter.setPlace((ChangeUsername)place);
 					presenter.start(panel, eventBus);
 				} else {
 					// Log that we have an unknown place but send the user to the default

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -9,18 +7,17 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
-import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,7 +27,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,18 +46,12 @@ public class LoginViewImpl extends Composite implements LoginView {
 	SimplePanel logoutPanel;
 	@UiField
 	HTMLPanel loginView;
-	@UiField
-	HTMLPanel changeUsernameView;
-	@UiField
-	Button changeUsernameButton;
-	@UiField
-	TextBox username;
-	@UiField
-	SpanElement messageLabel;
 	
 	//terms of service view
 	@UiField
 	HTMLPanel termsOfServiceView;
+	@UiField
+	DivElement termsOfServiceHighlightBox;
 	@UiField
 	CheckBox actEthicallyCb;
 	@UiField
@@ -79,7 +69,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	
-		private Presenter presenter;
+	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
@@ -103,18 +93,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		username.getElement().setAttribute("placeholder", "Username");
-		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
-		changeUsernameButton.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				messageLabel.setInnerHTML("");
-				changeUsernameButton.setEnabled(false);
-				presenter.setUsername(username.getValue());
-			}
-		});
-		
 		toUInitialized = false;
+		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
 
 	@Override
@@ -142,7 +122,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 
 	@Override
-	public void showLogout(boolean isSsoLogout) {
+	public void showLogout() {
 		clear();
 		headerWidget.refresh();
 		
@@ -152,15 +132,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		cp.setBodyStyleName("lightGreyBackground");
 		
 		HTML message = new HTML();
-		if(isSsoLogout) {
-			message.setHTML("<h4>"				
-					+ DisplayConstants.LOGOUT_TEXT
-					+ "</h4><br/><br/>"
-					+ DisplayUtils.getIconHtml(iconsImageBundle.warning16())
-					+ " " + DisplayConstants.LOGOUT_SSO_TEXT);
-		} else {
-			message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
-		}
+		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
 		cp.add(message, new MarginData(0, 0, 0, 10));
 		
 		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);
@@ -190,7 +162,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		// Add the widget to the panel
 		loginWidgetPanel.clear();
 		loginWidgetPanel.add(loginWidget.asWidget());
-		loginWidget.addUserListener(new UserListener() {			
+		loginWidget.setUserListener(new UserListener() {			
 			@Override
 			public void userChanged(UserSessionData newUser) {
 				presenter.setNewUser(newUser);
@@ -220,7 +192,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
-		changeUsernameButton.setEnabled(true);
 	}
 	
 	@Override
@@ -262,26 +233,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	private void hideViews() {
 		loginView.setVisible(false);
-		changeUsernameView.setVisible(false);
 		termsOfServiceView.setVisible(false);
 	}
-	
-	@Override
-	public void showSetUsernameUI() {
-		hideViews();
-		username.setValue("");
-		changeUsernameView.setVisible(true);
-	}
-	
-	@Override
-	public void showUsernameInvalid() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username format is invalid.</h4> <span class=\"text-warning\">"+DisplayConstants.USERNAME_FORMAT_ERROR+"</span>");
-		clear();
-	}
-	@Override
-	public void showUsernameTaken() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Username unavailable.</h4> <span class=\"text-warning\">Please try a different username</span>");
-		clear();
-	}
-
 }

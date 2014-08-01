@@ -22,8 +22,6 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
-import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
-import org.sagebionetworks.web.client.widget.sharing.AccessMenuButton;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.core.client.GWT;
@@ -91,8 +89,6 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	@Inject
 	public LocationableTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			AccessMenuButton accessMenuButton,
-			AccessControlListEditor accessControlListEditor,
 			Uploader locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 

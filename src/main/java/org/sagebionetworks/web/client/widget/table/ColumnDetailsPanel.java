@@ -73,7 +73,7 @@ public class ColumnDetailsPanel extends FlowPanel {
 	private Widget createColumnView(org.sagebionetworks.repo.model.table.ColumnModel col) {
 		SafeHtmlBuilder shb = new SafeHtmlBuilder();
 		shb.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.NAME + "</span>: ").appendEscaped(col.getName()).appendHtmlConstant("<br/>")
-		.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.TYPE + "</span>: ").appendEscaped(ColumnUtils.getColumnDisplayName(col.getColumnType())).appendHtmlConstant("<br/>");
+		.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.TYPE + "</span>: ").appendEscaped(TableViewUtils.getColumnDisplayName(col.getColumnType())).appendHtmlConstant("<br/>");
 		if(col.getDefaultValue() != null) 
 			shb.appendHtmlConstant("<span class=\"boldText\">" + DisplayConstants.DEFAULT_VALUE + "</span>: ").appendEscaped(col.getDefaultValue()).appendHtmlConstant("<br/>");
 		if(col.getEnumValues() != null && col.getEnumValues().size() > 0) {

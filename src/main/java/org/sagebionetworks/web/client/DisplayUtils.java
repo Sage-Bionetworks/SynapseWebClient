@@ -23,7 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -39,7 +44,6 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.GenotypeData;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Page;
 import org.sagebionetworks.repo.model.PhenotypeData;
 import org.sagebionetworks.repo.model.Project;
@@ -54,7 +58,6 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
@@ -66,6 +69,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Search;
@@ -79,11 +83,13 @@ import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.table.TableCellFileHandle;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
@@ -104,14 +110,12 @@ import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -122,8 +126,11 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
@@ -136,8 +143,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -154,16 +160,22 @@ import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-
+	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
-	
+	public static enum MessagePopup {  
+        INFO,
+        WARNING,
+        QUESTION
+	}
 	public static final String[] ENTITY_TYPE_DISPLAY_ORDER = new String[] {
 			Folder.class.getName(), Study.class.getName(), Data.class.getName(),
 			Code.class.getName(), Link.class.getName(), 
@@ -338,61 +350,41 @@ public class DisplayUtils {
 	}
 	
 	/**
-	 * Handles the exception. Resturn true if the user has been alerted to the exception already
+	 * Handles the exception. Returns true if the user has been alerted to the exception already
 	 * @param ex
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, PlaceChanger placeChanger, boolean isLoggedIn, SynapseView view) {
+	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, SynapseView view) {
+		//send exception to the javascript console
+		if (displayUtilsLogger != null && ex != null)
+			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
 		if(ex instanceof ReadOnlyModeException) {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(ex instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 			return true;
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
-			showInfo("Session Timeout", "Your session has timed out. Please login again.");
-			placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
 				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				placeChanger.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
 				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			String reason = ex.getMessage();			
-			String message = DisplayConstants.ERROR_BAD_REQUEST_MESSAGE;
-			if(reason.matches(".*entity with the name: .+ already exites.*")) {
-				message = DisplayConstants.ERROR_DUPLICATE_ENTITY_MESSAGE;
-			} else {
-				RegExp regEx = RegExp.compile(".*Name.+is already used.*", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null)
-					message = DisplayConstants.ERROR_DUPLICATE_NAME_MESSAGE;
-			}
-			
-			//final attempt to communicate a more relevant message. do this by looking for the "reason" stated in the response
-			if (DisplayConstants.ERROR_BAD_REQUEST_MESSAGE.equals(message)) {
-				//look for something in the form: "reason":"This is the reason for the error"
-				RegExp regEx = RegExp.compile("\"reason\"\\s*:\\s*\"(.+)\"", "gm");
-				MatchResult matchResult = regEx.exec(reason);
-				if (matchResult != null && matchResult.getGroupCount()==2) {
-					String parsedReason = matchResult.getGroup(1);
-					if (parsedReason != null && parsedReason.trim().length() > 0) {
-						message = parsedReason;
-					}
-				}
-			}
-			
-			view.showErrorMessage(message);
+			//exception handling on the backend now throws the reason into the exception message.  Easy!
+			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			placeChanger.goTo(new Home(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
 			return true;
 		}
 		
@@ -418,7 +410,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 */
 	public static boolean handleJSONAdapterException(JSONObjectAdapterException ex, PlaceChanger placeChanger, UserSessionData currentUser) {
-		MessageBox.info("Incompatible Client Version", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
+		DisplayUtils.showInfoDialog("Incompatible Client Version", DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION, null);
 		placeChanger.goTo(new Home(DEFAULT_PLACE_TOKEN));
 		return true;
 	}
@@ -439,7 +431,6 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
-
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -502,7 +493,7 @@ public class DisplayUtils {
 	}
 
 	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + message + "...";
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
 	}
 
 
@@ -537,35 +528,173 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		com.google.gwt.user.client.Window.alert(message);  
+		showPopup("", message, MessagePopup.WARNING, null, null);
 	}
-	
-	public static void showOkCancelMessage(
-			String title, 
-			String message, 
-			String iconStyle,
-			int minWidth,
-			final Callback okCallback, 
-			final Callback cancelCallback) {
-		MessageBox box = new MessageBox();
-	    box.setButtons(MessageBox.OKCANCEL);
-	    box.setIcon(iconStyle);
-	    box.setTitle(title);
-	    box.addCallback(new Listener<MessageBoxEvent>() {					
+
+	/**
+	 * @param t
+	 * @param jiraHelper
+	 * @param profile
+	 * @param friendlyErrorMessage
+	 *            (optional)
+	 */
+	public static void showErrorMessage(final Throwable t,
+			final JiraURLHelper jiraHelper, boolean isLoggedIn,
+			String friendlyErrorMessage) {
+		SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
+		if (!isLoggedIn) {
+			showErrorMessage(t.getMessage());
+			return;
+		}
+		final Dialog d = new Dialog();
+		d.addStyleName("padding-5");
+
+		final String errorMessage = friendlyErrorMessage == null ? t.getMessage() : friendlyErrorMessage;
+		HTML errorContent = new HTML(
+				getIcon("glyphicon-exclamation-sign margin-right-10 font-size-22 alert-danger")
+				+ errorMessage);
+		FlowPanel dialogContent = new FlowPanel();
+		dialogContent.addStyleName("margin-10");
+		dialogContent.add(errorContent);
+
+		// create text area for steps
+		FlowPanel formGroup = new FlowPanel();
+		formGroup.addStyleName("form-group margin-top-10");
+		formGroup.add(new HTML("<label>Describe the problem (optional)</label>"));
+		final TextArea textArea = new TextArea();
+		textArea.addStyleName("form-control");
+		textArea.getElement().setAttribute("placeholder","Steps to reproduce the error");
+		textArea.getElement().setAttribute("rows", "4");
+		formGroup.add(textArea);
+		dialogContent.add(formGroup);
+
+		d.add(dialogContent);
+
+		d.setAutoHeight(true);
+		d.setHideOnButtonClick(true);
+		d.setWidth(400);
+		d.setPlain(true);
+		d.setModal(true);
+		d.setLayout(new FitLayout());
+		d.setButtonAlign(HorizontalAlignment.RIGHT);
+		d.setHeading("Synapse Error");
+		d.yesText = DisplayConstants.SEND_BUG_REPORT;
+		d.noText = DisplayConstants.DO_NOT_SEND_BUG_REPORT;
+		d.setButtons(Dialog.YESNO);
+		com.extjs.gxt.ui.client.widget.button.Button yesButton = d.getButtonById(Dialog.YES);
+		yesButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 			@Override
-			public void handleEvent(MessageBoxEvent be) { 												
-				Button btn = be.getButtonClicked();
-				if(Dialog.OK.equals(btn.getItemId())) {
-					okCallback.invoke();
-				} else {
-					cancelCallback.invoke();
-				}
+			public void componentSelected(ButtonEvent ce) {
+				jiraHelper.createIssueOnBackend(textArea.getValue(), t,
+						errorMessage, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								showInfo("Report sent", "Thank you!");
+
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// failure to create issue!
+								DisplayUtils.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY+"\n" 
+								+ caught.getMessage() +"\n\n"
+								+ textArea.getValue());
+							}
+						});
 			}
 		});
-	    box.setMessage(message);
-	    box.setMinWidth(minWidth);
-	    box.show();
-
+		d.show();
+	}
+	
+	public static void showInfoDialog(
+			String title, 
+			String message,
+			Callback okCallback
+			) {
+		showPopup(title, message, MessagePopup.INFO, okCallback, null);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback,
+			Callback noCallback
+			) {
+		showPopup(title, message, MessagePopup.QUESTION, yesCallback, noCallback);
+	}
+	
+	public static void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback
+			) {
+		showConfirmDialog(title, message, yesCallback, new Callback() {
+			@Override
+			public void invoke() {
+				//do nothing when No is clicked
+			}
+		});
+	}
+	
+	public static void showPopup(String title, String message,
+			DisplayUtils.MessagePopup iconStyle,
+			final Callback primaryButtonCallback,
+			final Callback secondaryButtonCallback) {
+		
+		String iconHtml = "";
+		if (MessagePopup.INFO.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
+		else if (MessagePopup.WARNING.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
+		else if (MessagePopup.QUESTION.equals(iconStyle))
+			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		if (DisplayUtils.isDefined(title)) {
+			builder.appendHtmlConstant("<h5>");
+			builder.appendEscaped(title);
+			builder.appendHtmlConstant("</h5>");
+		}
+		builder.appendHtmlConstant("<div class=\"row\">");
+		if (iconHtml.length() > 0)
+			builder.appendHtmlConstant(iconHtml);
+		String messageWidth = DisplayUtils.isDefined(iconHtml) ? "col-xs-11" : "col-xs-12";
+		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
+		builder.appendEscaped(message);
+		builder.appendHtmlConstant("</div></div>");
+		boolean isSecondaryButton = secondaryButtonCallback != null;
+		
+		if (isSecondaryButton) {
+			Bootbox.confirm(builder.toSafeHtml().asString(), new ConfirmCallback() {
+				@Override
+				public void callback(boolean isConfirmed) {
+					if (isConfirmed) {
+						if (primaryButtonCallback != null)
+							primaryButtonCallback.invoke();
+					} else {
+						if (secondaryButtonCallback != null)
+							secondaryButtonCallback.invoke();
+					}
+				}
+			});
+		} else {
+			Bootbox.alert(builder.toSafeHtml().asString(), new AlertCallback() {
+				@Override
+				public void callback() {
+					if (primaryButtonCallback != null)
+						primaryButtonCallback.invoke();
+				}
+			});
+		}
+	}
+	
+	public static void center(Window window) {
+		int left = (com.google.gwt.user.client.Window.getClientWidth() - window.getOffsetWidth()) / 2;
+		window.setPosition(left, 150);
+		scrollToTop();
+	}
+	
+	public static void scrollToTop(){
+		com.google.gwt.user.client.Window.scrollTo(0, 0);
 	}
 	
 	public static String getPrimaryEmail(UserProfile userProfile) {
@@ -731,6 +860,11 @@ public class DisplayUtils {
 		return "#!" + getLoginPlaceString(LoginPlace.class) + ":" + place.toToken();
 	}
 
+	public static String getHelpPlaceHistoryToken(String token) {
+		Help place = new Help(token);
+		return "#!" + getHelpPlaceString(Help.class) + ":" + place.toToken();
+	}
+
 	
 	public static String getSearchHistoryToken(String searchQuery) {
 		Search place = new Search(searchQuery);
@@ -797,7 +931,6 @@ public class DisplayUtils {
 		}
 		return stub; 
 	}
-
 	
 	
 	/*
@@ -834,7 +967,9 @@ public class DisplayUtils {
 	private static String getLoginPlaceString(Class<LoginPlace> place) {
 		return getPlaceString(place.getName());		
 	}
-
+	private static String getHelpPlaceString(Class<Help> place) {
+		return getPlaceString(place.getName());		
+	}
 	
 	private static String getSearchPlaceString(Class<Search> place) {
 		return getPlaceString(place.getName());		
@@ -1099,6 +1234,8 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
+		//and do not cache
+		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
@@ -1401,9 +1538,13 @@ public class DisplayUtils {
 
 	// from http://stackoverflow.com/questions/3907531/gwt-open-page-in-a-new-tab
 	public static native JavaScriptObject newWindow(String url, String name, String features)/*-{
-    	var window = $wnd.open(url, name, features);
-    	return window;
-		}-*/;
+    	try {
+	    	var window = $wnd.open(url, name, features);
+	    	return window;
+		}catch(err) {
+			return null;
+		}
+	}-*/;
 
 	public static native void setWindowTarget(JavaScriptObject window, String target)/*-{
     	window.location = target;
@@ -1481,11 +1622,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
 	}
 	
 	public static String getWidgetMD(String attachmentName) {
@@ -1500,11 +1641,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**
@@ -1606,20 +1747,30 @@ public class DisplayUtils {
 	}
 
 	public static boolean isInTestWebsite(CookieProvider cookies) {
-		return cookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY) != null;
+		return isInCookies(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 
 	public static void setTestWebsite(boolean testWebsite, CookieProvider cookies) {
-		if (testWebsite && !isInTestWebsite(cookies)) {
-			//set the cookie
-			cookies.setCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, "true");
-		} else{
-			cookies.removeCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY);
-		}
+		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
 	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
+	
+	public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
+		return cookies.getCookie(cookieKey) != null;
+	}
 
+	public static void setInCookies(boolean value, String cookieKey, CookieProvider cookies) {
+		if (value && !isInCookies(cookieKey, cookies)) {
+			//set the cookie
+			cookies.setCookie(cookieKey, "true");
+		} else{
+			cookies.removeCookie(cookieKey);
+		}
+	}
+
+		
+	
 	/**
 	 * Create the URL to a version of a wiki's attachments.
 	 * @param baseFileHandleUrl
@@ -1654,18 +1805,20 @@ public class DisplayUtils {
 //				+"/"+ attachmentPathName+"?fileName="+URL.encodePathSegment(fileName);
 		String wikiIdParam = wikiKey.getWikiPageId() == null ? "" : "&" + WebConstants.WIKI_ID_PARAM_KEY + "=" + wikiKey.getWikiPageId();
 
-			//if preview, then avoid cache
-			String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
 				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
-					wikiIdParam + nocacheParam;
+					wikiIdParam;
 	}
 		
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
 		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
+	}
+	
+	public static String getParamForNoCaching() {
+		return WebConstants.NOCACHE_PARAM + new Date().getTime();
 	}
 	
 	/**
@@ -1677,7 +1830,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createRedirectUrl(String baseFileHandleUrl, String encodedRedirectUrl){
-		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE + "&nocache=" + new Date().getTime() +"&" + 
+		return baseFileHandleUrl + "?" + WebConstants.PROXY_PARAM_KEY + "=" + Boolean.TRUE +"&" + 
 				WebConstants.REDIRECT_URL_KEY + "=" + encodedRedirectUrl;
 	}
 	
@@ -1689,13 +1842,29 @@ public class DisplayUtils {
 	 */
 	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
-		//if preview, then avoid cache
-		String nocacheParam = preview ? "&nocache=" + new Date().getTime()  : "";
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
 				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) +
-				versionParam + nocacheParam;
+				versionParam;
+	}
+
+	/**
+	 * Create the url to a Table cell file handle.
+	 * @param baseFileHandleUrl
+	 * @param details
+	 * @param preview
+	 * @param proxy
+	 * @return
+	 */
+	public static String createTableCellFileEntityUrl(String baseFileHandleUrl, TableCellFileHandle details, boolean preview, boolean proxy){		
+		return baseFileHandleUrl + "?" +
+				WebConstants.ENTITY_PARAM_KEY + "=" + details.getTableId() + "&" +
+				WebConstants.TABLE_COLUMN_ID + "=" + details.getColumnId() + "&" +
+				WebConstants.TABLE_ROW_ID + "=" + details.getRowId() + "&" +
+				WebConstants.TABLE_ROW_VERSION_NUMBER + "=" + details.getVersionNumber() + "&" +
+				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy);
 	}
 	
 	/**
@@ -1907,7 +2076,7 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String surroundText(String text, String startTag, String endTag, boolean isMultiline, int startPos, int selectionLength) throws IllegalArgumentException {
-		if (isDefined(text) && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
+		if (text != null && selectionLength > -1 && startPos >= 0 && startPos <= text.length() && isDefined(startTag)) {
 			if (endTag == null) 
 				endTag = "";
 			int startTagLength = startTag.length();
@@ -1936,7 +2105,7 @@ public class DisplayUtils {
 		throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 	}
 	
-	private static boolean isDefined(String testString) {
+	public static boolean isDefined(String testString) {
 		return testString != null && testString.trim().length() > 0;
 	}
 	
@@ -1968,10 +2137,11 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, final Callback callback) {
+	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
 		final Dialog window = new Dialog();
 		// configure layout
-		window.setSize(560, 552);
+		int windowHeight = canChangePermission ? 552 : 282;
+		window.setSize(560, windowHeight);
 		window.setPlain(true);
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
@@ -1979,35 +2149,42 @@ public class DisplayUtils {
 		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
 	    
 		// configure buttons
-		window.okText = "Save";
-		window.cancelText = "Cancel";
-	    window.setButtons(Dialog.OKCANCEL);
-	    window.setButtonAlign(HorizontalAlignment.RIGHT);
+		if (canChangePermission) {
+			window.okText = "Save";
+			window.cancelText = "Cancel";
+			window.setButtons(Dialog.OKCANCEL);
+		} else {
+			window.cancelText = "Close";
+			window.setButtons(Dialog.CANCEL);
+		}
+		window.setButtonAlign(HorizontalAlignment.RIGHT);
 	    window.setHideOnButtonClick(false);
 		window.setResizable(true);
 		
-		// "Apply" button
-		// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-		Button applyButton = window.getButtonById(Dialog.OK);
-		applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				// confirm close action if there are unsaved changes
-				if (accessControlListEditor.hasUnsavedChanges()) {
-					accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-						@Override
-						public void onSuccess(EntityWrapper result) {
-							callback.invoke();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							//failure notification is handled by the acl editor view.
-						}
-					});
+		if (canChangePermission) {
+			// "Apply" button
+			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+			Button applyButton = window.getButtonById(Dialog.OK);
+			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				@Override
+				public void componentSelected(ButtonEvent ce) {
+					// confirm close action if there are unsaved changes
+					if (accessControlListEditor.hasUnsavedChanges()) {
+						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+							@Override
+							public void onSuccess(EntityWrapper result) {
+								callback.invoke();
+							}
+							@Override
+							public void onFailure(Throwable caught) {
+								//failure notification is handled by the acl editor view.
+							}
+						});
+					}
+					window.hide();
 				}
-				window.hide();
-			}
-	    });
+		    });
+		}
 		
 		// "Close" button				
 		Button closeButton = window.getButtonById(Dialog.CANCEL);
@@ -2026,7 +2203,14 @@ public class DisplayUtils {
 		row = new LayoutContainer();
 		row.setStyleName("row");
 		return row;
-}
+	}
+	
+	public static FlowPanel createRowContainerFlowPanel() {
+		FlowPanel row = new FlowPanel();
+		row.setStyleName("row");
+		return row;
+	}
+
 
 	public static enum ButtonType { DEFAULT, PRIMARY, SUCCESS, INFO, WARNING, DANGER, LINK }
 	public static enum BootstrapAlertType { SUCCESS, INFO, WARNING, DANGER }
@@ -2070,7 +2254,7 @@ public class DisplayUtils {
 		return null;
 	}
 	
-	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, int headingLevel) {
+	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
 		String linkStyle = "";
@@ -2080,12 +2264,21 @@ public class DisplayUtils {
 		if (clickHandler != null)
 			headingHtml.addClickHandler(clickHandler);
 		
-		FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-		profilePicture.addStyleName("pull-left media-object");
-		profilePicture.addStyleName("imageButton");
-		if (clickHandler != null)
-			profilePicture.addClickHandler(clickHandler);
-		panel.add(profilePicture);
+		if (pictureUri != null) {
+			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+			profilePicture.addStyleName("pull-left media-object imageButton");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		} else {
+			//display default picture
+			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			profilePicture.addStyleName("pull-left media-object displayInline ");
+			if (clickHandler != null)
+				profilePicture.addClickHandler(clickHandler);
+			panel.add(profilePicture);
+		}
 		FlowPanel mediaBodyPanel = new FlowPanel();
 		mediaBodyPanel.addStyleName("media-body");
 		mediaBodyPanel.add(headingHtml);
@@ -2131,19 +2324,8 @@ public class DisplayUtils {
 	}
 
 	public static String getShareMessage(String displayName, String entityId, String hostUrl) {
-		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Profile:v";
+		return displayName + DisplayConstants.SHARED_ON_SYNAPSE + ":\n"+hostUrl+"#!Synapse:"+entityId+"\n\n"+DisplayConstants.TURN_OFF_NOTIFICATIONS+hostUrl+"#!Settings:0";
 		//alternatively, could use the gwt I18n Messages class client side
-	}
-
-	public static String createPreviewFileHandleUrl(
-			PreviewFileHandle previewFileHandle) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static String createPreviewFileHandleUrl(S3FileHandle fileHandle) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	public static void getPublicPrincipalIds(UserAccountServiceAsync userAccountService, final AsyncCallback<PublicPrincipalIds> callback){
@@ -2166,5 +2348,95 @@ public class DisplayUtils {
 	public static String getPreviewSuffix(Boolean isPreview) {
 		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
+	
+	public static void hide(UIObject uiObject) {
+		uiObject.setVisible(false);
+	}
+	
+	public static void show(UIObject uiObject) {
+		uiObject.setVisible(true);
+	}
+	
+	public static void hide(com.google.gwt.dom.client.Element elem) {
+		UIObject.setVisible(elem, false);
+	}
+	
+	public static void show(com.google.gwt.dom.client.Element elem) {
+		UIObject.setVisible(elem, true);
+	}
+	
+	public static void showFormError(DivElement parentElement, DivElement messageElement) {
+		parentElement.addClassName("has-error");
+		DisplayUtils.show(messageElement);
+	}
+	 
+	public static void hideFormError(DivElement parentElement, DivElement messageElement) {
+		parentElement.removeClassName("has-error");
+		DisplayUtils.hide(messageElement);
+	}
 
+	 public static String getInfoHtml(String safeHtmlMessage) {
+		 return "<div class=\"alert alert-info\">"+safeHtmlMessage+"</div>";
+	 }
+
+	public static String getTableRowViewAreaToken(String id) {
+		return "row/" + id;
+	}
+
+	public static String getTableRowViewAreaToken(String id, String version) {
+		String str = "row/" + id;
+		if (version != null)
+			str += "/rowversion/" + version;
+		return str;
+	}
+	
+	public static void goToLastPlace(GlobalApplicationState globalApplicationState) {
+		Place forwardPlace = globalApplicationState.getLastPlace();
+		if(forwardPlace == null) {
+			forwardPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+		}
+		globalApplicationState.getPlaceChanger().goTo(forwardPlace);
+	}
+	
+	public static String getStackTrace(Throwable t) {
+		StringBuilder stackTrace = new StringBuilder();
+		if (t != null) {
+			for (StackTraceElement element : t.getStackTrace()) {
+				stackTrace.append(element + "\n");
+			}
+		}
+		return stackTrace.toString();
+	}
+	
+	/**
+	 * This is to work around a Chrome rendering bug, where some containers do not properly calculate their relative widths (in the dynamic bootstrap grid layout) when they are initially added.
+	 * The most visible of these cases is the Wiki Subpages panel (see SWC-1450). 
+	 * @param e
+	 */
+	public static void clearElementWidth(Element e) {
+		if ( e != null) {
+			Style style = e.getStyle();
+			if (style != null) {
+				style.setWidth(1, Unit.PX);
+				style.clearWidth();
+			}
+		}
+	}
+	
+	public static void configureShowHide(final InlineLabel label, final LayoutContainer content) {
+		label.setText(DisplayConstants.SHOW_LC);
+		label.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (content.isVisible()) {
+					content.setVisible(false);
+					label.setText(DisplayConstants.SHOW_LC);
+				} else {
+					content.setVisible(true);
+					label.setText(DisplayConstants.HIDE_LC);
+				}
+				content.layout(true);
+			}
+		});
+	}
 }

@@ -11,7 +11,9 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
@@ -22,6 +24,7 @@ import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -36,6 +39,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -84,7 +88,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private Anchor registerButton;
 	private Anchor supportLink;
 	private SimplePanel supportLinkContainer;
-	private HorizontalPanel userCommands;
+	private FlowPanel userCommands;
 	private FlowPanel userNameContainer;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private HorizontalPanel userNameWrapper;
@@ -186,48 +190,58 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 				}
 			});
 		}
 		if (userCommands == null){
-			userCommands = new HorizontalPanel();
+			userCommands = new FlowPanel();
         	userCommands.addStyleName("view header-inner-commands-container");
-
-        	Image userGuide = new Image(iconsImageBundle.bookOpen16());
-        	userGuide.addStyleName("imageButton");
-		 	
+        	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
+        	userGuide.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.SYNAPSE_TUTORIAL, TOOLTIP_POSITION.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(ClientProperties.USER_GUIDE_ID));
+					globalApplicationState.getPlaceChanger().goTo(new Help(WebConstants.GETTING_STARTED));
 				}
-			});   		 	
-	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.USER_GUIDE, TOOLTIP_POSITION.BOTTOM);
-
-        	Image settings = new Image(iconsImageBundle.settings16());
-   		 	settings.addStyleName("imageButton");
-		 	
-   		 	settings.addClickHandler(new ClickHandler() {
+			});
+    		
+        	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
+        	settings.addStyleName("displayInline imageButton movedown-3 margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
+        	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
 				}
-			});   		 	
-	 		DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
+			});
 		 	
-   		 	Image logout = new Image(iconsImageBundle.logoutGrey16());
-   		 	logout.addStyleName("imageButton");
-		 	logout.addClickHandler(new ClickHandler() {
+        	HTML logout = new HTML(DisplayUtils.getFontelloIcon("logout"));
+        	logout.addStyleName("displayInline imageButton movedown-2 margin-left-5 margin-right-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
+        	logout.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 				}
 			});
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
-		 			
+        	
+        	HTML dashboard = new HTML(DisplayUtils.getIcon("glyphicon-home"));
+        	dashboard.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
+        	DisplayUtils.addTooltip(this.synapseJSNIUtils, dashboard, DisplayConstants.TEXT_USER_HOME, TOOLTIP_POSITION.BOTTOM);
+        	dashboard.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+				}
+			});
+		 	boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+        	if (isInTestWebsite) 
+		 		userCommands.add(dashboard);
 			userCommands.add(userGuide);
-		 	userCommands.add(settings);
+			if (!isInTestWebsite) //settings will be in the dashboard, not in the header
+				userCommands.add(settings);
 		 	userCommands.add(logout);
 		}
 		

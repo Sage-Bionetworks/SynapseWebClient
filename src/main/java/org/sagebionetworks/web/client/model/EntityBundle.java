@@ -5,11 +5,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.repo.model.table.TableBundle;
 
 /**
  * A bundle of various parts of an entity.  This allows the client to get all the required parts in 
@@ -28,11 +27,12 @@ public class EntityBundle {
 	private List<AccessRequirement> unmetAccessRequirements;
 	private Boolean hasChildren;
 	private List<FileHandle> fileHandles;
+	private TableBundle tableBundle;
 	
 	public EntityBundle(Entity entity, Annotations annotations,
 			UserEntityPermissions permissions, EntityPath path, 
 			List<AccessRequirement> accessRequirements,
-		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles
+		List<AccessRequirement> unmetAccessRequirements, List<FileHandle> fileHandles, TableBundle tableBundle
 	) {
 		super();
 		this.entity = entity;
@@ -42,6 +42,7 @@ public class EntityBundle {
 		this.accessRequirements=accessRequirements;
 		this.unmetAccessRequirements=unmetAccessRequirements;
 		this.fileHandles = fileHandles;
+		this.tableBundle = tableBundle;
 	}
 	public Entity getEntity() {
 		return entity;
@@ -95,6 +96,13 @@ public class EntityBundle {
 	
 	public void setFileHandles(List<FileHandle> fileHandles) {
 		this.fileHandles = fileHandles;
+	}
+	
+	public TableBundle getTableBundle() {
+		return tableBundle;
+	}
+	public void setTableBundle(TableBundle tableBundle) {
+		this.tableBundle = tableBundle;
 	}
 	@Override
 	public int hashCode() {

@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -160,7 +160,7 @@ public class QueryStringUtilsTest {
 		URI uri = QueryStringUtils.writeQueryUri(ROOT_URL, params);
 		assertNotNull(uri);
 		System.out.println(uri);
-		assertTrue(uri.toString().contains("select+*+"));		
+		assertTrue(uri.toString().contains("select%20*%20"));		
 	}
 	
 	@Test
@@ -173,7 +173,7 @@ public class QueryStringUtilsTest {
 		URI uri = QueryStringUtils.writeQueryUri(ROOT_URL, params);
 		assertNotNull(uri);
 		System.out.println(uri);
-		assertTrue(uri.toString().contains("select+*+"));
+		assertTrue(uri.toString().contains("select%20*%20"));
 	}
 	
 }

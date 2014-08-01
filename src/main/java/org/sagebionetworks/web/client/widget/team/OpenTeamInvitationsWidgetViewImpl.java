@@ -29,7 +29,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 		this.sageImageBundle = sageImageBundle;
 		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
-		mainContainer.setTitle(DisplayConstants.PENDING_TEAM_INVITATIONS);
+		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_TEAM_INVITATIONS);
 	}
 	
 	@Override
@@ -58,8 +58,9 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 	public void configure(List<Team> teams, List<String> inviteMessages) {
 		clear();
 		mainContainer.clear();
+		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		for (int i = 0; i < teams.size(); i++) {
-			LayoutContainer lc = DisplayUtils.createRowContainer();
+			FlowPanel lc = new FlowPanel();
 			final Team team = teams.get(i);
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, inviteMessages.get(i));
@@ -78,8 +79,9 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 			buttonContainer.add(joinButton);
 			lc.add(teamRendererWidget);
 			lc.add(buttonContainer);
-			mainContainer.add(lc);
+			singleRow.add(lc);
 		}
+		mainContainer.add(singleRow);
 		if (teams.size() > 0)
 			add(mainContainer);
 	}

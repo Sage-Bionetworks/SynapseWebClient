@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -19,6 +22,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -27,12 +31,12 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -47,6 +51,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
@@ -104,6 +109,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@UiField
 	Anchor restApiLink;
 	
+	@UiField
+	DivElement certificationReminderUI;
+	@UiField
+	SpanElement lockdownDate1;
+	@UiField
+	SpanElement lockdownDate2;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -117,6 +129,9 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
 	
+	private static final Date LOCKDOWN = new Date(114, 9, 15);
+	public static final String LOCKDOWN_DATE_STRING = DateTimeFormat.getFormat("MMMM d").format(LOCKDOWN);
+	
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,
@@ -129,7 +144,8 @@ public class HomeViewImpl extends Composite implements HomeView {
 			EntityTreeBrowser favoritesTreeBrowser,
 			MyEvaluationEntitiesList myEvaluationsList,
 			CookieProvider cookies,
-			TeamListWidget teamsListWidget) {
+			TeamListWidget teamsListWidget,
+			final AuthenticationController authController) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -198,7 +214,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		userProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.VIEW_PROFILE_PLACE_TOKEN));
+				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
 			}
 		});
 	}
@@ -231,7 +247,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 		footer.clear();
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
-
+		showCertificationReminder(false);
+		myProjectsTreeBrowser.clear();
+		favoritesTreeBrowser.clear();
+		teamsListWidget.clear();
+		
 		boolean isLoggedIn = presenter.showLoggedInDetails();
 		
 		if(isLoggedIn) {
@@ -242,7 +262,11 @@ public class HomeViewImpl extends Composite implements HomeView {
 			whatIsSynapseContainer.setVisible(true);
 			getStartedContainer.setVisible(true);
 			projectPanel.clear();
-		}		
+		}
+	}
+
+	public static int getDaysRemaining() {
+		return CalendarUtil.getDaysBetween(new Date(), LOCKDOWN);
 	}
 	
 	@Override
@@ -419,7 +443,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		headerRow.add(wrapButton);
 		myTeamsContainer.add(headerRow);
 		Widget teamListWidget = teamsListWidget.asWidget();
-		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min");
+		teamListWidget.addStyleName("margin-bottom-15 margin-top-0 padding-left-10 highlight-box highlight-line-min line-height-1-7em-imp padding-top-15-imp");
 		myTeamsContainer.add(teamListWidget);
 		return myTeamsContainer;
 	}
@@ -454,6 +478,18 @@ public class HomeViewImpl extends Composite implements HomeView {
 	public void setFavoritesError(String string) {
 	}
 	
+	@Override
+	public void showCertificationReminder(boolean visible) {
+		if (visible && 
+			getDaysRemaining() > 0) {
+			DisplayUtils.show(certificationReminderUI);
+			lockdownDate1.setInnerHTML(LOCKDOWN_DATE_STRING);
+			lockdownDate2.setInnerHTML(LOCKDOWN_DATE_STRING);
+		} else {
+			DisplayUtils.hide(certificationReminderUI);
+		}
+	}
+	
 	private void fillProgrammaticClientInstallCode() {
 		configureNewWindowLink(rAPILink, ClientProperties.CLIENT_R_API_URL, DisplayConstants.API_DOCUMENTATION);
 		configureNewWindowLink(rExampleCodeLink, ClientProperties.CLIENT_R_EXAMPLE_CODE_URL, DisplayConstants.EXAMPLE_CODE);
@@ -468,23 +504,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 
-		final Dialog javaWindow = new Dialog();
-		javaWindow.add(new HTML(ProgrammaticClientCode.getJavaClientInstallHTML()));
-		javaWindow.setSize(560, 287);
-		javaWindow.setPlain(true);
-		javaWindow.setModal(false);
-		javaWindow.setHeading(DisplayConstants.INSTALL_JAVA_MAVEN);
-		javaWindow.setLayout(new FitLayout());			    
-	    javaWindow.setButtons(Dialog.CLOSE);
-	    javaWindow.setButtonAlign(HorizontalAlignment.RIGHT);
-
 		Button showJava = new Button(DisplayConstants.SHOW);
 		showJava.removeStyleName("gwt-Button");
 		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
 		showJava.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				javaWindow.show();
+				Bootbox.alert("<h4>"+DisplayConstants.INSTALL_JAVA_MAVEN + "</h4>" + ProgrammaticClientCode.getJavaClientInstallHTML().asString(), new AlertCallback() {
+					@Override
+					public void callback() {
+					}
+				});
 			}
 		});	
 		javaClientInstallPanel.add(showJava);

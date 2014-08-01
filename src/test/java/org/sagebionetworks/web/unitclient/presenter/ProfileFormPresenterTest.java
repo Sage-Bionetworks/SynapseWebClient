@@ -19,6 +19,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
@@ -34,6 +35,7 @@ public class ProfileFormPresenterTest {
 	ProfileFormWidget profileForm;
 	ProfileFormView mockView;
 	AuthenticationController mockAuthenticationController;
+	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWTWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
@@ -49,10 +51,11 @@ public class ProfileFormPresenterTest {
 	public void setup() throws JSONObjectAdapterException {
 		mockView = mock(ProfileFormView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockProfileUpdatedCallback = mock(ProfileUpdatedCallback.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, adapterFactory);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, mockGlobalApplicationState, adapterFactory);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
 		userProfile.writeToJSONObject(adapter.createNew());
@@ -86,10 +89,11 @@ public class ProfileFormPresenterTest {
 				userProfile.getEmail(), 
 				userProfile.getPic(), 
 				userProfile.getTeamName(), 
-				userProfile.getUrl());
+				userProfile.getUrl(),
+				userProfile.getUserName());
 		
 		verify(mockView).showUserUpdateSuccess();
-		verify(mockAuthenticationController).loginUser(anyString(), captor.capture());
+		verify(mockAuthenticationController).revalidateSession(anyString(), captor.capture());
 		//invoke the login callback to verify profile update success callback
 		captor.getValue().onSuccess("");
 		verify(mockProfileUpdatedCallback).profileUpdateSuccess();//successful update
@@ -112,7 +116,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null);
+				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}
@@ -128,7 +132,7 @@ public class ProfileFormPresenterTest {
 				userProfile.getLocation(), 
 				userProfile.getIndustry(), 
 				userProfile.getCompany(), 
-				userProfile.getEmail(), userProfile.getPic(), null, null);
+				userProfile.getEmail(), userProfile.getPic(), null, null, userProfile.getUserName());
 		
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Enumeration;
@@ -22,12 +23,14 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.HttpClientProviderImpl;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -37,7 +40,9 @@ import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -57,7 +62,7 @@ public class FileHandleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-
+	
 	/**
 	 * Injected with Gin
 	 */
@@ -116,6 +121,12 @@ public class FileHandleServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
+		//instruct not to cache
+		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
+		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
+		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
+
 		String token = getSessionToken(request);
 		SynapseClient client = createNewClient(token);
 		boolean isProxy = false;
@@ -128,12 +139,55 @@ public class FileHandleServlet extends HttpServlet {
 		String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
 		String entityVersion = request.getParameter(WebConstants.ENTITY_VERSION_PARAM_KEY);
 		
+		// table params
+		String tableColumnId = request.getParameter(WebConstants.TABLE_COLUMN_ID);
+		String tableRowId = request.getParameter(WebConstants.TABLE_ROW_ID);
+		String tableRowVersionNumbrer = request.getParameter(WebConstants.TABLE_ROW_VERSION_NUMBER);
+		
 		String ownerId = request.getParameter(WebConstants.WIKI_OWNER_ID_PARAM_KEY);
 		String ownerType = request.getParameter(WebConstants.WIKI_OWNER_TYPE_PARAM_KEY);
 		String fileName = request.getParameter(WebConstants.WIKI_FILENAME_PARAM_KEY);
 		Boolean isPreview = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY));
 		String redirectUrlString = request.getParameter(WebConstants.REDIRECT_URL_KEY);		
 		URL resolvedUrl = null;
+		
+		try {
+			resolveUrlAndRedirect(request, response, client, isProxy, teamId,
+					entityId, entityVersion, tableColumnId, tableRowId,
+					tableRowVersionNumbrer, ownerId, ownerType, fileName,
+					isPreview, redirectUrlString, resolvedUrl);
+		} catch (SynapseNotFoundException e) {
+			// Retry preview once, after 1.5 seconds
+			if(isPreview) {
+				try {
+					Thread.sleep(1500);
+					resolveUrlAndRedirect(request, response, client, isProxy, teamId,
+							entityId, entityVersion, tableColumnId, tableRowId,
+							tableRowVersionNumbrer, ownerId, ownerType, fileName,
+							isPreview, redirectUrlString, resolvedUrl);					
+				} catch (InterruptedException e1) { 
+					// ...
+				} catch (SynapseNotFoundException e1) {
+					// show generic image
+					doRedirect(request, response, isProxy, new URL(getBaseUrl(request) + WebConstants.PREVIEW_UNAVAILABLE_PATH));
+				} catch (SynapseException e1) { 
+					throw new ServletException(e);
+				}				
+			}			
+		} catch (SynapseException e) {
+			throw new ServletException(e);
+		}
+	}
+
+	private void resolveUrlAndRedirect(HttpServletRequest request,
+			HttpServletResponse response, SynapseClient client,
+			boolean isProxy, String teamId, String entityId,
+			String entityVersion, String tableColumnId, String tableRowId,
+			String tableRowVersionNumbrer, String ownerId, String ownerType,
+			String fileName, Boolean isPreview, String redirectUrlString,
+			URL resolvedUrl) throws MalformedURLException,
+			UnsupportedEncodingException, ClientProtocolException, IOException,
+			SynapseException, ServletException {
 		if (redirectUrlString != null) {
 			//simple redirect
 			resolvedUrl = new URL(URLDecoder.decode(redirectUrlString, "UTF-8"));
@@ -142,7 +196,7 @@ public class FileHandleServlet extends HttpServlet {
 		if (ownerId != null && ownerType != null) {
 			ObjectType type = ObjectType.valueOf(ownerType);
 			String wikiId = request.getParameter(WebConstants.WIKI_ID_PARAM_KEY);
-			WikiPageKey properKey = new WikiPageKey(ownerId, type, wikiId);
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(ownerId, type, wikiId);
 			String wikiVersion = request.getParameter(WebConstants.WIKI_VERSION_PARAM_KEY);
 			
 			// Redirect the user to the url
@@ -164,29 +218,51 @@ public class FileHandleServlet extends HttpServlet {
 			//Done
 		}
 		else if (entityId != null) {
-			if (entityVersion == null) {
-				if (isPreview)
-					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
-				else
-					resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
-			}
-				
-			else {
-				Long versionNumber = Long.parseLong(entityVersion);
-				if (isPreview)
-					resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
-				else
-					resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			// Table File Handle
+			if(tableColumnId != null || tableRowId != null || tableRowVersionNumbrer != null) {
+				if(tableColumnId != null && tableRowId != null && tableRowVersionNumbrer != null) {
+					try {
+						RowReference row = new RowReference();
+						row.setRowId(Long.parseLong(tableRowId));
+						row.setVersionNumber(Long.parseLong(tableRowVersionNumbrer));
+						if(isPreview) resolvedUrl = client.getTableFileHandlePreviewTemporaryUrl(entityId, row, tableColumnId);
+						else resolvedUrl = client.getTableFileHandleTemporaryUrl(entityId, row, tableColumnId);
+					} catch (NumberFormatException e) {
+						throw new ServletException(WebConstants.TABLE_ROW_ID +" and "+ WebConstants.TABLE_ROW_VERSION_NUMBER + " must be Long values. Actual values: "+ tableRowId +", " + tableRowVersionNumbrer);
+					}
+						
+				} else {
+					throw new ServletException("All table fields must be defined, if any are defined: " + WebConstants.TABLE_COLUMN_ID +", "+ WebConstants.TABLE_ROW_ID +", "+ WebConstants.TABLE_ROW_VERSION_NUMBER);
+				}
+			} else {
+				// Entity
+				if (entityVersion == null) {
+					if (isPreview)
+						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForCurrentVersion(entityId);
+					else
+						resolvedUrl = client.getFileEntityTemporaryUrlForCurrentVersion(entityId);
+				} else {
+					Long versionNumber = Long.parseLong(entityVersion);
+					if (isPreview)
+						resolvedUrl = client.getFileEntityPreviewTemporaryUrlForVersion(entityId, versionNumber);
+					else
+						resolvedUrl = client.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+				}
 			}
 		} else if (teamId != null) {
 			try {
-				resolvedUrl = client.getTeamIcon(teamId, false);
+				resolvedUrl = client.getTeamIcon(teamId);
 			} catch (SynapseException e) {
 				return;
-				//throw new ServletException(e);
 			}
 		}
 		
+		doRedirect(request, response, isProxy, resolvedUrl);
+	}
+
+	private void doRedirect(HttpServletRequest request,
+			HttpServletResponse response, boolean isProxy, URL resolvedUrl)
+			throws ClientProtocolException, IOException {
 		if (resolvedUrl != null){
 			if (isProxy) {
 				//do the get
@@ -266,7 +342,7 @@ public class FileHandleServlet extends HttpServlet {
 				if (isCreateEntity) {
 					//create the file entity
 					String parentEntityId = request.getParameter(WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
-					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), client);
+					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), null, client);
 					entityId = fileEntity.getId();
 				}
 				else if (entityId != null) {
@@ -274,14 +350,15 @@ public class FileHandleServlet extends HttpServlet {
 					fileEntity = (FileEntity) client.getEntityById(entityId);
 					//update data file handle id
 					fileEntity.setDataFileHandleId(newFileHandle.getId());
-					fileEntity = client.putEntity(fileEntity);
+					fileEntity = (FileEntity)client.putEntity(fileEntity);
 				}
 				
 				if (fileEntity != null) {
 					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
 					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
 					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fixNameAndLockDown(fileEntity, newFileHandle, isRestricted, client, true);
+					fixName(fileEntity, newFileHandle, client);
+					lockDown(fileEntity, isRestricted, client);
 				}
 			}
 			
@@ -321,27 +398,33 @@ public class FileHandleServlet extends HttpServlet {
 		}
 	}
 	
-	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, SynapseClient client) throws SynapseException {
+	public static FileEntity getNewFileEntity(String parentEntityId, String fileHandleId, String name, SynapseClient client) throws SynapseException {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setParentId(parentEntityId);
+		if (name != null)
+			fileEntity.setName(name);
 		fileEntity.setEntityType(FileEntity.class.getName());
 		//set data file handle id before creation
 		fileEntity.setDataFileHandleId(fileHandleId);
-		fileEntity = client.createEntity(fileEntity);
+		fileEntity = (FileEntity)client.createEntity(fileEntity);
 		return fileEntity;
 	}
-	public static void fixNameAndLockDown(FileEntity fileEntity, FileHandle newFileHandle, boolean isRestricted, SynapseClient client, boolean setNameAsFileName) throws SynapseException {
-		if(setNameAsFileName) {
+
+	public static void fixName(FileEntity fileEntity,
+			FileHandle newFileHandle,
+			SynapseClient client)
+			throws SynapseException {
 		String originalFileEntityName = fileEntity.getName();
-			try{
-				//and try to set the name to the filename
-				fileEntity.setName(newFileHandle.getFileName());
-				fileEntity = client.putEntity(fileEntity);
-			} catch(Throwable t){
-				fileEntity.setName(originalFileEntityName);
-			};
-		}
+		try {
+			// and try to set the name to the filename
+			fileEntity.setName(newFileHandle.getFileName());
+			fileEntity = (FileEntity) client.putEntity(fileEntity);
+		} catch (Throwable t) {
+			fileEntity.setName(originalFileEntityName);
+		};
+	}
 		
+	public static void lockDown(FileEntity fileEntity, boolean isRestricted, SynapseClient client) throws SynapseException {
 		// now lock down restricted data
 		if (isRestricted) {
 			// we only proceed if there aren't currently any access restrictions
@@ -393,5 +476,12 @@ public class FileHandleServlet extends HttpServlet {
 		return client;
 	}
 
+	private String getBaseUrl(HttpServletRequest request) {
+		StringBuffer url = request.getRequestURL();
+		String uri = request.getRequestURI();
+		String ctx = request.getContextPath();
+		String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
+		return base;
+	}
 
 }

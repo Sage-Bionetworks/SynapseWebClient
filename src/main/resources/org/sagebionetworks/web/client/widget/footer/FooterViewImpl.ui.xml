@@ -3,11 +3,12 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client">
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<g:HTMLPanel>
 
 		<!-- FOOTER -->		
-		<div class="footer-line-top-wrapper">
+		<div class="margin-top-10 footer-line-top-wrapper">
             <div class="footer-container">
                 <div class="footer-top-line">
             	</div>
@@ -20,14 +21,14 @@
 	            <div class="footer">
 					<div class="row">
 		                <div class="col-md-8">
-			                <h6>With Support From</h6>                            				                          				                    
-			                <div class="img-thumbnail"><a href="http://www.lsdfa.org/" target="_new"><img src="images/LSDF_logo.jpg" style="padding: 5px;"/></a></div>                            
-		                    <div class="img-thumbnail"><a href="http://www.cancer.gov/" target="_new"><img src="images/NCI_logo.jpg" style="padding: 5px;" /></a></div>                                                       
-		                    <div class="img-thumbnail"><a href="http://www.nhlbi.nih.gov/" target="_new"><img src="images/NHLBI_logo.jpg" style="padding: 5px;" /></a></div>                                                       
-		                    <div class="img-thumbnail"><a href="http://www.sloan.org/" target="_new"><img src="images/Sloan_logo.jpg" style="padding: 5px;" /></a></div>                                                       
+			                <h6>Synapse is supported by</h6>                            				                          				                    
+			                <div class="img-thumbnail"><a href="http://www.lsdfa.org/" target="_new"><g:Image resource='{sageImageBundle.lsdfLogo}' styleName='padding-5' /></a></div>                            
+		                    <div class="img-thumbnail"><a href="http://www.cancer.gov/" target="_new"><g:Image resource='{sageImageBundle.nciLogo}' styleName='padding-5' /></a></div>                                                       
+		                    <div class="img-thumbnail"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nhlbiLogo}' styleName='padding-5' /></a></div>                                                       
+		                    <div class="img-thumbnail"><a href="http://www.sloan.org/" target="_new"><g:Image resource='{sageImageBundle.sloanLogo}' styleName='padding-5' /></a></div>                                                       
 		                </div>
 		                <div class="col-md-2 col-sm-12">
-		                	<h6>Follow Us On</h6>                            
+		                	<h6>Follow us on</h6>                            
 		                    <div class="tweet-icon">
 		                        <a href="https://twitter.com/sagebio" class='social' title='Twitter'><img src="images/1px.png" alt="" width="26px" height="26px" /></a>
 		                    </div>
@@ -61,7 +62,7 @@
 	                    <div class="col-md-8">
 	                    	<p class="right">
 		                    	<a href="#!Home:0">Home</a> / 
-								<a href="#!Governance:0">Governance</a> /
+								<a href="#!Help:Governance">Governance</a> /
 								<a href="http://creativecommons.org/licenses/by/3.0/legalcode" target="_blank">Creative Commons License</a> / 
 								<g:FlowPanel ui:field="debugModePanel" />
 	                    	</p>

@@ -28,13 +28,16 @@ public class WebConstants {
 
 	public static final String PROVENANCE_API_URL = "https://sagebionetworks.jira.com/wiki/display/PLFM/Analysis+Provenance+in+Synapse";
 	
+	public static final String PREVIEW_UNAVAILABLE_PATH = "images/blank.png";
+	
 	/**
 	 * Regex defining a valid annotation name. Characters are selected to ensure
 	 * compatibility across services and clients.
 	 * 
 	 */
 	public static final String VALID_ANNOTATION_NAME_REGEX = "^[a-z,A-Z,0-9,_,.]+";
-	public static final String VALID_URL_REGEX = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+	//support #!Place:token/with/delimiter, or standard http url
+	public static final String VALID_URL_REGEX = "([#]{1}[!]{1}[a-zA-Z_0-9:/]+)|(^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])";
 	//copied from org.sagebionetworks.repo.model.principal.AliasEnum.USER_NAME and USER_EMAIL, added uppercase support
 	public static final String VALID_USERNAME_REGEX = "^[A-Za-z0-9._-]{3,}";
 	public static final String VALID_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
@@ -75,36 +78,6 @@ public class WebConstants {
 	// redirect with the sessio token as a request parameter (this is the default)
 	public static final String OPEN_ID_MODE_STANDARD = "STANDARD";
 
-	public static final String ENTITY_DESCRIPTION_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
-			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br></code></pre><br>" +
-			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>An [example][id]. Then, anywhere else in the description,<br>define the link:<br>  [id]: http://example.com/<br></code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre><br>" +
-			"<h3>Tables</h3><pre><code>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>Row 2 Content Cell 1  | Row 2 Content Cell 2  | Row 2 Content Cell 3</code></pre><br>" +
-			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
-			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
-			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
-			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
-			"<h3>Inline Code</h3><pre><code>Wrap inline snippets of `code` with backticks.<br>You can include literal backticks<br>like \\`this\\`.<br></code></pre><br>" +
-			"<h3>Preformatted Code Blocks</h3><pre><code>Wrap your code blocks in ```<br><br>This is a normal paragraph.<br><br>```<br>This is a preformatted<br>code block.<br>```</code></pre><br>" +
-			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
-			"</div>";
-
-	public static final String SYNAPSE_MARKDOWN_FORMATTING_TIPS_HTML = "<div style=\"margin-left:20px\"><br><br>" +
-			"<h3>Phrase Emphasis</h3><pre><code>*italic*   **bold**<br>_italic_   __bold__<br>--strike out--<br></code></pre><br>" +
-			"<h3>Subscript/Superscript</h3><pre><code>~subscript~  ^superscript^<br></code></pre><br>" +
-			"<h3>Links</h3><pre><code>http://sagebase.org - automatic!</code></pre><pre><code>syn12345 - automatic!</code></pre><pre><code>An [example](http://url.com/)</code></pre><pre><code>Custom Synapse ID link text:<br>[my text](#Synapse:syn12345)</code></pre></pre><br>" +
-			"<h3>Tables</h3><pre><code>Header 1 | Header 2 | Header 3<br>--- | --- | ---<br>Row 1 Content Cell 1  |  Row 1 Content Cell 2  |  Row 1 Content Cell 3<br>Row 2 Content Cell 1  |  Row 2 Content Cell 2  |  Row 2 Content Cell 3</code></pre><pre><code>Table styles:<br>short (for tables with significant number of rows)<br>text-align-center<br>text-align-right<br>border</pre></code><pre><code>To apply styles:<br>{| class=\"border text-align-center\"<br>Row 1 Content Cell 1 | Row 1 Content Cell 2  | Row 1 Content Cell 3<br>|}</pre></code><br>" +
-			"<h3>Images</h3><pre><code>![alt text](http://path/to/img.jpg)</code></pre><br>" +
-			"<h3>Inline LaTeX</h3><pre><code>$$\\(x^2\\)$$<br></code></pre><br>" +
-			"<h3>LaTeX Blocks</h3><p><pre><code>$$<br>\\begin{aligned}<br>x^2<br>\\end{aligned}<br>$$<br></code></pre></p><br>" +
-			"<h3>Headers</h3><p><pre><code># Header 1<br>## Header 2<br>###### Header 6<br></code></pre></p><p>Exclude a header from the table of contents:<pre><code>#! Header 1 <br>##! Header 2<br>######! Header 6</code></pre></p><br>" +
-			"<h3>Lists</h3><p>Ordered, without paragraphs:<pre><code>1.  List item one<br>2.  List item two<br></code></pre></p><p>Unordered, with paragraphs:<pre><code>*   A list item.<br>    With multiple paragraphs.<br>*   Another list item<br></code></pre></p><p>You can nest them:<pre><code>*   Abacus<br>    * answer<br>*   Bubbles<br>    1.  bunk<br>    2.  bupkis<br>        * BELITTLER<br>    3. burper<br>*   Cunning<br></code></pre></p><br>" +
-			"<h3>Blockquotes</h3><pre><code>&gt; Email-style angle brackets<br>&gt; are used for blockquotes.<br>&gt; &gt; And, they can be nested.<br>&gt; #### Headers in blockquotes<br>&gt; <br>&gt; * You can quote a list.<br>&gt; * Etc.<br></code></pre><br>" +
-			"<h3>Inline Code</h3><pre><code>Wrap inline snippets of `code` with backticks.<br>You can include literal backticks<br>like \\`this\\`.<br></code></pre><br>" +
-			"<h3>Fenced Code Blocks</h3><pre><code>Wrap your code blocks in ```<br><br>This is a normal paragraph.<br><br>```<br>This is a preformatted<br>code block.<br>```</code></pre><pre><code>To help syntax highlighting, you can add an optional language identifier<br><br>```r<br>library(synapseClient)<br>synapseLogin('usename','password')<br>syn1686521 <- getEntity('syn1686521')<br>```</code></pre><br>" +
-			"<h3>Symbols</h3><pre><code>&amp;copy; = copyright sign<br>&amp;mdash; = wide dash<br>&amp;amp; = ampersand<br>&amp;trade; = trademark TM<br>&amp;reg; = reserved mark R</code></pre><br>"+
-			"</div>";
-
-	
 	/*
 	 * Dimensions
 	 */
@@ -166,12 +139,9 @@ public class WebConstants {
 	public static final String MATHJAX_PREFIX = "\\[";
 	public static final String MATHJAX_SUFFIX = "\\]";
 	
-	
 	//Synapse Properties
 	public static final String CHALLENGE_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_synapse_id";
 	public static final String CHALLENGE_WRITE_UP_TUTORIAL_PROPERTY ="org.sagebionetworks.portal.challenge_writeup_synapse_id";
-	public static final String USER_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.userguide_synapse_id";
-	public static final String USER_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.userguide_wiki_id";
 	public static final String GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_synapse_id";
 	public static final String GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.gettingstartedguide_wiki_id";
 	public static final String CREATE_PROJECT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.createproject_synapse_id";
@@ -180,19 +150,37 @@ public class WebConstants {
 	public static final String R_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.rclient_wiki_id";
 	public static final String PYTHON_CLIENT_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_synapse_id";
 	public static final String PYTHON_CLIENT_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.pythonclient_wiki_id";
+	public static final String FORMATTING_GUIDE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_synapse_id";
+	public static final String FORMATTING_GUIDE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.formattingguide_wiki_id";
+	public static final String CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_synapse_id";
+	public static final String CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_wiki_id";
+	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
+	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
+
+
+	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
+	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
+	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
 	
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
+	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";
+
+	public static final String CONTENT_TYPE_JNLP = "application/x-java-jnlp-file";
 	public static final String CONCRETE_TYPE_KEY = "concreteType";
 	public static final String NODE_TYPE_KEY = "nodeType";
 	
 	
-	public static final String USER_GUIDE = "UserGuide";
 	public static final String GETTING_STARTED = "GettingStarted";
 	public static final String CREATE_PROJECT = "CreateProject";
 	public static final String R_CLIENT = "RClient";
 	public static final String PYTHON_CLIENT = "PythonClient";
 	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	public static final String FORMATTING_GUIDE = "FormattingGuide";
+	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
+	public static final String GOVERNANCE = "Governance";
+	
+	public static final String CERTIFICATION = "Certification";
 	
 	//APITableWidget default column names
 	public static final String DEFAULT_COL_NAME_PARENT_ID = "parentid";
@@ -203,5 +191,28 @@ public class WebConstants {
 	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
 	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
 	public static final String DEFAULT_COL_NAME_ID = "id";
+
+	public static final String HIGHLIGHT_KEY = "highlight";
 	
+	//ClientCache key suffixes (used to avoid collision in the cache)
+	public static final String USER_PROFILE_SUFFIX = "_USER_PROFILE";
+	public static final String TEMP_IMAGE_ATTACHMENT_SUFFIX = "_TEMP_IMAGE_ATTACHMENT";
+
+	public static final String TABLE_COLUMN_ID = "columnId";
+	public static final String TABLE_ROW_ID = "rowId";
+	public static final String TABLE_ROW_VERSION_NUMBER = "rowVersionNumber";
+
+
+	public static final String NOCACHE_PARAM = "&nocache=";
+	
+	//servlet response header keys/values to instruct caching behavior
+	public static final String EXPIRES_KEY = "Expires";
+	public static final String NO_CACHE_VALUE = "no-cache";
+	public static final String PRAGMA_KEY = "Pragma";
+	public static final String CACHE_CONTROL_VALUE_NO_CACHE = "private, no-store, no-cache, must-revalidate";
+	public static final String CACHE_CONTROL_KEY = "Cache-Control";
+
+	public static final String HIGHLIGHT_BOX_TITLE = "highlight-box-title";
+	
+	public static final String JOIN_WIDGET_IS_CHALLENGE_KEY = "isChallenge";
 }

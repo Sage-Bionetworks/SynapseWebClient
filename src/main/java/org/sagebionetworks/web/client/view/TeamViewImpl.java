@@ -144,14 +144,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public void configure(final Team team, boolean isAdmin, TeamMembershipStatus teamMembershipStatus, Long totalMemberCount) {
 		clear();
 		this.team = team;
-		String pictureUrl;
+		String pictureUrl = null;
 		if (team.getIcon() != null) {
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
-		} else {
-			pictureUrl = sageImageBundle.defaultProfilePicture().getSafeUri().asString();
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, 2);
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
 		mediaObjectContainer.add(mediaObjectPanel);
 		mainContainer.add(new HTML("<div><span class=\"padding-left-74 boldText margin-right-5\">Total members: </span><span>"+totalMemberCount+"</span></div>"));
 		//initialize the tools menu button
@@ -270,15 +268,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog("Leave Team?", DisplayConstants.PROMPT_SURE_LEAVE_TEAM, new Callback() {
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.leaveTeam();
-						}
+					public void invoke() {
+						presenter.leaveTeam();
 					}
-				});
+				}); 
 			}
 		});				
 		menuBtn.addMenuItem(a);
@@ -290,13 +285,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				MessageBox.confirm(DisplayConstants.LABEL_DELETE +" Team?", DisplayConstants.PROMPT_SURE_DELETE + " Team" +"?", new Listener<MessageBoxEvent>() {					
+				DisplayUtils.showConfirmDialog(DisplayConstants.LABEL_DELETE +" Team?", DisplayConstants.PROMPT_SURE_DELETE + " Team" +"?", new Callback() {
 					@Override
-					public void handleEvent(MessageBoxEvent be) { 					
-						com.extjs.gxt.ui.client.widget.button.Button btn = be.getButtonClicked();
-						if(Dialog.YES.equals(btn.getItemId())) {
-							presenter.deleteTeam();
-						}
+					public void invoke() {
+						presenter.deleteTeam();
 					}
 				});
 			}

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -27,17 +25,15 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 	private SynapseClientAsync synapseClient;
 	private Map<String, String> userId2html;
 	private NodeModelCreator nodeModelCreator;
-	SageImageBundle sageImageBundle;
 	SynapseJSNIUtils jsniUtils;
 	List<String> inputUserIds;
 	String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
 	
 	@Inject
-	public APITableColumnRendererUserId(SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SageImageBundle sageImageBundle, SynapseJSNIUtils jsniUtils) {
+	public APITableColumnRendererUserId(SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, SynapseJSNIUtils jsniUtils) {
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
-		this.sageImageBundle = sageImageBundle;
 		this.jsniUtils = jsniUtils;
 	}
 	
@@ -58,10 +54,11 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 			return;
 		}
 		
-		for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
-			String userId = (String) iterator.next();
-			userId2html.put(userId, emptyString);
+		for (String userId : inputUserIds) {
+			if (userId != null)
+				userId2html.put(userId, emptyString);
 		}
+		
 		List<String> uniqueUserIds = new ArrayList<String>();
 		uniqueUserIds.addAll(userId2html.keySet());
 		synapseClient.getUserGroupHeadersById(uniqueUserIds, new AsyncCallback<EntityWrapper>() {
@@ -79,15 +76,13 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 							html.append("\" style=\"width: 20px; height: 20px\"></img></span>");
 						}
 						else
-							html.append(DisplayUtils.getIconHtml(sageImageBundle.defaultProfilePicture20()));
+							html.append(DisplayUtils.getFontelloIcon("user font-size-13 imageButton userProfileImage lightGreyText displayInline"));
 							
 						html.append("&nbsp;"+DisplayUtils.getDisplayName(ugh)+"</a>");
 						userId2html.put(ugh.getOwnerId(), html.toString());
 					}
-						
-					
+
 					callback.onSuccess(new APITableInitializedColumnRenderer() {
-						
 						@Override
 						public Map<String, List<String>> getColumnData() {
 							if (outputColumnData == null) {
@@ -95,13 +90,15 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 								outputColumnData = new HashMap<String, List<String>>();
 								//iterate through input user ids to create output list
 								List<String> out = new ArrayList<String>();
-								for (Iterator iterator = inputUserIds.iterator(); iterator.hasNext();) {
-									String userId = (String) iterator.next();
-									String html = userId2html.get(userId);
-									if (html != null && html.length() > 0)
-										out.add(html);
-									else
-										out.add(userId);
+								for (String userId : inputUserIds) {
+									if (userId != null) {
+										String html = userId2html.get(userId);
+										if (DisplayUtils.isDefined(html))
+											out.add(html);
+										else
+											out.add(userId);
+									} else
+										out.add("");
 								}
 								outputColumnData.put(outputColumnName, out);
 							}

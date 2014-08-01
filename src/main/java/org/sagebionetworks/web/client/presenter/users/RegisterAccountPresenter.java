@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
@@ -25,19 +24,17 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	
 	private RegisterAccount place;
 	private RegisterAccountView view;
-	private CookieProvider cookieProvider;
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
-			CookieProvider cookieProvider, UserAccountServiceAsync userService,
+			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		// Set the presenter on the view
-		this.cookieProvider = cookieProvider;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
@@ -59,11 +56,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	public void setPlace(RegisterAccount place) {
 		this.place = place;
 		view.setPresenter(this);
-		view.clear();
 		view.showDefault();
 	}
 
-	@Override
+	/**
+	 * Check that the username/alias is available
+	 * @param username
+	 */
 	public void checkUsernameAvailable(String username) {
 		if (username.trim().length() > 3) {
 			synapseClient.isAliasAvailable(username, AliasType.USER_NAME.toString(), new AsyncCallback<Boolean>() {
@@ -82,7 +81,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		}
 	}
 	
-	@Override
+	/**
+	 * check that the email is available
+	 * @param username
+	 * @param email
+	 * @param firstName
+	 * @param lastName
+	 */
 	public void checkEmailAvailable(String email) {
 		synapseClient.isAliasAvailable(email, AliasType.USER_EMAIL.toString(), new AsyncCallback<Boolean>() {
 			@Override
@@ -99,7 +104,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		});
 	}
 
-	
+	/**
+	 * Create the new user account
+	 * @param username
+	 * @param email
+	 * @param firstName
+	 * @param lastName
+	 */
 	@Override
 	public void registerUser(String username, String email, String firstName, String lastName) {
 		UserRegistration userInfo = new UserRegistration(username, email, firstName, lastName);
@@ -114,11 +125,11 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 				if(caught instanceof ConflictException) {
 					view.showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
 				} else {
-					if (!DisplayUtils.handleServiceException(caught, globalApplicationState.getPlaceChanger(), false, view))
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, false, view))
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
 				}
-				view.showAccountCreationFailed();
 			}
 		});
 	}
+	
 }

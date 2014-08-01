@@ -6,7 +6,9 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.event.shared.EventBus;
@@ -24,14 +26,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
+	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
 	private boolean isEditing;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, EventBus eventBus) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus) {
 		this.cookieProvider = cookieProvider;
+		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		isEditing = false;
 	}
@@ -59,6 +63,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void setPlaceController(PlaceController placeController) {
 		this.placeController = placeController;
 	}
+	
+	@Override
+	public JiraURLHelper getJiraURLHelper() {
+		return jiraUrlHelper;
+	}
 
 	@Override
 	public Place getLastPlace() {		
@@ -68,7 +77,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public void setLastPlace(Place lastPlace) {
-		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
+		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
 		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 
@@ -101,8 +110,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		if(historyValue != null) {
 			Place place = appPlaceHistoryMapper.getPlace(historyValue);
 			return place;
-		}
-		return null;
+		} else return AppActivityMapper.getDefaultPlace();
 	}
 
 	@Override
