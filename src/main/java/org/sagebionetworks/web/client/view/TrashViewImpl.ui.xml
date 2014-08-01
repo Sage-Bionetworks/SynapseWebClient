@@ -29,7 +29,7 @@
 						</g:FlowPanel>
 						<g:SimplePanel ui:field="emptyTrashDisplay"><g:Label>Your trash is empty.</g:Label></g:SimplePanel>
 					</div>	
-					<g:Button ui:field="deleteSelectedButton" styleName="btn btn-danger left">Delete Selected</g:Button>	
+					<g:Button ui:field="deleteSelectedButton" styleName="btn left">Delete Selected</g:Button>	
 			</div>
         </div>
 		

@@ -156,13 +156,13 @@ public class TrashViewImpl extends Composite implements TrashView {
 		        	for (CheckBox checkBox : checkBoxes) {
 		        		checkBox.setChecked(true);
 		        	}
-		        	deleteSelectedButton.setEnabled(true);
+		        	toggleEnabledDeleteSelectedButton(true);
 		        } else {
 		        	// Deselect all of the trash.
 		        	for (CheckBox checkBox : checkBoxes) {
 		        		checkBox.setChecked(false);
 		        	}
-		        	deleteSelectedButton.setEnabled(false);
+		        	toggleEnabledDeleteSelectedButton(false);
 		        }
 			}
 			
@@ -268,7 +268,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	public void refreshTable() {
 		clear();
 		presenter.getTrash(presenter.getOffset());
-		deleteSelectedButton.setEnabled(false);
+		toggleEnabledDeleteSelectedButton(false);
 	}
 	
 	@Override
@@ -286,13 +286,15 @@ public class TrashViewImpl extends Composite implements TrashView {
 			public void onClick(ClickEvent event) {
 				boolean checked = cb.getValue();
 				if (checked) {
-					if (selectedTrash.isEmpty())
-						deleteSelectedButton.setEnabled(true);
+					if (selectedTrash.isEmpty()) {
+						toggleEnabledDeleteSelectedButton(true);
+					}
 					selectedTrash.add(trashedEntity);
 				} else {
 					selectedTrash.remove(trashedEntity);
-					if (selectedTrash.isEmpty())
-						deleteSelectedButton.setEnabled(false);
+					if (selectedTrash.isEmpty()) {
+						toggleEnabledDeleteSelectedButton(false);
+					}
 				}
 			}
 			
@@ -356,7 +358,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 			selectedTrash.remove(trashedEntity);
 			
 			if (selectedTrash.isEmpty())
-				deleteSelectedButton.setEnabled(false);
+				toggleEnabledDeleteSelectedButton(false);
 			
 			// Remove that row from the table
 			trashTable.remove(removeRowIndex);
@@ -418,5 +420,14 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private void showButtons() {
 		deleteAllButton.setVisible(true);
 		deleteSelectedButton.setVisible(true);
+	}
+	
+	private void toggleEnabledDeleteSelectedButton(boolean toEnable) {
+		deleteSelectedButton.setEnabled(toEnable);
+		if (toEnable) {
+			deleteSelectedButton.addStyleName("btn-danger");
+		} else {
+			deleteSelectedButton.removeStyleName("btn-danger");
+		}
 	}
 }
