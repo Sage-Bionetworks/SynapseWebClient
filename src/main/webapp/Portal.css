@@ -1636,6 +1636,11 @@ a.projectTitle:hover {
 	cursor: pointer !important;
 }
 
+/* popups with very long values (like some urls) are shown out of bounds in bootstrap. */
+.popover-content {
+	overflow-x: hidden;
+}
+
 h1, .h1, h2, .h2, h3, .h3 {
 	margin-top: 0px !important;
 }

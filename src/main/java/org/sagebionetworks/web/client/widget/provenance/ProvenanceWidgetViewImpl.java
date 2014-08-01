@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -30,7 +33,6 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -45,7 +47,6 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -187,7 +188,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private ProvNodeContainer getNodeContainer(final ProvGraphNode node) {
 		if(node instanceof EntityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
-			addToolTipToContainer(node, container.getContent(), DisplayConstants.ENTITY);			
+			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
 		} else if(node instanceof ActivityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
@@ -195,33 +196,46 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
 			} else {
-				addToolTipToContainer(node, container.getContent(), DisplayConstants.ACTIVITY);				
+				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter, this);
 		} else if(node instanceof ExternalGraphNode) {			
 			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
-			addToolTipToContainer(node, container.getContent(), DisplayConstants.EXTERNAL_URL);
+			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
 			return container;
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final Component container, final String title) {					
-		final PopupPanel popup = DisplayUtils.addToolTip(container, DisplayUtils.getLoadingHtml(sageImageBundle));
-		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer nodeContainer, final String title) {					
+		final Popover popover = new Popover(nodeContainer);
+		popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
+		popover.setTrigger(Trigger.MANUAL);
+		popover.setPlacement(Placement.RIGHT);
+		popover.setIsHtml(true);
+		
+		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
+				if (!node.isShowingPopover()) {
+					node.setShowingPopover(true);
+					popover.show();
+				}
+				
 				// load the tooltip contents only once
-				if(filledPopoverIds.containsKey(node.getId())) {															
+				if(filledPopoverIds.containsKey(node.getId())) {
 					return;
 				}															
 				// retrieve info
 				presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
 					@Override
 					public void onSuccess(KeyValueDisplay<String> result) {
-						renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
+						String popoverHtml = ProvViewUtil.createEntityPopoverHtml(result).asString();
+						if (!DisplayUtils.isDefined(popoverHtml))
+							popoverHtml = DisplayConstants.DETAILS_UNAVAILABLE;
+						renderPopover(popoverHtml);
 					}
 					
 					@Override
@@ -231,9 +245,20 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					
 					private void renderPopover(String rendered) {
 						filledPopoverIds.put(container.getId(), rendered);
-						popup.setWidget(new HTML(rendered));						
+						popover.setContent(rendered);
+						popover.reconfigure();
+						if (node.isShowingPopover())
+							popover.show();
 					}
 				});
+			}
+		});
+		
+		container.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				popover.hide();
+				node.setShowingPopover(false);
 			}
 		});
 	}

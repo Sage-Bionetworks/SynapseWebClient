@@ -186,7 +186,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, clientCache, idToNode, callback);
+		ProvUtils.getInfo(nodeId, synapseClient, nodeModelCreator, adapterFactory, clientCache, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")

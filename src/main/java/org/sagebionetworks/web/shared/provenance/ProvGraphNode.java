@@ -10,6 +10,7 @@ public abstract class ProvGraphNode implements IsSerializable {
 	boolean pushRight = false;
 	double xPos;
 	double yPos;
+	boolean isShowingPopover = false;
 	
 	public double getxPos() {
 		return xPos;
@@ -34,6 +35,13 @@ public abstract class ProvGraphNode implements IsSerializable {
 	}
 	public void setPushRight(boolean pushRight) {
 		this.pushRight = pushRight;
+	}
+	
+	public boolean isShowingPopover() {
+		return isShowingPopover;
+	}
+	public void setShowingPopover(boolean isShowingPopover) {
+		this.isShowingPopover = isShowingPopover;
 	}
 	
 	/**
