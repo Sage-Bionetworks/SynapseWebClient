@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -28,6 +30,8 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 	TextBox maxSize;
 	@UiField
 	TextBox defaultValue;
+	@UiField
+	TextBox restrictValues;
 	String id;
 	TypePresenter presenter;
 	
@@ -107,6 +111,13 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 		maxSize.setVisible(visible);
 	}
 
+	@Override
+	public void setEnumValues(List<String> enums) {
+		restrictValues.setText(ColumnModelUtils.listToCSV(enums));
+	}
 
-
+	@Override
+	public List<String> getEnumValues() {
+		return ColumnModelUtils.csvToList(restrictValues.getText());
+	}
 }

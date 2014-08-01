@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -98,4 +100,17 @@ public interface ColumnModelTableRow extends IsWidget {
 	 * @param selectionPresenter
 	 */
 	public void setSelectionPresenter(SelectionPresenter selectionPresenter);
+	
+	/**
+	 * Restrict values to an enumeration.
+	 * 
+	 * @param enums
+	 */
+	public void setEnumValues(List<String> enums);
+	
+	/**
+	 * Restrict values to an enumeration.
+	 * @return
+	 */
+	public List<String> getEnumValues();
 }
