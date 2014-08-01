@@ -168,8 +168,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 					presenter.start(panel, eventBus);
 
 				} else {
-					// Log that we have an unknown place but send the user to
-					// the default
+					// Log that we have an unknown place but send the user to the default
 					log.log(Level.WARNING, "Unknown Place: " + place.getClass().getName());
 					// Go to the default place
 					place = getDefaultPlace();
