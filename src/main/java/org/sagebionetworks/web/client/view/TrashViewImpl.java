@@ -85,6 +85,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 	CheckBox selectAllCheckBox;
 	@UiField
 	TBody tableBody;
+	@UiField
+	SimplePanel emptyTrashDisplay;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -182,6 +184,9 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	@Override
 	public void configure(List<TrashedEntity> trashedEntities) {
+		trashTableAndPaginationPanel.setVisible(true);
+		emptyTrashDisplay.setVisible(false);
+		showButtons();
 		for (TrashedEntity trashedEntity : trashedEntities) {
 			displayTrashedEntity(trashedEntity);
 		}
@@ -194,8 +199,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void displayEmptyTrash() {
 		hideButtons();
-		trashTableAndPaginationPanel.clear();
-		trashTableAndPaginationPanel.add(new Label(TRASH_IS_EMPTY_DISPLAY));
+		trashTableAndPaginationPanel.setVisible(false);
+		emptyTrashDisplay.setVisible(true);
 	}
 	
 	@Override
@@ -408,5 +413,10 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private void hideButtons() {
 		deleteAllButton.setVisible(false);
 		deleteSelectedButton.setVisible(false);
+	}
+	
+	private void showButtons() {
+		deleteAllButton.setVisible(true);
+		deleteSelectedButton.setVisible(true);
 	}
 }
