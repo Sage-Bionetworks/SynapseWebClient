@@ -3,25 +3,25 @@
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<g:HTMLPanel>
-		<b:ButtonToolBar ui:field="buttonToolbar">
+		<b:ButtonToolBar ui:field="buttonToolbar" visible="false">
 			<b:ButtonGroup>
-				<b:Button icon="SQUARE_O" />
-				<b:Button dataToggle="DROPDOWN" height="28px"></b:Button>
+				<b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />
+				<b:Button ui:field="selectDropDown" dataToggle="DROPDOWN"
+					height="28px" />
 				<b:DropDownMenu>
 					<b:DropDownHeader>Select</b:DropDownHeader>
-					<b:AnchorListItem>All</b:AnchorListItem>
-					<b:AnchorListItem>None</b:AnchorListItem>
+					<b:AnchorListItem ui:field="selectAllItem">All</b:AnchorListItem>
+					<b:AnchorListItem ui:field="selectNoneItem">None</b:AnchorListItem>
 				</b:DropDownMenu>
 			</b:ButtonGroup>
 			<b:ButtonGroup>
-				<b:Button icon="PLUS"></b:Button>
+				<b:Button ui:field="moveUpButton" icon="ARROW_UP" enabled="false" />
+				<b:Button ui:field="moveDownButton" icon="ARROW_DOWN"
+					enabled="false" />
 			</b:ButtonGroup>
 			<b:ButtonGroup>
-				<b:Button icon="ARROW_UP" enabled="false"></b:Button>
-				<b:Button icon="ARROW_DOWN" enabled="false"></b:Button>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
-				<b:Button icon="TRASH_O" enabled="false"></b:Button>
+				<b:Button ui:field="deleteSelectedButton" icon="TRASH_O"
+					enabled="false" />
 			</b:ButtonGroup>
 		</b:ButtonToolBar>
 
@@ -41,6 +41,9 @@
 					</t:TableHeader>
 					<t:TableHeader>
 						<b.html:Text>Default Value</b.html:Text>
+					</t:TableHeader>
+					<t:TableHeader>
+						<b.html:Text>Restrict Values</b.html:Text>
 					</t:TableHeader>
 				</t:TableRow>
 			</t:THead>

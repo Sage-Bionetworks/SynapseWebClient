@@ -39,10 +39,10 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		flowpanel.addStyleName("margin-top-5");
 		queryField = new TextField<String>();
 		isRowVisibleField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_SHOW_ROW_NUMBERS_COL);
-		isRowVisibleField.addStyleName("apitable");
-
+		isRowVisibleField.addStyleName("checkbox margin-top-0-checkbox");
+		
 		isPagingField = new CheckBox(DisplayConstants.SYNAPSE_API_CALL_IS_PAGING);
-		isPagingField.addStyleName("apitable");
+		isPagingField.addStyleName("checkbox margin-top-0-checkbox");
 
 		rowNumbersColumnNameField = new TextField<String>();
 		
@@ -50,9 +50,9 @@ public class QueryTableConfigViewImpl extends LayoutContainer implements QueryTa
 		initNewField(DisplayConstants.SYNAPSE_API_CALL_QUERY_LABEL, queryField, flowpanel);
 		queryField.setAllowBlank(false);
 		
-		flowpanel.add(new SimplePanel(isPagingField));
+		flowpanel.add(isPagingField);
 		
-		flowpanel.add(new SimplePanel(isRowVisibleField));
+		flowpanel.add(isRowVisibleField);
 		//initNewField(DisplayConstants.SYNAPSE_API_CALL_ROW_NUMBERS_COL_NAME, rowNumbersColumnNameField, flowpanel);
 		
 		flowpanel.add(columnsManager.asWidget());

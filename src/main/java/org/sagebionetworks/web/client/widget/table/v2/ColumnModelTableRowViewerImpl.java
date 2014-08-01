@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.CheckBoxButton;
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
@@ -15,15 +17,10 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer {
+public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowViewer {
 	
 	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowViewerImpl> {	}
-	/*
-	 * The actual <tr> for this editor.
-	 */
-	TableRow row;
-	@UiField
-	CheckBoxButton select;
+
 	@UiField
 	FormControlStatic name;
 	@UiField
@@ -32,6 +29,9 @@ public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer 
 	FormControlStatic maxSize;
 	@UiField
 	FormControlStatic defaultValue;
+	@UiField
+	FormControlStatic restrictValues;
+	
 	String id;
 	
 	@Inject
@@ -62,16 +62,6 @@ public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer 
 	@Override
 	public String getDefaultValue() {
 		return defaultValue.getText();
-	}
-
-	@Override
-	public void setSelected(boolean select) {
-		this.select.setActive(select);
-	}
-
-	@Override
-	public boolean isSelected() {
-		return this.select.isActive();
 	}
 
 	@Override
@@ -108,5 +98,16 @@ public class ColumnModelTableRowViewerImpl implements ColumnModelTableRowViewer 
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue.setText(defaultValue);
 	}
+
+	@Override
+	public void setEnumValues(List<String> enums) {
+		restrictValues.setText(ColumnModelUtils.listToCSV(enums));
+	}
+
+	@Override
+	public List<String> getEnumValues() {
+		return ColumnModelUtils.csvToList(restrictValues.getText());
+	}
+
 
 }

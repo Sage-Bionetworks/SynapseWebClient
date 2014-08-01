@@ -6,7 +6,7 @@
 
 	<t:TableRow>
 		<t:TableData>
-			<b:CheckBoxButton ui:field="select" type="LINK"/>
+			<b:CheckBox ui:field="select"/>
 		</t:TableData>
 		<t:TableData>
 			<b:TextBox ui:field="name" placeholder="Column Name"/>
@@ -26,6 +26,9 @@
 		</t:TableData>
 		<t:TableData>
 			<b:TextBox ui:field="defaultValue" placeholder="Default Value"/>
+		</t:TableData>
+		<t:TableData>
+			<b:TextBox ui:field="restrictValues" placeholder="value1, value2, value-n..."/>
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

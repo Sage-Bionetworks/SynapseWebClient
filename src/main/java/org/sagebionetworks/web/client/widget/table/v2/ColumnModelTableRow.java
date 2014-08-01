@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -8,6 +10,19 @@ import com.google.gwt.user.client.ui.IsWidget;
  *
  */
 public interface ColumnModelTableRow extends IsWidget {
+	
+	/**
+	 * Control for this view.
+	 * @author John
+	 *
+	 */
+	public interface SelectionPresenter{
+		
+		/**
+		 * Called when selection changes.
+		 */
+		public void selectionChanged(boolean isSelected);
+	}
 	
 	/**
 	 * ColumnModel.id
@@ -74,4 +89,28 @@ public interface ColumnModelTableRow extends IsWidget {
 	 * Is this row selected?
 	 */
 	public boolean isSelected();
+
+	/**
+	 * Delete this row.
+	 */
+	public void delete();
+	
+	/**
+	 * Set the selection presenter for this view.
+	 * @param selectionPresenter
+	 */
+	public void setSelectionPresenter(SelectionPresenter selectionPresenter);
+	
+	/**
+	 * Restrict values to an enumeration.
+	 * 
+	 * @param enums
+	 */
+	public void setEnumValues(List<String> enums);
+	
+	/**
+	 * Restrict values to an enumeration.
+	 * @return
+	 */
+	public List<String> getEnumValues();
 }

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, SynapseWidgetPresenter{
+public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnModelsViewBase.Presenter, ColumnModelTableRow.SelectionPresenter, SynapseWidgetPresenter{
 	
 	public static final ColumnType DEFAULT_NEW_COLUMN_TYPE = ColumnType.STRING;
 	public static final long DEFAULT_STRING_MAX_SIZE = 50L;
@@ -35,6 +36,10 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	String tableId;
 	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
+	/*
+	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
+	 */
+	boolean changingSelection = false;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -60,6 +65,7 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 
 	@Override
 	public void configure(String tableId, List<ColumnModel> models, boolean isEditable) {
+		this.changingSelection = false;
 		this.tableId = tableId;
 		this.isEditable = isEditable;
 		this.startingModels = models;
@@ -88,7 +94,7 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	}
 
 	@Override
-	public void addNewColumn() {
+	public ColumnModelTableRowEditor addNewColumn() {
 		// Create a new column
 		ColumnModel cm = new ColumnModel();
 		cm.setColumnType(DEFAULT_NEW_COLUMN_TYPE);
@@ -96,10 +102,13 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		// Assign an id to this column
 		ColumnModelTableRowEditor rowEditor = ginInjector.createNewColumnModelTableRowEditor();
 		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
+		rowEditor.setSelectionPresenter(this);
 		editor.addColumn(rowEditor);
 		this.editorRows.add(rowEditor);
 		// Setup a presenter for this row
 		new ColumnModelTableRowEditorPresenter(rowEditor);
+		checkSelectionState();
+		return rowEditor;
 	}
 	
 
@@ -125,18 +134,14 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, this.isEditable);
 		for(ColumnModel cm: this.startingModels){
-			ColumnModelTableRowViewer rowEditor = ginInjector.createNewColumnModelTableRowViewer();
-			ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
-			rowEditor.setSelectable(true);
-			editor.addColumn(rowEditor);
-			this.editorRows.add(rowEditor);
+			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
+			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
+			rowViewer.setSelectable(true);
+			rowViewer.setSelectionPresenter(this);
+			editor.addColumn(rowViewer);
+			this.editorRows.add(rowViewer);
 		}
-	}
-
-	@Override
-	public void columnSelectionChanged(String columnId, Boolean isSelected) {
-		// TODO Auto-generated method stub
-		
+		checkSelectionState();
 	}
 
 	@Override
@@ -171,5 +176,138 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		} catch (JSONObjectAdapterException e) {
 			baseView.showError(e.getMessage());
 		}
+	}
+
+	@Override
+	public void toggleSelect() {
+		changeAllSelection(!anyRowsSelected());
+	}
+
+	@Override
+	public void selectAll() {
+		changeAllSelection(true);
+	}
+
+	@Override
+	public void selectNone() {
+		changeAllSelection(false);
+	}
+
+
+	@Override
+	public void onMoveUp() {
+		SelectedRow toMove = findFirstSelected();
+		this.editorRows.remove(toMove.row);
+		int newInex = toMove.index-1;
+		this.editorRows.add(newInex, toMove.row);
+		this.editor.moveColumn(toMove.row, newInex);
+		checkSelectionState();
+	}
+
+	@Override
+	public void onMoveDown() {
+		SelectedRow toMove = findFirstSelected();
+		this.editorRows.remove(toMove.index);
+		int newInex = toMove.index+1;
+		this.editorRows.add(newInex, toMove.row);
+		this.editor.moveColumn(toMove.row, newInex);
+		checkSelectionState();
+	}
+
+	@Override
+	public void deleteSelected() {
+		// Select all 
+		Iterator<ColumnModelTableRow> it = editorRows.iterator();
+		while(it.hasNext()){
+			ColumnModelTableRow row = it.next();
+			if(row.isSelected()){
+				row.delete();
+				it.remove();
+			}
+		}
+		// Check the selection state when done.
+		checkSelectionState();
+	}
+
+	/**
+	 * Find the first selected row.
+	 * @return
+	 */
+	private SelectedRow findFirstSelected(){
+		int index = 0;
+		for(ColumnModelTableRow row: editorRows){
+			if(row.isSelected()){
+				return new SelectedRow(row, index);
+			}
+			index++;
+		}
+		throw new IllegalStateException("Nothing selected");
+	}
+	
+	private static class SelectedRow{
+		ColumnModelTableRow row;
+		int index;
+		public SelectedRow(ColumnModelTableRow row, int index) {
+			super();
+			this.row = row;
+			this.index = index;
+		}
+	}
+	
+	@Override
+	public void selectionChanged(boolean isSelected) {
+		checkSelectionState();
+	}
+	
+	/**
+	 * Change the selection state of all rows to the passed value.
+	 * 
+	 * @param select
+	 */
+	private void changeAllSelection(boolean select){
+		try{
+			changingSelection = true;
+			// Select all 
+			for(ColumnModelTableRow row: editorRows){
+				row.setSelected(select);
+			}
+		}finally{
+			changingSelection = false;
+		}
+		checkSelectionState();
+	}
+	
+	/**
+	 * The current selection state determines which buttons are enabled.
+	 */
+	private void checkSelectionState(){
+		if(!changingSelection){
+			int index = 0;
+			int count = 0;
+			int lastIndex = 0;
+			for(ColumnModelTableRow row: editorRows){
+				if(row.isSelected()){
+					count++;
+					lastIndex = index;
+				}
+				index++;
+			}
+			editor.setCanDelete(count > 0);
+			editor.setCanMoveUp(count == 1 && lastIndex > 0);
+			editor.setCanMoveDown(count == 1 && lastIndex < editorRows.size()-1);
+		}
+	}
+	
+	/**
+	 * Are any of the rows selected?
+	 * @return
+	 */
+	private boolean anyRowsSelected(){
+		for(ColumnModelTableRow row: editorRows){
+			if(row.isSelected()){
+				return true;
+			}
+		}
+		return false;
 	}
 }

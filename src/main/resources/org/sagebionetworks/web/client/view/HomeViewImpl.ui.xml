@@ -245,12 +245,11 @@
 					<div class="col-md-3">
 						<h3>Terms of Use</h3>
 						<div class="well">
-							<p>There are times where human data can only be shared with certain
-								restrictions. Learn what the rules are and how to apply and comply
-								with data privacy levels.</p>
+							<p>Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, 
+							    guidelines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews.</p>
 							<div style="margin-top: 10px;">
 								<h4>
-									<a href="#!WikiPlace:dataAccessLevelsContent" class="service-tipsy north link">Learn the Rules for Sharing And Using Human Data</a>
+									<a href="#!Help:Governance" class="service-tipsy north link">Learn about Synapse Use and Oversight</a>
 								</h4>
 							</div>
 						</div>				

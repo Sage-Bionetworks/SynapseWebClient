@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class ColumnModelUtilsTest {
 		model.setColumnType(ColumnType.STRING);
 		model.setDefaultValue("foo and bar");
 		model.setMaximumSize(3L);
+		model.setEnumValues(Arrays.asList("one", "two","three"));
 		// stub the view
 		ColumnModelTableRowStub row = new ColumnModelTableRowStub();
 		// apply to the row.
@@ -75,6 +77,33 @@ public class ColumnModelUtilsTest {
 		// Extract as list
 		List<ColumnModel> clones = ColumnModelUtils.extractColumnModels(rows);
 		assertEquals(models, clones);
+	}
+	
+	@Test
+	public void testCSVRoundTripEmpty(){
+		List<String> list = new LinkedList<String>();
+		String csv = ColumnModelUtils.listToCSV(list);
+		assertEquals("", csv);
+		List<String> clone = ColumnModelUtils.csvToList(csv);
+		assertEquals(list, clone);	
+	}
+	
+	@Test
+	public void testCSVRoundTripOne(){
+		List<String> list = Arrays.asList("one");
+		String csv = ColumnModelUtils.listToCSV(list);
+		assertEquals("one", csv);
+		List<String> clone = ColumnModelUtils.csvToList(csv);
+		assertEquals(list, clone);	
+	}
+	
+	@Test
+	public void testCSVRoundTripMany(){
+		List<String> list = Arrays.asList("one","two");
+		String csv = ColumnModelUtils.listToCSV(list);
+		assertEquals("one, two", csv);
+		List<String> clone = ColumnModelUtils.csvToList(csv);
+		assertEquals(list, clone);	
 	}
 
 }

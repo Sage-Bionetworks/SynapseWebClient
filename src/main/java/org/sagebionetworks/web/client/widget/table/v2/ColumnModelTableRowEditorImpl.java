@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.ui.CheckBoxButton;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -18,16 +19,9 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class ColumnModelTableRowEditorImpl implements ColumnModelTableRowEditor {
+public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow implements ColumnModelTableRowEditor {
 	
 	public interface Binder extends UiBinder<TableRow, ColumnModelTableRowEditorImpl> {	}
-	
-	/*
-	 * The actual <tr> for this editor.
-	 */
-	TableRow row;
-	@UiField
-	CheckBoxButton select;
 	@UiField
 	TextBox name;
 	@UiField
@@ -36,8 +30,10 @@ public class ColumnModelTableRowEditorImpl implements ColumnModelTableRowEditor 
 	TextBox maxSize;
 	@UiField
 	TextBox defaultValue;
+	@UiField
+	TextBox restrictValues;
 	String id;
-	Presenter presenter;
+	TypePresenter presenter;
 	
 	@Inject
 	public ColumnModelTableRowEditorImpl(Binder uiBinder){
@@ -70,17 +66,7 @@ public class ColumnModelTableRowEditorImpl implements ColumnModelTableRowEditor 
 	}
 
 	@Override
-	public void setSelected(boolean select) {
-		this.select.setActive(select);
-	}
-
-	@Override
-	public boolean isSelected() {
-		return this.select.isActive();
-	}
-
-	@Override
-	public void setPresenter(Presenter presenterIn) {
+	public void setTypePresenter(TypePresenter presenterIn) {
 		this.presenter = presenterIn;
 		type.addChangeHandler(new ChangeHandler() {
 			@Override
@@ -125,4 +111,13 @@ public class ColumnModelTableRowEditorImpl implements ColumnModelTableRowEditor 
 		maxSize.setVisible(visible);
 	}
 
+	@Override
+	public void setEnumValues(List<String> enums) {
+		restrictValues.setText(ColumnModelUtils.listToCSV(enums));
+	}
+
+	@Override
+	public List<String> getEnumValues() {
+		return ColumnModelUtils.csvToList(restrictValues.getText());
+	}
 }

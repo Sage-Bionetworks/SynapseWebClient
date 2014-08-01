@@ -25,7 +25,6 @@
     <inherits name="org.gwtbootstrap3.extras.card.Card"/>
     <inherits name="org.gwtbootstrap3.extras.slider.Slider"/>
     <inherits name="org.gwtbootstrap3.extras.toggleswitch.ToggleSwitch"/>
-    <inherits name="org.gwtbootstrap3.extras.summernote.Summernote"/>
     <inherits name="org.gwtbootstrap3.extras.select.Select"/>
     <inherits name="org.gwtbootstrap3.extras.positionedtabs.PositionedTabs"/>
     <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
@@ -61,10 +60,8 @@
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	
 	<!-- Limit build permuatations (testing only)  -->
- 	
 <!-- 	
 	<set-property name="user.agent" value="safari"/>
- -->
-	
+	 --> 
 	
 </module>

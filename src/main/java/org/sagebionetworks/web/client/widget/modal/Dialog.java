@@ -2,12 +2,12 @@ package org.sagebionetworks.web.client.widget.modal;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,7 +22,6 @@ import com.google.inject.Inject;
  * 
  */
 public class Dialog extends Composite {
-
 	public interface DialogUiBinder extends UiBinder<Widget, Dialog> {}
 	
 	private Callback callback;
@@ -34,9 +33,11 @@ public class Dialog extends Composite {
 	@UiField
 	Button defaultButton;
 	
+	boolean autoHide;
+	
 	@UiField
 	Modal modal;
-	
+
 	/**
 	 * Create a new Modal dialog.
 	 */
@@ -48,6 +49,8 @@ public class Dialog extends Composite {
 			public void onClick(ClickEvent event) {
 				if (callback != null)
 					callback.onPrimary();
+				if (autoHide)
+					hide();
 			}
 		});
 		defaultButton.addClickHandler(new ClickHandler() {
@@ -55,8 +58,14 @@ public class Dialog extends Composite {
 			public void onClick(ClickEvent event) {
 				if (callback != null)
 					callback.onDefault();
+				if (autoHide)
+					hide();
 			}
 		});
+	}
+	
+	public void setSize(ModalSize modalSize) {
+		modal.setSize(modalSize);
 	}
 	
 	/**
@@ -65,11 +74,14 @@ public class Dialog extends Composite {
 	 * @param primaryButtonText The text for the primary button (i.e "Save").  The primary button is highlighted.
 	 * @param defaultButtonText The text for the default button (i.e "Cancel").  The default button will not be highlighted.  If null, will hide default button.
 	 * @param callback
+	 * @param autoHide if true, will hide the dialog on primary or default button click.
 	 */
-	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback) {
+	public void configure(String title, Widget body, String primaryButtonText, String defaultButtonText, Callback callback, boolean autoHide) {
+		this.autoHide = autoHide;
 		mainContent.clear();
 		this.callback = callback;
 		primaryButton.setText(primaryButtonText);
+		
 		boolean isDefaultButtonVisible = defaultButtonText != null;
 		defaultButton.setVisible(isDefaultButtonVisible);
 		if (isDefaultButtonVisible)

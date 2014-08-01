@@ -6,7 +6,7 @@
 
 	<t:TableRow>
 		<t:TableData>
-			<b:CheckBoxButton ui:field="select" type="LINK"></b:CheckBoxButton>
+			<b:CheckBox ui:field="select"/>
 		</t:TableData>
 		<t:TableData>
 			<b:FormControlStatic ui:field="name"/>
@@ -20,5 +20,8 @@
 		<t:TableData>
 			<b:FormControlStatic ui:field="defaultValue"/>
 		</t:TableData>
+		<t:TableData>
+			<b:FormControlStatic ui:field="restrictValues"/>
+		</t:TableData>		
 	</t:TableRow>
 </ui:UiBinder>

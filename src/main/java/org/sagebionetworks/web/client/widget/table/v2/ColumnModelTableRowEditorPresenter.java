@@ -6,7 +6,7 @@ package org.sagebionetworks.web.client.widget.table.v2;
  * @author John
  *
  */
-public class ColumnModelTableRowEditorPresenter implements ColumnModelTableRowEditor.Presenter {
+public class ColumnModelTableRowEditorPresenter implements ColumnModelTableRowEditor.TypePresenter {
 
 	ColumnModelTableRowEditor editor;
 	ColumnTypeViewEnum currentType;
@@ -16,7 +16,7 @@ public class ColumnModelTableRowEditorPresenter implements ColumnModelTableRowEd
 		this.editor = editor;
 		currentType = editor.getColumnType();
 		maxSize = editor.getMaxSize();
-		editor.setPresenter(this);
+		editor.setTypePresenter(this);
 	}
 	
 	@Override
