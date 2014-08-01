@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
+import java.util.List;
+
 import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeViewEnum;
 
@@ -19,6 +21,7 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	private String defaultValue;
 	private boolean isSelected;
 	private SelectionPresenter selectionPresenter;
+	private List<String> enumValues;
 	public String getColumnName() {
 		return columnName;
 	}
@@ -71,9 +74,15 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 				+ ((columnType == null) ? 0 : columnType.hashCode());
 		result = prime * result
 				+ ((defaultValue == null) ? 0 : defaultValue.hashCode());
+		result = prime * result
+				+ ((enumValues == null) ? 0 : enumValues.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + (isSelected ? 1231 : 1237);
 		result = prime * result + ((maxSize == null) ? 0 : maxSize.hashCode());
+		result = prime
+				* result
+				+ ((selectionPresenter == null) ? 0 : selectionPresenter
+						.hashCode());
 		return result;
 	}
 	@Override
@@ -97,6 +106,11 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 				return false;
 		} else if (!defaultValue.equals(other.defaultValue))
 			return false;
+		if (enumValues == null) {
+			if (other.enumValues != null)
+				return false;
+		} else if (!enumValues.equals(other.enumValues))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -109,6 +123,11 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 				return false;
 		} else if (!maxSize.equals(other.maxSize))
 			return false;
+		if (selectionPresenter == null) {
+			if (other.selectionPresenter != null)
+				return false;
+		} else if (!selectionPresenter.equals(other.selectionPresenter))
+			return false;
 		return true;
 	}
 	@Override
@@ -119,6 +138,12 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	@Override
 	public void setSelectionPresenter(SelectionPresenter selectionPresenter) {
 		this.selectionPresenter = selectionPresenter;
+	}
+	public List<String> getEnumValues() {
+		return enumValues;
+	}
+	public void setEnumValues(List<String> enumValues) {
+		this.enumValues = enumValues;
 	}
 	
 }

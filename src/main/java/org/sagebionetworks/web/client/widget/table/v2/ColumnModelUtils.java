@@ -34,6 +34,9 @@ public class ColumnModelUtils {
 		if(model.getMaximumSize() != null){
 			row.setMaxSize(model.getMaximumSize().toString());
 		}
+		if(model.getEnumValues() != null){
+			row.setEnumValues(model.getEnumValues());
+		}
 		row.setDefaultValue(model.getDefaultValue());
 	}
 	
@@ -86,7 +89,49 @@ public class ColumnModelUtils {
 		if(size != null){
 			model.setMaximumSize(Long.parseLong(size));
 		}
+		if(row.getEnumValues() != null && !row.getEnumValues().isEmpty()){
+			model.setEnumValues(row.getEnumValues());
+		}
 		model.setDefaultValue(treatEmptyAsNull(row.getDefaultValue()));
 		return model;
+	}
+	
+	/**
+	 * Convert the passed list of strings to a CSV.
+	 * @param list
+	 * @return
+	 */
+	public static String listToCSV(List<String> list){
+		StringBuilder builder = new StringBuilder();
+		if(list != null){
+			int index = 0;
+			for(String value: list){
+				if(index > 0){
+					builder.append(", ");
+				}
+				builder.append(value);
+				index++;
+			}
+		}
+		return builder.toString();
+	}
+	
+	/**
+	 * Convert a CSV to a list of strings
+	 * @param csv
+	 * @return
+	 */
+	public static List<String> csvToList(String csv){
+		List<String> list = new LinkedList<String>();
+		if(csv != null){
+			String[] split = csv.split(",");
+			for(String value: split){
+				String trim = value.trim();
+				if(!"".equals(trim)){
+					list.add(value.trim());
+				}
+			}
+		}
+		return list;
 	}
 }
