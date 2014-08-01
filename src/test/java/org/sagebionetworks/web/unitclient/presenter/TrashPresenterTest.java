@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -81,7 +82,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapse).viewTrashForUser(
 				anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.getTrash(ARBITRARY_OFFSET);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView).displayFailureMessage(anyString(), anyString());
 	}
 	
 	@Test
@@ -97,8 +98,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapse).purgeTrashForUser(
 				any(AsyncCallback.class));
 		presenter.purgeAll();
-		verify(mockView).showErrorMessage(anyString());
-	}
+		verify(mockView).displayFailureMessage(anyString(), anyString());	}
 
 	@Test
 	public void testPurgeEntities() {
@@ -113,8 +113,7 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapse).purgeMultipleTrashedEntitiesForUser(
 				anySet(), any(AsyncCallback.class));
 		presenter.purgeEntities(new HashSet<TrashedEntity>(trashList.getResults()));
-		verify(mockView).showErrorMessage(anyString());
-	}
+		verify(mockView).displayFailureMessage(anyString(), anyString());	}
 	
 	@Test
 	public void testRestore() {
@@ -133,12 +132,11 @@ public class TrashPresenterTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
 				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
-		verify(mockView).showErrorMessage(anyString());
-	}
+		verify(mockView).displayFailureMessage(anyString(), anyString());	}
 	
 	@Test
 	public void testRestoreParentNotFoundFailureRestoreCall() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapse).restoreFromTrash(
+		AsyncMockStubber.callFailureWith(new ForbiddenException()).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showErrorMessage(anyString());

@@ -36,13 +36,19 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	public static final String TRASH_EMPTIED_TITLE = "Trash Emptied!";
 	public static final String TRASH_EMPTIED_MESSAGE = "Your trash was successfully emptied.";
 	
+	public static final String ERROR_RESTORING_ENTITY_TITLE = "Sorry, an error occurred while restoring this entity.";
+	public static final String ERROR_EMPTYING_TRASH_TITLE = "Sorry, an error occurred while emptying your trash.";
+	public static final String ERROR_DELETING_SELECTED_TITLE = "Sorry, an error occured while deleting your selected entities.";
+	public static final String ERROR_FETCHING_TRASH_TITLE = "Sorry, an error occured while fetching your trash.";
+	
+	
 	private Trash place;
 	private TrashView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private NodeModelCreator nodeModelCreator;
-	private PaginatedResults<TrashedEntity> trashList;	// TODO: Delete.
+	private PaginatedResults<TrashedEntity> trashList;	// TODO: Field?
 	private int offset;
 
 	@Inject
@@ -84,7 +90,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				createFailureDisplay(caught);
+				createFailureDisplay(ERROR_EMPTYING_TRASH_TITLE, caught);
 			}
 			
 		});
@@ -97,33 +103,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		} else {
 			this.offset = offset;
 		}
-//		final Integer nonNullOffset = this.offset;
-//		
-//		// Add enough nulls to the end of fetched entities.
-//		while (view.getFetchedEntitiesList().size() < this.offset + TRASH_LIMIT) {
-//			view.getFetchedEntitiesList().add(null);
-//		}
-//		
-//		// Check if you have encountered the trash at given offset.
-//		List<TrashedEntity> alreadyFetched = new ArrayList<TrashedEntity>();
-//		for (int i = 0; i < TRASH_LIMIT; i++) {
-//			if (this.offset + i >= view.getFetchedEntitiesList().size()) {
-//				// Haven't fetched trash with this large of offset.
-//				break;
-//			}
-//			TrashedEntity currEntity = view.getFetchedEntitiesList().get(this.offset + i);
-//			if (currEntity == null) {
-//				// Haven't fetched this trash.
-//				break;
-//			}
-//			alreadyFetched.add(currEntity);
-//		}
-//		
-//		if (alreadyFetched.size() == TRASH_LIMIT) {
-//			// All entities have already been fetched. Display them and return.
-//			view.configure(alreadyFetched);
-//			return;
-//		}
+		
+		
 		
 		synapseClient.viewTrashForUser(this.offset, TRASH_LIMIT, new AsyncCallback<String>() {
 			@Override
@@ -132,11 +113,6 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 				try {
 					trashList = nodeModelCreator.createPaginatedResults(result, TrashedEntity.class);
 					if (trashList.getTotalNumberOfResults() > 0) {
-//						// Add them to fetched entities.
-//						List<TrashedEntity> results = trashList.getResults();
-//						for (int i = 0; i < results.size(); i++) {
-//							view.getFetchedEntitiesList().set(nonNullOffset + i, results.get(i));
-//						}
 						view.configure(trashList.getResults());
 					} else {
 						view.displayEmptyTrash();
@@ -149,7 +125,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				createFailureDisplay(caught);
+				createFailureDisplay(ERROR_FETCHING_TRASH_TITLE, caught);
 			}
 			
 		});
@@ -177,7 +153,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				createFailureDisplay(caught);
+				createFailureDisplay(ERROR_DELETING_SELECTED_TITLE, caught);
 			}
 			
 		});
@@ -196,10 +172,9 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof ForbiddenException) {
-					//view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
-					view.alertErrorMessage(caught.getMessage());
+					view.showErrorMessage(DisplayConstants.ERROR_RESTORING_TRASH_PARENT_NOT_FOUND);
 				} else {
-					createFailureDisplay(caught);
+					createFailureDisplay(ERROR_RESTORING_ENTITY_TITLE, caught);
 				}
 			}
 			
@@ -229,9 +204,9 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		getTrash(offset);
 	}
 	
-	private void createFailureDisplay(Throwable caught) {
+	private void createFailureDisplay(String title, Throwable caught) {
 		if (!DisplayUtils.handleServiceException(caught, globalAppState, authController.isLoggedIn(), view)) {                    
-			view.showErrorMessage(caught.getMessage());
+			view.displayFailureMessage(title, caught.getMessage());
 		}
 	}
 }
