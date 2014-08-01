@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.header;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -186,7 +187,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		if(userAnchor == null) {
 			userAnchor = new Anchor();
 			userAnchor.addStyleName("headerUsernameLink");
-			DisplayUtils.addTooltip(synapseJSNIUtils, userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(userAnchor, DisplayConstants.VIEW_EDIT_PROFILE, Placement.BOTTOM);
 			userAnchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -199,7 +200,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	userCommands.addStyleName("view header-inner-commands-container");
         	HTML userGuide = new HTML(DisplayUtils.getFontelloIcon("book"));
         	userGuide.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, userGuide, DisplayConstants.SYNAPSE_TUTORIAL, TOOLTIP_POSITION.BOTTOM);
+        	DisplayUtils.addTooltip(userGuide, DisplayConstants.SYNAPSE_TUTORIAL, Placement.BOTTOM);
         	userGuide.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -209,7 +210,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     		
         	HTML settings = new HTML(DisplayUtils.getIcon("glyphicon-wrench"));
         	settings.addStyleName("displayInline imageButton movedown-3 margin-left-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, settings, DisplayConstants.TEXT_USER_SETTINGS, TOOLTIP_POSITION.BOTTOM);
+        	DisplayUtils.addTooltip(settings, DisplayConstants.TEXT_USER_SETTINGS, Placement.BOTTOM);
         	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -219,7 +220,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		 	
         	HTML logout = new HTML(DisplayUtils.getFontelloIcon("logout"));
         	logout.addStyleName("displayInline imageButton movedown-2 margin-left-5 margin-right-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, logout, DisplayConstants.LABEL_LOGOUT_TEXT, TOOLTIP_POSITION.BOTTOM);
+        	DisplayUtils.addTooltip(logout, DisplayConstants.LABEL_LOGOUT_TEXT, Placement.BOTTOM);
         	logout.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -229,7 +230,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	
         	HTML dashboard = new HTML(DisplayUtils.getIcon("glyphicon-home"));
         	dashboard.addStyleName("displayInline imageButton movedown-2 margin-left-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, dashboard, DisplayConstants.TEXT_USER_HOME, TOOLTIP_POSITION.BOTTOM);
+        	DisplayUtils.addTooltip(dashboard, DisplayConstants.TEXT_USER_HOME, Placement.BOTTOM);
         	dashboard.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -307,7 +308,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 						userAnchor.fireEvent(event);
 					}
 				});
-				DisplayUtils.addTooltip(synapseJSNIUtils, profilePicture, DisplayConstants.VIEW_EDIT_PROFILE, TOOLTIP_POSITION.BOTTOM);
+				DisplayUtils.addTooltip(profilePicture, DisplayConstants.VIEW_EDIT_PROFILE, Placement.BOTTOM);
 				userNameWrapper.add(profilePicture);
 			}
 			userNameWrapper.add(userAnchor);

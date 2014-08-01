@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -668,7 +669,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
 				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet) {
-					DisplayUtils.addTooltip(this.synapseJSNIUtils, a, constraint.getValue(), TOOLTIP_POSITION.RIGHT);
+					DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT);
 				}
 				
 				a.addClickHandler(clickHandler);	

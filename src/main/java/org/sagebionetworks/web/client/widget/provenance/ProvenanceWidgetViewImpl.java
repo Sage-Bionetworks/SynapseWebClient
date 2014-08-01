@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
@@ -210,18 +210,18 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	}
 
 	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer nodeContainer, final String title) {					
-		final Popover popover = new Popover(nodeContainer);
-		popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
-		popover.setTrigger(Trigger.MANUAL);
-		popover.setPlacement(Placement.RIGHT);
-		popover.setIsHtml(true);
+		final Tooltip tooltip = new Tooltip(nodeContainer);
+		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+		tooltip.setTrigger(Trigger.MANUAL);
+		tooltip.setPlacement(Placement.RIGHT);
+		tooltip.setIsHtml(true);
 		
 		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
 				if (!node.isShowingPopover()) {
 					node.setShowingPopover(true);
-					popover.show();
+					tooltip.show();
 				}
 				
 				// load the tooltip contents only once
@@ -245,10 +245,10 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					
 					private void renderPopover(String rendered) {
 						filledPopoverIds.put(container.getId(), rendered);
-						popover.setContent(rendered);
-						popover.reconfigure();
+						tooltip.setText(rendered);
+						tooltip.reconfigure();
 						if (node.isShowingPopover())
-							popover.show();
+							tooltip.show();
 					}
 				});
 			}
@@ -257,7 +257,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		container.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {
-				popover.hide();
+				tooltip.hide();
 				node.setShowingPopover(false);
 			}
 		});

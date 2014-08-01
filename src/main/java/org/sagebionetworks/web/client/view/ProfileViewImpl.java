@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -454,7 +456,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 tutorialLink.setPixelSize(25, 32);
 			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
 			 certificateWidget.configure(profile, passingRecord);
-			 final Popover tooltip = DisplayUtils.addToolTip(tutorialLink, DisplayConstants.CERTIFIED_USER);
+			 final Tooltip tooltip = DisplayUtils.addTooltip(tutorialLink.asWidget(), DisplayConstants.CERTIFIED_USER, Placement.AUTO);
 			 tutorialLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

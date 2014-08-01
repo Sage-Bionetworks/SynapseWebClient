@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -67,7 +68,7 @@ public class EntityViewUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		
 		FlowPanel lc = new FlowPanel();
 		lc.addStyleName("inline-block");
@@ -103,7 +104,7 @@ public class EntityViewUtils {
 				}
 			});		
 			lc.add(flagLink);
-			DisplayUtils.addTooltip(synapseJSNIUtils, flagLink, DisplayConstants.FLAG_TOOL_TIP, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(flagLink, DisplayConstants.FLAG_TOOL_TIP, Placement.BOTTOM);
 		}
 			
 	    return lc;

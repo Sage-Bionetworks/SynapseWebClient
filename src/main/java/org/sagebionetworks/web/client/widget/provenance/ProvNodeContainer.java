@@ -1,18 +1,18 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
+import org.gwtbootstrap3.client.ui.Popover;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProvNodeContainer extends LayoutContainer {	
 	
 	HTML messageContent;
-	PopupPanel messagePopup;
+	Popover messagePopup;
 	LayoutContainer messageContainer;
 	
 	public ProvNodeContainer() {
@@ -49,7 +49,7 @@ public class ProvNodeContainer extends LayoutContainer {
 		messageContainer = new LayoutContainer();				
 		messageContent = new HTML();
 		messageContainer.add(messageContent);
-		messagePopup = DisplayUtils.addToolTip(messageContainer, "");
+		messagePopup = DisplayUtils.addPopover(messageContainer, "");
 		this.add(messageContainer);
 		this.layout(true);
 		messageContainer.hide();

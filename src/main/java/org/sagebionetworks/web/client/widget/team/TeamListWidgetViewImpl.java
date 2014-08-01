@@ -55,7 +55,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	public void setRequestCount(String teamId, Long count) {
 		if (team2NotificationPanel.containsKey(teamId)) {
 			HTML widget = new HTML(DisplayUtils.getBadgeHtml(count.toString()));
-			DisplayUtils.addToolTip(widget, "Team has a pending join request");
+			DisplayUtils.addPopover(widget, "Team has a pending join request");
 			team2NotificationPanel.get(teamId).setWidget(widget);
 		}
 	}

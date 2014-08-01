@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -674,7 +675,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		command.addStyleName("btn-xs");
 		command.addClickHandler(clickHandler);
 		if (tooltipText != null)
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(command, tooltipText, Placement.BOTTOM);
 		command.setHeight("22px");
 		return command;
 	}

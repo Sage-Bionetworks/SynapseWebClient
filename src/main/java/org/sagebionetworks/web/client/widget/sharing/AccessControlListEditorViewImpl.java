@@ -301,7 +301,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if (notifyPeopleCheckbox == null) {
 					notifyPeopleCheckbox = new CheckBox("Notify people via email");
 					setIsNotifyPeople(true);
-					DisplayUtils.addToolTip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+					DisplayUtils.addPopover(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 				}
 				
 				FlowPanel cbPanel = new FlowPanel();

@@ -35,9 +35,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
+	//TODO: remove global app state
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
-	PortalGinInjector ginInjector;
 	
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
@@ -59,7 +59,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
-		this.ginInjector = ginInjector;
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 	

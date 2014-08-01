@@ -51,6 +51,9 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	DivElement colorLine;
 	@UiField
+	DivElement separator;
+	
+	@UiField
 	HeadingElement settingsHeading;
 
 	
@@ -194,17 +197,19 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void render(boolean standAlonePlace) {
 		//set the Settings page breadcrumb
 		breadcrumbsPanel.clear();
-		DisplayUtils.hide(header);
-		DisplayUtils.hide(footer);
-		DisplayUtils.hide(colorLine);
-		DisplayUtils.hide(settingsHeading);
-		
 		if (standAlonePlace) {
 			DisplayUtils.show(header);
 			DisplayUtils.show(footer);
-			breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
 			DisplayUtils.show(colorLine);
 			DisplayUtils.show(settingsHeading);
+			DisplayUtils.show(separator);
+			breadcrumbsPanel.add(breadcrumb.asWidget("Settings"));
+		} else {
+			DisplayUtils.hide(header);
+			DisplayUtils.hide(footer);
+			DisplayUtils.hide(colorLine);
+			DisplayUtils.hide(settingsHeading);
+			DisplayUtils.hide(separator);
 		}
 		
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");

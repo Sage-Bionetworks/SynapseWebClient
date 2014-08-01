@@ -27,7 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -1283,7 +1285,7 @@ public class DisplayUtils {
 		return ordered;
 	}
 	
-	public static Popover addToolTip(Widget widget, String message) {
+	public static Popover addPopover(Widget widget, String message) {
 		Popover popover = new Popover(widget);
 		popover.setPlacement(Placement.AUTO);
 		popover.setIsHtml(true);
@@ -1291,28 +1293,8 @@ public class DisplayUtils {
 		return popover;
 	}
 	
-	public static PopupPanel addToolTip(final Component widget, String message) {
-		final PopupPanel popup = new PopupPanel(true);
-		popup.setWidget(new HTML(message));
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		widget.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-			          public void setPosition(int offsetWidth, int offsetHeight) {
-			        	  popup.showRelativeTo(widget);
-			          }
-			        });
-			}
-		});
-		widget.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.hide();
-			}
-		});
-		return popup;
+	public static Tooltip addToolTip(final Component widget, String message) {
+		return addTooltip(widget, message, Placement.AUTO);
 	}
 	
 	/**
@@ -1340,41 +1322,17 @@ public class DisplayUtils {
 	 * @param tooltipText text to display
 	 * @param pos where to position the tooltip relative to the widget
 	 */
-	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("title", tooltipText);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-animation", "false");
-		optionsMap.put("data-html", "true");
-		addTooltip(util, widget, optionsMap);
+	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
+		Tooltip t = new Tooltip();
+		t.setWidget(widget);
+		t.setPlacement(pos);
+		t.setText(tooltipText);
+		t.setIsHtml(true);
+		t.setIsAnimated(false);
+		t.setTrigger(Trigger.HOVER);
+		return t;
 	}
 		
-	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
-		el.setId(id);
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "tooltip");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-			
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapTooltip(el.getId());
-					} else {
-						util.hideBootstrapTooltip(el.getId());
-					}
-				}
-			});
-		}
-	}
-
 	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
 		Map<String, String> optionsMap = new HashMap<String, String>();
 		optionsMap.put("data-html", "true");
@@ -1385,17 +1343,6 @@ public class DisplayUtils {
 		addPopover(util, widget, content, optionsMap);
 	}
 
-	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-trigger", "hover");		
-		addPopover(util, widget, content, optionsMap);
-	}
-
-	
 	/**
 	 * Adds a popover to a target widget
 	 * 
@@ -1953,7 +1900,7 @@ public class DisplayUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		lc.add(htmlPanel);
 
 		return lc;
