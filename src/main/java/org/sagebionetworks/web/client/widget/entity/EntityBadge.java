@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -8,17 +7,17 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,18 +31,21 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
+	private GlobalApplicationState globalAppState;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			EntityIconsCache iconsCache,
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
+			GlobalApplicationState globalAppState,
 			ClientCache clientCache) {
 		this.view = view;
 		this.iconsCache = iconsCache;
 		this.synapseClient = synapseClient;
 		this.adapterFactory = adapterFactory;
 		this.clientCache = clientCache;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}
 	
@@ -105,6 +107,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				callback.onFailure(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void entityClicked(EntityHeader entityHeader) {
+		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
 	}
 
 }

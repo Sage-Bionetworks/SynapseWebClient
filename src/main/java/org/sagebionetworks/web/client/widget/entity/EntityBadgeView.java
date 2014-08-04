@@ -27,6 +27,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	public interface Presenter {
 		ImageResource getIconForType(String type);
 		void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback);
+		void entityClicked(EntityHeader entityHeader);
 	}
 
 }

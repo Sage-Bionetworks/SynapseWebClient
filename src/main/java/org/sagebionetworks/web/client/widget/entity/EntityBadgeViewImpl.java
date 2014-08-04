@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
@@ -35,14 +33,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
-	//TODO: remove global app state
-	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
-	Popover popover;
+	Tooltip popover;
 	@UiField
 	SimplePanel iconContainer;
 	@UiField
@@ -53,11 +49,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			GlobalApplicationState globalApplicationState,
 			SageImageBundle sageImageBundle, 
 			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		initWidget(uiBinder.createAndBindUi(this));
 	}
@@ -71,7 +65,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			isPopoverInitialized = false;
 			popover.setIsHtml(true);
 			popover.setTitle(entityHeader.getName());
-			popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
+			popover.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
@@ -93,7 +87,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
+					presenter.entityClicked(entityHeader);
 				}
 			});
 			ClickHandler clickHandler = new ClickHandler() {
@@ -129,7 +123,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				
 				private void renderPopover(String content) {
 					isPopoverInitialized = true;
-					popover.setContent(content);
+					popover.setText(content);
 					popover.reconfigure();
 					if (isMouseOverAnchor)
 						popover.show();
