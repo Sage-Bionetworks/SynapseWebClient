@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -854,6 +855,11 @@ public class DisplayUtils {
 		TeamSearch place = new TeamSearch(searchTerm, start);
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
+	
+	public static String getTrashHistoryToken(String token, Integer start) {
+		Trash place = new Trash(token, start);
+		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
+	}
 
 	public static String getLoginPlaceHistoryToken(String token) {
 		LoginPlace place = new LoginPlace(token);
@@ -961,6 +967,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getTrashPlaceString(Class<Trash> place) {
 		return getPlaceString(place.getName());		
 	}
 
