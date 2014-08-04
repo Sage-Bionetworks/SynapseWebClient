@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,7 +82,6 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -110,10 +108,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -138,11 +133,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -166,7 +156,6 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
@@ -1336,53 +1325,21 @@ public class DisplayUtils {
 		t.setTrigger(Trigger.HOVER);
 		return t;
 	}
-		
-	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("trigger", "click");		
-		addPopover(util, widget, content, optionsMap);
-	}
 
 	/**
-	 * Adds a popover to a target widget
-	 * 
-	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
-	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-		el.setAttribute("data-content", content);
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "popover");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapPopover(el.getId());
-					}
-				}
-			});
-		}
+	* Adds a popover to a target widget
+	*/
+	public static void addClickPopover(Widget widget, String title, String content, Placement placement) {
+		Popover popover = new Popover();
+		popover.setIsHtml(true);
+		popover.setIsAnimated(true);
+		popover.setTitle(title);
+		popover.setPlacement(placement);
+		popover.setTrigger(Trigger.CLICK);
+		popover.setWidget(widget);
+		popover.setContent(content);
 	}
 
-	public static void applyAttributes(final Element el,
-			Map<String, String> optionsMap) {
-		for (Entry<String, String> option : optionsMap.entrySet()) {
-			DOM.setElementAttribute(el, option.getKey(), option.getValue());
-		}
-	}
-	
     /*
      * Private methods
      */
