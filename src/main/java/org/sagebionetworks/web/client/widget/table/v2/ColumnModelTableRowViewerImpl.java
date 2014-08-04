@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -27,6 +29,9 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	FormControlStatic maxSize;
 	@UiField
 	FormControlStatic defaultValue;
+	@UiField
+	FormControlStatic restrictValues;
+	
 	String id;
 	
 	@Inject
@@ -92,6 +97,16 @@ public class ColumnModelTableRowViewerImpl extends AbstractColumnModelTableRow i
 	@Override
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue.setText(defaultValue);
+	}
+
+	@Override
+	public void setEnumValues(List<String> enums) {
+		restrictValues.setText(ColumnModelUtils.listToCSV(enums));
+	}
+
+	@Override
+	public List<String> getEnumValues() {
+		return ColumnModelUtils.csvToList(restrictValues.getText());
 	}
 
 
