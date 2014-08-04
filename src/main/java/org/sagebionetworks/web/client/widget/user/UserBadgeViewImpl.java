@@ -80,7 +80,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 			}
 			//also add the username in a popup (in the case when the name shown does not show the entire display name)
 			if (displayName.length() != name.length())
-				DisplayUtils.addTooltip(nameWidget, displayName, Placement.AUTO);
+				DisplayUtils.addTooltip(nameWidget, displayName);
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

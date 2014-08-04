@@ -1309,6 +1309,10 @@ public class DisplayUtils {
 	private static int tooltipCount= 0;
 	private static int popoverCount= 0;
 	
+	public static Tooltip addTooltip(Widget widget, String tooltipText){
+		return addTooltip(widget, tooltipText, Placement.AUTO);
+	}
+	
 	/**
 	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *

@@ -219,8 +219,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
-				if (!node.isShowingPopover()) {
-					node.setShowingPopover(true);
+				if (!node.isShowingTooltip()) {
+					node.setShowingTooltip(true);
 					tooltip.show();
 				}
 				
@@ -247,7 +247,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						filledPopoverIds.put(container.getId(), rendered);
 						tooltip.setText(rendered);
 						tooltip.reconfigure();
-						if (node.isShowingPopover())
+						if (node.isShowingTooltip())
 							tooltip.show();
 					}
 				});
@@ -258,7 +258,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			@Override
 			public void handleEvent(BaseEvent be) {
 				tooltip.hide();
-				node.setShowingPopover(false);
+				node.setShowingTooltip(false);
 			}
 		});
 	}

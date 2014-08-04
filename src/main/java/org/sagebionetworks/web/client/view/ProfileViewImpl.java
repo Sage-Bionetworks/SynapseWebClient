@@ -456,7 +456,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 tutorialLink.setPixelSize(25, 32);
 			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
 			 certificateWidget.configure(profile, passingRecord);
-			 final Tooltip tooltip = DisplayUtils.addTooltip(tutorialLink.asWidget(), DisplayConstants.CERTIFIED_USER, Placement.AUTO);
+			 final Tooltip tooltip = DisplayUtils.addTooltip(tutorialLink.asWidget(), DisplayConstants.CERTIFIED_USER);
 			 tutorialLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
