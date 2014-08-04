@@ -46,7 +46,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	private GlobalApplicationState globalAppState;
 	private AuthenticationController authController;
 	private NodeModelCreator nodeModelCreator;
-	private PaginatedResults<TrashedEntity> trashList;	// TODO: Field?
+	private PaginatedResults<TrashedEntity> trashList;
 	private int offset;
 
 	@Inject

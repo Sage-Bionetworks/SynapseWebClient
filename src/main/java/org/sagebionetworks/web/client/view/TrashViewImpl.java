@@ -1,33 +1,24 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.base.ComplexWidget;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.EventListener;
-
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
-import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
-import org.sagebionetworks.web.client.view.bootstrap.table.THead;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
@@ -39,14 +30,12 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 
@@ -65,7 +54,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	private static final String DELETE_SELECTED_CONFIRM_MESSAGE = "You can't undo this action.";
 	private static final String EMPTY_TRASH_CONFIRM_TITLE = "Erase all items in your Trash?";
 	private static final String EMPTY_TRASH_CONFIRM_MESSAGE = "You can't undo this action.";
-	private static final String TRASH_IS_EMPTY_DISPLAY = "Your trash is empty.";
 	
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	
