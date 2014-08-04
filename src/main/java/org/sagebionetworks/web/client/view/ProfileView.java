@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -27,6 +28,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	
 	public void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
 	public void refreshHeader();
+	public void setMyProjects(List<EntityHeader> myProjects);
+	public void setMyProjectsError(String string);
 	
 	public interface Presenter extends SynapsePresenter {
 
@@ -37,6 +40,10 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void showEditProfile();
 		
 		void showViewMyProfile();
+		
+		void createProject(String name);
+		
+		void createTeam(final String teamName);
 		
 		void goTo(Place place);
 	}

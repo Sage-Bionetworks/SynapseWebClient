@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.user;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -79,7 +80,7 @@ public class UserBadgeViewImpl extends LayoutContainer implements UserBadgeView 
 			}
 			//also add the username in a popup (in the case when the name shown does not show the entire display name)
 			if (displayName.length() != name.length())
-				DisplayUtils.addToolTip(nameWidget, displayName);
+				DisplayUtils.addTooltip(nameWidget, displayName);
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {

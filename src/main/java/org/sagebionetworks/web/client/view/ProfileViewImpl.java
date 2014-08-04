@@ -2,6 +2,10 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -11,13 +15,19 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
@@ -27,6 +37,8 @@ import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -34,13 +46,14 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -60,10 +73,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel updateWithLinkedInPanel;
 	@UiField
 	SimplePanel viewProfilePanel;
-	@UiField
-	SimplePanel myTeamsPanel;
-	@UiField
-	SimplePanel myTeamInvitesPanel;
 	
 	@UiField
 	FlowPanel editProfileButtonPanel;
@@ -76,12 +85,70 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	SimplePanel editPictureButtonPanel;
 	
+	@UiField
+	Anchor showProfileLink;
+	
+	//////Tabs
+	@UiField
+	Anchor projectsLink;
+	@UiField
+	LIElement projectsListItem;
+	@UiField
+	Anchor teamsLink;
+	@UiField
+	LIElement teamsListItem;
+	@UiField
+	Anchor settingsLink;
+	@UiField
+	LIElement settingsListItem;
+//	@UiField
+//	Anchor messagesLink;
+//	@UiField
+//	LIElement messagesListItem;
+//	@UiField
+//	Anchor challengesLink;
+//	@UiField
+//	LIElement challengesListItem;
+
+	@UiField
+	DivElement navtabContainer;
+	
+	@UiField
+	DivElement projectsTabContainer;
+	@UiField
+	FlowPanel challengesTabContainer;
+	@UiField
+	DivElement teamsTabContainer;
+	@UiField
+	FlowPanel messagesTabContainer;
+	@UiField
+	FlowPanel settingsTabContainer;
+	
+	
+	//Project tab
+	@UiField
+	TextBox createProjectTextBox;
+	@UiField
+	Button createProjectButton;
+	@UiField
+	DivElement createProjectUI;
+	@UiField
+	FlowPanel projectsTabContent;
+	
+	//Teams tab
+	@UiField
+	TextBox createTeamTextBox;
+	@UiField
+	Button createTeamButton;
+	@UiField
+	DivElement createTeamUI;
+	@UiField
+	FlowPanel teamsTabContent;
 	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private Button linkedInButtonEditProfile;
-	private Button linkedInButtonViewProfile;
 	private Button editProfileButton;
 	private Breadcrumb breadcrumb;
 	
@@ -95,6 +162,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
 	private CertificateWidget certificateWidget;
+	private SettingsPresenter settingsPresenter;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
@@ -106,7 +175,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
 			CookieProvider cookies,
-			CertificateWidget certificateWidget) {		
+			CertificateWidget certificateWidget,
+			SettingsPresenter settingsPresenter,
+			PortalGinInjector ginInjector) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
@@ -117,7 +188,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.myTeamsWidget = myTeamsWidget;
 		this.cookies = cookies;
 		this.certificateWidget = certificateWidget;
-		
+		this.settingsPresenter = settingsPresenter;
+		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -125,16 +197,39 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificatePanel.setWidget(certificateWidget.asWidget());
 		createViewProfile();
 		linkedInButtonEditProfile = createLinkedInButton();
-		linkedInButtonViewProfile = createLinkedInButton();
 		
 		createEditProfileCommandsPanel();
 		
-		myTeamsPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
-		
 		picturePanel.clear();
+		initTabs();
+		
+		showProfileLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.show(viewProfilePanel);
+				DisplayUtils.show(picturePanel);
+				DisplayUtils.hide(showProfileLink);
+			}
+		});
+		
+		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		createProjectButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createProject(createProjectTextBox.getValue());
+			}
+		});
+		
+		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		createTeamButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.createTeam(createTeamTextBox.getValue());
+			}
+		});
 	}
 	
-			@Override
+	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		header.clear();
@@ -162,17 +257,26 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(teams, false);
-			myTeamsPanel.add(myTeamsWidget.asWidget());
-			myTeamsPanel.setVisible(true);
-		
-			//if isOwner, show Edit button too (which redirects to the edit version of the Profile place)
-			updateViewProfile(profile, passingRecord, isOwner);
+			myTeamsWidget.configure(teams, true);
+			teamsTabContent.clear();
+			settingsTabContainer.clear();
+			projectsTabContent.clear();
+			DisplayUtils.hide(settingsListItem);
+//			DisplayUtils.hide(messagesListItem);
+//			DisplayUtils.hide(challengesListItem);
+			
+			updateViewProfile(profile, passingRecord);
 			viewProfilePanel.add(profileWidget);
 			
 			if (isOwner) {
+				DisplayUtils.show(showProfileLink);
+				DisplayUtils.show(settingsListItem);
+				settingsTabContainer.add(settingsPresenter.asWidget());
+//				DisplayUtils.show(messagesListItem);
+//				DisplayUtils.show(challengesListItem);
+				
+				//if owner, show Edit button too (which redirects to the edit version of the Profile place)
 				editProfileButtonPanel.add(editProfileButton);
-				editProfileButtonPanel.add(linkedInButtonViewProfile);
 				openInvitesWidget.configure(new Callback() {
 					@Override
 					public void invoke() {
@@ -181,10 +285,53 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 					}
 				}, (CallbackP)null);
 				
-				myTeamInvitesPanel.add(openInvitesWidget.asWidget());
-				}
+				teamsTabContent.add(openInvitesWidget.asWidget());
+				
+				//hide my profile by default, and provide link to show it
+				DisplayUtils.hide(viewProfilePanel);
+				DisplayUtils.hide(picturePanel);
+				
+				//show create project and team UI
+				DisplayUtils.show(createProjectUI);
+				DisplayUtils.show(createTeamUI);
+			} else {
+				DisplayUtils.show(viewProfilePanel);
+				DisplayUtils.show(picturePanel);
 			}
+			
+			//Teams
+			SimplePanel wrapper = new SimplePanel();
+			wrapper.add(myTeamsWidget.asWidget());
+			wrapper.addStyleName("highlight-box");
+			wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
+			teamsTabContent.add(wrapper);
+			
+			setTabSelected(ProfileArea.PROJECTS);
+			DisplayUtils.show(navtabContainer);
 		}
+	}
+	
+	@Override
+	public void setMyProjects(List<EntityHeader> myProjects) {
+		FlowPanel wrapper = new FlowPanel();
+		wrapper.addStyleName("highlight-box");
+		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Projects");
+		projectsTabContent.add(wrapper);
+		
+		for (EntityHeader entityHeader : myProjects) {
+			EntityBadge teamRenderer = ginInjector.getEntityBadgeWidget();
+			teamRenderer.configure(entityHeader);
+			Widget teamRendererWidget = teamRenderer.asWidget();
+			teamRendererWidget.addStyleName("margin-top-5");
+			wrapper.add(teamRendererWidget);
+		}
+		if (myProjects.isEmpty())
+			wrapper.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+	}
+
+	@Override
+	public void setMyProjectsError(String string) {
+	}
 	
 	@Override
 	public void render() {
@@ -289,7 +436,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		return editPictureButton;
 	 }
 	 
-	 private void updateViewProfile(UserProfile profile, PassingRecord passingRecord, boolean isOwner) {
+	 private void updateViewProfile(UserProfile profile, PassingRecord passingRecord) {
 		 profileWidget.clear();
 		 String name, industry, location, summary;
 		 name = DisplayUtils.getDisplayName(profile);
@@ -309,7 +456,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 tutorialLink.setPixelSize(25, 32);
 			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
 			 certificateWidget.configure(profile, passingRecord);
-			 final PopupPanel tooltip = DisplayUtils.addToolTip(tutorialLink, DisplayConstants.CERTIFIED_USER);
+			 final Tooltip tooltip = DisplayUtils.addTooltip(tutorialLink.asWidget(), DisplayConstants.CERTIFIED_USER);
 			 tutorialLink.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -362,8 +509,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 builder.appendHtmlConstant("<p><a href=\""+url+"\" class=\"link\" target=\"_blank\">" + url + "</a></p>");
 		 }
 		 
-		 // Account number
-		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
+//		 // Account number
+//		 builder.appendHtmlConstant("<h5>" + DisplayConstants.SYNAPSE_ACCOUNT_NUMBER + ": ").appendEscaped(profile.getOwnerId()).appendHtmlConstant("</h5>");		 
 		 
 		 HTML profileHtml = new HTML(builder.toSafeHtml());
 		 profileWidget.add(profileHtml);
@@ -396,12 +543,103 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		editProfileButtonPanel.clear();
-		myTeamInvitesPanel.clear();
-		myTeamsPanel.clear();
-		myTeamsPanel.setVisible(false);
 		picturePanel.clear();
 		editPicturePanel.clear();
 		editPictureButtonPanel.clear();
 		certificatePanel.setVisible(false);
+		DisplayUtils.hide(navtabContainer);
+		projectsTabContent.clear();
+		DisplayUtils.hide(showProfileLink);
+		
+		hideTabContainers();
+		DisplayUtils.hide(createProjectUI);
+		DisplayUtils.hide(createTeamUI);
+	}
+	
+	private void hideTabContainers() {
+		//hide all tab containers
+		DisplayUtils.hide(projectsTabContainer);
+		DisplayUtils.hide(challengesTabContainer);
+		DisplayUtils.hide(teamsTabContainer);
+		DisplayUtils.hide(messagesTabContainer);
+		DisplayUtils.hide(settingsTabContainer);
+	}
+	
+	
+	/**
+	 * Used only for setting the view's tab display
+	 * @param targetTab
+	 * @param userSelected 
+	 */
+	private void setTabSelected(Synapse.ProfileArea targetTab) {
+		// tell presenter what tab we're on only if the user clicked
+		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
+		hideTabContainers();
+		projectsListItem.removeClassName("active");
+		projectsLink.addStyleName("link");
+		teamsListItem.removeClassName("active");
+		teamsLink.addStyleName("link");
+		settingsListItem.removeClassName("active");
+		settingsLink.addStyleName("link");
+//		challengesListItem.removeClassName("active");
+//		challengesLink.addStyleName("link");
+//		messagesListItem.removeClassName("active");
+//		messagesLink.addStyleName("link");
+		
+		LIElement tab; 
+		Anchor link;
+		
+		if (targetTab == Synapse.ProfileArea.PROJECTS) {
+			tab = projectsListItem;
+			link = projectsLink;
+			DisplayUtils.show(projectsTabContainer);
+		} else if(targetTab == Synapse.ProfileArea.TEAMS) {
+			tab = teamsListItem;
+			link = teamsLink;
+			DisplayUtils.show(teamsTabContainer);
+		} else if(targetTab == Synapse.ProfileArea.SETTINGS) {
+			tab = settingsListItem;
+			link = settingsLink;
+			DisplayUtils.show(settingsTabContainer);
+//		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
+//			tab = challengesListItem;
+//			link = challengesLink;
+//			DisplayUtils.show(challengesTabContainer);
+//		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
+//			tab = messagesListItem;
+//			link = messagesLink;
+//			DisplayUtils.show(messagesTabContainer);
+		} else {
+			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
+			return;
+		}
+		
+		link.removeStyleName("link");
+		tab.addClassName("active");
+	}
+	
+	private void initTabs() {
+		projectsLink.setText(DisplayConstants.PROJECTS);
+		projectsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
+		
+		teamsLink.setText(DisplayConstants.TEAMS);
+		teamsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
+		
+		settingsLink.setText(DisplayConstants.SETTINGS);
+		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
+		
+//		challengesLink.setText(DisplayConstants.CHALLENGES);
+//		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+//		messagesLink.setText(DisplayConstants.MESSAGES);
+//		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
+	}
+	
+	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				setTabSelected(targetTab);					
+			}
+		};
 	}
 }

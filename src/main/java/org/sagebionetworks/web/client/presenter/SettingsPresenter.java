@@ -27,6 +27,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter, Presenter<Settings> {
@@ -68,7 +69,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Set the presenter on the view
-		this.view.render();
+		this.view.render(true);
 		
 		// Install the view
 		panel.setWidget(view);
@@ -81,10 +82,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.view.setPresenter(this);
 		this.view.clear();
 		updateView();
-		
-		getAPIKey();
-		
-		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	private void getAPIKey() {
@@ -269,6 +266,10 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		//Support other tokens?
 		updateUserStorage();
 		getUserNotificationEmail();
+
+		getAPIKey();
+		
+		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
 	@Override
@@ -317,7 +318,12 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 				view.showEmailChangeFailed(caught.getMessage());
 			}
 		});
-
+	}
+	
+	public Widget asWidget() {
+		this.view.render(false);
+		updateView();
+		return view.asWidget();
 	}
 }
 

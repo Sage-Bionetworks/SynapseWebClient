@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -20,16 +20,16 @@ public class ProgrammaticClientCode extends Composite implements SynapseWidgetPr
 	
 	public static LayoutContainer createLoadWidget(String entityId, Long versionNumber, SynapseJSNIUtils synapseJSNIUtils, SageImageBundle sageImageBundle) {
 		Anchor rLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoR45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, rLink, "Synapse R Client", getRClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(rLink, "Synapse R Client", getRClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 
 		Anchor pythonLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoPython45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(pythonLink, "Synapse Python Client", getPythonClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 
 		Anchor shellLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoCommandLine45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(shellLink, "Synapse Command Line Client", getCommandLineClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 
 		Anchor javaLink = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.logoJava45())));
-		DisplayUtils.addClickPopover(synapseJSNIUtils, javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addClickPopover(javaLink, "Synapse Java Client", getJavaClientEntityLoad(entityId, versionNumber).asString(), Placement.BOTTOM);
 		
 		LayoutContainer lc = new LayoutContainer();
 		lc.add(rLink);

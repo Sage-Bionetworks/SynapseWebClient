@@ -18,7 +18,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	public void render();
+	public void render(boolean standAlonePlace);
 
 	/**
 	 * Shows the user that their password change succeeded

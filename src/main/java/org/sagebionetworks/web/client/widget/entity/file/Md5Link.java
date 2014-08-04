@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -32,7 +32,7 @@ public class Md5Link extends SimplePanel {
 				showMd5Dialog(md5);
 			}
 		});
-		DisplayUtils.addTooltip(synapseJSNIUtils, md5Link, md5, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(md5Link, md5, Placement.BOTTOM);
 		this.add(md5Link);
 	}
 	

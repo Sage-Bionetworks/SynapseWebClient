@@ -1117,6 +1117,9 @@ ol.lowerroman {
 	padding-top: 15px !important;
 }
 
+.padding-top-bottom-15-left-right-25 {
+	padding: 15px 25px 15px 25px;
+}
 
 .padding-bottom-15 {
 	padding-bottom: 15px;
@@ -1125,6 +1128,11 @@ ol.lowerroman {
 .padding-5 {
 	padding: 5px;
 }
+
+.padding-15 {
+	padding: 15px;
+}
+
 
 .padding-2 {
 	padding: 2px;
@@ -1626,6 +1634,11 @@ a.projectTitle:hover {
 .entity-tabs > li.active > a:focus {
 	background-color: #f9f9f9 !important;
 	cursor: pointer !important;
+}
+
+/* popups with very long values (like some urls) are shown out of bounds in bootstrap. */
+.popover-content {
+	overflow-x: hidden;
 }
 
 h1, .h1, h2, .h2, h3, .h3 {

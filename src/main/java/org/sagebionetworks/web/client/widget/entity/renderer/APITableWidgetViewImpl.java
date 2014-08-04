@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.table.TableState;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
@@ -184,14 +184,14 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			panel.add(prev, "disabled");
 		} else {
 			panel.add(prev);
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, prev, DisplayConstants.PAGE_BACK, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(prev, DisplayConstants.PAGE_BACK, Placement.BOTTOM);
 		}
 		panel.add(label, "pagerLabel");
 		if(end == total) {
 			panel.add(next, "disabled");
 		} else {
 			panel.add(next);
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, next, DisplayConstants.PAGE_NEXT, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(next, DisplayConstants.PAGE_NEXT, Placement.BOTTOM);
 		}
 		add(panel);
 		layout(true);

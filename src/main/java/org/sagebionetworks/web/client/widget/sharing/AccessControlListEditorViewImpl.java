@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -301,7 +302,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				if (notifyPeopleCheckbox == null) {
 					notifyPeopleCheckbox = new CheckBox("Notify people via email");
 					setIsNotifyPeople(true);
-					DisplayUtils.addToolTip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+					DisplayUtils.addTooltip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
 				}
 				
 				FlowPanel cbPanel = new FlowPanel();

@@ -3,25 +3,16 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
-	<ui:style>
-		.important {
-		font-weight: bold;
-		}
-
-		.rowTop {
-		vertical-align: top;
-		}
-	</ui:style>
-
 	<g:HTMLPanel>
-		<div class="color-line"></div>
+		<div ui:field="colorLine" class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp"></div>
+		<div class="margin-top-10-imp"></div>
+		<div ui:field="separator" class="separator"></div>
 		<div class="container">
 			<div style="white-space: normal;">
 				<g:SimplePanel ui:field="breadcrumbsPanel" />
 			</div>
-			<h2>Settings</h2>
+			<h2 ui:field="settingsHeading">Settings</h2>
 
 			<div class="well">
 				<h4>

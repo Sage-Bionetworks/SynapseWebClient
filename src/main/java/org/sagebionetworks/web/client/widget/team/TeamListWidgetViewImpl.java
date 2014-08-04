@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -55,7 +56,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	public void setRequestCount(String teamId, Long count) {
 		if (team2NotificationPanel.containsKey(teamId)) {
 			HTML widget = new HTML(DisplayUtils.getBadgeHtml(count.toString()));
-			DisplayUtils.addToolTip(widget, "Team has a pending join request");
+			DisplayUtils.addTooltip(widget, "Team has a pending join request");
 			team2NotificationPanel.get(teamId).setWidget(widget);
 		}
 	}

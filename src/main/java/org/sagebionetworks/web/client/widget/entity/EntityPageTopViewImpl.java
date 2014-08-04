@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Label;
@@ -408,7 +409,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 	}
 	
-	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin) {
+	private Widget createModifiedAndCreatedWidget(Entity entity, boolean addTopMargin)  {
+		return createModifiedAndCreatedWidget(entity, ginInjector, addTopMargin);
+	}
+	
+	public static Widget createModifiedAndCreatedWidget(Entity entity, PortalGinInjector ginInjector, boolean addTopMargin) {
 		FlowPanel attributionPanel = new FlowPanel();
 		UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 		createdByBadge.configure(entity.getCreatedBy());
@@ -749,12 +754,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	
 	private Widget createProvenanceWidget(EntityBundle bundle, boolean fullWidth) {
-		final LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.addStyleName("highlight-box");
-		lc.setTitle(DisplayConstants.PROVENANCE);
-		
-	    // Create the property body
+		// Create the property body
 	    // the headers for properties.
 		ProvenanceWidget provenanceWidget = ginInjector.getProvenanceRenderer();						
 		
@@ -767,11 +767,10 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 	    provenanceWidget.configure(null, configMap, null, null);
 	    final Widget provViewWidget = provenanceWidget.asWidget(); 
-	    final LayoutContainer border = new LayoutContainer();
-	    border.add(provViewWidget);
-		
-	    lc.add(border);
-	    lc.layout();
+	    FlowPanel lc = new FlowPanel();
+	    lc.addStyleName("highlight-box");
+	    lc.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, DisplayConstants.PROVENANCE);
+	    lc.add(provViewWidget);
 	    SimplePanel wrapper = new SimplePanel(lc);
 	    String width = fullWidth ? "col-md-12" : "col-md-6";
 	    wrapper.addStyleName(width);
