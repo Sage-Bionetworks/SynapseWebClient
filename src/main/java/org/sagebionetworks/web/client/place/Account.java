@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.place;
 
-import com.google.gwt.http.client.URL;
+import org.sagebionetworks.web.client.presenter.AccountPresenter;
+
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
@@ -11,7 +12,7 @@ public class Account extends Place{
 
 	public Account(String token) {
 		if (_isFirefox())
-			this.token = URL.encodePathSegment(token);
+			this.token = AccountPresenter.encodeTokenKeysAndValues(token);
 		else
 			this.token = token;
 	}
