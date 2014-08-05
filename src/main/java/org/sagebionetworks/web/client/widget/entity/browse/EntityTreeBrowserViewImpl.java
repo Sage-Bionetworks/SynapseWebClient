@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -37,13 +38,21 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityTreeBrowserViewImpl extends LayoutContainer implements EntityTreeBrowserView {
+public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBrowserView {
 
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
@@ -58,80 +67,86 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	private TreeStore<EntityTreeModel> store;
 	private HashMap<String, ImageResource> typeToIcon = new HashMap<String, ImageResource>();
 	private boolean makeLinks = true;
-	private Integer height = null; 
+	private Integer height = null;
+	private Tree entityTree;
+	private Map<TreeItem, EntityHeader> item2header;
 	
-	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-		
-		if(store == null) createStore();
-		
-	    tree = new TreePanel<EntityTreeModel>(store);  
-	    tree.setStateful(true);  
-	    tree.setDisplayProperty(EntityTreeModel.KEY_LINK); 
-	    tree.setBorders(false);
-	    
-	    // statefull components need a defined id  
-	    tree.setId("statefullasyncentitytree_" + (Math.random()*100));  
-		tree.setIconProvider(new ModelIconProvider<EntityTreeModel>() {
-			public AbstractImagePrototype getIcon(EntityTreeModel model) {
-				String type = model.getType();
-				ImageResource icon;
-				if(typeToIcon.containsKey(type)) {
-					icon = typeToIcon.get(type);
-				} else {
-					icon = presenter.getIconForType(type);
-					typeToIcon.put(type, icon);
-				}				
-				if(icon == null) {
-					return null;
-				}
-				return AbstractImagePrototype.create(icon);
-			}
-		});		
-		
-		TreePanelSelectionModel<EntityTreeModel> sm = tree.getSelectionModel();
-		sm.setSelectionMode(SelectionMode.SINGLE);
-		sm.addSelectionChangedListener(new SelectionChangedListener<EntityTreeModel>() {			
-			@Override
-			public void selectionChanged(SelectionChangedEvent<EntityTreeModel> se) {
-				setSelection(se.getSelectedItem());
-			}
-		});
-		tree.setAutoHeight(true);
-		tree.setAutoWidth(true);
-				
-		cp = new ContentPanel();  
-	    cp.setHeaderVisible(false);  
-	    cp.setLayout(new FitLayout());  
-	    cp.add(tree);  
-	    determineHeight();	    
-	    cp.setAutoWidth(true);
-	    cp.setBorders(false);
-	    add(cp);  		
-	};
-		
-	private void determineHeight() {
-		if(cp != null) {
-			if(height == null) {
-				cp.setAutoHeight(true);
-				cp.setScrollMode(Scroll.NONE);
-			} else {
-				if(isRendered()) {
-					cp.setAutoHeight(false);
-					cp.setHeight(height);
-					cp.setScrollMode(Scroll.AUTO);
-				}
-			}
-		}
-	}
+//	@Override
+//	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
+//		super.onRender(parent, index);		
+//		
+//		if(store == null) createStore();
+//		
+//	    tree = new TreePanel<EntityTreeModel>(store);  
+//	    tree.setStateful(true);  
+//	    tree.setDisplayProperty(EntityTreeModel.KEY_LINK); 
+//	    tree.setBorders(false);
+//	    
+//	    // statefull components need a defined id  
+//	    tree.setId("statefullasyncentitytree_" + (Math.random()*100));  
+//		tree.setIconProvider(new ModelIconProvider<EntityTreeModel>() {
+//			public AbstractImagePrototype getIcon(EntityTreeModel model) {
+//				String type = model.getType();
+//				ImageResource icon;
+//				if(typeToIcon.containsKey(type)) {
+//					icon = typeToIcon.get(type);
+//				} else {
+//					icon = presenter.getIconForType(type);
+//					typeToIcon.put(type, icon);
+//				}				
+//				if(icon == null) {
+//					return null;
+//				}
+//				return AbstractImagePrototype.create(icon);
+//			}
+//		});		
+//		
+//		TreePanelSelectionModel<EntityTreeModel> sm = tree.getSelectionModel();
+//		sm.setSelectionMode(SelectionMode.SINGLE);
+//		sm.addSelectionChangedListener(new SelectionChangedListener<EntityTreeModel>() {			
+//			@Override
+//			public void selectionChanged(SelectionChangedEvent<EntityTreeModel> se) {
+//				setSelection(se.getSelectedItem());
+//			}
+//		});
+//		tree.setAutoHeight(true);
+//		tree.setAutoWidth(true);
+//				
+//		cp = new ContentPanel();  
+//	    cp.setHeaderVisible(false);  
+//	    cp.setLayout(new FitLayout());  
+//	    cp.add(tree);  
+//	    determineHeight();	    
+//	    cp.setAutoWidth(true);
+//	    cp.setBorders(false);
+//	    add(cp);  		
+//	};
+//		
+//	private void determineHeight() {
+//		if(cp != null) {
+//			if(height == null) {
+//				cp.setAutoHeight(true);
+//				cp.setScrollMode(Scroll.NONE);
+//			} else {
+//				if(isRendered()) {
+//					cp.setAutoHeight(false);
+//					cp.setHeight(height);
+//					cp.setScrollMode(Scroll.AUTO);
+//				}
+//			}
+//		}
+//	}
 
 	@Inject
 	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		entityTree = new Tree();
+		item2header = new HashMap<TreeItem, EntityHeader>();
 
-		this.setLayout(new FitLayout());
+		//this.setLayout(new FitLayout());
+		this.add(entityTree);
+		// TODO: Set up stuff? Not really much to set up.
 	}
 
 	@Override
@@ -160,8 +175,11 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 
 	@Override
 	public void clear() {
-		if(store == null) createStore();
-		store.removeAll();
+		//if(store == null) createStore();
+		//store.removeAll();
+		
+		//if (entityTree == null) entityTree = new Tree();
+		entityTree.clear();
 	}
 
 	@Override
@@ -176,8 +194,31 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 			eh.setType(PLACEHOLDER_TYPE);
 			rootEntities.add(eh);
 		}
-		store.add(convertEntityHeaderToModel(rootEntities), false);
-		if (sort) store.sort(EntityTreeModel.KEY_NAME, SortDir.ASC);
+		//store.add(convertEntityHeaderToModel(rootEntities), false);
+		//if (sort) store.sort(EntityTreeModel.KEY_NAME, SortDir.ASC);
+		
+		// Make root stuff. Add to tree.
+		// TODO: Sort if sort.
+		for (final EntityHeader header : rootEntities) {
+			// Add item to tree.
+			HorizontalPanel panel = new HorizontalPanel();
+			CheckBox cb = new CheckBox();
+			cb.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					// Get Children or something!
+				}
+				
+			});
+			
+			panel.add(new Label(header.getName()));
+			TreeItem item = new TreeItem(panel);
+			entityTree.addItem(item);
+			
+			// Update fields.
+			item2header.put(item,  header);
+		}
 	}
 	
 	@Override
@@ -188,7 +229,8 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	/*
 	 * Private Methods
 	 */
-
+	
+	// TODO: EntityTreeModel needed?
 	private List<EntityTreeModel> convertEntityHeaderToModel(List<EntityHeader> headers) {
 		
 		List<EntityTreeModel> models = new ArrayList<EntityTreeModel>();
@@ -282,7 +324,7 @@ public class EntityTreeBrowserViewImpl extends LayoutContainer implements Entity
 	@Override
 	public void setWidgetHeight(int height) {
 		this.height = height;
-		determineHeight();		
+		// determineHeight();	// TODO: Find equivalent gwt method?
 	}
 	
 }
