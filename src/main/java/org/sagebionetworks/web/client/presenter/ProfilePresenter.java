@@ -24,7 +24,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -46,7 +45,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private Profile place;
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
@@ -63,7 +61,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			LinkedInServiceAsync linkedInService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			CookieProvider cookieProvider,
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
@@ -75,7 +72,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
@@ -158,7 +154,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					//parse the LinkedIn UserProfile json
 					UserProfile linkedInProfile;
 					try {
-						linkedInProfile = nodeModelCreator.createJSONEntity(result, UserProfile.class);
+						linkedInProfile = new UserProfile(adapterFactory.createNew(result));
 						 profileForm.updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
 						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
 						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
@@ -186,7 +182,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
-						final UserProfile profile = nodeModelCreator.createJSONEntity(userProfileJson, UserProfile.class);
+						final UserProfile profile = new UserProfile(adapterFactory.createNew(userProfileJson));
 						if (isOwner) {
 							//only configure the profile form (editor) if owner of this profile
 							profileForm.configure(profile, profileUpdatedCallback);

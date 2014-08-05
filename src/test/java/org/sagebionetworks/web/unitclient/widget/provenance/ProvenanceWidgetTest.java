@@ -43,6 +43,7 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -87,6 +88,7 @@ public class ProvenanceWidgetTest {
 	LayoutServiceAsync mockLayoutService;
 	ClientCache mockClientCache;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
+	GlobalApplicationState mockGlobalAppState;
 	
 	Data outputEntity;
 	String entity456Id = "syn456";
@@ -112,7 +114,8 @@ public class ProvenanceWidgetTest {
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 		mockClientCache = mock(ClientCache.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
+		mockGlobalAppState = mock(GlobalApplicationState.class);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
