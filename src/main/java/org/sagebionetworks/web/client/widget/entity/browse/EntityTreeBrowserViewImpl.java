@@ -202,37 +202,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Make root stuff. Add to tree.
 		// TODO: Sort if sort.
 		for (final EntityHeader header : rootEntities) {
-			// Update fields.
-			header2item.put(header,  item);
 			
-			// Add item to tree.
-			HorizontalPanel panel = new HorizontalPanel();
-			CheckBox cb = new CheckBox();
-			cb.addClickHandler(new ClickHandler() {
-
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.getFolderChildren(header.getId(), new AsyncCallback<List<EntityHeader>>() {
-
-						@Override
-						public void onSuccess(List<EntityHeader> result) {
-							
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
-							
-						}
-						
-					});
-				}
-				
-			});
-			
-			panel.add(new Label(header.getName()));
-			TreeItem item = new TreeItem(panel);
-			entityTree.addItem(item);
 		}
 	}
 	
@@ -356,6 +326,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Create panel and make tree item.
 		HorizontalPanel panel = new HorizontalPanel();
 		final TreeItem childItem = new TreeItem(panel);
+		
+		// Update fields.
+		header2item.put(childToCreate, childItem);
 		
 		// Add checkbox that displays children.
 		CheckBox cb = new CheckBox();
