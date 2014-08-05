@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Settings;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -209,7 +208,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
     		
         	HTML trash = new HTML(DisplayUtils.getIcon("glyphicon-trash"));
         	trash.addStyleName("displayInline imageButton margin-left-5 font-size-17");
-        	DisplayUtils.addTooltip(this.synapseJSNIUtils, trash, DisplayConstants.TEXT_USER_TRASH, Placement.BOTTOM);
+        	DisplayUtils.addTooltip(trash, DisplayConstants.TEXT_USER_TRASH, Placement.BOTTOM);
         	trash.addClickHandler(new ClickHandler() {
         		@Override
 				public void onClick(ClickEvent event) {
