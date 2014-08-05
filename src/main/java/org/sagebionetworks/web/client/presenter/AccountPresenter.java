@@ -46,7 +46,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	public void setPlace(Account place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String emailValidationToken = place.toToken();
+		String emailValidationToken = place.getFixedToken();
 		validateToken(emailValidationToken);
 	}
 	
