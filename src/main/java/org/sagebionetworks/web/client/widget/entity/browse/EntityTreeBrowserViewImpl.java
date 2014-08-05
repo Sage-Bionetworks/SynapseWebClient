@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,11 +43,13 @@ import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -58,6 +61,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
 	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
+	private static final TreeItem DUMMY_ITEM = new TreeItem(new Label("DUMMY ITEM"));	// TODO: Use of this is very hacky. How else to display close image on tree item with no children?
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -145,6 +149,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		this.iconsImageBundle = iconsImageBundle;
 		entityTree = new Tree();
 		header2item = new HashMap<EntityHeader, TreeItem>();
+		alreadyFetchedEntityChildren = new HashSet<EntityHeader>();
 
 		//this.setLayout(new FitLayout());
 		this.add(entityTree);
@@ -202,7 +207,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Make root stuff. Add to tree.
 		// TODO: Sort if sort.
 		for (final EntityHeader header : rootEntities) {
-			
+			createAndPlaceTreeItem(header, null, true);
 		}
 	}
 	
@@ -336,23 +341,27 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
-
-					@Override
-					public void onSuccess(List<EntityHeader> result) {
-						for (EntityHeader entity : result) {
-							createAndPlaceTreeItem(entity, childToCreate, false);
+				if (!alreadyFetchedEntityChildren.contains(childToCreate)) {
+					// We have not already gotten children for this entity. Let's get them.
+					alreadyFetchedEntityChildren.add(childToCreate);
+					presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
+		
+						@Override
+						public void onSuccess(List<EntityHeader> result) {
+							for (EntityHeader entity : result) {
+								createAndPlaceTreeItem(entity, childToCreate, false);
+							}
+							
 						}
 						
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+						@Override
+						public void onFailure(Throwable caught) {
+							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+							
+						}
 						
-					}
-					
-				});
+					});
+				}
 				
 				boolean selected = ((CheckBox) event.getSource()).getValue();
 				if (selected) {
@@ -364,12 +373,30 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			
 		});
 		
+		
+		// Get Icon. TODO: Super sloppy with the PLACEHOLDER_TYPE checks.
+		String type = childToCreate.getType();
+		if (!typeToIcon.containsKey(type) && !PLACEHOLDER_TYPE.equals(type)) {
+			ImageResource iconResource = presenter.getIconForType(type);
+			typeToIcon.put(type, iconResource);
+		}
+		Image iconImage = null;
+		if (!PLACEHOLDER_TYPE.equals(type))
+			iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
+		
 		// Add info to panel to be displayed.
 		panel.add(cb);
+		if (!PLACEHOLDER_TYPE.equals(type))
+			panel.add(iconImage);
 		panel.add(new Label(childToCreate.getName()));
+		showClosedImage(childItem);
 		
 		// Set the created child the child of the given parent entity.
-		header2item.get(parent).addItem(childItem);
+		if (isRootItem) {
+			entityTree.addItem(childItem);
+		} else {
+			header2item.get(parent).addItem(childItem);
+		}
 	}
 	
 }
