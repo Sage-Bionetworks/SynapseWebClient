@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -69,7 +70,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private boolean makeLinks = true;
 	private Integer height = null;
 	private Tree entityTree;
-	private Map<TreeItem, EntityHeader> item2header;
+	private Map<EntityHeader, TreeItem> header2item;
+	private Set<EntityHeader> alreadyFetchedEntityChildren;
 	
 //	@Override
 //	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
@@ -142,7 +144,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		entityTree = new Tree();
-		item2header = new HashMap<TreeItem, EntityHeader>();
+		header2item = new HashMap<EntityHeader, TreeItem>();
 
 		//this.setLayout(new FitLayout());
 		this.add(entityTree);
@@ -200,6 +202,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Make root stuff. Add to tree.
 		// TODO: Sort if sort.
 		for (final EntityHeader header : rootEntities) {
+			// Update fields.
+			header2item.put(header,  item);
+			
 			// Add item to tree.
 			HorizontalPanel panel = new HorizontalPanel();
 			CheckBox cb = new CheckBox();
@@ -207,7 +212,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 
 				@Override
 				public void onClick(ClickEvent event) {
-					// Get Children or something!
+					presenter.getFolderChildren(header.getId(), new AsyncCallback<List<EntityHeader>>() {
+
+						@Override
+						public void onSuccess(List<EntityHeader> result) {
+							
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+							
+						}
+						
+					});
 				}
 				
 			});
@@ -215,11 +233,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			panel.add(new Label(header.getName()));
 			TreeItem item = new TreeItem(panel);
 			entityTree.addItem(item);
-			
-			// Update fields.
-			item2header.put(item,  header);
 		}
 	}
+	
+	
 	
 	@Override
 	public void setMakeLinks(boolean makeLinks) {
@@ -230,7 +247,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	 * Private Methods
 	 */
 	
-	// TODO: EntityTreeModel needed?
+	// TODO: EntityTreeModel needed? That's "Tree" yeah?
 	private List<EntityTreeModel> convertEntityHeaderToModel(List<EntityHeader> headers) {
 		
 		List<EntityTreeModel> models = new ArrayList<EntityTreeModel>();
@@ -325,6 +342,61 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void setWidgetHeight(int height) {
 		this.height = height;
 		// determineHeight();	// TODO: Find equivalent gwt method?
+	}
+	
+	/**
+	 * Makes a TreeItem and places it in the tree.
+	 * @param parent
+	 * @param child
+	 * @param isRootItem
+	 */
+	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityHeader parent, boolean isRootItem) {
+		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
+		
+		// Create panel and make tree item.
+		HorizontalPanel panel = new HorizontalPanel();
+		final TreeItem childItem = new TreeItem(panel);
+		
+		// Add checkbox that displays children.
+		CheckBox cb = new CheckBox();
+		cb.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
+
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						for (EntityHeader entity : result) {
+							createAndPlaceTreeItem(entity, childToCreate, false);
+						}
+						
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+						
+					}
+					
+				});
+				
+				boolean selected = ((CheckBox) event.getSource()).getValue();
+				if (selected) {
+					childItem.setSelected(true);
+				} else {
+					childItem.setSelected(false);
+				}
+			}
+			
+		});
+		
+		// Add info to panel to be displayed.
+		panel.add(cb);
+		panel.add(new Label(childToCreate.getName()));
+		
+		// Set the created child the child of the given parent entity.
+		header2item.get(parent).addItem(childItem);
 	}
 	
 }
