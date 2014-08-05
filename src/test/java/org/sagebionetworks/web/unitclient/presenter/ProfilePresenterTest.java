@@ -23,6 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
@@ -33,10 +34,13 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
@@ -122,6 +126,12 @@ public class ProfilePresenterTest {
 		myProjects.add(project1);
 		myProjects.add(project2);
 		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		//set up create project test
+		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		//set up create team test
+		AsyncMockStubber.callSuccessWith("new team id").when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
@@ -241,4 +251,75 @@ public class ProfilePresenterTest {
 		profilePresenter.getUserProjects("anyUserId");
 		verify(mockView).setMyProjectsError(anyString());
 	}
+	
+	@Test
+	public void testCreateProject() {
+		profilePresenter.createProject("valid name");
+		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		//inform user of success, and go to new project page
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockPlaceChanger).goTo(any(Synapse.class));
+	}
+
+	@Test
+	public void testCreateProjectEmptyName() {
+		profilePresenter.createProject("");
+		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+		Mockito.reset(mockView);
+		
+		profilePresenter.createProject(null);
+		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+
+	@Test
+	public void testCreateProjectError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.createProject("valid name");
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCreateProjectNameConflictError() {
+		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.createProject("valid name");
+		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+	}
+	
+	@Test
+	public void testCreateTeam() {
+		profilePresenter.createTeam("valid name");
+		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		//inform user of success, and go to new team page
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockPlaceChanger).goTo(any(Team.class));
+	}
+
+	@Test
+	public void testCreateTeamEmptyName() {
+		profilePresenter.createTeam("");
+		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+		Mockito.reset(mockView);
+		
+		profilePresenter.createTeam(null);
+		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+
+	@Test
+	public void testCreateTeamError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		profilePresenter.createTeam("valid name");
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCreateTeamNameConflictError() {
+		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		profilePresenter.createTeam("valid name");
+		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_TEAM_NAME_EXISTS));
+	}
+
 }

@@ -278,7 +278,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void createTeam(final String teamName) {
-		//validate project name
+		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
 			view.showErrorMessage(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
