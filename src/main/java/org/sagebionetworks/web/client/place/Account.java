@@ -11,14 +11,18 @@ public class Account extends Place{
 	private String token;
 
 	public Account(String token) {
-		if (_isFirefox())
-			this.token = AccountPresenter.encodeTokenKeysAndValues(token);
-		else
-			this.token = token;
+		this.token = token;
 	}
 
 	public String toToken() {
 		return token;
+	}
+	
+	public String getFixedToken(){
+		if (_isFirefox())
+			return AccountPresenter.encodeTokenKeysAndValues(token);
+		else
+			return token;
 	}
 	
 	private final static native boolean _isFirefox() /*-{ 
