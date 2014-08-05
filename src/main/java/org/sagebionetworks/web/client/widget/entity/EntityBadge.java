@@ -81,6 +81,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
+					//If necessary, expand to support other types.  
+					//But do not pull in NodeAdapterFactory for the mapping, as this will cause the initial fragment download size to significantly increase.
 					if (!Project.class.getName().equals(result.getEntityClassName())) {
 						callback.onFailure(new IllegalArgumentException("Entity badge detailed information currently only supports Projects"));
 					}

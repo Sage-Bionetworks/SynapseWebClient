@@ -193,7 +193,9 @@ public class ProvUtils {
 		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+
+		if (entity.getModifiedOn() != null)
+			map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
