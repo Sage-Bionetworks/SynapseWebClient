@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -18,21 +19,17 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.shared.EntityType;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -132,7 +129,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
 		
 		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
-		DisplayUtils.addTooltip(this.synapseJSNIUtils, downloadButton, DisplayConstants.BUTTON_DOWNLOAD, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
 		downloadButtonContainer.clear();
 		downloadButtonContainer.add(downloadButton);
 		
