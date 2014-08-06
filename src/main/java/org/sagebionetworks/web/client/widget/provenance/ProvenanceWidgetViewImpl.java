@@ -213,7 +213,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		final Tooltip tooltip = new Tooltip(nodeContainer);
 		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 		tooltip.setTrigger(Trigger.MANUAL);
-		tooltip.setPlacement(Placement.RIGHT);
+		tooltip.setPlacement(Placement.BOTTOM);
 		tooltip.setIsHtml(true);
 		
 		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {

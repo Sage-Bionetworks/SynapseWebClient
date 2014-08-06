@@ -317,9 +317,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		projectsTabContent.add(wrapper);
 		
 		for (EntityHeader entityHeader : myProjects) {
-			EntityBadge teamRenderer = ginInjector.getEntityBadgeWidget();
-			teamRenderer.configure(entityHeader);
-			Widget teamRendererWidget = teamRenderer.asWidget();
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeader);
+			Widget teamRendererWidget = badge.asWidget();
 			teamRendererWidget.addStyleName("margin-top-5");
 			wrapper.add(teamRendererWidget);
 		}
