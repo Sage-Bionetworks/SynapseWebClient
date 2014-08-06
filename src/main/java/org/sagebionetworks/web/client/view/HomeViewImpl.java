@@ -409,11 +409,13 @@ public class HomeViewImpl extends Composite implements HomeView {
 		return createProjectContainer;
 	}
 	
-	private LayoutContainer getFavoritesContainer() {
-		LayoutContainer favoritesContainer = new LayoutContainer();
+	private FlowPanel getFavoritesContainer() {
+		FlowPanel favoritesContainer = new FlowPanel();
 		favoritesContainer.add(
 				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
-		favoritesContainer.add(favoritesTreeBrowser.asWidget());
+		SimplePanel favoritesPanel = new SimplePanel(favoritesTreeBrowser.asWidget());
+		favoritesPanel.addStyleName("panel panel-default");
+		favoritesContainer.add(favoritesPanel);
 		return favoritesContainer;
 	}
 	
