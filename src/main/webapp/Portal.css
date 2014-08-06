@@ -1629,6 +1629,13 @@ a.projectTitle:hover {
 /*
  * Bootstrap Overrides 
  */
+ 
+.dropdown-menu>li>a, 
+.x-menu-list-item>a:visited,
+.x-menu-list-item>a:visited>* {
+	color: #333 !important;
+}
+
 .entity-tabs > li.active > a,
 .entity-tabs > li.active > a:hover,
 .entity-tabs > li.active > a:focus {
