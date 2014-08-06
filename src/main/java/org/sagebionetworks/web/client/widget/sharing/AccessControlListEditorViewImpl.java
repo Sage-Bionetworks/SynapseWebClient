@@ -586,11 +586,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
 			@Override  
 			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
-			      final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
+				  final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
 				  final PermissionsTableEntry entry = store.getAt(rowIndex);
-			    if(entry.getAclEntry().isOwner()) {
-					return new Label("");		    	
-			    } else {				    
 					Anchor removeAnchor = new Anchor();
 					removeAnchor.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.deleteButton16()));
 					removeAnchor.addClickHandler(new ClickHandler() {			
@@ -601,8 +598,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 						}
 					});
 					return removeAnchor;
-				    
-			    }
 			  }
 			};  
 		return removeButton;
