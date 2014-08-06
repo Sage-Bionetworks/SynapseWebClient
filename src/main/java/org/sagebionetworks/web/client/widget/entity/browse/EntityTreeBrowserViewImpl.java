@@ -42,6 +42,8 @@ import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.OpenEvent;
+import com.google.gwt.event.logical.shared.OpenHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -61,7 +63,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
 	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
-	private static final TreeItem DUMMY_ITEM = new TreeItem(new Label("DUMMY ITEM"));	// TODO: Use of this is very hacky. How else to display close image on tree item with no children?
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -75,6 +76,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Integer height = null;
 	private Tree entityTree;
 	private Map<EntityHeader, TreeItem> header2item;
+	private Map<TreeItem, EntityHeader> item2header;
 	private Set<EntityHeader> alreadyFetchedEntityChildren;
 	
 //	@Override
@@ -149,10 +151,51 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		this.iconsImageBundle = iconsImageBundle;
 		entityTree = new Tree();
 		header2item = new HashMap<EntityHeader, TreeItem>();
+		item2header = new HashMap<TreeItem, EntityHeader>();
 		alreadyFetchedEntityChildren = new HashSet<EntityHeader>();
 
 		//this.setLayout(new FitLayout());
 		this.add(entityTree);
+		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
+
+			@Override
+			public void onOpen(OpenEvent<TreeItem> event) {
+				final TreeItem source = event.getTarget();
+				final EntityHeader sourceHeader = item2header.get(source);
+				if (!alreadyFetchedEntityChildren.contains(sourceHeader)) {
+					// We have not already gotten children for this entity. Get rid of it's dummy child
+					// and let's grab the new children.
+					// source.removeItems();
+					alreadyFetchedEntityChildren.add(sourceHeader);
+					presenter.getFolderChildren(sourceHeader.getId(), new AsyncCallback<List<EntityHeader>>() {
+		
+						@Override
+						public void onSuccess(List<EntityHeader> result) {
+							source.removeItems();	// Remove the dummy child item.
+							for (EntityHeader entity : result) {
+								createAndPlaceTreeItem(entity, sourceHeader, false);
+							}
+							
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+							
+						}
+						
+					});
+				}
+				
+//				boolean selected = ((CheckBox) event.getSource()).getValue();
+//				if (selected) {
+//					childItem.setSelected(true);
+//				} else {
+//					childItem.setSelected(false);
+//				}
+			}
+			
+		});
 		// TODO: Set up stuff? Not really much to set up.
 	}
 
@@ -245,68 +288,68 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		return models;
 	}
 
-	private void createStore() {
-	    // data proxy  
-	    RpcProxy<List<EntityTreeModel>> proxy = new RpcProxy<List<EntityTreeModel>>() {  
-			@Override
-			protected void load(Object loadConfig, final AsyncCallback<List<EntityTreeModel>> callback) {
-				if(loadConfig != null) {
-					String entityId = ((EntityTreeModel) loadConfig).getId();
-					getFolderChildren(callback, entityId);
-				} else {
-					callback.onFailure(null);
-				}
-			}
-		};
-	  
-	    // tree loader  
-	    loader = new BaseTreeLoader<EntityTreeModel>(proxy) {  
-	      @Override  
-	      public boolean hasChildren(EntityTreeModel parent) {
-	    	if(PLACEHOLDER_ID.equals(parent.getId())) return false; // non-entity node 	    	
-	        return true; // all entities could have children. Don't lookup just to answer this correctly  
-	      }  
-	    };  
-	  
-	    // trees store  
-	    store = new TreeStore<EntityTreeModel>(loader);  
-	    store.setKeyProvider(new ModelKeyProvider<EntityTreeModel>() {  
-	      public String getKey(EntityTreeModel model) {  
-	        return model.getKey();  
-	      }  
-	    });  
-	    store.setStoreSorter(new StoreSorter<EntityTreeModel>() {  	  
-	      @Override  
-	      public int compare(Store<EntityTreeModel> store, EntityTreeModel m1, EntityTreeModel m2, String property) {
-	    	// put placeholders at end
-	    	  if(m1.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return 1;
-	    	  if(m2.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return -1;
-	        return m1.getName().compareToIgnoreCase(m2.getName());  
-	      }  
-	    });  		   
-	}
+//	private void createStore() {
+//	    // data proxy  
+//	    RpcProxy<List<EntityTreeModel>> proxy = new RpcProxy<List<EntityTreeModel>>() {  
+//			@Override
+//			protected void load(Object loadConfig, final AsyncCallback<List<EntityTreeModel>> callback) {
+//				if(loadConfig != null) {
+//					String entityId = ((EntityTreeModel) loadConfig).getId();
+//					getFolderChildren(callback, entityId);
+//				} else {
+//					callback.onFailure(null);
+//				}
+//			}
+//		};
+//	  
+//	    // tree loader  
+//	    loader = new BaseTreeLoader<EntityTreeModel>(proxy) {  
+//	      @Override  
+//	      public boolean hasChildren(EntityTreeModel parent) {
+//	    	if(PLACEHOLDER_ID.equals(parent.getId())) return false; // non-entity node 	    	
+//	        return true; // all entities could have children. Don't lookup just to answer this correctly  
+//	      }  
+//	    };  
+//	  
+//	    // trees store  
+//	    store = new TreeStore<EntityTreeModel>(loader);  
+//	    store.setKeyProvider(new ModelKeyProvider<EntityTreeModel>() {  
+//	      public String getKey(EntityTreeModel model) {  
+//	        return model.getKey();  
+//	      }  
+//	    });  
+//	    store.setStoreSorter(new StoreSorter<EntityTreeModel>() {  	  
+//	      @Override  
+//	      public int compare(Store<EntityTreeModel> store, EntityTreeModel m1, EntityTreeModel m2, String property) {
+//	    	// put placeholders at end
+//	    	  if(m1.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return 1;
+//	    	  if(m2.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return -1;
+//	        return m1.getName().compareToIgnoreCase(m2.getName());  
+//	      }  
+//	    });  		   
+//	}
 
-	private void setSelection(EntityTreeModel selectedItem) {
-		if(selectedItem != null && !PLACEHOLDER_ID.equals(selectedItem.getId())) {
-			presenter.setSelection(selectedItem.getId());
-		}
-	}
+//	private void setSelection(EntityTreeModel selectedItem) {
+//		if(selectedItem != null && !PLACEHOLDER_ID.equals(selectedItem.getId())) {
+//			presenter.setSelection(selectedItem.getId());
+//		}
+//	}
 
-	private void getFolderChildren(final AsyncCallback<List<EntityTreeModel>> callback, String entityId) {
-		presenter.getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
-			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				// convert to model data
-				List<EntityTreeModel> models = convertEntityHeaderToModel(result);
-				callback.onSuccess(models);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
+//	private void getFolderChildren(final AsyncCallback<List<EntityTreeModel>> callback, String entityId) {
+//		presenter.getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
+//			@Override
+//			public void onSuccess(List<EntityHeader> result) {
+//				// convert to model data
+//				List<EntityTreeModel> models = convertEntityHeaderToModel(result);
+//				callback.onSuccess(models);
+//			}
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				callback.onFailure(caught);
+//			}
+//		});
+//	}
 
 	@Override
 	public void removeEntity(EntityTreeModel entityModel) {
@@ -334,44 +377,50 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		// Update fields.
 		header2item.put(childToCreate, childItem);
+		item2header.put(childItem, childToCreate);
+		
+		// TODO: HACKY: Add dummy item to childItem to make expandable.
+		TreeItem dummyItem = new TreeItem();
+		dummyItem.setVisible(false);
+		childItem.addItem(dummyItem);
 		
 		// Add checkbox that displays children.
-		CheckBox cb = new CheckBox();
-		cb.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!alreadyFetchedEntityChildren.contains(childToCreate)) {
-					// We have not already gotten children for this entity. Let's get them.
-					alreadyFetchedEntityChildren.add(childToCreate);
-					presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
-		
-						@Override
-						public void onSuccess(List<EntityHeader> result) {
-							for (EntityHeader entity : result) {
-								createAndPlaceTreeItem(entity, childToCreate, false);
-							}
-							
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
-							
-						}
-						
-					});
-				}
-				
-				boolean selected = ((CheckBox) event.getSource()).getValue();
-				if (selected) {
-					childItem.setSelected(true);
-				} else {
-					childItem.setSelected(false);
-				}
-			}
+//		CheckBox cb = new CheckBox();
+//		cb.addClickHandler(new ClickHandler() {
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				if (!alreadyFetchedEntityChildren.contains(childToCreate)) {
+//					// We have not already gotten children for this entity.
+//					alreadyFetchedEntityChildren.add(childToCreate);
+//					presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
+//		
+//						@Override
+//						public void onSuccess(List<EntityHeader> result) {
+//							for (EntityHeader entity : result) {
+//								createAndPlaceTreeItem(entity, childToCreate, false);
+//							}
+//							
+//						}
+//						
+//						@Override
+//						public void onFailure(Throwable caught) {
+//							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+//							
+//						}
+//						
+//					});
+//				}
+//				
+//				boolean selected = ((CheckBox) event.getSource()).getValue();
+//				if (selected) {
+//					childItem.setSelected(true);
+//				} else {
+//					childItem.setSelected(false);
+//				}
+//			}
 			
-		});
+//		});
 		
 		
 		// Get Icon. TODO: Super sloppy with the PLACEHOLDER_TYPE checks.
@@ -385,11 +434,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
 		
 		// Add info to panel to be displayed.
-		panel.add(cb);
 		if (!PLACEHOLDER_TYPE.equals(type))
 			panel.add(iconImage);
 		panel.add(new Label(childToCreate.getName()));
-		showClosedImage(childItem);
 		
 		// Set the created child the child of the given parent entity.
 		if (isRootItem) {
