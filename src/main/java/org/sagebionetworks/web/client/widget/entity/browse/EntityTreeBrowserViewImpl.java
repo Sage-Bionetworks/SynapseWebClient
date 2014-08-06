@@ -40,6 +40,7 @@ import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
@@ -48,8 +49,10 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -63,6 +66,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private static final String PLACEHOLDER_ID = "-1";
 	private static final String PLACEHOLDER_TYPE = "-1";
 	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
+	
+	private static final int TREE_ITEM_ICON_INDEX = 0;
+	
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
@@ -78,6 +84,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Map<EntityHeader, TreeItem> header2item;
 	private Map<TreeItem, EntityHeader> item2header;
 	private Set<EntityHeader> alreadyFetchedEntityChildren;
+	private Image loadingImage;
 	
 //	@Override
 //	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
@@ -153,8 +160,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		header2item = new HashMap<EntityHeader, TreeItem>();
 		item2header = new HashMap<TreeItem, EntityHeader>();
 		alreadyFetchedEntityChildren = new HashSet<EntityHeader>();
+		loadingImage = new Image(sageImageBundle.loading16());
 
-		//this.setLayout(new FitLayout());
 		this.add(entityTree);
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
 
@@ -163,19 +170,38 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 				final TreeItem source = event.getTarget();
 				final EntityHeader sourceHeader = item2header.get(source);
 				if (!alreadyFetchedEntityChildren.contains(sourceHeader)) {
-					// We have not already gotten children for this entity. Get rid of it's dummy child
-					// and let's grab the new children.
-					// source.removeItems();
-					alreadyFetchedEntityChildren.add(sourceHeader);
+					// We have not already fetched children for this entity.
+					
+					// Change to loading icon.
+					final Image oldIcon = (Image) ((HorizontalPanel) source.getWidget()).getWidget(TREE_ITEM_ICON_INDEX);
+					((HorizontalPanel) source.getWidget()).remove(TREE_ITEM_ICON_INDEX);
+					((HorizontalPanel) source.getWidget()).insert(loadingImage, TREE_ITEM_ICON_INDEX);
+					
 					presenter.getFolderChildren(sourceHeader.getId(), new AsyncCallback<List<EntityHeader>>() {
 		
 						@Override
 						public void onSuccess(List<EntityHeader> result) {
-							source.removeItems();	// Remove the dummy child item.
-							for (EntityHeader entity : result) {
-								createAndPlaceTreeItem(entity, sourceHeader, false);
+							// We got the children!
+							alreadyFetchedEntityChildren.add(sourceHeader);
+							source.removeItems();	// Remove the dummy item.
+							int maxLimit = presenter.getMaxLimit();		// TODO: Note: All of this getMaxLimit stuff is for naught, as the presenter call limits the number of fetched entities to that max limit.
+							
+							// Make a tree item for each child and place them in the tree.
+							for (int i = 0; i < result.size() && i < maxLimit; i++) {
+								createAndPlaceTreeItem(result.get(i), sourceHeader, false);
 							}
 							
+							// If the max limit was reached, display that in placeholder in tree.
+							if (result.size() > presenter.getMaxLimit()) {
+								EntityHeader placeHolderHeader = new EntityHeader();
+								placeHolderHeader.setType(PLACEHOLDER_TYPE);
+								placeHolderHeader.setName("Limited to " + maxLimit + " results of " + result.size());
+								createAndPlaceTreeItem(placeHolderHeader, sourceHeader, false);
+							}
+							
+							// Change back to original icon.
+							((HorizontalPanel) source.getWidget()).remove(TREE_ITEM_ICON_INDEX);
+							((HorizontalPanel) source.getWidget()).insert(oldIcon, TREE_ITEM_ICON_INDEX);
 						}
 						
 						@Override
@@ -186,17 +212,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 						
 					});
 				}
-				
-//				boolean selected = ((CheckBox) event.getSource()).getValue();
-//				if (selected) {
-//					childItem.setSelected(true);
-//				} else {
-//					childItem.setSelected(false);
-//				}
 			}
 			
 		});
-		// TODO: Set up stuff? Not really much to set up.
 	}
 
 	@Override
@@ -244,11 +262,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			eh.setType(PLACEHOLDER_TYPE);
 			rootEntities.add(eh);
 		}
-		//store.add(convertEntityHeaderToModel(rootEntities), false);
-		//if (sort) store.sort(EntityTreeModel.KEY_NAME, SortDir.ASC);
-		
-		// Make root stuff. Add to tree.
-		// TODO: Sort if sort.
 		for (final EntityHeader header : rootEntities) {
 			createAndPlaceTreeItem(header, null, true);
 		}
@@ -371,6 +384,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityHeader parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		
+		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
+			// Not an actual entity. Just display and call it good.
+			TreeItem placeHolderItem = new TreeItem(new HTMLPanel("<div>" + childToCreate.getName() + "</div>"));
+			if (isRootItem) {
+				entityTree.addItem(placeHolderItem);
+			} else {
+				header2item.get(parent).addItem(placeHolderItem);
+			}
+			return;
+		}
+		
 		// Create panel and make tree item.
 		HorizontalPanel panel = new HorizontalPanel();
 		final TreeItem childItem = new TreeItem(panel);
@@ -379,64 +403,23 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		header2item.put(childToCreate, childItem);
 		item2header.put(childItem, childToCreate);
 		
+		
+		String type = childToCreate.getType();
+		
 		// TODO: HACKY: Add dummy item to childItem to make expandable.
-		TreeItem dummyItem = new TreeItem();
-		dummyItem.setVisible(false);
-		childItem.addItem(dummyItem);
-		
-		// Add checkbox that displays children.
-//		CheckBox cb = new CheckBox();
-//		cb.addClickHandler(new ClickHandler() {
-//
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				if (!alreadyFetchedEntityChildren.contains(childToCreate)) {
-//					// We have not already gotten children for this entity.
-//					alreadyFetchedEntityChildren.add(childToCreate);
-//					presenter.getFolderChildren(childToCreate.getId(), new AsyncCallback<List<EntityHeader>>() {
-//		
-//						@Override
-//						public void onSuccess(List<EntityHeader> result) {
-//							for (EntityHeader entity : result) {
-//								createAndPlaceTreeItem(entity, childToCreate, false);
-//							}
-//							
-//						}
-//						
-//						@Override
-//						public void onFailure(Throwable caught) {
-//							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
-//							
-//						}
-//						
-//					});
-//				}
-//				
-//				boolean selected = ((CheckBox) event.getSource()).getValue();
-//				if (selected) {
-//					childItem.setSelected(true);
-//				} else {
-//					childItem.setSelected(false);
-//				}
-//			}
-			
-//		});
-		
+		childItem.addItem(createDummyItem());
 		
 		// Get Icon. TODO: Super sloppy with the PLACEHOLDER_TYPE checks.
-		String type = childToCreate.getType();
-		if (!typeToIcon.containsKey(type) && !PLACEHOLDER_TYPE.equals(type)) {
+		if (!typeToIcon.containsKey(type)) {
 			ImageResource iconResource = presenter.getIconForType(type);
 			typeToIcon.put(type, iconResource);
 		}
-		Image iconImage = null;
-		if (!PLACEHOLDER_TYPE.equals(type))
-			iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
+		
+		Image iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
 		
 		// Add info to panel to be displayed.
-		if (!PLACEHOLDER_TYPE.equals(type))
-			panel.add(iconImage);
-		panel.add(new Label(childToCreate.getName()));
+		panel.add(iconImage);
+		panel.add(new Anchor("<a href=\"" + DisplayUtils.getSynapseHistoryToken(childToCreate.getId()) + "\">" + childToCreate.getName() + "</a>", true));
 		
 		// Set the created child the child of the given parent entity.
 		if (isRootItem) {
@@ -444,6 +427,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		} else {
 			header2item.get(parent).addItem(childItem);
 		}
+	}
+	
+	private TreeItem createDummyItem() {
+		TreeItem result = new TreeItem();
+		result.setVisible(false);
+		return result;
 	}
 	
 }
