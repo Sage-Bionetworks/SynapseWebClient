@@ -91,6 +91,9 @@ import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
+import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -681,6 +684,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 		bind(BigUserBadgeView.class).to(BigUserBadgeViewImpl.class);
+		
+		bind(EntityIconsCache.class).in(Singleton.class);
+		
+		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
 		

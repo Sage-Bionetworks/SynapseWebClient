@@ -206,6 +206,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 
 	@Override
 	public ImageResource getIconForType(String type) {
+		return getIconForType(type, entityTypeProvider, iconsImageBundle);
+	}
+	
+	public static ImageResource getIconForType(String type, EntityTypeProvider entityTypeProvider, IconsImageBundle iconsImageBundle) {
 		if(type == null) return null;
 		EntityType entityType;
 		if(type.startsWith("org.")) entityType = entityTypeProvider.getEntityTypeForClassName(type); 			

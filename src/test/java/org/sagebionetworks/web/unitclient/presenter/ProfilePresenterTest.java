@@ -1,21 +1,19 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -25,21 +23,24 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
@@ -57,23 +58,27 @@ public class ProfilePresenterTest {
 	UserAccountServiceAsync mockUserService;
 	LinkedInServiceAsync mockLinkedInService;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
 	CookieProvider mockCookieProvider;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	GWTWrapper mockGWTWrapper;
+	SearchServiceAsync mockSearchService;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
+	
 	Profile place = Mockito.mock(Profile.class);
 	
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
 	String password = "password";
+	List<String> myProjectsJson;
+	List<EntityHeader> myProjects;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
+		mockSearchService = mock(SearchServiceAsync.class);
 		mockView = mock(ProfileView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -81,14 +86,12 @@ public class ProfilePresenterTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockLinkedInService = mock(LinkedInServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockCookieProvider = mock(CookieProvider.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
 		
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockNodeModelCreator, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockLinkedInService, mockGlobalApplicationState, mockSynapseClient, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, mockSearchService);	
 		verify(mockView).setPresenter(profilePresenter);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), any(Class.class))).thenReturn(userProfile);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");
@@ -109,6 +112,26 @@ public class ProfilePresenterTest {
 		PassingRecord myPassingRecord = new PassingRecord();
 		String passingRecordJson = myPassingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(passingRecordJson).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		
+		//set up get user projects test
+		EntityHeader project1 = new EntityHeader();
+		project1.setId("syn1");
+		EntityHeader project2 = new EntityHeader();
+		project2.setId("syn2");
+		
+		myProjectsJson = new ArrayList<String>();
+		myProjectsJson.add(project1.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		myProjectsJson.add(project2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		myProjects = new ArrayList<EntityHeader>();
+		myProjects.add(project1);
+		myProjects.add(project2);
+		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		//set up create project test
+		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		
+		//set up create team test
+		AsyncMockStubber.callSuccessWith("new team id").when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
@@ -214,4 +237,89 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testGetUserProjects() {
+		profilePresenter.getUserProjects("anyUserId");
+		verify(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).setMyProjects(eq(myProjects));
+	}
+	
+	@Test
+	public void testGetUserProjectsError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.getUserProjects("anyUserId");
+		verify(mockView).setMyProjectsError(anyString());
+	}
+	
+	@Test
+	public void testCreateProject() {
+		profilePresenter.createProject("valid name");
+		verify(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		//inform user of success, and go to new project page
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockPlaceChanger).goTo(any(Synapse.class));
+	}
+
+	@Test
+	public void testCreateProjectEmptyName() {
+		profilePresenter.createProject("");
+		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+		Mockito.reset(mockView);
+		
+		profilePresenter.createProject(null);
+		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+
+	@Test
+	public void testCreateProjectError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.createProject("valid name");
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCreateProjectNameConflictError() {
+		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.createProject("valid name");
+		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+	}
+	
+	@Test
+	public void testCreateTeam() {
+		profilePresenter.createTeam("valid name");
+		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		//inform user of success, and go to new team page
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockPlaceChanger).goTo(any(Team.class));
+	}
+
+	@Test
+	public void testCreateTeamEmptyName() {
+		profilePresenter.createTeam("");
+		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+		Mockito.reset(mockView);
+		
+		profilePresenter.createTeam(null);
+		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(anyString());
+	}
+
+	@Test
+	public void testCreateTeamError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		profilePresenter.createTeam("valid name");
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testCreateTeamNameConflictError() {
+		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		profilePresenter.createTeam("valid name");
+		verify(mockView).showErrorMessage(eq(DisplayConstants.WARNING_TEAM_NAME_EXISTS));
+	}
+
 }

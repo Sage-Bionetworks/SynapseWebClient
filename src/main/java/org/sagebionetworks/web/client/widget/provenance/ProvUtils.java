@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -192,7 +193,9 @@ public class ProvUtils {
 		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
+
+		if (entity.getModifiedOn() != null)
+			map.put("Modified On", DisplayUtils.converDataToPrettyString(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
@@ -246,6 +249,7 @@ public class ProvUtils {
 	public static void getInfo(String nodeId,			
 			SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			AdapterFactory adapterFactory,
 			ClientCache clientCache,
 			Map<String, ProvGraphNode> idToNode,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
@@ -256,9 +260,9 @@ public class ProvUtils {
 		if(node == null) callback.onFailure(null);
 		
 		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, nodeModelCreator, clientCache, callback, (EntityGraphNode)node);
+			getInfoEntityTreeNode(synapseClient, nodeModelCreator, adapterFactory, clientCache, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
-			getInfoActivityTreeNode(synapseClient, nodeModelCreator, clientCache, callback, (ActivityGraphNode)node);
+			getInfoActivityTreeNode(synapseClient, nodeModelCreator, adapterFactory, clientCache, callback, (ActivityGraphNode)node);
 		} else if(node instanceof ExternalGraphNode) {
 			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
 		}
@@ -271,6 +275,7 @@ public class ProvUtils {
 	private static void getInfoActivityTreeNode(
 			final SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			ActivityGraphNode atNode) {
@@ -279,7 +284,7 @@ public class ProvUtils {
 			public void onSuccess(String result) {
 				try {
 					final Activity activity = nodeModelCreator.createJSONEntity(result, Activity.class);
-					UserBadge.getUserProfile(activity.getModifiedBy(), nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					UserBadge.getUserProfile(activity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {
 							callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
@@ -304,6 +309,7 @@ public class ProvUtils {
 
 	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
 			final NodeModelCreator nodeModelCreator,
+			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			EntityGraphNode etNode) {
@@ -312,7 +318,7 @@ public class ProvUtils {
 			public void onSuccess(EntityWrapper result) {
 				try {
 					final Entity entity = nodeModelCreator.createEntity(result);
-					UserBadge.getUserProfile(entity.getModifiedBy(), nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {
 							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		

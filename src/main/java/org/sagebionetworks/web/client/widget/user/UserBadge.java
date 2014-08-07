@@ -4,10 +4,10 @@ import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -23,15 +23,15 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	private UserBadgeView view;
 	SynapseClientAsync synapseClient;
-	NodeModelCreator nodeModelCreator;
+	AdapterFactory adapterFactory;
 	private Integer maxNameLength;
 	ClientCache clientCache;
 	
 	@Inject
-	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator, ClientCache clientCache) {
+	public UserBadge(UserBadgeView view, SynapseClientAsync synapseClient, AdapterFactory adapterFactory, ClientCache clientCache) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
+		this.adapterFactory = adapterFactory;
 		this.clientCache = clientCache;
 		view.setPresenter(this);
 	}
@@ -54,7 +54,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		if (principalId != null && principalId.trim().length() > 0) {
 			view.showLoading();
 			
-			UserBadge.getUserProfile(principalId, nodeModelCreator, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+			UserBadge.getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile profile) {
 					view.setProfile(profile, maxNameLength);
@@ -75,16 +75,16 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		view.setCustomClickHandler(clickHandler);
 	}	
 
-	public static void getUserProfile(final String principalId, final NodeModelCreator nodeModelCreator, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
+	public static void getUserProfile(final String principalId, final AdapterFactory adapterFactory, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
 		String profileString = clientCache.get(principalId + WebConstants.USER_PROFILE_SUFFIX);
 		if (profileString != null) {
-			parseProfile(profileString, nodeModelCreator, callback);
+			parseProfile(profileString, adapterFactory, callback);
 		} else {
 		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String result) {
 					clientCache.put(principalId + WebConstants.USER_PROFILE_SUFFIX, result);
-					parseProfile(result, nodeModelCreator, callback);
+					parseProfile(result, adapterFactory, callback);
 				}
 			
 			@Override
@@ -95,9 +95,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	}
 	
-	public static void parseProfile(String profileString, NodeModelCreator nodeModelCreator, AsyncCallback<UserProfile> callback) {
+	public static void parseProfile(String profileString, AdapterFactory adapterFactory, AsyncCallback<UserProfile> callback) {
 		try {
-			UserProfile profile = nodeModelCreator.createJSONEntity(profileString, UserProfile.class);
+			UserProfile profile = new UserProfile(adapterFactory.createNew(profileString));
 			callback.onSuccess(profile);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);

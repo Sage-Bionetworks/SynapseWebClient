@@ -129,8 +129,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				}
 			}
 		});
-
-		
 	}
 
 	@Override
