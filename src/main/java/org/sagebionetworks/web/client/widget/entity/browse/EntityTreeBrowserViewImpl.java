@@ -41,6 +41,7 @@ import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanel;
 import com.extjs.gxt.ui.client.widget.treepanel.TreePanelSelectionModel;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
@@ -442,9 +443,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	
 	public interface EntityTreeResources extends Tree.Resources {
 		
-		@Source("C4EA130FD0ED44BE513FEEDDE13614DA.cache.png")
+		@Source("images/icons/cog-16.png")
 		ImageResource treeOpen();
 		
+		@Source("images/icons/magnifier-zoom-in-16.png")
 		ImageResource treeClose();
 	}
 	
