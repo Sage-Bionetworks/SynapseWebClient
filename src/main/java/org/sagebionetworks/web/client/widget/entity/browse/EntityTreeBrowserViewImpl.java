@@ -164,7 +164,14 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 
 		this.add(entityTree);
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
-
+			
+			/**
+			 * When a node is expanded, if its children have not already
+			 * been fetched and placed into the tree, it will delete the dummy
+			 * child node and fetch the actual children of the expanded node.
+			 * During this process, the icon of the expanded node is switched
+			 * to a loading indicator.
+			 */
 			@Override
 			public void onOpen(OpenEvent<TreeItem> event) {
 				final TreeItem source = event.getTarget();
@@ -184,19 +191,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 							// We got the children!
 							alreadyFetchedEntityChildren.add(sourceHeader);
 							source.removeItems();	// Remove the dummy item.
-							int maxLimit = presenter.getMaxLimit();		// TODO: Note: All of this getMaxLimit stuff is for naught, as the presenter call limits the number of fetched entities to that max limit.
 							
 							// Make a tree item for each child and place them in the tree.
-							for (int i = 0; i < result.size() && i < maxLimit; i++) {
-								createAndPlaceTreeItem(result.get(i), sourceHeader, false);
-							}
-							
-							// If the max limit was reached, display that in placeholder in tree.
-							if (result.size() > presenter.getMaxLimit()) {
-								EntityHeader placeHolderHeader = new EntityHeader();
-								placeHolderHeader.setType(PLACEHOLDER_TYPE);
-								placeHolderHeader.setName("Limited to " + maxLimit + " results of " + result.size());
-								createAndPlaceTreeItem(placeHolderHeader, sourceHeader, false);
+							for (EntityHeader header : result) {
+								createAndPlaceTreeItem(header, sourceHeader, false);
 							}
 							
 							// Change back to original icon.
@@ -206,7 +204,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 						
 						@Override
 						public void onFailure(Throwable caught) {
-							System.out.println("CHECK BEHAVIOR HERE FOR NOT FOLDER");	// TODO
+							System.out.println("ERROROROROORROORR");	// TODO
 							
 						}
 						
@@ -278,7 +276,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	 * Private Methods
 	 */
 	
-	// TODO: EntityTreeModel needed? That's "Tree" yeah?
 	private List<EntityTreeModel> convertEntityHeaderToModel(List<EntityHeader> headers) {
 		
 		List<EntityTreeModel> models = new ArrayList<EntityTreeModel>();
@@ -372,14 +369,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	@Override
 	public void setWidgetHeight(int height) {
 		this.height = height;
-		// determineHeight();	// TODO: Find equivalent gwt method?
 	}
 	
 	/**
-	 * Makes a TreeItem and places it in the tree.
-	 * @param parent
-	 * @param child
-	 * @param isRootItem
+	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
+	 * child so that the item can be expanded.
+	 * @param childToCreate The EntityHeader who's information will be used to create a
+	 * 					 	new tree item and place in the tree.
+	 * @param parent The EntityHeader that corresponds to the tree item the the created
+	 * 				 child will become the child of. Parameter ignored if isRootItem.
+	 * @param isRootItem true if the childToCreate is a root item, false otherwise.
 	 */
 	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityHeader parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
@@ -397,6 +396,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		// Create panel and make tree item.
 		HorizontalPanel panel = new HorizontalPanel();
+		panel.getElement().getStyle().setProperty("padding", "10px");
 		final TreeItem childItem = new TreeItem(panel);
 		
 		// Update fields.
@@ -406,22 +406,22 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		String type = childToCreate.getType();
 		
-		// TODO: HACKY: Add dummy item to childItem to make expandable.
+		// HACKY: Add dummy item to childItem to make expandable.
 		childItem.addItem(createDummyItem());
 		
-		// Get Icon. TODO: Super sloppy with the PLACEHOLDER_TYPE checks.
-		if (!typeToIcon.containsKey(type)) {
-			ImageResource iconResource = presenter.getIconForType(type);
-			typeToIcon.put(type, iconResource);
-		}
+		if (!typeToIcon.containsKey(type))
+			typeToIcon.put(type, presenter.getIconForType(type));
 		
 		Image iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
 		
 		// Add info to panel to be displayed.
 		panel.add(iconImage);
-		panel.add(new Anchor("<a href=\"" + DisplayUtils.getSynapseHistoryToken(childToCreate.getId()) + "\">" + childToCreate.getName() + "</a>", true));
+		Anchor linkToEntity = new Anchor("<a href=\"" + DisplayUtils.getSynapseHistoryToken(childToCreate.getId()) + "\">" + childToCreate.getName() + "</a>", true);
+		linkToEntity.getElement().getStyle().setProperty("paddingLeft", "3px");
+		linkToEntity.getElement().getStyle().setProperty("fontSize", "11px");
+		panel.add(linkToEntity);
 		
-		// Set the created child the child of the given parent entity.
+		// Place the created child in the tree as the child of the given parent entity.
 		if (isRootItem) {
 			entityTree.addItem(childItem);
 		} else {
@@ -429,10 +429,23 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		}
 	}
 	
+	/**
+	 * Creates the dummy item used to make all items placed in the tree
+	 * expandable.
+	 * @return the dummy tree item.
+	 */
 	private TreeItem createDummyItem() {
 		TreeItem result = new TreeItem();
 		result.setVisible(false);
 		return result;
+	}
+	
+	public interface EntityTreeResources extends Tree.Resources {
+		
+		@Source("C4EA130FD0ED44BE513FEEDDE13614DA.cache.png")
+		ImageResource treeOpen();
+		
+		ImageResource treeClose();
 	}
 	
 }
