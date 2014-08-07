@@ -50,6 +50,8 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
+import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -89,6 +91,9 @@ import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetView;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
+import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.entity.EntityIconsCache;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
@@ -469,6 +474,11 @@ public class PortalGinModule extends AbstractGinModule {
 		//ChangeUsername
 		bind(ChangeUsernameViewImpl.class).in(Singleton.class);
 		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class);
+		
+		// Trash
+		bind(TrashViewImpl.class).in(Singleton.class);
+		bind(TrashView.class).to(TrashViewImpl.class);
+		
 
 		/*
 		 * Factories
@@ -674,6 +684,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
 		bind(BigUserBadgeView.class).to(BigUserBadgeViewImpl.class);
+		
+		bind(EntityIconsCache.class).in(Singleton.class);
+		
+		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);
 		

@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -140,6 +142,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	
+	public TrashPresenter getTrashPresenter();
+	
 	public TeamSearchPresenter getTeamSearchPresenter();
 	
 	public EventBus getEventBus();
@@ -215,6 +219,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SimpleTableWidget getSimpleTableWidget();
+	
+	public EntityBadge getEntityBadgeWidget();
 
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();

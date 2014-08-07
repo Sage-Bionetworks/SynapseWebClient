@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -308,5 +310,18 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(String tableId, List<String> schemaJSON,
 			AsyncCallback<List<String>> callback);
+
+	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
+	
+	void purgeTrashForUser(AsyncCallback<Void> callback);
+
+	void moveToTrash(String entityId, AsyncCallback<Void> callback);
+
+	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
+	
+	void viewTrashForUser(long offset, long limit,
+			AsyncCallback<String> callback);
+
+	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
 }

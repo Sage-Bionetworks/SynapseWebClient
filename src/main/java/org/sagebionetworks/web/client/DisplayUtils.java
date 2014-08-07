@@ -22,10 +22,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -76,10 +79,10 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -106,10 +109,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -134,11 +134,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -162,7 +157,6 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
@@ -854,6 +848,11 @@ public class DisplayUtils {
 		TeamSearch place = new TeamSearch(searchTerm, start);
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
+	
+	public static String getTrashHistoryToken(String token, Integer start) {
+		Trash place = new Trash(token, start);
+		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
+	}
 
 	public static String getLoginPlaceHistoryToken(String token) {
 		LoginPlace place = new LoginPlace(token);
@@ -961,6 +960,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getTrashPlaceString(Class<Trash> place) {
 		return getPlaceString(place.getName());		
 	}
 
@@ -1281,103 +1284,16 @@ public class DisplayUtils {
 		return ordered;
 	}
 	
-	public static PopupPanel addToolTip(Widget widget, String message) {
-		PopupPanel popup = addToolTip(widget);
-		popup.setWidget(new HTML(message));
-		return popup;
+	public static Popover addPopover(Widget widget, String message) {
+		Popover popover = new Popover(widget);
+		popover.setPlacement(Placement.AUTO);
+		popover.setIsHtml(true);
+		popover.setContent(message);
+		return popover;
 	}
 	
-	/**
-	 * Creates and attaches a simple tooltip to a GWT widget
-	 * 
-	 * Customization of content and style are made by the caller method
-	 * 
-	 * @param widget: the widget to attach the popup/tooltip to
-	 * @return the new popup/tooltip that can be customized
-	 */
-	public static PopupPanel addToolTip(final Widget widget) {
-		return addToolTip(widget, false, false);
-	}
-	
-	/**
-	 * Provides a more flexible configuration of a tooltip's behavior
-	 * 
-	 * Customization of content and style are made by the caller method
-	 * 
-	 * Note: if keepOpen is set to true and autoHide is set to false, the caller 
-	 * 		should provide an alternative way to closing/hiding the tooltip
-	 * 
-	 * @param widget: the widget to attach to
-	 * @param keepToolTipOpen: whether the tooltip should remain open when the curser leaves the widget but 
-	 * 					moves onto the tooltip
-	 * @param autoHide: whether the tooltip should close when the curser clicks outside of it
-	 * @return the new tooltip
-	 */
-	public static PopupPanel addToolTip(final Widget widget, boolean keepToolTipOpen, boolean autoHide) {
-		final PopupPanel popup = createToolTip(autoHide);
-		widget.addDomHandler(new MouseOverHandler() {
-			@Override
-			public void onMouseOver(MouseOverEvent event) {
-				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-			          public void setPosition(int offsetWidth, int offsetHeight) {
-			        	  popup.showRelativeTo(widget);
-			          }
-			        });
-			}
-		}, MouseOverEvent.getType());
-
-		//If the tooltip is to remain open, we do not "hide" it when the curser moves out of the widget
-		if(keepToolTipOpen) {
-			popup.addDomHandler(new MouseOverHandler() {
-				@Override
-				public void onMouseOver(MouseOverEvent event) {
-					popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-				          public void setPosition(int offsetWidth, int offsetHeight) {
-				        	  popup.showRelativeTo(widget);
-				          }
-				        });
-				}
-			}, MouseOverEvent.getType());	
-		} else {
-			widget.addDomHandler(new MouseOutHandler() {
-				@Override
-				public void onMouseOut(MouseOutEvent event) {
-					popup.hide();
-				}
-			}, MouseOutEvent.getType());
-		}
-		return popup;
-	}
-	
-	private static PopupPanel createToolTip(boolean autoHide) {
-		final PopupPanel popup = new PopupPanel(autoHide);
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		return popup;
-	}
-	
-	public static PopupPanel addToolTip(final Component widget, String message) {
-		final PopupPanel popup = new PopupPanel(true);
-		popup.setWidget(new HTML(message));
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		widget.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-			          public void setPosition(int offsetWidth, int offsetHeight) {
-			        	  popup.showRelativeTo(widget);
-			          }
-			        });
-			}
-		});
-		widget.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.hide();
-			}
-		});
-		return popup;
+	public static Tooltip addToolTip(final Component widget, String message) {
+		return addTooltip(widget, message, Placement.AUTO);
 	}
 	
 	/**
@@ -1392,6 +1308,10 @@ public class DisplayUtils {
 	private static int tooltipCount= 0;
 	private static int popoverCount= 0;
 	
+	public static Tooltip addTooltip(Widget widget, String tooltipText){
+		return addTooltip(widget, tooltipText, Placement.AUTO);
+	}
+	
 	/**
 	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *
@@ -1405,98 +1325,31 @@ public class DisplayUtils {
 	 * @param tooltipText text to display
 	 * @param pos where to position the tooltip relative to the widget
 	 */
-	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("title", tooltipText);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-animation", "false");
-		optionsMap.put("data-html", "true");
-		addTooltip(util, widget, optionsMap);
-	}
-		
-	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
-		el.setId(id);
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "tooltip");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-			
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapTooltip(el.getId());
-					} else {
-						util.hideBootstrapTooltip(el.getId());
-					}
-				}
-			});
-		}
+	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
+		Tooltip t = new Tooltip();
+		t.setWidget(widget);
+		t.setPlacement(pos);
+		t.setText(tooltipText);
+		t.setIsHtml(true);
+		t.setIsAnimated(false);
+		t.setTrigger(Trigger.HOVER);
+		return t;
 	}
 
-	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("trigger", "click");		
-		addPopover(util, widget, content, optionsMap);
-	}
-
-	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-trigger", "hover");		
-		addPopover(util, widget, content, optionsMap);
-	}
-
-	
 	/**
-	 * Adds a popover to a target widget
-	 * 
-	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
-	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-		el.setAttribute("data-content", content);
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "popover");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapPopover(el.getId());
-					}
-				}
-			});
-		}
+	* Adds a popover to a target widget
+	*/
+	public static void addClickPopover(Widget widget, String title, String content, Placement placement) {
+		Popover popover = new Popover();
+		popover.setIsHtml(true);
+		popover.setIsAnimated(true);
+		popover.setTitle(title);
+		popover.setPlacement(placement);
+		popover.setTrigger(Trigger.CLICK);
+		popover.setWidget(widget);
+		popover.setContent(content);
 	}
 
-	public static void applyAttributes(final Element el,
-			Map<String, String> optionsMap) {
-		for (Entry<String, String> option : optionsMap.entrySet()) {
-			DOM.setElementAttribute(el, option.getKey(), option.getValue());
-		}
-	}
-	
     /*
      * Private methods
      */
@@ -2018,7 +1871,7 @@ public class DisplayUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		lc.add(htmlPanel);
 
 		return lc;

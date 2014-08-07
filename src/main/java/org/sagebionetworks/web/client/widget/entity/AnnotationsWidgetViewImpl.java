@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAnnotationDialog;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogUtils;
@@ -59,7 +59,7 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 		Image addAnnotationButton = new Image(resource);
 		addAnnotationButton.addStyleName("imageButton vertical-align-middle margin-left-5");
 		addAnnotationButton.addClickHandler(handler);
-		DisplayUtils.addTooltip(synapseJSNIUtils, addAnnotationButton, tooltipText, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(addAnnotationButton, tooltipText, Placement.BOTTOM);
 		return addAnnotationButton;
 	}
 	
@@ -95,7 +95,7 @@ public class AnnotationsWidgetViewImpl extends FlowPanel implements AnnotationsW
 				l1.addStyleName("inline-block greyText-imp");
 				HTML l2 = new HTML(value);
 				l2.addStyleName("inline-block blackText-imp");
-				DisplayUtils.addTooltip(synapseJSNIUtils, l2, row.getToolTipsBody(), TOOLTIP_POSITION.BOTTOM);
+				DisplayUtils.addTooltip(l2, row.getToolTipsBody(), Placement.BOTTOM);
 				g.setWidget(i, 0, l1);
 				g.setWidget(i, 1, l2);
 				
