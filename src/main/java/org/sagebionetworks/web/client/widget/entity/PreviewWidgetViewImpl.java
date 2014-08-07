@@ -1,21 +1,49 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetView, IsWidget{
+public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetView, IsWidget{
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private String previewHtml;
+	private Anchor fullScreenAnchor; 
+	private Dialog previewDialog;
+	private boolean isCode;
 	
 	@Inject
-	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
+	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, Dialog dialog) {
+		this.synapseJSNIUtils = synapseJsniUtils;
+		this.previewDialog = dialog;
+		dialog.setSize(ModalSize.LARGE);
+		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
+		fullScreenAnchor.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (previewHtml != null) {
+					previewDialog.configure("Preview", new HTMLPanel(previewHtml), DisplayConstants.OK, null, null, true);
+					previewDialog.show();
+					if (isCode) {
+						synapseJSNIUtils.highlightCodeBlocks();
+					}
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -38,35 +66,36 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 		sb.append(" src=\"");
 		sb.append(previewUrl);
 		sb.append("\"></img></a>");
-		add(new HTMLPanel(sb.toString()));
+		setPreview(sb.toString());
 	}
 	
 	@Override
 	public void setCodePreview(String code) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre class=\"previewPreMaxHeight\" style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
 		sb.append(code);
 		sb.append("</code></pre>");
-		add(new HTMLPanel(sb.toString()));
+		setPreview(sb.toString());
 		synapseJSNIUtils.highlightCodeBlocks();
+		isCode = true;
 	}
 	
 	@Override
 	public void setTextPreview(String text) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre class=\"previewPreMaxHeight\" style=\"overflow:auto;white-space:pre;\">");
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\">");
 		sb.append(text);
 		sb.append("</pre>");
-		add(new HTMLPanel(sb.toString()));
+		setPreview(sb.toString());
 	}
 	
 	@Override
 	public void setTablePreview(String text, String delimiter) {
 		clear();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block;max-height:200px\">");
+		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block\">");
 		String[] lines = text.split("[\r\n]");
 		for (int i = 0; i < lines.length; i++) {
 			sb.append("<tr>");
@@ -79,9 +108,23 @@ public class PreviewWidgetViewImpl extends SimplePanel implements PreviewWidgetV
 			sb.append("</tr>");
 		}
 		sb.append("</table>");
-		add(new HTMLPanel(sb.toString()));
+		setPreview(sb.toString());
 	}
 	
+	@Override
+	public void clear() {
+		previewHtml = null;
+		isCode = false;
+		super.clear();
+	}
+	
+	private void setPreview(String html) {
+		previewHtml = html;
+		add(fullScreenAnchor);
+		ScrollPanel wrapper= new ScrollPanel(new HTMLPanel(html));
+		wrapper.setHeight("205px");
+		add(wrapper);
+	}
 	@Override
 	public void showErrorMessage(String message) {
 		clear();
