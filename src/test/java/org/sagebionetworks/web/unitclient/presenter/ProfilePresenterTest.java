@@ -242,14 +242,14 @@ public class ProfilePresenterTest {
 	public void testGetUserProjects() {
 		profilePresenter.getUserProjects("anyUserId");
 		verify(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setMyProjects(eq(myProjects));
+		verify(mockView).setProjects(eq(myProjects));
 	}
 	
 	@Test
 	public void testGetUserProjectsError() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getUserProjects("anyUserId");
-		verify(mockView).setMyProjectsError(anyString());
+		verify(mockView).setProjectsError(anyString());
 	}
 	
 	@Test

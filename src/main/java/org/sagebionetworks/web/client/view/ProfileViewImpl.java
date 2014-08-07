@@ -103,10 +103,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 //	Anchor messagesLink;
 //	@UiField
 //	LIElement messagesListItem;
-//	@UiField
-//	Anchor challengesLink;
-//	@UiField
-//	LIElement challengesListItem;
+	@UiField
+	Anchor challengesLink;
+	@UiField
+	LIElement challengesListItem;
 
 	@UiField
 	DivElement navtabContainer;
@@ -114,7 +114,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement projectsTabContainer;
 	@UiField
-	FlowPanel challengesTabContainer;
+	DivElement challengesTabContainer;
 	@UiField
 	DivElement teamsTabContainer;
 	@UiField
@@ -142,6 +142,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createTeamUI;
 	@UiField
 	FlowPanel teamsTabContent;
+	
+	//Challenges
+	@UiField
+	FlowPanel challengesTabContent;
+	@UiField
+	DivElement challengesHighlightBox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -225,6 +231,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.createTeam(createTeamTextBox.getValue());
 			}
 		});
+		projectsTabContent.addStyleName("margin-10");
+		challengesTabContent.addStyleName("margin-10");
 	}
 	
 	@Override
@@ -259,9 +267,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			teamsTabContent.clear();
 			settingsTabContainer.clear();
 			projectsTabContent.clear();
+			challengesTabContent.clear();
+			
 			DisplayUtils.hide(settingsListItem);
 //			DisplayUtils.hide(messagesListItem);
-//			DisplayUtils.hide(challengesListItem);
 			
 			updateViewProfile(profile, passingRecord);
 			viewProfilePanel.add(profileWidget);
@@ -271,7 +280,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				DisplayUtils.show(settingsListItem);
 				settingsTabContainer.add(settingsPresenter.asWidget());
 //				DisplayUtils.show(messagesListItem);
-//				DisplayUtils.show(challengesListItem);
 				
 				//if owner, show Edit button too (which redirects to the edit version of the Profile place)
 				editProfileButtonPanel.add(editProfileButton);
@@ -310,25 +318,43 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setMyProjects(List<EntityHeader> myProjects) {
-		FlowPanel wrapper = new FlowPanel();
-		wrapper.addStyleName("highlight-box");
-		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Projects");
-		projectsTabContent.add(wrapper);
-		
-		for (EntityHeader entityHeader : myProjects) {
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeader);
-			Widget teamRendererWidget = badge.asWidget();
-			teamRendererWidget.addStyleName("margin-top-5");
-			wrapper.add(teamRendererWidget);
-		}
-		if (myProjects.isEmpty())
-			wrapper.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+	public void setProjects(List<EntityHeader> projectHeaders) {
+		addEntityBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
-	public void setMyProjectsError(String string) {
+	public void setProjectsError(String string) {
+	}
+	
+	@Override
+	protected void onAttach() {
+		super.onAttach();
+		startCarousel();
+	}
+	
+	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
+		for (EntityHeader entityHeader : projectHeaders) {
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeader);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-top-5");
+			targetPanel.add(widget);
+		}
+		if (projectHeaders.isEmpty())
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+	}
+	
+	@Override
+	public void setChallenges(List<EntityHeader> projectHeaders) {
+		if (projectHeaders.size() > 0) {
+			DisplayUtils.show(challengesHighlightBox);
+			addEntityBadges(projectHeaders, challengesTabContent);
+		}
+	}
+	
+	@Override
+	public void setChallengesError(String error) {
+		
 	}
 	
 	@Override
@@ -548,7 +574,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();
 		DisplayUtils.hide(showProfileLink);
-		
+		challengesTabContent.clear();
+		DisplayUtils.hide(challengesHighlightBox);
 		hideTabContainers();
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
@@ -579,8 +606,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamsLink.addStyleName("link");
 		settingsListItem.removeClassName("active");
 		settingsLink.addStyleName("link");
-//		challengesListItem.removeClassName("active");
-//		challengesLink.addStyleName("link");
+		challengesListItem.removeClassName("active");
+		challengesLink.addStyleName("link");
 //		messagesListItem.removeClassName("active");
 //		messagesLink.addStyleName("link");
 		
@@ -599,10 +626,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			tab = settingsListItem;
 			link = settingsLink;
 			DisplayUtils.show(settingsTabContainer);
-//		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
-//			tab = challengesListItem;
-//			link = challengesLink;
-//			DisplayUtils.show(challengesTabContainer);
+		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
+			tab = challengesListItem;
+			link = challengesLink;
+			DisplayUtils.show(challengesTabContainer);
 //		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
 //			tab = messagesListItem;
 //			link = messagesLink;
@@ -626,8 +653,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		settingsLink.setText(DisplayConstants.SETTINGS);
 		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
 		
-//		challengesLink.setText(DisplayConstants.CHALLENGES);
-//		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		challengesLink.setText(DisplayConstants.CHALLENGES);
+		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
 //		messagesLink.setText(DisplayConstants.MESSAGES);
 //		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
 	}
@@ -640,4 +667,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
+	
+	private static native void startCarousel() /*-{
+		$wnd.jQuery('#myCarousel').carousel('cycle');
+	}-*/;
 }

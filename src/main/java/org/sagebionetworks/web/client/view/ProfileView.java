@@ -19,17 +19,19 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 * Set this view's presenter
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
+	void setPresenter(Presenter presenter);
 	
 	/**
 	 * Renders the view for a given presenter
 	 */
-	public void render();
+	void render();
 	
-	public void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
-	public void refreshHeader();
-	public void setMyProjects(List<EntityHeader> myProjects);
-	public void setMyProjectsError(String string);
+	void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
+	void refreshHeader();
+	void setProjects(List<EntityHeader> myProjects);
+	void setProjectsError(String string);
+	void setChallenges(List<EntityHeader> headers);
+	void setChallengesError(String error);
 	
 	public interface Presenter extends SynapsePresenter {
 
