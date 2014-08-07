@@ -101,8 +101,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				//SWC-1566: A BadRequestException is frequently hit (when attempting to remove the last administrator), so just pop up an error message if this type.
-				if(caught instanceof BadRequestException || !DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
 				} 
 			}
