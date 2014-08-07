@@ -130,15 +130,6 @@ public class MemberListWidgetTest {
 		verify(mockView).showErrorMessage(eq(badRequestMessage));
 	}
 	
-	public void testRemoveMemberStandardHandlingFailure() throws Exception {
-		widget.configure(teamId, isAdmin, mockTeamUpdatedCallback);
-		AsyncMockStubber.callFailureWith(new ReadOnlyModeException()).when(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		widget.removeMember("a user id");
-		verify(mockSynapseClient).deleteTeamMember(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE));
-	}
-	
-	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetIsAdmin() throws Exception {
