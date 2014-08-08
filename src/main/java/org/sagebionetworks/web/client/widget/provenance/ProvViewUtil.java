@@ -218,7 +218,7 @@ public class ProvViewUtil {
 				String val = map.get(key);
 				if(val == null) val = "";
 				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
-				if (!DisplayConstants.DESCRIPTION.equalsIgnoreCase(key) && val.length() > 0) {
+				if (ProvUtils.isShowKeyValue(key, val)) {
 					sb.appendHtmlConstant("<span class=\"boldText\">")
 					.appendEscaped(key + ":")
 					.appendHtmlConstant("</span> ")

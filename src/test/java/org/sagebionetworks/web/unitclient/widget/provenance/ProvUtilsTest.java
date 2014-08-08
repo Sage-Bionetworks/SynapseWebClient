@@ -199,6 +199,7 @@ public class ProvUtilsTest {
 		assertFalse(foundExpand2);
 	}
 
+	@Test
 	public void testCreateUniqueNodeId() throws Exception {
 		Integer sequence = 0;
 		Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
@@ -209,6 +210,7 @@ public class ProvUtilsTest {
 		}		
 	}
 	
+	@Test
 	public void testExtractReferences() {
 		String entId1 = "syn123";
 		String entId2 = "syn456";
@@ -239,6 +241,7 @@ public class ProvUtilsTest {
 		assertTrue(refs.contains(ref2));
 	}
 	
+	@Test
 	public void testMapReferencesToHeaders() throws Exception {
 		Reference ref = new Reference();
 		ref.setTargetId("syn456");
@@ -255,7 +258,16 @@ public class ProvUtilsTest {
 		assertTrue(refToHeader.containsKey(ref));
 		assertEquals(header, refToHeader.get(ref));
 	}
-		
+	
+	@Test
+	public void testIsShowKeyValue() {
+		assertTrue(ProvUtils.isShowKeyValue("Month", "October"));
+		assertTrue(ProvUtils.isShowKeyValue("Month", ""));
+		assertTrue(ProvUtils.isShowKeyValue("DeScriptioN", "filled in"));
+		assertFalse(ProvUtils.isShowKeyValue("description", ""));
+		assertFalse(ProvUtils.isShowKeyValue("description", null));
+	}
+	
 	/*
 	 * Private Methods
 	 */
