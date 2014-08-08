@@ -8,12 +8,12 @@
 	<g:HTMLPanel>
 		<table cellspacing='0' cellpadding='0'>
 			<tr>
-				<td align="left" width="20px" style="vertical-align: top;">					
+				<td align="left" width="20px" style="vertical-align: top; padding-left: 2px;">					
 					<g:SimplePanel ui:field="iconContainer" />
 				</td>
 				<td>
-				    <b:Tooltip text="..." placement="RIGHT" ui:field="popover" trigger="MANUAL">
-			    		<g:FlowPanel ui:field="entityContainer" />
+				    <b:Tooltip text="..." placement="RIGHT" ui:field="popover" trigger="MANUAL" container="body">
+			    		<g:FlowPanel ui:field="entityContainer" styleName="entityTreeItem-textPanel" />
 			    	</b:Tooltip> 
 				</td>
 			</tr>

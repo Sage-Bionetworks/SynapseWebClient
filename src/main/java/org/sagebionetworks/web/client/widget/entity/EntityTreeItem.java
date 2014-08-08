@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Data;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -90,11 +94,26 @@ public class EntityTreeItem implements IsTreeItem, EntityTreeItemView.Presenter,
 				try {
 					//If necessary, expand to support other types.  
 					//But do not pull in NodeAdapterFactory for the mapping, as this will cause the initial fragment download size to significantly increase.
-					if (!Project.class.getName().equals(result.getEntityClassName())) {
-						callback.onFailure(new IllegalArgumentException("Entity tree items detailed information currently only supports Projects"));
-					}
+//					if (!Project.class.getName().equals(result.getEntityClassName()) || !Data.class.getName().equals(result.getEntityClassName())) {
+//						callback.onFailure(new IllegalArgumentException("Entity tree items detailed information currently only supports Projects"));
+//					}
 					
-					final Project entity = new Project(adapterFactory.createNew(result.getEntityJson()));
+					// TODO: Haven't checked any of this. Also, hacky final thing.
+					Entity preEntity = null;
+					if (Project.class.getName().equals(result.getEntityClassName())) {
+						preEntity = new Project(adapterFactory.createNew(result.getEntityJson()));
+					} else if (Folder.class.getName().equals(result.getEntityClassName())) {
+						preEntity = new Folder(adapterFactory.createNew(result.getEntityJson()));
+					} else if (Data.class.getName().equals(result.getEntityClassName())) {
+						preEntity = new Data(adapterFactory.createNew(result.getEntityJson()));
+					} else if (FileEntity.class.getName().equals(result.getEntityClassName())) {
+						preEntity = new FileEntity(adapterFactory.createNew(result.getEntityJson()));
+					} else {
+						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not yet supported."));
+					}
+					final Entity entity = preEntity;
+					
+					//final Project entity = new Project(adapterFactory.createNew(result.getEntityJson()));
 					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {
@@ -105,6 +124,8 @@ public class EntityTreeItem implements IsTreeItem, EntityTreeItemView.Presenter,
 							callback.onFailure(caught);
 						}
 					});
+					
+					
 						
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));

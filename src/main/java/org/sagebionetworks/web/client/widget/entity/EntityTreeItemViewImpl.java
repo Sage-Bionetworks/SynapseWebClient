@@ -55,6 +55,7 @@ public class EntityTreeItemViewImpl extends Composite implements EntityTreeItemV
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		initWidget(uiBinder.createAndBindUi(this));
+		
 	}
 	
 	@Override
