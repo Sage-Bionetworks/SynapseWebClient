@@ -340,11 +340,6 @@ public class ProvUtils {
 			}
 		});
 	}
-	
-	public static boolean isShowKeyValue(String key, String val) {
-		return !DisplayConstants.DESCRIPTION.equalsIgnoreCase(key) || (val != null && val.length() > 0);
-	}
-
 }
 
 

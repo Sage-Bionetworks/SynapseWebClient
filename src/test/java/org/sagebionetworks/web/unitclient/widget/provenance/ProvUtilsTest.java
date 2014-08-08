@@ -259,15 +259,6 @@ public class ProvUtilsTest {
 		assertEquals(header, refToHeader.get(ref));
 	}
 	
-	@Test
-	public void testIsShowKeyValue() {
-		assertTrue(ProvUtils.isShowKeyValue("Month", "October"));
-		assertTrue(ProvUtils.isShowKeyValue("Month", ""));
-		assertTrue(ProvUtils.isShowKeyValue("DeScriptioN", "filled in"));
-		assertFalse(ProvUtils.isShowKeyValue("description", ""));
-		assertFalse(ProvUtils.isShowKeyValue("description", null));
-	}
-	
 	/*
 	 * Private Methods
 	 */
