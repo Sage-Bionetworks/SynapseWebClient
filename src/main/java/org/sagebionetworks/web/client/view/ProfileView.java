@@ -26,12 +26,14 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void render();
 	
-	void updateView(UserProfile profile, List<Team> teams, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
+	void updateView(UserProfile profile, boolean editable, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
 	void refreshHeader();
 	void setProjects(List<EntityHeader> myProjects);
 	void setProjectsError(String string);
 	void setChallenges(List<EntityHeader> headers);
 	void setChallengesError(String error);
+	void setTeams(List<Team> teams);
+	void setTeamsError(String error);
 	
 	public interface Presenter extends SynapsePresenter {
 

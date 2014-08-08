@@ -195,12 +195,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	private void updateProfileView(final String userId, final boolean isEditing) {
+	private void updateProfileView(String userId, final boolean isEditing) {
 		view.clear();
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		globalApplicationState.setIsEditing(isEditing);
 		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
-		synapseClient.getUserProfile(userId, new AsyncCallback<String>() {
+		synapseClient.getUserProfile(targetUserId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
@@ -210,17 +210,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							profileForm.configure(profile, profileUpdatedCallback);
 						}
 						
-						AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								view.showErrorMessage(caught.getMessage());
-							}
-							@Override
-							public void onSuccess(List<Team> teams) {
-								getIsCertifiedAndUpdateView(profile, teams, isEditing, isOwner);
-							}
-						};
-						TeamListWidget.getTeams(targetUserId, synapseClient, adapterFactory, teamCallback);
+						getIsCertifiedAndUpdateView(profile, isEditing, isOwner);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}    				
@@ -232,15 +222,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			});
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final List<Team> teams, final boolean isEditing, final boolean isOwner) {
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isEditing, final boolean isOwner) {
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, teams, isEditing, isOwner, passingRecord, profileForm.asWidget());
+					view.updateView(profile, isEditing, isOwner, passingRecord, profileForm.asWidget());
 					getUserProjects(profile.getOwnerId());
-					getChallenges(teams);
+					getTeamsAndChallenges(profile.getOwnerId());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -248,14 +238,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException)
-					view.updateView(profile, teams, isEditing, isOwner, null, profileForm.asWidget());
+					view.updateView(profile, isEditing, isOwner, null, profileForm.asWidget());
 				else
 					view.showErrorMessage(caught.getMessage());
 				
 				getUserProjects(profile.getOwnerId());
-				getChallenges(teams);
+				getTeamsAndChallenges(profile.getOwnerId());
 			}
 		});
+	}
+	
+	public void getTeamsAndChallenges(String userId) {
+		AsyncCallback<List<Team>> teamCallback = new AsyncCallback<List<Team>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setTeamsError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(List<Team> teams) {
+				view.setTeams(teams);
+				getChallenges(teams);
+			}
+		};
+		TeamListWidget.getTeams(userId, synapseClient, adapterFactory, teamCallback);
 	}
 	
 	public void getChallenges(List<Team> teams) {

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -248,7 +249,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -263,11 +264,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(teams, true);
 			teamsTabContent.clear();
 			settingsTabContainer.clear();
-			projectsTabContent.clear();
-			challengesTabContent.clear();
 			
 			DisplayUtils.hide(settingsListItem);
 //			DisplayUtils.hide(messagesListItem);
@@ -318,12 +316,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setTeams(List<Team> teams) {
+		myTeamsWidget.configure(teams, true);
+	}
+	
+	@Override
+	public void setTeamsError(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
 	public void setProjects(List<EntityHeader> projectHeaders) {
 		addEntityBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
-	public void setProjectsError(String string) {
+	public void setProjectsError(String error) {
+		DisplayUtils.showErrorMessage(error);
 	}
 	
 	@Override
@@ -333,6 +342,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
+		targetPanel.clear();
 		for (EntityHeader entityHeader : projectHeaders) {
 			EntityBadge badge = ginInjector.getEntityBadgeWidget();
 			badge.configure(entityHeader);
@@ -354,7 +364,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setChallengesError(String error) {
-		
+		DisplayUtils.showErrorMessage(error);
 	}
 	
 	@Override
@@ -573,6 +583,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();
+		//init with loading widget
+		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		
 		DisplayUtils.hide(showProfileLink);
 		challengesTabContent.clear();
 		DisplayUtils.hide(challengesHighlightBox);
