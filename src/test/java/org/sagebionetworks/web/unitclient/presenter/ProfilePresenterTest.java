@@ -90,6 +90,7 @@ public class ProfilePresenterTest {
 	String password = "password";
 	List<String> myProjectsJson;
 	List<EntityHeader> myProjects;
+	List<Team> myTeams;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
@@ -125,7 +126,7 @@ public class ProfilePresenterTest {
 		testUser.writeToJSONObject(adapter);
 		testUserJson = adapter.toJSONString(); 
 		
-		TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
+		myTeams = TeamListWidgetTest.setupUserTeams(adapter, mockSynapseClient);
 		setupGetUserProfile();
 		
 		PassingRecord myPassingRecord = new PassingRecord();
@@ -205,10 +206,13 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testPublicView() {
+	public void testPublicView() throws JSONObjectAdapterException{
 		//view another user profile
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		String targetUserId = "12345";
+		userProfile.setOwnerId(targetUserId);
+		setupGetUserProfile();
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		
 		when(place.toToken()).thenReturn(targetUserId);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
@@ -221,9 +225,12 @@ public class ProfilePresenterTest {
 	}
 
 	@Test
-	public void testViewMyProfileNoRedirect() {
+	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
 		//view another user profile
 		String myPrincipalId = "456";
+		userProfile.setOwnerId(myPrincipalId);
+		setupGetUserProfile();
+		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(myPrincipalId);
 		when(place.toToken()).thenReturn(myPrincipalId);
@@ -234,7 +241,7 @@ public class ProfilePresenterTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockSynapseClient).getTeamsForUser(captor.capture(),  any(AsyncCallback.class));
 		assertEquals(myPrincipalId, captor.getValue());
-	}
+	} 
 	
 
 	@Test
@@ -249,9 +256,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyList(), anyBoolean(), anyBoolean(), any(PassingRecord.class), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), any(PassingRecord.class), any(Widget.class));
 	}
 	
 	@Test
@@ -259,10 +266,10 @@ public class ProfilePresenterTest {
 		//have not taken the test
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		
-		verify(mockView).updateView(any(UserProfile.class), anyList(), anyBoolean(), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
 	}
 	
 	@Test
@@ -270,7 +277,7 @@ public class ProfilePresenterTest {
 		//some other error occurred
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, new ArrayList(), false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -439,5 +446,21 @@ public class ProfilePresenterTest {
 		when(mockCookies.getCookie(eq(HomePresenter.TEAMS_2_CHALLENGE_ENTITIES_COOKIE))).thenReturn(null);
 		profilePresenter.getTeamId2ChallengeIdWhitelist(callback);
 		verify(mockRequestBuilder, times(1)).configure(any(RequestBuilder.Method.class), anyString());
+	}
+	
+	@Test
+	public void testGetTeams() {
+		profilePresenter.getTeamsAndChallenges("anyUserId");
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeams(eq(myTeams));
+	}
+	
+	@Test
+	public void testGetTeamsError() {
+		String errorMessage = "error loading teams";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		profilePresenter.getTeamsAndChallenges("anyUserId");
+		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
+		verify(mockView).setTeamsError(errorMessage);
 	}
 }
