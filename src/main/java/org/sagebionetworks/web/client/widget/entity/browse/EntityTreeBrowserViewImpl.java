@@ -11,7 +11,10 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
@@ -46,6 +49,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -58,8 +63,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeImages;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.Tree.Resources;
 import com.google.inject.Inject;
 
 public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBrowserView {
@@ -73,19 +80,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
+	private PortalGinInjector ginInjector;
 		
 	private TreeLoader<EntityTreeModel> loader;  
 	private TreePanel<EntityTreeModel> tree;  
 	private ContentPanel cp;
 	private TreeStore<EntityTreeModel> store;
-	private HashMap<String, ImageResource> typeToIcon = new HashMap<String, ImageResource>();
 	private boolean makeLinks = true;
 	private Integer height = null;
 	private Tree entityTree;
-	private Map<EntityHeader, TreeItem> header2item;
-	private Map<TreeItem, EntityHeader> item2header;
-	private Set<EntityHeader> alreadyFetchedEntityChildren;
-	private Image loadingImage;
+	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
+	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	
 //	@Override
 //	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
@@ -154,15 +159,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 //	}
 
 	@Inject
-	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
+	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		entityTree = new Tree();
-		header2item = new HashMap<EntityHeader, TreeItem>();
-		item2header = new HashMap<TreeItem, EntityHeader>();
-		alreadyFetchedEntityChildren = new HashSet<EntityHeader>();
-		loadingImage = new Image(sageImageBundle.loading16());
-
+		this.ginInjector = ginInjector;
+		
+		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
+		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
+		
+		entityTree = new Tree(new EntityTreeResources());
+		
 		this.add(entityTree);
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
 			
@@ -175,38 +181,33 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			 */
 			@Override
 			public void onOpen(OpenEvent<TreeItem> event) {
-				final TreeItem source = event.getTarget();
-				final EntityHeader sourceHeader = item2header.get(source);
-				if (!alreadyFetchedEntityChildren.contains(sourceHeader)) {
+				final EntityTreeItem target = treeItem2entityTreeItem.get(event.getTarget());
+				if (!alreadyFetchedEntityChildren.contains(target)) {
 					// We have not already fetched children for this entity.
 					
 					// Change to loading icon.
-					final Image oldIcon = (Image) ((HorizontalPanel) source.getWidget()).getWidget(TREE_ITEM_ICON_INDEX);
-					((HorizontalPanel) source.getWidget()).remove(TREE_ITEM_ICON_INDEX);
-					((HorizontalPanel) source.getWidget()).insert(loadingImage, TREE_ITEM_ICON_INDEX);
+					target.showLoadingChildren();
 					
-					presenter.getFolderChildren(sourceHeader.getId(), new AsyncCallback<List<EntityHeader>>() {
-		
+					presenter.getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
+						
 						@Override
 						public void onSuccess(List<EntityHeader> result) {
-							// We got the children!
-							alreadyFetchedEntityChildren.add(sourceHeader);
-							source.removeItems();	// Remove the dummy item.
+							// We got the children.
+							alreadyFetchedEntityChildren.add(target);
+							target.asTreeItem().removeItems();	// Remove the dummy item.
 							
 							// Make a tree item for each child and place them in the tree.
 							for (EntityHeader header : result) {
-								createAndPlaceTreeItem(header, sourceHeader, false);
+								createAndPlaceTreeItem(header, target, false);
 							}
 							
-							// Change back to original icon.
-							((HorizontalPanel) source.getWidget()).remove(TREE_ITEM_ICON_INDEX);
-							((HorizontalPanel) source.getWidget()).insert(oldIcon, TREE_ITEM_ICON_INDEX);
+							// Change back to type icon.
+							target.showTypeIcon();
 						}
 						
 						@Override
 						public void onFailure(Throwable caught) {
-							System.out.println("ERROROROROORROORR");	// TODO
-							
+							DisplayUtils.showErrorMessage("ERROROROROORROORR");	// TODO
 						}
 						
 					});
@@ -242,11 +243,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 
 	@Override
 	public void clear() {
-		//if(store == null) createStore();
-		//store.removeAll();
-		
-		//if (entityTree == null) entityTree = new Tree();
 		entityTree.clear();
+		treeItem2entityTreeItem.clear();
 	}
 
 	@Override
@@ -265,8 +263,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			createAndPlaceTreeItem(header, null, true);
 		}
 	}
-	
-	
 	
 	@Override
 	public void setMakeLinks(boolean makeLinks) {
@@ -381,7 +377,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	 * 				 child will become the child of. Parameter ignored if isRootItem.
 	 * @param isRootItem true if the childToCreate is a root item, false otherwise.
 	 */
-	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityHeader parent, boolean isRootItem) {
+	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityTreeItem parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		
 		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
@@ -390,43 +386,26 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			if (isRootItem) {
 				entityTree.addItem(placeHolderItem);
 			} else {
-				header2item.get(parent).addItem(placeHolderItem);
+				parent.asTreeItem().addItem(placeHolderItem);
 			}
 			return;
 		}
 		
-		// Create panel and make tree item.
-		HorizontalPanel panel = new HorizontalPanel();
-		panel.getElement().getStyle().setProperty("padding", "10px");
-		final TreeItem childItem = new TreeItem(panel);
+		// Make tree item.
+		EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
+		childItem.configure(childToCreate);
 		
 		// Update fields.
-		header2item.put(childToCreate, childItem);
-		item2header.put(childItem, childToCreate);
-		
-		
-		String type = childToCreate.getType();
-		
+		treeItem2entityTreeItem.put(childItem.asTreeItem(), childItem);
+				
 		// HACKY: Add dummy item to childItem to make expandable.
-		childItem.addItem(createDummyItem());
-		
-		if (!typeToIcon.containsKey(type))
-			typeToIcon.put(type, presenter.getIconForType(type));
-		
-		Image iconImage = new Image(typeToIcon.get(type));	// TODO: AbstractImagePrototype?
-		
-		// Add info to panel to be displayed.
-		panel.add(iconImage);
-		Anchor linkToEntity = new Anchor("<a href=\"" + DisplayUtils.getSynapseHistoryToken(childToCreate.getId()) + "\">" + childToCreate.getName() + "</a>", true);
-		linkToEntity.getElement().getStyle().setProperty("paddingLeft", "3px");
-		linkToEntity.getElement().getStyle().setProperty("fontSize", "11px");
-		panel.add(linkToEntity);
+		childItem.asTreeItem().addItem(createDummyItem());
 		
 		// Place the created child in the tree as the child of the given parent entity.
 		if (isRootItem) {
 			entityTree.addItem(childItem);
 		} else {
-			header2item.get(parent).addItem(childItem);
+			parent.asTreeItem().addItem(childItem);
 		}
 	}
 	
@@ -441,13 +420,33 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		return result;
 	}
 	
-	public interface EntityTreeResources extends Tree.Resources {
-		
-		@Source("images/icons/cog-16.png")
+	public class EntityTreeResources implements Tree.Resources {
+		@Override
+	    public ImageResource treeClosed() {
+	        return EntityTreeImageBundle.IMAGE_RESOURCE.treeClosed();
+	    }
+
+	    @Override
+	    public ImageResource treeOpen() {
+	        return EntityTreeImageBundle.IMAGE_RESOURCE.treeOpen();
+	    }
+
+		@Override
+		public ImageResource treeLeaf() {
+			return EntityTreeImageBundle.DEFAULT_RESOURCES.treeLeaf();
+		}
+	}
+	
+	public interface EntityTreeImageBundle extends ClientBundle, ClientBundleWithLookup {
+		EntityTreeImageBundle IMAGE_RESOURCE = GWT.create(EntityTreeImageBundle.class);
+		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
+
+		// TODO: Change paths to proper images.
+	    @Source("images/icons/navigation-270-button-16.png")
 		ImageResource treeOpen();
 		
-		@Source("images/icons/magnifier-zoom-in-16.png")
-		ImageResource treeClose();
+		@Source("images/icons/navigation-000-button-16.png")
+		ImageResource treeClosed();
 	}
 	
 }
