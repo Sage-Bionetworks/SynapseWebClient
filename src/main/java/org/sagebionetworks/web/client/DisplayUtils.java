@@ -373,12 +373,17 @@ public class DisplayUtils {
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			//exception handling on the backend now throws the reason into the exception message.  Easy!
-			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
+			//show error (not to file a jira though)
+			view.showErrorMessage(ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
+			return true;
+		} else if (ex instanceof UnknownErrorException) {
+			//An unknown error occurred. 
+			//Exception handling on the backend now throws the reason into the exception message.  Easy!
+			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
 			return true;
 		}
 		
