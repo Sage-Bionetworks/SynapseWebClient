@@ -21,6 +21,10 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 
 	void showLoadError(String entityId);
 	
+	void showLoadingIcon();
+	
+	void showTypeIcon();
+	
 	/**
 	 * Presenter interface
 	 */
@@ -29,5 +33,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 		void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback);
 		void entityClicked(EntityHeader entityHeader);
 	}
+
+	
 
 }

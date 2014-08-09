@@ -13,17 +13,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
-import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.Style.SortDir;
-import com.extjs.gxt.ui.client.data.BaseTreeLoader;
-import com.extjs.gxt.ui.client.data.ModelIconProvider;
-import com.extjs.gxt.ui.client.data.ModelKeyProvider;
-import com.extjs.gxt.ui.client.data.RpcProxy;
-import com.extjs.gxt.ui.client.data.TreeLoader;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
 import com.extjs.gxt.ui.client.event.MessageBoxEvent;
@@ -82,81 +73,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private IconsImageBundle iconsImageBundle;
 	private PortalGinInjector ginInjector;
 		
-	private TreeLoader<EntityTreeModel> loader;  
-	private TreePanel<EntityTreeModel> tree;  
-	private ContentPanel cp;
-	private TreeStore<EntityTreeModel> store;
 	private boolean makeLinks = true;
 	private Integer height = null;
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
-	
-//	@Override
-//	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-//		super.onRender(parent, index);		
-//		
-//		if(store == null) createStore();
-//		
-//	    tree = new TreePanel<EntityTreeModel>(store);  
-//	    tree.setStateful(true);  
-//	    tree.setDisplayProperty(EntityTreeModel.KEY_LINK); 
-//	    tree.setBorders(false);
-//	    
-//	    // statefull components need a defined id  
-//	    tree.setId("statefullasyncentitytree_" + (Math.random()*100));  
-//		tree.setIconProvider(new ModelIconProvider<EntityTreeModel>() {
-//			public AbstractImagePrototype getIcon(EntityTreeModel model) {
-//				String type = model.getType();
-//				ImageResource icon;
-//				if(typeToIcon.containsKey(type)) {
-//					icon = typeToIcon.get(type);
-//				} else {
-//					icon = presenter.getIconForType(type);
-//					typeToIcon.put(type, icon);
-//				}				
-//				if(icon == null) {
-//					return null;
-//				}
-//				return AbstractImagePrototype.create(icon);
-//			}
-//		});		
-//		
-//		TreePanelSelectionModel<EntityTreeModel> sm = tree.getSelectionModel();
-//		sm.setSelectionMode(SelectionMode.SINGLE);
-//		sm.addSelectionChangedListener(new SelectionChangedListener<EntityTreeModel>() {			
-//			@Override
-//			public void selectionChanged(SelectionChangedEvent<EntityTreeModel> se) {
-//				setSelection(se.getSelectedItem());
-//			}
-//		});
-//		tree.setAutoHeight(true);
-//		tree.setAutoWidth(true);
-//				
-//		cp = new ContentPanel();  
-//	    cp.setHeaderVisible(false);  
-//	    cp.setLayout(new FitLayout());  
-//	    cp.add(tree);  
-//	    determineHeight();	    
-//	    cp.setAutoWidth(true);
-//	    cp.setBorders(false);
-//	    add(cp);  		
-//	};
-//		
-//	private void determineHeight() {
-//		if(cp != null) {
-//			if(height == null) {
-//				cp.setAutoHeight(true);
-//				cp.setScrollMode(Scroll.NONE);
-//			} else {
-//				if(isRendered()) {
-//					cp.setAutoHeight(false);
-//					cp.setHeight(height);
-//					cp.setScrollMode(Scroll.AUTO);
-//				}
-//			}
-//		}
-//	}
 
 	@Inject
 	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
@@ -295,73 +216,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		return models;
 	}
 
-//	private void createStore() {
-//	    // data proxy  
-//	    RpcProxy<List<EntityTreeModel>> proxy = new RpcProxy<List<EntityTreeModel>>() {  
-//			@Override
-//			protected void load(Object loadConfig, final AsyncCallback<List<EntityTreeModel>> callback) {
-//				if(loadConfig != null) {
-//					String entityId = ((EntityTreeModel) loadConfig).getId();
-//					getFolderChildren(callback, entityId);
-//				} else {
-//					callback.onFailure(null);
-//				}
-//			}
-//		};
-//	  
-//	    // tree loader  
-//	    loader = new BaseTreeLoader<EntityTreeModel>(proxy) {  
-//	      @Override  
-//	      public boolean hasChildren(EntityTreeModel parent) {
-//	    	if(PLACEHOLDER_ID.equals(parent.getId())) return false; // non-entity node 	    	
-//	        return true; // all entities could have children. Don't lookup just to answer this correctly  
-//	      }  
-//	    };  
-//	  
-//	    // trees store  
-//	    store = new TreeStore<EntityTreeModel>(loader);  
-//	    store.setKeyProvider(new ModelKeyProvider<EntityTreeModel>() {  
-//	      public String getKey(EntityTreeModel model) {  
-//	        return model.getKey();  
-//	      }  
-//	    });  
-//	    store.setStoreSorter(new StoreSorter<EntityTreeModel>() {  	  
-//	      @Override  
-//	      public int compare(Store<EntityTreeModel> store, EntityTreeModel m1, EntityTreeModel m2, String property) {
-//	    	// put placeholders at end
-//	    	  if(m1.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return 1;
-//	    	  if(m2.getName().startsWith(PLACEHOLDER_NAME_PREFIX)) return -1;
-//	        return m1.getName().compareToIgnoreCase(m2.getName());  
-//	      }  
-//	    });  		   
+//	@Override
+//	public void removeEntity(EntityHeader entityHeader) {
+//		entityTree.remove(header2)
 //	}
-
-//	private void setSelection(EntityTreeModel selectedItem) {
-//		if(selectedItem != null && !PLACEHOLDER_ID.equals(selectedItem.getId())) {
-//			presenter.setSelection(selectedItem.getId());
-//		}
-//	}
-
-//	private void getFolderChildren(final AsyncCallback<List<EntityTreeModel>> callback, String entityId) {
-//		presenter.getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
-//			@Override
-//			public void onSuccess(List<EntityHeader> result) {
-//				// convert to model data
-//				List<EntityTreeModel> models = convertEntityHeaderToModel(result);
-//				callback.onSuccess(models);
-//			}
-//
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				callback.onFailure(caught);
-//			}
-//		});
-//	}
-
-	@Override
-	public void removeEntity(EntityTreeModel entityModel) {
-		store.remove(entityModel);
-	}
 
 	@Override
 	public void setWidgetHeight(int height) {
@@ -442,10 +300,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
 
 		// TODO: Change paths to proper images.
-	    @Source("images/icons/navigation-270-button-16.png")
+	    @Source("images/icons/arrow-down-dir.png")
 		ImageResource treeOpen();
 		
-		@Source("images/icons/navigation-000-button-16.png")
+	    
+		@Source("images/icons/arrow-right-dir.png")
 		ImageResource treeClosed();
 	}
 	

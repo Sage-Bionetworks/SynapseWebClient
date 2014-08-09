@@ -43,6 +43,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
+	Image iconPicture;
 	boolean isPopoverInitialized;
 	boolean isMouseOverAnchor;
 	
@@ -98,7 +99,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			};
 			
 			ImageResource icon = presenter.getIconForType(entityHeader.getType());
-			Image iconPicture = new Image(icon);
+			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
 			iconPicture.addStyleName("imageButton displayInline");
@@ -163,6 +164,18 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		iconContainer.clear();
 		entityContainer.clear();
 	}
+	
+	@Override
+	public void showLoadingIcon() {
+		// TODO: Properly get loading image?
+		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
+	}
+	
+	@Override
+	public void showTypeIcon() {
+		iconContainer.setWidget(iconPicture);
+	}
+	
 	
 	/*
 	 * Private Methods
