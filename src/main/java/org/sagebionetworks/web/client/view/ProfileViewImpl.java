@@ -147,8 +147,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
-	@UiField
-	DivElement challengesHighlightBox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -335,12 +333,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	@Override
-	protected void onAttach() {
-		super.onAttach();
-		startCarousel();
-	}
-	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
 		targetPanel.clear();
 		for (EntityHeader entityHeader : projectHeaders) {
@@ -357,7 +349,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setChallenges(List<EntityHeader> projectHeaders) {
 		if (projectHeaders.size() > 0) {
-			DisplayUtils.show(challengesHighlightBox);
+			DisplayUtils.show(challengesListItem);
 			addEntityBadges(projectHeaders, challengesTabContent);
 		}
 	}
@@ -588,10 +580,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		DisplayUtils.hide(showProfileLink);
 		challengesTabContent.clear();
-		DisplayUtils.hide(challengesHighlightBox);
 		hideTabContainers();
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
+		DisplayUtils.hide(challengesListItem);
 	}
 	
 	private void hideTabContainers() {
@@ -680,8 +672,4 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
-	
-	private static native void startCarousel() /*-{
-		$wnd.jQuery('#myCarousel').carousel('cycle');
-	}-*/;
 }
