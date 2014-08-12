@@ -1,16 +1,22 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.inject.Inject;
 
-public class FavoriteWidgetViewImpl extends Composite implements FavoriteWidgetView {
+public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetView {
 	
 	private static String favoriteStarOffHtml;
 	private static String favoriteStarHtml;
@@ -21,6 +27,8 @@ public class FavoriteWidgetViewImpl extends Composite implements FavoriteWidgetV
 
 	private Anchor favoriteAnchor;
 	boolean isFavorite = false;
+	private InlineHTML emptyDiv;
+	private Tooltip tip;
 	
 	@Inject
 	public FavoriteWidgetViewImpl(IconsImageBundle iconsImageBundle) {
@@ -39,9 +47,29 @@ public class FavoriteWidgetViewImpl extends Composite implements FavoriteWidgetV
 				presenter.setIsFavorite(isFavorite);
 			}
 		});
-		initWidget(favoriteAnchor);
+		add(favoriteAnchor);
+		emptyDiv = new InlineHTML();
+		add(emptyDiv);
+		tip = new Tooltip(emptyDiv);
+		tip.setText("Click the star to add this to your favorites!");
+		tip.setTrigger(Trigger.MANUAL);
+		tip.setPlacement(Placement.RIGHT);
+		add(tip);
 	}
 
+	@Override
+	public void showFavoritesReminder() {
+		tip.show();
+		Timer t = new Timer() {
+			@Override
+			public void run() {
+				tip.hide();
+			}
+		};
+		// Schedule the timer to run once in 5 seconds.
+		t.schedule(10000);
+	}
+	
 	@Override
 	public void showIsFavorite(boolean isFavorite) {
 		this.isFavorite = isFavorite;

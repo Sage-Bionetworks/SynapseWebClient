@@ -275,6 +275,7 @@ public class DisplayConstants {
 	public static final String LABEL_INITIALIZING = "Initializing...";
 	public static final String LABEL_FINISHING = "Finishing...";
 	public static final String LABEL_CREATE_LINK = "Save Link To This Page";
+	public static final String ADD_TO_FAVORITES = "Add To Favorites";
 	public static final String LABEL_SUBMIT_TO_EVALUATION = "Submit To Challenge";
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
