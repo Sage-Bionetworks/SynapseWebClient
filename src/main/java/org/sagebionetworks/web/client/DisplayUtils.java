@@ -1612,7 +1612,7 @@ public class DisplayUtils {
 		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 	
 	public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
 		return cookies.getCookie(cookieKey) != null;

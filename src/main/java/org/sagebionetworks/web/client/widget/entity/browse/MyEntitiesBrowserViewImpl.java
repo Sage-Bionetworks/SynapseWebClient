@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.Events;
@@ -67,7 +68,6 @@ public class MyEntitiesBrowserViewImpl extends LayoutContainer implements MyEnti
 		TabItem favoritesTab = new TabItem(DisplayConstants.MY_FAVORITES);
 		favoritesTab.add(favoritesTreeBrowser.asWidget());
 		favoritesTab.setScrollMode(Scroll.AUTO);
-		favoritesTab.setIcon(AbstractImagePrototype.create(iconsImageBundle.star16()));
 		panel.add(favoritesTab);
 		
 		panel.addListener(Events.Select, new Listener<TabPanelEvent>() {
