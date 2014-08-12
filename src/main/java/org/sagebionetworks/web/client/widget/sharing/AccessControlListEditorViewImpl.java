@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -26,17 +25,14 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -91,7 +87,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
-	private Button publicButton;
+	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ComboBox<ModelData> peopleCombo;
 	private CheckBox notifyPeopleCheckbox;
@@ -152,16 +148,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;
 		if (publicButton != null) {
-			if (isPubliclyVisible) {
-				//already publicly visible, button removes access to public
-				publicButton.setText(DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL);
-				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.lockGrey16()));
-				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
-			}
-			else {
-				publicButton.setText(DisplayConstants.BUTTON_MAKE_PUBLIC_ACL);
-				publicButton.setIcon(AbstractImagePrototype.create(iconsImageBundle.globe16()));
-				DisplayUtils.addToolTip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
+			if(isPubliclyVisible) {
+				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, "glyphicon-lock");
+//				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
+			} else {
+				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, "glyphicon-globe");
+//				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
 			}
 		}
 	}
@@ -281,23 +273,26 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				form2.add(fieldSet);
 				
 				//Make Public button
-				publicButton = new Button();
-				publicButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-					@Override
-					public void componentSelected(ButtonEvent ce) {
-						//add the ability for PUBLIC to see this entity
-						if (isPubliclyVisible) {
-							presenter.makePrivate();
-						}
-						else {
-							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+				if (publicButton == null) {
+					publicButton = DisplayUtils.createButton("Test");
+					publicButton.addStyleName("btn-xs");
+					setIsPubliclyVisible(false);
+					
+					publicButton.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							//add the ability for PUBLIC to see this entity
+							if (isPubliclyVisible) {
+								presenter.makePrivate();
+							}
+							else {
+								if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+									presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+								}
 							}
 						}
-						
-					}
-				});
-				publicButton.addStyleName("left");
+					});
+				}
 				
 				if (notifyPeopleCheckbox == null) {
 					notifyPeopleCheckbox = new CheckBox("Notify people via email");
@@ -308,8 +303,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				FlowPanel cbPanel = new FlowPanel();
 				cbPanel.addStyleName("margin-top-0 margin-right-10 checkbox right");
 				cbPanel.add(notifyPeopleCheckbox);
+				
+				FlowPanel publicButtonPanel = new FlowPanel();
+				publicButtonPanel.addStyleName("margin-top-0 margin-left-10 left");
+				publicButtonPanel.add(publicButton);
+				
 				FlowPanel publicButtonAndCheckbox = new FlowPanel();
-				publicButtonAndCheckbox.add(publicButton);
+				publicButtonAndCheckbox.add(publicButtonPanel);
 				publicButtonAndCheckbox.add(cbPanel);
 				form2.add(publicButtonAndCheckbox);
 				add(form2);
