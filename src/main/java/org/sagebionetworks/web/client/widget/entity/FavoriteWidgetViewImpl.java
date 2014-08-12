@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -41,7 +42,7 @@ public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetV
 		emptyDiv = new InlineHTML();
 		add(emptyDiv);
 		tip = new Tooltip(emptyDiv);
-		tip.setText("Click the star to add this to your favorites!");
+		tip.setText(DisplayConstants.FAVORITES_REMINDER_TOOLTIP_MESSAGE);
 		tip.setTrigger(Trigger.MANUAL);
 		tip.setPlacement(Placement.RIGHT);
 		add(tip);
@@ -56,7 +57,7 @@ public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetV
 				tip.hide();
 			}
 		};
-		// Schedule the timer to run once in 5 seconds.
+		// Schedule the timer to run once in 10 seconds.
 		t.schedule(10000);
 	}
 	

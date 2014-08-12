@@ -81,12 +81,7 @@ public class FavoriteWidget implements Presenter {
 				@Override
 				public void onSuccess(Void result) {
 					view.showIsFavorite(isFavorite(entityId));
-					//if the user has no favorites (and we have not reminded them lately), then pop up a reminder
-					if (globalApplicationState.getFavorites().isEmpty() && !DisplayUtils.isInCookies(FAVORITES_REMINDER, cookies)) {
-						view.showFavoritesReminder();
-						Date expires = new Date(System.currentTimeMillis() + (1000*60*60*24*5)); //5 days
-						cookies.setCookie(FAVORITES_REMINDER, "true", expires);
-					}
+					showReminder();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -95,6 +90,16 @@ public class FavoriteWidget implements Presenter {
 		}
 	}
 
+	/**
+	 * If the user has no favorites (and we have not reminded them lately), then pop up a reminder
+	 */
+	public void showReminder() {
+		if (globalApplicationState.getFavorites().isEmpty() && !DisplayUtils.isInCookies(FAVORITES_REMINDER, cookies)) {
+			view.showFavoritesReminder();
+			Date expires = new Date(System.currentTimeMillis() + (1000*60*60*24*5)); //5 days
+			cookies.setCookie(FAVORITES_REMINDER, "true", expires);
+		}
+	}
 
 	private void setIsFavorite(final String entityId,
 			final boolean isFavorite, final AsyncCallback<Void> callback) {
