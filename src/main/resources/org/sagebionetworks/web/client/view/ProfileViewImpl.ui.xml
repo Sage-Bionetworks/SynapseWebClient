@@ -36,6 +36,7 @@
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
+						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="favoritesLink"/></li>
 						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li>
 						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="teamsLink"/></li>
 						    <!--  <li class="entity-tab" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li> -->
@@ -63,6 +64,11 @@
 							</div>
 							
 						</div>
+						<div class="tab-background padding-15" ui:field="favoritesTabContainer">
+					    	<div class="highlight-box" highlight-box-title="Favorites">
+					    		<g:FlowPanel ui:field="favoritesTabContent" />
+					    	</div>
+					    </div>
 					    <div class="tab-background padding-15" ui:field="challengesTabContainer">
 					    	<div class="highlight-box" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" />

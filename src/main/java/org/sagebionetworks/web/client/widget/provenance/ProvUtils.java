@@ -179,14 +179,20 @@ public class ProvUtils {
 	}
 
 	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy) {
+		return entityToKeyValueDisplay(entity, modifiedBy, true);
+	}
+	
+	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy, boolean includeName) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
 		order.add("ID");
 		map.put("ID", entity.getId());
 		
-		order.add("Name");
-		map.put("Name", entity.getName());		
+		if (includeName) {
+			order.add("Name");
+			map.put("Name", entity.getName());
+		}
 		
 		if(entity instanceof Versionable) {
 			order.add("Version");

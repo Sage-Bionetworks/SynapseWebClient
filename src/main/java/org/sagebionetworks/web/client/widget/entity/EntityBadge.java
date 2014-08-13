@@ -91,7 +91,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {
-							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
+							callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile), false));		
 						}
 						@Override
 						public void onFailure(Throwable caught) {

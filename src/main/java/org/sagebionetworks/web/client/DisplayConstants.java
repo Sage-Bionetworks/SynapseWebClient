@@ -568,6 +568,7 @@ public class DisplayConstants {
 	public static final String FILES = "Files";
 	public static final String PROJECTS = "Projects";
 	public static final String CHALLENGES = "Challenges";
+	public static final String FAVORITES = "Favorites";
 	public static final String TEAMS = "Teams";
 	public static final String MESSAGES = "Messages";
 	public static final String SETTINGS = "Settings";
