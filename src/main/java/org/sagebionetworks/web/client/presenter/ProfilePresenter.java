@@ -71,6 +71,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private CookieProvider cookies;
 	private RequestBuilderWrapper requestBuilder;
 	
+	private String currentUserId;
+	
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -199,8 +201,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		globalApplicationState.setIsEditing(isEditing);
-		final String targetUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
-		synapseClient.getUserProfile(targetUserId, new AsyncCallback<String>() {
+		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
+		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String userProfileJson) {
 					try {
@@ -229,8 +231,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
 					view.updateView(profile, isEditing, isOwner, passingRecord, profileForm.asWidget());
-					getUserProjects(profile.getOwnerId());
-					getTeamsAndChallenges(profile.getOwnerId());
+					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}
@@ -242,10 +243,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				else
 					view.showErrorMessage(caught.getMessage());
 				
+				proceed();
+			}
+			
+			private void proceed() {
 				getUserProjects(profile.getOwnerId());
 				getTeamsAndChallenges(profile.getOwnerId());
+				if (isOwner) {
+					getFavorites();
+				}
 			}
 		});
+	}
+	
+	@Override
+	public void refreshTeams() {
+		getTeamsAndChallenges(currentUserId);
 	}
 	
 	public void getTeamsAndChallenges(String userId) {
@@ -374,6 +387,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setProjectsError("Could not load Projects");
+			}
+		});
+	}
+	
+	public void getFavorites() {
+		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onSuccess(List<EntityHeader> result) {
+				view.setFavorites(result);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setFavoritesError("Could not load Favorites");
 			}
 		});
 	}
