@@ -386,7 +386,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setProjectsError("Could not load Projects");
+				view.setProjectsError("Could not load Projects: " + caught.getMessage());
 			}
 		});
 	}
@@ -399,7 +399,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setFavoritesError("Could not load Favorites");
+				view.setFavoritesError("Could not load Favorites: " + caught.getMessage());
 			}
 		});
 	}
