@@ -1046,7 +1046,7 @@ h1, h2, h3, h4, h5, h6 {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.gwt-TreeItem > div {
+.gwt-TreeItem > div > div {
 	padding-bottom: 4px;
 }
 
