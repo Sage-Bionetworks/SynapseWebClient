@@ -46,7 +46,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	public interface ProfileUpdatedCallback {
-		void profileUpdateCancelled();
 		void profileUpdateSuccess();
 		void onFailure(Throwable caught);
 	}
@@ -55,10 +54,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		ownerProfile = userProfile;
 		this.profileUpdatedCallback = profileUpdatedCallback;
 		view.updateView(userProfile);
-	}
-	
-	public void hideCancelButton(){
-		view.hideCancelButton();
 	}
 	
 	public Widget asWidget() {
@@ -152,11 +147,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				callback.onFailure(caught);
 			}
 		});
-	}
-	
-	@Override
-	public void cancelClicked() {
-		profileUpdatedCallback.profileUpdateCancelled();
 	}
 	
 	public void setUpdateButtonText(String text){

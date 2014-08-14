@@ -10,11 +10,8 @@
 		<div class="separator margin-top-10-imp"></div>
 		<div class="margin-10">
 			<div class="row margin-top-5">
-				<div class="col-md-3" style="white-space: normal;">
+				<div class="col-xs-12" style="white-space: normal;">
 					<g:SimplePanel ui:field="breadcrumbsPanel" />
-				</div>
-				<div class="col-md-9">
-					<g:FlowPanel ui:field="editProfileButtonPanel" />
 				</div>
 			</div>
 
@@ -35,17 +32,19 @@
 			    <div class="col-xs-12">
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
-						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
-						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="favoritesLink"/></li>
-						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li>
-						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="teamsLink"/></li>
-						    <!--  <li class="entity-tab" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li> -->
-						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="settingsLink"/></li>
+						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
+						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" text="Favorites" ui:field="favoritesLink"/></li>
+						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" text="Challenges" ui:field="challengesLink"/></li>
+						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" text="Teams" ui:field="teamsLink"/></li>
+						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" text="Settings" ui:field="settingsLink"/></li>
 					    </ul>
 					</div>
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
-							<div ui:field="createProjectUI" class="margin-bottom-10 row">
+							<div class="highlight-box" highlight-box-title="Projects">
+								<g:FlowPanel ui:field="projectsTabContent" />
+							</div>
+							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-12 col-sm-6">
 									<div class="input-group">
 										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
@@ -59,10 +58,6 @@
 								    <a href="#!ProjectsHome:0">What's a Project?</a>
 								</div>
 							</div>
-							<div class="highlight-box" highlight-box-title="Projects">
-								<g:FlowPanel ui:field="projectsTabContent" />
-							</div>
-							
 						</div>
 						<div class="tab-background padding-15" ui:field="favoritesTabContainer">
 					    	<div class="highlight-box" highlight-box-title="Favorites">
@@ -75,7 +70,9 @@
 					    	</div>
 					    </div>
 					    <div class="tab-background padding-15" ui:field="teamsTabContainer">
-							<div ui:field="createTeamUI" class="margin-bottom-10 row">
+							<g:FlowPanel ui:field="teamsTabContent" />
+							
+							<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-12 col-sm-6">
 									<div class="input-group">
 										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
@@ -86,28 +83,33 @@
 								</div>
 								<div class="col-xs-12 col-sm-6" />
 							</div>
-							<g:FlowPanel ui:field="teamsTabContent" />
 						</div>
-					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="messagesTabContainer" />
-					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer" />
-						
+					    <div class="tab-background padding-15" ui:field="settingsTabContainer">
+					        <g:FlowPanel ui:field="settingsTabContent" />
+					        <div class="container">
+						        <div class="highlight-box" highlight-box-title="Profile">
+						            <div class="row">
+						                <div class="col-sm-12">
+											<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+										</div>
+						                <div class="margin-bottom-10 col-sm-12">
+											<g:SimplePanel ui:field="editPicturePanel"/>
+										</div>
+										<div class="margin-bottom-20 col-sm-12">
+											<g:SimplePanel ui:field="editPictureButtonPanel"/>
+										</div>
+										<div class="margin-bottom-20 col-sm-12">
+											<g:SimplePanel ui:field="updateUserInfoPanel" />
+										</div>
+									</div>    
+						        </div>    
+					        </div>
+					    </div>
 					</div>
 				</div>
 			</div>
 			<div class="row margin-top-5">
-			    <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-20">
-				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
-			</div>
-				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-10">
-					<g:SimplePanel ui:field="editPicturePanel"/>
-				</div>
-				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 margin-bottom-20">
-					<g:SimplePanel ui:field="editPictureButtonPanel"/>
-				</div>
-				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
-					<g:SimplePanel ui:field="updateUserInfoPanel" />
-				</div>
-				<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
+			    <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
 					<g:SimplePanel ui:field="certificatePanel" />
 				</div>
 			</div>

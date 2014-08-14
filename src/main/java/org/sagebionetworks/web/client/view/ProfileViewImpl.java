@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
@@ -74,8 +73,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel viewProfilePanel;
 	
 	@UiField
-	FlowPanel editProfileButtonPanel;
-	@UiField
 	SimplePanel breadcrumbsPanel;
 	@UiField
 	SimplePanel picturePanel;
@@ -100,10 +97,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Anchor settingsLink;
 	@UiField
 	LIElement settingsListItem;
-//	@UiField
-//	Anchor messagesLink;
-//	@UiField
-//	LIElement messagesListItem;
 	@UiField
 	Anchor challengesLink;
 	@UiField
@@ -126,10 +119,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement teamsTabContainer;
 	@UiField
-	FlowPanel messagesTabContainer;
-	@UiField
-	FlowPanel settingsTabContainer;
-	
+	DivElement settingsTabContainer;
 	
 	//Project tab
 	@UiField
@@ -159,11 +149,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	FlowPanel favoritesTabContent;
 	
+	//Settings
+	@UiField
+	FlowPanel settingsTabContent;
+	
 	private Presenter presenter;
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private Button linkedInButtonEditProfile;
-	private Button editProfileButton;
 	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
@@ -171,7 +164,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private HTML defaultProfilePicture;
 	
 	private Footer footerWidget;
-	private CookieProvider cookies;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
@@ -188,7 +180,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			CookieProvider cookies,
 			CertificateWidget certificateWidget,
 			SettingsPresenter settingsPresenter,
 			PortalGinInjector ginInjector) {		
@@ -200,7 +191,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.breadcrumb = breadcrumb;
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
-		this.cookies = cookies;
 		this.certificateWidget = certificateWidget;
 		this.settingsPresenter = settingsPresenter;
 		this.ginInjector = ginInjector;
@@ -211,8 +201,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificatePanel.setWidget(certificateWidget.asWidget());
 		createViewProfile();
 		linkedInButtonEditProfile = createLinkedInButton();
-		
-		createEditProfileCommandsPanel();
 		
 		picturePanel.clear();
 		initTabs();
@@ -241,6 +229,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.createTeam(createTeamTextBox.getValue());
 			}
 		});
+		
 		projectsTabContent.addStyleName("margin-10");
 		challengesTabContent.addStyleName("margin-10");
 		favoritesTabContent.addStyleName("margin-10");
@@ -259,71 +248,65 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget, ProfileArea initialTab) {
 		clear();
 		//when editable, show profile form and linkedin import ui
-		if (isEditing)
-		{
-			Widget profilePicture = getProfilePicture(profile, profile.getPic());
-			profilePicture.addStyleName("left");
-			editPicturePanel.add(profilePicture);
-			editPictureButtonPanel.add(getEditPictureButton(profile));
-			updateUserInfoPanel.add(profileFormWidget);
-		 	updateWithLinkedInPanel.add(linkedInButtonEditProfile);
+		teamsTabContent.clear();
+		DisplayUtils.hide(settingsListItem);
+		updateViewProfile(profile, passingRecord);
+		viewProfilePanel.add(profileWidget);
+		if (isOwner) {
+			DisplayUtils.show(favoritesListItem);
+			DisplayUtils.show(showProfileLink);
+			DisplayUtils.show(settingsListItem);
+			
+			openInvitesWidget.configure(new Callback() {
+				@Override
+				public void invoke() {
+					//refresh the teams and invites
+					presenter.refreshTeams();
+				}
+			}, (CallbackP)null);
+			
+			teamsTabContent.add(openInvitesWidget.asWidget());
+			
+			settingsTabContent.add(settingsPresenter.asWidget());
+			
+			//hide my profile by default, and provide link to show it
+			DisplayUtils.hide(viewProfilePanel);
+			DisplayUtils.hide(picturePanel);
+			
+			//show create project and team UI
+			DisplayUtils.show(createProjectUI);
+			DisplayUtils.show(createTeamUI);
+			
+			initEditProfileUI(profile, profileFormWidget);
+		} else {
+			DisplayUtils.show(viewProfilePanel);
+			DisplayUtils.show(picturePanel);
 		}
-		else
-		{
-			//view only
-			teamsTabContent.clear();
-			settingsTabContainer.clear();
-			
-			DisplayUtils.hide(settingsListItem);
-//			DisplayUtils.hide(messagesListItem);
-			
-			updateViewProfile(profile, passingRecord);
-			viewProfilePanel.add(profileWidget);
-			
-			if (isOwner) {
-				DisplayUtils.show(favoritesListItem);
-				DisplayUtils.show(showProfileLink);
-				DisplayUtils.show(settingsListItem);
-				settingsTabContainer.add(settingsPresenter.asWidget());
-//				DisplayUtils.show(messagesListItem);
-				
-				//if owner, show Edit button too (which redirects to the edit version of the Profile place)
-				editProfileButtonPanel.add(editProfileButton);
-				openInvitesWidget.configure(new Callback() {
-					@Override
-					public void invoke() {
-						//refresh the teams and invites
-						presenter.refreshTeams();
-					}
-				}, (CallbackP)null);
-				
-				teamsTabContent.add(openInvitesWidget.asWidget());
-				
-				//hide my profile by default, and provide link to show it
-				DisplayUtils.hide(viewProfilePanel);
-				DisplayUtils.hide(picturePanel);
-				
-				//show create project and team UI
-				DisplayUtils.show(createProjectUI);
-				DisplayUtils.show(createTeamUI);
-			} else {
-				DisplayUtils.show(viewProfilePanel);
-				DisplayUtils.show(picturePanel);
-			}
-			
-			//Teams
-			SimplePanel wrapper = new SimplePanel();
-			wrapper.add(myTeamsWidget.asWidget());
-			wrapper.addStyleName("highlight-box");
-			wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
-			teamsTabContent.add(wrapper);
-			
+		
+		//Teams
+		SimplePanel wrapper = new SimplePanel();
+		wrapper.add(myTeamsWidget.asWidget());
+		wrapper.addStyleName("highlight-box");
+		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
+		teamsTabContent.add(wrapper);
+		
+		if (initialTab != null)
+			setTabSelected(initialTab);
+		else 
 			setTabSelected(ProfileArea.PROJECTS);
-			DisplayUtils.show(navtabContainer);
-		}
+		DisplayUtils.show(navtabContainer);
+	}
+	
+	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
+		Widget profilePicture = getProfilePicture(profile, profile.getPic());
+		profilePicture.addStyleName("left");
+		editPicturePanel.add(profilePicture);
+		editPictureButtonPanel.add(getEditPictureButton(profile));
+		updateUserInfoPanel.add(profileFormWidget);
+	 	updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 	}
 	
 	@Override
@@ -388,17 +371,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		breadcrumbsPanel.clear();
 		breadcrumbsPanel.add(breadcrumb.asWidget("Profile"));
 	}
-
-	private void createEditProfileCommandsPanel() {
-		editProfileButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_EDIT_PROFILE, ButtonType.DEFAULT, "glyphicon-pencil");
-		editProfileButton.addClickHandler(new ClickHandler() {
-	    	@Override
-			public void onClick(ClickEvent event) {
-	    		presenter.showEditProfile();
-	    	}
-	    });
-		editProfileButton.addStyleName("right btn-xs margin-left-5");
-	}
 	 
 	private Button createLinkedInButton() {
 		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
@@ -410,7 +382,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 	    
 		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
-		command.addStyleName("right btn-xs");
+		command.addStyleName("right btn-xs margin-right-10");
 		
 	    return command;
 	}
@@ -591,7 +563,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateWithLinkedInPanel.clear();
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
-		editProfileButtonPanel.clear();
 		picturePanel.clear();
 		editPicturePanel.clear();
 		editPictureButtonPanel.clear();
@@ -603,6 +574,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		favoritesTabContent.clear();
 		favoritesTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		
+		settingsTabContent.clear();
 		
 		DisplayUtils.hide(showProfileLink);
 		challengesTabContent.clear();
@@ -619,7 +592,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(favoritesTabContainer);
 		DisplayUtils.hide(challengesTabContainer);
 		DisplayUtils.hide(teamsTabContainer);
-		DisplayUtils.hide(messagesTabContainer);
 		DisplayUtils.hide(settingsTabContainer);
 	}
 	
@@ -633,73 +605,41 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		// tell presenter what tab we're on only if the user clicked
 		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
 		hideTabContainers();
-		projectsListItem.removeClassName("active");
-		projectsLink.addStyleName("link");
-		teamsListItem.removeClassName("active");
-		teamsLink.addStyleName("link");
-		settingsListItem.removeClassName("active");
-		settingsLink.addStyleName("link");
-		challengesListItem.removeClassName("active");
-		challengesLink.addStyleName("link");
-//		messagesListItem.removeClassName("active");
-//		messagesLink.addStyleName("link");
-		favoritesListItem.removeClassName("active");
-		favoritesLink.addStyleName("link");
-
-		
-		LIElement tab; 
-		Anchor link;
+		removeClass("active", projectsListItem, teamsListItem, settingsListItem, challengesListItem, favoritesListItem);
 		
 		if (targetTab == Synapse.ProfileArea.PROJECTS) {
-			tab = projectsListItem;
-			link = projectsLink;
+			projectsListItem.addClassName("active");;
 			DisplayUtils.show(projectsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.TEAMS) {
-			tab = teamsListItem;
-			link = teamsLink;
+			teamsListItem.addClassName("active");;
 			DisplayUtils.show(teamsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.SETTINGS) {
-			tab = settingsListItem;
-			link = settingsLink;
+			settingsListItem.addClassName("active");;
 			DisplayUtils.show(settingsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
-			tab = challengesListItem;
-			link = challengesLink;
+			challengesListItem.addClassName("active");;
 			DisplayUtils.show(challengesTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
-			tab = favoritesListItem;
-			link = favoritesLink;
+			favoritesListItem.addClassName("active");;
 			DisplayUtils.show(favoritesTabContainer);
-//		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
-//			tab = messagesListItem;
-//			link = messagesLink;
-//			DisplayUtils.show(messagesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
 		}
-		
-		link.removeStyleName("link");
-		tab.addClassName("active");
+	}
+	
+	private void removeClass(String cssClassName, LIElement... elements) {
+		for (LIElement liElement : elements) {
+			liElement.removeClassName(cssClassName);
+		}
 	}
 	
 	private void initTabs() {
-		projectsLink.setText(DisplayConstants.PROJECTS);
 		projectsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
-		
-		teamsLink.setText(DisplayConstants.TEAMS);
 		teamsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
-		
-		settingsLink.setText(DisplayConstants.SETTINGS);
 		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
-		
-		challengesLink.setText(DisplayConstants.CHALLENGES);
 		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
-		
-		favoritesLink.setText(DisplayConstants.FAVORITES);
 		favoritesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.FAVORITES));
-//		messagesLink.setText(DisplayConstants.MESSAGES);
-//		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {

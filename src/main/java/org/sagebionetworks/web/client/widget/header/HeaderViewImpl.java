@@ -222,7 +222,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(Profile.SETTINGS_PROFILE_TOKEN));
 				}
 			});
 		 	
