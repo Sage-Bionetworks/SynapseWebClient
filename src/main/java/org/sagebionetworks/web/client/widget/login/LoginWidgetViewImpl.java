@@ -105,6 +105,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		loginFieldsPanel.add(signInBtn);
 		loginFieldsPanel.add(forgotPasswordLink);
 		synapseLoginFieldsContainer.setWidget(loginFieldsPanel);
+		synapseLoginFieldsContainer.setMethod(FormPanel.METHOD_POST);
 		synapseLoginFieldsContainer.addSubmitHandler(new FormPanel.SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
