@@ -1046,24 +1046,9 @@ h1, h2, h3, h4, h5, h6 {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.gwt-Tree > div:first-child { 
-      width: 0px !important; 
-      height: 0px !important; 
-      margin: 0px !important; 
-      padding: 0px !important; 
- } 
-
- .gwt-Tree > div {
-      padding: 0px 5px !important;
- }
-
- .gwt-Tree > div[hidefocus=true] {
-      width: 0px !important;
-      height: 0px !important;
-
-      margin: 0px !important;
-      padding: 0px !important;
- }
+.entityBadge {
+	padding-bottom: 4px !important;
+}
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
