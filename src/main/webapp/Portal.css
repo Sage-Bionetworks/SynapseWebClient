@@ -1042,6 +1042,14 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration:underline;
 }
 
+.gwt-TreeItem {
+	font: normal 11px arial, tahoma, helvetica, sans-serif;
+}
+
+.gwt-TreeItem > div {
+	padding-bottom: 4px;
+}
+
 /**table of contents styling **/
 /** .8em to 1.2em **/
 .toc-indent4 {
