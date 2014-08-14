@@ -146,5 +146,7 @@ public class MemberListWidgetTest {
 		widget.setIsAdmin("a user id", true);
 		verify(mockSynapseClient).setIsTeamAdmin(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
+		//also refreshes members to get correct admin state
+		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 }
