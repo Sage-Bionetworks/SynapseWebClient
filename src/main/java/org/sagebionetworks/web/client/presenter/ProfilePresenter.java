@@ -149,10 +149,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void showEditMyProfile() {
+		checkLoggedIn();
 		updateProfileView(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS);
 	}
 	
 	public void showViewMyProfile() {
+		checkLoggedIn();
 		updateProfileView(authenticationController.getCurrentUserPrincipalId());
 	}
 
@@ -462,6 +464,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				}
 			}
 		});
+	}
+	
+	private void checkLoggedIn() {
+		if (!authenticationController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+		}
 	}
 	
 	private void setupProfileFormCallback() {

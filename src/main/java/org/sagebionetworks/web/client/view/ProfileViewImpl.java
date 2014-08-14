@@ -52,6 +52,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -229,10 +230,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.createTeam(createTeamTextBox.getValue());
 			}
 		});
-		
-		projectsTabContent.addStyleName("margin-10");
-		challengesTabContent.addStyleName("margin-10");
-		favoritesTabContent.addStyleName("margin-10");
 	}
 	
 	@Override
@@ -608,23 +605,30 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		removeClass("active", projectsListItem, teamsListItem, settingsListItem, challengesListItem, favoritesListItem);
 		
 		if (targetTab == Synapse.ProfileArea.PROJECTS) {
-			projectsListItem.addClassName("active");;
-			DisplayUtils.show(projectsTabContainer);
+			setTabSelected(projectsListItem, projectsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.TEAMS) {
-			teamsListItem.addClassName("active");;
-			DisplayUtils.show(teamsTabContainer);
+			setTabSelected(teamsListItem, teamsTabContainer);
 		} else if(targetTab == Synapse.ProfileArea.SETTINGS) {
-			settingsListItem.addClassName("active");;
-			DisplayUtils.show(settingsTabContainer);
+			setTabSelected(settingsListItem, settingsTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
-			challengesListItem.addClassName("active");;
-			DisplayUtils.show(challengesTabContainer);
+			setTabSelected(challengesListItem, challengesTabContainer);
 		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
-			favoritesListItem.addClassName("active");;
-			DisplayUtils.show(favoritesTabContainer);
+			setTabSelected(favoritesListItem, favoritesTabContainer);
 		} else {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
+		}
+	}
+	
+	private void setTabSelected(LIElement listItem, DivElement container) {
+		//only selects if the list item is visible
+		if (UIObject.isVisible(listItem)) {
+			listItem.addClassName("active");
+			DisplayUtils.show(container);
+		} else {
+			//if tab is not visible, select projects tab
+			projectsListItem.addClassName("active");
+			DisplayUtils.show(projectsTabContainer);
 		}
 	}
 	
