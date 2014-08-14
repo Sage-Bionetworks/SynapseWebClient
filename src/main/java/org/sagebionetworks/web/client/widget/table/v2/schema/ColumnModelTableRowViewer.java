@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2;
+package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 public interface ColumnModelTableRowViewer extends ColumnModelTableRow {
 

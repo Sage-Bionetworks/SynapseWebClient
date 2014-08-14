@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 
 /**
  * Stub for ColumnModelTableRowEditor

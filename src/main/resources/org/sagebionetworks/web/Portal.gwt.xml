@@ -60,8 +60,7 @@
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	
 	<!-- Limit build permuatations (testing only)  -->
-<!-- 	
 	<set-property name="user.agent" value="safari"/>
-	 --> 
+	 
 	
 </module>

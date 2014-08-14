@@ -2,8 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeViewEnum;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 import com.google.gwt.user.client.ui.Widget;
 

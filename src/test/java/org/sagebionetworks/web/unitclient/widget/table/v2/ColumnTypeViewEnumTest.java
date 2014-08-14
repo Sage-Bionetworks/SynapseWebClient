@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeViewEnum;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 public class ColumnTypeViewEnumTest {
 

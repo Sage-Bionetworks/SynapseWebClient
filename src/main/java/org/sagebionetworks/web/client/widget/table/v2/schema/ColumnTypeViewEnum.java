@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2;
+package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import org.sagebionetworks.repo.model.table.ColumnType;
 
@@ -15,7 +15,8 @@ public enum ColumnTypeViewEnum {
 	Integer(ColumnType.INTEGER),
 	Double(ColumnType.DOUBLE),
 	Date(ColumnType.DATE),
-	File(ColumnType.FILEHANDLEID);
+	File(ColumnType.FILEHANDLEID),
+	Entity(ColumnType.ENTITYID);
 	
 	private ColumnType type;
 	ColumnTypeViewEnum(ColumnType type){

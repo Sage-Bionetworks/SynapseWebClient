@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2;
+package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 
 /**
  * Stub for ColumnModelTableRowViewer

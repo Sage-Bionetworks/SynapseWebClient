@@ -6,9 +6,9 @@ import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
 
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditorPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnTypeViewEnum;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorPresenter;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 public class ColumnModelTableRowEditorPresenterTest {
 	

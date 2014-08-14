@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2;
+package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -10,7 +10,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView.ViewType;
+import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;

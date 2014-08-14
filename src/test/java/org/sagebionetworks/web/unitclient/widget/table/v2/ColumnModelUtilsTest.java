@@ -9,8 +9,8 @@ import java.util.List;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRow;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 public class ColumnModelUtilsTest {
 	
