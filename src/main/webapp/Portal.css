@@ -1377,6 +1377,10 @@ ol.lowerroman {
     position: absolute;
 }
 
+.padding-top-0 {
+	padding-top: 0px !important;
+}
+
 .fileTabTopPadding {
 	padding-top: 5px;
 }
