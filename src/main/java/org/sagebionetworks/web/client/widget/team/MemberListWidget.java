@@ -121,7 +121,8 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			public void onFailure(Throwable caught) {
 				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
 					view.showErrorMessage(caught.getMessage());
-				} 
+				}
+				refreshMembers(searchTerm, offset);
 			}
 		});
 	}
