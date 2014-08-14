@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
@@ -258,9 +259,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), any(PassingRecord.class), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq(ProfileArea.SETTINGS));
 	}
 	
 	@Test
@@ -268,10 +269,10 @@ public class ProfilePresenterTest {
 		//have not taken the test
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class), eq(ProfileArea.TEAMS));
 	}
 	
 	@Test
@@ -279,7 +280,7 @@ public class ProfilePresenterTest {
 		//some other error occurred
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
