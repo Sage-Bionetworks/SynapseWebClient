@@ -37,12 +37,13 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowserView {
+public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView {
 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
@@ -62,14 +63,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoWidget = quizInfoWidget;
-		this.setLayout(new FitLayout());
+		//this.setLayout(new FitLayout());
 	}
-	
-	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-		
-	};
 
 	@Override
 	public void configure(String entityId, boolean canEdit) {
@@ -78,11 +73,9 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	
 	@Override
 	public void configure(String entityId, boolean canEdit, String title) {
-		this.removeAll(true);
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		LayoutContainer topbar = new LayoutContainer();		
+		this.clear();
+		FlowPanel lc = new FlowPanel();
+		FlowPanel topbar = new FlowPanel();
 		boolean isTitle = (title!=null);
 		if(isTitle) {
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
@@ -104,21 +97,20 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			});
 		
 			topbar.add(upload);
-			topbar.add(addFolder, new MarginData(0, 3, 0, 0));
+			topbar.add(addFolder);//, new MarginData(0, 3, 0, 0));
 		}
 		
-		LayoutContainer files = new LayoutContainer();
+		SimplePanel files = new SimplePanel();
+		files.addStyleName("highlight-box padding-top-0");
 		entityTreeBrowser.configure(entityId, true);
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
-		files.add(etbW);
+		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
 		if (canEdit || isTitle)
 			lc.add(topbar);
 		lc.add(files);
-		lc.layout();
 		this.add(lc);
-		this.layout(true);
 	}
 	
 	@Override
@@ -300,6 +292,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 	@Override
 	public void clear() {
+		super.clear();
 	}
 
 	@Override
