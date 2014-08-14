@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
@@ -27,6 +30,9 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
@@ -35,6 +41,7 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.transform.NodeModelCreatorImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -314,6 +321,13 @@ public class GwtTestSuite extends GWTTestCase {
 		fh.setId("20");
 		fileHandles.add(fh);
 		
+		TableBundle tableBundle = new TableBundle();
+		ColumnModel cm = new ColumnModel();
+		cm.setColumnType(ColumnType.BOOLEAN);
+		cm.setId("123");
+		tableBundle.setColumnModels(Arrays.asList(cm));
+		tableBundle.setMaxRowsPerPage(new Long(678));
+		
 		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
 		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
@@ -328,6 +342,7 @@ public class GwtTestSuite extends GWTTestCase {
 		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
 		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
 		transport.setFileHandlesJson(entityListToString(fileHandles));
+		transport.setTableData(factory.createJsonStringForEntity(tableBundle));
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
@@ -373,10 +388,43 @@ public class GwtTestSuite extends GWTTestCase {
 	}
 	
 
+	@Test
+	public void testEncodeTokenFFRealWorld() {
+		//email validation token is decoded in FF only!
+		//first, real world case.  This was the actual token read in by FF:
+		String token = "userid=273960&email=scicomp@sagebase.org&timestamp=2014-08-04T15:06:48.257+0000&domain=SYNAPSE&mac=XI45by8krakTcSPS7mEthZtQYrk=";
+		String result = AccountPresenter.encodeTokenKeysAndValues(token);
+		//should contain encoded version of "+0000"
+		Assert.assertTrue(result.contains("%2B0000"));
+		//should contain the entire mac address, which has "=" in it that must be encoded
+		Assert.assertTrue(result.contains("mac=XI45by8krakTcSPS7mEthZtQYrk%3D"));
+		//should still contain ampersands and equals
+		Assert.assertTrue(result.contains("&"));
+		Assert.assertTrue(result.contains("="));
+	}
+	
+	@Test
+	public void testEncodeTokenEmptyString() {
+		String token = "";
+		String result = AccountPresenter.encodeTokenKeysAndValues(token);
+		Assert.assertEquals("", result);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testEncodeTokenInvalid() {
+		String key = "mac";
+		String value = "Many=Equal=Signs";
+		String encodedValue = "Many%3DEqual%3DSigns";
+		
+		String token = "userid=273960&"+key + "=" + value + "&anotherkey=andvalue";
+		String result = AccountPresenter.encodeTokenKeysAndValues(token);
+		Assert.assertTrue(result.contains(key));
+		Assert.assertTrue(result.contains(encodedValue));
+	}
+	
 	@Override
 	public String toString() {
 		return "GwtTestSuite for Module: "+getModuleName();
 	}
-	
 
 }

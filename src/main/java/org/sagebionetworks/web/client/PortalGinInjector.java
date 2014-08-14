@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -72,6 +74,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -135,6 +141,8 @@ public interface PortalGinInjector extends Ginjector {
 	public AccountPresenter getAccountPresenter();
 	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
+	
+	public TrashPresenter getTrashPresenter();
 	
 	public TeamSearchPresenter getTeamSearchPresenter();
 	
@@ -201,10 +209,19 @@ public interface PortalGinInjector extends Ginjector {
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	
+	// TableEntit V2
+	public ColumnModelsView createNewColumnModelsView();
+	public ColumnModelsWidget createNewColumnModelsWidget();
+	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
+	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
+	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
 	public SimpleTableWidget getSimpleTableWidget();
+	
+	public EntityBadge getEntityBadgeWidget();
+
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();

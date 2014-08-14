@@ -61,7 +61,7 @@ public class TableViewUtils {
 	static {
 		columnToDisplayName = new HashMap<ColumnType, String>();
 		columnToDisplayName.put(ColumnType.STRING, "String");
-		columnToDisplayName.put(ColumnType.LONG, "Integer");
+		columnToDisplayName.put(ColumnType.INTEGER, "Integer");
 		columnToDisplayName.put(ColumnType.DOUBLE, "Double");
 		columnToDisplayName.put(ColumnType.BOOLEAN, "Boolean");
 		columnToDisplayName.put(ColumnType.FILEHANDLEID, "File");
@@ -69,7 +69,7 @@ public class TableViewUtils {
 		
 		columnToDisplayWidth = new HashMap<ColumnType, Integer>();
 		columnToDisplayWidth.put(ColumnType.STRING, 150);
-		columnToDisplayWidth.put(ColumnType.LONG, 100);
+		columnToDisplayWidth.put(ColumnType.INTEGER, 100);
 		columnToDisplayWidth.put(ColumnType.DOUBLE, 100);
 		columnToDisplayWidth.put(ColumnType.BOOLEAN, 100);
 		columnToDisplayWidth.put(ColumnType.FILEHANDLEID, 150);
@@ -97,7 +97,7 @@ public class TableViewUtils {
 		    return configSimpleText(col, canEdit, rowUpdater, cellTable, view); // Simple text field    				
 		} else if(col.getColumnType() == ColumnType.DOUBLE) {
 			return configNumberField(col, true, canEdit, rowUpdater, cellTable, view);   
-		} else if(col.getColumnType() == ColumnType.LONG) {
+		} else if(col.getColumnType() == ColumnType.INTEGER) {
 			return configNumberField(col, false, canEdit, rowUpdater, cellTable, view);   
 		} else if(col.getColumnType() == ColumnType.BOOLEAN) {			
 			if(canEdit) return configBooleanCombo(col, rowUpdater, cellTable, view); 

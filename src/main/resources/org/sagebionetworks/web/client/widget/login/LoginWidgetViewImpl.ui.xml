@@ -6,8 +6,7 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	<g:HTMLPanel>
-		<div class="container">
-
+		<div>
 			<g:SimplePanel ui:field="googleSSOContainer" />
 				<div class="signin-panel panel panel-body margin-top-15">
 	   				<h4 class="form-signin-heading">Sign in with a Synapse Account</h4>

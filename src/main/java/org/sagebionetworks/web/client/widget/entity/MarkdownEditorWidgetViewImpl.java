@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -15,22 +17,20 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
@@ -73,6 +73,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 	private ResourceLoader resourceLoader;
 	private MarkdownWidget markdownWidget;
 	private Presenter presenter;
+	private Dialog dialog;
 	
 	@Inject
 	public MarkdownEditorWidgetViewImpl(SynapseClientAsync synapseClient,
@@ -81,7 +82,8 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
-			MarkdownWidget markdownWidget) {
+			MarkdownWidget markdownWidget, 
+			Dialog dialog) {
 		super();
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -91,6 +93,8 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.markdownWidget = markdownWidget;
+		this.dialog = dialog;
+		dialog.setSize(ModalSize.LARGE);
 		markdownWidget.addStyleName("margin-10");
 		widgetSelectionState = new WidgetSelectionState();
 	}
@@ -193,7 +197,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		LayoutContainer overallRow = DisplayUtils.createRowContainer();
 		LayoutContainer row = DisplayUtils.createRowContainer();
 		FlowPanel commands = new FlowPanel();
-		commands.addStyleName("col-md-12");
+		commands.addStyleName("margin-top-5 col-md-12");
 		row.add(commands);
 		overallRow.add(row);
 		formPanel.add(overallRow, previewFormData);
@@ -368,6 +372,8 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 					Window.scrollTo(0, mdCommands.getElement().getAbsoluteTop());
 			}
 		});
+		
+		mdCommands.add(dialog);
 	}
 	
 	public void handleEditWidgetCommand() {
@@ -439,16 +445,6 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 
 	@Override
 	public void showPreviewHTML(String result, boolean isWiki) throws JSONObjectAdapterException {
-		final Dialog window = new Dialog();
-		window.setMaximizable(false);
-	    window.setSize(650, 500);
-	    window.setPlain(true);  
-	    window.setModal(true);  
-	    window.setHeading("Preview");
-	    window.setLayout(new FitLayout());
-	    window.setButtons(Dialog.OK);
-	    window.setHideOnButtonClick(true);
-
 		HTMLPanel panel;
 		if(result == null || "".equals(result)) {
 	    	panel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<div style=\"font-size: 80%\">" + DisplayConstants.LABEL_NO_DESCRIPTION + "</div>"));
@@ -462,27 +458,17 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		FlowPanel f = new FlowPanel();
 		f.setStyleName("entity-description-preview-wrapper");
 		f.add(panel);
-		window.add(new ScrollPanel(f));
-		window.show();
+		
+		dialog.configure("Preview", f, DisplayConstants.OK, null, null, true);
+		dialog.show();
 	}
 	
 	public void showFormattingGuideDialog() {
-        final Dialog window = new Dialog();
-        window.setMaximizable(false);
-        window.setSize(590, 600);
-        window.setPlain(true); 
-        window.setModal(true); 
-
-        window.setHeading(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT); 
-        window.setButtons(Dialog.OK);
-        window.setHideOnButtonClick(true);
-
-        window.setLayout(new FitLayout());
-        ScrollPanel wrapper = new ScrollPanel();
+		ScrollPanel wrapper = new ScrollPanel();
         wrapper.add(markdownWidget);
-	    window.add(wrapper);
-        // show the window
-	    window.show();		
+        
+		dialog.configure(DisplayConstants.ENTITY_DESCRIPTION_TIPS_TEXT, wrapper, DisplayConstants.OK, null, null, true);
+		dialog.show();
 	}
 
 	private Menu createHeadingMenu() {
@@ -688,7 +674,7 @@ public class MarkdownEditorWidgetViewImpl extends FlowPanel implements MarkdownE
 		command.addStyleName("btn-xs");
 		command.addClickHandler(clickHandler);
 		if (tooltipText != null)
-			DisplayUtils.addTooltip(this.synapseJSNIUtils, command, tooltipText, TOOLTIP_POSITION.BOTTOM);
+			DisplayUtils.addTooltip(command, tooltipText, Placement.BOTTOM);
 		command.setHeight("22px");
 		return command;
 	}

@@ -230,7 +230,7 @@ public class EntityEditor {
 		Entity entity = (Entity) entityFactory.newInstance(className);
 		entity.setParentId(parentId);
 		entity.setEntityType(className);
-		EntityBundle newBundle = new EntityBundle(entity, null, null, null, null, null, null);
+		EntityBundle newBundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		return newBundle;
 	}
 

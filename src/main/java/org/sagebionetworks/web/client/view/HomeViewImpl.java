@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.view;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -21,6 +23,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
@@ -29,16 +32,12 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.HomeSearchBox;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -413,7 +412,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private LayoutContainer getFavoritesContainer() {
 		LayoutContainer favoritesContainer = new LayoutContainer();
 		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
 		favoritesContainer.add(favoritesTreeBrowser.asWidget());
 		return favoritesContainer;
 	}
@@ -506,23 +505,17 @@ public class HomeViewImpl extends Composite implements HomeView {
 		pythonClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 		clClientInstallPanel.add(new HTML(ProgrammaticClientCode.getPythonClientInstallHTML()));
 
-		final Dialog javaWindow = new Dialog();
-		javaWindow.add(new HTML(ProgrammaticClientCode.getJavaClientInstallHTML()));
-		javaWindow.setSize(560, 287);
-		javaWindow.setPlain(true);
-		javaWindow.setModal(false);
-		javaWindow.setHeading(DisplayConstants.INSTALL_JAVA_MAVEN);
-		javaWindow.setLayout(new FitLayout());			    
-	    javaWindow.setButtons(Dialog.CLOSE);
-	    javaWindow.setButtonAlign(HorizontalAlignment.RIGHT);
-
 		Button showJava = new Button(DisplayConstants.SHOW);
 		showJava.removeStyleName("gwt-Button");
 		showJava.addStyleName("btn btn-default btn-lg btn-block margin-top-5");
 		showJava.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				javaWindow.show();
+				Bootbox.alert("<h4>"+DisplayConstants.INSTALL_JAVA_MAVEN + "</h4>" + ProgrammaticClientCode.getJavaClientInstallHTML().asString(), new AlertCallback() {
+					@Override
+					public void callback() {
+					}
+				});
 			}
 		});	
 		javaClientInstallPanel.add(showJava);

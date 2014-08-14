@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -66,6 +67,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
@@ -102,6 +104,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
@@ -122,6 +125,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -151,49 +155,54 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
-	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"+PortalVersionHolder.getVersionInfo();
-	static {//kick off initialization (like pattern compilation) by referencing it
-			SynapseMarkdownProcessor.getInstance();
-		}
-	
-	private Cache<MarkdownCacheRequest, String> wiki2Markdown = CacheBuilder.newBuilder()
-			.maximumSize(35)
-			.expireAfterAccess(1, TimeUnit.HOURS)
-			.build(
-					new CacheLoader<MarkdownCacheRequest, String>() {
-						@Override
-						public String load(MarkdownCacheRequest key)
-								throws Exception {
-							try {
-								org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-								WikiPage returnPage = null;
-								 if (key.getVersion() == null)
-									 returnPage = synapseClient.getV2WikiPageAsV1(key.getWikiPageKey());
-								 else 
-									 returnPage = synapseClient.getVersionOfV2WikiPageAsV1(key.getWikiPageKey(), key.getVersion());
+	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
+			+ PortalVersionHolder.getVersionInfo();
+	static {// kick off initialization (like pattern compilation) by referencing
+			// it
+		SynapseMarkdownProcessor.getInstance();
+	}
 
-								return EntityFactory.createJSONStringForEntity(returnPage);
-							} catch(SynapseException e) {
-								throw ExceptionUtil.convertSynapseException(e);
-							}
-						}
+	private Cache<MarkdownCacheRequest, String> wiki2Markdown = CacheBuilder
+			.newBuilder().maximumSize(35).expireAfterAccess(1, TimeUnit.HOURS)
+			.build(new CacheLoader<MarkdownCacheRequest, String>() {
+				@Override
+				public String load(MarkdownCacheRequest key) throws Exception {
+					try {
+						org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+						WikiPage returnPage = null;
+						if (key.getVersion() == null)
+							returnPage = synapseClient.getV2WikiPageAsV1(key
+									.getWikiPageKey());
+						else
+							returnPage = synapseClient
+									.getVersionOfV2WikiPageAsV1(
+											key.getWikiPageKey(),
+											key.getVersion());
+
+						return EntityFactory
+								.createJSONStringForEntity(returnPage);
+					} catch (SynapseException e) {
+						throw ExceptionUtil.convertSynapseException(e);
 					}
-				);
-	
+				}
+			});
+
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
+	private TableModelUtils tableModelUtils = new TableModelUtils(adapterFactory);
 	
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
-	
+
 	/**
 	 * Injected with Gin
 	 */
 	private ServiceUrlProvider urlProvider;
 
 	/**
-	 * Essentially the constructor. Setup org.sagebionetworks.client.SynapseClient client.
+	 * Essentially the constructor. Setup
+	 * org.sagebionetworks.client.SynapseClient client.
 	 * 
 	 * @param provider
 	 */
@@ -208,7 +217,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 
 	/**
-	 * This allows tests provide mock org.sagebionetworks.client.SynapseClient ojbects
+	 * This allows tests provide mock org.sagebionetworks.client.SynapseClient
+	 * ojbects
 	 * 
 	 * @param provider
 	 */
@@ -224,11 +234,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
+
+	public void setTableModelUtils(TableModelUtils tableModelUtils) {
+		this.tableModelUtils = tableModelUtils;
+	}
 	
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, String> wikiToMarkdown) {
 		this.wiki2Markdown = wikiToMarkdown;
 	}
-	
+
 	/**
 	 * Validate that the service is ready to go. If any of the injected data is
 	 * missing then it cannot run. Public for tests.
@@ -247,7 +261,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return UserDataProvider.getThreadLocalUserToken(this
 				.getThreadLocalRequest());
 	}
-	
+
 	/*
 	 * SynapseClient Service Methods
 	 */
@@ -257,79 +271,90 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException {
+	public EntityWrapper getEntityForVersion(String entityId, Long versionNumber)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Entity entity;
-			if(versionNumber == null) {				
+			if (versionNumber == null) {
 				entity = synapseClient.getEntityById(entityId);
 			} else {
-				entity = synapseClient.getEntityByIdForVersion(entityId, versionNumber);
+				entity = synapseClient.getEntityByIdForVersion(entityId,
+						versionNumber);
 			}
 			JSONObjectAdapter entityJson = entity
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityJson.toJSONString(), entity.getClass().getName());
+			return new EntityWrapper(entityJson.toJSONString(), entity
+					.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-		
+
 	@Override
 	public EntityBundleTransport getEntityBundle(String entityId, int partsMask)
 			throws RestServiceException {
-		try {			
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();			
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			EntityBundle eb;
-			//TODO:remove the try catch when PLFM-1752 is fixed
+			// TODO:remove the try catch when PLFM-1752 is fixed
 			try {
 				eb = synapseClient.getEntityBundle(entityId, partsMask);
-				} catch(SynapseNotFoundException e) {
-				//if we're trying to get the filehandles, then give another try without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
+			} catch (SynapseNotFoundException e) {
+				// if we're trying to get the filehandles, then give another try
+				// without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
+							& partsMask;
 					eb = synapseClient.getEntityBundle(entityId, newPartsMask);
-				}
-				else throw e;
+				} else
+					throw e;
 			}
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public EntityBundleTransport getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
-		try {			
+		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			EntityBundle eb;
-			//TODO:remove the try catch when PLFM-1752 is fixed
+			// TODO:remove the try catch when PLFM-1752 is fixed
 			try {
-				eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);
-			} catch(SynapseNotFoundException e) {
-				//if we're trying to get the filehandles, then give another try without the filehandles
-				if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0) {
-					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES) & partsMask;
-					eb = synapseClient.getEntityBundle(entityId, versionNumber, newPartsMask);
-				}
-				else throw e;
+				eb = synapseClient.getEntityBundle(entityId, versionNumber,
+						partsMask);
+			} catch (SynapseNotFoundException e) {
+				// if we're trying to get the filehandles, then give another try
+				// without the filehandles
+				if ((EntityBundleTransport.FILE_HANDLES & partsMask) != 0) {
+					int newPartsMask = (~EntityBundleTransport.FILE_HANDLES)
+							& partsMask;
+					eb = synapseClient.getEntityBundle(entityId, versionNumber,
+							newPartsMask);
+				} else
+					throw e;
 			}
-			
+
 			return convertBundleToTransport(entityId, eb, partsMask);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String getEntityVersions(String entityId, int offset, int limit)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<VersionInfo> versions = synapseClient.getEntityVersions(entityId, offset, limit);
-			JSONObjectAdapter entityJson = versions.writeToJSONObject(adapterFactory.createNew());
+			PaginatedResults<VersionInfo> versions = synapseClient
+					.getEntityVersions(entityId, offset, limit);
+			JSONObjectAdapter entityJson = versions
+					.writeToJSONObject(adapterFactory.createNew());
 			return entityJson.toJSONString();
 		} catch (SynapseException e) {
 			log.error(e);
@@ -340,15 +365,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public EntityWrapper getEntityPath(String entityId) throws RestServiceException {
+	public EntityWrapper getEntityPath(String entityId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			EntityPath entityPath = synapseClient.getEntityPath(entityId);
 			JSONObjectAdapter entityPathJson = entityPath
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(entityPathJson.toJSONString(), entityPath.getClass().getName());
+			return new EntityWrapper(entityPathJson.toJSONString(), entityPath
+					.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -357,14 +384,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public EntityWrapper search(String searchQueryJson) throws RestServiceException {
+	public EntityWrapper search(String searchQueryJson)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 			SearchResults searchResults = synapseClient.search(new SearchQuery(
 					adapter.createNew(searchQueryJson)));
 			searchResults.writeToJSONObject(adapter);
-			return new EntityWrapper(adapter.toJSONString(), SearchResults.class.getName());
+			return new EntityWrapper(adapter.toJSONString(),
+					SearchResults.class.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -379,7 +408,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 */
 
 	// Convert repo-side EntityBundle to serializable EntityBundleTransport
-	private EntityBundleTransport convertBundleToTransport(String entityId, 
+	private EntityBundleTransport convertBundleToTransport(String entityId,
 			EntityBundle eb, int partsMask) throws RestServiceException {
 		EntityBundleTransport ebt = new EntityBundleTransport();
 		try {
@@ -389,21 +418,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
 				Annotations a = eb.getAnnotations();
-				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
+				ebt.setAnnotationsJson(EntityFactory
+						.createJSONStringForEntity(a));
 			}
 			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
 				UserEntityPermissions uep = eb.getPermissions();
-				ebt.setPermissionsJson(EntityFactory.createJSONStringForEntity(uep));
+				ebt.setPermissionsJson(EntityFactory
+						.createJSONStringForEntity(uep));
 			}
 			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
 				EntityPath path = eb.getPath();
-				ebt.setEntityPathJson(EntityFactory.createJSONStringForEntity(path));
+				ebt.setEntityPathJson(EntityFactory
+						.createJSONStringForEntity(path));
 			}
 			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
 				List<EntityHeader> rbList = eb.getReferencedBy();
 				PaginatedResults<EntityHeader> rb = new PaginatedResults<EntityHeader>();
 				rb.setResults(rbList);
-				ebt.setEntityReferencedByJson(EntityFactory.createJSONStringForEntity(rb));
+				ebt.setEntityReferencedByJson(EntityFactory
+						.createJSONStringForEntity(rb));
 			}
 			if ((EntityBundleTransport.HAS_CHILDREN & partsMask) > 0) {
 				Boolean hasChildren = eb.getHasChildren();
@@ -421,46 +454,56 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				}
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
-			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask)!=0) {
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
+			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
+				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb
+						.getAccessRequirements()));
 			}
-			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask)!=0) {
-				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb.getUnmetAccessRequirements()));
+			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
+				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb
+						.getUnmetAccessRequirements()));
 			}
 			if ((EntityBundleTransport.FILE_HANDLES & partsMask)!=0 && eb.getFileHandles() != null)
 				ebt.setFileHandlesJson(createJSONStringFromArray(eb.getFileHandles()));
 			
-			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
+			if ((EntityBundleTransport.TABLE_DATA & partsMask) != 0
+					&& eb.getTableBundle() != null) {
+				ebt.setTableData(EntityFactory.createJSONStringForEntity(eb
+						.getTableBundle()));
+			}
 			
+			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
+
 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());			
+			throw new UnknownErrorException(e.getMessage());
 		}
 		return ebt;
 	}
-	
-	public static String createJSONStringFromArray(List<? extends JSONEntity> list) throws JSONObjectAdapterException {
+
+	public static String createJSONStringFromArray(
+			List<? extends JSONEntity> list) throws JSONObjectAdapterException {
 		JSONArrayAdapter aa = new JSONArrayAdapterImpl();
-		for (int i=0; i<list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			JSONObjectAdapter oa = new JSONObjectAdapterImpl();
 			list.get(i).writeToJSONObject(oa);
 			aa.put(i, oa);
 		}
 		return aa.toJSONString();
 	}
-	
 
 	/**
-	 * The org.sagebionetworks.client.SynapseClient client is stateful so we must create a new one for each
-	 * request
-	 */	
+	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
+	 * must create a new one for each request
+	 */
 	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
-		// Create a new syanpse			
-		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider.createNewClient();		
+		// Create a new syanpse
+		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
+				.createNewClient();
 		synapseClient.setSessionToken(tokenProvider.getSessionToken());
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		synapseClient.setFileEndpoint(StackConfiguration
+				.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
 		return synapseClient;
@@ -473,14 +516,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	private static final Integer MAX_LIMIT = Integer.MAX_VALUE;
 	private static final Integer ZERO_OFFSET = 0;
-	
+
 	// before we hit this limit we will use another mechanism to find users
 	private static final int EVALUATION_PAGINATION_LIMIT = Integer.MAX_VALUE;
 	private static final int EVALUATION_PAGINATION_OFFSET = 0;
-	
+
 	private static final int USER_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find users
-	private static final int USER_PAGINATION_LIMIT = 1000; 
+	private static final int USER_PAGINATION_LIMIT = 1000;
 	private static final int GROUPS_PAGINATION_OFFSET = 0;
 	// before we hit this limit we will use another mechanism to find groups
 	private static final int GROUPS_PAGINATION_LIMIT = 1000;
@@ -524,24 +567,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 * Update entity
 	 */
 	@Override
-	public EntityWrapper updateEntity(String entityJson) throws RestServiceException {
+	public EntityWrapper updateEntity(String entityJson)
+			throws RestServiceException {
 		try {
 			// update
 			Entity entity = parseEntityFromJson(entityJson);
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			entity = synapseClient.putEntity(entity);
-			
+
 			EntityWrapper wrapper = new EntityWrapper();
 			wrapper.setEntityClassName(entity.getClass().getName());
-			wrapper.setEntityJson(entity.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-			return wrapper;			
+			wrapper.setEntityJson(entity.writeToJSONObject(
+					adapterFactory.createNew()).toJSONString());
+			return wrapper;
 		} catch (JSONObjectAdapterException e) {
 			throw new BadRequestException(e.getMessage());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}	
-	
+	}
+
 	@Override
 	public String createOrUpdateEntity(String entityJson, String annoJson,
 			boolean isNew) throws RestServiceException {
@@ -634,15 +679,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 
 	}
-	
 
 	@Override
 	public String getEntityHeaderBatch(String referenceList)
 			throws RestServiceException {
 		try {
-			ReferenceList list = new ReferenceList(new JSONObjectAdapterImpl(referenceList));
+			ReferenceList list = new ReferenceList(new JSONObjectAdapterImpl(
+					referenceList));
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list.getReferences());
+			BatchResults<EntityHeader> results = synapseClient
+					.getEntityHeaderBatch(list.getReferences());
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -650,7 +696,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public List<String> getEntityHeaderBatch(List<String> entityIds)
 			throws RestServiceException {
@@ -662,7 +708,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				list.add(ref);
 			}
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			BatchResults<EntityHeader> results = synapseClient.getEntityHeaderBatch(list);
+			BatchResults<EntityHeader> results = synapseClient
+					.getEntityHeaderBatch(list);
 			List<String> returnList = new ArrayList<String>();
 			for (EntityHeader header : results.getResults()) {
 				returnList.add(EntityFactory.createJSONStringForEntity(header));
@@ -675,31 +722,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-
-
 	@Override
 	public void deleteEntityById(String entityId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.deleteEntityById(entityId);			
+			synapseClient.deleteEntityById(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
-	
+
 	@Override
 	public void deleteEntityById(String entityId, Boolean skipTrashCan)
 			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.deleteEntityById(entityId, skipTrashCan);			
+			synapseClient.deleteEntityById(entityId, skipTrashCan);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
-	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException {
+	public void deleteEntityVersionById(String entityId, Long versionNumber)
+			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			synapseClient.deleteEntityVersionById(entityId, versionNumber);
@@ -709,9 +755,77 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
+	public String viewTrashForUser(long offset, long limit)
+			throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			PaginatedResults<TrashedEntity> results = synapseClient
+					.viewTrashForUser(offset, limit);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void restoreFromTrash(String entityId, String newParentId)
+			throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.restoreFromTrash(entityId, newParentId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public void moveToTrash(String entityId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.moveToTrash(entityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public void purgeTrashForUser() throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.purgeTrashForUser();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public void purgeTrashForUser(String entityId) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			synapseClient.purgeTrashForUser(entityId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			for (String entityId : entityIds) {
+				synapseClient.purgeTrashForUser(entityId);
+			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
 	public String getUserProfile() throws RestServiceException {
-		try	{
-			//cached, in a cookie?
+		try {
+			// cached, in a cookie?
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			UserProfile profile = synapseClient.getMyProfile();
 			return EntityFactory.createJSONStringForEntity(profile);
@@ -719,9 +833,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
-	
+
 	@Override
 	public String getUserProfile(String userId) throws RestServiceException {
 		try {
@@ -737,69 +851,83 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
 	public String getTeam(String teamId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			Team team = synapseClient.getTeam(teamId);
-			
+
 			return EntityFactory.createJSONStringForEntity(team);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper getUserGroupHeadersById(List<String> ids) throws RestServiceException {
+	public EntityWrapper getUserGroupHeadersById(List<String> ids)
+			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			UserGroupHeaderResponsePage response = synapseClient.getUserGroupHeadersByIds(ids);
+			UserGroupHeaderResponsePage response = synapseClient
+					.getUserGroupHeadersByIds(ids);
 			JSONObjectAdapter responseJSON = response
 					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(responseJSON.toJSONString(), responseJSON.getClass().getName());
+			return new EntityWrapper(responseJSON.toJSONString(), responseJSON
+					.getClass().getName());
 		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e); 
+			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public void updateUserProfile(String userProfileJson) throws RestServiceException {
+	public void updateUserProfile(String userProfileJson)
+			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			JSONObject userProfileJSONObject = new JSONObject(userProfileJson);
-			UserProfile profile = EntityFactory.createEntityFromJSONObject(userProfileJSONObject, UserProfile.class);
+			UserProfile profile = EntityFactory.createEntityFromJSONObject(
+					userProfileJSONObject, UserProfile.class);
 			AttachmentData pic = profile.getPic();
-			if (pic != null && pic.getTokenId() == null && pic.getUrl() != null){
-				//special case, client provided just enough information to pull the pic from an external location (so try to store in s3 before updating the profile).
+			if (pic != null && pic.getTokenId() == null && pic.getUrl() != null) {
+				// special case, client provided just enough information to pull
+				// the pic from an external location (so try to store in s3
+				// before updating the profile).
 				log.info("Downloading picture from url: " + pic.getUrl());
 				URL url = new URL(pic.getUrl());
 				pic.setUrl(null);
 				File temp = null;
 				URLConnection conn = null;
-				try
-			    {
-			    	conn = url.openConnection();
-				    conn.setDoInput(true);
-				    conn.setDoOutput(false);
-				    temp = ServiceUtils.writeToTempFile(conn.getInputStream(), UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
-				 	// Now upload the file
-			    	String contentType = conn.getContentType();
-			    	String fileName = temp.getName();
-			    	if (contentType != null && contentType.equalsIgnoreCase("image/jpeg") && !fileName.toLowerCase().endsWith(".jpg"))
-			    		fileName = profile.getOwnerId() + ".jpg";
-					pic = synapseClient.uploadUserProfileAttachmentToSynapse(profile.getOwnerId(), temp, fileName);
-				} catch (Throwable t){
-					//couldn't pull the picture from the external server.  log and move on with the update
+				try {
+					conn = url.openConnection();
+					conn.setDoInput(true);
+					conn.setDoOutput(false);
+					temp = ServiceUtils
+							.writeToTempFile(
+									conn.getInputStream(),
+									UserProfileAttachmentServlet.MAX_ATTACHMENT_SIZE_IN_BYTES);
+					// Now upload the file
+					String contentType = conn.getContentType();
+					String fileName = temp.getName();
+					if (contentType != null
+							&& contentType.equalsIgnoreCase("image/jpeg")
+							&& !fileName.toLowerCase().endsWith(".jpg"))
+						fileName = profile.getOwnerId() + ".jpg";
+					pic = synapseClient.uploadUserProfileAttachmentToSynapse(
+							profile.getOwnerId(), temp, fileName);
+				} catch (Throwable t) {
+					// couldn't pull the picture from the external server. log
+					// and move on with the update
 					t.printStackTrace();
-				} finally{
-					// Unconditionally delete the tmp file and close the input stream
+				} finally {
+					// Unconditionally delete the tmp file and close the input
+					// stream
 					if (temp != null)
 						temp.delete();
 					try {
@@ -808,7 +936,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						t.printStackTrace();
 					}
 				}
-			    profile.setPic(pic);
+				profile.setPic(pic);
 			}
 			synapseClient.updateMyProfile(profile);
 		} catch (SynapseException e) {
@@ -819,22 +947,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		} catch (IOException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException {
+	public void additionalEmailValidation(String userId, String emailAddress,
+			String callbackUrl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			synapseClient.additionalEmailValidation(userIdLong, emailAddress, callbackUrl);
+			synapseClient.additionalEmailValidation(userIdLong, emailAddress,
+					callbackUrl);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public void addEmail(String emailValidationToken) throws RestServiceException {
+	public void addEmail(String emailValidationToken)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			AddEmailInfo newEmailInfo = new AddEmailInfo();
@@ -844,7 +975,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String getNotificationEmail() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -854,7 +985,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public void setNotificationEmail(String email) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -864,97 +995,113 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	public AccessControlList getAcl(String id) throws SynapseException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		EntityHeader benefactor = synapseClient.getEntityBenefactor(id);
 		String benefactorId = benefactor.getId();
 		return synapseClient.getACL(benefactorId);
 	}
-	
+
 	@Override
 	public EntityWrapper getNodeAcl(String id) throws RestServiceException {
 		try {
 			AccessControlList acl = getAcl(id);
-			JSONObjectAdapter aclJson = acl
-					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper createAcl(EntityWrapper aclEW) throws RestServiceException {
+	public EntityWrapper createAcl(EntityWrapper aclEW)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(
+					aclEW.getEntityJson(), AccessControlList.class);
 			acl = synapseClient.createACL(acl);
-			JSONObjectAdapter aclJson = acl
-					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper updateAcl(EntityWrapper aclEW) throws RestServiceException {
+	public EntityWrapper updateAcl(EntityWrapper aclEW)
+			throws RestServiceException {
 		return updateAcl(aclEW, false);
 	}
-	
+
 	@Override
-	public EntityWrapper updateAcl(EntityWrapper aclEW, boolean recursive) throws RestServiceException {
+	public EntityWrapper updateAcl(EntityWrapper aclEW, boolean recursive)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			AccessControlList acl = jsonEntityFactory.createEntity(aclEW.getEntityJson(), AccessControlList.class);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(
+					aclEW.getEntityJson(), AccessControlList.class);
 			acl = synapseClient.updateACL(acl, recursive);
-			JSONObjectAdapter aclJson = acl
-					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper deleteAcl(String ownerEntityId) throws RestServiceException {
+	public EntityWrapper deleteAcl(String ownerEntityId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			// first delete the ACL
 			synapseClient.deleteACL(ownerEntityId);
-			// now get the ACL governing this entity, which will be some ancestor, the 'permissions benefactor'
+			// now get the ACL governing this entity, which will be some
+			// ancestor, the 'permissions benefactor'
 			AccessControlList acl = getAcl(ownerEntityId);
-			JSONObjectAdapter aclJson = acl
-					.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass().getName());
+			JSONObjectAdapter aclJson = acl.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aclJson.toJSONString(), aclJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException {
+	public boolean hasAccess(String ownerEntityId, String accessType)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.canAccess(ownerEntityId, ACCESS_TYPE.valueOf(accessType));
+			return synapseClient.canAccess(ownerEntityId,
+					ACCESS_TYPE.valueOf(accessType));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
-	
+
 	@Override
-	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException {
+	public boolean hasAccess(String ownerId, String ownerType, String accessType)
+			throws RestServiceException {
 		ObjectType type = ObjectType.valueOf(ownerType);
 		ACCESS_TYPE access = ACCESS_TYPE.valueOf(accessType);
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -964,85 +1111,102 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public EntityWrapper getAllUsers() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<UserProfile> userProfiles = synapseClient.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
-			JSONObjectAdapter upJson = userProfiles.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(upJson.toJSONString(), upJson.getClass().getName());
+			PaginatedResults<UserProfile> userProfiles = synapseClient
+					.getUsers(USER_PAGINATION_OFFSET, USER_PAGINATION_LIMIT);
+			JSONObjectAdapter upJson = userProfiles
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(upJson.toJSONString(), upJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
 	public String createUserProfileAttachmentPresignedUrl(String id,
 			String tokenOrPreviewId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PresignedUrl url = synapseClient.createUserProfileAttachmentPresignedUrl(id, tokenOrPreviewId);
+			PresignedUrl url = synapseClient
+					.createUserProfileAttachmentPresignedUrl(id,
+							tokenOrPreviewId);
 			return EntityFactory.createJSONStringForEntity(url);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper createAccessRequirement(EntityWrapper arEW) throws RestServiceException {
+	public EntityWrapper createAccessRequirement(EntityWrapper arEW)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
 			@SuppressWarnings("unchecked")
-			AccessRequirement ar = jsonEntityFactory.createEntity(arEW.getEntityJson(), 
-					(Class<AccessRequirement>)Class.forName(arEW.getEntityClassName()));
-			AccessRequirement result = synapseClient.createAccessRequirement(ar);
-			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName());
+			AccessRequirement ar = jsonEntityFactory.createEntity(arEW
+					.getEntityJson(), (Class<AccessRequirement>) Class
+					.forName(arEW.getEntityClassName()));
+			AccessRequirement result = synapseClient
+					.createAccessRequirement(ar);
+			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} catch (ClassNotFoundException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper createLockAccessRequirement(String entityId) throws RestServiceException {
+	public EntityWrapper createLockAccessRequirement(String entityId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			AccessRequirement result = synapseClient.createLockAccessRequirement(entityId);
-			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(arJson.toJSONString(), arJson.getClass().getName());
+			AccessRequirement result = synapseClient
+					.createLockAccessRequirement(entityId);
+			JSONObjectAdapter arJson = result.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(arJson.toJSONString(), arJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
-	
+
 	@Override
-	public AccessRequirementsTransport getUnmetAccessRequirements(String entityId) throws RestServiceException {
+	public AccessRequirementsTransport getUnmetAccessRequirements(
+			String entityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(entityId);
 			subjectId.setType(RestrictableObjectType.ENTITY);
 
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
-				synapseClient.getUnmetAccessRequirements(subjectId);
-			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = synapseClient
+					.getUnmetAccessRequirements(subjectId);
+			JSONObjectAdapter arJson = accessRequirements
+					.writeToJSONObject(adapterFactory.createNew());
 			AccessRequirementsTransport transport = new AccessRequirementsTransport();
-			transport.setAccessRequirementsString(arJson.toJSONString());	
+			transport.setAccessRequirementsString(arJson.toJSONString());
 			Entity e = synapseClient.getEntityById(entityId);
-			transport.setEntityString(EntityFactory.createJSONStringForEntity(e));
+			transport.setEntityString(EntityFactory
+					.createJSONStringForEntity(e));
 			transport.setEntityClassAsString(e.getClass().getName());
 			transport.setUserProfileString(getUserProfile());
 			return transport;
@@ -1050,40 +1214,44 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public String getUnmetEvaluationAccessRequirements(String evalId) throws RestServiceException {
+	public String getUnmetEvaluationAccessRequirements(String evalId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
 			subjectId.setId(evalId);
 			subjectId.setType(RestrictableObjectType.EVALUATION);
 
-			VariableContentPaginatedResults<AccessRequirement> accessRequirements = 
-				synapseClient.getUnmetAccessRequirements(subjectId);
-			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+			VariableContentPaginatedResults<AccessRequirement> accessRequirements = synapseClient
+					.getUnmetAccessRequirements(subjectId);
+			JSONObjectAdapter arJson = accessRequirements
+					.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public String getUnmetTeamAccessRequirements(String teamId) throws RestServiceException {
+	public String getUnmetTeamAccessRequirements(String teamId)
+			throws RestServiceException {
 		return getTeamAccessRequirements(teamId, true);
 	}
 
 	@Override
-	public String getTeamAccessRequirements(String teamId) throws RestServiceException {
+	public String getTeamAccessRequirements(String teamId)
+			throws RestServiceException {
 		return getTeamAccessRequirements(teamId, false);
 	}
 
-	
-	private String getTeamAccessRequirements(String teamId, boolean unmetOnly) throws RestServiceException {
+	private String getTeamAccessRequirements(String teamId, boolean unmetOnly)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
@@ -1091,24 +1259,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			subjectId.setType(RestrictableObjectType.TEAM);
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements;
 			if (unmetOnly)
-				accessRequirements = synapseClient.getUnmetAccessRequirements(subjectId);
+				accessRequirements = synapseClient
+						.getUnmetAccessRequirements(subjectId);
 			else
-				accessRequirements = synapseClient.getAccessRequirements(subjectId);
-			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+				accessRequirements = synapseClient
+						.getAccessRequirements(subjectId);
+			JSONObjectAdapter arJson = accessRequirements
+					.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public String getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException {
+	public String getAllEntityUploadAccessRequirements(String entityId)
+			throws RestServiceException {
 		return getEntityAccessRequirements(entityId, false, ACCESS_TYPE.UPLOAD);
 	}
 
-	public String getEntityAccessRequirements(String entityId, boolean unmetOnly, ACCESS_TYPE targetAccessType) throws RestServiceException {
+	public String getEntityAccessRequirements(String entityId,
+			boolean unmetOnly, ACCESS_TYPE targetAccessType)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
@@ -1116,26 +1290,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			subjectId.setType(RestrictableObjectType.ENTITY);
 			VariableContentPaginatedResults<AccessRequirement> accessRequirements;
 			if (unmetOnly)
-				accessRequirements = synapseClient.getUnmetAccessRequirements(subjectId);
+				accessRequirements = synapseClient
+						.getUnmetAccessRequirements(subjectId);
 			else
-				accessRequirements = synapseClient.getAccessRequirements(subjectId);
-			//filter to the targetAccessType
+				accessRequirements = synapseClient
+						.getAccessRequirements(subjectId);
+			// filter to the targetAccessType
 			if (targetAccessType != null) {
-				List<AccessRequirement> filteredResults = filterAccessRequirements(accessRequirements.getResults(), targetAccessType);
+				List<AccessRequirement> filteredResults = filterAccessRequirements(
+						accessRequirements.getResults(), targetAccessType);
 				accessRequirements.setResults(filteredResults);
-				accessRequirements.setTotalNumberOfResults(filteredResults.size());
+				accessRequirements.setTotalNumberOfResults(filteredResults
+						.size());
 			}
-			
-			JSONObjectAdapter arJson = accessRequirements.writeToJSONObject(adapterFactory.createNew());
+
+			JSONObjectAdapter arJson = accessRequirements
+					.writeToJSONObject(adapterFactory.createNew());
 			return arJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
-	public List<AccessRequirement> filterAccessRequirements(List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
+
+	public List<AccessRequirement> filterAccessRequirements(
+			List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
 		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
 		if (unfilteredList != null) {
 			for (AccessRequirement accessRequirement : unfilteredList) {
@@ -1146,146 +1326,174 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 		return filteredAccessRequirements;
 	}
-	
-	
+
 	@Override
-	public EntityWrapper createAccessApproval(EntityWrapper aaEW) throws RestServiceException {
+	public EntityWrapper createAccessApproval(EntityWrapper aaEW)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			    			@SuppressWarnings("unchecked")
-							AccessApproval aa = jsonEntityFactory.createEntity(aaEW.getEntityJson(), 
-					(Class<AccessApproval>)Class.forName(aaEW.getEntityClassName()));
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			@SuppressWarnings("unchecked")
+			AccessApproval aa = jsonEntityFactory.createEntity(aaEW
+					.getEntityJson(), (Class<AccessApproval>) Class
+					.forName(aaEW.getEntityClassName()));
 			AccessApproval result = synapseClient.createAccessApproval(aa);
-			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (ClassNotFoundException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
+
 	@Override
 	@Deprecated
-	public EntityWrapper updateExternalLocationable(String entityId, String externalUrl, String name) throws RestServiceException {
+	public EntityWrapper updateExternalLocationable(String entityId,
+			String externalUrl, String name) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Entity locationable = synapseClient.getEntityById(entityId);
-			if(!(locationable instanceof Locationable)) {
-				throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
+			if (!(locationable instanceof Locationable)) {
+				throw new RuntimeException("Upload failed. Entity id: "
+						+ locationable.getId() + " is not Locationable.");
 			}
 			if (isManuallySettingExternalName(name)) {
 				locationable.setName(name);
 			}
-			Locationable result = synapseClient.updateExternalLocationableToSynapse((Locationable)locationable, externalUrl);
-			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+			Locationable result = synapseClient
+					.updateExternalLocationableToSynapse(
+							(Locationable) locationable, externalUrl);
+			JSONObjectAdapter aaJson = result.writeToJSONObject(adapterFactory
+					.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	@Override
-	public EntityWrapper updateExternalFile(String entityId, String externalUrl, String name) throws RestServiceException {
+	public EntityWrapper updateExternalFile(String entityId,
+			String externalUrl, String name) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			Entity entity = synapseClient.getEntityById(entityId);
-			if(!(entity instanceof FileEntity)) {
-				throw new RuntimeException("Upload failed. Entity id: " + entity.getId() + " is not a File.");
+			if (!(entity instanceof FileEntity)) {
+				throw new RuntimeException("Upload failed. Entity id: "
+						+ entity.getId() + " is not a File.");
 			}
-			
+
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
-			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
-			((FileEntity)entity).setDataFileHandleId(clone.getId());
+			ExternalFileHandle clone = synapseClient
+					.createExternalFileHandle(efh);
+			((FileEntity) entity).setDataFileHandleId(clone.getId());
 			if (isManuallySettingName)
 				entity.setName(name);
 			Entity updatedEntity = synapseClient.putEntity(entity);
 			if (!isManuallySettingName)
-				updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
-			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+				updatedEntity = updateExternalFileName(updatedEntity,
+						externalUrl, synapseClient);
+			JSONObjectAdapter aaJson = updatedEntity
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
+
 	private boolean isManuallySettingExternalName(String name) {
 		return name != null && name.trim().length() > 0;
 	}
-	
+
 	@Override
-	public EntityWrapper createExternalFile(String parentEntityId, String externalUrl, String name) throws RestServiceException {
+	public EntityWrapper createExternalFile(String parentEntityId,
+			String externalUrl, String name) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			boolean isManuallySettingName = isManuallySettingExternalName(name);
 			FileEntity newEntity = new FileEntity();
 			ExternalFileHandle efh = new ExternalFileHandle();
 			efh.setExternalURL(externalUrl);
-			ExternalFileHandle clone = synapseClient.createExternalFileHandle(efh);
+			ExternalFileHandle clone = synapseClient
+					.createExternalFileHandle(efh);
 			newEntity.setDataFileHandleId(clone.getId());
 			newEntity.setParentId(parentEntityId);
 			if (isManuallySettingName)
 				newEntity.setName(name);
 			Entity updatedEntity = synapseClient.createEntity(newEntity);
 			if (!isManuallySettingName)
-				updatedEntity = updateExternalFileName(updatedEntity, externalUrl, synapseClient);
-			JSONObjectAdapter aaJson = updatedEntity.writeToJSONObject(adapterFactory.createNew());
-			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass().getName());
+				updatedEntity = updateExternalFileName(updatedEntity,
+						externalUrl, synapseClient);
+			JSONObjectAdapter aaJson = updatedEntity
+					.writeToJSONObject(adapterFactory.createNew());
+			return new EntityWrapper(aaJson.toJSONString(), aaJson.getClass()
+					.getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
-		} 
+		}
 	}
-	
-	private Entity updateExternalFileName(Entity entity, String externalUrl, org.sagebionetworks.client.SynapseClient synapseClient) {
+
+	private Entity updateExternalFileName(Entity entity, String externalUrl,
+			org.sagebionetworks.client.SynapseClient synapseClient) {
 		String oldName = entity.getName();
-		try{
-			//also try to rename to something reasonable, ignore if anything goes wrong
+		try {
+			// also try to rename to something reasonable, ignore if anything
+			// goes wrong
 			entity.setName(DisplayUtils.getFileNameFromExternalUrl(externalUrl));
 			entity = synapseClient.putEntity(entity);
-		} catch(Throwable t) {
-			//if anything goes wrong, send back the actual name
+		} catch (Throwable t) {
+			// if anything goes wrong, send back the actual name
 			entity.setName(oldName);
 		}
 		return entity;
 	}
 
 	@Override
-	public String markdown2Html(String markdown, Boolean isPreview, Boolean isAlphaMode, String clientHostString) throws RestServiceException{
+	public String markdown2Html(String markdown, Boolean isPreview,
+			Boolean isAlphaMode, String clientHostString)
+			throws RestServiceException {
 		try {
 			long startTime = System.currentTimeMillis();
-			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, isPreview, clientHostString);
+			String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
+					markdown, isPreview, clientHostString);
 			long endTime = System.currentTimeMillis();
-			float elapsedTime = endTime-startTime;
-			logInfo("Markdown processing took " + (elapsedTime/1000f) + " seconds.  In alpha mode? " + isAlphaMode);
+			float elapsedTime = endTime - startTime;
+			logInfo("Markdown processing took " + (elapsedTime / 1000f)
+					+ " seconds.  In alpha mode? " + isAlphaMode);
 			return html;
 		} catch (IOException e) {
 			throw new RestServiceException(e.getMessage());
 		}
 	}
 
-	
 	@Override
 	public String getActivityForEntity(String entityId)
 			throws RestServiceException {
 		return getActivityForEntityVersion(entityId, null);
 	}
-	
+
 	@Override
 	public String getActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			Activity activity = synapseClient.getActivityForEntityVersion(entityId, versionNumber);
+			Activity activity = synapseClient.getActivityForEntityVersion(
+					entityId, versionNumber);
 			return EntityFactory.createJSONStringForEntity(activity);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1306,13 +1514,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public String getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Reference> refs = synapseClient.getEntitiesGeneratedBy(activityId, limit, offset);
+			PaginatedResults<Reference> refs = synapseClient
+					.getEntitiesGeneratedBy(activityId, limit, offset);
 			return EntityFactory.createJSONStringForEntity(refs);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1326,28 +1535,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			String attachmentName) throws RestServiceException {
 		EntityWrapper updatedEntityWrapper = null;
 		try {
-				org.sagebionetworks.client.SynapseClient client = createSynapseClient();
-				Entity e = client.getEntityById(entityId);
-				if (e.getAttachments() != null) {
-					for (AttachmentData data : e.getAttachments()) {
-						if (data.getName().equals(attachmentName)) {
-							e.getAttachments().remove(data);
-							break;
-						}
+			org.sagebionetworks.client.SynapseClient client = createSynapseClient();
+			Entity e = client.getEntityById(entityId);
+			if (e.getAttachments() != null) {
+				for (AttachmentData data : e.getAttachments()) {
+					if (data.getName().equals(attachmentName)) {
+						e.getAttachments().remove(data);
+						break;
 					}
 				}
-				// Save the changes.
-				Entity updatedEntity = client.putEntity(e);
-				updatedEntityWrapper = new EntityWrapper(EntityFactory.createJSONStringForEntity(updatedEntity), updatedEntity.getClass().getName());
+			}
+			// Save the changes.
+			Entity updatedEntity = client.putEntity(e);
+			updatedEntityWrapper = new EntityWrapper(
+					EntityFactory.createJSONStringForEntity(updatedEntity),
+					updatedEntity.getClass().getName());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-		
+
 		return updatedEntityWrapper;
 	}
-	
+
 	@Override
 	public String getJSONEntity(String repoUri) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1356,21 +1567,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return entity.toString();
 		} catch (SynapseTableUnavailableException e) {
 			handleTableUnavailableException(e);
-			//TableUnavilableException is thrown in line above, should never reach the next line
+			// TableUnavilableException is thrown in line above, should never
+			// reach the next line
 			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String createWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException {
+	public String createWikiPage(String ownerId, String ownerType,
+			String wikiPageJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
 			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
-			WikiPage returnPage = synapseClient.createWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					WikiPage.class);
+			WikiPage returnPage = synapseClient.createWikiPage(ownerId,
+					ObjectType.valueOf(ownerType), page);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1378,32 +1594,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public void deleteWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException {
+	public void deleteWikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
 			synapseClient.deleteWikiPage(properKey);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String getWikiHeaderTree(String ownerId, String ownerType) throws RestServiceException {
+	public String getWikiHeaderTree(String ownerId, String ownerType)
+			throws RestServiceException {
 		try {
-			PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
+			PaginatedResults<WikiHeader> results = getWikiHeaderTree(ownerId,
+					ObjectType.valueOf(ownerType));
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	private PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId, ObjectType ownerType)  throws RestServiceException{
+
+	private PaginatedResults<WikiHeader> getWikiHeaderTree(String ownerId,
+			ObjectType ownerType) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<WikiHeader> results = synapseClient.getWikiHeaderTree(ownerId, ownerType);
+			PaginatedResults<WikiHeader> results = synapseClient
+					.getWikiHeaderTree(ownerId, ownerType);
 			return results;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1411,30 +1635,40 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	private String getRootWikiId(org.sagebionetworks.client.SynapseClient synapseClient, String ownerId, ObjectType ownerType) throws RestServiceException{
-		try{
-			WikiPage rootPage = synapseClient.getRootWikiPage(ownerId, ownerType);
+
+	private String getRootWikiId(
+			org.sagebionetworks.client.SynapseClient synapseClient,
+			String ownerId, ObjectType ownerType) throws RestServiceException {
+		try {
+			WikiPage rootPage = synapseClient.getRootWikiPage(ownerId,
+					ownerType);
 			if (rootPage != null)
 				return rootPage.getId();
-			else return null;
+			else
+				return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String getWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException{
+	public String getWikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			if (key.getWikiPageId() == null) {
-				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				// asking for the root. find the root id first
+				String rootWikiPage = getRootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
-			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
 			WikiPage returnPage = synapseClient.getWikiPage(properKey);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
@@ -1443,15 +1677,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String updateWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException{
+	public String updateWikiPage(String ownerId, String ownerType,
+			String wikiPageJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
 			@SuppressWarnings("unchecked")
-			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
-			WikiPage returnPage = synapseClient.updateWikiPage(ownerId, ObjectType.valueOf(ownerType), page);
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					WikiPage.class);
+			WikiPage returnPage = synapseClient.updateWikiPage(ownerId,
+					ObjectType.valueOf(ownerType), page);
 			return EntityFactory.createJSONStringForEntity(returnPage);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1461,23 +1699,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getFileEndpoint() throws RestServiceException{
-//		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		return synapseClient.getFileEndpoint();
+	public String getFileEndpoint() throws RestServiceException {
+		// org.sagebionetworks.client.SynapseClient synapseClient =
+		// createSynapseClient();
+		// return synapseClient.getFileEndpoint();
 		return StackConfiguration.getFileServiceEndpoint();
 	}
+
 	@Override
-	public String getWikiAttachmentHandles(org.sagebionetworks.web.shared.WikiPageKey key)
+	public String getWikiAttachmentHandles(
+			org.sagebionetworks.web.shared.WikiPageKey key)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			if (key.getWikiPageId() == null) {
-				//asking for the root.  find the root id first
-				String rootWikiPage = getRootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
+				// asking for the root. find the root id first
+				String rootWikiPage = getRootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
 				key.setWikiPageId(rootWikiPage);
 			}
-			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-			FileHandleResults results = synapseClient.getWikiAttachmenthHandles(properKey);
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			FileHandleResults results = synapseClient
+					.getWikiAttachmenthHandles(properKey);
 			return EntityFactory.createJSONStringForEntity(results);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1486,232 +1733,289 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	 // V2 Wiki crud
-    @Override
-    public String createV2WikiPage(String ownerId, String ownerType,
-                    String wikiPageJson) throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-                    @SuppressWarnings("unchecked")
-                    V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,V2WikiPage.class);
-                    V2WikiPage returnPage = synapseClient.createV2WikiPage(ownerId, ObjectType.valueOf(ownerType), page);
-                    return EntityFactory.createJSONStringForEntity(returnPage);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-
-    private String getV2RootWikiId(org.sagebionetworks.client.SynapseClient synapseClient, String ownerId, ObjectType ownerType) throws RestServiceException{
-            try{
-                    V2WikiPage rootPage = synapseClient.getV2RootWikiPage(ownerId, ownerType);
-                    if (rootPage != null)
-                            return rootPage.getId();
-                    else return null;
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-    
-    @Override
-    public String getV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
-                    throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    if (key.getWikiPageId() == null) {
-                            //asking for the root.  find the root id first
-                            String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-                            key.setWikiPageId(rootWikiPage);
-                    }
-                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-                    V2WikiPage returnPage = synapseClient.getV2WikiPage(properKey);
-                    return EntityFactory.createJSONStringForEntity(returnPage);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-    
-    @Override
-    public String getVersionOfV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
-    	throws RestServiceException {
-    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-    	try {
-            if (key.getWikiPageId() == null) {
-                    //asking for the root.  find the root id first
-                    String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-                    key.setWikiPageId(rootWikiPage);
-            }
-            WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-            V2WikiPage returnPage = synapseClient.getVersionOfV2WikiPage(properKey, version);
-            return EntityFactory.createJSONStringForEntity(returnPage);
-	    } catch (SynapseException e) {
-	            throw ExceptionUtil.convertSynapseException(e);
-	    } catch (JSONObjectAdapterException e) {
-	            throw new UnknownErrorException(e.getMessage());
-	    }
-    }
-    
-    @Override
-    public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
-    			throws RestServiceException, IOException {
-    	String markdown = getMarkdown(key);
-    	String html = SynapseMarkdownProcessor.getInstance().markdown2Html(markdown, false, null);
-    	String plainText = Jsoup.clean(html,  "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
-    	return plainText;
-    }
-
-    @Override
-    public String updateV2WikiPage(String ownerId, String ownerType,
-                    String wikiPageJson) throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-                    @SuppressWarnings("unchecked")
-                    V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,V2WikiPage.class);
-                    V2WikiPage returnPage = synapseClient.updateV2WikiPage(ownerId, ObjectType.valueOf(ownerType), page);
-                    return EntityFactory.createJSONStringForEntity(returnPage);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-
-    @Override
-    public String restoreV2WikiPage(String ownerId, String ownerType,
-                    String wikiId, Long versionToUpdate)
-                    throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId, ObjectType.valueOf(ownerType), wikiId, versionToUpdate);
-                    return EntityFactory.createJSONStringForEntity(returnPage);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-
-    @Override
-    public void deleteV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
-                    throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-                    synapseClient.deleteV2WikiPage(properKey);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            }
-    }
-
-    @Override
-    public String getV2WikiHeaderTree(String ownerId, String ownerType)
-                    throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    PaginatedResults<V2WikiHeader> results = synapseClient.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
-                    return EntityFactory.createJSONStringForEntity(results);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-    
-    @Override
-    public String getV2WikiAttachmentHandles(
-                    org.sagebionetworks.web.shared.WikiPageKey key)
-                    throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    if (key.getWikiPageId() == null) {
-                            //asking for the root.  find the root id first
-                            String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-                            key.setWikiPageId(rootWikiPage);
-                    }
-                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-                    FileHandleResults results = synapseClient.getV2WikiAttachmentHandles(properKey);
-                    return EntityFactory.createJSONStringForEntity(results);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-
-    @Override
-    public String getVersionOfV2WikiAttachmentHandles(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
-    	throws RestServiceException {
-    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-    	try {
-            if (key.getWikiPageId() == null) {
-                    //asking for the root.  find the root id first
-                    String rootWikiPage = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-                    key.setWikiPageId(rootWikiPage);
-            }
-            WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-            FileHandleResults results = synapseClient.getVersionOfV2WikiAttachmentHandles(properKey, version);
-            return EntityFactory.createJSONStringForEntity(results);
-	    } catch (SynapseException e) {
-	            throw ExceptionUtil.convertSynapseException(e);
-	    } catch (JSONObjectAdapterException e) {
-	            throw new UnknownErrorException(e.getMessage());
-	    }
-    }
-    
-    @Override
-    public String getV2WikiHistory(
-                    org.sagebionetworks.web.shared.WikiPageKey key, Long limit,
-                    Long offset) throws RestServiceException {
-            org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-            try {
-                    WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
-                    PaginatedResults<V2WikiHistorySnapshot> results = synapseClient.getV2WikiHistory(properKey, limit, offset);
-                    return EntityFactory.createJSONStringForEntity(results);
-            } catch (SynapseException e) {
-                    throw ExceptionUtil.convertSynapseException(e);
-            } catch (JSONObjectAdapterException e) {
-                    throw new UnknownErrorException(e.getMessage());
-            }
-    }
-    
-    @Override
-	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key) throws IOException, RestServiceException{
+	// V2 Wiki crud
+	@Override
+	public String createV2WikiPage(String ownerId, String ownerType,
+			String wikiPageJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		String wikiPageKeyId = getWikiKeyId(synapseClient, key);
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), wikiPageKeyId);
 		try {
-			return synapseClient.downloadV2WikiMarkdown(properKey);
-		} catch(SynapseException e) {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			@SuppressWarnings("unchecked")
+			V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					V2WikiPage.class);
+			V2WikiPage returnPage = synapseClient.createV2WikiPage(ownerId,
+					ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	private String getV2RootWikiId(
+			org.sagebionetworks.client.SynapseClient synapseClient,
+			String ownerId, ObjectType ownerType) throws RestServiceException {
+		try {
+			V2WikiPage rootPage = synapseClient.getV2RootWikiPage(ownerId,
+					ownerType);
+			if (rootPage != null)
+				return rootPage.getId();
+			else
+				return null;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				// asking for the root. find the root id first
+				String rootWikiPage = getV2RootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			V2WikiPage returnPage = synapseClient.getV2WikiPage(properKey);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getVersionOfV2WikiPage(
+			org.sagebionetworks.web.shared.WikiPageKey key, Long version)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				// asking for the root. find the root id first
+				String rootWikiPage = getV2RootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			V2WikiPage returnPage = synapseClient.getVersionOfV2WikiPage(
+					properKey, version);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getPlainTextWikiPage(
+			org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException, IOException {
+		String markdown = getMarkdown(key);
+		String html = SynapseMarkdownProcessor.getInstance().markdown2Html(
+				markdown, false, null);
+		String plainText = Jsoup.clean(html, "", Whitelist.none(),
+				new Document.OutputSettings().prettyPrint(false));
+		return plainText;
+	}
+
+	@Override
+	public String updateV2WikiPage(String ownerId, String ownerType,
+			String wikiPageJson) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			@SuppressWarnings("unchecked")
+			V2WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					V2WikiPage.class);
+			V2WikiPage returnPage = synapseClient.updateV2WikiPage(ownerId,
+					ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String restoreV2WikiPage(String ownerId, String ownerType,
+			String wikiId, Long versionToUpdate) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			V2WikiPage returnPage = synapseClient.restoreV2WikiPage(ownerId,
+					ObjectType.valueOf(ownerType), wikiId, versionToUpdate);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void deleteV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			synapseClient.deleteV2WikiPage(properKey);
+		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
 	@Override
-	public String getVersionOfMarkdown(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws IOException, RestServiceException{
+	public String getV2WikiHeaderTree(String ownerId, String ownerType)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), key.getWikiPageId());
 		try {
-			return synapseClient.downloadVersionOfV2WikiMarkdown(properKey, version);
-		}catch (SynapseException e) {
-            throw ExceptionUtil.convertSynapseException(e);
+			PaginatedResults<V2WikiHeader> results = synapseClient
+					.getV2WikiHeaderTree(ownerId, ObjectType.valueOf(ownerType));
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String zipAndUploadFile(String content, String fileName) throws IOException, RestServiceException{
+	public String getV2WikiAttachmentHandles(
+			org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				// asking for the root. find the root id first
+				String rootWikiPage = getV2RootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			FileHandleResults results = synapseClient
+					.getV2WikiAttachmentHandles(properKey);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getVersionOfV2WikiAttachmentHandles(
+			org.sagebionetworks.web.shared.WikiPageKey key, Long version)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			if (key.getWikiPageId() == null) {
+				// asking for the root. find the root id first
+				String rootWikiPage = getV2RootWikiId(synapseClient,
+						key.getOwnerObjectId(),
+						ObjectType.valueOf(key.getOwnerObjectType()));
+				key.setWikiPageId(rootWikiPage);
+			}
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			FileHandleResults results = synapseClient
+					.getVersionOfV2WikiAttachmentHandles(properKey, version);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getV2WikiHistory(
+			org.sagebionetworks.web.shared.WikiPageKey key, Long limit,
+			Long offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+					key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()),
+					key.getWikiPageId());
+			PaginatedResults<V2WikiHistorySnapshot> results = synapseClient
+					.getV2WikiHistory(properKey, limit, offset);
+			return EntityFactory.createJSONStringForEntity(results);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String getMarkdown(org.sagebionetworks.web.shared.WikiPageKey key)
+			throws IOException, RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		String wikiPageKeyId = getWikiKeyId(synapseClient, key);
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+				key.getOwnerObjectId(),
+				ObjectType.valueOf(key.getOwnerObjectType()), wikiPageKeyId);
+		try {
+			return synapseClient.downloadV2WikiMarkdown(properKey);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public String getVersionOfMarkdown(
+			org.sagebionetworks.web.shared.WikiPageKey key, Long version)
+			throws IOException, RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+				key.getOwnerObjectId(),
+				ObjectType.valueOf(key.getOwnerObjectType()),
+				key.getWikiPageId());
+		try {
+			return synapseClient.downloadVersionOfV2WikiMarkdown(properKey,
+					version);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public String zipAndUploadFile(String content, String fileName)
+			throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		File file = zipUp(content, fileName);
 		String contentType = guessContentTypeFromStream(file);
 		try {
 			// Upload the file and create S3 handle
-			S3FileHandle handle = synapseClient.createFileHandle(file, contentType);
+			S3FileHandle handle = synapseClient.createFileHandle(file,
+					contentType);
 			try {
 				return EntityFactory.createJSONStringForEntity(handle);
 			} catch (JSONObjectAdapterException e) {
@@ -1723,14 +2027,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	private File zipUp(String content, String fileName) throws IOException {
 		// Create a temporary file to write content to
 		File tempFile = File.createTempFile(fileName, ".tmp");
-		if(content != null) {
+		if (content != null) {
 			FileUtils.writeByteArrayToFile(tempFile, content.getBytes());
 		} else {
-			// When creating a wiki for the first time, markdown content doesn't exist
+			// When creating a wiki for the first time, markdown content doesn't
+			// exist
 			// Uploaded file should be empty
 			byte[] emptyByteArray = new byte[0];
 			FileUtils.writeByteArrayToFile(tempFile, emptyByteArray);
@@ -1738,67 +2043,84 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return tempFile;
 	}
 
-	private static String guessContentTypeFromStream(File file)	throws FileNotFoundException, IOException {
+	private static String guessContentTypeFromStream(File file)
+			throws FileNotFoundException, IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try{
+		try {
 			// Let java guess from the stream.
 			String contentType = URLConnection.guessContentTypeFromStream(is);
 			// If Java fails then set the content type to be octet-stream
-			if(contentType == null){
+			if (contentType == null) {
 				contentType = "application/octet-stream";
 			}
 			return contentType;
-		}finally{
+		} finally {
 			is.close();
 		}
 	}
 
 	@Override
 	public String createV2WikiPageWithV1(String ownerId, String ownerType,
-             String wikiPageJson) throws IOException, RestServiceException {
+			String wikiPageJson) throws IOException, RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-        try {
-	        JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-	        @SuppressWarnings("unchecked")
-	        WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
-	        WikiPage returnPage = synapseClient.createV2WikiPageWithV1(ownerId, ObjectType.valueOf(ownerType), page);
-	        return EntityFactory.createJSONStringForEntity(returnPage);
-        } catch (SynapseException e) {
-            throw ExceptionUtil.convertSynapseException(e);
-        } catch (JSONObjectAdapterException e) {
-            throw new UnknownErrorException(e.getMessage());
-        }
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			@SuppressWarnings("unchecked")
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					WikiPage.class);
+			WikiPage returnPage = synapseClient.createV2WikiPageWithV1(ownerId,
+					ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
 	}
-	
+
 	@Override
-    public String updateV2WikiPageWithV1(String ownerId, String ownerType,
-            String wikiPageJson) throws IOException, RestServiceException {
-    	org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-	    try {
-	        JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-	        @SuppressWarnings("unchecked")
-	        WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,WikiPage.class);
-	        WikiPage returnPage = synapseClient.updateV2WikiPageWithV1(ownerId, ObjectType.valueOf(ownerType), page);
-	        return EntityFactory.createJSONStringForEntity(returnPage);
-	    } catch (SynapseException e) {
-	        throw ExceptionUtil.convertSynapseException(e);
-	    } catch (JSONObjectAdapterException e) {
-	        throw new UnknownErrorException(e.getMessage());
-	    }
-    }
-	private String getWikiKeyId(org.sagebionetworks.client.SynapseClient synapseClient, org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException {
+	public String updateV2WikiPageWithV1(String ownerId, String ownerType,
+			String wikiPageJson) throws IOException, RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			@SuppressWarnings("unchecked")
+			WikiPage page = jsonEntityFactory.createEntity(wikiPageJson,
+					WikiPage.class);
+			WikiPage returnPage = synapseClient.updateV2WikiPageWithV1(ownerId,
+					ObjectType.valueOf(ownerType), page);
+			return EntityFactory.createJSONStringForEntity(returnPage);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	private String getWikiKeyId(
+			org.sagebionetworks.client.SynapseClient synapseClient,
+			org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException {
 		String wikiPageId = key.getWikiPageId();
 		if (wikiPageId == null) {
-			//asking for the root.  find the root id first
-			wikiPageId = getV2RootWikiId(synapseClient, key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()));
-         }
+			// asking for the root. find the root id first
+			wikiPageId = getV2RootWikiId(synapseClient, key.getOwnerObjectId(),
+					ObjectType.valueOf(key.getOwnerObjectType()));
+		}
 		return wikiPageId;
 	}
+
 	@Override
-    public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key)
-                    throws RestServiceException, IOException {
+	public String getV2WikiPageAsV1(
+			org.sagebionetworks.web.shared.WikiPageKey key)
+			throws RestServiceException, IOException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+				key.getOwnerObjectId(),
+				ObjectType.valueOf(key.getOwnerObjectType()),
+				getWikiKeyId(synapseClient, key));
 		String etag = null;
 		try {
 			V2WikiPage page = synapseClient.getV2WikiPage(properKey);
@@ -1808,19 +2130,25 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-        
-        MarkdownCacheRequest request = new MarkdownCacheRequest(properKey, etag, null);
-        return processMarkdownRequest(request);
-    }
+
+		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
+				etag, null);
+		return processMarkdownRequest(request);
+	}
 
 	@Override
-    public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) 
-    	throws RestServiceException, IOException {
+	public String getVersionOfV2WikiPageAsV1(
+			org.sagebionetworks.web.shared.WikiPageKey key, Long version)
+			throws RestServiceException, IOException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(key.getOwnerObjectId(), ObjectType.valueOf(key.getOwnerObjectType()), getWikiKeyId(synapseClient, key));
+		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
+				key.getOwnerObjectId(),
+				ObjectType.valueOf(key.getOwnerObjectType()),
+				getWikiKeyId(synapseClient, key));
 		String etag = null;
 		try {
-			V2WikiPage page = synapseClient.getVersionOfV2WikiPage(properKey, version);
+			V2WikiPage page = synapseClient.getVersionOfV2WikiPage(properKey,
+					version);
 			etag = page.getEtag();
 			key.setWikiPageId(page.getId());
 		} catch (SynapseException e) {
@@ -1828,22 +2156,28 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-        
-        MarkdownCacheRequest request = new MarkdownCacheRequest(properKey, etag, version);
-        return processMarkdownRequest(request);
-    }
-	
-	private String processMarkdownRequest(MarkdownCacheRequest request) throws RestServiceException {
+
+		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
+				etag, version);
+		return processMarkdownRequest(request);
+	}
+
+	private String processMarkdownRequest(MarkdownCacheRequest request)
+			throws RestServiceException {
 		try {
 			String markdown = wiki2Markdown.get(request);
 			return markdown;
 		} catch (ExecutionException e) {
-			if (e.getCause() != null && e.getCause() instanceof SynapseException)
-				throw ExceptionUtil.convertSynapseException((SynapseException)e.getCause());
-			else throw new RestServiceException(e.getMessage());
+			if (e.getCause() != null
+					&& e.getCause() instanceof SynapseException)
+				throw ExceptionUtil
+						.convertSynapseException((SynapseException) e
+								.getCause());
+			else
+				throw new RestServiceException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public String addFavorite(String entityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1861,10 +2195,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void removeFavorite(String entityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.removeFavorite(entityId);			
+			synapseClient.removeFavorite(entityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
@@ -1872,7 +2206,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
+			PaginatedResults<EntityHeader> favorites = synapseClient
+					.getFavorites(limit, offset);
 			return EntityFactory.createJSONStringForEntity(favorites);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1880,7 +2215,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	public String createTeam(String teamName) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1893,7 +2228,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	public void deleteTeam(String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1903,12 +2238,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	
 	@Override
-	public String getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException {
+	public String getTeamMembers(String teamId, String fragment, Integer limit,
+			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<TeamMember> members = synapseClient.getTeamMembers(teamId, fragment, limit, offset);
+			PaginatedResults<TeamMember> members = synapseClient
+					.getTeamMembers(teamId, fragment, limit, offset);
 			return EntityFactory.createJSONStringForEntity(members);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1916,12 +2252,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public ArrayList<String> getTeamsForUser(String userId) throws RestServiceException {
+	public ArrayList<String> getTeamsForUser(String userId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(userId, MAX_LIMIT, ZERO_OFFSET);
+			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(
+					userId, MAX_LIMIT, ZERO_OFFSET);
 			List<Team> teamList = teams.getResults();
 			ArrayList<String> teamListStrings = new ArrayList<String>();
 			for (Team t : teamList) {
@@ -1934,12 +2272,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String getTeams(String userId, Integer limit, Integer offset) throws RestServiceException {
+	public String getTeams(String userId, Integer limit, Integer offset)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(userId, limit, offset);
+			PaginatedResults<Team> teams = synapseClient.getTeamsForUser(
+					userId, limit, offset);
 
 			return EntityFactory.createJSONStringForEntity(teams);
 		} catch (SynapseException e) {
@@ -1948,15 +2288,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	public String getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException {
+
+	public String getTeamsBySearch(String searchTerm, Integer limit,
+			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			if (searchTerm != null && searchTerm.trim().length() ==0)
+			if (searchTerm != null && searchTerm.trim().length() == 0)
 				searchTerm = null;
 			if (offset == null)
 				offset = ZERO_OFFSET.intValue();
-			PaginatedResults<Team> teams = synapseClient.getTeams(searchTerm, limit, offset);
+			PaginatedResults<Team> teams = synapseClient.getTeams(searchTerm,
+					limit, offset);
 			return EntityFactory.createJSONStringForEntity(teams);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1964,25 +2306,30 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException {
+
+	public void deleteOpenMembershipRequests(String currentUserId, String teamId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-//			get all open membership requests for this user
-			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, currentUserId, MAX_LIMIT, ZERO_OFFSET);
-			//and delete each one
-//			for (MembershipRequest request : requests.getResults()) {
-//				synapseClient.deleteMembershipRequest(request.getId());
-//			}
+			// get all open membership requests for this user
+			PaginatedResults<MembershipRequest> requests = synapseClient
+					.getOpenMembershipRequests(teamId, currentUserId,
+							MAX_LIMIT, ZERO_OFFSET);
+			// and delete each one
+			// for (MembershipRequest request : requests.getResults()) {
+			// synapseClient.deleteMembershipRequest(request.getId());
+			// }
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	public String getTeamMembershipState(String currentUserId, String teamId) throws RestServiceException {
+
+	public String getTeamMembershipState(String currentUserId, String teamId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, currentUserId);
+			TeamMembershipStatus membershipStatus = synapseClient
+					.getTeamMembershipStatus(teamId, currentUserId);
 			return EntityFactory.createJSONStringForEntity(membershipStatus);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1990,161 +2337,200 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public void requestMembership(String currentUserId, String teamId, String message) throws RestServiceException {
+	public void requestMembership(String currentUserId, String teamId,
+			String message) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, currentUserId);
-			//if we can join the team without creating the request (like if we are a team admin, or there is an open invitation), then just do that!
+			TeamMembershipStatus membershipStatus = synapseClient
+					.getTeamMembershipStatus(teamId, currentUserId);
+			// if we can join the team without creating the request (like if we
+			// are a team admin, or there is an open invitation), then just do
+			// that!
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, currentUserId);
-			} else if (!membershipStatus.getHasOpenRequest()){
-				//otherwise, create the request
+			} else if (!membershipStatus.getHasOpenRequest()) {
+				// otherwise, create the request
 				MembershipRqstSubmission membershipRequest = new MembershipRqstSubmission();
 				membershipRequest.setMessage(message);
 				membershipRequest.setTeamId(teamId);
 				membershipRequest.setUserId(currentUserId);
 
-				//make new Synapse call
+				// make new Synapse call
 				synapseClient.createMembershipRequest(membershipRequest);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public void inviteMember(String userGroupId, String teamId, String message) throws RestServiceException {
+	public void inviteMember(String userGroupId, String teamId, String message)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId, userGroupId);
-			//if we can join the team without creating the invite (like if we are a team admin, or there is an open membership request), then just do that!
+			TeamMembershipStatus membershipStatus = synapseClient
+					.getTeamMembershipStatus(teamId, userGroupId);
+			// if we can join the team without creating the invite (like if we
+			// are a team admin, or there is an open membership request), then
+			// just do that!
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, userGroupId);
-			} else if (!membershipStatus.getHasOpenInvitation()){
-				//check to see if there is already an open invite
+			} else if (!membershipStatus.getHasOpenInvitation()) {
+				// check to see if there is already an open invite
 				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
 				membershipInvite.setMessage(message);
 				membershipInvite.setTeamId(teamId);
 				membershipInvite.setInviteeId(userGroupId);
-				
-				//make new Synapse call
+
+				// make new Synapse call
 				synapseClient.createMembershipInvitation(membershipInvite);
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException {
+	public String getCertifiedUserPassingRecord(String userId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PassingRecord passingRecord = synapseClient.getCertifiedUserPassingRecord(userId);
-			//This method only returns the PassingRecord if the user actually passed (portal does not currently care about the top failed attempt).
+			PassingRecord passingRecord = synapseClient
+					.getCertifiedUserPassingRecord(userId);
+			// This method only returns the PassingRecord if the user actually
+			// passed (portal does not currently care about the top failed
+			// attempt).
 			if (passingRecord.getPassed() == null || !passingRecord.getPassed()) {
-				throw new NotFoundException("The user has not passed the certification quiz.");
+				throw new NotFoundException(
+						"The user has not passed the certification quiz.");
 			}
-			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter passingRecordJson = passingRecord
+					.writeToJSONObject(adapterFactory.createNew());
 			return passingRecordJson.toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
- 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	@Override
-	public String getCertificationQuiz() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Quiz quiz = synapseClient.getCertifiedUserTest();
-			JSONObjectAdapter quizJson = quiz.writeToJSONObject(adapterFactory.createNew());
-			return quizJson.toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
- 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	@Override
-	public String submitCertificationQuizResponse(String quizResponseJson) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			QuizResponse response = jsonEntityFactory.createEntity(quizResponseJson, QuizResponse.class);
-			PassingRecord passingRecord = synapseClient.submitCertifiedUserTestResponse(response);
-			JSONObjectAdapter passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew());
-			return passingRecordJson.toJSONString();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
- 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	public Boolean isTeamMember(String userId, Long groupPrincipalId) throws RestServiceException {
-		Boolean isMember = null;
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(groupPrincipalId.toString(), userId);
-			isMember = membershipStatus.getIsMember(); 
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-		return isMember;
-	}
-	
-	@Override
-	public TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PaginatedResults<TeamMember> allMembers = synapseClient.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
-			long memberCount = allMembers.getTotalNumberOfResults();
-			boolean isAdmin = false;
-			Team team = synapseClient.getTeam(teamId);
-			String membershipStatusJsonString = null;
-			//get membership state for the current user
-			if (isLoggedIn){
-				TeamMembershipStatus membershipStatus = synapseClient.getTeamMembershipStatus(teamId,userId);
-				JSONObjectAdapter membershipStatusJson = membershipStatus.writeToJSONObject(adapterFactory.createNew());
-				membershipStatusJsonString = membershipStatusJson.toJSONString();
-				if (membershipStatus.getIsMember()) {
-					TeamMember teamMember = synapseClient.getTeamMember(teamId, userId);
-					isAdmin = teamMember.getIsAdmin();
-				}
-			}
-			
-			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
-			return new TeamBundle(teamJson.toJSONString(), memberCount, membershipStatusJsonString, isAdmin);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException {
+	public String getCertificationQuiz() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, MAX_LIMIT, ZERO_OFFSET);
-			//and ask for the team info for each invite, and fill that in the bundle
-			
+			Quiz quiz = synapseClient.getCertifiedUserTest();
+			JSONObjectAdapter quizJson = quiz.writeToJSONObject(adapterFactory
+					.createNew());
+			return quizJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public String submitCertificationQuizResponse(String quizResponseJson)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			QuizResponse response = jsonEntityFactory.createEntity(
+					quizResponseJson, QuizResponse.class);
+			PassingRecord passingRecord = synapseClient
+					.submitCertifiedUserTestResponse(response);
+			JSONObjectAdapter passingRecordJson = passingRecord
+					.writeToJSONObject(adapterFactory.createNew());
+			return passingRecordJson.toJSONString();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	public Boolean isTeamMember(String userId, Long groupPrincipalId)
+			throws RestServiceException {
+		Boolean isMember = null;
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			TeamMembershipStatus membershipStatus = synapseClient
+					.getTeamMembershipStatus(groupPrincipalId.toString(),
+							userId);
+			isMember = membershipStatus.getIsMember();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		return isMember;
+	}
+
+	@Override
+	public TeamBundle getTeamBundle(String userId, String teamId,
+			boolean isLoggedIn) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<TeamMember> allMembers = synapseClient
+					.getTeamMembers(teamId, null, 1, ZERO_OFFSET);
+			long memberCount = allMembers.getTotalNumberOfResults();
+			boolean isAdmin = false;
+			Team team = synapseClient.getTeam(teamId);
+			String membershipStatusJsonString = null;
+			// get membership state for the current user
+			if (isLoggedIn) {
+				TeamMembershipStatus membershipStatus = synapseClient
+						.getTeamMembershipStatus(teamId, userId);
+				JSONObjectAdapter membershipStatusJson = membershipStatus
+						.writeToJSONObject(adapterFactory.createNew());
+				membershipStatusJsonString = membershipStatusJson
+						.toJSONString();
+				if (membershipStatus.getIsMember()) {
+					TeamMember teamMember = synapseClient.getTeamMember(teamId,
+							userId);
+					isAdmin = teamMember.getIsAdmin();
+				}
+			}
+
+			JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory
+					.createNew());
+			return new TeamBundle(teamJson.toJSONString(), memberCount,
+					membershipStatusJsonString, isAdmin);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<MembershipRequestBundle> getOpenRequests(String teamId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<MembershipRequest> requests = synapseClient
+					.getOpenMembershipRequests(teamId, null, MAX_LIMIT,
+							ZERO_OFFSET);
+			// and ask for the team info for each invite, and fill that in the
+			// bundle
+
 			List<MembershipRequestBundle> returnList = new ArrayList<MembershipRequestBundle>();
-			//now go through and create a MembershipRequestBundle for each pair
-			
+			// now go through and create a MembershipRequestBundle for each pair
+
 			for (MembershipRequest request : requests.getResults()) {
-				UserProfile profile = synapseClient.getUserProfile(request.getUserId());
-				
-				JSONObjectAdapter profileJson = profile.writeToJSONObject(adapterFactory.createNew());
-				JSONObjectAdapter requestJson = request.writeToJSONObject(adapterFactory.createNew());
-				MembershipRequestBundle b = new MembershipRequestBundle(profileJson.toJSONString(), requestJson.toJSONString());
+				UserProfile profile = synapseClient.getUserProfile(request
+						.getUserId());
+
+				JSONObjectAdapter profileJson = profile
+						.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter requestJson = request
+						.writeToJSONObject(adapterFactory.createNew());
+				MembershipRequestBundle b = new MembershipRequestBundle(
+						profileJson.toJSONString(), requestJson.toJSONString());
 				returnList.add(b);
 			}
-			
+
 			return returnList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2152,14 +2538,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException {
+	public Long getOpenRequestCount(String currentUserId, String teamId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//must be an admin to the team open requests.  To get admin status, must be a member
+			// must be an admin to the team open requests. To get admin status,
+			// must be a member
 			try {
-				PaginatedResults<MembershipRequest> requests = synapseClient.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
+				PaginatedResults<MembershipRequest> requests = synapseClient
+						.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
 				return requests.getTotalNumberOfResults();
 			} catch (SynapseForbiddenException forbiddenEx) {
 				return null;
@@ -2168,25 +2557,34 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public List<MembershipInvitationBundle> getOpenInvitations(String userId) throws RestServiceException {
+	public List<MembershipInvitationBundle> getOpenInvitations(String userId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipInvitation> invitations = synapseClient.getOpenMembershipInvitations(userId,null, MAX_LIMIT, ZERO_OFFSET);
-			//and ask for the team info for each invite, and fill that in the bundle
-			
+			PaginatedResults<MembershipInvitation> invitations = synapseClient
+					.getOpenMembershipInvitations(userId, null, MAX_LIMIT,
+							ZERO_OFFSET);
+			// and ask for the team info for each invite, and fill that in the
+			// bundle
+
 			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
-			//now go through and create a MembershipInvitationBundle for each pair
-			
+			// now go through and create a MembershipInvitationBundle for each
+			// pair
+
 			for (MembershipInvitation invite : invitations.getResults()) {
 				Team team = synapseClient.getTeam(invite.getTeamId());
-				JSONObjectAdapter teamJson = team.writeToJSONObject(adapterFactory.createNew());
-				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(teamJson.toJSONString(), null, inviteJson.toJSONString());
+				JSONObjectAdapter teamJson = team
+						.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter inviteJson = invite
+						.writeToJSONObject(adapterFactory.createNew());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(
+						teamJson.toJSONString(), null,
+						inviteJson.toJSONString());
 				returnList.add(b);
 			}
-			
+
 			return returnList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2194,25 +2592,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public List<MembershipInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException {
+	public List<MembershipInvitationBundle> getOpenTeamInvitations(
+			String teamId, Integer limit, Integer offset)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, limit, offset);
-			//and ask for the team info for each invite, and fill that in the bundle
-			
+			PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient
+					.getOpenMembershipInvitationSubmissions(teamId, null,
+							limit, offset);
+			// and ask for the team info for each invite, and fill that in the
+			// bundle
+
 			List<MembershipInvitationBundle> returnList = new ArrayList<MembershipInvitationBundle>();
-			//now go through and create a MembershipInvitationBundle for each pair
-			
+			// now go through and create a MembershipInvitationBundle for each
+			// pair
+
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
-				UserProfile profile = synapseClient.getUserProfile(invite.getInviteeId());
-				JSONObjectAdapter profileJson = profile.writeToJSONObject(adapterFactory.createNew());
-				JSONObjectAdapter inviteJson = invite.writeToJSONObject(adapterFactory.createNew());
-				MembershipInvitationBundle b = new MembershipInvitationBundle(null, profileJson.toJSONString(), inviteJson.toJSONString());
+				UserProfile profile = synapseClient.getUserProfile(invite
+						.getInviteeId());
+				JSONObjectAdapter profileJson = profile
+						.writeToJSONObject(adapterFactory.createNew());
+				JSONObjectAdapter inviteJson = invite
+						.writeToJSONObject(adapterFactory.createNew());
+				MembershipInvitationBundle b = new MembershipInvitationBundle(
+						null, profileJson.toJSONString(),
+						inviteJson.toJSONString());
 				returnList.add(b);
 			}
-			
+
 			return returnList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2220,9 +2629,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	@Override 
-	public void deleteMembershipInvitation(String invitationId) throws RestServiceException {
+
+	@Override
+	public void deleteMembershipInvitation(String invitationId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.deleteMembershipInvitation(invitationId);
@@ -2230,19 +2640,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException {
+	public void setIsTeamAdmin(String currentUserId, String targetUserId,
+			String teamId, boolean isTeamAdmin) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.setTeamMemberPermissions(teamId, targetUserId, isTeamAdmin);
+			synapseClient.setTeamMemberPermissions(teamId, targetUserId,
+					isTeamAdmin);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException {
+	public void deleteTeamMember(String currentUserId, String targetUserId,
+			String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.removeTeamMember(teamId, targetUserId);
@@ -2250,15 +2663,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String updateTeam(String teamJson) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
 			Team team = jsonEntityFactory.createEntity(teamJson, Team.class);
 			Team updatedTeam = synapseClient.updateTeam(team);
-			JSONObjectAdapter updatedTeamJson = updatedTeam.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter updatedTeamJson = updatedTeam
+					.writeToJSONObject(adapterFactory.createNew());
 			return updatedTeamJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2267,15 +2682,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	
 	@Override
-	public ArrayList<String> getFavoritesList(Integer limit, Integer offset) throws RestServiceException {
+	public ArrayList<String> getFavoritesList(Integer limit, Integer offset)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<EntityHeader> favorites = synapseClient.getFavorites(limit, offset);
+			PaginatedResults<EntityHeader> favorites = synapseClient
+					.getFavorites(limit, offset);
 			ArrayList<String> results = new ArrayList<String>();
-			for(EntityHeader eh : favorites.getResults()) {
-				results.add(eh.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			for (EntityHeader eh : favorites.getResults()) {
+				results.add(eh.writeToJSONObject(adapterFactory.createNew())
+						.toJSONString());
 			}
 			return results;
 		} catch (SynapseException e) {
@@ -2285,12 +2702,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	
 	@Override
-	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException{
+	public String getDescendants(String nodeId, int pageSize,
+			String lastDescIdExcl) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			EntityIdList entityIdList = synapseClient.getDescendants(nodeId, pageSize, lastDescIdExcl);
+			EntityIdList entityIdList = synapseClient.getDescendants(nodeId,
+					pageSize, lastDescIdExcl);
 			return EntityFactory.createJSONStringForEntity(entityIdList);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2298,23 +2716,39 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+
 	@Override
-	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException {
+	public String getEntityDoi(String entityId, Long versionNumber)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			Doi	doi = synapseClient.getEntityDoi(entityId, versionNumber);
+			Doi doi = synapseClient.getEntityDoi(entityId, versionNumber);
 			return EntityFactory.createJSONStringForEntity(doi);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		} catch (Exception e) {
-			throw ExceptionUtil.convertSynapseException(new SynapseNotFoundException());	//backend will be changed to throw a SynapseNotFoundException when no records are found
+			throw ExceptionUtil
+					.convertSynapseException(new SynapseNotFoundException()); // backend
+																				// will
+																				// be
+																				// changed
+																				// to
+																				// throw
+																				// a
+																				// SynapseNotFoundException
+																				// when
+																				// no
+																				// records
+																				// are
+																				// found
 		}
 	}
 
 	@Override
-	public void createDoi(String entityId, Long versionNumber) throws RestServiceException {
+	public void createDoi(String entityId, Long versionNumber)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.createEntityDoi(entityId, versionNumber);
@@ -2322,9 +2756,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException {
+	public String getChunkedFileToken(String fileName, String contentType,
+			String contentMD5) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			CreateChunkedFileTokenRequest ccftr = new CreateChunkedFileTokenRequest();
@@ -2332,9 +2767,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ccftr.setContentType(contentType);
 			ccftr.setContentMD5(contentMD5);
 			// Start the upload
-			ChunkedFileToken token = synapseClient.createChunkedFileUploadToken(ccftr);
-			
-			JSONObjectAdapter requestJson = token.writeToJSONObject(adapterFactory.createNew());
+			ChunkedFileToken token = synapseClient
+					.createChunkedFileUploadToken(ccftr);
+
+			JSONObjectAdapter requestJson = token
+					.writeToJSONObject(adapterFactory.createNew());
 			return requestJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2342,13 +2779,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException{
+	public String getChunkedPresignedUrl(String requestJson)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			ChunkRequest request = jsonEntityFactory.createEntity(requestJson,
+					ChunkRequest.class);
 			return synapseClient.createChunkedPresignedUrl(request).toString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2356,30 +2796,34 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException {
+	public String combineChunkedFileUpload(List<String> requests)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//re-create each request
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			//reconstruct all part numbers, and token
-			ChunkedFileToken token=null;
+			// re-create each request
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			// reconstruct all part numbers, and token
+			ChunkedFileToken token = null;
 			List<Long> parts = new ArrayList<Long>();
-			
+
 			for (String requestJson : requests) {
-				ChunkRequest request = jsonEntityFactory.createEntity(requestJson, ChunkRequest.class);
+				ChunkRequest request = jsonEntityFactory.createEntity(
+						requestJson, ChunkRequest.class);
 				token = request.getChunkedFileToken();
 				parts.add(request.getChunkNumber());
 			}
-			
+
 			CompleteAllChunksRequest cacr = new CompleteAllChunksRequest();
 			cacr.setChunkedFileToken(token);
 			cacr.setChunkNumbers(parts);
 
 			// Start the daemon
 			UploadDaemonStatus status = synapseClient.startUploadDeamon(cacr);
-			JSONObjectAdapter requestJson = status.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter requestJson = status
+					.writeToJSONObject(adapterFactory.createNew());
 			return requestJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2387,16 +2831,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public String getUploadDaemonStatus(String daemonId) throws RestServiceException {
+	public String getUploadDaemonStatus(String daemonId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			UploadDaemonStatus status = synapseClient.getCompleteUploadDaemonStatus(daemonId);
+			UploadDaemonStatus status = synapseClient
+					.getCompleteUploadDaemonStatus(daemonId);
 			if (State.FAILED == status.getState()) {
 				logError(status.getErrorMessage());
 			}
-			JSONObjectAdapter requestJson = status.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter requestJson = status
+					.writeToJSONObject(adapterFactory.createNew());
 			return requestJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2466,9 +2913,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String getEvaluations(List<String> evaluationIds) throws RestServiceException {
+	public String getEvaluations(List<String> evaluationIds)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			List<Evaluation> evalList = new ArrayList<Evaluation>();
@@ -2478,38 +2926,44 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			PaginatedResults<Evaluation> results = new PaginatedResults<Evaluation>();
 			results.setResults(evalList);
 			results.setTotalNumberOfResults(evalList.size());
-			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter evaluationsJson = results
+					.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	
+
 	@Override
-	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException {
+	public String getFileEntityTemporaryUrlForVersion(String entityId,
+			Long versionNumber) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			URL url = synapseClient.getFileEntityTemporaryUrlForVersion(entityId, versionNumber);
+			URL url = synapseClient.getFileEntityTemporaryUrlForVersion(
+					entityId, versionNumber);
 			return url.toString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 
 	}
-	
+
 	@Override
 	public String getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
-			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			PaginatedResults<Evaluation> results = synapseClient
+					.getAvailableEvaluationsPaginated(
+							EVALUATION_PAGINATION_OFFSET,
+							EVALUATION_PAGINATION_LIMIT);
+			JSONObjectAdapter evaluationsJson = results
+					.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public String getAvailableEvaluations(Set<String> targetEvaluationIds)
 			throws RestServiceException {
@@ -2517,33 +2971,46 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			List<String> targetEvaluationIdsList = new ArrayList<String>();
 			targetEvaluationIdsList.addAll(targetEvaluationIds);
-			PaginatedResults<Evaluation> results = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT, targetEvaluationIdsList);
-			JSONObjectAdapter evaluationsJson = results.writeToJSONObject(adapterFactory.createNew());
+			PaginatedResults<Evaluation> results = synapseClient
+					.getAvailableEvaluationsPaginated(
+							EVALUATION_PAGINATION_OFFSET,
+							EVALUATION_PAGINATION_LIMIT,
+							targetEvaluationIdsList);
+			JSONObjectAdapter evaluationsJson = results
+					.writeToJSONObject(adapterFactory.createNew());
 			return evaluationsJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	/**
-	 * Return all evaluations associated to a particular entity, for which the caller can change permissions
+	 * Return all evaluations associated to a particular entity, for which the
+	 * caller can change permissions
 	 */
 	@Override
-	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException {
-		if (entityId == null || entityId.trim().length()==0 ) {
+	public ArrayList<String> getSharableEvaluations(String entityId)
+			throws RestServiceException {
+		if (entityId == null || entityId.trim().length() == 0) {
 			throw new BadRequestException("Entity ID must be given");
 		}
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//look up the available evaluations
-			PaginatedResults<Evaluation> allEvaluations = synapseClient.getEvaluationByContentSource(entityId, EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
-			
+			// look up the available evaluations
+			PaginatedResults<Evaluation> allEvaluations = synapseClient
+					.getEvaluationByContentSource(entityId,
+							EVALUATION_PAGINATION_OFFSET,
+							EVALUATION_PAGINATION_LIMIT);
+
 			ArrayList<String> mySharableEvalauations = new ArrayList<String>();
 			for (Evaluation eval : allEvaluations.getResults()) {
-				//evaluation is associated to entity id.  can I change permissions?
-				UserEvaluationPermissions uep = synapseClient.getUserEvaluationPermissions(eval.getId());
+				// evaluation is associated to entity id. can I change
+				// permissions?
+				UserEvaluationPermissions uep = synapseClient
+						.getUserEvaluationPermissions(eval.getId());
 				if (uep.getCanChangePermissions()) {
-					mySharableEvalauations.add(eval.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+					mySharableEvalauations.add(eval.writeToJSONObject(
+							adapterFactory.createNew()).toJSONString());
 				}
 			}
 			return mySharableEvalauations;
@@ -2551,76 +3018,95 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	public String createSubmission(String submissionJson, String etag) throws RestServiceException {
+
+	public String createSubmission(String submissionJson, String etag)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			Submission sub = jsonEntityFactory.createEntity(submissionJson, Submission.class);
-			Submission updatedSubmission = synapseClient.createSubmission(sub, etag);
-			JSONObjectAdapter updatedSubmissionJson = updatedSubmission.writeToJSONObject(adapterFactory.createNew());
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			Submission sub = jsonEntityFactory.createEntity(submissionJson,
+					Submission.class);
+			Submission updatedSubmission = synapseClient.createSubmission(sub,
+					etag);
+			JSONObjectAdapter updatedSubmissionJson = updatedSubmission
+					.writeToJSONObject(adapterFactory.createNew());
 			return updatedSubmissionJson.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	public String getUserEvaluationPermissions(String evalId) throws RestServiceException {
+
+	public String getUserEvaluationPermissions(String evalId)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			UserEvaluationPermissions permissions = synapseClient.getUserEvaluationPermissions(evalId);
-			JSONObjectAdapter json = permissions.writeToJSONObject(adapterFactory.createNew());
+			UserEvaluationPermissions permissions = synapseClient
+					.getUserEvaluationPermissions(evalId);
+			JSONObjectAdapter json = permissions
+					.writeToJSONObject(adapterFactory.createNew());
 			return json.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	public String getEvaluationAcl(String evalId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			AccessControlList acl = synapseClient.getEvaluationAcl(evalId);
-			JSONObjectAdapter json = acl.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter json = acl.writeToJSONObject(adapterFactory
+					.createNew());
 			return json.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	public String updateEvaluationAcl(String aclJson) throws RestServiceException {
+
+	public String updateEvaluationAcl(String aclJson)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-			AccessControlList acl = jsonEntityFactory.createEntity(aclJson, AccessControlList.class);
-			AccessControlList updatedacl = synapseClient.updateEvaluationAcl(acl);
-			JSONObjectAdapter json = updatedacl.writeToJSONObject(adapterFactory.createNew());
+			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
+					adapterFactory);
+			AccessControlList acl = jsonEntityFactory.createEntity(aclJson,
+					AccessControlList.class);
+			AccessControlList updatedacl = synapseClient
+					.updateEvaluationAcl(acl);
+			JSONObjectAdapter json = updatedacl
+					.writeToJSONObject(adapterFactory.createNew());
 			return json.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
-	public String getAvailableEvaluationsSubmitterAliases() throws RestServiceException{
+
+	public String getAvailableEvaluationsSubmitterAliases()
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//query for all available evaluations.
-			PaginatedResults<Evaluation> availableEvaluations = synapseClient.getAvailableEvaluationsPaginated(0, MAX_LIMIT);
-			//gather all submissions
+			// query for all available evaluations.
+			PaginatedResults<Evaluation> availableEvaluations = synapseClient
+					.getAvailableEvaluationsPaginated(0, MAX_LIMIT);
+			// gather all submissions
 			List<Submission> allSubmissions = new ArrayList<Submission>();
 			for (Evaluation evaluation : availableEvaluations.getResults()) {
-				//query for all submissions for each evaluation
-				PaginatedResults<Submission> submissions = synapseClient.getMySubmissions(evaluation.getId(), 0, MAX_LIMIT);
+				// query for all submissions for each evaluation
+				PaginatedResults<Submission> submissions = synapseClient
+						.getMySubmissions(evaluation.getId(), 0, MAX_LIMIT);
 				allSubmissions.addAll(submissions.getResults());
 			}
-			
-			//sort by created on
+
+			// sort by created on
 			Collections.sort(allSubmissions, new Comparator<Submission>() {
 				@Override
 				public int compare(Submission o1, Submission o2) {
 					return o2.getCreatedOn().compareTo(o1.getCreatedOn());
 				}
 			});
-			
-			//run through and only keep unique submitter alias values (first in the list was most recently used)
+
+			// run through and only keep unique submitter alias values (first in
+			// the list was most recently used)
 			Set<String> uniqueSubmitterAliases = new HashSet<String>();
 			List<String> returnAliases = new ArrayList<String>();
 			for (Submission sub : allSubmissions) {
@@ -2630,14 +3116,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					returnAliases.add(submitterAlias);
 				}
 			}
-			//if it contains null or empty string, remove
+			// if it contains null or empty string, remove
 			returnAliases.remove(null);
 			returnAliases.remove("");
 			RestResourceList returnList = new RestResourceList();
 			returnList.setList(returnAliases);
-			JSONObjectAdapter returnListJson = returnList.writeToJSONObject(adapterFactory.createNew());
+			JSONObjectAdapter returnListJson = returnList
+					.writeToJSONObject(adapterFactory.createNew());
 			return returnListJson.toJSONString();
-			
+
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -2647,11 +3134,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public Boolean hasSubmitted() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//get all evaluations for which the user has joined as a participant
-			PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluationsPaginated(EVALUATION_PAGINATION_OFFSET, EVALUATION_PAGINATION_LIMIT);
+			// get all evaluations for which the user has joined as a
+			// participant
+			PaginatedResults<Evaluation> evaluations = synapseClient
+					.getAvailableEvaluationsPaginated(
+							EVALUATION_PAGINATION_OFFSET,
+							EVALUATION_PAGINATION_LIMIT);
 			for (Evaluation evaluation : evaluations.getResults()) {
-				//return true if any of these have a submission
-				PaginatedResults<Submission> res = synapseClient.getMySubmissions(evaluation.getId(), 0, 0);
+				// return true if any of these have a submission
+				PaginatedResults<Submission> res = synapseClient
+						.getMySubmissions(evaluation.getId(), 0, 0);
 				if (res.getTotalNumberOfResults() > 0) {
 					return true;
 				}
@@ -2661,14 +3153,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {			
+		try {
 			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
-			new PortalVersionHolder();			
-			return PortalVersionHolder.getVersionInfo() +","+ versionInfo.getVersion();			
+			new PortalVersionHolder();
+			return PortalVersionHolder.getVersionInfo() + ","
+					+ versionInfo.getVersion();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -2676,24 +3169,27 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	private static class PortalVersionHolder {
 		private static String versionInfo = "";
-		
+
 		static {
-			InputStream s = SynapseClientImpl.class.getResourceAsStream("/version-info.properties");
+			InputStream s = SynapseClientImpl.class
+					.getResourceAsStream("/version-info.properties");
 			Properties prop = new Properties();
 			try {
 				prop.load(s);
 			} catch (IOException e) {
-				throw new RuntimeException("version-info.properties file not found", e);
+				throw new RuntimeException(
+						"version-info.properties file not found", e);
 			}
-			versionInfo = prop.getProperty("org.sagebionetworks.portal.version");
+			versionInfo = prop
+					.getProperty("org.sagebionetworks.portal.version");
 		}
-		
+
 		private static String getVersionInfo() {
 			return versionInfo;
 		}
-				
+
 	}
-	
+
 	@Override
 	public String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
@@ -2701,17 +3197,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	public static class PortalPropertiesHolder {
 		private static Properties props;
-		
+
 		static {
-			InputStream s = SynapseClientImpl.class.getResourceAsStream("/portal.properties");
+			InputStream s = SynapseClientImpl.class
+					.getResourceAsStream("/portal.properties");
 			props = new Properties();
 			try {
 				props.load(s);
 			} catch (IOException e) {
-				throw new RuntimeException("portal.properties file not found", e);
+				throw new RuntimeException("portal.properties file not found",
+						e);
 			}
 		}
-		
+
 		public static String getProperty(String key) {
 			return props.getProperty(key);
 		}
@@ -2724,30 +3222,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return synapseClient.retrieveApiKey();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}		
+		}
 	}
-	
+
 	@Override
-	public String createColumnModel(String columnModelJson) throws RestServiceException {
+	public String createColumnModel(String columnModelJson)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			ColumnModel column = new ColumnModel(adapterFactory.createNew(columnModelJson));			
+			ColumnModel column = new ColumnModel(
+					adapterFactory.createNew(columnModelJson));
 			ColumnModel createdColumn = synapseClient.createColumnModel(column);
-			return createdColumn.writeToJSONObject(adapterFactory.createNew()).toJSONString();			
+			return createdColumn.writeToJSONObject(adapterFactory.createNew())
+					.toJSONString();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
-	
 	@Override
-	public List<String> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException {
+	public List<String> getColumnModelsForTableEntity(String tableEntityId)
+			throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			List<ColumnModel> columns = synapseClient.getColumnModelsForTableEntity(tableEntityId);
+			List<ColumnModel> columns = synapseClient
+					.getColumnModelsForTableEntity(tableEntityId);
 			List<String> stringList = new ArrayList<String>();
-			for(ColumnModel col : columns) {
-				stringList.add(col.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			for (ColumnModel col : columns) {
+				stringList.add(col
+						.writeToJSONObject(adapterFactory.createNew())
+						.toJSONString());
 			}
 			return stringList;
 		} catch (SynapseException e) {
@@ -2758,14 +3262,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String sendMessage(Set<String> recipients, String subject, String messageBody) throws RestServiceException {
+	public String sendMessage(Set<String> recipients, String subject,
+			String messageBody) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			MessageToUser message = new MessageToUser();
 			message.setRecipients(recipients);
 			message.setSubject(subject);
-			MessageToUser sentMessage = synapseClient.sendStringMessage(message, messageBody);
-			JSONObjectAdapter sentMessageJson = sentMessage.writeToJSONObject(adapterFactory.createNew());
+			MessageToUser sentMessage = synapseClient.sendStringMessage(
+					message, messageBody);
+			JSONObjectAdapter sentMessageJson = sentMessage
+					.writeToJSONObject(adapterFactory.createNew());
 			return sentMessageJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -2773,89 +3280,105 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	@Override
-	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException {
+	public Boolean isAliasAvailable(String alias, String aliasType)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			AliasType type = AliasType.valueOf(aliasType);
-			AliasCheckRequest request= new AliasCheckRequest();
+			AliasCheckRequest request = new AliasCheckRequest();
 			request.setAlias(alias);
 			request.setType(type);
-			AliasCheckResponse response = synapseClient.checkAliasAvailable(request);
+			AliasCheckResponse response = synapseClient
+					.checkAliasAvailable(request);
 			return response.getAvailable();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 
-	private static long sequence = 0; 
-	
+	private static long sequence = 0;
+
 	@Override
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException {		
-		if(query == null) throw new BadRequestException("query must be defined");
-		
+	public QueryResult executeTableQuery(String query,
+			QueryDetails modifyingQueryDetails, boolean includeTotalRowCount)
+			throws RestServiceException {
+		if (query == null)
+			throw new BadRequestException("query must be defined");
+
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		// modify query with QueryDetails if requested
 		String executedQuery;
-		if(modifyingQueryDetails != null) executedQuery = ServiceUtils.modifyQuery(query, modifyingQueryDetails);
-		else executedQuery = query;		
-		
-		//Extract QueryDetails from executed Query		
-		QueryDetails queryDetails = ServiceUtils.extractQueryDetails(executedQuery);
-			
+		if (modifyingQueryDetails != null)
+			executedQuery = ServiceUtils.modifyQuery(query,
+					modifyingQueryDetails);
+		else
+			executedQuery = query;
+
+		// Extract QueryDetails from executed Query
+		QueryDetails queryDetails = ServiceUtils
+				.extractQueryDetails(executedQuery);
+
 		// Get total row count if requested
 		Integer totalRowCount = null;
-		if(includeTotalRowCount) {
+		if (includeTotalRowCount) {
 			try {
-				RowSet countSet = synapseClient.queryTableEntity(executedQuery, true, true);
+				RowSet countSet = synapseClient.queryTableEntity(executedQuery,
+						true, true);
 				if (countSet != null && countSet.getRows() != null
 						&& countSet.getRows().size() > 0
 						&& countSet.getRows().get(0).getValues() != null
-						&& countSet.getRows().get(0).getValues().size() > 0) {					
-					totalRowCount = Integer.parseInt(countSet.getRows().get(0).getValues().get(0));							
+						&& countSet.getRows().get(0).getValues().size() > 0) {
+					totalRowCount = Integer.parseInt(countSet.getRows().get(0)
+							.getValues().get(0));
 				}
 			} catch (SynapseTableUnavailableException e) {
 				handleTableUnavailableException(e);
 			} catch (SynapseException e) {
 				logError(e.getMessage());
 				throw ExceptionUtil.convertSynapseException(e);
-			} catch (NumberFormatException e) { 
-				// do nothing 				
+			} catch (NumberFormatException e) {
+				// do nothing
 			}
 		}
-		
-		// Execute Query		
+
+		// Execute Query
 		String json = null;
 		try {
 			RowSet rs = synapseClient.queryTableEntity(executedQuery);
-			 json = rs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			json = rs.writeToJSONObject(adapterFactory.createNew())
+					.toJSONString();
 		} catch (SynapseTableUnavailableException e) {
 			handleTableUnavailableException(e);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());		
+			throw new UnknownErrorException(e.getMessage());
 		}
-		
+
 		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
 	}
 
-	private void handleTableUnavailableException(SynapseTableUnavailableException e) throws TableUnavilableException {
+	private void handleTableUnavailableException(
+			SynapseTableUnavailableException e) throws TableUnavilableException {
 		try {
-			throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+			throw new TableUnavilableException(e.getStatus()
+					.writeToJSONObject(adapterFactory.createNew())
+					.toJSONString());
 		} catch (JSONObjectAdapterException e1) {
 			throw new TableUnavilableException(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public String sendRowsToTable(String rowSet) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			RowSet toAppend = new RowSet(adapterFactory.createNew(rowSet));
 			RowReferenceSet refSet = synapseClient.appendRowsToTable(toAppend);
-			return refSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			return refSet.writeToJSONObject(adapterFactory.createNew())
+					.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -2863,36 +3386,74 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	
 	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getHelpPages()
 			throws RestServiceException {
 		initHelpPagesMap();
 		return pageName2WikiKeyMap;
 	}
-	
+
 	private void initHelpPagesMap() {
 		if (pageName2WikiKeyMap == null) {
 			HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
-			tempMap.put(WebConstants.GETTING_STARTED, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.CREATE_PROJECT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.R_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.PYTHON_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.COMMAND_LINE_CLIENT, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.FORMATTING_GUIDE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.CHALLENGE_PARTICIPATION_INFO, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY)));
-			tempMap.put(WebConstants.GOVERNANCE, new org.sagebionetworks.web.shared.WikiPageKey(getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY), ObjectType.ENTITY.toString(), getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
-			
+			tempMap.put(
+					WebConstants.GETTING_STARTED,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.GETTING_STARTED_GUIDE_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.CREATE_PROJECT,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.CREATE_PROJECT_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.R_CLIENT,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.R_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.PYTHON_CLIENT,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.COMMAND_LINE_CLIENT,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.PYTHON_CLIENT_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.FORMATTING_GUIDE,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.FORMATTING_GUIDE_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.CHALLENGE_PARTICIPATION_INFO,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY)));
+			tempMap.put(
+					WebConstants.GOVERNANCE,
+					new org.sagebionetworks.web.shared.WikiPageKey(
+							getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY),
+							ObjectType.ENTITY.toString(),
+							getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
+
 			pageName2WikiKeyMap = tempMap;
 		}
 	}
-	
-	public Set<String> getWikiBasedEntities()
-			throws RestServiceException {
+
+	public Set<String> getWikiBasedEntities() throws RestServiceException {
 		initWikiEntities();
 		return wikiBasedEntities;
 	}
-	
+
 	private void initWikiEntities() {
 		if (wikiBasedEntities == null) {
 			HashSet<String> tempSet = new HashSet<String>();
@@ -2901,7 +3462,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			tempSet.add(getSynapseProperty(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
 			tempSet.add(getSynapseProperty(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
 			tempSet.add(getSynapseProperty(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
-			//because wikiBasedEntities is volatile, current state will be reflected in all threads
+			// because wikiBasedEntities is volatile, current state will be
+			// reflected in all threads
 			wikiBasedEntities = tempSet;
 		}
 	}
@@ -2918,23 +3480,29 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String deleteRowsFromTable(String toDelete) throws RestServiceException {
+	public String deleteRowsFromTable(String toDelete)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			RowSelection toDeleteSet = new RowSelection(adapterFactory.createNew(toDelete));
-			RowReferenceSet responseSet = synapseClient.deleteRowsFromTable(toDeleteSet);			
-			return responseSet.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			RowSelection toDeleteSet = new RowSelection(
+					adapterFactory.createNew(toDelete));
+			RowReferenceSet responseSet = synapseClient
+					.deleteRowsFromTable(toDeleteSet);
+			return responseSet.writeToJSONObject(adapterFactory.createNew())
+					.toJSONString();
 		} catch (SynapseTableUnavailableException e) {
 			try {
-				throw new TableUnavilableException(e.getStatus().writeToJSONObject(adapterFactory.createNew()).toJSONString());
+				throw new TableUnavilableException(e.getStatus()
+						.writeToJSONObject(adapterFactory.createNew())
+						.toJSONString());
 			} catch (JSONObjectAdapterException e1) {
 				throw new TableUnavilableException(e.getMessage());
 			}
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());		
-		}		
+			throw new UnknownErrorException(e.getMessage());
+		}
 	}
 
 	@Override
@@ -2950,5 +3518,54 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	/**
+	 * Helper to get the entity bundle of a table entity.
+	 * 
+	 * @param synapseClient
+	 * @param tableId
+	 * @return
+	 * @throws SynapseException
+	 * @throws RestServiceException
+	 */
+	private EntityBundleTransport getTableEntityBundle(
+			org.sagebionetworks.client.SynapseClient synapseClient,
+			String tableId) throws SynapseException, RestServiceException {
+		int partsMask = EntityBundle.ENTITY + EntityBundle.TABLE_DATA;
+		EntityBundle bundle = synapseClient.getEntityBundle(tableId, partsMask);
+		return convertBundleToTransport(tableId, bundle, partsMask);
+	}
+	
+	@Override
+	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			List<ColumnModel> models = tableModelUtils
+					.columnModelFromJSON(schemaJSON);
+			// Create any models that do not have an ID
+			List<String> newSchema = new LinkedList<String>();
+			for (ColumnModel m : models) {
+				if (m.getId() == null) {
+					ColumnModel clone = synapseClient.createColumnModel(m);
+					m.setId(clone.getId());
+				}
+				newSchema.add(m.getId());
+			}
+			// Get the table
+			TableEntity table = synapseClient.getEntity(tableId,
+					TableEntity.class);
+			table.setColumnIds(newSchema);
+			table = synapseClient.putEntity(table);
+			// Return the models
+			return tableModelUtils.toJSONList(models);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+
+
 	
 }

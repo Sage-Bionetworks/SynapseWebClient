@@ -168,6 +168,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		    }
 		}
 	}
+	
 	@Override
 	public boolean isDirectUploadSupported() {
 		return _isDirectUploadSupported();

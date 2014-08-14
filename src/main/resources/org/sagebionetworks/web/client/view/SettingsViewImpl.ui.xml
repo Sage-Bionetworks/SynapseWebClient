@@ -3,25 +3,16 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
-	<ui:style>
-		.important {
-		font-weight: bold;
-		}
-
-		.rowTop {
-		vertical-align: top;
-		}
-	</ui:style>
-
 	<g:HTMLPanel>
-		<div class="color-line"></div>
+		<div ui:field="colorLine" class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
-		<div class="separator margin-top-10-imp"></div>
+		<div class="margin-top-10-imp"></div>
+		<div ui:field="separator" class="separator"></div>
 		<div class="container">
 			<div style="white-space: normal;">
 				<g:SimplePanel ui:field="breadcrumbsPanel" />
 			</div>
-			<h2>Settings</h2>
+			<h2 ui:field="settingsHeading">Settings</h2>
 
 			<div class="well">
 				<h4>
@@ -53,7 +44,7 @@
 				</div>
 				<div class="col-md-6">
 					<div ui:field="changeSynapsePasswordUI">
-					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-40" >
+					    <div ui:field="changeSynapsePasswordHighlightBox" class="highlight-box margin-bottom-20" >
 					        <form class="form-horizontal" role="form">
 					   			  <div ui:field="currentPassword" class="form-group row">
 								    <label class="col-sm-3 control-label">Current password</label>
@@ -76,10 +67,12 @@
 								      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 								    </div>
 								  </div>
-								  <div class="col-sm-12">
-								      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
-								      <g:FlowPanel ui:field="forgotPasswordContainer"/>
-								  </div>
+								  <div class="form-group row">
+									  <div class="col-sm-12">
+									      <g:Button ui:field="changePasswordBtn" styleName="btn btn-large btn-default margin-top-10 margin-bottom-10" text="Change Password"/>
+									      <g:FlowPanel ui:field="forgotPasswordContainer"/>
+									  </div>
+								 </div>
 							</form>
 						</div>
 					</div>

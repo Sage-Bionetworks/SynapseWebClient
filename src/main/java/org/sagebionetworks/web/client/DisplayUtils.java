@@ -22,10 +22,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
+import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
+import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -73,10 +79,10 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.utils.TOOLTIP_POSITION;
 import org.sagebionetworks.web.client.widget.Alert;
 import org.sagebionetworks.web.client.widget.Alert.AlertType;
 import org.sagebionetworks.web.client.widget.FitImage;
@@ -103,10 +109,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
@@ -131,11 +134,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -151,17 +149,14 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.ButtonBase;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
@@ -378,12 +373,17 @@ public class DisplayUtils {
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
-			//exception handling on the backend now throws the reason into the exception message.  Easy!
-			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
+			//show error (not to file a jira though)
+			view.showErrorMessage(ex.getMessage());
 			return true;
 		} else if(ex instanceof NotFoundException) {
 			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
 			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
+			return true;
+		} else if (ex instanceof UnknownErrorException) {
+			//An unknown error occurred. 
+			//Exception handling on the backend now throws the reason into the exception message.  Easy!
+			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
 			return true;
 		}
 		
@@ -492,7 +492,7 @@ public class DisplayUtils {
 	}
 
 	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " " + message + "...";
+		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
 	}
 
 
@@ -527,7 +527,7 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		showPopup("", message, MessagePopup.WARNING, 300, DisplayConstants.OK, null, null, null);
+		showPopup("", message, MessagePopup.WARNING, null, null);
 	}
 
 	/**
@@ -610,7 +610,7 @@ public class DisplayUtils {
 			String message,
 			Callback okCallback
 			) {
-		showPopup(title, message, MessagePopup.INFO, 300, DisplayConstants.OK, okCallback, null, null);
+		showPopup(title, message, MessagePopup.INFO, okCallback, null);
 	}
 	
 	public static void showConfirmDialog(
@@ -619,7 +619,7 @@ public class DisplayUtils {
 			Callback yesCallback,
 			Callback noCallback
 			) {
-		showPopup(title, message, MessagePopup.QUESTION, 300, DisplayConstants.YES, yesCallback, DisplayConstants.NO, noCallback);
+		showPopup(title, message, MessagePopup.QUESTION, yesCallback, noCallback);
 	}
 	
 	public static void showConfirmDialog(
@@ -635,84 +635,55 @@ public class DisplayUtils {
 		});
 	}
 	
-	public static void showOkCancelMessage(
-			String title, 
-			String message, 
-			MessagePopup iconStyle,
-			int minWidth,
-			Callback okCallback,
-			Callback cancelCallback) {
-		showPopup(title, message, iconStyle, minWidth, DisplayConstants.OK, okCallback, DisplayConstants.BUTTON_CANCEL, cancelCallback);
-	}
-
 	public static void showPopup(String title, String message,
-			DisplayUtils.MessagePopup iconStyle, int minWidth,
-			String primaryButtonText, final Callback primaryButtonCallback,
-			String secondaryButtonText, final Callback secondaryButtonCallback) {
-
-		final Window dialog = new Window();
-		dialog.setMaximizable(false);
-		dialog.setSize(minWidth, 100);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setAutoHeight(true);
-		dialog.setResizable(false);
-		dialog.setClosable(false); //do not include x button in upper right
+			DisplayUtils.MessagePopup iconStyle,
+			final Callback primaryButtonCallback,
+			final Callback secondaryButtonCallback) {
+		
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-22 margin-top-10 margin-left-10");
+			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-22 margin-top-10 margin-left-10");
+			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-22 margin-top-10 margin-left-10");
-		HorizontalPanel content = new HorizontalPanel();
+			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+		SafeHtmlBuilder builder = new SafeHtmlBuilder();
+		if (DisplayUtils.isDefined(title)) {
+			builder.appendHtmlConstant("<h5>");
+			builder.appendEscaped(title);
+			builder.appendHtmlConstant("</h5>");
+		}
+		builder.appendHtmlConstant("<div class=\"row\">");
 		if (iconHtml.length() > 0)
-			content.add(new HTML(iconHtml));
-		HTMLPanel messagePanel = new HTMLPanel("h6", SafeHtmlUtils.htmlEscape(message));
-		messagePanel.addStyleName("margin-top-10 margin-left-10 margin-bottom-20");
-		messagePanel.setWidth((minWidth-75) + "px");
-		content.add(messagePanel);
-		content.setWidth("100%");
-		content.addStyleName("whiteBackground padding-5");
-		dialog.add(content);
-		dialog.setHeading(title);
-		FlowPanel buttonPanel = new FlowPanel();
-		buttonPanel.setHeight("50px");
-		buttonPanel.addStyleName("whiteBackground");
-		boolean isSecondaryButton = secondaryButtonText != null;
-
-		com.google.gwt.user.client.ui.Button continueButton = DisplayUtils
-				.createButton(primaryButtonText, ButtonType.PRIMARY);
-		continueButton.addStyleName("right margin-right-10 margin-bottom-10");
-		continueButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialog.hide();
-				if (primaryButtonCallback != null)
-					primaryButtonCallback.invoke();
-			}
-		});
-
-		buttonPanel.add(continueButton);
-
+			builder.appendHtmlConstant(iconHtml);
+		String messageWidth = DisplayUtils.isDefined(iconHtml) ? "col-xs-11" : "col-xs-12";
+		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
+		builder.appendEscaped(message);
+		builder.appendHtmlConstant("</div></div>");
+		boolean isSecondaryButton = secondaryButtonCallback != null;
+		
 		if (isSecondaryButton) {
-			com.google.gwt.user.client.ui.Button cancelButton = DisplayUtils
-					.createButton(secondaryButtonText);
-			cancelButton.addStyleName("right margin-bottom-10 margin-right-10");
-			cancelButton.addClickHandler(new ClickHandler() {
+			Bootbox.confirm(builder.toSafeHtml().asString(), new ConfirmCallback() {
 				@Override
-				public void onClick(ClickEvent event) {
-					dialog.hide();
-					if (secondaryButtonCallback != null)
-						secondaryButtonCallback.invoke();
+				public void callback(boolean isConfirmed) {
+					if (isConfirmed) {
+						if (primaryButtonCallback != null)
+							primaryButtonCallback.invoke();
+					} else {
+						if (secondaryButtonCallback != null)
+							secondaryButtonCallback.invoke();
+					}
 				}
 			});
-			buttonPanel.add(cancelButton);
+		} else {
+			Bootbox.alert(builder.toSafeHtml().asString(), new AlertCallback() {
+				@Override
+				public void callback() {
+					if (primaryButtonCallback != null)
+						primaryButtonCallback.invoke();
+				}
+			});
 		}
-
-		dialog.add(buttonPanel);
-		dialog.show();
-		center(dialog);
 	}
 	
 	public static void center(Window window) {
@@ -882,6 +853,11 @@ public class DisplayUtils {
 		TeamSearch place = new TeamSearch(searchTerm, start);
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
+	
+	public static String getTrashHistoryToken(String token, Integer start) {
+		Trash place = new Trash(token, start);
+		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
+	}
 
 	public static String getLoginPlaceHistoryToken(String token) {
 		LoginPlace place = new LoginPlace(token);
@@ -989,6 +965,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getTrashPlaceString(Class<Trash> place) {
 		return getPlaceString(place.getName());		
 	}
 
@@ -1309,103 +1289,16 @@ public class DisplayUtils {
 		return ordered;
 	}
 	
-	public static PopupPanel addToolTip(Widget widget, String message) {
-		PopupPanel popup = addToolTip(widget);
-		popup.setWidget(new HTML(message));
-		return popup;
+	public static Popover addPopover(Widget widget, String message) {
+		Popover popover = new Popover(widget);
+		popover.setPlacement(Placement.AUTO);
+		popover.setIsHtml(true);
+		popover.setContent(message);
+		return popover;
 	}
 	
-	/**
-	 * Creates and attaches a simple tooltip to a GWT widget
-	 * 
-	 * Customization of content and style are made by the caller method
-	 * 
-	 * @param widget: the widget to attach the popup/tooltip to
-	 * @return the new popup/tooltip that can be customized
-	 */
-	public static PopupPanel addToolTip(final Widget widget) {
-		return addToolTip(widget, false, false);
-	}
-	
-	/**
-	 * Provides a more flexible configuration of a tooltip's behavior
-	 * 
-	 * Customization of content and style are made by the caller method
-	 * 
-	 * Note: if keepOpen is set to true and autoHide is set to false, the caller 
-	 * 		should provide an alternative way to closing/hiding the tooltip
-	 * 
-	 * @param widget: the widget to attach to
-	 * @param keepToolTipOpen: whether the tooltip should remain open when the curser leaves the widget but 
-	 * 					moves onto the tooltip
-	 * @param autoHide: whether the tooltip should close when the curser clicks outside of it
-	 * @return the new tooltip
-	 */
-	public static PopupPanel addToolTip(final Widget widget, boolean keepToolTipOpen, boolean autoHide) {
-		final PopupPanel popup = createToolTip(autoHide);
-		widget.addDomHandler(new MouseOverHandler() {
-			@Override
-			public void onMouseOver(MouseOverEvent event) {
-				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-			          public void setPosition(int offsetWidth, int offsetHeight) {
-			        	  popup.showRelativeTo(widget);
-			          }
-			        });
-			}
-		}, MouseOverEvent.getType());
-
-		//If the tooltip is to remain open, we do not "hide" it when the curser moves out of the widget
-		if(keepToolTipOpen) {
-			popup.addDomHandler(new MouseOverHandler() {
-				@Override
-				public void onMouseOver(MouseOverEvent event) {
-					popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-				          public void setPosition(int offsetWidth, int offsetHeight) {
-				        	  popup.showRelativeTo(widget);
-				          }
-				        });
-				}
-			}, MouseOverEvent.getType());	
-		} else {
-			widget.addDomHandler(new MouseOutHandler() {
-				@Override
-				public void onMouseOut(MouseOutEvent event) {
-					popup.hide();
-				}
-			}, MouseOutEvent.getType());
-		}
-		return popup;
-	}
-	
-	private static PopupPanel createToolTip(boolean autoHide) {
-		final PopupPanel popup = new PopupPanel(autoHide);
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		return popup;
-	}
-	
-	public static PopupPanel addToolTip(final Component widget, String message) {
-		final PopupPanel popup = new PopupPanel(true);
-		popup.setWidget(new HTML(message));
-		popup.setGlassEnabled(false);
-		popup.addStyleName("topLevelZIndex");
-		widget.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
-			          public void setPosition(int offsetWidth, int offsetHeight) {
-			        	  popup.showRelativeTo(widget);
-			          }
-			        });
-			}
-		});
-		widget.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				popup.hide();
-			}
-		});
-		return popup;
+	public static Tooltip addToolTip(final Component widget, String message) {
+		return addTooltip(widget, message, Placement.AUTO);
 	}
 	
 	/**
@@ -1420,6 +1313,10 @@ public class DisplayUtils {
 	private static int tooltipCount= 0;
 	private static int popoverCount= 0;
 	
+	public static Tooltip addTooltip(Widget widget, String tooltipText){
+		return addTooltip(widget, tooltipText, Placement.AUTO);
+	}
+	
 	/**
 	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
 	 *
@@ -1433,98 +1330,31 @@ public class DisplayUtils {
 	 * @param tooltipText text to display
 	 * @param pos where to position the tooltip relative to the widget
 	 */
-	public static void addTooltip(final SynapseJSNIUtils util, Widget widget, String tooltipText, TOOLTIP_POSITION pos){
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("title", tooltipText);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-animation", "false");
-		optionsMap.put("data-html", "true");
-		addTooltip(util, widget, optionsMap);
-	}
-		
-	private static void addTooltip(final SynapseJSNIUtils util, Widget widget, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-tooltip-"+(tooltipCount++) : el.getId();
-		el.setId(id);
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "tooltip");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-			
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapTooltip(el.getId());
-					} else {
-						util.hideBootstrapTooltip(el.getId());
-					}
-				}
-			});
-		}
+	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
+		Tooltip t = new Tooltip();
+		t.setWidget(widget);
+		t.setPlacement(pos);
+		t.setText(tooltipText);
+		t.setIsHtml(true);
+		t.setIsAnimated(false);
+		t.setTrigger(Trigger.HOVER);
+		return t;
 	}
 
-	public static void addClickPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("trigger", "click");		
-		addPopover(util, widget, content, optionsMap);
-	}
-
-	public static void addHoverPopover(final SynapseJSNIUtils util, Widget widget, String title, String content, TOOLTIP_POSITION pos) {
-		Map<String, String> optionsMap = new HashMap<String, String>();
-		optionsMap.put("data-html", "true");
-		optionsMap.put("data-animation", "true");
-		optionsMap.put("title", title);
-		optionsMap.put("data-placement", pos.toString().toLowerCase());
-		optionsMap.put("data-trigger", "hover");		
-		addPopover(util, widget, content, optionsMap);
-	}
-
-	
 	/**
-	 * Adds a popover to a target widget
-	 * 
-	 * Same warnings apply as to {@link #addTooltip(SynapseJSNIUtils, Widget, String) addTooltip}
-	 */
-	public static void addPopover(final SynapseJSNIUtils util, Widget widget, String content, Map<String, String> optionsMap) {
-		final Element el = widget.getElement();
-		el.setAttribute("data-content", content);
-
-		String id = isNullOrEmpty(el.getId()) ? "sbn-popover-"+(popoverCount++) : el.getId();
-		optionsMap.put("id", id);
-		optionsMap.put("rel", "popover");
-
-		if (el.getNodeType() == 1 && !isPresent(el.getNodeName(), CORE_ATTR_INVALID_ELEMENTS)) {
-			// If nodeName is a tag and not in the INVALID_ELEMENTS list then apply the appropriate transformation
-
-			applyAttributes(el, optionsMap);
-
-			widget.addAttachHandler( new AttachEvent.Handler() {
-				@Override
-				public void onAttachOrDetach(AttachEvent event) {
-					if (event.isAttached()) {
-						util.bindBootstrapPopover(el.getId());
-					}
-				}
-			});
-		}
+	* Adds a popover to a target widget
+	*/
+	public static void addClickPopover(Widget widget, String title, String content, Placement placement) {
+		Popover popover = new Popover();
+		popover.setIsHtml(true);
+		popover.setIsAnimated(true);
+		popover.setTitle(title);
+		popover.setPlacement(placement);
+		popover.setTrigger(Trigger.CLICK);
+		popover.setWidget(widget);
+		popover.setContent(content);
 	}
 
-	public static void applyAttributes(final Element el,
-			Map<String, String> optionsMap) {
-		for (Entry<String, String> option : optionsMap.entrySet()) {
-			DOM.setElementAttribute(el, option.getKey(), option.getValue());
-		}
-	}
-	
     /*
      * Private methods
      */
@@ -1650,11 +1480,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get404Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">404</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">404</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.PAGE_NOT_FOUND
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div>");
+						+ DisplayConstants.PAGE_NOT_FOUND_DESC + "</p></div></div>");
 	}
 	
 	public static String getWidgetMD(String attachmentName) {
@@ -1669,11 +1499,11 @@ public class DisplayUtils {
 	
 	public static SafeHtml get403Html() {
 		return SafeHtmlUtils
-				.fromSafeConstant("<div class=\"margin-left-15 margin-top-15 padding-bottom-15\" style=\"height: 150px;\"><p class=\"error left colored\">403</p><h1>"
+				.fromSafeConstant("<div class=\"row\"><div class=\"col-xs-12\"><p class=\"margin-left-15 error left colored\">403</p><h1 class=\"margin-top-60-imp\">"
 						+ DisplayConstants.FORBIDDEN
 						+ "</h1>"
 						+ "<p>"
-						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div>");
+						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
 	/**
@@ -1782,7 +1612,7 @@ public class DisplayUtils {
 		setInCookies(testWebsite, DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY, cookies);
 	}
 	
-	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";	
+	public static final String SYNAPSE_TEST_WEBSITE_COOKIE_KEY = "SynapseTestWebsite";
 	
 	public static boolean isInCookies(String cookieKey, CookieProvider cookies) {
 		return cookies.getCookie(cookieKey) != null;
@@ -2046,7 +1876,7 @@ public class DisplayUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(synapseJSNIUtils, htmlPanel, tooltip, TOOLTIP_POSITION.BOTTOM);
+		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		lc.add(htmlPanel);
 
 		return lc;

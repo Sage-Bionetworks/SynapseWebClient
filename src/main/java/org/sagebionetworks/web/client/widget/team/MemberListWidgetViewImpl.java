@@ -14,13 +14,9 @@ import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
@@ -56,7 +52,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		this.portalGinInjector = portalGinInjector;
 		memberSearchContainer = new SimplePanel();
 		mainContainer = new FlowPanel();
-		mainContainer.addStyleName("highlight-box");
+		mainContainer.addStyleName("highlight-box margin-bottom-10");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.MEMBERS);
 	}
 	
@@ -89,6 +85,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		horizontalTable.addStyleName("row");
 		
 	    searchField = new TextBox();
+	    searchField.setWidth("300px");
 	    searchField.addStyleName("form-control");
 	    searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
@@ -111,7 +108,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		container.addStyleName("right width-150 padding-left-5");
 		horizontalTable.add(container);
 		container = new SimplePanel(searchField);
-		container.addStyleName("padding-right-5 col-md-3 right");
+		container.addStyleName("right");
 		horizontalTable.add(container);
 		memberSearchContainer.add(horizontalTable);
 	}
@@ -124,17 +121,19 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		if (searchTerm == null)
 			searchTerm = "";
 		searchField.setValue(searchTerm);
-		
+		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		add(memberSearchContainer);
+		
 		for (TeamMember teamMember : members) {
-			LayoutContainer rowPanel = DisplayUtils.createRowContainer();
-			rowPanel.addStyleName("col-md-12");
-			LayoutContainer left = new LayoutContainer();
+			FlowPanel mediaContainer = new FlowPanel();
+			mediaContainer.addStyleName("col-xs-12 col-md-6");
+			mediaContainer.setHeight("120px");
+			FlowPanel left = new FlowPanel();
 			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
-			LayoutContainer right = new LayoutContainer();
+			FlowPanel right = new FlowPanel();
 			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
-			rowPanel.add(left);
-			rowPanel.add(right);
+			mediaContainer.add(left);
+			mediaContainer.add(right);
 			final UserGroupHeader member = teamMember.getMember();
 			String rowPrincipalId = member.getOwnerId();
 			BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
@@ -170,16 +169,17 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 				left.add(new HTML("<span class=\"margin-left-15\">Admin</span>"));
 			}
 			
-			mainContainer.add(rowPanel);
+			singleRow.add(mediaContainer);
 		}
 		
+		mainContainer.add(singleRow);
 		add(mainContainer);
 		createPagination();
 	}
 	
 
 	private void createPagination() {
-		LayoutContainer lc = new LayoutContainer();
+		FlowPanel lc = new FlowPanel();
 		UnorderedListPanel ul = new UnorderedListPanel();
 		ul.setStyleName("pagination pagination-lg");
 

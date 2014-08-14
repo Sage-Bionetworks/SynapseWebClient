@@ -66,7 +66,7 @@ public class DisplayConstants {
 	public static final String PASSWORD_SET_TEXT = "Your password has been set. Please login to verify.";
 	public static final String PASSWORD_AND_EMAIL_SET_TEXT = "Your new email address and password have been set. Please login to verify.";
 	public static final String EMAIL_SET_FAILED_TEXT = "Email address change failed. Please try again.";
-	
+
 	public static final String PREVIEW_UNAVAILABLE="No Preview Available";	//text shown when FileEntity preview can't be shown
 	
 	public static final String NEWS_UNAVAILABLE_TEXT = "The Synapse news service is currently unavailable.";
@@ -172,6 +172,7 @@ public class DisplayConstants {
 	public static final String ERROR_API_TABLE_RENDERER_MISSING_INPUT_COLUMN = "Specified input column is missing from the service response: ";
 	public static final String ERROR_GETTING_PERMISSIONS_TEXT = "READ ONLY MODE. Reason: An error occurred in retrieving your level of access.";	
 	public static final String ERROR_ACL_RETRIEVAL_FAILED = "Retrieval of sharing settings failed. Please try again.";
+	public static final String ERROR_RESTORING_TRASH_PARENT_NOT_FOUND = "Sorry, you cannot restore this item because the original parent cannot be found.";
 	public static final String ERROR_LOCAL_ACL_CREATION_FAILED = "Creation of local sharing settings failed. Please try again.";
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
 	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
@@ -258,6 +259,7 @@ public class DisplayConstants {
 	public static final String LABEL_TEAM_CREATED = "Team Created";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
+	public static final String TEXT_USER_TRASH = "Trash";
 	public static final String TEXT_USER_HOME = "Home";
 	public static final String TEXT_USER_VIEW_PROFILE = "Profile";
 	public static final String UPLOAD_FILE = "Upload File";
@@ -277,7 +279,7 @@ public class DisplayConstants {
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
-	
+	public static final String FAVORITES_REMINDER_TOOLTIP_MESSAGE = "Click the star to add this to your favorites!";
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
 	
@@ -564,6 +566,12 @@ public class DisplayConstants {
 	public static final String ADD_FOLDER = "Add Folder";
 	public static final String ADD_FILE = "Add File";
 	public static final String FILES = "Files";
+	public static final String PROJECTS = "Projects";
+	public static final String CHALLENGES = "Challenges";
+	public static final String FAVORITES = "Favorites";
+	public static final String TEAMS = "Teams";
+	public static final String MESSAGES = "Messages";
+	public static final String SETTINGS = "Settings";
 	public static final String CHALLENGE_ADMIN = "Challenge Admin";
 	public static final String ERROR_FOLDER_CREATION_FAILED = "Folder creation failed. Please try again";
 	public static final String ERROR_FOLDER_RENAME_FAILED = "Setting the folder name failed.";

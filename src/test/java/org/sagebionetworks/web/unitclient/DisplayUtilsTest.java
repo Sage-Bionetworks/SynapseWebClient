@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,14 +9,29 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
 public class DisplayUtilsTest {
 	
@@ -25,7 +39,19 @@ public class DisplayUtilsTest {
 	private String textWithMarkdown = "This is the **test** markdown\nthat will be used.";
 	private String markdownDelimiter = "*";
 	private String markdownDelimiter2 = "**";
+	private String errorMessage= "my test error message";
+	private GlobalApplicationState mockGlobalApplicationState;
+	private PlaceChanger mockPlaceChanger;
+	private SynapseView mockView;
 	
+	@Before
+	public void setup(){
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockView = mock(SynapseView.class);
+		mockPlaceChanger = mock(PlaceChanger.class);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+	}	
+
 	@Test
 	public void testGetMimeType(){
 		Map<String, String> expected = new HashMap<String, String>();
@@ -372,6 +398,51 @@ public class DisplayUtilsTest {
 		String result = DisplayUtils.surroundText("", markdownDelimiter, markdownDelimiter, false, startPos, selectionLength);
 		assertEquals(markdownDelimiter + markdownDelimiter, result);
 	}
+	
+	@Test
+	public void testHandleServiceExceptionReadOnly() {
+		assertTrue(DisplayUtils.handleServiceException(new ReadOnlyModeException(), mockGlobalApplicationState, true, mockView));
+		verify(mockView).showErrorMessage(eq(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionDown() {
+		assertTrue(DisplayUtils.handleServiceException(new SynapseDownException(), mockGlobalApplicationState, true, mockView));
+		verify(mockPlaceChanger).goTo(any(Down.class));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionForbiddenLoggedIn() {
+		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, true, mockView));
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
+		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, false, mockView));
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionBadRequest() {
+		assertTrue(DisplayUtils.handleServiceException(new BadRequestException(errorMessage), mockGlobalApplicationState, true, mockView));
+		verify(mockView).showErrorMessage(eq(errorMessage));
+	}
+
+	@Test
+	public void testHandleServiceExceptionNotFound() {
+		assertTrue(DisplayUtils.handleServiceException(new NotFoundException(), mockGlobalApplicationState, true, mockView));
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_NOT_FOUND));
+		verify(mockPlaceChanger).goTo(any(Home.class));
+	}
+	
+	@Test
+	public void testHandleServiceExceptionNotRecognized() {
+		assertFalse(DisplayUtils.handleServiceException(new IllegalArgumentException(), mockGlobalApplicationState, true, mockView));
+		Mockito.verifyZeroInteractions(mockView, mockPlaceChanger);
+	}
+	
 }
 
 

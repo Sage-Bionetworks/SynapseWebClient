@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -30,7 +33,6 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -45,7 +47,6 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -90,7 +91,6 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	protected void onRender(Element parent, int index) {
 		// TODO Auto-generated method stub
 		super.onRender(parent, index);
-		initJsPlumb();
 		this.add(container);
 		createGraph();
 	}
@@ -150,8 +150,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		prov = new LayoutContainer();
 		prov.setStyleAttribute("position", "relative");		
 		prov.setHeight(height);				
-		
-		if(graph != null) {			
+		if(graph != null) {
 			container.removeAll();			
 			if(!inFullScreen) addFullScreenAnchor();			
 			// add nodes to graph
@@ -165,10 +164,11 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		
 		container.add(prov, new MarginData(5));
 		this.addStyleName("scroll-auto");
-		container.layout(true);
 		
+		container.layout(true);
 		if(graph != null) {			
 			// make connections (assure DOM elements are in before asking jsPlumb to connect them)
+			beforeJSPlumbLoad(prov.getId());
 			Set<ProvGraphEdge> edges = graph.getEdges();
 			for(ProvGraphEdge edge : edges) {
 				connect(edge.getSink().getId(), edge.getSource().getId());
@@ -176,8 +176,8 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 			// look for old versions
 			presenter.findOldVersions();
+			afterJSPlumbLoad();
 		}
-		
 	}
 	
 	/**
@@ -188,7 +188,7 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 	private ProvNodeContainer getNodeContainer(final ProvGraphNode node) {
 		if(node instanceof EntityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createEntityContainer((EntityGraphNode)node, iconsImageBundle);
-			addToolTipToContainer(node, container.getContent(), DisplayConstants.ENTITY);			
+			addToolTipToContainer(node, container, DisplayConstants.ENTITY);			
 			return container;
 		} else if(node instanceof ActivityGraphNode) {
 			ProvNodeContainer container = ProvViewUtil.createActivityContainer((ActivityGraphNode)node, iconsImageBundle, ginInjector);
@@ -196,33 +196,46 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 			if(((ActivityGraphNode) node).getType() == ActivityType.UNDEFINED) {
 				addUndefinedToolTip(container);
 			} else {
-				addToolTipToContainer(node, container.getContent(), DisplayConstants.ACTIVITY);				
+				addToolTipToContainer(node, container, DisplayConstants.ACTIVITY);				
 			}
 			return container;
 		} else if(node instanceof ExpandGraphNode) {
 			return ProvViewUtil.createExpandContainer((ExpandGraphNode)node, sageImageBundle, presenter, this);
 		} else if(node instanceof ExternalGraphNode) {			
 			ProvNodeContainer container = ProvViewUtil.createExternalUrlContainer((ExternalGraphNode) node, iconsImageBundle);
-			addToolTipToContainer(node, container.getContent(), DisplayConstants.EXTERNAL_URL);
+			addToolTipToContainer(node, container, DisplayConstants.EXTERNAL_URL);
 			return container;
 		}
 		return null;
 	}
 
-	private void addToolTipToContainer(final ProvGraphNode node, final Component container, final String title) {					
-		final PopupPanel popup = DisplayUtils.addToolTip(container, DisplayUtils.getLoadingHtml(sageImageBundle));
-		container.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
+	private void addToolTipToContainer(final ProvGraphNode node, final LayoutContainer nodeContainer, final String title) {					
+		final Tooltip tooltip = new Tooltip(nodeContainer);
+		tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+		tooltip.setTrigger(Trigger.MANUAL);
+		tooltip.setPlacement(Placement.BOTTOM);
+		tooltip.setIsHtml(true);
+		
+		nodeContainer.addListener(Events.OnMouseOver, new Listener<BaseEvent>() {
 			@Override
 			public void handleEvent(BaseEvent be) {	
+				if (!node.isShowingTooltip()) {
+					node.setShowingTooltip(true);
+					tooltip.show();
+				}
+				
 				// load the tooltip contents only once
-				if(filledPopoverIds.containsKey(node.getId())) {															
+				if(filledPopoverIds.containsKey(node.getId())) {
 					return;
 				}															
 				// retrieve info
 				presenter.getInfo(node.getId(), new AsyncCallback<KeyValueDisplay<String>>() {						
 					@Override
 					public void onSuccess(KeyValueDisplay<String> result) {
-						renderPopover(ProvViewUtil.createEntityPopoverHtml(result).asString());
+						String popoverHtml = ProvViewUtil.createEntityPopoverHtml(result).asString();
+						if (!DisplayUtils.isDefined(popoverHtml))
+							popoverHtml = DisplayConstants.DETAILS_UNAVAILABLE;
+						renderPopover(popoverHtml);
 					}
 					
 					@Override
@@ -232,9 +245,20 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 					
 					private void renderPopover(String rendered) {
 						filledPopoverIds.put(container.getId(), rendered);
-						popup.setWidget(new HTML(rendered));						
+						tooltip.setText(rendered);
+						tooltip.reconfigure();
+						if (node.isShowingTooltip())
+							tooltip.show();
 					}
 				});
+			}
+		});
+		
+		container.addListener(Events.OnMouseOut, new Listener<BaseEvent>() {
+			@Override
+			public void handleEvent(BaseEvent be) {
+				tooltip.hide();
+				node.setShowingTooltip(false);
 			}
 		});
 	}
@@ -250,18 +274,20 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 
 	
 	private static native void connect(String parentId, String childId) /*-{
-		var jsPlumb = $wnd.jsPlumb;		
-		jsPlumb.connect({source:parentId, target:childId, overlays:jsP_overlays	});
+		jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
 	}-*/;
 	
-	private static native void initJsPlumb() /*-{
+	/**
+	 * Call before connecting divs. Suspends drawing graph until bulk operation is complete (call afterJSPlumbLoad)
+	 * @param parentContainerId
+	 */
+	private static native void beforeJSPlumbLoad(String containerId) /*-{
 		;(function() {
-					
 			$wnd.jsPlumbDemo = {					
 				init : function() {					
 					var color = "gray";
-					var jsPlumb = $wnd.jsPlumb;		
-					jsPlumb.importDefaults({
+					jsPlumbInstance = $wnd.jsPlumb.getInstance();		
+					jsPlumbInstance.importDefaults({
 						// notice the 'curviness' argument to this Bezier curve.  the curves on this page are far smoother
 						// than the curves on the first demo, which use the default curviness value.			
 						Connector : [ "Straight" ],
@@ -289,14 +315,23 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 		$wnd.jsPlumb.bind("ready", function() {
 			// chrome fix.
 			document.onselectstart = function () { return false; };
-			$wnd.jsPlumb.setRenderMode($wnd.jsPlumb.SVG);
 			$wnd.jsPlumbDemo.init();
+			jsPlumbInstance.setRenderMode($wnd.jsPlumb.SVG);
+			jsPlumbInstance.setSuspendDrawing(true);
+			jsPlumbInstance.setContainer(containerId);
 		});
-
-	
+		
+		
 	}-*/;
-
 	
+	/**
+	 * Call after connecting divs.
+	 */
+	private static native void afterJSPlumbLoad() /*-{
+		jsPlumbInstance.setSuspendDrawing(false, true);
+	}-*/;
+	
+		
 	private void createFullScreenButton(IconsImageBundle iconsImageBundle) {
 		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
 		//fullSizeButton.setStyleName("z-index-10");
