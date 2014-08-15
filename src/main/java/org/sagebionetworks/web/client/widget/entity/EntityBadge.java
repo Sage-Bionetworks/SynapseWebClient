@@ -118,14 +118,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	public void entityClicked(EntityHeader entityHeader) {
 		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
 	}
-
-	// TODO: "show" names a little weird for presenter?
-	// TODO: setTypeIconVisible(boolena)
+	
 	public void setTypeIconVisible(boolean isVisible) {
 		view.setTypeIconVisible(true);
 	}
-	
-	// SAME HERE!!
+
 	public void showLoadingIcon() {
 		view.showLoadingIcon();
 	}

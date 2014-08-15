@@ -143,8 +143,8 @@ public class EntityBadgeTest {
 	public void testShowTypeIcon() throws Exception {
 		EntityHeader header = new EntityHeader();
 		header.setId("syn93847");
-		widget.showTypeIcon();
-		verify(mockView).showTypeIcon();
+		widget.setTypeIconVisible(true);
+		verify(mockView).setTypeIconVisible(anyBoolean());
 	}
 	
 	@Test
