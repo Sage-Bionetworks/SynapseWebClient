@@ -148,12 +148,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void showEditMyProfile() {
+	public void editMyProfile() {
 		checkLoggedIn();
 		updateProfileView(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS);
 	}
 	
-	public void showViewMyProfile() {
+	public void viewMyProfile() {
 		checkLoggedIn();
 		updateProfileView(authenticationController.getCurrentUserPrincipalId());
 	}
@@ -482,7 +482,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			public void continueToEditProfile() {
-				showEditMyProfile();
+				editMyProfile();
 				view.refreshHeader();
 			}
 			
@@ -540,7 +540,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token) || Profile.SETTINGS_PROFILE_TOKEN.equals(token)) {
-				showEditMyProfile();
+				editMyProfile();
 			} else {
 				//otherwise, this is a user id
 				updateProfileView(token);

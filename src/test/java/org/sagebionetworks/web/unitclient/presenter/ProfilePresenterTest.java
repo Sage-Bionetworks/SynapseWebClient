@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -481,5 +482,40 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setFavoritesError(anyString());
 	}
+	
+	
+	@Test
+	public void testEditMyProfile() {
+		profilePresenter.editMyProfile();
+		//verify updateView shows Settings as the initial tab
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq(ProfileArea.SETTINGS));
+	}
+	@Test
+	public void testEditMyProfileAsAnonymous() {
+		//verify forces login if anonymous and trying to edit own profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		profilePresenter.editMyProfile();
+		
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testViewMyProfile() {
+		profilePresenter.viewMyProfile();
+		//verify updateView shows default as the initial tab
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq((Synapse.ProfileArea)null));
+	}
+	@Test
+	public void testViewMyProfileAsAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		//verify forces login if anonymous and trying to view own anonymous profile
+		profilePresenter.viewMyProfile();
+		
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+
+	
 	
 }
