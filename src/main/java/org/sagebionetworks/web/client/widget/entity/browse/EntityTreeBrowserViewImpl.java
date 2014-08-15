@@ -123,7 +123,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 						
 						@Override
 						public void onFailure(Throwable caught) {
-							DisplayUtils.showErrorMessage("ERROROROROORROORR");	// TODO
+							showErrorMessage(caught.getMessage());	// TODO: Do this properly?
 						}
 						
 					});
