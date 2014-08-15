@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -46,7 +47,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	public interface ProfileUpdatedCallback {
-		void profileUpdateCancelled();
 		void profileUpdateSuccess();
 		void onFailure(Throwable caught);
 	}
@@ -55,10 +55,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		ownerProfile = userProfile;
 		this.profileUpdatedCallback = profileUpdatedCallback;
 		view.updateView(userProfile);
-	}
-	
-	public void hideCancelButton(){
-		view.hideCancelButton();
 	}
 	
 	public Widget asWidget() {
@@ -154,11 +150,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		});
 	}
 	
-	@Override
-	public void cancelClicked() {
-		profileUpdatedCallback.profileUpdateCancelled();
-	}
-	
 	public void setUpdateButtonText(String text){
 		view.setUpdateButtonText(text);
 	}
@@ -179,7 +170,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				if (profileUpdatedCallback != null)
 					profileUpdatedCallback.profileUpdateSuccess();
 				else 
-					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
 			}
 		};
 		authenticationController.revalidateSession(currentUser.getSession().getSessionToken(), callback);

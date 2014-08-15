@@ -24,7 +24,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -97,12 +96,6 @@ public class ProfileFormPresenterTest {
 		//invoke the login callback to verify profile update success callback
 		captor.getValue().onSuccess("");
 		verify(mockProfileUpdatedCallback).profileUpdateSuccess();//successful update
-	}
-	
-	@Test
-	public void testCancelled() {
-		profileForm.cancelClicked();
-		verify(mockProfileUpdatedCallback).profileUpdateCancelled();//callback with cancel
 	}
 	
 	@Test

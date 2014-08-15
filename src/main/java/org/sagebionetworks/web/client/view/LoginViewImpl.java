@@ -12,15 +12,16 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Window;
+import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -30,7 +31,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -68,12 +68,14 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Anchor viewToULink;
 	@UiField
 	Button takePledgeButton;
+	@UiField
+	SimplePanel loggingInDialogContainer;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
-	private Window logginInWindow;
+	private Dialog loggingInDialog;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
@@ -83,18 +85,29 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Inject
 	public LoginViewImpl(Binder uiBinder, IconsImageBundle icons,
 			Header headerWidget, Footer footerWidget,
-			SageImageBundle sageImageBundle, LoginWidget loginWidget) {
+			SageImageBundle sageImageBundle, LoginWidget loginWidget, Dialog loggingInDialog) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
+		this.loggingInDialog = loggingInDialog;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		toUInitialized = false;
 		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
+		
+		SafeHtmlBuilder shb = new SafeHtmlBuilder();
+		shb.appendHtmlConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()) + "<h4>");
+		shb.appendEscaped(DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
+		shb.appendHtmlConstant("</h4>");
+		Html loadingContent = new Html(shb.toSafeHtml().asString());
+		
+		loadingContent.addStyleName("center");
+		loggingInDialog.configure("", loadingContent, null, null, null, false);
+		loggingInDialogContainer.add(loggingInDialog);
 	}
 
 	@Override
@@ -110,15 +123,12 @@ public class LoginViewImpl extends Composite implements LoginView {
 	
 	@Override
 	public void showLoggingInLoader() {
-		if(logginInWindow == null) {
-			logginInWindow = DisplayUtils.createLoadingWindow(sageImageBundle, DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
-		}
-		logginInWindow.show();
+		loggingInDialog.show();
 	}
 
 	@Override
 	public void hideLoggingInLoader() {
-		logginInWindow.hide();
+		loggingInDialog.hide();
 	}
 
 	@Override
@@ -167,7 +177,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			public void userChanged(UserSessionData newUser) {
 				presenter.setNewUser(newUser);
 			}
-		});				
+		});
 	}
 	
 	@Override
@@ -188,7 +198,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	@Override
 	public void clear() {
-		if(logginInWindow != null) logginInWindow.hide();
+		if(loggingInDialog != null) loggingInDialog.hide();
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();

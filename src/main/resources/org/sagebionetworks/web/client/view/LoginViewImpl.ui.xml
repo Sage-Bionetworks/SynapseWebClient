@@ -61,7 +61,7 @@
 				</g:HTMLPanel>
 				</div> <!-- close class="container" -->
 
-				
+			<g:SimplePanel ui:field="loggingInDialogContainer" />
 <!-- start footer -->
             <div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />
