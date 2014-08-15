@@ -75,6 +75,9 @@ public class TableModelTestUtils {
 				case STRING:
 					defaultValue = "defaultString";
 					break;
+				case ENTITYID:
+					defaultValue = "syn123";
+					break;	
 				default:
 					throw new IllegalStateException("huh? missing enum");
 				}

@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -23,21 +26,26 @@ public class FavoriteWidget implements Presenter {
 	private NodeModelCreator nodeModelCreator;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private GlobalApplicationState globalApplicationState;
+	private CookieProvider cookies;
 
 	String entityId;
+	
+	public static final String FAVORITES_REMINDER = "FavoritesReminder";
 	
 	@Inject
 	public FavoriteWidget(FavoriteWidgetView view,
 			SynapseClientAsync synapseClient,
 			NodeModelCreator nodeModelCreator,
 			JSONObjectAdapter jsonObjectAdapter,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			CookieProvider cookies) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;
+		this.cookies = cookies;
 	}
 	
 	public void configure(String entityId) {
@@ -73,6 +81,7 @@ public class FavoriteWidget implements Presenter {
 				@Override
 				public void onSuccess(Void result) {
 					view.showIsFavorite(isFavorite(entityId));
+					showReminder();
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -81,6 +90,16 @@ public class FavoriteWidget implements Presenter {
 		}
 	}
 
+	/**
+	 * If the user has no favorites (and we have not reminded them lately), then pop up a reminder
+	 */
+	public void showReminder() {
+		if (globalApplicationState.getFavorites().isEmpty() && !DisplayUtils.isInCookies(FAVORITES_REMINDER, cookies)) {
+			view.showFavoritesReminder();
+			Date expires = new Date(System.currentTimeMillis() + (1000*60*60*24*5)); //5 days
+			cookies.setCookie(FAVORITES_REMINDER, "true", expires);
+		}
+	}
 
 	private void setIsFavorite(final String entityId,
 			final boolean isFavorite, final AsyncCallback<Void> callback) {

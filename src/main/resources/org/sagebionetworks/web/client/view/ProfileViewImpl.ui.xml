@@ -2,8 +2,9 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	
 	<g:HTMLPanel>
-
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
@@ -35,7 +36,8 @@
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
-						    <!--  <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li> -->
+						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="favoritesLink"/></li>
+						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li>
 						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="teamsLink"/></li>
 						    <!--  <li class="entity-tab" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li> -->
 						    <li class="entity-tab" ui:field="settingsListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="settingsLink"/></li>
@@ -57,10 +59,22 @@
 								    <a href="#!ProjectsHome:0">What's a Project?</a>
 								</div>
 							</div>
-							<g:FlowPanel ui:field="projectsTabContent" />
+							<div class="highlight-box" highlight-box-title="Projects">
+								<g:FlowPanel ui:field="projectsTabContent" />
+							</div>
+							
 						</div>
-					    <g:FlowPanel styleName="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer" />
-						<div class="tab-background padding-15" ui:field="teamsTabContainer">
+						<div class="tab-background padding-15" ui:field="favoritesTabContainer">
+					    	<div class="highlight-box" highlight-box-title="Favorites">
+					    		<g:FlowPanel ui:field="favoritesTabContent" />
+					    	</div>
+					    </div>
+					    <div class="tab-background padding-15" ui:field="challengesTabContainer">
+					    	<div class="highlight-box" highlight-box-title="Challenges">
+					    		<g:FlowPanel ui:field="challengesTabContent" />
+					    	</div>
+					    </div>
+					    <div class="tab-background padding-15" ui:field="teamsTabContainer">
 							<div ui:field="createTeamUI" class="margin-bottom-10 row">
 							    <div class="col-xs-12 col-sm-6">
 									<div class="input-group">

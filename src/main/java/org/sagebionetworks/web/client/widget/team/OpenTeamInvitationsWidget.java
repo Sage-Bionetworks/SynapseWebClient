@@ -100,6 +100,8 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			public void onSuccess(Void result) {
 				view.showInfo(DisplayConstants.JOIN_TEAM_SUCCESS, "");
 				teamUpdatedCallback.invoke();
+				//refresh the open invitations
+				configure(teamUpdatedCallback, (CallbackP<List<MembershipInvitationBundle>>)null);
 			}
 			
 			@Override

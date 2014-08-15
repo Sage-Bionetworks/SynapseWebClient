@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
@@ -343,7 +344,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		});
 		menuBtn.addMenuItem(a);		
 	}
-
+	
 	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
 //		item.setIcon(AbstractImagePrototype.create(iconsImageBundle.synapseStep16()));
 		Anchor a = new Anchor(DisplayConstants.LABEL_SUBMIT_TO_EVALUATION);

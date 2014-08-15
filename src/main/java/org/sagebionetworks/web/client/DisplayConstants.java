@@ -279,7 +279,7 @@ public class DisplayConstants {
 	public static final String ANONYMOUS_JOIN_EVALUATION = "Please login or register for a free Synapse account to participate in this challenge.";
 	public static final String ANONYMOUS_JOIN = "Please login or register for a free Synapse account to join.";
 	public static final String SUBMIT_VERSIONABLE_ENTITY_MESSAGE = "Please select a versionable entity to submit for evaluation.";
-	
+	public static final String FAVORITES_REMINDER_TOOLTIP_MESSAGE = "Click the star to add this to your favorites!";
 	public static final String SUBMITTED_TITLE = "Submitted";
 	public static final String SUBMITTED_TO_EVALUATION = "Submitted to the selected evaluation(s)";
 	
@@ -568,6 +568,7 @@ public class DisplayConstants {
 	public static final String FILES = "Files";
 	public static final String PROJECTS = "Projects";
 	public static final String CHALLENGES = "Challenges";
+	public static final String FAVORITES = "Favorites";
 	public static final String TEAMS = "Teams";
 	public static final String MESSAGES = "Messages";
 	public static final String SETTINGS = "Settings";

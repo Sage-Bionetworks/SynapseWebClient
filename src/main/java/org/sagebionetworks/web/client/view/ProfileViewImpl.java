@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -103,10 +104,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 //	Anchor messagesLink;
 //	@UiField
 //	LIElement messagesListItem;
-//	@UiField
-//	Anchor challengesLink;
-//	@UiField
-//	LIElement challengesListItem;
+	@UiField
+	Anchor challengesLink;
+	@UiField
+	LIElement challengesListItem;
+	@UiField
+	Anchor favoritesLink;
+	@UiField
+	LIElement favoritesListItem;
+
 
 	@UiField
 	DivElement navtabContainer;
@@ -114,7 +120,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement projectsTabContainer;
 	@UiField
-	FlowPanel challengesTabContainer;
+	DivElement favoritesTabContainer;
+	@UiField
+	DivElement challengesTabContainer;
 	@UiField
 	DivElement teamsTabContainer;
 	@UiField
@@ -142,6 +150,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createTeamUI;
 	@UiField
 	FlowPanel teamsTabContent;
+	
+	//Challenges
+	@UiField
+	FlowPanel challengesTabContent;
+	
+	//Favorites
+	@UiField
+	FlowPanel favoritesTabContent;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -225,6 +241,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.createTeam(createTeamTextBox.getValue());
 			}
 		});
+		projectsTabContent.addStyleName("margin-10");
+		challengesTabContent.addStyleName("margin-10");
+		favoritesTabContent.addStyleName("margin-10");
 	}
 	
 	@Override
@@ -240,7 +259,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, List<Team> teams, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
+	public void updateView(UserProfile profile, boolean isEditing, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		//when editable, show profile form and linkedin import ui
 		if (isEditing)
@@ -255,31 +274,29 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		else
 		{
 			//view only
-			myTeamsWidget.configure(teams, true);
 			teamsTabContent.clear();
 			settingsTabContainer.clear();
-			projectsTabContent.clear();
+			
 			DisplayUtils.hide(settingsListItem);
 //			DisplayUtils.hide(messagesListItem);
-//			DisplayUtils.hide(challengesListItem);
 			
 			updateViewProfile(profile, passingRecord);
 			viewProfilePanel.add(profileWidget);
 			
 			if (isOwner) {
+				DisplayUtils.show(favoritesListItem);
 				DisplayUtils.show(showProfileLink);
 				DisplayUtils.show(settingsListItem);
 				settingsTabContainer.add(settingsPresenter.asWidget());
 //				DisplayUtils.show(messagesListItem);
-//				DisplayUtils.show(challengesListItem);
 				
 				//if owner, show Edit button too (which redirects to the edit version of the Profile place)
 				editProfileButtonPanel.add(editProfileButton);
 				openInvitesWidget.configure(new Callback() {
 					@Override
 					public void invoke() {
-						//refresh the view after accepting/ignoring
-						presenter.showViewMyProfile();
+						//refresh the teams and invites
+						presenter.refreshTeams();
 					}
 				}, (CallbackP)null);
 				
@@ -310,25 +327,59 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setMyProjects(List<EntityHeader> myProjects) {
-		FlowPanel wrapper = new FlowPanel();
-		wrapper.addStyleName("highlight-box");
-		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Projects");
-		projectsTabContent.add(wrapper);
-		
-		for (EntityHeader entityHeader : myProjects) {
-			EntityBadge badge = ginInjector.getEntityBadgeWidget();
-			badge.configure(entityHeader);
-			Widget teamRendererWidget = badge.asWidget();
-			teamRendererWidget.addStyleName("margin-top-5");
-			wrapper.add(teamRendererWidget);
-		}
-		if (myProjects.isEmpty())
-			wrapper.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+	public void setTeams(List<Team> teams) {
+		myTeamsWidget.configure(teams, true);
+	}
+	
+	@Override
+	public void setTeamsError(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
+	public void setProjects(List<EntityHeader> projectHeaders) {
+		addEntityBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
-	public void setMyProjectsError(String string) {
+	public void setProjectsError(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
+	
+	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
+		targetPanel.clear();
+		for (EntityHeader entityHeader : projectHeaders) {
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeader);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-top-5");
+			targetPanel.add(widget);
+		}
+		if (projectHeaders.isEmpty())
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+	}
+	
+	@Override
+	public void setChallenges(List<EntityHeader> projectHeaders) {
+		if (projectHeaders.size() > 0) {
+			DisplayUtils.show(challengesListItem);
+			addEntityBadges(projectHeaders, challengesTabContent);
+		}
+	}
+	
+	@Override
+	public void setChallengesError(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
+	public void setFavorites(List<EntityHeader> headers) {
+		addEntityBadges(headers, favoritesTabContent);
+	}
+	
+	@Override
+	public void setFavoritesError(String error) {
+		DisplayUtils.showErrorMessage(error);
 	}
 	
 	@Override
@@ -547,16 +598,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();
-		DisplayUtils.hide(showProfileLink);
+		//init with loading widget
+		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		
+		favoritesTabContent.clear();
+		favoritesTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		
+		DisplayUtils.hide(showProfileLink);
+		challengesTabContent.clear();
 		hideTabContainers();
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
+		DisplayUtils.hide(challengesListItem);
+		DisplayUtils.hide(favoritesListItem);
 	}
 	
 	private void hideTabContainers() {
 		//hide all tab containers
 		DisplayUtils.hide(projectsTabContainer);
+		DisplayUtils.hide(favoritesTabContainer);
 		DisplayUtils.hide(challengesTabContainer);
 		DisplayUtils.hide(teamsTabContainer);
 		DisplayUtils.hide(messagesTabContainer);
@@ -579,10 +639,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamsLink.addStyleName("link");
 		settingsListItem.removeClassName("active");
 		settingsLink.addStyleName("link");
-//		challengesListItem.removeClassName("active");
-//		challengesLink.addStyleName("link");
+		challengesListItem.removeClassName("active");
+		challengesLink.addStyleName("link");
 //		messagesListItem.removeClassName("active");
 //		messagesLink.addStyleName("link");
+		favoritesListItem.removeClassName("active");
+		favoritesLink.addStyleName("link");
+
 		
 		LIElement tab; 
 		Anchor link;
@@ -599,10 +662,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			tab = settingsListItem;
 			link = settingsLink;
 			DisplayUtils.show(settingsTabContainer);
-//		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
-//			tab = challengesListItem;
-//			link = challengesLink;
-//			DisplayUtils.show(challengesTabContainer);
+		} else if (targetTab == Synapse.ProfileArea.CHALLENGES) {
+			tab = challengesListItem;
+			link = challengesLink;
+			DisplayUtils.show(challengesTabContainer);
+		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
+			tab = favoritesListItem;
+			link = favoritesLink;
+			DisplayUtils.show(favoritesTabContainer);
 //		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
 //			tab = messagesListItem;
 //			link = messagesLink;
@@ -626,8 +693,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		settingsLink.setText(DisplayConstants.SETTINGS);
 		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
 		
-//		challengesLink.setText(DisplayConstants.CHALLENGES);
-//		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		challengesLink.setText(DisplayConstants.CHALLENGES);
+		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		
+		favoritesLink.setText(DisplayConstants.FAVORITES);
+		favoritesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.FAVORITES));
 //		messagesLink.setText(DisplayConstants.MESSAGES);
 //		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
 	}

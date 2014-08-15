@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.Popover;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,12 +10,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
-import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,13 +35,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
-	Tooltip popover;
+	Popover popover;
 	@UiField
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
+	@UiField
+	Anchor infoLink;
+	
 	boolean isPopoverInitialized;
-	boolean isMouseOverAnchor;
+	boolean isPopover;
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -62,28 +62,28 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
+			infoLink.setVisible(true);
 			isPopoverInitialized = false;
 			popover.setIsHtml(true);
 			popover.setTitle(entityHeader.getName());
-			popover.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+			popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
 			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
 			anchor.addStyleName("link");
-			anchor.addMouseOverHandler(new MouseOverHandler() {
+			isPopover = false;
+			infoLink.addClickHandler(new ClickHandler() {
 				@Override
-				public void onMouseOver(MouseOverEvent event) {
-					isMouseOverAnchor = true;
-					showPopover(anchor, entityHeader.getId(), entityHeader.getName());
+				public void onClick(ClickEvent event) {
+					if (isPopover)
+						popover.hide();
+					else
+						showPopover(anchor, entityHeader.getId(), entityHeader.getName());
+					
+					isPopover = !isPopover;
 				}
 			});
-			anchor.addMouseOutHandler(new MouseOutHandler() {
-				@Override
-				public void onMouseOut(MouseOutEvent event) {
-					popover.hide();
-					isMouseOverAnchor = false;
-				}
-			});
+			
 			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -123,9 +123,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				
 				private void renderPopover(String content) {
 					isPopoverInitialized = true;
-					popover.setText(content);
+					popover.setContent(content);
 					popover.reconfigure();
-					if (isMouseOverAnchor)
+					if (isPopover)
 						popover.show();
 				}
 			});
@@ -162,6 +162,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
+		infoLink.setVisible(false);
 	}
 	
 	/*

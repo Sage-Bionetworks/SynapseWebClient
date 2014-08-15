@@ -215,14 +215,16 @@ public class ProvViewUtil {
 		if(kvDisplay != null) {
 			Map<String,String> map = kvDisplay.getMap();
 			for(String key : kvDisplay.getKeyDisplayOrder()) {
-				String val = map.get(key);
-				if(val == null) val = "";
-				val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
-				sb.appendHtmlConstant("<span class=\"boldText\">")
-				.appendEscaped(key + ":")
-				.appendHtmlConstant("</span> ")
-				.appendEscaped(val)
-				.appendHtmlConstant("<br/>");
+				if (!DisplayConstants.DESCRIPTION.equalsIgnoreCase(key)) {
+					String val = map.get(key);
+					if(val == null) val = "";
+					val = val.length() > MAX_TOOL_TIP_VALUE_CHAR ? val.substring(0, MAX_TOOL_TIP_VALUE_CHAR-3) + "..." : val;
+					sb.appendHtmlConstant("<span class=\"boldText\">")
+					.appendEscaped(key + ":")
+					.appendHtmlConstant("</span> ")
+					.appendEscaped(val)
+					.appendHtmlConstant("<br/>");
+				}
 			}
 		}		
 		return sb.toSafeHtml();
