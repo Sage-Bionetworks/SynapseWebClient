@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -138,7 +139,7 @@ public class AppActivityMapper implements ActivityMapper {
 			return presenter;
 		} else {
 			// check if this is a no-restart place change
-			if(place instanceof Synapse && ((Synapse)place).isNoRestartActivity() && lastActivity != null) {
+			if(place instanceof RestartActivityOptional && ((RestartActivityOptional)place).isNoRestartActivity() && lastActivity != null) {
 				return lastActivity;
 			}
 			if(loading != null) loading.showWidget();

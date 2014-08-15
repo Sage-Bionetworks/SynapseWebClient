@@ -80,7 +80,10 @@ public class Dialog extends Composite {
 		this.autoHide = autoHide;
 		mainContent.clear();
 		this.callback = callback;
-		primaryButton.setText(primaryButtonText);
+		boolean isPrimaryButtonVisible = primaryButtonText != null;
+		primaryButton.setVisible(isPrimaryButtonVisible);
+		if (isPrimaryButtonVisible)
+			primaryButton.setText(primaryButtonText);
 		
 		boolean isDefaultButtonVisible = defaultButtonText != null;
 		defaultButton.setVisible(isDefaultButtonVisible);

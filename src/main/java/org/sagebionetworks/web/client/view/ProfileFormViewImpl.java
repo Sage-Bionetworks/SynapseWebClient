@@ -30,8 +30,6 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	
 	@UiField
 	Button okButton;
-	@UiField
-	Button cancelButton;
 	
 	@UiField
 	Button changeUsernameButton;
@@ -115,13 +113,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 				startSave();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.cancelClicked();
-			}
-		});
+		
 		changeUsernameButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -183,12 +175,6 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		 }
 	 }
 		 
-
-	 @Override
-	 public void hideCancelButton(){
-		 cancelButton.setVisible(false);
-	 }
-
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
