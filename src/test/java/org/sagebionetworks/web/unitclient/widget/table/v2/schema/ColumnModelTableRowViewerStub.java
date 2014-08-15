@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.table.v2;
+package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 

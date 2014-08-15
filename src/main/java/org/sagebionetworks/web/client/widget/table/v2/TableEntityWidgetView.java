@@ -27,6 +27,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param tableBundel
 	 * @param isEditable
 	 */
-	void configure(String tableId, TableBundle tableBundel, boolean isEditable);
+	void configure(String tableId, TableBundle tableBundel, boolean isEditable, String queryString);
 
 }

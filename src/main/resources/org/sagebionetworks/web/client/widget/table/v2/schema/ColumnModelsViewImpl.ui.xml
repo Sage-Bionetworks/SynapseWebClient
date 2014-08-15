@@ -52,7 +52,7 @@
 		<b:Button ui:field="addColumnButton" icon="PLUS" type="INFO">Add
 			Column</b:Button>
 		<b:Button ui:field="editColumnsButton" icon="GEAR" type="INFO">Edit
-			Columns</b:Button>
+			Schema</b:Button>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

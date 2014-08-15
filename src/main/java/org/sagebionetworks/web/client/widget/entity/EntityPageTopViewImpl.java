@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -721,7 +722,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Table
-		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();
+		TableEntityWidget tableWidget = ginInjector.createNewTableEntityWidget();
+//		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
 			public void onQueryChange(String newQuery) {
@@ -729,11 +731,16 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			}
 		};		
 		TableRowHeader rowHeader = presenter.getTableRowHeader();
-		if(rowHeader != null) {
-			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, rowHeader, qch);									
-		} else {
-			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);						
+//		if(rowHeader != null) {
+//			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, rowHeader, qch);									
+//		} else {
+//			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);						
+//		}
+		String queryString = null;
+		if(rowHeader != null){
+			queryString = presenter.getTableQuery();
 		}
+		tableWidget.configure(bundle, canEdit, queryString, qch);
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);

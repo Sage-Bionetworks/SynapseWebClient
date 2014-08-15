@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.table.v2;
+package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.Vi
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
