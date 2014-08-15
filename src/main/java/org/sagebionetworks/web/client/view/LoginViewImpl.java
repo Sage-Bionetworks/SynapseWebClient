@@ -178,7 +178,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 				presenter.setNewUser(newUser);
 			}
 		});
-		loggingInDialog.show();
 	}
 	
 	@Override

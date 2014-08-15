@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -163,6 +164,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
+	@Override
+	public void updateArea(ProfileArea area) {
+		if (area != null) {
+			place.setArea(area);
+			place.setNoRestartActivity(true);
+			globalApplicationState.getPlaceChanger().goTo(place);
+		}
+	}
+	
 	/**
 	 * This method will update the current user's profile using LinkedIn
 	 */
@@ -229,13 +239,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			});
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea initialTab) {
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget(), initialTab);
+					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget(), area);
 					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -244,7 +254,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException)
-					view.updateView(profile, isOwner, null, profileForm.asWidget(), initialTab);
+					view.updateView(profile, isOwner, null, profileForm.asWidget(), area);
 				else
 					view.showErrorMessage(caught.getMessage());
 				
@@ -506,9 +516,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void showView(Profile place) {
 		setupProfileFormCallback();
 		String token = place.toToken();
-		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(token)) {
+		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
-			updateProfileView(token);
+			updateProfileView(place.getUserId(), place.getArea());
 		}
 		else if(!"".equals(token) && token != null) {
 			//if this contains an oauth_token, it's from linkedin
@@ -539,11 +549,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
-			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token) || Profile.SETTINGS_PROFILE_TOKEN.equals(token)) {
-				editMyProfile();
 			} else {
 				//otherwise, this is a user id
-				updateProfileView(token);
+				updateProfileView(place.getUserId(), place.getArea());
 			}
 		}
 	}

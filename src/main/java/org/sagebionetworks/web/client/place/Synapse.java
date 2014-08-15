@@ -4,7 +4,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
-public class Synapse extends Place{
+public class Synapse extends Place implements RestartActivityOptional{
 	public static final String VERSION_DELIMITER = "/version/";
 	
 	public static final String ADMIN_DELIMITER = getDelimiter(Synapse.EntityArea.ADMIN);
@@ -144,7 +144,7 @@ public class Synapse extends Place{
     }
 
 	public static enum EntityArea { WIKI, FILES, TABLES, ADMIN }
-	public static enum ProfileArea { PROJECTS, FAVORITES, CHALLENGES, TEAMS, MESSAGES, SETTINGS }
+	public static enum ProfileArea { PROJECTS, FAVORITES, CHALLENGES, TEAMS, SETTINGS }
 
 	@Override
 	public int hashCode() {
@@ -171,10 +171,12 @@ public class Synapse extends Place{
 		return true;
 	}
 
+	@Override
 	public void setNoRestartActivity(boolean noRestart) {
 		this.noRestartActivity = noRestart;
 	}
 
+	@Override
 	public boolean isNoRestartActivity() {
 		return noRestartActivity;
 	}

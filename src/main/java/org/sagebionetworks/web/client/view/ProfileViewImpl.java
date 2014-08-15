@@ -618,6 +618,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			showErrorMessage("Unrecognized profile tab: " + targetTab.name());
 			return;
 		}
+		presenter.updateArea(targetTab);
 	}
 	
 	private void setTabSelected(LIElement listItem, DivElement container) {
