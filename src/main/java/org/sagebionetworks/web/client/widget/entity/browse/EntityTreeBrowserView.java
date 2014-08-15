@@ -34,11 +34,6 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * @param makeLinks Make the labels entity links if true 
 	 */
 	public void setMakeLinks(boolean makeLinks);
-
-//	/*
-//	 * Explicityly sets the height of the widget
-//	 */
-//	public void setWidgetHeight(int height);
 	
 	/**
 	 * Presenter interface
