@@ -42,6 +42,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	FlowPanel entityContainer;
 	@UiField
 	Anchor infoLink;
+	Image iconPicture;
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;

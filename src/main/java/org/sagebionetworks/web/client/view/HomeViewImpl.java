@@ -413,7 +413,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private FlowPanel getFavoritesContainer() {
 		FlowPanel favoritesContainer = new FlowPanel();
 		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + AbstractImagePrototype.create(iconsImageBundle.star16()).getHTML() + "</h3>")));
+				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
 		SimplePanel favoritesPanel = new SimplePanel(favoritesTreeBrowser.asWidget());
 		favoritesPanel.addStyleName("panel panel-default");
 		favoritesContainer.add(favoritesPanel);
