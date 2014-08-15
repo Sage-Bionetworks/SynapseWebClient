@@ -168,7 +168,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void showLoadingIcon() {
-		// TODO: Properly get loading image?
 		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
 	}
 	
