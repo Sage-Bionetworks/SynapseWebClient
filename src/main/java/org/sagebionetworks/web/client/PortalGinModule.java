@@ -102,8 +102,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxView;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBoxViewImpl;
-import org.sagebionetworks.web.client.widget.entity.EntityTreeItemView;
-import org.sagebionetworks.web.client.widget.entity.EntityTreeItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListView;
 import org.sagebionetworks.web.client.widget.entity.EvaluationLinksListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EvaluationListView;
@@ -581,7 +579,6 @@ public class PortalGinModule extends AbstractGinModule {
 
 		// EntityTreeBrowser
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
-		bind(EntityTreeItemView.class).to(EntityTreeItemViewImpl.class);
 
 		// MyEntitiesBrowser
 		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);

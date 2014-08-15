@@ -23,7 +23,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	
 	void showLoadingIcon();
 	
-	void showTypeIcon();
+	public void setTypeIconVisible(boolean isVisible);
 	
 	/**
 	 * Presenter interface

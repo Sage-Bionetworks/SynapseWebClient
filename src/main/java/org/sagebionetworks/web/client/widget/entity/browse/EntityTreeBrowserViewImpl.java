@@ -69,10 +69,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 		
-	private boolean makeLinks = true;
-//	private Integer height = null;
+	private boolean makeLinks = true;		// TODO: Unnecessary?
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
+	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 
 	@Inject
@@ -80,6 +80,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		this.ginInjector = ginInjector;
 		
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
+		header2entityTreeItem = new HashMap<EntityHeader, EntityTreeItem>();
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		
 		entityTree = new Tree(new EntityTreeResources());
@@ -117,7 +118,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 							}
 							
 							// Change back to type icon.
-							target.showTypeIcon();
+							target.setTypeIconVisible(true);
 						}
 						
 						@Override
@@ -187,38 +188,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	/*
 	 * Private Methods
 	 */
-	
-	private List<EntityTreeModel> convertEntityHeaderToModel(List<EntityHeader> headers) {
-		
-		List<EntityTreeModel> models = new ArrayList<EntityTreeModel>();
-		int maxlimit = presenter.getMaxLimit();
-		
-		for(int i=0; i<headers.size() && i<maxlimit; i++) {
-			EntityHeader header = headers.get(i);
-			String link;
-			String name = header.getName();
-			if(makeLinks && !PLACEHOLDER_ID.equals(header.getId())) {
-				link = "<a href=\"" + DisplayUtils.getSynapseHistoryToken(header.getId()) + "\">" + name + "</a>";
-			} else {
-				link = name;
-			}
-			models.add(new EntityTreeModel(header.getId(), name, link, header.getType()));
-		}
-		if(headers.size() >= maxlimit) {
-			models.add(new EntityTreeModel(PLACEHOLDER_ID, PLACEHOLDER_ID, PLACEHOLDER_NAME_PREFIX + " Limited to " + maxlimit + " results" , PLACEHOLDER_TYPE));
-		}
-		return models;
-	}
 
-//	@Override
-//	public void removeEntity(EntityHeader entityHeader) {
-//		entityTree.remove(header2)
-//	}
-//
-//	@Override
-//	public void setWidgetHeight(int height) {
-//		this.height = height;
-//	}
+	@Override
+	public void removeEntity(EntityHeader entityHeader) {
+		header2entityTreeItem.get(entityHeader).asTreeItem().remove();
+	}
 	
 	/**
 	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
@@ -249,6 +223,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		// Update fields.
 		treeItem2entityTreeItem.put(childItem.asTreeItem(), childItem);
+		header2entityTreeItem.put(childToCreate,  childItem);
 				
 		// Add dummy item to childItem to make expandable.
 		childItem.asTreeItem().addItem(createDummyItem());
@@ -262,8 +237,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 	
 	/**
-	 * Creates the dummy item used to make all items placed in the tree
-	 * expandable.
+	 * Creates the dummy item used to make a tree item expandable.
 	 * @return the dummy tree item.
 	 */
 	private TreeItem createDummyItem() {

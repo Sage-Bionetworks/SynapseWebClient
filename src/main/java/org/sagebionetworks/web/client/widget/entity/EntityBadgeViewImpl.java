@@ -172,9 +172,15 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
 	}
 	
+	// TODO: "setVisible" name misleading, as I am setting the widget?
 	@Override
-	public void showTypeIcon() {
-		iconContainer.setWidget(iconPicture);
+	public void setTypeIconVisible(boolean isVisible) {
+		if (isVisible) {
+			iconContainer.setWidget(iconPicture);
+			iconPicture.setVisible(true);
+		} else {
+			iconContainer.setVisible(false);
+		}
 	}
 	
 	

@@ -63,7 +63,6 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoWidget = quizInfoWidget;
-		//this.setLayout(new FitLayout());
 	}
 
 	@Override

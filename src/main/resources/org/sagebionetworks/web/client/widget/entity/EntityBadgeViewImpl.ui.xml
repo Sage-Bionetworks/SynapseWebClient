@@ -5,7 +5,7 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:HTMLPanel>
+	<g:HTMLPanel styleName="entityBadge">
 		<table cellspacing='0' cellpadding='0'>
 			<tr>
 				<td align="left" width="20px" style="vertical-align: top;">					
@@ -13,7 +13,7 @@
 				</td>
 				<td>
 			    	<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-					<b:Popover content="..." placement="RIGHT" ui:field="popover" trigger="MANUAL">
+					<b:Popover content="..." placement="RIGHT" ui:field="popover" trigger="MANUAL" container="body">
 						<g:Anchor ui:field="infoLink"><span class="glyphicon glyphicon-info-sign margin-left-5 greyText-imp"></span></g:Anchor>
 					</b:Popover>
 				</td>

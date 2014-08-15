@@ -85,20 +85,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
-					//If necessary, expand to support other types.  
-					//But do not pull in NodeAdapterFactory for the mapping, as this will cause the initial fragment download size to significantly increase.
-					Entity preEntity = null; // TODO: Test each entity (Haven't tried file).
-					if (Project.class.getName().equals(result.getEntityClassName())) {
-						preEntity = new Project(adapterFactory.createNew(result.getEntityJson()));
-					} else if (Folder.class.getName().equals(result.getEntityClassName())) {
-						preEntity = new Folder(adapterFactory.createNew(result.getEntityJson()));
-					} else if (FileEntity.class.getName().equals(result.getEntityClassName())) {
-						preEntity = new FileEntity(adapterFactory.createNew(result.getEntityJson()));
-					} else {
+					final Entity entity = AdapterUtils.getEntityForBadgeInfo(adapterFactory, result);
+					if (entity == null) {
 						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for enitty badge detailed information."));
 						return;
 					}
-					final Entity entity = preEntity;
 					
 					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
@@ -129,10 +120,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 
 	// TODO: "show" names a little weird for presenter?
-	public void showTypeIcon() {
-		view.showTypeIcon();
+	// TODO: setTypeIconVisible(boolena)
+	public void setTypeIconVisible(boolean isVisible) {
+		view.setTypeIconVisible(true);
 	}
 	
+	// SAME HERE!!
 	public void showLoadingIcon() {
 		view.showLoadingIcon();
 	}

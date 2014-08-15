@@ -47,8 +47,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		entityBadge.showLoadingIcon();
 	}
 	
-	public void showTypeIcon() {
-		entityBadge.showTypeIcon();
+	public void setTypeIconVisible(boolean isVisible) {
+		entityBadge.setTypeIconVisible(isVisible);
 	}
 	
 	public EntityHeader getHeader() {

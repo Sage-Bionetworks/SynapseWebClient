@@ -23,11 +23,11 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 */
 	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort);
 	
-//	/**
-//	 * Remove an entity from the view identified by entityId
-//	 * @param entityModel
-//	 */
-//	public void removeEntity(EntityHeader entityHeader);
+	/**
+	 * Remove an entity from the view identified by entityId
+	 * @param entityModel
+	 */
+	public void removeEntity(EntityHeader entityHeader);
 
 	/**
 	 * Show links if true
