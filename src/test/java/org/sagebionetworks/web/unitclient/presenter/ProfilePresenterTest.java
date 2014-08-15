@@ -147,6 +147,8 @@ public class ProfilePresenterTest {
 		myProjects.add(project2);
 		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
+		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		
 		//set up create project test
 		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		
@@ -463,4 +465,20 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
 		verify(mockView).setTeamsError(errorMessage);
 	}
+	
+	@Test
+	public void testGetFavorites() {
+		profilePresenter.getFavorites();
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).setFavorites(eq(myProjects));
+	}
+	
+	@Test
+	public void testGetFavoritesError() {
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		profilePresenter.getFavorites();
+		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).setFavoritesError(anyString());
+	}
+	
 }

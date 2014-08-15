@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.MyEvaluationEntitiesList;
 import org.sagebionetworks.web.client.widget.entity.ProgrammaticClientCode;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;

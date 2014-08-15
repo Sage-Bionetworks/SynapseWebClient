@@ -30,6 +30,9 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshHeader();
 	void setProjects(List<EntityHeader> myProjects);
 	void setProjectsError(String string);
+	void setFavorites(List<EntityHeader> headers);
+	void setFavoritesError(String string);
+	
 	void setChallenges(List<EntityHeader> headers);
 	void setChallengesError(String error);
 	void setTeams(List<Team> teams);
@@ -50,5 +53,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void createTeam(final String teamName);
 		
 		void goTo(Place place);
+		
+		void refreshTeams();
 	}
 }

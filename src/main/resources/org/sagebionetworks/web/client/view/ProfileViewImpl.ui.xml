@@ -36,6 +36,7 @@
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center no-background" ui:field="projectsLink"/></li>
+						    <li class="entity-tab" ui:field="favoritesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="favoritesLink"/></li>
 						    <li class="entity-tab" ui:field="challengesListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="challengesLink"/></li>
 						    <li class="entity-tab" ui:field="teamsListItem"><g:Anchor styleName="text-align-center link no-background" ui:field="teamsLink"/></li>
 						    <!--  <li class="entity-tab" ui:field="messagesListItem" style="width: 157px"><g:Anchor styleName="text-align-center link no-background" ui:field="messagesLink"/></li> -->
@@ -63,65 +64,15 @@
 							</div>
 							
 						</div>
+						<div class="tab-background padding-15" ui:field="favoritesTabContainer">
+					    	<div class="highlight-box" highlight-box-title="Favorites">
+					    		<g:FlowPanel ui:field="favoritesTabContent" />
+					    	</div>
+					    </div>
 					    <div class="tab-background padding-15" ui:field="challengesTabContainer">
-					    	<div ui:field="challengesHighlightBox" class="highlight-box" highlight-box-title="Challenges">
+					    	<div class="highlight-box" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" />
 					    	</div>
-					    <!-- Carousel
-						    ================================================== -->
-						    <div id="myCarousel" class="carousel slide margin-top-10">
-						      <!-- Indicators -->
-						      <ol class="carousel-indicators">
-						        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-						        <li data-target="#myCarousel" data-slide-to="1"></li>
-						        <li data-target="#myCarousel" data-slide-to="2"></li>
-						        <li data-target="#myCarousel" data-slide-to="3"></li>
-							  </ol>
-						      <div class="carousel-inner">
-						        <div class="item active">
-						          <a href="#!Challenges:DREAM"><g:Image resource='{sageImageBundle.dream85Banner}' /></a>
-						          <div class="container">
-						            <div class="carousel-caption">
-						              <p><a class="btn btn-large btn-primary" href="#!Challenges:DREAM">Learn More</a></p>
-						            </div>
-						          </div>
-						        </div>
-						        <div class="item">
-						          <a href="#!Synapse:syn312572"><g:Image resource='{sageImageBundle.dream85SM}' /></a>
-						          <div class="container">
-						            <div class="carousel-caption">			              
-						              <p><a class="btn btn-large btn-primary" href="#!Synapse:syn312572">Challenge Details &amp; Registration</a></p>
-						            </div>
-						          </div>
-						        </div>
-						        <div class="item">
-						          <a href="#!Synapse:syn2455683"><g:Image resource='{sageImageBundle.dream9AML}' /></a>
-						          <div class="container">
-						            <div class="carousel-caption">
-						              <p><a class="btn btn-large btn-primary" style="position: relative; top: -45px; left: 200px;" href="#!Synapse:syn2455683">Challenge Details &amp; Registration</a></p>
-						            </div>
-						          </div>
-						        </div>
-						        <div class="item">
-						          <a href="#!Synapse:syn2290704"><g:Image resource='{sageImageBundle.dream9AD}' /></a>
-						          <div class="container">
-						            <div class="carousel-caption">
-						              <p><a class="btn btn-large btn-primary" style="position: relative; top: -60px;" href="#!Synapse:syn2290704">Challenge Details &amp; Registration</a></p>
-						            </div>
-						          </div>
-						        </div>
-						        <div class="item">
-						          <a href="#!Synapse:syn2384331"><g:Image resource='{sageImageBundle.dream9Broad}' /></a>
-						          <div class="container">
-						            <div class="carousel-caption">
-						                <p><a class="btn btn-large btn-primary" style="position: relative; top: -64px;" href="#!Synapse:syn2384331">Challenge Details &amp; Registration</a></p>
-						            </div>
-						          </div>
-						        </div>
-						      </div>
-						      <a class="left carousel-control-clean" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-						      <a class="right carousel-control-clean" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-						    </div><!-- /.carousel -->
 					    </div>
 					    <div class="tab-background padding-15" ui:field="teamsTabContainer">
 							<div ui:field="createTeamUI" class="margin-bottom-10 row">

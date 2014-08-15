@@ -108,12 +108,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Anchor challengesLink;
 	@UiField
 	LIElement challengesListItem;
+	@UiField
+	Anchor favoritesLink;
+	@UiField
+	LIElement favoritesListItem;
+
 
 	@UiField
 	DivElement navtabContainer;
 	
 	@UiField
 	DivElement projectsTabContainer;
+	@UiField
+	DivElement favoritesTabContainer;
 	@UiField
 	DivElement challengesTabContainer;
 	@UiField
@@ -147,8 +154,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Challenges
 	@UiField
 	FlowPanel challengesTabContent;
+	
+	//Favorites
 	@UiField
-	DivElement challengesHighlightBox;
+	FlowPanel favoritesTabContent;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -234,6 +243,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		});
 		projectsTabContent.addStyleName("margin-10");
 		challengesTabContent.addStyleName("margin-10");
+		favoritesTabContent.addStyleName("margin-10");
 	}
 	
 	@Override
@@ -274,6 +284,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			viewProfilePanel.add(profileWidget);
 			
 			if (isOwner) {
+				DisplayUtils.show(favoritesListItem);
 				DisplayUtils.show(showProfileLink);
 				DisplayUtils.show(settingsListItem);
 				settingsTabContainer.add(settingsPresenter.asWidget());
@@ -284,8 +295,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				openInvitesWidget.configure(new Callback() {
 					@Override
 					public void invoke() {
-						//refresh the view after accepting/ignoring
-						presenter.showViewMyProfile();
+						//refresh the teams and invites
+						presenter.refreshTeams();
 					}
 				}, (CallbackP)null);
 				
@@ -335,12 +346,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	@Override
-	protected void onAttach() {
-		super.onAttach();
-		startCarousel();
-	}
-	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
 		targetPanel.clear();
 		for (EntityHeader entityHeader : projectHeaders) {
@@ -357,13 +362,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setChallenges(List<EntityHeader> projectHeaders) {
 		if (projectHeaders.size() > 0) {
-			DisplayUtils.show(challengesHighlightBox);
+			DisplayUtils.show(challengesListItem);
 			addEntityBadges(projectHeaders, challengesTabContent);
 		}
 	}
 	
 	@Override
 	public void setChallengesError(String error) {
+		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
+	public void setFavorites(List<EntityHeader> headers) {
+		addEntityBadges(headers, favoritesTabContent);
+	}
+	
+	@Override
+	public void setFavoritesError(String error) {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
@@ -586,17 +601,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		
+		favoritesTabContent.clear();
+		favoritesTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		
 		DisplayUtils.hide(showProfileLink);
 		challengesTabContent.clear();
-		DisplayUtils.hide(challengesHighlightBox);
 		hideTabContainers();
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
+		DisplayUtils.hide(challengesListItem);
+		DisplayUtils.hide(favoritesListItem);
 	}
 	
 	private void hideTabContainers() {
 		//hide all tab containers
 		DisplayUtils.hide(projectsTabContainer);
+		DisplayUtils.hide(favoritesTabContainer);
 		DisplayUtils.hide(challengesTabContainer);
 		DisplayUtils.hide(teamsTabContainer);
 		DisplayUtils.hide(messagesTabContainer);
@@ -623,6 +643,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		challengesLink.addStyleName("link");
 //		messagesListItem.removeClassName("active");
 //		messagesLink.addStyleName("link");
+		favoritesListItem.removeClassName("active");
+		favoritesLink.addStyleName("link");
+
 		
 		LIElement tab; 
 		Anchor link;
@@ -643,6 +666,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			tab = challengesListItem;
 			link = challengesLink;
 			DisplayUtils.show(challengesTabContainer);
+		} else if (targetTab == Synapse.ProfileArea.FAVORITES) {
+			tab = favoritesListItem;
+			link = favoritesLink;
+			DisplayUtils.show(favoritesTabContainer);
 //		} else if(targetTab == Synapse.ProfileArea.MESSAGES) {
 //			tab = messagesListItem;
 //			link = messagesLink;
@@ -668,6 +695,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		challengesLink.setText(DisplayConstants.CHALLENGES);
 		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		
+		favoritesLink.setText(DisplayConstants.FAVORITES);
+		favoritesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.FAVORITES));
 //		messagesLink.setText(DisplayConstants.MESSAGES);
 //		messagesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.MESSAGES));
 	}
@@ -680,8 +710,4 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
-	
-	private static native void startCarousel() /*-{
-		$wnd.jQuery('#myCarousel').carousel('cycle');
-	}-*/;
 }

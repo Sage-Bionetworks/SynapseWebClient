@@ -24,7 +24,6 @@ public class GWTCacheControlFilter implements Filter {
 	
 	//break up into three buckets.  never cache, cache for some time, or cache forever (when changed, GWT will rename the file)
 	public static final long CACHE_TIME=1000*60*60*8;  //8 hours.  cache for some time
-	public static final long MONTH_CACHE_TIME=1000*60*60*24*30;  //30 days.  cache "forever"
 	private FilterConfig filterConfig;
 
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -32,7 +31,7 @@ public class GWTCacheControlFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String requestURI = httpRequest.getRequestURI().toLowerCase();
 		if (requestURI.contains(".cache.")) {
-			setCacheTime(response, MONTH_CACHE_TIME);
+			setCacheMaxAge(response);
 		}
 		else if (!requestURI.contains(".nocache.") && !requestURI.contains("portal.html")) {
 			setCacheTime(response, CACHE_TIME);
@@ -44,6 +43,13 @@ public class GWTCacheControlFilter implements Filter {
 		long now = new Date().getTime();
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		httpResponse.setDateHeader("Expires", now+cacheTime);
+		httpResponse.setDateHeader("Date", now);
+	}
+	
+	private void setCacheMaxAge(ServletResponse response) {
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		httpResponse.setHeader("Cache-Control", "max-age");
+		httpResponse.setDateHeader("Date", new Date().getTime());
 	}
 	
 	public void init(FilterConfig config) throws ServletException {

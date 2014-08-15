@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
+import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -95,7 +96,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 			JSONObjectAdapter jsonObjectAdapter, EntityEditor entityEditor,
 			AutoGenFactory entityFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookieProvider, EvaluationSubmitter evaluationSubmitter) {
+			CookieProvider cookieProvider, EvaluationSubmitter evaluationSubmitter
+			) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.entityTypeProvider = entityTypeProvider;
