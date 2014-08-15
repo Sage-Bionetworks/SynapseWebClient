@@ -73,7 +73,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	@Override
 	public void configure(String entityId, boolean canEdit, String title) {
 		this.clear();
-		FlowPanel lc = new FlowPanel();
+		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
 		boolean isTitle = (title!=null);
 		if(isTitle) {
@@ -107,9 +107,9 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
 		if (canEdit || isTitle)
-			lc.add(topbar);
-		lc.add(files);
-		this.add(lc);
+			fp.add(topbar);
+		fp.add(files);
+		this.add(fp);
 	}
 	
 	@Override
