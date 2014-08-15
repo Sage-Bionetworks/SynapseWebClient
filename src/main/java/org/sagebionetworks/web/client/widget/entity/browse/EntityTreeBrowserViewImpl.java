@@ -66,23 +66,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private static final String PLACEHOLDER_TYPE = "-1";
 	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
 	
-	private static final int TREE_ITEM_ICON_INDEX = 0;
-	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
-	private IconsImageBundle iconsImageBundle;
 	private PortalGinInjector ginInjector;
 		
 	private boolean makeLinks = true;
-	private Integer height = null;
+//	private Integer height = null;
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 
 	@Inject
-	public EntityTreeBrowserViewImpl(SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
-		this.iconsImageBundle = iconsImageBundle;
+	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
@@ -220,11 +214,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 //	public void removeEntity(EntityHeader entityHeader) {
 //		entityTree.remove(header2)
 //	}
-
-	@Override
-	public void setWidgetHeight(int height) {
-		this.height = height;
-	}
+//
+//	@Override
+//	public void setWidgetHeight(int height) {
+//		this.height = height;
+//	}
 	
 	/**
 	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
@@ -256,7 +250,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Update fields.
 		treeItem2entityTreeItem.put(childItem.asTreeItem(), childItem);
 				
-		// HACKY: Add dummy item to childItem to make expandable.
+		// Add dummy item to childItem to make expandable.
 		childItem.asTreeItem().addItem(createDummyItem());
 		
 		// Place the created child in the tree as the child of the given parent entity.
@@ -277,6 +271,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		result.setVisible(false);
 		return result;
 	}
+	
+	
+	/*
+	 * Image Resources for Tree Expand/Collapse Icons
+	 */
 	
 	public class EntityTreeResources implements Tree.Resources {
 		@Override
@@ -299,12 +298,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		EntityTreeImageBundle IMAGE_RESOURCE = GWT.create(EntityTreeImageBundle.class);
 		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
 
-		// TODO: Change paths to proper images.
-	    @Source("images/icons/arrow-down-dir.png")
+	    @Source("images/icons/arrow-down-dir-16.png")
 		ImageResource treeOpen();
 		
 	    
-		@Source("images/icons/arrow-right-dir.png")
+		@Source("images/icons/arrow-right-dir-16.png")
 		ImageResource treeClosed();
 	}
 	

@@ -4,7 +4,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static junit.framework.Assert.*;
 
-import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -138,6 +137,22 @@ public class EntityBadgeTest {
 		header.setId("syn93847");
 		widget.entityClicked(header);
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
+	}
+	
+	@Test
+	public void testShowTypeIcon() throws Exception {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn93847");
+		widget.showTypeIcon();
+		verify(mockView).showTypeIcon();
+	}
+	
+	@Test
+	public void testShowLoadingIcon() throws Exception {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn93847");
+		widget.showLoadingIcon();
+		verify(mockView).showLoadingIcon();
 	}
 
 
