@@ -7,6 +7,7 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class Profile extends Place implements RestartActivityOptional{
+	public static final String EDIT_PROFILE_TOKEN="edit";
 	public static final String DELIMITER = "/"; 
 	public static final String SETTINGS_DELIMITER = getDelimiter(Synapse.ProfileArea.SETTINGS);
 	public static final String PROJECTS_DELIMITER = getDelimiter(Synapse.ProfileArea.PROJECTS);

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -486,9 +486,17 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testEditMyProfile() {
+		String testUserId = "9980";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
 		profilePresenter.editMyProfile();
 		//verify updateView shows Settings as the initial tab
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq(ProfileArea.SETTINGS));
+		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = captor.getValue();
+		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
+		assertEquals(testUserId, capturedPlace.getUserId());
 	}
 	@Test
 	public void testEditMyProfileAsAnonymous() {
@@ -502,9 +510,17 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testViewMyProfile() {
+		String testUserId = "9981";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
 		profilePresenter.viewMyProfile();
-		//verify updateView shows default as the initial tab
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq((Synapse.ProfileArea)null));
+		//verify updateView shows Settings as the initial tab
+		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = captor.getValue();
+		assertNull(capturedPlace.getArea());
+		assertEquals(testUserId, capturedPlace.getUserId());
 	}
 	@Test
 	public void testViewMyProfileAsAnonymous() {

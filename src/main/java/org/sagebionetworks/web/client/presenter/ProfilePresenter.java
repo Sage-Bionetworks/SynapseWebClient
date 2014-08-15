@@ -150,15 +150,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void editMyProfile() {
-		checkLoggedIn();
-		updateProfileView(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS);
+		if (checkIsLoggedIn())
+			goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
 	}
 	
 	public void viewMyProfile() {
-		checkLoggedIn();
-		updateProfileView(authenticationController.getCurrentUserPrincipalId());
+		if (checkIsLoggedIn())
+			goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 	}
-
+	
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
@@ -476,11 +476,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	private void checkLoggedIn() {
+	private boolean checkIsLoggedIn() {
 		if (!authenticationController.isLoggedIn()) {
 			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			return false;
 		}
+		return true;
 	}
 	
 	private void setupProfileFormCallback() {
@@ -549,6 +551,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				} else {
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
+			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
+				editMyProfile();
 			} else {
 				//otherwise, this is a user id
 				updateProfileView(place.getUserId(), place.getArea());
