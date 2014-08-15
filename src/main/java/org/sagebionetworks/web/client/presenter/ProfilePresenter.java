@@ -30,6 +30,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -147,18 +149,28 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	@Override
-	public void showEditProfile() {
-		updateProfileView(authenticationController.getCurrentUserPrincipalId(), true);
+	public void editMyProfile() {
+		if (checkIsLoggedIn())
+			goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
 	}
-	@Override
-	public void showViewMyProfile() {
-		updateProfileView(authenticationController.getCurrentUserPrincipalId(), false);
+	
+	public void viewMyProfile() {
+		if (checkIsLoggedIn())
+			goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
 	}
-
+	
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
+	}
+	
+	@Override
+	public void updateArea(ProfileArea area) {
+		if (area != null) {
+			place.setArea(area);
+			place.setNoRestartActivity(true);
+			globalApplicationState.getPlaceChanger().goTo(place);
+		}
 	}
 	
 	/**
@@ -197,10 +209,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	private void updateProfileView(String userId, final boolean isEditing) {
+	private void updateProfileView(String userId) {
+		updateProfileView(userId, null);
+	}
+	
+	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
-		globalApplicationState.setIsEditing(isEditing);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
 				@Override
@@ -212,10 +227,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							profileForm.configure(profile, profileUpdatedCallback);
 						}
 						
-						getIsCertifiedAndUpdateView(profile, isEditing, isOwner);
+						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 					} catch (JSONObjectAdapterException e) {
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}    				
+					}
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -224,13 +239,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			});
 	}
 	
-	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isEditing, final boolean isOwner) {
+	public void getIsCertifiedAndUpdateView(final UserProfile profile, final boolean isOwner, final ProfileArea area) {
 		synapseClient.getCertifiedUserPassingRecord(profile.getOwnerId(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecordJson) {
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, isEditing, isOwner, passingRecord, profileForm.asWidget());
+					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget(), area);
 					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -239,7 +254,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException)
-					view.updateView(profile, isEditing, isOwner, null, profileForm.asWidget());
+					view.updateView(profile, isOwner, null, profileForm.asWidget(), area);
 				else
 					view.showErrorMessage(caught.getMessage());
 				
@@ -461,22 +476,25 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
+	private boolean checkIsLoggedIn() {
+		if (!authenticationController.isLoggedIn()) {
+			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			return false;
+		}
+		return true;
+	}
+	
 	private void setupProfileFormCallback() {
 		profileUpdatedCallback = new ProfileUpdatedCallback() {
-			
 			@Override
 			public void profileUpdateSuccess() {
 				view.showInfo("Success", "Your profile has been updated.");
-				continueToViewProfile();
+				continueToEditProfile();
 			}
 			
-			@Override
-			public void profileUpdateCancelled() {
-				continueToViewProfile();
-			}
-			
-			public void continueToViewProfile() {
-				showViewMyProfile();
+			public void continueToEditProfile() {
+				editMyProfile();
 				view.refreshHeader();
 			}
 			
@@ -485,6 +503,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
 					view.showErrorMessage(caught.getMessage());
 				}
+				continueToEditProfile();
 			}
 		};
 	}
@@ -499,9 +518,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private void showView(Profile place) {
 		setupProfileFormCallback();
 		String token = place.toToken();
-		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(token)) {
+		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
 			//View my profile
-			updateProfileView(token, false);
+			updateProfileView(place.getUserId(), place.getArea());
 		}
 		else if(!"".equals(token) && token != null) {
 			//if this contains an oauth_token, it's from linkedin
@@ -533,10 +552,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.showErrorMessage("An error occurred. Please try reloading the page.");
 				}
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
-				showEditProfile();
+				editMyProfile();
 			} else {
 				//otherwise, this is a user id
-				updateProfileView(token, false);
+				updateProfileView(place.getUserId(), place.getArea());
 			}
 		}
 	}

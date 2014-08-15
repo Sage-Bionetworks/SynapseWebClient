@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -39,8 +39,10 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
@@ -258,9 +260,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), any(PassingRecord.class), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq(ProfileArea.SETTINGS));
 	}
 	
 	@Test
@@ -268,10 +270,10 @@ public class ProfilePresenterTest {
 		//have not taken the test
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class), eq(ProfileArea.TEAMS));
 	}
 	
 	@Test
@@ -279,7 +281,7 @@ public class ProfilePresenterTest {
 		//some other error occurred
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 	
-		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, true);
+		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.PROJECTS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
@@ -480,5 +482,56 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setFavoritesError(anyString());
 	}
+	
+	
+	@Test
+	public void testEditMyProfile() {
+		String testUserId = "9980";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		profilePresenter.editMyProfile();
+		//verify updateView shows Settings as the initial tab
+		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = captor.getValue();
+		assertEquals(ProfileArea.SETTINGS, capturedPlace.getArea());
+		assertEquals(testUserId, capturedPlace.getUserId());
+	}
+	@Test
+	public void testEditMyProfileAsAnonymous() {
+		//verify forces login if anonymous and trying to edit own profile
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		profilePresenter.editMyProfile();
+		
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testViewMyProfile() {
+		String testUserId = "9981";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(testUserId);
+		
+		profilePresenter.viewMyProfile();
+		//verify updateView shows Settings as the initial tab
+		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		verify(mockPlaceChanger).goTo(captor.capture());
+		Profile capturedPlace = captor.getValue();
+		assertNull(capturedPlace.getArea());
+		assertEquals(testUserId, capturedPlace.getUserId());
+	}
+	@Test
+	public void testViewMyProfileAsAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		//verify forces login if anonymous and trying to view own anonymous profile
+		profilePresenter.viewMyProfile();
+		
+		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+
+	
 	
 }
