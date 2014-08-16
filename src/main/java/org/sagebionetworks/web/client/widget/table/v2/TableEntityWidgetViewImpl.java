@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
@@ -8,17 +10,16 @@ import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelBody;
+import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
-import org.sagebionetworks.repo.model.table.TableBundle;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,11 +39,15 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	PanelBody columnDetailsPanel;
 	@UiField
+	Alert noColumnsAlert;
+	@UiField
 	InputGroup queryInputGroup;
 	@UiField
 	TextBox queryInput;
 	@UiField
 	Button queryButton;
+	@UiField
+	Panel queryResultsPanel;
 	@UiField
 	ButtonToolBar resultsToolBar;
 	@UiField
@@ -56,6 +61,12 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	Container progressContainer;
 	@UiField
+	Text progressText;
+	@UiField
+	ProgressBar progressBar;
+	@UiField
+	Button progressCancelButton;
+	@UiField
 	Modal editRowsModal;
 	@UiField
 	SimplePanel rowEditorModalPanel;
@@ -65,6 +76,8 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Button saveRowsButton;
 	@UiField
 	Button cancelRowsButton;
+	@UiField
+	Alert queryResultAlert;
 	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
@@ -84,9 +97,26 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 
 	@Override
-	public void configure(String tableId, TableBundle tableBundel, boolean isEditable, String queryString) {
-		this.columnModelsWidget.configure(tableId, tableBundel.getColumnModels(), isEditable);
-		this.queryInput.setText(queryString);
+	public void configure(String tableId, List<ColumnModel> schema,
+			boolean isEditable) {
+		this.columnModelsWidget.configure(tableId, schema, isEditable);
 	}
+
+	@Override
+	public void showNoColumns(String message) {
+		this.noColumnsAlert.setText(message);
+		this.noColumnsAlert.setVisible(true);
+	}
+
+	@Override
+	public void setQueryInputVisible(boolean visible) {
+		this.queryInputGroup.setVisible(visible);
+	}
+
+	@Override
+	public void setQueryResultsVisible(boolean visible) {
+		this.queryResultsPanel.setVisible(visible);
+	}
+
 
 }

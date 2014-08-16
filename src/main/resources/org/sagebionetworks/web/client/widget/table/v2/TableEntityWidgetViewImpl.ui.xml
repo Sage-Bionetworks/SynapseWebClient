@@ -19,7 +19,8 @@
 					<b:PanelBody ui:field="columnDetailsPanel" />
 				</b:Panel>
 			</b:Collapse>
-
+			
+			<b:Alert ui:field="noColumnsAlert" type="INFO"/>
 
 			<b:InputGroup ui:field="queryInputGroup" visible="true">
 				<b:TextBox ui:field="queryInput" />
@@ -29,7 +30,7 @@
 				</b:InputGroupButton>
 			</b:InputGroup>
 			<bh:ClearFix styleName="clearfix margin-top-15" />
-			<b:Panel>
+			<b:Panel ui:field="queryResultsPanel">
 				<b:PanelBody>
 					<!-- ToolBar for the table results -->
 					<b:ButtonToolBar ui:field="resultsToolBar">
@@ -49,26 +50,26 @@
 						condensed="true" striped="true" hover="true" />
 
 					<!-- progress bar -->
-					<b:Container fluid="true" ui:field="progressContainer" visible="false">
+					<b:Container fluid="true" ui:field="progressContainer" visible="true">
 						<b:Row>
 							<b:Column size="XS_9" offset="XS_1">
-								<b:Alert type="INFO">
-									<bh:Strong text="Executing Query:" />
-									<bh:Text text="..." />
-								</b:Alert>
+							<bh:Text ui:field="progressText">Executing query...</bh:Text>
 							</b:Column>
 						</b:Row>
 						<b:Row>
 							<b:Column size="XS_8" offset="XS_1">
 								<b:Progress>
-									<b:ProgressBar type="INFO" percent="20" text="20%" />
+									<b:ProgressBar ui:field="progressBar" type="INFO" percent="20" text="20%" />
 								</b:Progress>
 							</b:Column>
 							<b:Column size="XS_1">
-								<b:Button icon="BAN" type="DANGER" size="SMALL"/>
+								<b:Button ui:field="progressCancelButton" icon="BAN" type="DANGER" size="SMALL"/>
 							</b:Column>
 						</b:Row>
 					</b:Container>
+					<b:Alert ui:field="queryResultAlert" type="DANGER" text="Errors go here">
+						
+					</b:Alert>
 					<!-- This modal dialog will contain the editor for query results -->
 					<b:Modal ui:field="editRowsModal" title="Edit Rows"
 						closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true"

@@ -37,10 +37,11 @@ import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, WidgetRendererPresenter {
+public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, WidgetRendererPresenter, IsWidget {
 	
 	private final static Integer DEFAULT_PAGE_SIZE = 50; 
 	private final static Integer DEFAULT_OFFSET = 0; 

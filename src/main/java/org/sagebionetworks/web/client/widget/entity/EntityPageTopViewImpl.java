@@ -69,6 +69,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -722,25 +723,30 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Table
-		TableEntityWidget tableWidget = ginInjector.createNewTableEntityWidget();
-//		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
 			public void onQueryChange(String newQuery) {
 				presenter.setTableQuery(newQuery);				
 			}
-		};		
-		TableRowHeader rowHeader = presenter.getTableRowHeader();
-//		if(rowHeader != null) {
-//			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, rowHeader, qch);									
-//		} else {
-//			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);						
-//		}
-		String queryString = null;
-		if(rowHeader != null){
-			queryString = presenter.getTableQuery();
+
+			@Override
+			public String getQueryString() {
+				return presenter.getTableQuery();
+			}
+		};
+		boolean useV2Table = true;
+		IsWidget tableWidget = null;
+		if(useV2Table){
+			// V2
+			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
+			v2TableWidget.configure(bundle, canEdit, qch);
+			tableWidget = v2TableWidget;
+		}else{
+			// V1
+			SimpleTableWidget simpleTableWidget = ginInjector.getSimpleTableWidget();
+			simpleTableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);	
+			tableWidget = simpleTableWidget;
 		}
-		tableWidget.configure(bundle, canEdit, queryString, qch);
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
