@@ -56,7 +56,7 @@ public class TimingFilter implements Filter {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			log.trace(httpRequest.getServletPath()+" elapse: "+(end-start)+" ms");
 			// Clear the logging thread context
-			ThreadContext.clear();
+			ThreadContext.clearAll();
 		}
 	}
 
