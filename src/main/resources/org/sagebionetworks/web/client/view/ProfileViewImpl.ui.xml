@@ -9,12 +9,6 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<div class="margin-10">
-			<div class="row margin-top-5">
-				<div class="col-xs-12" style="white-space: normal;">
-					<g:SimplePanel ui:field="breadcrumbsPanel" />
-				</div>
-			</div>
-
 			<div class="row">
 				<div class="col-md-3 col-sm-4 col-xs-12">
 						<g:SimplePanel ui:field="picturePanel"/>
@@ -26,6 +20,7 @@
 			<div class="row margin-top-5">
 				<div class="col-xs-12">
 					<g:Anchor ui:field="showProfileLink" text="Show my full profile" />
+					<g:Anchor ui:field="hideProfileLink" text="Hide my profile" />
 				</div>
 			</div>
 			<div class="row margin-top-5">
@@ -73,13 +68,16 @@
 							<g:FlowPanel ui:field="teamsTabContent" />
 							
 							<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
-							    <div class="col-xs-12 col-sm-6">
+							    <div class="col-xs-8 col-sm-6">
 									<div class="input-group">
 										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
 										<span class="input-group-btn">
 											<g:Button ui:field="createTeamButton" styleName="btn btn-default">Create Team</g:Button>
 										</span>
 									</div>
+								</div>
+								 <div class="col-xs-4 col-sm-6">
+									<g:Button ui:field="teamSearchButton" styleName="btn btn-default right"><span class="glyphicon glyphicon-search"></span> Team Search</g:Button>
 								</div>
 							</div>
 						</div>
