@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -74,8 +75,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel viewProfilePanel;
 	
 	@UiField
-	SimplePanel breadcrumbsPanel;
-	@UiField
 	SimplePanel picturePanel;
 	@UiField
 	SimplePanel editPicturePanel;
@@ -84,6 +83,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@UiField
 	Anchor showProfileLink;
+	@UiField
+	Anchor hideProfileLink;
 	
 	//////Tabs
 	@UiField
@@ -141,6 +142,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createTeamUI;
 	@UiField
 	FlowPanel teamsTabContent;
+	@UiField
+	Button teamSearchButton;
 	
 	//Challenges
 	@UiField
@@ -158,7 +161,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Header headerWidget;
 	private SageImageBundle sageImageBundle;
 	private Button linkedInButtonEditProfile;
-	private Breadcrumb breadcrumb;
 	
 	//View profile widgets
 	private FlowPanel profileWidget;
@@ -189,7 +191,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.breadcrumb = breadcrumb;
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
 		this.certificateWidget = certificateWidget;
@@ -212,6 +213,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				DisplayUtils.show(viewProfilePanel);
 				DisplayUtils.show(picturePanel);
 				DisplayUtils.hide(showProfileLink);
+				DisplayUtils.show(hideProfileLink);
+			}
+		});
+		
+		hideProfileLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DisplayUtils.hide(viewProfilePanel);
+				DisplayUtils.hide(picturePanel);
+				DisplayUtils.hide(hideProfileLink);
+				DisplayUtils.show(showProfileLink);
 			}
 		});
 		
@@ -228,6 +240,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.createTeam(createTeamTextBox.getValue());
+			}
+		});
+		
+		teamSearchButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.goTo(new TeamSearch(""));
 			}
 		});
 	}
@@ -362,13 +381,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
-	@Override
-	public void render() {
-		//set the Settings page breadcrumb
-		breadcrumbsPanel.clear();
-		breadcrumbsPanel.add(breadcrumb.asWidget("Profile"));
-	}
-	 
 	private Button createLinkedInButton() {
 		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
 		command.addClickHandler(new ClickHandler() {
@@ -575,6 +587,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		settingsTabContent.clear();
 		
 		DisplayUtils.hide(showProfileLink);
+		DisplayUtils.hide(hideProfileLink);
 		challengesTabContent.clear();
 		hideTabContainers();
 		DisplayUtils.hide(createProjectUI);
