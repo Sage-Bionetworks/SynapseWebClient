@@ -69,11 +69,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 		
-	private boolean makeLinks = true;		// TODO: Unnecessary?
+	private boolean makeLinks = true;		// TODO: THIS!!
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
-	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 
 	@Inject
 	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector) {
@@ -81,53 +80,16 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		header2entityTreeItem = new HashMap<EntityHeader, EntityTreeItem>();
-		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		
 		entityTree = new Tree(new EntityTreeResources());
 		
 		this.add(entityTree);
 		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
 			
-			/**
-			 * When a node is expanded, if its children have not already
-			 * been fetched and placed into the tree, it will delete the dummy
-			 * child node and fetch the actual children of the expanded node.
-			 * During this process, the icon of the expanded node is switched
-			 * to a loading indicator.
-			 */
 			@Override
 			public void onOpen(OpenEvent<TreeItem> event) {
 				final EntityTreeItem target = treeItem2entityTreeItem.get(event.getTarget());
-				if (!alreadyFetchedEntityChildren.contains(target)) {
-					// We have not already fetched children for this entity.
-					
-					// Change to loading icon.
-					target.showLoadingChildren();
-					
-					presenter.getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
-						
-						@Override
-						public void onSuccess(List<EntityHeader> result) {
-							// We got the children.
-							alreadyFetchedEntityChildren.add(target);
-							target.asTreeItem().removeItems();	// Remove the dummy item.
-							
-							// Make a tree item for each child and place them in the tree.
-							for (EntityHeader header : result) {
-								createAndPlaceTreeItem(header, target, false);
-							}
-							
-							// Change back to type icon.
-							target.setTypeIconVisible(true);
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							showErrorMessage(caught.getMessage());	// TODO: Do this properly?
-						}
-						
-					});
-				}
+				presenter.expandTreeItemOnOpen(target);
 			}
 			
 		});
@@ -161,6 +123,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void clear() {
 		entityTree.clear();
 		treeItem2entityTreeItem.clear();
+		header2entityTreeItem.clear();
+		presenter.clearRecordsFetchedChildren();
 	}
 
 	@Override
@@ -176,7 +140,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			rootEntities.add(eh);
 		}
 		for (final EntityHeader header : rootEntities) {
-			createAndPlaceTreeItem(header, null, true);
+			createAndPlaceRootTreeItem(header);
 		}
 	}
 	
@@ -194,16 +158,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		header2entityTreeItem.get(entityHeader).asTreeItem().remove();
 	}
 	
-	/**
-	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
-	 * child so that the item can be expanded.
-	 * @param childToCreate The EntityHeader who's information will be used to create a
-	 * 					 	new tree item and place in the tree.
-	 * @param parent The EntityHeader that corresponds to the tree item the the created
-	 * 				 child will become the child of. Parameter ignored if isRootItem.
-	 * @param isRootItem true if the childToCreate is a root item, false otherwise.
-	 */
-	private void createAndPlaceTreeItem(final EntityHeader childToCreate, final EntityTreeItem parent, boolean isRootItem) {
+	@Override
+	public void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		
 		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
@@ -234,6 +190,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		} else {
 			parent.asTreeItem().addItem(childItem);
 		}
+	}
+	
+	@Override
+	public void createAndPlaceRootTreeItem(EntityHeader toCreate) {
+		createAndPlaceTreeItem(toCreate, null, true);
 	}
 	
 	/**

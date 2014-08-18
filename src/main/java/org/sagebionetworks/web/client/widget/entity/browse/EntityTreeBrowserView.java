@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -15,25 +16,38 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * Set the presenter.
 	 * @param presenter
 	 */
-	public void setPresenter(Presenter presenter);
+	void setPresenter(Presenter presenter);
 
 	/**
 	 * 
 	 * @param rootEntities list of entities to make root level nodes for in the tree
 	 */
-	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort);
+	void setRootEntities(List<EntityHeader> rootEntities, boolean sort);
 	
 	/**
 	 * Remove an entity from the view identified by entityId
 	 * @param entityModel
 	 */
-	public void removeEntity(EntityHeader entityHeader);
+	void removeEntity(EntityHeader entityHeader);
 
 	/**
 	 * Show links if true
 	 * @param makeLinks Make the labels entity links if true 
 	 */
-	public void setMakeLinks(boolean makeLinks);
+	void setMakeLinks(boolean makeLinks);
+	
+	/**
+	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
+	 * child so that the item can be expanded.
+	 * @param childToCreate The EntityHeader who's information will be used to create a
+	 * 					 	new tree item and place in the tree.
+	 * @param parent The EntityHeader that corresponds to the tree item the the created
+	 * 				 child will become the child of. Parameter ignored if isRootItem.
+	 * @param isRootItem true if the childToCreate is a root item, false otherwise.
+	 */
+	void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem);
+	
+	void createAndPlaceRootTreeItem(EntityHeader toCreate);
 	
 	/**
 	 * Presenter interface
@@ -47,6 +61,10 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		int getMaxLimit();
 
 		ImageResource getIconForType(String type);
+		
+		void expandTreeItemOnOpen(final EntityTreeItem target);
+		
+		void clearRecordsFetchedChildren();
 
 	}
 

@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -21,6 +23,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -44,6 +47,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private IconsImageBundle iconsImageBundle;
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
+	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	
 	private String currentSelection;
 	
@@ -67,6 +71,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.synapseClient = synapseClient;
 		this.iconsImageBundle = iconsImageBundle;
 		this.adapterFactory = adapterFactory;
+		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		
 		view.setPresenter(this);
 	}	
@@ -192,6 +197,53 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		view.setMakeLinks(makeLinks);
 	}
 	
+	/**
+	 * When a node is expanded, if its children have not already
+	 * been fetched and placed into the tree, it will delete the dummy
+	 * child node and fetch the actual children of the expanded node.
+	 * During this process, the icon of the expanded node is switched
+	 * to a loading indicator.
+	 */
+	@Override
+	public void expandTreeItemOnOpen(final EntityTreeItem target) {
+		if (!alreadyFetchedEntityChildren.contains(target)) {
+			// We have not already fetched children for this entity.
+			
+			// Change to loading icon.
+			target.showLoadingChildren();
+			
+			getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
+				
+				@Override
+				public void onSuccess(List<EntityHeader> result) {
+					// We got the children.
+					alreadyFetchedEntityChildren.add(target);
+					target.asTreeItem().removeItems();	// Remove the dummy item.
+					
+					// Make a tree item for each child and place them in the tree.
+					for (EntityHeader header : result) {
+						view.createAndPlaceTreeItem(header, target, false);
+					}
+					
+					// Change back to type icon.
+					target.setTypeIconVisible(true);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
+				
+			});
+		}
+	}
+	
+	@Override
+	public void clearRecordsFetchedChildren() {
+		alreadyFetchedEntityChildren.clear();
+	}
 	
 	/*
 	 * Private Methods
