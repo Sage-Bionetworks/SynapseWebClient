@@ -101,7 +101,7 @@
 			<div class="col-md-12">
 				<g:Button ui:field="okButton"
 					styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right"
-					text="Update" />
+					text="Update Profile" />
 			</div>
 		</div>
 	</g:HTMLPanel>
