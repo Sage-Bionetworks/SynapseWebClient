@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.LinkedInInfo;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -71,7 +72,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
 	private RequestBuilderWrapper requestBuilder;
-	
+	private int teamNotificationCount;
 	private String currentUserId;
 	
 	@Inject
@@ -211,6 +212,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
+		teamNotificationCount = 0;
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
@@ -554,6 +556,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				updateProfileView(place.getUserId(), place.getArea());
 			}
 		}
+	}
+	
+	@Override
+	public void updateTeamInvites(List<MembershipInvitationBundle> invites) {
+		if (invites != null && invites.size() > 0) {
+			teamNotificationCount += invites.size();
+			//update team notification count
+			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+		}
+	}
+	
+	@Override
+	public void addMembershipRequests(int count) {
+		teamNotificationCount += count;
+		view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 	}
 }
 

@@ -807,7 +807,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getBadgeHtml(String i) {
-		return "<span class=\"badge\">"+i+"</span>";
+		return "<span class=\"badge moveup-4\">"+i+"</span>";
 	}
 
 	

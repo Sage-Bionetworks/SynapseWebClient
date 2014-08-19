@@ -14,6 +14,8 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
 public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView {
@@ -23,7 +25,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
-	
+	SimplePanel notificationsPanel;
 	
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -33,11 +35,14 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		notificationsPanel = new SimplePanel();
+		notificationsPanel.addStyleName("displayInline");
 	}
 	
 	@Override
 	public void setTeam(final Team team, Integer maxNameLength) {
 		clear();
+		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
 		
 		if(team != null) {
@@ -75,6 +80,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 				setCellWidth(profilePicture, "20px");
 			}
 			add(anchor);
+			add(notificationsPanel);
 		} 		
 		
 	}
@@ -104,6 +110,12 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		this.presenter = presenter;		
 	}
 
+	@Override
+	public void setRequestCount(Long count) {
+		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count.toString()));
+		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
+		notificationsPanel.setWidget(widget);
+	}
 
 	/*
 	 * Private Methods

@@ -63,4 +63,8 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 
+	public void setRequestCount(Long count) {
+		view.setRequestCount(count);
+	}
+
 }

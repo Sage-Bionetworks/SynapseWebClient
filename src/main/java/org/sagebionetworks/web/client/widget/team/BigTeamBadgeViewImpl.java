@@ -13,6 +13,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
 public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView {
@@ -22,7 +25,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
-	
+	SimplePanel notificationsPanel;
 	@Inject
 	public BigTeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
@@ -31,11 +34,14 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		notificationsPanel = new SimplePanel();
+		notificationsPanel.addStyleName("displayInline pull-left");
 	}
 	
 	@Override
 	public void setTeam(final Team team, String description) {
 		clear();
+		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
 		
 		String name = team.getName();
@@ -51,6 +57,8 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		}
 		
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5);
+		mediaObjectPanel.addStyleName("displayInline");
+		add(notificationsPanel);
 		add(mediaObjectPanel);
 	}
 
@@ -79,6 +87,12 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		this.presenter = presenter;		
 	}
 
+	@Override
+	public void setRequestCount(Long count) {
+		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count.toString()));
+		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
+		notificationsPanel.setWidget(widget);
+	}
 
 	/*
 	 * Private Methods

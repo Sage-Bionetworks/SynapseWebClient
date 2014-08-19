@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -35,6 +36,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setChallengesError(String error);
 	void setTeams(List<Team> teams);
 	void setTeamsError(String error);
+	void setTeamNotificationCount(String count);
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -44,5 +46,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void refreshTeams();
 		void updateArea(ProfileArea area);
+		void updateTeamInvites(List<MembershipInvitationBundle> invites);
+		void addMembershipRequests(int count);
 	}
 }

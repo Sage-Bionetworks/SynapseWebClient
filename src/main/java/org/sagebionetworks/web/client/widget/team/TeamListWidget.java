@@ -23,6 +23,11 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private AdapterFactory adapterFactory;
+	private RequestCountCallback requestCountCallback;
+	public 	interface RequestCountCallback {
+		void invoke(String teamId, Long requestCount);
+	}
+
 	@Inject
 	public TeamListWidget(TeamListWidgetView view, 
 			SynapseClientAsync synapseClient, 
@@ -43,13 +48,15 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 	}
 	
 	public void configure(List<Team> teams, boolean isBig) {
+		configure(teams, isBig, null);
+	}
+	
+	public void configure(List<Team> teams, boolean isBig, RequestCountCallback requestCountCallback) {
+		this.requestCountCallback = requestCountCallback;
 		view.configure(teams, isBig);
-		
 		//then asynchronously load the request counts
-		if (!isBig) {
-			for (Team team : teams) {
-				queryForRequestCount(team.getId());
-			}
+		for (Team team : teams) {
+			queryForRequestCount(team.getId());
 		}
 	}
 	
@@ -78,8 +85,12 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
 			@Override
 			public void onSuccess(Long result) {
-				if (result != null && result > 0)
+				if (result != null && result > 0) {
 					view.setRequestCount(teamId, result);
+					if (requestCountCallback != null)
+						requestCountCallback.invoke(teamId, result);
+				}
+					
 			}
 			@Override
 			public void onFailure(Throwable caught) {

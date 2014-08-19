@@ -34,5 +34,8 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
+	public void setRequestCount(Long count) {
+		view.setRequestCount(count);
+	}
 }
