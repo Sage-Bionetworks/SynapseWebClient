@@ -21,7 +21,6 @@ public class ClientProperties {
 	public static final String TEAM2CHALLENGE_WHITELIST_URL = "https://s3.amazonaws.com/static.synapse.org/teamId2challengeEntityId.json";
 	
 	public static final String BCC_SUMMARY_CONTENT_PAGE_ID = "24084489";
-	public static final String DATA_ACCESS_LEVELS_CONTENT_PAGE_ID = "21168199";
 	
 	public static final String CHALLENGE_OVERVIEW_CONTENT_PROVIDER_ID = "challengeOverviewContent";
 	public static final String BCC_SUMMARY_PROVIDER_ID = "bccSummaryContent";
