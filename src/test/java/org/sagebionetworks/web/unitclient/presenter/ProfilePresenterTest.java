@@ -71,12 +71,10 @@ public class ProfilePresenterTest {
 	ProfileView mockView;
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
-	LinkedInServiceAsync mockLinkedInService;
 	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	ProfileFormWidget mockProfileForm;
 	PlaceChanger mockPlaceChanger;	
-	CookieProvider mockCookieProvider;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	GWTWrapper mockGWTWrapper;
 	SearchServiceAsync mockSearchService;
@@ -102,17 +100,15 @@ public class ProfilePresenterTest {
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockLinkedInService = mock(LinkedInServiceAsync.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockCookieProvider = mock(CookieProvider.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockProfileForm = mock(ProfileFormWidget.class);
 		mockRequestBuilder = mock(RequestBuilderWrapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockLinkedInService, mockGlobalApplicationState, 
-				mockSynapseClient, mockCookieProvider, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, mockSearchService, 
-				mockSynapseJSNIUtils, mockCookies, mockRequestBuilder);	
+		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
+				mockSynapseClient, mockCookies, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, mockSearchService, 
+				mockSynapseJSNIUtils, mockRequestBuilder);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
@@ -195,18 +191,14 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
-	public void testRedirectToLinkedIn() {
-		profilePresenter.setPlace(place);
-		profilePresenter.redirectToLinkedIn();
-	}
-	
-	@Test
 	public void testUpdateProfileWithLinkedIn() {
 		profilePresenter.setPlace(place);
-		when(mockCookieProvider.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");
 		String requestToken = "token";
 		String verifier = "12345";
 		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
+		//pass-through
+		verify(mockProfileForm).updateProfileWithLinkedIn(eq(requestToken), eq(verifier));
 	}
 	
 	@Test
