@@ -71,11 +71,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 		
-	private boolean makeLinks = true;		// TODO: THIS!!
+	private boolean makeLinks = true;		// TODO: Default true?
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
-	private EntityTreeItem selectedItem;		// TODO: Why do I have to ipmlement this?
+	private EntityTreeItem selectedItem;		// TODO: Why do I have to implement this?
 
 	@Inject
 	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector) {
@@ -151,14 +151,19 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
 		if(rootEntities.size() == 0) {
-			EntityHeader eh = new EntityHeader();
-			eh.setId(PLACEHOLDER_ID);
-			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY);
-			eh.setType(PLACEHOLDER_TYPE);
-			rootEntities.add(eh);
-		}
-		for (final EntityHeader header : rootEntities) {
-			createAndPlaceRootTreeItem(header);
+//			EntityHeader eh = new EntityHeader();
+//			eh.setId(PLACEHOLDER_ID);
+//			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY);
+//			eh.setType(PLACEHOLDER_TYPE);
+//			rootEntities.add(eh);
+			TreeItem emptyItem = new TreeItem(new HTMLPanel("<div>" + PLACEHOLDER_NAME_PREFIX + DisplayConstants.EMPTY + "</div>"));
+			emptyItem.addStyleName("entityTreeItem-font");
+			entityTree.addItem(emptyItem);
+			//entityTree.addItem(new TreeItem(new HTMLPanel("<div>" +  + DisplayConstants.EMPTY + "</div>")));
+		} else {
+			for (final EntityHeader header : rootEntities) {
+				createAndPlaceRootTreeItem(header);
+			}
 		}
 	}
 	
@@ -180,21 +185,21 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		
-		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
-			// Not an actual entity. Just display and call it good.
-			TreeItem placeHolderItem = new TreeItem(new HTMLPanel("<div>" + childToCreate.getName() + "</div>"));
-			if (isRootItem) {
-				entityTree.addItem(placeHolderItem);
-			} else {
-				parent.asTreeItem().addItem(placeHolderItem);
-			}
-			return;
-		}
+//		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
+//			// Not an actual entity. Just display and call it good.
+//			TreeItem placeHolderItem = new TreeItem(new HTMLPanel("<div>" + childToCreate.getName() + "</div>"));
+//			if (isRootItem) {
+//				entityTree.addItem(placeHolderItem);
+//			} else {
+//				parent.asTreeItem().addItem(placeHolderItem);
+//			}
+//			return;
+//		}
 		
 		// Make tree item.
 		EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.setMakeLinks(makeLinks);
-		childItem.configure(childToCreate);
+		childItem.configure(childToCreate, isRootItem);
 		
 		// Update fields.
 		treeItem2entityTreeItem.put(childItem.asTreeItem(), childItem);

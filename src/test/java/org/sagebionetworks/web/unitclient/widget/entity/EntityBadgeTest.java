@@ -143,8 +143,8 @@ public class EntityBadgeTest {
 	public void testShowTypeIcon() throws Exception {
 		EntityHeader header = new EntityHeader();
 		header.setId("syn93847");
-		widget.setTypeIconVisible(true);
-		verify(mockView).setTypeIconVisible(anyBoolean());
+		widget.hideLoadingIcon();
+		verify(mockView).hideLoadingIcon();
 	}
 	
 	@Test
@@ -153,6 +153,27 @@ public class EntityBadgeTest {
 		header.setId("syn93847");
 		widget.showLoadingIcon();
 		verify(mockView).showLoadingIcon();
+	}
+	
+	@Test
+	public void testGetEntity() {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn12345");
+		widget.configure(header);
+		assertTrue(header == widget.getHeader());
+	}
+	
+	@Test
+	public void testMakeLinks() {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn12345");
+		widget.configure(header);
+		
+		widget.setMakeLinks(false);
+		verify(mockView).setMakeLinks(false);
+		
+		widget.setMakeLinks(true);
+		verify(mockView).setMakeLinks(true);
 	}
 
 

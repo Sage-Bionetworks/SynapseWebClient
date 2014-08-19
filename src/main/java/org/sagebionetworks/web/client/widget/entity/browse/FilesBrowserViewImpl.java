@@ -96,7 +96,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 			});
 		
 			topbar.add(upload);
-			topbar.add(addFolder);//, new MarginData(0, 3, 0, 0));
+			topbar.add(addFolder);
 		}
 		
 		SimplePanel files = new SimplePanel();
@@ -106,8 +106,9 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
-		if (canEdit || isTitle)
+		if (canEdit || isTitle) {
 			fp.add(topbar);
+		}
 		fp.add(files);
 		this.add(fp);
 	}

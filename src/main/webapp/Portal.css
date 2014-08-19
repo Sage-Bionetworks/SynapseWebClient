@@ -645,6 +645,10 @@ a.shortBtn {
 	margin-bottom: 5px;
 }
 
+.margin-bottom-4 {
+	margin-bottom: 4px;
+}
+
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
@@ -1043,20 +1047,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* This how to change font size? Can't apply to entityBadge?*/
-.gwt-TreeItem {
+/*.gwt-TreeItem {
+	font: normal 11px arial, tahoma, helvetica, sans-serif;
+}*/
+
+.entityTreeItem, .entityTreeItem-font {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.entityTreeItem:hover {
-	background-color: #d9e8fb;
+.entityTreeItem {
+	background-color: #fff;
+	margin: 0 !important;
+	padding-left: 16px !important;
 }
 
-.entityTreeItem-selected {
+.entityTreeItem:hover {
 	background-color: #eee;
 }
 
-.entityBadge {
-	padding-bottom: 4px !important;
+.entityTreeItem-selected {
+	background-color: #d9e8fb;
 }
 
 /**table of contents styling **/
@@ -1140,6 +1150,10 @@ ol.lowerroman {
 
 .padding-bottom-15 {
 	padding-bottom: 15px;
+}
+
+.padding-bottom-4-imp {
+	padding-bottom: 4px !important;
 }
 
 .padding-5 {
@@ -1562,6 +1576,10 @@ a.projectTitle:hover {
 
 .padding-left-0 {
 	padding-left: 0px;
+}
+
+.padding-left-0-imp {
+	padding-left: 0px !important;
 }
 .padding-left-5 {
 	padding-left: 5px;

@@ -5,7 +5,7 @@
   xmlns:c="urn:import:com.google.gwt.user.cellview.client"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:HTMLPanel styleName="entityBadge">
+	<g:HTMLPanel>
 		<table cellspacing='0' cellpadding='0'>
 			<tr>
 				<td align="left" width="20px" style="vertical-align: top;">					

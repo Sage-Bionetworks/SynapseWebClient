@@ -411,13 +411,22 @@ public class HomeViewImpl extends Composite implements HomeView {
 	}
 	
 	private FlowPanel getFavoritesContainer() {
-		FlowPanel favoritesContainer = new FlowPanel();
-		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
-		SimplePanel favoritesPanel = new SimplePanel(favoritesTreeBrowser.asWidget());
-		favoritesPanel.addStyleName("panel panel-default");
-		favoritesContainer.add(favoritesPanel);
-		return favoritesContainer;
+//		FlowPanel favoritesContainer = new FlowPanel();
+//		favoritesContainer.add(
+//				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+//		SimplePanel favoritesPanel = new SimplePanel(favoritesTreeBrowser.asWidget());
+//		favoritesPanel.addStyleName("panel panel-default");
+//		favoritesContainer.add(favoritesPanel);
+//		return favoritesContainer;
+		FlowPanel myFavPanel = new FlowPanel();
+		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+		ScrollPanel favoritesScrollPanel = new ScrollPanel();
+		favoritesScrollPanel.addStyleName("panel panel-default");
+		favoritesScrollPanel.setHeight("45px");		// TODO: Default height?
+		favoritesScrollPanel.add(favoritesTreeBrowser.asWidget());
+		myFavPanel.add(favoritesScrollPanel);
+		return myFavPanel;
+		
 	}
 	
 	@Override
@@ -461,8 +470,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		myProjPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
 		ScrollPanel myProjectsTreePanel = new ScrollPanel();
 		myProjectsTreePanel.addStyleName("panel panel-default");
-		myProjectsTreePanel.setSize("360px", "180px");
-		myProjectsTreePanel.getElement().getStyle().setProperty("width", "auto");
+		myProjectsTreePanel.setHeight("180px");
 		myProjectsTreePanel.add(myProjectsTreeBrowser.asWidget());
 		myProjPanel.add(myProjectsTreePanel);
 		return myProjPanel;

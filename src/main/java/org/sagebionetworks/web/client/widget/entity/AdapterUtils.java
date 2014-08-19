@@ -268,13 +268,13 @@ public class AdapterUtils {
 	 * @return Instance of the entity if it is valid,
 	 * 		   otherwise returns null.
 	 */
-	public static Entity getEntityForBadgeInfo(AdapterFactory adapterFactory, EntityWrapper wrapper) throws JSONObjectAdapterException {
-		if (Project.class.getName().equals(wrapper.getEntityClassName())) {
-			return new Project(adapterFactory.createNew(wrapper.getEntityJson()));
-		} else if (Folder.class.getName().equals(wrapper.getEntityClassName())) {
-			return  new Folder(adapterFactory.createNew(wrapper.getEntityJson()));
-		} else if (FileEntity.class.getName().equals(wrapper.getEntityClassName())) {
-			return  new FileEntity(adapterFactory.createNew(wrapper.getEntityJson()));
+	public static Entity getEntityForBadgeInfo(AdapterFactory adapterFactory, String className, String jsonEntity) throws JSONObjectAdapterException {
+		if (Project.class.getName().equals(className)) {
+			return new Project(adapterFactory.createNew(jsonEntity));
+		} else if (Folder.class.getName().equals(className)) {
+			return  new Folder(adapterFactory.createNew(jsonEntity));
+		} else if (FileEntity.class.getName().equals(className)) {
+			return  new FileEntity(adapterFactory.createNew(jsonEntity));
 		} else {
 			return null;
 		}
