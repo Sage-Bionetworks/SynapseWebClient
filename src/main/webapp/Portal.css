@@ -1038,13 +1038,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gwt-TreeItem-selected {
-  background: #ffffff !important;
+  background: #0198E1 !important;
   text-decoration:underline;
 }
 
 /* This how to change font size? Can't apply to entityBadge?*/
 .gwt-TreeItem {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
+}
+
+.entityTreeItem:hover {
+	background-color: #d9e8fb;
+}
+
+.entityTreeItem-selected {
+	background-color: #eee;
 }
 
 .entityBadge {

@@ -210,7 +210,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			// We have not already fetched children for this entity.
 			
 			// Change to loading icon.
-			target.showLoadingChildren();
+			target.showLoadingIcon();
 			
 			getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
 				
@@ -226,7 +226,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 					}
 					
 					// Change back to type icon.
-					target.setTypeIconVisible(true);
+					target.showTypeIcon();
 				}
 				
 				@Override

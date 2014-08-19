@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,6 +44,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Anchor infoLink;
 	Image iconPicture;
+	boolean makeLinks = true;	// TODO: Default to make links?
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;
@@ -63,49 +65,54 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-			infoLink.setVisible(true);
+			infoLink.setVisible(false);
 			isPopoverInitialized = false;
 			popover.setIsHtml(true);
 			popover.setTitle(entityHeader.getName());
 			popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
-			
-			final Anchor anchor = new Anchor();
-			anchor.setText(entityHeader.getName());
-			anchor.addStyleName("link");
-			isPopover = false;
-			infoLink.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (isPopover)
-						popover.hide();
-					else
-						showPopover(anchor, entityHeader.getId(), entityHeader.getName());
-					
-					isPopover = !isPopover;
-				}
-			});
-			
-			anchor.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.entityClicked(entityHeader);
-				}
-			});
-			ClickHandler clickHandler = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					anchor.fireEvent(event);
-				}
-			};
 			
 			ImageResource icon = presenter.getIconForType(entityHeader.getType());
 			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
 			iconPicture.addStyleName("imageButton displayInline");
-			iconPicture.addClickHandler(clickHandler);
 			iconContainer.setWidget(iconPicture);
-			entityContainer.add(anchor);
+			
+			final Anchor anchor = new Anchor();
+			if (makeLinks) {
+				infoLink.setVisible(true);
+				anchor.setText(entityHeader.getName());
+				anchor.addStyleName("link");
+				isPopover = false;
+				infoLink.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						if (isPopover)
+							popover.hide();
+						else
+							showPopover(anchor, entityHeader.getId(), entityHeader.getName());
+						
+						isPopover = !isPopover;
+					}
+				});
+				
+				anchor.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						presenter.entityClicked(entityHeader);
+					}
+				});
+				ClickHandler clickHandler = new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						anchor.fireEvent(event);
+					}
+				};
+				iconPicture.addClickHandler(clickHandler);
+				entityContainer.add(anchor);
+			} else {
+				entityContainer.add(new Label(entityHeader.getName()));
+			}
 		} 		
 	}
 	
@@ -171,15 +178,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
 	}
 	
-	// TODO: "setVisible" name misleading, as I am setting the widget?
 	@Override
-	public void setTypeIconVisible(boolean isVisible) {
-		if (isVisible) {
-			iconContainer.setWidget(iconPicture);
-			iconPicture.setVisible(true);
-		} else {
-			iconContainer.setVisible(false);
-		}
+	public void hideLoadingIcon() {
+		iconContainer.setWidget(iconPicture);
+	}
+	
+	@Override
+	public void setMakeLinks(boolean makeLinks) {
+		this.makeLinks = makeLinks;
 	}
 	
 	

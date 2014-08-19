@@ -36,6 +36,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
 	private GlobalApplicationState globalAppState;
+	private EntityHeader entityHeader;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -54,6 +55,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void configure(EntityHeader header) {
+		entityHeader = header;
 		view.setEntity(header);
 	}
 	
@@ -119,12 +121,20 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
 	}
 	
-	public void setTypeIconVisible(boolean isVisible) {
-		view.setTypeIconVisible(true);
+	public void hideLoadingIcon() {
+		view.hideLoadingIcon();
 	}
 
 	public void showLoadingIcon() {
 		view.showLoadingIcon();
+	}
+	
+	public EntityHeader getHeader() {
+		return entityHeader;
+	}
+	
+	public void setMakeLinks(boolean makeLinks) {
+		view.setMakeLinks(makeLinks);
 	}
 
 }

@@ -40,6 +40,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.OpenEvent;
 import com.google.gwt.event.logical.shared.OpenHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
@@ -73,6 +75,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
+	private EntityTreeItem selectedItem;		// TODO: Why do I have to ipmlement this?
 
 	@Inject
 	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector) {
@@ -90,6 +93,21 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			public void onOpen(OpenEvent<TreeItem> event) {
 				final EntityTreeItem target = treeItem2entityTreeItem.get(event.getTarget());
 				presenter.expandTreeItemOnOpen(target);
+			}
+			
+		});
+		
+		entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
+
+			@Override
+			public void onSelection(SelectionEvent<TreeItem> event) {
+				if (selectedItem != null) {
+					selectedItem.asTreeItem().removeStyleName("entityTreeItem-selected");
+				}
+				final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
+				selectedItem = targetItem;
+				targetItem.asTreeItem().addStyleName("entityTreeItem-selected");
+				presenter.setSelection(selectedItem.getHeader().getId());
 			}
 			
 		});
@@ -175,6 +193,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		// Make tree item.
 		EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
+		childItem.setMakeLinks(makeLinks);
 		childItem.configure(childToCreate);
 		
 		// Update fields.

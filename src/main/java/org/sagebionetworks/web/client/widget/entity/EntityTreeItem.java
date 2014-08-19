@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 
 	private TreeItem treeItem;
-	private EntityHeader entityHeader;
+	//private EntityHeader entityHeader;
 	private EntityBadge entityBadge;
 	
 	@Inject
@@ -30,7 +30,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	public void configure(EntityHeader header) {
 		entityBadge.configure(header);
 		treeItem = new TreeItem(asWidget());
-		entityHeader = header;
+		treeItem.addStyleName("entityTreeItem");
+		//entityHeader = header;
 	}
 
 	@Override
@@ -43,16 +44,24 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		return treeItem;
 	}
 	
-	public void showLoadingChildren() {
+	public void setMakeLinks() {
+		
+	}
+	
+	public void showLoadingIcon() {
 		entityBadge.showLoadingIcon();
 	}
 	
-	public void setTypeIconVisible(boolean isVisible) {
-		entityBadge.setTypeIconVisible(isVisible);
+	public void showTypeIcon() {
+		entityBadge.hideLoadingIcon();
 	}
 	
 	public EntityHeader getHeader() {
-		return entityHeader;
+		return entityBadge.getHeader();
+	}
+	
+	public void setMakeLinks(boolean makeLinks) {
+		entityBadge.setMakeLinks(makeLinks);
 	}
 
 }
