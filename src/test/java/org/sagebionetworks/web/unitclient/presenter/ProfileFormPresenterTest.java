@@ -140,15 +140,17 @@ public class ProfileFormPresenterTest {
 	@Test
 	public void testRedirectToLinkedIn() {
 		profileForm.redirectToLinkedIn();
+		verify(mockLinkedInService).returnAuthUrl(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testUpdateProfileWithLinkedIn() {
-		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn("secret");
+		String secret = "secret";
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
 		String requestToken = "token";
 		String verifier = "12345";
 		profileForm.updateProfileWithLinkedIn(requestToken, verifier);
-		
+		verify(mockLinkedInService).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
 }
