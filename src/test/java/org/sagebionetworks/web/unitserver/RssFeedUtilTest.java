@@ -123,4 +123,12 @@ public class RssFeedUtilTest {
 		Assert.assertTrue(trimmedContent.length() < testSourceContent.length() && trimmedContent.length() > 0);
 	}
 	
+	@Test
+	public void testSWC1650() {
+		String html = "http://synapse.org is another test <img alt=\"\" border=\"0\" src=\"http://pixel.wp.com/b.gif?host=sagesynapse.wordpress.com&amp;blog=39174488&amp;post=363&amp;subd=sagesynapse&amp;ref=&amp;feed=1\" width=\"1\" height=\"1\">";
+		String fixedNewsFeed = RssFeedUtils.fixNewsFeed(html);
+		Assert.assertTrue(fixedNewsFeed.contains("https://pixel.wp.com/b.gif"));
+		Assert.assertFalse(fixedNewsFeed.contains("https://synapse.org"));
+	}
+	
 }
