@@ -386,7 +386,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 }
 	 
 	 public static void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url, FlowPanel viewProfilePanel) {
-		 viewProfilePanel.clear();
 		 String name = DisplayUtils.getDisplayName(fName, lName, userName);
 		 url = DisplayUtils.replaceWithEmptyStringIfNull(url);
 		 company = DisplayUtils.replaceWithEmptyStringIfNull(company);

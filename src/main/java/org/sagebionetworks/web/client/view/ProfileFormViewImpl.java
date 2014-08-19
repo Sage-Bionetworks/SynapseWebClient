@@ -172,6 +172,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		previewButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				viewProfilePanel.clear();
 				String fName, lName, userName, industry, location, summary, company, position, url;
 				fName = trim(firstNameField.getValue());
 				lName = trim(lastNameField.getValue());
@@ -321,7 +322,7 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		});
 	    
 		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
-		command.addStyleName("right btn-xs margin-right-10");
+		command.addStyleName("right btn-xs margin-right-10 moveup-35");
 		
 	    return command;
 	}
