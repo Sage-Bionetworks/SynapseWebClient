@@ -20,12 +20,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -37,7 +35,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -49,7 +46,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -60,9 +56,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-	private LinkedInServiceAsync linkedInService;
 	private GlobalApplicationState globalApplicationState;
-	private CookieProvider cookieProvider;
+	
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
@@ -77,7 +72,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
-			LinkedInServiceAsync linkedInService,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
 			CookieProvider cookieProvider,
@@ -86,21 +80,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AdapterFactory adapterFactory,
 			SearchServiceAsync searchService,
 			SynapseJSNIUtils synapseJSNIUtils, 
-			CookieProvider cookies,
 			RequestBuilderWrapper requestBuilder) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		this.linkedInService = linkedInService;
 		this.globalApplicationState = globalApplicationState;
-		this.cookieProvider = cookieProvider;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
 		this.searchService = searchService;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.cookies = cookies;
 		this.requestBuilder = requestBuilder;
+		this.cookies = cookieProvider;
 		view.setPresenter(this);
 	}
 
@@ -124,26 +115,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
         view.clear();
         return null;
     }
-	
-	@Override
-	public void redirectToLinkedIn() {
-		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
-			@Override
-			public void onSuccess(LinkedInInfo result) {
-				// Store the requestToken secret in a cookie, set to expire in five minutes
-				Date date = new Date(System.currentTimeMillis() + 300000);
-				cookieProvider.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
-				// Open the LinkedIn authentication window in the same tab
-				Window.open(result.getAuthUrl(), "_self", "");
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage("An error occurred. Please try reloading the page.");					
-			}
-		});
-	}
 	
 	public void editMyProfile() {
 		if (checkIsLoggedIn())
@@ -174,39 +145,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	@Override
 	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
-		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
-		// If not, grab the user's info for an update.
-		String secret = cookieProvider.getCookie(CookieKeys.LINKEDIN);
-		if(secret == null || secret.equals("")) {
-			view.showErrorMessage("You request has timed out. Please reload the page and try again.");
-		} else {
-			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					//parse the LinkedIn UserProfile json
-					UserProfile linkedInProfile;
-					try {
-						linkedInProfile = new UserProfile(adapterFactory.createNew(result));
-						 profileForm.updateProfile(linkedInProfile.getFirstName(), linkedInProfile.getLastName(), 
-						    		linkedInProfile.getSummary(), linkedInProfile.getPosition(), 
-						    		linkedInProfile.getLocation(), linkedInProfile.getIndustry(), 
-						    		linkedInProfile.getCompany(), null, linkedInProfile.getPic(), null, null, null);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage("An error occurred. Please try reloading the page.");									
-				}
-			});
-		}
-	}
-	
-	private void updateProfileView(String userId) {
-		updateProfileView(userId, null);
+		profileForm.updateProfileWithLinkedIn(requestToken, verifier);
 	}
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
