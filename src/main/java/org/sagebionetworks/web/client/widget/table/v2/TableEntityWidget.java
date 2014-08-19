@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 
@@ -56,7 +58,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
 		this.queryChagneHandler = qch;
-		this.view.configure(this.tableId, this.tableBundle.getColumnModels(), this.canEdit);
+		this.view.configure(bundle, this.canEdit);
 		checkState();
 	}
 
@@ -78,7 +80,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			}
 			view.setQueryInputVisible(false);
 			view.setQueryResultsVisible(false);
-			view.showNoColumns(message);
+			view.showTableMessage(AlertType.INFO, message);
+			view.setTableMessageVisible(true);
 		}
 	}
 	
@@ -106,6 +109,11 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		long maxRowsPerPage = this.tableBundle.getMaxRowsPerPage();
 		long maxTwoThirds = maxRowsPerPage - maxRowsPerPage/3l;
 		return Math.min(maxTwoThirds, DEFAULT_PAGE_SIZE);
+	}
+
+	@Override
+	public void onPersistSuccess(EntityUpdatedEvent event) {
+		this.queryChagneHandler.onPersistSuccess(event);
 	}
 	
 }

@@ -16,11 +16,16 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -48,20 +53,31 @@ public class ColumnModelsWidgetTest {
 	ColumnModelsViewBase mockBaseView;
 	ColumnModelsView mockViewer;
 	ColumnModelsView mockEditor;
+	EntityUpdatedHandler mockUpdateHandler;
 	PortalGinInjector mockGinInjector;
 	SynapseClientAsync mockSynapseClient;
 	TableModelUtils tableModelUtils;
 	ColumnModelsWidget widget;
+	EntityBundle mockBundle;
+	TableEntity table;
+	TableBundle tableBundle;
 	
 	@Before
 	public void before(){
 		mockBaseView = Mockito.mock(ColumnModelsViewBase.class);
 		mockViewer = Mockito.mock(ColumnModelsView.class);
 		mockEditor = Mockito.mock(ColumnModelsView.class);
+		mockBundle = Mockito.mock(EntityBundle.class);
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockUpdateHandler = Mockito.mock(EntityUpdatedHandler.class);
 		adapterFactory = new AdapterFactoryImpl();
 		tableModelUtils = new TableModelUtils(adapterFactory);
+		table = new TableEntity();
+		table.setId("syn123");
+		tableBundle = new TableBundle();
+		when(mockBundle.getEntity()).thenReturn(table);
+		when(mockBundle.getTableBundle()).thenReturn(tableBundle);
 		when(mockGinInjector.createNewColumnModelsView()).thenReturn(mockViewer, mockEditor);
 		when(mockGinInjector.createNewColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
 			@Override
@@ -86,7 +102,8 @@ public class ColumnModelsWidgetTest {
 	public void testConfigure(){
 		boolean isEdtiable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure("syn123", schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		verify(mockViewer, times(1)).configure(ViewType.VIEWER, isEdtiable);
 		// All rows should be added to both the viewer and editor
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
@@ -96,7 +113,8 @@ public class ColumnModelsWidgetTest {
 	public void testOnEditColumns(){
 		boolean isEdtiable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure("syn123", schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// show the editor
 		widget.onEditColumns();
 		verify(mockEditor, times(1)).configure(ViewType.EDITOR, isEdtiable);
@@ -111,7 +129,8 @@ public class ColumnModelsWidgetTest {
 	public void testOnEditNonEditable(){
 		boolean isEdtiable = false;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure("syn123", schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// should fail
 		widget.onEditColumns();
 	}
@@ -120,7 +139,8 @@ public class ColumnModelsWidgetTest {
 	public void testAddNewColumn(){
 		boolean isEdtiable = true;
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure("syn123", schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// show the editor
 		widget.onEditColumns();
 		// This should add a new string column
@@ -138,9 +158,9 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testOnSaveSuccess() throws JSONObjectAdapterException{
 		boolean isEdtiable = true;
-		String tableId = "syn123";
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(tableId, schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
 		// Add a column
@@ -149,22 +169,21 @@ public class ColumnModelsWidgetTest {
 		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
 		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
 		List<String> results = tableModelUtils.toJSONList(expectedNewScheam);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
 		verify(mockBaseView).hideEditor();
-		// the view should be configured with original columns, then again 
-		// with the original columns after the save plus one new column
-		verify(mockViewer, times(schema.size()*2+1)).addColumn(any(ColumnModelTableRow.class));
+		// Save success should be called.
+		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 	
 	@Test
 	public void testOnSaveFailure() throws JSONObjectAdapterException{
 		boolean isEdtiable = true;
-		String tableId = "syn123";
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
-		widget.configure(tableId, schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
 		// Add a column
@@ -185,9 +204,9 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testSelectAll(){
 		boolean isEdtiable = true;
-		String tableId = "syn123";
 		List<ColumnModel> schema = new LinkedList<ColumnModel>();
-		widget.configure(tableId, schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
 		verify(mockEditor).setCanDelete(false);
@@ -233,9 +252,9 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testSelectNone(){
 		boolean isEdtiable = true;
-		String tableId = "syn123";
 		List<ColumnModel> schema = new LinkedList<ColumnModel>();
-		widget.configure(tableId, schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
 		// Add three columns
@@ -254,9 +273,9 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testToggleSelect(){
 		boolean isEdtiable = true;
-		String tableId = "syn123";
 		List<ColumnModel> schema = new LinkedList<ColumnModel>();
-		widget.configure(tableId, schema, isEdtiable);
+		tableBundle.setColumnModels(schema);
+		widget.configure(mockBundle, isEdtiable, mockUpdateHandler);
 		// Show the dialog
 		widget.onEditColumns();
 		// Add three columns

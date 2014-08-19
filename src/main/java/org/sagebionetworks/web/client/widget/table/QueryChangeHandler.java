@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.table;
 
-public interface QueryChangeHandler {
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+
+public interface QueryChangeHandler extends EntityUpdatedHandler{
 	
 	/**
 	 * Call to notify of a query change.

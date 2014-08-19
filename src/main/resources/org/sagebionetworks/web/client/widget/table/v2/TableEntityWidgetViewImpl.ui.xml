@@ -20,7 +20,7 @@
 				</b:Panel>
 			</b:Collapse>
 			
-			<b:Alert ui:field="noColumnsAlert" type="INFO"/>
+			<b:Alert ui:field="tableMessage" type="INFO"/>
 
 			<b:InputGroup ui:field="queryInputGroup" visible="true">
 				<b:TextBox ui:field="queryInput" />

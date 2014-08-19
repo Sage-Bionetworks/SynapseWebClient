@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.TableBundle;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface TableEntityWidgetView extends IsWidget {
 	
-	public interface Presenter{
+	public interface Presenter extends EntityUpdatedHandler {
 		
 	}
 	
@@ -30,13 +29,21 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param tableBundel
 	 * @param isEditable
 	 */
-	void configure(String tableId, List<ColumnModel> schema, boolean isEditable);
+	void configure(EntityBundle bundle, boolean isEditable);
+	
+	/**
+	 * 
+	 * @param type
+	 * @param message
+	 */
+	public void showTableMessage(AlertType type, String message);
 
 	/**
-	 * Notify the view that there are no columns.
+	 * Show or hide the table message.
+	 * 
+	 * @param visible
 	 */
-	public void showNoColumns(String message);
-
+	public void setTableMessageVisible(boolean visible);
 	/**
 	 * Show or hide the query input
 	 * @param b

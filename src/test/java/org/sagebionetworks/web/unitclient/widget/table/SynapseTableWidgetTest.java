@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
@@ -45,7 +46,8 @@ public class SynapseTableWidgetTest {
 	
 	@Test
 	public void testConfigure() {
-		tableWidget.configure(table, false);		
+		EntityBundle bundle = new EntityBundle(table, null, null, null, null, null, null, null);
+		tableWidget.configure(bundle, false);		
 	}
 
 }

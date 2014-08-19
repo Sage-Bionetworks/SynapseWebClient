@@ -3537,7 +3537,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+	public void setTableSchema(String tableJson, List<String> schemaJSON)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -3553,12 +3553,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				newSchema.add(m.getId());
 			}
 			// Get the table
-			TableEntity table = synapseClient.getEntity(tableId,
-					TableEntity.class);
+			TableEntity table = tableModelUtils.tableEntityFromJSON(tableJson);
 			table.setColumnIds(newSchema);
 			table = synapseClient.putEntity(table);
-			// Return the models
-			return tableModelUtils.toJSONList(models);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

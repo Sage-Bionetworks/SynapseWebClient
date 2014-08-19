@@ -733,6 +733,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 			public String getQueryString() {
 				return presenter.getTableQuery();
 			}
+
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
 		};
 		boolean useV2Table = true;
 		IsWidget tableWidget = null;
@@ -744,13 +749,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		}else{
 			// V1
 			SimpleTableWidget simpleTableWidget = ginInjector.getSimpleTableWidget();
-			simpleTableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);	
+			simpleTableWidget.configure(bundle, canEdit, presenter.getTableQuery(), qch);	
 			tableWidget = simpleTableWidget;
 		}
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
-		
 		// TODO (maybe):
 //		// Programmatic Clients
 //		tablesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));

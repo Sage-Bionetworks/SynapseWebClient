@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -17,7 +16,7 @@ public interface ColumnModelsViewBase extends IsWidget {
 		 * @param models
 		 * @param isEditabl
 		 */
-		public void configure(String tableId, List<ColumnModel> models, boolean isEditable);
+		public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler);
 		
 		/**
 		 * Called when the save button is pressed

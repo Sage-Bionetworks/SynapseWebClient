@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
@@ -12,10 +10,11 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -39,7 +38,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	PanelBody columnDetailsPanel;
 	@UiField
-	Alert noColumnsAlert;
+	Alert tableMessage;
 	@UiField
 	InputGroup queryInputGroup;
 	@UiField
@@ -97,15 +96,9 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	}
 
 	@Override
-	public void configure(String tableId, List<ColumnModel> schema,
+	public void configure(EntityBundle bundle,
 			boolean isEditable) {
-		this.columnModelsWidget.configure(tableId, schema, isEditable);
-	}
-
-	@Override
-	public void showNoColumns(String message) {
-		this.noColumnsAlert.setText(message);
-		this.noColumnsAlert.setVisible(true);
+		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
 	}
 
 	@Override
@@ -116,6 +109,17 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@Override
 	public void setQueryResultsVisible(boolean visible) {
 		this.queryResultsPanel.setVisible(visible);
+	}
+
+	@Override
+	public void showTableMessage(AlertType type, String message) {
+		this.tableMessage.setType(type);
+		this.tableMessage.setText(message);
+	}
+
+	@Override
+	public void setTableMessageVisible(boolean visible) {
+		this.tableMessage.setVisible(visible);
 	}
 
 

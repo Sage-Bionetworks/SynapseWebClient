@@ -9,6 +9,9 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
@@ -37,6 +40,9 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	String tableId;
 	List<ColumnModel> startingModels;
 	List<ColumnModelTableRow> editorRows;
+	EntityBundle bundle;
+	EntityUpdatedHandler updateHandler;
+	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
@@ -65,13 +71,14 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	}
 
 	@Override
-	public void configure(String tableId, List<ColumnModel> models, boolean isEditable) {
+	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
 		this.changingSelection = false;
-		this.tableId = tableId;
 		this.isEditable = isEditable;
-		this.startingModels = models;
+		this.bundle = bundle;
+		this.startingModels = bundle.getTableBundle().getColumnModels();
+		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
-		for(ColumnModel cm: models){
+		for(ColumnModel cm: this.startingModels){
 			// Create a viewer
 			ColumnModelTableRowViewer rowViewer = ginInjector.createNewColumnModelTableRowViewer();
 			ColumnModelUtils.applyColumnModelToRow(cm, rowViewer);
@@ -154,25 +161,19 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		try {
 			baseView.setLoading();
 			json = tableModelUtils.toJSONList(newSchema);
-			synapseClient.setTableSchema(tableId, json, new AsyncCallback<List<String>>(){
+			String tableEntityJSON = tableModelUtils.toJSON(this.bundle.getEntity());
+			synapseClient.setTableSchema(tableEntityJSON, json, new AsyncCallback<Void>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
 					baseView.showError(caught.getMessage());
 				}
-
+				
 				@Override
-				public void onSuccess(List<String> result) {
-					// Convert back
-					try {
-						List<ColumnModel> results = tableModelUtils.columnModelFromJSON(result);
-						// Hide the dialog
-						baseView.hideEditor();
-						// Reconfigure the view
-						configure(tableId, results, isEditable);
-					} catch (JSONObjectAdapterException e) {
-						baseView.showError(e.getMessage());
-					}
+				public void onSuccess(Void result) {
+					// Hide the dialog
+					baseView.hideEditor();
+					updateHandler.onPersistSuccess(new EntityUpdatedEvent());
 				}});
 		} catch (JSONObjectAdapterException e) {
 			baseView.showError(e.getMessage());

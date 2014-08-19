@@ -19,6 +19,8 @@ import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.BootstrapTable;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.ListCreatorViewWidget;
@@ -107,7 +109,9 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	CellTable<TableModel> cellTable;
 	MySimplePager pager;
 	private List<ColumnModel> columns;
+	EntityBundle bundle;
 	SelectionModel<TableModel> selectionModel;
+	EntityUpdatedHandler handler;
 	Presenter presenter;
 	Map<Column,ColumnModel> columnToModel;
 	AsyncDataProvider<TableModel> dataProvider;
@@ -143,18 +147,19 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		this.columnEditorPanel.add(columnModelsWidget.asWidget());
 	}
 	
+
 	@Override
-	public void createNewTable(String tableEntityId, List<ColumnModel> columns, RowSet rowset,
-			int totalRowCount, boolean canEdit, String queryString,
-			QueryDetails queryDetails) {		
-		this.columns = columns;				
+	public void createNewTable(EntityBundle bundle, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails, EntityUpdatedHandler handler) {
+		this.bundle = bundle;
+		this.handler = handler;
+		this.columns = bundle.getTableBundle().getColumnModels();				
 		this.initialLoad = rowset;
 		this.initialDetails = queryDetails;
 		columnToModel.clear();
 
 		// Render Table			
 		columnEditorBuilt = false; // clear out old column editor view
-		setupTableEditorToolbar(tableEntityId, columns, canEdit);
+		setupTableEditorToolbar(bundle.getEntity().getId(), columns, canEdit);
 		setDefaultToolbarButtonVisibility(canEdit);
 		
 		// special cases display user instructions instead of empty table
@@ -166,7 +171,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 		setupQueryBox(queryString);			
 		queryPanel.setVisible(true);		
 		buildTable(queryDetails, totalRowCount, canEdit);
-		buildColumns(tableEntityId, columns, canEdit);			
+		buildColumns(bundle.getEntity().getId(), columns, canEdit);			
 		hideLoading();		 	    
 	}
 	
@@ -597,7 +602,7 @@ public class SimpleTableWidgetViewImpl extends Composite implements SimpleTableW
 	private void setupTableEditorToolbar(final String tableId, final List<ColumnModel> columns, boolean canEdit) {
 		buttonToolbar.clear();
 		
-		this.columnModelsWidget.configure(tableId, this.columns, canEdit);
+		this.columnModelsWidget.configure(this.bundle, canEdit, this.handler);
 
 		showColumnsBtn = DisplayUtils.createIconButton(DisplayConstants.COLUMN_DETAILS, ButtonType.DEFAULT, "glyphicon-th-list");
 		showColumnsBtn.addStyleName("margin-right-5");
