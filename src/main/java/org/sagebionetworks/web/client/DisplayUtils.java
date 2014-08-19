@@ -164,7 +164,7 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-	private static DateTimeFormat prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss"); 
+	private static DateTimeFormat prettyFormat = null; 
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
@@ -822,6 +822,9 @@ public class DisplayUtils {
 	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
+		if (prettyFormat == null) {
+			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+		}
 		return prettyFormat.format(toFormat);
 	}
 	
