@@ -7,11 +7,21 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.TYPE;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.widget.entity.AdapterUtils;
+
+
+
+
+
+import static org.mockito.Mockito.*;
 
 public class AdapterUtilsTest {
 	
@@ -193,6 +203,28 @@ public class AdapterUtilsTest {
 		// Get the value
 		List<Date> back = AdapterUtils.getListValue(adapter, type, key, Date.class);
 		assertEquals(value, back);
+	}
+	
+	@Test
+	public void testGetEntityForBadgeInfo() throws JSONObjectAdapterException {
+		AdapterFactory mockAdapterFactory = mock(AdapterFactory.class);
+		String anyString = "anyString";
+		try {
+			AdapterUtils.getEntityForBadgeInfo(mockAdapterFactory, Project.class.getName(), anyString);
+		} catch (IllegalArgumentException e) {}
+		verify(mockAdapterFactory).createNew(anyString);
+		
+		mockAdapterFactory = mock(AdapterFactory.class);
+		try {
+			AdapterUtils.getEntityForBadgeInfo(mockAdapterFactory, Folder.class.getName(), anyString);
+		} catch (IllegalArgumentException e) {}
+		verify(mockAdapterFactory).createNew(anyString);
+		
+		mockAdapterFactory = mock(AdapterFactory.class);
+		try {
+			AdapterUtils.getEntityForBadgeInfo(mockAdapterFactory, FileEntity.class.getName(), anyString);
+		} catch (IllegalArgumentException e) {}
+		verify(mockAdapterFactory).createNew(anyString);
 	}
 	
 }

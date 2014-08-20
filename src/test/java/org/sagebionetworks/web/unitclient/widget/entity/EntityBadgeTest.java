@@ -4,7 +4,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static junit.framework.Assert.*;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Entity;
@@ -29,6 +28,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -175,6 +175,11 @@ public class EntityBadgeTest {
 		widget.setMakeLinks(true);
 		verify(mockView).setMakeLinks(true);
 	}
-
-
+	
+	@Test
+	public void testSetNonDefaultEntityClickedHandler() {
+		ClickHandler mockClickHandler = mock(ClickHandler.class);
+		widget.setNonDefaultEntityClickedHandler(mockClickHandler);
+		verify(mockView).setNonDefaultEntityClickedHandler(any(ClickHandler.class));
+	}
 }

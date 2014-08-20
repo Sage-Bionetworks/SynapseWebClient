@@ -19,14 +19,12 @@ import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,8 +43,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
-//	@UiField
-//	Anchor infoLink;
 	Image iconPicture;
 	boolean makeLinks = true;	// TODO: Default to make links?
 	ClickHandler nonDefaultClickHandler;
@@ -70,86 +66,57 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-//			infoLink.setVisible(false);
 			isPopoverInitialized = false;
 			tooltip.setIsHtml(true);
 			tooltip.setTitle(entityHeader.getName());
 						
 			tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 			
-//			ImageResource icon = presenter.getIconForType(entityHeader.getType());
-//			iconPicture = new Image(icon);
-//			iconPicture.setWidth("16px");
-//			iconPicture.setHeight("16px");
-//			iconPicture.addStyleName("imageButton displayInline");
-//			iconContainer.setWidget(iconPicture);
+			
+			
+			
+			final Anchor anchor = new Anchor();
+			anchor.setText(entityHeader.getName());
+			anchor.addStyleName("link");
+			isPopover = false;
+			anchor.addMouseOverHandler(new MouseOverHandler() {
+				
+				@Override
+				public void onMouseOver(MouseOverEvent event) {
+					showPopover(anchor, entityHeader.getId(), entityHeader.getName());
+					isPopover = true;
+				}
+			});
+			anchor.addMouseOutHandler(new MouseOutHandler() {
+				@Override
+				public void onMouseOut(MouseOutEvent event) {
+					isPopover = false;
+					tooltip.hide();
+				}
+			});
+			
+			anchor.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					entityClicked(entityHeader, event);
+				}
+			});
+			
+			ClickHandler clickHandler = new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					anchor.fireEvent(event);
+				}
+			};
 			
 			ImageResource icon = presenter.getIconForType(entityHeader.getType());
 			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
 			iconPicture.addStyleName("imageButton displayInline");
+			iconPicture.addClickHandler(clickHandler);
 			iconContainer.setWidget(iconPicture);
-			
-			
-			
-//			if (makeLinks) {
-				final Anchor anchor = new Anchor();
-				anchor.setText(entityHeader.getName());
-				anchor.addStyleName("link");
-				isPopover = false;
-				anchor.addMouseOverHandler(new MouseOverHandler() {
-					
-					@Override
-					public void onMouseOver(MouseOverEvent event) {
-						showPopover(anchor, entityHeader.getId(), entityHeader.getName());
-						isPopover = true;
-					}
-				});
-				anchor.addMouseOutHandler(new MouseOutHandler() {
-					@Override
-					public void onMouseOut(MouseOutEvent event) {
-						isPopover = false;
-						tooltip.hide();
-					}
-				});
-				
-				if (nonDefaultClickHandler == null) {
-					// Use default click handler.
-			
-					anchor.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							presenter.entityClicked(entityHeader);
-						}
-					});
-				} else {
-					// Use non-default click handler.
-					
-					anchor.addClickHandler(nonDefaultClickHandler);
-				}
-				
-				ClickHandler clickHandler = new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						anchor.fireEvent(event);
-					}
-				};
-				
-				iconPicture.addClickHandler(clickHandler);
-				entityContainer.add(anchor);
-//			} else {
-//				entityContainer.add(new Label(entityHeader.getName()));
-//			}
-			
-//			ImageResource icon = presenter.getIconForType(entityHeader.getType());
-//			Image iconPicture = new Image(icon);
-//			iconPicture.setWidth("16px");
-//			iconPicture.setHeight("16px");
-//			iconPicture.addStyleName("imageButton displayInline");
-//			iconPicture.addClickHandler(clickHandler);
-//			iconContainer.setWidget(iconPicture);
-//			entityContainer.add(anchor);
+			entityContainer.add(anchor);
 		} 		
 	}
 	
@@ -225,8 +192,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void setNonDefaultClickHandler(ClickHandler handler) {
+	public void setNonDefaultEntityClickedHandler(ClickHandler handler) {
 		nonDefaultClickHandler = handler;
+	}
+	
+	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
+		if (nonDefaultClickHandler == null) {
+			presenter.entityClicked(entityHeader);
+		} else {
+			nonDefaultClickHandler.onClick(event);
+		}
 	}
 	
 	/*

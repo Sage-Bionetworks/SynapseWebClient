@@ -28,8 +28,8 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	
 	void setMakeLinks(boolean makeLinks);
 	
-	void setNonDefaultClickHandler(ClickHandler handler);
-	
+	void setNonDefaultEntityClickedHandler(ClickHandler handler);
+		
 	/**
 	 * Presenter interface
 	 */

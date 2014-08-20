@@ -1055,10 +1055,10 @@ h1, h2, h3, h4, h5, h6 {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.entityTreeItem-selected .gwt-TreeItem-selected a,
-.entityTreeItem-selected .gwt-TreeItem-selected a:hover, 
-.entityTreeItem-selected .gwt-TreeItem-selected img,
-.entityTreeItem-selected .gwt-TreeItem-selected img:hover {
+.entityTreeItem-selected a,
+.entityTreeItem-selected a:hover, 
+.entityTreeItem-selected img,
+.entityTreeItem-selected img:hover {
     color: black !important;
     cursor: default !important;
     font-weight: bold;

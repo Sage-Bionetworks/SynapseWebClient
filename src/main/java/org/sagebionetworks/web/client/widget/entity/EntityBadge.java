@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -139,8 +135,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	
-	public void setNonDefaultClickHandler(ClickHandler handler) {
-		view.setNonDefaultClickHandler(handler);
+	public void setNonDefaultEntityClickedHandler(ClickHandler handler) {
+		view.setNonDefaultEntityClickedHandler(handler);
 	}
 
 }
