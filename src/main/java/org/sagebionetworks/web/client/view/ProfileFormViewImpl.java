@@ -1,10 +1,17 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
@@ -12,10 +19,13 @@ import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,11 +35,17 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	
 	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@UiField
-	Button okButton;
+	org.gwtbootstrap3.client.ui.Button okButton;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button cancelButton;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button previewButton;
+	@UiField
+	org.gwtbootstrap3.client.ui.Button previewDialogOkButton;
 	
 	@UiField
 	Button changeUsernameButton;
@@ -64,13 +80,33 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	@UiField
 	TextAreaElement bioField;
 	
+	@UiField
+	SimplePanel updateWithLinkedInPanel;
+
+	@UiField
+	SimplePanel editPicturePanel;
+	@UiField
+	SimplePanel editPictureButtonPanel;
+
+	@UiField
+	Modal previewDialog;
+	
+	@UiField
+	FlowPanel viewProfilePanel;
+	@UiField
+	SimplePanel picturePanel;
+	
+	
+	private Button linkedInButtonEditProfile;
+	
 	@Inject
 	public ProfileFormViewImpl(ProfileFormImplUiBinder binder, 
-			IconsImageBundle icons,
-			SageImageBundle sageImageBundle) {
+			SageImageBundle sageImageBundle,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		initWidget(binder.createAndBindUi(this));
-		this.iconsImageBundle = icons;
 		this.sageImageBundle = sageImageBundle;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		linkedInButtonEditProfile = createLinkedInButton();
 		init();
 	}
 
@@ -83,6 +119,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	public void updateView(UserProfile profile) {
 		clear();
 		updateUserForm(profile);
+		updateProfilePicture(profile, profile.getPic());
+		editPictureButtonPanel.add(getEditPictureButton(profile));
+		updateWithLinkedInPanel.add(linkedInButtonEditProfile);
 	}
 	
 	@Override
@@ -102,11 +141,12 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 
 	@Override
 	public void setUpdateButtonText(String text){
-		okButton.removeStyleName("disabled");
-		okButton.setHTML(text);
+		okButton.setEnabled(true);
+		okButton.setText(text);
 	}
 	
 	 private void init() {
+		okButton.addStyleName("right margin-right-10");
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -118,6 +158,40 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 			@Override
 			public void onClick(ClickEvent event) {
 				showChangeUsernameUI();
+			}
+		});
+		
+		cancelButton.addStyleName("right margin-right-5");
+		cancelButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.rollback();
+			}
+		});
+		
+		previewButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				viewProfilePanel.clear();
+				String fName, lName, userName, industry, location, summary, company, position, url;
+				fName = trim(firstNameField.getValue());
+				lName = trim(lastNameField.getValue());
+				userName = trim(userNameField.getValue());
+				industry = trim(industryField.getValue());
+				location = trim(locationField.getValue());
+				summary = trim(bioField.getValue());
+				company = trim(currentAffiliationField.getValue());
+				position =trim(currentPositionField.getValue());
+				url = trim(moreInfoField.getValue());
+				ProfileViewImpl.fillInProfileView(fName, lName, userName, industry, location, summary, company, position, url, viewProfilePanel);
+				previewDialog.show();
+			}
+		});
+		
+		previewDialogOkButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				previewDialog.hide();
 			}
 		});
 		DisplayUtils.hide(changeUsernameUi);
@@ -190,8 +264,70 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		DisplayUtils.showInfo(title, message);
 	}
 	
-	@Override
+	private Button getEditPictureButton(final UserProfile profile) {
+		 String userId = profile.getOwnerId();
+		 final String actionUrl =  synapseJSNIUtils.getBaseProfileAttachmentUrl()+ "?" + WebConstants.USER_PROFILE_PARAM_KEY + "=" + userId;
+		 Button editPictureButton = DisplayUtils.createButton("Upload new picture");
+		 editPictureButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+	    		//upload a new photo. UI to send to S3, then update the profile with the new attachment data (by redirecting back to view profile)
+						AddAttachmentDialog.showAddAttachmentDialog(actionUrl,sageImageBundle, 
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_TITLE,
+								DisplayConstants.ATTACH_PROFILE_PIC_DIALOG_BUTTON_TEXT,new AddAttachmentDialog.Callback() {
+							@Override
+							public void onSaveAttachment(UploadResult result) {
+								if(result != null){
+									if(UploadStatus.SUCCESS == result.getUploadStatus()){
+										showInfo(DisplayConstants.TEXT_PROFILE_PICTURE_SUCCESS, "");
+										updateProfilePicture(profile, result.getAttachmentData());
+									}else{
+										showErrorMessage(DisplayConstants.ERROR_PROFILE_PICTURE_FAILED+result.getMessage());
+									}
+								}
+							}
+						});
+			}
+		});
+		return editPictureButton;
+	 }
 	
+	private void updateProfilePicture(UserProfile profile, AttachmentData pic) {
+		//update main edit picture panel
+		editPicturePanel.clear();
+		Widget profilePicture = ProfileViewImpl.getProfilePicture(profile, pic, synapseJSNIUtils);
+		profilePicture.addStyleName("left");
+		editPicturePanel.add(profilePicture);
+		//and preview
+		picturePanel.clear();
+		profilePicture = ProfileViewImpl.getProfilePicture(profile, pic, synapseJSNIUtils);
+		profilePicture.addStyleName("left");
+		picturePanel.add(profilePicture);
+	}
+	
+	@Override
 	public void clear() {
+		updateWithLinkedInPanel.clear();
+		editPicturePanel.clear();
+		editPictureButtonPanel.clear();
+	}
+	
+	private Button createLinkedInButton() {
+		Button command = DisplayUtils.createIconButton("", ButtonType.DEFAULT, "");
+		command.addClickHandler(new ClickHandler() {
+	    	@Override
+			public void onClick(ClickEvent event) {
+				linkedInClicked();
+			}
+		});
+	    
+		command.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getFontelloIcon("linkedin-squared") + "Import from LinkedIn"));
+		command.addStyleName("right btn-xs margin-right-10 moveup-35");
+		
+	    return command;
+	}
+	
+	private void linkedInClicked(){
+		presenter.redirectToLinkedIn();
 	}
 }

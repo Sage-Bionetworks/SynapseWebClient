@@ -1,18 +1,22 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style>
-		div.center {
-		margin-left: auto;
-		margin-right: auto;
-		width: 8em;
-		padding:15px;
-		}
-	</ui:style>
-
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
+         <div class="row">
+            <div class="col-sm-12">
+				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+			</div>
+               <div class="margin-bottom-10 col-sm-12">
+				<g:SimplePanel ui:field="editPicturePanel"/>
+			</div>
+			<div class="margin-bottom-20 col-sm-12">
+				<g:SimplePanel ui:field="editPictureButtonPanel"/>
+			</div>
+		</div>    
+
 		<div class="row margin-bottom-10">
-			<div class="col-sm-6">
+		    <div class="col-sm-6">
 				<h3 ui:field="userNameHeading" class="inline-block margin-right-10"></h3>
 				<g:Button ui:field="changeUsernameButton" styleName="btn btn-default btn-xs"
 					text="Change username" />
@@ -98,12 +102,32 @@
 		</div>
 
 		<div class="row">
-			<div class="col-md-12">
-				<g:Button ui:field="okButton"
-					styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right"
-					text="Update Profile" />
+		   	<div class="col-sm-6">
+				<b:Button ui:field="previewButton" type="DEFAULT">Preview</b:Button>
+			</div>
+			<div class="col-sm-6">
+				<b:Button ui:field="okButton" type="DEFAULT">Update Profile</b:Button>
+				<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 			</div>
 		</div>
+		
+		<b:Modal ui:field="previewDialog" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+		  <b:ModalBody>
+		      <g:HTMLPanel>
+			  	<div class="row">
+					<div class="col-md-3 col-sm-4 col-xs-12">
+						<g:SimplePanel ui:field="picturePanel"/>
+					</div>
+					<div class="col-md-9 col-sm-8 col-xs-12">
+						<g:FlowPanel ui:field="viewProfilePanel" />
+					</div>
+				</div>
+			</g:HTMLPanel>
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="previewDialogOkButton" type="PRIMARY">OK</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

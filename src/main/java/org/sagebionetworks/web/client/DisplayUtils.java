@@ -432,6 +432,15 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
+
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(org.gwtbootstrap3.client.ui.Button button) {
+		button.setEnabled(false);
+		button.setText(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "...").asString());
+	}
+
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -2302,4 +2311,13 @@ public class DisplayUtils {
 			}
 		});
 	}
+	
+	/**
+	  * just return the empty string if input string parameter s is null, otherwise returns s.
+	  */
+	 public static String replaceWithEmptyStringIfNull(String s) {
+		if (s == null)
+			return "";
+		else return s;
+	 }
 }
