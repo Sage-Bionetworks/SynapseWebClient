@@ -1042,14 +1042,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gwt-TreeItem-selected {
-  background: #0198E1 !important;
+  background: #ffffff !important;
   text-decoration:underline;
 }
-
-/* This how to change font size? Can't apply to entityBadge?*/
-/*.gwt-TreeItem {
-	font: normal 11px arial, tahoma, helvetica, sans-serif;
-}*/
 
 .entityTreeItem, .entityTreeItem-font {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
@@ -1064,20 +1059,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     text-decoration: none !important;
 }
-
-.entityTreeItem {
-	/*background-color: #fff;*/
-	/*margin: 0 !important;*/
-	/*padding-left: 16px !important;*/
-}
-
-/*.entityTreeItem:hover {
-	background-color: #eee;
-}
-
-.entityTreeItem-selected {
-	background-color: #d9e8fb !important;
-}*/
 
 /**table of contents styling **/
 /** .8em to 1.2em **/
