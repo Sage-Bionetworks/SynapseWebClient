@@ -3,12 +3,13 @@ package org.sagebionetworks.web.client.widget.team;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPresenter {
+public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
 	
 	private BigTeamBadgeView view;
 	SynapseClientAsync synapseClient;
@@ -34,5 +35,9 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	
+	@Override
+	public void setNotificationValue(String value) {
+		view.setRequestCount(value);
+	}
 }

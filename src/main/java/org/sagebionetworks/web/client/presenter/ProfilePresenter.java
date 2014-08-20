@@ -35,6 +35,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.LinkedInInfo;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -46,6 +48,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -66,8 +69,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
 	private RequestBuilderWrapper requestBuilder;
-	
+	private int teamNotificationCount;
 	private String currentUserId;
+	private boolean isOwner;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -150,7 +154,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
-		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
+		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
 				@Override
@@ -198,7 +202,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			private void proceed() {
 				getUserProjects(profile.getOwnerId());
-				getTeamsAndChallenges(profile.getOwnerId());
+				refreshTeams();
 				if (isOwner) {
 					getFavorites();
 				}
@@ -208,6 +212,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		teamNotificationCount = 0;
 		getTeamsAndChallenges(currentUserId);
 	}
 	
@@ -219,7 +224,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onSuccess(List<Team> teams) {
-				view.setTeams(teams);
+				view.setTeams(teams,isOwner);
 				getChallenges(teams);
 			}
 		};
@@ -493,6 +498,32 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				updateProfileView(place.getUserId(), place.getArea());
 			}
 		}
+	}
+	
+	@Override
+	public void updateTeamInvites(List<MembershipInvitationBundle> invites) {
+		if (invites != null && invites.size() > 0) {
+			teamNotificationCount += invites.size();
+			//update team notification count
+			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+}
+	}
+
+	@Override
+	public void addMembershipRequests(int count) {
+		teamNotificationCount += count;
+		view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+	}
+	
+	/**
+	 * Exposed for test purposes only
+	 */
+	public int getTeamNotificationCount() {
+		return teamNotificationCount;
+	}
+	
+	public void setTeamNotificationCount(int teamNotificationCount) {
+		this.teamNotificationCount = teamNotificationCount;
 	}
 }
 

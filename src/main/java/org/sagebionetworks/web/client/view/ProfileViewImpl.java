@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
@@ -229,6 +230,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
+	public void setTeamNotificationCount(String count) {
+		teamsLink.setHTML(DisplayConstants.TEAMS + "&nbsp" + DisplayUtils.getBadgeHtml(count));
+	}
+	
+	@Override
 	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget, ProfileArea initialTab) {
 		clear();
 		//when editable, show profile form and linkedin import ui
@@ -262,13 +268,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			DisplayUtils.show(favoritesListItem);
 			DisplayUtils.show(settingsListItem);
 			
+			CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+				@Override
+				public void invoke(List<MembershipInvitationBundle> invites) {
+					presenter.updateTeamInvites(invites);
+				}
+			};
 			openInvitesWidget.configure(new Callback() {
 				@Override
 				public void invoke() {
 					//refresh the teams and invites
 					presenter.refreshTeams();
 				}
-			}, (CallbackP)null);
+			}, openTeamInvitationsCallback);
 			
 			teamsTabContent.add(openInvitesWidget.asWidget());
 			
@@ -307,8 +319,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams) {
-		myTeamsWidget.configure(teams, true);
+	public void setTeams(List<Team> teams, boolean showNotifications) {
+		myTeamsWidget.configure(teams, true, showNotifications, new TeamListWidget.RequestCountCallback() {
+			@Override
+			public void invoke(String teamId, Long requestCount) {
+				presenter.addMembershipRequests(requestCount.intValue());
+			}
+		});
 	}
 	
 	@Override
@@ -482,6 +499,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(favoritesListItem);
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
+		
+		//reset tab link text (remove any notifications)
+		teamsLink.setHTML(DisplayConstants.TEAMS);
 	}
 	
 	private void hideTabContainers() {

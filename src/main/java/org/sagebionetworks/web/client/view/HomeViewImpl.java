@@ -419,7 +419,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refreshMyTeams(List<Team> teams) {
-		teamsListWidget.configure(teams, false);
+		teamsListWidget.configure(teams, false, true);
 	}
 	
 	private LayoutContainer getTeamsContainer() {
