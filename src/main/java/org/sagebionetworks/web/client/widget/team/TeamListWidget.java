@@ -47,16 +47,19 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
-	public void configure(List<Team> teams, boolean isBig) {
-		configure(teams, isBig, null);
+	public void configure(List<Team> teams, boolean isBig, boolean isRequestCountVisible) {
+		configure(teams, isBig, isRequestCountVisible, null);
 	}
 	
-	public void configure(List<Team> teams, boolean isBig, RequestCountCallback requestCountCallback) {
+	public void configure(List<Team> teams, boolean isBig, boolean isRequestCountVisible, RequestCountCallback requestCountCallback) {
 		this.requestCountCallback = requestCountCallback;
+		
 		view.configure(teams, isBig);
 		//then asynchronously load the request counts
-		for (Team team : teams) {
-			queryForRequestCount(team.getId());
+		if (isRequestCountVisible) {
+			for (Team team : teams) {
+				queryForRequestCount(team.getId());
+			}
 		}
 	}
 	

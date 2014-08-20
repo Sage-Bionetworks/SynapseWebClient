@@ -212,7 +212,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
-		teamNotificationCount = 0;
 		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
@@ -261,7 +260,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			private void proceed() {
 				getUserProjects(profile.getOwnerId());
-				getTeamsAndChallenges(profile.getOwnerId());
+				refreshTeams();
 				if (isOwner) {
 					getFavorites();
 				}
@@ -271,6 +270,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	@Override
 	public void refreshTeams() {
+		teamNotificationCount = 0;
 		getTeamsAndChallenges(currentUserId);
 	}
 	

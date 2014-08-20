@@ -9,7 +9,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.Notifier;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -23,7 +23,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	private SageImageBundle sageImageBundle;
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
-	private Map<String, SynapseWidgetPresenter> team2Badge;
+	private Map<String, Notifier> team2Badge;
 	boolean isBig;
 	@Inject
 	public TeamListWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
@@ -55,10 +55,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void setRequestCount(String teamId, Long count) {
 		if (team2Badge.containsKey(teamId)) {
-			if (isBig)
-				((BigTeamBadge)team2Badge.get(teamId)).setRequestCount(count);
-			else
-				((TeamBadge)team2Badge.get(teamId)).setRequestCount(count);
+			team2Badge.get(teamId).setNotificationValue(count.toString());
 		}
 	}
 	
@@ -66,7 +63,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	public void configure(List<Team> teams, boolean isBig) {
 		this.isBig = isBig;
 		clear();
-		team2Badge = new HashMap<String, SynapseWidgetPresenter>();
+		team2Badge = new HashMap<String, Notifier>();
 		if (isBig)
 			addStyleName("row");
 		else

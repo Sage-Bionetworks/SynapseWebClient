@@ -88,8 +88,8 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	}
 
 	@Override
-	public void setRequestCount(Long count) {
-		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count.toString()));
+	public void setRequestCount(String count) {
+		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
 		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
 		notificationsPanel.setWidget(widget);
 	}
