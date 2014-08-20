@@ -64,23 +64,23 @@ import com.google.inject.Inject;
 
 public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBrowserView {
 
-	private static final String PLACEHOLDER_ID = "-1";
-	private static final String PLACEHOLDER_TYPE = "-1";
-	public static final String PLACEHOLDER_NAME_PREFIX = "&#8212";
+	public static final String EMPTY_DISPLAY = "&#8212" + " " + DisplayConstants.EMPTY;
 	
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
+	private IconsImageBundle iconsImageBundle;
 		
 	private boolean makeLinks = true;		// TODO: Default true?
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
 	private EntityTreeItem selectedItem;		// TODO: Why do I have to implement this?
+	
 
 	@Inject
-	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector) {
+	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector, IconsImageBundle iconsImageBundle) {
 		this.ginInjector = ginInjector;
-		
+		this.iconsImageBundle = iconsImageBundle;
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		header2entityTreeItem = new HashMap<EntityHeader, EntityTreeItem>();
 		
@@ -151,15 +151,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
 		if(rootEntities.size() == 0) {
-//			EntityHeader eh = new EntityHeader();
-//			eh.setId(PLACEHOLDER_ID);
-//			eh.setName(PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY);
-//			eh.setType(PLACEHOLDER_TYPE);
-//			rootEntities.add(eh);
-			TreeItem emptyItem = new TreeItem(new HTMLPanel("<div>" + PLACEHOLDER_NAME_PREFIX + DisplayConstants.EMPTY + "</div>"));
+			TreeItem emptyItem = new TreeItem(new HTMLPanel("<div>" + EMPTY_DISPLAY + "</div>"));
 			emptyItem.addStyleName("entityTreeItem-font");
 			entityTree.addItem(emptyItem);
-			//entityTree.addItem(new TreeItem(new HTMLPanel("<div>" +  + DisplayConstants.EMPTY + "</div>")));
 		} else {
 			for (final EntityHeader header : rootEntities) {
 				createAndPlaceRootTreeItem(header);
@@ -184,17 +178,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	@Override
 	public void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem) {
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
-		
-//		if (PLACEHOLDER_TYPE.equals(childToCreate.getType())) {
-//			// Not an actual entity. Just display and call it good.
-//			TreeItem placeHolderItem = new TreeItem(new HTMLPanel("<div>" + childToCreate.getName() + "</div>"));
-//			if (isRootItem) {
-//				entityTree.addItem(placeHolderItem);
-//			} else {
-//				parent.asTreeItem().addItem(placeHolderItem);
-//			}
-//			return;
-//		}
 		
 		// Make tree item.
 		EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
@@ -239,12 +222,12 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public class EntityTreeResources implements Tree.Resources {
 		@Override
 	    public ImageResource treeClosed() {
-	        return EntityTreeImageBundle.IMAGE_RESOURCE.treeClosed();
+	        return iconsImageBundle.arrowRightDir16();
 	    }
 
 	    @Override
 	    public ImageResource treeOpen() {
-	        return EntityTreeImageBundle.IMAGE_RESOURCE.treeOpen();
+	        return iconsImageBundle.arrowDownDir16();
 	    }
 
 		@Override
@@ -254,15 +237,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 	
 	public interface EntityTreeImageBundle extends ClientBundle, ClientBundleWithLookup {
-		EntityTreeImageBundle IMAGE_RESOURCE = GWT.create(EntityTreeImageBundle.class);
 		Tree.Resources DEFAULT_RESOURCES = GWT.create(Tree.Resources.class);
-
-	    @Source("images/icons/arrow-down-dir-16.png")
-		ImageResource treeOpen();
-		
-	    
-		@Source("images/icons/arrow-right-dir-16.png")
-		ImageResource treeClosed();
 	}
 	
 }

@@ -34,11 +34,12 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	
 	public void configure(EntityHeader header, boolean isRootItem) {
 		entityBadge.configure(header);
+		entityBadge.asWidget().addStyleName("padding-bottom-4-imp");
 		treeItem = new TreeItem(asWidget());
-		if (!isRootItem)
-			treeItem.addStyleName("entityTreeItem padding-bottom-4-imp");
+		if (isRootItem)
+			treeItem.addStyleName("entityTreeItem padding-left-0-imp");
 		else
-			treeItem.addStyleName("entityTreeItem padding-bottom-4-imp padding-left-0-imp");
+			treeItem.addStyleName("entityTreeItem");
 		//entityHeader = header;
 	}
 

@@ -89,7 +89,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 				try {
 					final Entity entity = AdapterUtils.getEntityForBadgeInfo(adapterFactory, result.getEntityClassName(), result.getEntityJson());
 					if (entity == null) {
-						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for enitty badge detailed information."));
+						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for entity badge detailed information."));
 						return;
 					}
 					
