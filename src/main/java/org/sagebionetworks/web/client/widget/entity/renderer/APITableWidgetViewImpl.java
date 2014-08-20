@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class APITableWidgetViewImpl extends LayoutContainer implements APITableWidgetView {
+public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetView {
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -44,13 +44,8 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 	}
 	
 	@Override
-	public void clear() {
-		removeAll(true);
-	}
-	
-	@Override
 	public void configure(Map<String,List<String>> columnData, String[] columnNames, APITableInitializedColumnRenderer[] renderers, APITableConfig tableConfig) {
-		removeAll();
+		clear();
 		if (columnData.size() > 0) {
 			String elementId = HTMLPanel.createUniqueId();
 			StringBuilder builder = new StringBuilder();
@@ -130,7 +125,6 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 
 			HTMLPanel panel = new HTMLPanel(builder.toString());
 			add(panel);
-			layout(true);
 			
 			for (ClickHandler clickHandler : clickHandler2ElementsMap.keySet()) {
 				List<String> elementIds = clickHandler2ElementsMap.get(clickHandler);
@@ -184,30 +178,26 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 			panel.add(prev, "disabled");
 		} else {
 			panel.add(prev);
-			DisplayUtils.addTooltip(prev, DisplayConstants.PAGE_BACK, Placement.BOTTOM);
 		}
 		panel.add(label, "pagerLabel");
 		if(end == total) {
 			panel.add(next, "disabled");
 		} else {
 			panel.add(next);
-			DisplayUtils.addTooltip(next, DisplayConstants.PAGE_NEXT, Placement.BOTTOM);
 		}
 		add(panel);
-		layout(true);
 	}
 	
 	@Override
 	public void showError(String message) {
-		removeAll();
+		clear();
 		String errorMessage = DisplayUtils.getIconHtml(iconsImageBundle.error16()) + message;
 		add(new HTMLPanel(DisplayUtils.getMarkdownAPITableWarningHtml(errorMessage)));	
-		layout(true);
 	}
 	
 	@Override
 	public void showTableUnavailable() {
-		removeAll();
+		clear();
 		FlowPanel unavailableContainer = new FlowPanel();
 		unavailableContainer.addStyleName("jumbotron");
 		unavailableContainer.add(new HTML("<h2>" + DisplayConstants.TABLE_UNAVAILABLE + "</h2><p><strong>"+ TableState.PROCESSING +"</strong>: "+ DisplayConstants.TABLE_PROCESSING_DESCRIPTION +"</p>"));
@@ -223,7 +213,6 @@ public class APITableWidgetViewImpl extends LayoutContainer implements APITableW
 		unavailableContainer.add(tryAgain);
 		
 		add(unavailableContainer);
-		layout(true);
 	}
 	
 	@Override
