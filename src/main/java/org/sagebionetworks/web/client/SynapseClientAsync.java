@@ -324,4 +324,7 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
+	
+	void getMyProjects(AsyncCallback<List<String>> projectHeaders);
+	void getUserProjects(String userId, AsyncCallback<List<String>> projectHeaders);
 }

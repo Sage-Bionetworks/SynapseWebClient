@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -334,13 +335,32 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setProjects(List<EntityHeader> projectHeaders) {
-		addEntityBadges(projectHeaders, projectsTabContent);
+	public void setProjects(List<ProjectHeader> projectHeaders) {
+		addProjectBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
 	public void setProjectsError(String error) {
 		DisplayUtils.showErrorMessage(error);
+	}
+	
+	
+	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
+		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
+		targetPanel.clear();
+		for (ProjectHeader projectHeader : projectHeaders) {
+			EntityHeader entityHeaderWrapper = new EntityHeader();
+			entityHeaderWrapper.setId(projectHeader.getId());
+			entityHeaderWrapper.setName(projectHeader.getName());
+			
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeaderWrapper);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-top-5");
+			targetPanel.add(widget);
+		}
+		if (projectHeaders.isEmpty())
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
 	}
 	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -201,7 +202,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			private void proceed() {
-				getUserProjects(profile.getOwnerId());
+				refreshProjects();
 				refreshTeams();
 				if (isOwner) {
 					getFavorites();
@@ -209,7 +210,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		});
 	}
-	
+
+	public void refreshProjects() {
+		if (isOwner)
+			getMyProjects(currentUserId);
+		else
+			getUserProjects(currentUserId);
+	}
 	@Override
 	public void refreshTeams() {
 		teamNotificationCount = 0;
@@ -333,17 +340,49 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId) {
-		EntityBrowserUtils.loadUserUpdateable(userId, searchService, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+	public void getMyProjects(String userId) {
+		synapseClient.getMyProjects(new AsyncCallback<List<String>>() {
 			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setProjects(result);
+			public void onSuccess(List<String> projectHeaderStrings) {
+				try {
+					List<ProjectHeader> headers = parseResponse(projectHeaderStrings);
+					view.setProjects(headers);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}	
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setProjectsError("Could not load Projects: " + caught.getMessage());
+				view.setProjectsError("Could not load my projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void getUserProjects(String userId) {
+		synapseClient.getUserProjects(userId, new AsyncCallback<List<String>>() {
+			@Override
+			public void onSuccess(List<String> projectHeaderStrings) {
+				try {
+					List<ProjectHeader> headers = parseResponse(projectHeaderStrings);
+					view.setProjects(headers);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}	
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setProjectsError("Could not load my projects:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public List<ProjectHeader> parseResponse(List<String> projectHeaderStrings) throws JSONObjectAdapterException {
+		List<ProjectHeader> headers = new ArrayList<ProjectHeader>();
+		for (String headerString : projectHeaderStrings) {
+			ProjectHeader header = new ProjectHeader(adapterFactory.createNew(headerString));
+			headers.add(header);
+		}
+		return headers;
 	}
 	
 	public void getFavorites() {

@@ -60,6 +60,7 @@ import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -3566,6 +3567,43 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	@Override
+	public List<String> getMyProjects() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(0, MAX_LIMIT);
+			List<ProjectHeader> list = headers.getResults();
+			ArrayList<String> listStrings = new ArrayList<String>();
+			for (ProjectHeader t : list) {
+				listStrings.add(EntityFactory.createJSONStringForEntity(t));
+			}
+			return listStrings;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public List<String> getUserProjects(String userId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Long userIdLong = Long.parseLong(userId);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, 0, MAX_LIMIT);
+			List<ProjectHeader> list = headers.getResults();
+			ArrayList<String> listStrings = new ArrayList<String>();
+			for (ProjectHeader t : list) {
+				listStrings.add(EntityFactory.createJSONStringForEntity(t));
+			}
+			return listStrings;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
 
 	
 }

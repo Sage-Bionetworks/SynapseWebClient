@@ -381,4 +381,7 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
 			throws RestServiceException;
+	
+	List<String> getMyProjects() throws RestServiceException;
+	List<String> getUserProjects(String userId) throws RestServiceException;
 }
