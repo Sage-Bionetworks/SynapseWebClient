@@ -458,7 +458,7 @@ public class ProfilePresenterTest {
 	public void testGetTeams() {
 		profilePresenter.getTeamsAndChallenges("anyUserId");
 		verify(mockSynapseClient).getTeamsForUser(anyString(),  any(AsyncCallback.class));
-		verify(mockView).setTeams(eq(myTeams));
+		verify(mockView).setTeams(eq(myTeams), anyBoolean());
 	}
 	
 	@Test

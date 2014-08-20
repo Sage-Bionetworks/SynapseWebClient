@@ -74,6 +74,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private RequestBuilderWrapper requestBuilder;
 	private int teamNotificationCount;
 	private String currentUserId;
+	private boolean isOwner;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -212,7 +213,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void updateProfileView(String userId, final ProfileArea initialTab) {
 		view.clear();
-		final boolean isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
+		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
 				@Override
@@ -282,7 +283,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onSuccess(List<Team> teams) {
-				view.setTeams(teams);
+				view.setTeams(teams,isOwner);
 				getChallenges(teams);
 			}
 		};

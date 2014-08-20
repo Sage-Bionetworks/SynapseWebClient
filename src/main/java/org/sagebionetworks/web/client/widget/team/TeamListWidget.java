@@ -95,7 +95,6 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 					if (requestCountCallback != null)
 						requestCountCallback.invoke(teamId, result);
 				}
-					
 			}
 			@Override
 			public void onFailure(Throwable caught) {

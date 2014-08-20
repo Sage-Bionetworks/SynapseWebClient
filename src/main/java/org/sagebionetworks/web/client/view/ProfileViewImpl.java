@@ -338,8 +338,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setTeams(List<Team> teams) {
-		myTeamsWidget.configure(teams, true, true, new TeamListWidget.RequestCountCallback() {
+	public void setTeams(List<Team> teams, boolean showNotifications) {
+		myTeamsWidget.configure(teams, true, showNotifications, new TeamListWidget.RequestCountCallback() {
 			@Override
 			public void invoke(String teamId, Long requestCount) {
 				presenter.addMembershipRequests(requestCount.intValue());
