@@ -1,1 +1,0 @@
-package org.sagebionetworks.web.client.widget;public interface Notifier {	void setNotificationValue(String value);}

@@ -86,4 +86,13 @@ public class TeamBadgeTest {
 		badge.configure("");
 		verify(mockView, never()).setTeam(any(Team.class), anyInt());
 	}
+	
+	@Test
+	public void testSetNotificationValue() throws Exception {
+		//pass-through test
+		String notificationValue = "98";
+		badge.setNotificationValue(notificationValue);
+		verify(mockView).setRequestCount(eq(notificationValue));
+	}
+	
 }

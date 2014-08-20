@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
+import org.sagebionetworks.web.client.widget.team.TeamListWidget.RequestCountCallback;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -52,6 +53,7 @@ public class TeamListWidgetTest {
 		mockGetTeamsCallback = mock(AsyncCallback.class);
 		widget = new TeamListWidget(mockView, mockSynapseClient, mockGlobalApplicationState,mockAuthenticationController, adapter);
 		teamList = setupUserTeams(adapter, mockSynapseClient);
+		AsyncMockStubber.callSuccessWith(0l).when(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	public static ArrayList<Team> setupUserTeams(JSONObjectAdapter adapter, SynapseClientAsync mockSynapseClient) throws JSONObjectAdapterException {
@@ -68,13 +70,13 @@ public class TeamListWidgetTest {
 		return teamList;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetTeams() throws Exception {
 		widget.getTeams("12345",mockSynapseClient, adapterFactory, mockGetTeamsCallback);
 		verify(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
 		verify(mockGetTeamsCallback).onSuccess(eq(teamList));
 	}
+	@Test
 	public void testGetTeamsFailure() throws Exception {
 		Exception ex = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
@@ -83,7 +85,7 @@ public class TeamListWidgetTest {
 		verify(mockGetTeamsCallback).onFailure(eq(ex));
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testGetQueryForRequestCount() throws Exception {
 		//when request count is null, should do nothing
@@ -104,10 +106,44 @@ public class TeamListWidgetTest {
 		verify(mockView).setRequestCount(anyString(), anyLong());
 		verify(mockView, times(0)).showErrorMessage(anyString());
 	}
+	
+	@Test
 	public void testGetQueryForRequestCountFailure() throws Exception {
 		Exception ex = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 		widget.queryForRequestCount("12345");
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testConfigureIsBigNoRequestCount() {
+		//this is the configuration used by the Team Search page
+		boolean isBig = true;
+		boolean isRequestCountVisible = false;
+		widget.configure(teamList, isBig, isRequestCountVisible);
+		verify(mockView).configure(eq(teamList), eq(isBig));
+		//should not call since request count is not visible
+		verify(mockSynapseClient, never()).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testConfigureIsBigWithRequestCount() {
+		//this is the configuration used by the Teams tab in the dashboard
+		boolean isBig = true;
+		boolean isRequestCountVisible = true;
+		widget.configure(teamList, isBig, isRequestCountVisible);
+		verify(mockView).configure(eq(teamList), eq(isBig));
+		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testConfigureSmallWithRequestCount() {
+		//this is the configuration used by the old home page
+		boolean isBig = false;
+		boolean isRequestCountVisible = true;
+		widget.configure(teamList, isBig, isRequestCountVisible);
+		verify(mockView).configure(eq(teamList), eq(isBig));
+		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
 }

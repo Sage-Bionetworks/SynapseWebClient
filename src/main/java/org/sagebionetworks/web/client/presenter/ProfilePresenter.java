@@ -572,5 +572,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamNotificationCount += count;
 		view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 	}
+	
+	/**
+	 * Exposed for test purposes only
+	 */
+	public int getTeamNotificationCount() {
+		return teamNotificationCount;
+	}
+	
+	public void setTeamNotificationCount(int teamNotificationCount) {
+		this.teamNotificationCount = teamNotificationCount;
+	}
 }
 

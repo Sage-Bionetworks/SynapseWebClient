@@ -50,6 +50,7 @@ import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
+import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -218,6 +219,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		
 		when(place.toToken()).thenReturn(targetUserId);
+		when(place.getUserId()).thenReturn(targetUserId);
 		profilePresenter.setPlace(place);
 		verify(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
@@ -532,6 +534,31 @@ public class ProfilePresenterTest {
 		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
 	}
 
+	@Test
+	public void testUpdateTeamInvites() {
+		//reset team notification count
+		profilePresenter.setTeamNotificationCount(0);
+		int inviteCount = 3;
+		List<MembershipInvitationBundle> invites = new ArrayList<MembershipInvitationBundle>();
+		for (int i = 0; i < inviteCount; i++) {
+			invites.add(new MembershipInvitationBundle());	
+		}
+		profilePresenter.updateTeamInvites(invites);
+		
+		assertEquals(inviteCount, profilePresenter.getTeamNotificationCount());
+		verify(mockView).setTeamNotificationCount(eq(Integer.toString(inviteCount)));
+	}
 	
+	@Test
+	public void testAddMembershipRequests() {
+		int beforeNotificationCount = 12; 
+		profilePresenter.setTeamNotificationCount(beforeNotificationCount);
+		
+		profilePresenter.addMembershipRequests(1);
+		
+		int expectedAfterNotificationCount = beforeNotificationCount+1;
+		assertEquals(expectedAfterNotificationCount, profilePresenter.getTeamNotificationCount());
+		verify(mockView).setTeamNotificationCount(eq(Integer.toString(expectedAfterNotificationCount)));
+	}
 	
 }
