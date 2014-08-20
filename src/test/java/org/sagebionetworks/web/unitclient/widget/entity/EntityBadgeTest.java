@@ -72,6 +72,7 @@ public class EntityBadgeTest {
 		EntityWrapper wrapper = new EntityWrapper();
 		String entityJson = entity.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		wrapper.setEntityJson(entityJson);
+		wrapper.setEntityClassName(entity.getClass().getName());
 		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -181,4 +182,5 @@ public class EntityBadgeTest {
 		widget.setNonDefaultEntityClickedHandler(mockClickHandler);
 		verify(mockView).setNonDefaultEntityClickedHandler(any(ClickHandler.class));
 	}
+
 }
