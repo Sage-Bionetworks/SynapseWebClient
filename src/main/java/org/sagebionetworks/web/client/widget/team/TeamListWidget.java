@@ -88,8 +88,10 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		synapseClient.getOpenRequestCount(authenticationController.getCurrentUserPrincipalId(), teamId, new AsyncCallback<Long>() {
 			@Override
 			public void onSuccess(Long result) {
-				if (result != null && result > 0) {
-					view.setRequestCount(teamId, result);
+				if (result != null) {
+					//only inform the view if the resulting count is positive
+					if (result > 0)
+						view.setRequestCount(teamId, result);
 					if (requestCountCallback != null)
 						requestCountCallback.invoke(teamId, result);
 				}

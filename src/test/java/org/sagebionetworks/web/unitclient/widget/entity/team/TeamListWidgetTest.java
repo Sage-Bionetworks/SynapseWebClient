@@ -131,9 +131,13 @@ public class TeamListWidgetTest {
 		//this is the configuration used by the Teams tab in the dashboard
 		boolean isBig = true;
 		boolean isRequestCountVisible = true;
-		widget.configure(teamList, isBig, isRequestCountVisible);
+		//also test the request count callback
+		TeamListWidget.RequestCountCallback mockCallback = mock(TeamListWidget.RequestCountCallback.class);
+		widget.configure(teamList, isBig, isRequestCountVisible, mockCallback);
 		verify(mockView).configure(eq(teamList), eq(isBig));
 		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
+		//verify callback was invoked
+		verify(mockCallback).invoke(anyString(), anyLong());
 	}
 	
 	@Test
@@ -141,7 +145,8 @@ public class TeamListWidgetTest {
 		//this is the configuration used by the old home page
 		boolean isBig = false;
 		boolean isRequestCountVisible = true;
-		widget.configure(teamList, isBig, isRequestCountVisible);
+		//null request count callback
+		widget.configure(teamList, isBig, isRequestCountVisible, null);
 		verify(mockView).configure(eq(teamList), eq(isBig));
 		verify(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
 	}
