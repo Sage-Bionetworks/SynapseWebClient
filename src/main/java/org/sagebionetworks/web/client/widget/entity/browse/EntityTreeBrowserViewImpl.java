@@ -37,11 +37,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private PortalGinInjector ginInjector;
 	private IconsImageBundle iconsImageBundle;
 		
-	private boolean makeLinks = true;		// TODO: Default true?
+	private boolean makeLinks = true;
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
-	private EntityTreeItem selectedItem;		// TODO: Why do I have to implement this?
+	private EntityTreeItem selectedItem;
 	
 
 	@Inject
@@ -77,17 +77,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		}
 	}
 	
-	private void selectEntity(EntityTreeItem itemToSelect) {
-		if (selectedItem != null) {
-//			selectedItem.asTreeItem().removeStyleName("entityTreeItem-selected");
-			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
-		}
-		selectedItem = itemToSelect;
-//		selectedItem.asTreeItem().addStyleName("entityTreeItem-selected");
-		selectedItem.asWidget().addStyleName("entityTreeItem-selected");
-		presenter.setSelection(selectedItem.getHeader().getId());
-	}
-
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -121,7 +110,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {
+	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {		// TODO: Boolean sort?
 		clear();
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
@@ -140,10 +129,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	public void setMakeLinks(boolean makeLinks) {
 		this.makeLinks = makeLinks;
 	}
-	
-	/*
-	 * Private Methods
-	 */
 
 	@Override
 	public void removeEntity(EntityHeader entityHeader) {
@@ -157,7 +142,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		// Make tree item.
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.setMakeLinks(makeLinks);
-		if (!makeLinks) {	// change to better variable name.
+		if (!makeLinks) {	// TODO: better variable name: isSelectable?
 			// Add select functionality.
 			childItem.setNonDefaultClickHandler(new ClickHandler() {
 
@@ -191,6 +176,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		createAndPlaceTreeItem(toCreate, null, true);
 	}
 	
+	
+	/*
+	 * Private Methods
+	 */
+	
+	private void selectEntity(EntityTreeItem itemToSelect) {
+		if (selectedItem != null) {
+			selectedItem.asWidget().removeStyleName("entityTreeItem-selected");
+		}
+		selectedItem = itemToSelect;
+		selectedItem.asWidget().addStyleName("entityTreeItem-selected");
+		presenter.setSelection(selectedItem.getHeader().getId());
+	}
+
 	/**
 	 * Creates the dummy item used to make a tree item expandable.
 	 * @return the dummy tree item.

@@ -15,7 +15,6 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	private TreeItem treeItem;
 	private EntityBadge entityBadge;
 	private PortalGinInjector ginInjector;
-	private ClickHandler nonDefaultClickHandler;
 	
 	@Inject
 	public EntityTreeItem(PortalGinInjector ginInjector) { 
