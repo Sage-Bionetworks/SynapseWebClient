@@ -3,18 +3,16 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
-import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelBody;
-import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -26,12 +24,15 @@ import com.google.inject.Inject;
 
 /**
  * Basic implementation of the TableEntityWidgetView with zero business logic
+ * 
  * @author John
- *
+ * 
  */
-public class TableEntityWidgetViewImpl extends Composite implements TableEntityWidgetView {
-	
-	public interface Binder extends UiBinder<Widget, TableEntityWidgetViewImpl> {	}
+public class TableEntityWidgetViewImpl extends Composite implements
+		TableEntityWidgetView {
+
+	public interface Binder extends UiBinder<Widget, TableEntityWidgetViewImpl> {
+	}
 
 	@UiField
 	Button columnDetailsToggleButton;
@@ -39,6 +40,8 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	PanelBody columnDetailsPanel;
 	@UiField
 	Alert tableMessage;
+	@UiField
+	Alert queryResultsMessage;
 	@UiField
 	InputGroup queryInputGroup;
 	@UiField
@@ -58,13 +61,7 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	@UiField
 	CellTable queryResults;
 	@UiField
-	Container progressContainer;
-	@UiField
-	Text progressText;
-	@UiField
-	ProgressBar progressBar;
-	@UiField
-	Button progressCancelButton;
+	SimplePanel progressContainer;
 	@UiField
 	Modal editRowsModal;
 	@UiField
@@ -75,29 +72,27 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 	Button saveRowsButton;
 	@UiField
 	Button cancelRowsButton;
-	@UiField
-	Alert queryResultAlert;
-	
+
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	Presenter presenter;
-	
+
 	@Inject
-	public TableEntityWidgetViewImpl(final Binder uiBinder, PortalGinInjector ginInjector){
+	public TableEntityWidgetViewImpl(final Binder uiBinder,
+			PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.ginInjector = ginInjector;
 		this.columnModelsWidget = ginInjector.createNewColumnModelsWidget();
 		this.columnDetailsPanel.add(this.columnModelsWidget.asWidget());
 	}
-	
+
 	@Override
 	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
+		this.presenter = presenter;
 	}
 
 	@Override
-	public void configure(EntityBundle bundle,
-			boolean isEditable) {
+	public void configure(EntityBundle bundle, boolean isEditable) {
 		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
 	}
 
@@ -122,5 +117,42 @@ public class TableEntityWidgetViewImpl extends Composite implements TableEntityW
 		this.tableMessage.setVisible(visible);
 	}
 
+	@Override
+	public void setInputQueryString(String startQuery) {
+		this.queryInput.setText(startQuery);
+	}
+
+	@Override
+	public void setQueryInputLoading(boolean loading) {
+		this.queryInput.setEnabled(!loading);
+		if (loading) {
+			this.queryButton.state().loading();
+		} else {
+			this.queryButton.state().reset();
+		}
+
+	}
+
+	@Override
+	public void setQueryMessage(AlertType type, String message) {
+		this.queryResultsMessage.setType(type);
+		this.queryResultsMessage.setText(message);
+	}
+
+	@Override
+	public void setQueryResultsMessageVisible(boolean visible) {
+		this.queryResultsMessage.setVisible(visible);
+	}
+
+	@Override
+	public void setProgressWidget(
+			AsynchronousProgressWidget asynchProgressWidget) {
+		this.progressContainer.add(asynchProgressWidget);
+	}
+
+	@Override
+	public void setQueryProgressVisible(boolean visible) {
+		this.progressContainer.setVisible(visible);
+	}
 
 }

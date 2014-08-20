@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -26,18 +32,23 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 
 	private TableEntityWidgetView view;
 	private PortalGinInjector ginInjector;
+	private SynapseClientAsync synapseClient;
+	private TableModelUtils tableModelUtils;
+	private AsynchronousProgressWidget asynchProgressWidget;
 	
 	String tableId;
 	TableBundle  tableBundle;
-	
 	boolean canEdit;
 	QueryChangeHandler queryChagneHandler;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, PortalGinInjector ginInjector){
+	public TableEntityWidget(TableEntityWidgetView view, PortalGinInjector ginInjector,  SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
 		this.view = view;
 		this.ginInjector = ginInjector;
+		this.synapseClient = synapseClient;
+		this.tableModelUtils = tableModelUtils;
 		this.view.setPresenter(this);
+		this.asynchProgressWidget = this.ginInjector.creatNewAsynchronousProgressWidget();
 	}
 
 	@Override
@@ -59,6 +70,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.canEdit = canEdit;
 		this.queryChagneHandler = qch;
 		this.view.configure(bundle, this.canEdit);
+		this.view.setProgressWidget(this.asynchProgressWidget);
 		checkState();
 	}
 
@@ -68,21 +80,89 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public void checkState() {
 		// If there are no columns, then the first thing to do is ask the user to create some columns.
 		if(this.tableBundle.getColumnModels().size() < 1){
-			String message = null;
-			if(this.canEdit){
-				message = NO_COLUMNS_EDITABLE;
-			}else{
-				message = NO_COLUMNS_NOT_EDITABLE;
+			setNoColumnsState();
+		}else{
+			// There are columns.
+			String startQuery = queryChagneHandler.getQueryString();;
+			if(startQuery == null){
+				// use a default query
+				startQuery = getDefaultQueryString();
 			}
-			// There can be no query when there are no columns
-			if(this.queryChagneHandler.getQueryString() != null){
-				this.queryChagneHandler.onQueryChange(null);
-			}
-			view.setQueryInputVisible(false);
-			view.setQueryResultsVisible(false);
-			view.showTableMessage(AlertType.INFO, message);
-			view.setTableMessageVisible(true);
+			// Execute the query
+			view.setInputQueryString(startQuery);
+			view.setQueryInputVisible(true);
+			view.setQueryInputLoading(true);
+			
+			// start the job
+			synapseClient.startAsynchQuery(startQuery, new AsyncCallback<String>(){
+				@Override
+				public void onFailure(Throwable caught) {
+					setQueryFailed(caught.getMessage());
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					// Wait for the job to finish
+					AsynchronousJobStatus status;
+					try {
+						status = tableModelUtils.createAsynchronousJobStatus(result);
+						// show the progress
+						waitForQueryResutls(status);
+					} catch (JSONObjectAdapterException e) {
+						setQueryFailed(e.getMessage());
+					} 					
+				}});
 		}
+	}
+	
+	private void waitForQueryResutls(AsynchronousJobStatus status){
+		view.setQueryProgressVisible(true);
+		this.asynchProgressWidget.configure("Executing query...", status, new AsynchronousProgressHandler() {
+			
+			@Override
+			public void onFailure(Throwable failure) {
+				setQueryFailed(failure.getMessage());
+			}
+			
+			@Override
+			public void onComplete(AsynchronousJobStatus status) {
+				view.showTableMessage(AlertType.INFO, "Query complete");
+			}
+			
+			@Override
+			public void onCancel(AsynchronousJobStatus status) {
+				view.showTableMessage(AlertType.WARNING, "Query canceled");
+			}
+		});
+	}
+	
+	private void setQueryFailed(String message){
+		// Set the message
+		view.setQueryMessage(AlertType.DANGER, message);
+		view.setQueryResultsMessageVisible(true);
+		view.setQueryInputLoading(false);
+	}
+	
+
+	/**
+	 * Set the view to show no columns message.
+	 */
+	private void setNoColumnsState() {
+		String message = null;
+		if(this.canEdit){
+			message = NO_COLUMNS_EDITABLE;
+		}else{
+			message = NO_COLUMNS_NOT_EDITABLE;
+		}
+		// There can be no query when there are no columns
+		if(this.queryChagneHandler.getQueryString() != null){
+			this.queryChagneHandler.onQueryChange(null);
+		}
+		view.setQueryInputVisible(false);
+		view.setQueryResultsVisible(false);
+		view.showTableMessage(AlertType.INFO, message);
+		view.setTableMessageVisible(true);
+		view.setQueryResultsMessageVisible(false);
 	}
 	
 	/**

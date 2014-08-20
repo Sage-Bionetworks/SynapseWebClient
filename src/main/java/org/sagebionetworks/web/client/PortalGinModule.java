@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONArrayGwt;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
@@ -78,6 +79,12 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
+import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
+import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
+import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -494,6 +501,11 @@ public class PortalGinModule extends AbstractGinModule {
 		// table
 		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
 		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
+		
+		// Asynchronous progress
+		bind(TimerProvider.class).to(TimerProviderImpl.class);
+		bind(NumberFormatProvider.class).to(NumberFormatProviderImpl.class);
+		bind(AsynchronousProgressView.class).to(AsynchronousProgressViewImpl.class);
 		
 		/*
 		 * Widgets

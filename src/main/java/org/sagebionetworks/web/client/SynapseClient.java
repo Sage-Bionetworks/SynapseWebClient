@@ -382,4 +382,16 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Start an Asynchronous query.
+	 * @param query
+	 * @return The JSON of the 
+	 * @throws RestServiceException 
+	 */
+	public String startAsynchQuery(String query) throws RestServiceException;
+	
+	public String getAsynchJobStatus(String jobId) throws RestServiceException;
+	
+	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
 }
