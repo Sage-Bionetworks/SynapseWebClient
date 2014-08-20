@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Popover;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -10,12 +10,16 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,15 +40,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
-	Popover popover;
+	Tooltip tooltip;
 	@UiField
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
-	@UiField
-	Anchor infoLink;
+//	@UiField
+//	Anchor infoLink;
 	Image iconPicture;
 	boolean makeLinks = true;	// TODO: Default to make links?
+	ClickHandler nonDefaultClickHandler;
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;
@@ -65,11 +70,19 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-			infoLink.setVisible(false);
+//			infoLink.setVisible(false);
 			isPopoverInitialized = false;
-			popover.setIsHtml(true);
-			popover.setTitle(entityHeader.getName());
-			popover.setContent(DisplayUtils.getLoadingHtml(sageImageBundle));
+			tooltip.setIsHtml(true);
+			tooltip.setTitle(entityHeader.getName());
+						
+			tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
+			
+//			ImageResource icon = presenter.getIconForType(entityHeader.getType());
+//			iconPicture = new Image(icon);
+//			iconPicture.setWidth("16px");
+//			iconPicture.setHeight("16px");
+//			iconPicture.addStyleName("imageButton displayInline");
+//			iconContainer.setWidget(iconPicture);
 			
 			ImageResource icon = presenter.getIconForType(entityHeader.getType());
 			iconPicture = new Image(icon);
@@ -78,41 +91,65 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			iconPicture.addStyleName("imageButton displayInline");
 			iconContainer.setWidget(iconPicture);
 			
-			final Anchor anchor = new Anchor();
-			if (makeLinks) {
-				infoLink.setVisible(true);
+			
+			
+//			if (makeLinks) {
+				final Anchor anchor = new Anchor();
 				anchor.setText(entityHeader.getName());
 				anchor.addStyleName("link");
 				isPopover = false;
-				infoLink.addClickHandler(new ClickHandler() {
+				anchor.addMouseOverHandler(new MouseOverHandler() {
+					
 					@Override
-					public void onClick(ClickEvent event) {
-						if (isPopover)
-							popover.hide();
-						else
-							showPopover(anchor, entityHeader.getId(), entityHeader.getName());
-						
-						isPopover = !isPopover;
+					public void onMouseOver(MouseOverEvent event) {
+						showPopover(anchor, entityHeader.getId(), entityHeader.getName());
+						isPopover = true;
+					}
+				});
+				anchor.addMouseOutHandler(new MouseOutHandler() {
+					@Override
+					public void onMouseOut(MouseOutEvent event) {
+						isPopover = false;
+						tooltip.hide();
 					}
 				});
 				
-				anchor.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						presenter.entityClicked(entityHeader);
-					}
-				});
+				if (nonDefaultClickHandler == null) {
+					// Use default click handler.
+			
+					anchor.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							presenter.entityClicked(entityHeader);
+						}
+					});
+				} else {
+					// Use non-default click handler.
+					
+					anchor.addClickHandler(nonDefaultClickHandler);
+				}
+				
 				ClickHandler clickHandler = new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
 						anchor.fireEvent(event);
 					}
 				};
+				
 				iconPicture.addClickHandler(clickHandler);
 				entityContainer.add(anchor);
-			} else {
-				entityContainer.add(new Label(entityHeader.getName()));
-			}
+//			} else {
+//				entityContainer.add(new Label(entityHeader.getName()));
+//			}
+			
+//			ImageResource icon = presenter.getIconForType(entityHeader.getType());
+//			Image iconPicture = new Image(icon);
+//			iconPicture.setWidth("16px");
+//			iconPicture.setHeight("16px");
+//			iconPicture.addStyleName("imageButton displayInline");
+//			iconPicture.addClickHandler(clickHandler);
+//			iconContainer.setWidget(iconPicture);
+//			entityContainer.add(anchor);
 		} 		
 	}
 	
@@ -131,14 +168,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				
 				private void renderPopover(String content) {
 					isPopoverInitialized = true;
-					popover.setContent(content);
-					popover.reconfigure();
+					tooltip.setText(content);
+					tooltip.reconfigure();
 					if (isPopover)
-						popover.show();
+						tooltip.show();
 				}
 			});
 		}
-		popover.show();
+		tooltip.show();
 	}
 
 	@Override
@@ -170,7 +207,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
-		infoLink.setVisible(false);
 	}
 	
 	@Override
@@ -188,6 +224,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		this.makeLinks = makeLinks;
 	}
 	
+	@Override
+	public void setNonDefaultClickHandler(ClickHandler handler) {
+		nonDefaultClickHandler = handler;
+	}
 	
 	/*
 	 * Private Methods

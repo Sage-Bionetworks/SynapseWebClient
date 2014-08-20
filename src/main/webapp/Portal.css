@@ -1055,19 +1055,29 @@ h1, h2, h3, h4, h5, h6 {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.entityTreeItem {
-	background-color: #fff;
-	margin: 0 !important;
-	padding-left: 16px !important;
+.entityTreeItem-selected .gwt-TreeItem-selected a,
+.entityTreeItem-selected .gwt-TreeItem-selected a:hover, 
+.entityTreeItem-selected .gwt-TreeItem-selected img,
+.entityTreeItem-selected .gwt-TreeItem-selected img:hover {
+    color: black !important;
+    cursor: default !important;
+    font-weight: bold;
+    text-decoration: none !important;
 }
 
-.entityTreeItem:hover {
+.entityTreeItem {
+	/*background-color: #fff;*/
+	/*margin: 0 !important;*/
+	/*padding-left: 16px !important;*/
+}
+
+/*.entityTreeItem:hover {
 	background-color: #eee;
 }
 
 .entityTreeItem-selected {
 	background-color: #d9e8fb !important;
-}
+}*/
 
 /**table of contents styling **/
 /** .8em to 1.2em **/

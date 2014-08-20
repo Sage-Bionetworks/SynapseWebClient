@@ -12,10 +12,9 @@
 					<g:SimplePanel ui:field="iconContainer" />
 				</td>
 				<td>
-			    	<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
-					<b:Popover content="..." placement="RIGHT" ui:field="popover" trigger="MANUAL" container="body">
-							<g:Anchor ui:field="infoLink"><span class="glyphicon glyphicon-info-sign margin-left-5 greyText-imp"></span></g:Anchor>
-					</b:Popover>
+				    <b:Tooltip text="..." placement="RIGHT" ui:field="tooltip" trigger="MANUAL" container="body">
+			    		<g:FlowPanel ui:field="entityContainer" styleName="displayInline"/>
+					</b:Tooltip>
 				</td>
 			</tr>
 		</table>

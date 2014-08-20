@@ -52,7 +52,6 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 		//add all known cache providers to the list
 		if (registeredCacheProviders.isEmpty()) {
 			registeredCacheProviders.add(new NewsFeedCacheProvider());
-			registeredCacheProviders.add(new DataAccessLevelsCacheProvider());
 		}
 	}
 	
@@ -71,7 +70,7 @@ public class RssServiceImpl extends RemoteServiceServlet implements RssService {
 					logger.throwing(RssServiceImpl.class.getName(), "updateCache()", e);
 				}
 			}
-		}, 0, 5, TimeUnit.MINUTES);
+		}, 0, 10, TimeUnit.MINUTES);
 	}
 	
 	private void updateCache() throws RestServiceException{

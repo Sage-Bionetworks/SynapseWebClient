@@ -164,5 +164,10 @@ public class RssFeedUtils {
 			throw new IllegalArgumentException("Could not read from the source data: " + xml, e);
 		}
 		return pageContent;
-	}	
+	}
+	
+	public static String fixNewsFeed(String newsFeed) {
+		//SWC-1188: Wordpress delivers beacon images over http instead of https (despite source url)
+		return newsFeed.replaceAll("http://pixel.wp.com", "https://pixel.wp.com");
+	}
 }

@@ -97,20 +97,27 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			
 		});
 		
-		entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
-
-			@Override
-			public void onSelection(SelectionEvent<TreeItem> event) {
-				if (selectedItem != null) {
-					selectedItem.asTreeItem().removeStyleName("entityTreeItem-selected");
+		if (!makeLinks) {
+			entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
+	
+				@Override
+				public void onSelection(SelectionEvent<TreeItem> event) {
+					final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
+					selectEntity(targetItem);
 				}
-				final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
-				selectedItem = targetItem;
-				targetItem.asTreeItem().addStyleName("entityTreeItem-selected");
-				presenter.setSelection(selectedItem.getHeader().getId());
-			}
-			
-		});
+				
+			});
+		}
+	}
+	
+	private void selectEntity(EntityTreeItem itemToSelect) {
+		if (selectedItem != null) {
+			selectedItem.asTreeItem().removeStyleName("entityTreeItem-selected");
+		}
+		//final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
+		selectedItem = itemToSelect;
+		selectedItem.asTreeItem().addStyleName("entityTreeItem-selected");
+		presenter.setSelection(selectedItem.getHeader().getId());
 	}
 
 	@Override
@@ -180,8 +187,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		if (parent == null && !isRootItem) throw new IllegalArgumentException("Must specify a parent entity under which to place the created child in the tree.");
 		
 		// Make tree item.
-		EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
+		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.setMakeLinks(makeLinks);
+		if (!makeLinks) {	// change to better variable name.
+			// Add select functionality.
+			childItem.setNonDefaultClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
+					selectEntity(childItem);
+				}
+				
+			});
+			
+		}
 		childItem.configure(childToCreate, isRootItem);
 		
 		// Update fields.

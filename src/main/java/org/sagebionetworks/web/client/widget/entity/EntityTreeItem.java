@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsTreeItem;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,7 +19,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	private TreeItem treeItem;
 	//private EntityHeader entityHeader;
 	private EntityBadge entityBadge;
-	PortalGinInjector ginInjector;
+	private PortalGinInjector ginInjector;
+	private ClickHandler nonDefaultClickHandler;
 	
 	@Inject
 	public EntityTreeItem(PortalGinInjector ginInjector) { 
@@ -33,6 +35,9 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	}
 	
 	public void configure(EntityHeader header, boolean isRootItem) {
+		if (nonDefaultClickHandler != null) {
+			entityBadge.setNonDefaultClickHandler(nonDefaultClickHandler);
+		}
 		entityBadge.configure(header);
 		entityBadge.asWidget().addStyleName("padding-bottom-4-imp");
 		treeItem = new TreeItem(asWidget());
@@ -71,6 +76,10 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	
 	public void setMakeLinks(boolean makeLinks) {
 		entityBadge.setMakeLinks(makeLinks);
+	}
+	
+	public void setNonDefaultClickHandler(ClickHandler handler) {
+		entityBadge.setNonDefaultClickHandler(handler);
 	}
 
 }

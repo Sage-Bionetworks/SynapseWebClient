@@ -23,6 +23,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -135,6 +136,11 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	public void setMakeLinks(boolean makeLinks) {
 		view.setMakeLinks(makeLinks);
+	}
+	
+	
+	public void setNonDefaultClickHandler(ClickHandler handler) {
+		view.setNonDefaultClickHandler(handler);
 	}
 
 }

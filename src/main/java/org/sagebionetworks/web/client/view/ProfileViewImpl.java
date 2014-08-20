@@ -594,6 +594,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
 		DisplayUtils.hide(favoritesListItem);
+		createTeamTextBox.setValue("");
+		createProjectTextBox.setValue("");
 	}
 	
 	private void hideTabContainers() {
