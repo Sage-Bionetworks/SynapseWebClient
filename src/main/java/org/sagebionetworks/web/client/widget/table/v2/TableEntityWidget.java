@@ -120,7 +120,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.asynchProgressWidget.configure("Executing query...", status, new AsynchronousProgressHandler() {
 			
 			@Override
-			public void onFailure(Throwable failure) {
+			public void onStatusCheckFailure(String jobId, Throwable failure) {
 				setQueryFailed(failure.getMessage());
 			}
 			

@@ -1,13 +1,9 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,12 +28,11 @@ public class AsynchronousProgressWidget implements
 
 	private AsynchronousProgressView view;
 	private SynapseClientAsync synapseClient;
-	private OneTimeReference<AsynchronousProgressHandler> handlerReference;
 	private NumberFormatProvider numberFormatProvider;
-	private TimerProvider timerProvider;
-	private AsynchronousJobStatus currentStatus;
+	private TimerProvider timerProvider;;
 	private AdapterFactory adapterFactory;
-	private boolean isCanceled;
+	private String trackingJobId;
+	private AsynchronousJobTracker jobTracker;
 
 	@Inject
 	public AsynchronousProgressWidget(AsynchronousProgressView view,
@@ -60,121 +55,47 @@ public class AsynchronousProgressWidget implements
 	 * @param statusToTrack
 	 */
 	public void configure(String title, AsynchronousJobStatus statusToTrack,
-			AsynchronousProgressHandler handler) {
+			final AsynchronousProgressHandler handler) {
 		view.setTitle(title);
-		isCanceled = false;
-		/*
-		 * OneTimeReference ensure we only call a single method of the handler
-		 * even under conditions where asynchronous calls return after a user
-		 * clicks cancel.
-		 */
-		this.handlerReference = new OneTimeReference<AsynchronousProgressHandler>(
-				handler);
-		this.currentStatus = statusToTrack;
-		// Setup the timer
-		timerProvider.setHandler(new FireHandler() {
-			@Override
-			public void fire() {
-				// when the timer fires the status is checked.
-				checkAndWait();
-			}
-		});
-		// There is nothing do to if the job already failed
-		if (!AsynchJobState.PROCESSING.equals(statusToTrack.getJobState())) {
-			handler.onComplete(statusToTrack);
-		} else {
-			// Set the current status and start the timer.s
-			setCurrentStatus(statusToTrack);
-			checkAndWait();
-		}
-	}
-
-	/**
-	 * Check the current status and if still processing then wait.
-	 * 
-	 */
-	private void checkAndWait() {
-		// Get the current status
-		synapseClient.getAsynchJobStatus(this.currentStatus.getJobId(),
-				new AsyncCallback<String>() {
+		// This is the jobId we are currently tracking
+		// Tracking a new job will "disconnect" this widget from any previously
+		// running trackers.
+		trackingJobId = statusToTrack.getJobId();
+		// We create a new job tacker for each job.
+		jobTracker = new AsynchronousJobTracker(synapseClient, timerProvider,
+				adapterFactory, WAIT_MS, statusToTrack,
+				new UpdatingAsynchProgressHandler() {
 					@Override
-					public void onSuccess(String result) {
-						// If the user already canceled
-						// Parse the results
-						try {
-							AsynchronousJobStatus status = new AsynchronousJobStatus(
-									adapterFactory.createNew(result));
-							// Set the current status
-							setCurrentStatus(status);
-							// are we done?
-							if (!AsynchJobState.PROCESSING.equals(status
-									.getJobState())) {
-								attemptCallOnConplete(status);
-							} else {
-								// Start the timer if the user has not canceled
-								if (!isCanceled) {
-									// Setup another wait
-									timerProvider.schedule(WAIT_MS);
-								}
-							}
-						} catch (JSONObjectAdapterException e) {
-							attemptCallOnFailure(e);
+					public void onStatusCheckFailure(String jobId, Throwable failure) {
+						// We only care about the current job (not old jobs)
+						if (trackingJobId.equals(jobId)) {
+							handler.onStatusCheckFailure(trackingJobId, failure);
 						}
 					}
 
 					@Override
-					public void onFailure(Throwable caught) {
-						attemptCallOnFailure(caught);
+					public void onComplete(AsynchronousJobStatus status) {
+						if (trackingJobId.equals(status.getJobId())) {
+							handler.onComplete(status);
+						}
+					}
+
+					@Override
+					public void onCancel(AsynchronousJobStatus status) {
+						if (trackingJobId.equals(status.getJobId())) {
+							handler.onCancel(status);
+						}
+					}
+
+					@Override
+					public void onUpdate(AsynchronousJobStatus status) {
+						if (trackingJobId.equals(status.getJobId())) {
+							setCurrentStatus(status);
+						}
 					}
 				});
-	}
-
-	/**
-	 * Attempt to notify the handler of completion. Only the first call to a
-	 * handler will succeed. All subsequent calls will be swallowed. For
-	 * example, it would be bad to call onCancel() after calling onComplete().
-	 * 
-	 * @param status
-	 */
-	private void attemptCallOnConplete(AsynchronousJobStatus status) {
-		AsynchronousProgressHandler handler = handlerReference.getReference();
-		// if the handler is null then we have already called one of the handler
-		// methods and must not call another.
-		if (handler != null) {
-			handler.onComplete(status);
-		}
-	}
-
-	/**
-	 * Attempt to notify the handler of the failure. Only the first call to a
-	 * handler will succeed. All subsequent calls will be swallowed. For
-	 * example, it would be bad to call onCancel() after calling onComplete().
-	 * 
-	 * @param caught
-	 */
-	private void attemptCallOnFailure(Throwable caught) {
-		AsynchronousProgressHandler handler = handlerReference.getReference();
-		// if the handler is null then we have already called one of the handler
-		// methods and must not call another.
-		if (handler != null) {
-			handler.onFailure(caught);
-		}
-	}
-
-	/**
-	 * Attempt to notify the handler of a cancel. Only the first call to a
-	 * handler will succeed. All subsequent calls will be swallowed. For
-	 * example, it would be bad to call onCancel() after calling onComplete().
-	 * 
-	 * @param caught
-	 */
-	private void attemptCallOnCancel() {
-		AsynchronousProgressHandler handler = handlerReference.getReference();
-		// if the handler is null then we have already called one of the handler
-		// methods and must not call another.
-		if (handler != null) {
-			handler.onCancel(this.currentStatus);
-		}
+		// Start the tracker
+		jobTracker.start();
 	}
 
 	/**
@@ -183,7 +104,6 @@ public class AsynchronousProgressWidget implements
 	 * @param status
 	 */
 	private void setCurrentStatus(AsynchronousJobStatus status) {
-		this.currentStatus = status;
 		double percent = calculateProgressPercent(status);
 		String text = numberFormatProvider.format(percent) + "%";
 		this.view.setProgress(percent, text, status.getProgressMessage());
@@ -212,10 +132,8 @@ public class AsynchronousProgressWidget implements
 
 	@Override
 	public void onCancel() {
-		isCanceled = true;
-		// cancel the timer
-		this.timerProvider.cancel();
-		attemptCallOnCancel();
+		// Calling cancel on the tracker will feed-back to this widget.
+		jobTracker.cancel();
 	}
 
 }

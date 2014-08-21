@@ -24,9 +24,9 @@ public interface AsynchronousProgressHandler {
 	public void onComplete(AsynchronousJobStatus status);
 	
 	/**
-	 * Called when checking the status fails.
+	 * Called when checking the status fails, this is not the same as a job failure.
 	 * 
 	 * @param failure
 	 */
-	public void onFailure(Throwable failure);
+	public void onStatusCheckFailure(String jobId, Throwable failure);
 }
