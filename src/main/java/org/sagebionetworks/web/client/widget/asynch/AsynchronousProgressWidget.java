@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,24 +25,17 @@ public class AsynchronousProgressWidget implements
 	public static final int WAIT_MS = 1000;
 
 	private AsynchronousProgressView view;
-	private SynapseClientAsync synapseClient;
 	private NumberFormatProvider numberFormatProvider;
-	private TimerProvider timerProvider;;
-	private AdapterFactory adapterFactory;
 	private String trackingJobId;
 	private AsynchronousJobTracker jobTracker;
 
 	@Inject
 	public AsynchronousProgressWidget(AsynchronousProgressView view,
-			SynapseClientAsync synapseClient,
-			NumberFormatProvider numberFormatProvider,
-			TimerProvider timerProvider, AdapterFactory adapterFactory) {
+			NumberFormatProvider numberFormatProvider, AsynchronousJobTracker jobTracker) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.numberFormatProvider = numberFormatProvider;
 		this.numberFormatProvider.setFormat(PERCENT_FORMAT);
-		this.timerProvider = timerProvider;
-		this.adapterFactory = adapterFactory;
+		this.jobTracker = jobTracker;
 		this.view.setPresenter(this);
 	}
 
@@ -61,10 +52,8 @@ public class AsynchronousProgressWidget implements
 		// Tracking a new job will "disconnect" this widget from any previously
 		// running trackers.
 		trackingJobId = statusToTrack.getJobId();
-		// We create a new job tacker for each job.
-		jobTracker = new AsynchronousJobTracker(synapseClient, timerProvider,
-				adapterFactory, WAIT_MS, statusToTrack,
-				new UpdatingAsynchProgressHandler() {
+		// Configure this job
+		jobTracker.configure(statusToTrack, WAIT_MS, new UpdatingAsynchProgressHandler() {
 					@Override
 					public void onStatusCheckFailure(String jobId, Throwable failure) {
 						// We only care about the current job (not old jobs)
@@ -117,12 +106,12 @@ public class AsynchronousProgressWidget implements
 	 */
 	private double calculateProgressPercent(AsynchronousJobStatus status) {
 		if (status.getProgressCurrent() == null
-				|| status.getProgressTotal() == null) {
+				|| status.getProgressTotal() == null || status.getProgressTotal() < 1l) {
 			return 0.0;
 		}
 		double current = status.getProgressCurrent();
 		double total = status.getProgressTotal();
-		return current / total;
+		return current / total * 100.0;
 	}
 
 	@Override

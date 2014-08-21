@@ -16,7 +16,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -30,7 +30,7 @@ public class AsynchronousJobTrackerTest {
 	AdapterFactory adapterFactory;
 	int waitTimeMS;
 	UpdatingAsynchProgressHandler mockHandler;
-	AsynchronousJobTracker tracker;
+	AsynchronousJobTrackerImpl tracker;
 	AsynchronousJobStatus start;
 	String startJSON;
 	AsynchronousJobStatus middle;
@@ -45,6 +45,7 @@ public class AsynchronousJobTrackerTest {
 		adapterFactory = new AdapterFactoryImpl();
 		waitTimeMS = 1000;
 		mockHandler = Mockito.mock(UpdatingAsynchProgressHandler.class);
+		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider, adapterFactory);
 		
 		// Setup three phases for a job.
 		String jobId = "123";
@@ -69,14 +70,14 @@ public class AsynchronousJobTrackerTest {
 		done.setProgressCurrent(100l);
 		done.setProgressTotal(100l);
 		doneJSON =  EntityFactory.createJSONStringForEntity(done);
-		
-		tracker = new AsynchronousJobTracker(mockSynapseClient, mockTimerProvider, adapterFactory, waitTimeMS, start, mockHandler);
+//		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider, adapterFactory, waitTimeMS, start, mockHandler);
 	}
 	
 	@Test
 	public void testAlreadyDone(){
 		// Start with a job that is already done.
 		start.setJobState(AsynchJobState.COMPLETE);
+		tracker.configure(start, waitTimeMS, mockHandler);
 		tracker.start();
 		verify(mockHandler).onComplete(start);
 	}
@@ -85,6 +86,7 @@ public class AsynchronousJobTrackerTest {
 	public void testAlreadyFailed(){
 		// Start with a job that is already done.
 		start.setJobState(AsynchJobState.FAILED);
+		tracker.configure(start, waitTimeMS, mockHandler);
 		tracker.start();
 		verify(mockHandler).onComplete(start);
 	}
@@ -93,6 +95,7 @@ public class AsynchronousJobTrackerTest {
 	public void testMultipleStatesSuccess() throws JSONObjectAdapterException{
 		// simulate three calls
 		AsyncMockStubber.callSuccessWith(startJSON, middleJSON, doneJSON).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
+		tracker.configure(start, waitTimeMS, mockHandler);
 		tracker.start();
 		// Update should occur for all three phases
 		verify(mockHandler, times(2)).onUpdate(start);
@@ -108,6 +111,7 @@ public class AsynchronousJobTrackerTest {
 	public void testWithFailure() throws JSONObjectAdapterException{
 		Throwable error = new Throwable("Something went wrong");
 		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
+		tracker.configure(start, waitTimeMS, mockHandler);
 		start.setJobState(AsynchJobState.PROCESSING);
 		tracker.start();
 		// Even though the call will fail it should still call update once.
@@ -124,6 +128,7 @@ public class AsynchronousJobTrackerTest {
 		// simulate three calls
 		// These will still be called ever after the cancel.
 		AsyncMockStubber.callSuccessWith(startJSON, middleJSON, doneJSON).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
+		tracker.configure(start, waitTimeMS, mockHandler);
 		// Since this test is not using a multiple threads cancel must be called before we start.
 		tracker.cancel();
 		tracker.start();

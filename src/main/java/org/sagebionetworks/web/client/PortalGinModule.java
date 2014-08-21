@@ -79,6 +79,8 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
@@ -506,6 +508,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TimerProvider.class).to(TimerProviderImpl.class);
 		bind(NumberFormatProvider.class).to(NumberFormatProviderImpl.class);
 		bind(AsynchronousProgressView.class).to(AsynchronousProgressViewImpl.class);
+		bind(AsynchronousJobTracker.class).to(AsynchronousJobTrackerImpl.class);
 		
 		/*
 		 * Widgets
