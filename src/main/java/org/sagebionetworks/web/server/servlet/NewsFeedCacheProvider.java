@@ -10,7 +10,7 @@ public class NewsFeedCacheProvider implements CacheProvider {
 
 	@Override
 	public String getValueToCache() {
-	 	return RssFeedUtils.getFeedData(ClientProperties.NEWS_FEED_URL, 4, true);
+		return RssFeedUtils.fixNewsFeed(RssFeedUtils.getFeedData(ClientProperties.NEWS_FEED_URL, 4, true));
 	}
 
 }

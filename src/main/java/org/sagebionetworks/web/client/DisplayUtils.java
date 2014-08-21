@@ -134,6 +134,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -163,6 +164,7 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
+	private static DateTimeFormat prettyFormat = null; 
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
@@ -430,6 +432,15 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
+
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(org.gwtbootstrap3.client.ui.Button button) {
+		button.setEnabled(false);
+		button.setText(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "...").asString());
+	}
+
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -805,7 +816,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getBadgeHtml(String i) {
-		return "<span class=\"badge\">"+i+"</span>";
+		return "<span class=\"badge moveup-4\">"+i+"</span>";
 	}
 
 	
@@ -820,7 +831,10 @@ public class DisplayUtils {
 	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		return DateUtils.convertDateToString(FORMAT.DATE_TIME, toFormat).replaceAll("T", " ");
+		if (prettyFormat == null) {
+			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+		}
+		return prettyFormat.format(toFormat);
 	}
 	
 	
@@ -2297,4 +2311,13 @@ public class DisplayUtils {
 			}
 		});
 	}
+	
+	/**
+	  * just return the empty string if input string parameter s is null, otherwise returns s.
+	  */
+	 public static String replaceWithEmptyStringIfNull(String s) {
+		if (s == null)
+			return "";
+		else return s;
+	 }
 }

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.ClientBundle.Source;
 
 public interface IconsImageBundle extends ClientBundle {
 	
@@ -61,6 +62,13 @@ public interface IconsImageBundle extends ClientBundle {
 	
 	@Source("images/icons/document--arrow-16.png")
 	ImageResource documentArrow16();
+	
+	@Source("images/icons/arrow-down-dir-16.png")
+	ImageResource arrowDownDir16();
+	
+    
+	@Source("images/icons/arrow-right-dir-16.png")
+	ImageResource arrowRightDir16();
 	
 	@Source("images/icons/document--pencil-16.png")
 	ImageResource documentEdit16();

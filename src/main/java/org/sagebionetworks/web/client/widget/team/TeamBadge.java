@@ -4,13 +4,14 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter {
+public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
 	
 	private TeamBadgeView view;
 	SynapseClientAsync synapseClient;
@@ -61,6 +62,11 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	@Override
+	public void setNotificationValue(String value) {
+		view.setRequestCount(value);
 	}
 
 }
