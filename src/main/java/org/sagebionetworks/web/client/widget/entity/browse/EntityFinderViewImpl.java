@@ -176,10 +176,10 @@ public class EntityFinderViewImpl extends LayoutContainer implements EntityFinde
 		// configure tree browsers
 		EntityTreeBrowser tree;
 		tree = myEntitiesBrowser.getEntityTreeBrowser();
-		tree.setMakeLinks(false);
+		tree.makeSelectable();
 		
 		tree = myEntitiesBrowser.getFavoritesTreeBrowser();
-		tree.setMakeLinks(false);
+		tree.makeSelectable();
 		
 		myEntitiesBrowser.setEntitySelectedHandler(new SelectedHandler() {					
 			@Override

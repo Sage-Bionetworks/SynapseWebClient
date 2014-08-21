@@ -43,6 +43,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel iconContainer;
 	@UiField
 	FlowPanel entityContainer;
+	Image iconPicture;
+	ClickHandler nonDefaultClickHandler;
 	
 	boolean isPopoverInitialized;
 	boolean isPopover;
@@ -69,6 +71,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 						
 			tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 			
+			
+			
+			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
 			anchor.addStyleName("link");
@@ -92,9 +97,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			anchor.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.entityClicked(entityHeader);
+					entityClicked(entityHeader, event);
 				}
 			});
+			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -103,7 +109,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			};
 			
 			ImageResource icon = presenter.getIconForType(entityHeader.getType());
-			Image iconPicture = new Image(icon);
+			iconPicture = new Image(icon);
 			iconPicture.setWidth("16px");
 			iconPicture.setHeight("16px");
 			iconPicture.addStyleName("imageButton displayInline");
@@ -167,6 +173,29 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
+	}
+	
+	@Override
+	public void showLoadingIcon() {
+		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
+	}
+	
+	@Override
+	public void hideLoadingIcon() {
+		iconContainer.setWidget(iconPicture);
+	}
+	
+	@Override
+	public void setClickHandler(ClickHandler handler) {
+		nonDefaultClickHandler = handler;
+	}
+	
+	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
+		if (nonDefaultClickHandler == null) {
+			presenter.entityClicked(entityHeader);
+		} else {
+			nonDefaultClickHandler.onClick(event);
+		}
 	}
 	
 	/*

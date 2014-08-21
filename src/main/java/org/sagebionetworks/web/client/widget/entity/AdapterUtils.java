@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.TYPE;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.shared.EntityWrapper;
 
 
 /**
@@ -253,6 +259,24 @@ public class AdapterUtils {
 			return getClassTypeForSchema(schema.getItems());
 		}else{
 			throw new IllegalArgumentException("Unknown type: "+schema.getType());
+		}
+	}
+	
+	/**
+	 * If an EntityWrapper of a valid type (Project, Folder, FileEntity) is given, will
+	 * return an instance of that Entity. Otherwise, will return null.
+	 * @return Instance of the entity if it is valid,
+	 * 		   otherwise returns null.
+	 */
+	public static Entity getEntityForBadgeInfo(AdapterFactory adapterFactory, String className, String jsonEntity) throws JSONObjectAdapterException {
+		if (Project.class.getName().equals(className)) {
+			return new Project(adapterFactory.createNew(jsonEntity));
+		} else if (Folder.class.getName().equals(className)) {
+			return  new Folder(adapterFactory.createNew(jsonEntity));
+		} else if (FileEntity.class.getName().equals(className)) {
+			return  new FileEntity(adapterFactory.createNew(jsonEntity));
+		} else {
+			return null;
 		}
 	}
 }

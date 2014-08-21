@@ -353,7 +353,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			targetPanel.add(widget);
 		}
 		if (projectHeaders.isEmpty())
-			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.PLACEHOLDER_NAME_PREFIX + " " + DisplayConstants.EMPTY + "</div>").asString()));
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY +  "</div>").asString()));
 	}
 	
 	@Override
