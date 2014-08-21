@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -31,7 +30,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public static final long DEFAULT_PAGE_SIZE = 10L;
 
 	private TableEntityWidgetView view;
-	private PortalGinInjector ginInjector;
 	private SynapseClientAsync synapseClient;
 	private TableModelUtils tableModelUtils;
 	private AsynchronousProgressWidget asynchProgressWidget;
@@ -39,16 +37,15 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	String tableId;
 	TableBundle  tableBundle;
 	boolean canEdit;
-	QueryChangeHandler queryChagneHandler;
+	QueryChangeHandler queryChangeHandler;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, PortalGinInjector ginInjector,  SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
+	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget,  SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
 		this.view = view;
-		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		this.tableModelUtils = tableModelUtils;
+		this.asynchProgressWidget = asynchProgressWidget;
 		this.view.setPresenter(this);
-		this.asynchProgressWidget = this.ginInjector.creatNewAsynchronousProgressWidget();
 	}
 
 	@Override
@@ -68,7 +65,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
-		this.queryChagneHandler = qch;
+		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
 		this.view.setProgressWidget(this.asynchProgressWidget);
 		checkState();
@@ -83,7 +80,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			setNoColumnsState();
 		}else{
 			// There are columns.
-			String startQuery = queryChagneHandler.getQueryString();;
+			String startQuery = queryChangeHandler.getQueryString();;
 			if(startQuery == null){
 				// use a default query
 				startQuery = getDefaultQueryString();
@@ -107,7 +104,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 					try {
 						status = tableModelUtils.createAsynchronousJobStatus(result);
 						// show the progress
-						waitForQueryResutls(status);
+						waitForQueryResults(status);
 					} catch (JSONObjectAdapterException e) {
 						setQueryFailed(e.getMessage());
 					} 					
@@ -115,7 +112,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		}
 	}
 	
-	private void waitForQueryResutls(AsynchronousJobStatus status){
+	private void waitForQueryResults(AsynchronousJobStatus status){
 		view.setQueryProgressVisible(true);
 		this.asynchProgressWidget.configure("Executing query...", status, new AsynchronousProgressHandler() {
 			
@@ -155,8 +152,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			message = NO_COLUMNS_NOT_EDITABLE;
 		}
 		// There can be no query when there are no columns
-		if(this.queryChagneHandler.getQueryString() != null){
-			this.queryChagneHandler.onQueryChange(null);
+		if(this.queryChangeHandler.getQueryString() != null){
+			this.queryChangeHandler.onQueryChange(null);
 		}
 		view.setQueryInputVisible(false);
 		view.setQueryResultsVisible(false);
@@ -193,7 +190,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 
 	@Override
 	public void onPersistSuccess(EntityUpdatedEvent event) {
-		this.queryChagneHandler.onPersistSuccess(event);
+		this.queryChangeHandler.onPersistSuccess(event);
 	}
 	
 }
