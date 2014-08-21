@@ -90,7 +90,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	public String initiateSession(String username, String password) throws RestServiceException {
 		validateService();
 		
-		SynapseClient synapseClient = createSynapseClient();
+		SynapseClient synapseClient = createAnonymousSynapseClient();
 		try {
 			Session session = synapseClient.login(username, password);
 			return EntityFactory.createJSONStringForEntity(session);
