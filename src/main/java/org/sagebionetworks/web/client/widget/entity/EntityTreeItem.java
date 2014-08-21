@@ -14,12 +14,10 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 
 	private TreeItem treeItem;
 	private EntityBadge entityBadge;
-	private PortalGinInjector ginInjector;
 	
 	@Inject
-	public EntityTreeItem(PortalGinInjector ginInjector) { 
-		this.ginInjector = ginInjector;
-		entityBadge = ginInjector.getEntityBadgeWidget();
+	public EntityTreeItem(EntityBadge entityBadge) { 
+		this.entityBadge = entityBadge;
 	}
 	
 	public void configure(EntityHeader header, boolean isRootItem) {
@@ -54,12 +52,8 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		return entityBadge.getHeader();
 	}
 	
-	public void setMakeLinks(boolean makeLinks) {
-		entityBadge.setMakeLinks(makeLinks);
-	}
-	
-	public void setNonDefaultClickHandler(ClickHandler handler) {
-		entityBadge.setNonDefaultEntityClickedHandler(handler);
+	public void setClickHandler(ClickHandler handler) {
+		entityBadge.setClickHandler(handler);
 	}
 
 }

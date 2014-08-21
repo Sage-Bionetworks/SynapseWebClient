@@ -164,23 +164,10 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
-	public void testMakeLinks() {
-		EntityHeader header = new EntityHeader();
-		header.setId("syn12345");
-		widget.configure(header);
-		
-		widget.setMakeLinks(false);
-		verify(mockView).setMakeLinks(false);
-		
-		widget.setMakeLinks(true);
-		verify(mockView).setMakeLinks(true);
-	}
-	
-	@Test
-	public void testSetNonDefaultEntityClickedHandler() {
+	public void testSetClickHandler() {
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
-		widget.setNonDefaultEntityClickedHandler(mockClickHandler);
-		verify(mockView).setNonDefaultEntityClickedHandler(any(ClickHandler.class));
+		widget.setClickHandler(mockClickHandler);
+		verify(mockView).setClickHandler(any(ClickHandler.class));
 	}
 
 }

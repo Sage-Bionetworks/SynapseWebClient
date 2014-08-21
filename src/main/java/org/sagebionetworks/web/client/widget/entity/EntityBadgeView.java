@@ -26,9 +26,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 	
 	void hideLoadingIcon();
 	
-	void setMakeLinks(boolean makeLinks);
-	
-	void setNonDefaultEntityClickedHandler(ClickHandler handler);
+	void setClickHandler(ClickHandler handler);
 		
 	/**
 	 * Presenter interface

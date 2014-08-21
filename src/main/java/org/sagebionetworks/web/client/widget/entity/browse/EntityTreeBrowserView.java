@@ -31,10 +31,10 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	void removeEntity(EntityHeader entityHeader);
 
 	/**
-	 * Show links if true
-	 * @param makeLinks Make the labels entity links if true 
+	 * Rather than linking to the Entity Page, a clicked entity
+	 * in the tree will become selected.
 	 */
-	void setMakeLinks(boolean makeLinks);
+	void makeSelectable();
 	
 	/**
 	 * Makes a TreeItem and places it in the tree. Gives the created item a "dummy"
@@ -47,8 +47,14 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 */
 	void createAndPlaceTreeItem(EntityHeader childToCreate, EntityTreeItem parent, boolean isRootItem);
 	
+	/**
+	 * Makes a TreeItem and places it in the root of the tree.
+	 * 
+	 * @param toCreate The EntityHeader who's information will be used to create
+	 * 				   a new tree item and place in the tree.
+	 */
 	void createAndPlaceRootTreeItem(EntityHeader toCreate);
-	
+		
 	/**
 	 * Presenter interface
 	 */

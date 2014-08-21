@@ -37,7 +37,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private PortalGinInjector ginInjector;
 	private IconsImageBundle iconsImageBundle;
 		
-	private boolean makeLinks = true;
+	private boolean isSelectable = false;
 	private Tree entityTree;
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
@@ -63,18 +63,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 			}
 			
 		});
-		
-		if (!makeLinks) {
-			entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
-	
-				@Override
-				public void onSelection(SelectionEvent<TreeItem> event) {
-					final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
-					selectEntity(targetItem);
-				}
-				
-			});
-		}
 	}
 	
 	@Override
@@ -126,8 +114,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 	
 	@Override
-	public void setMakeLinks(boolean makeLinks) {
-		this.makeLinks = makeLinks;
+	public void makeSelectable() {
+		this.isSelectable = true;
+		entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
+
+			@Override
+			public void onSelection(SelectionEvent<TreeItem> event) {
+				final EntityTreeItem targetItem = treeItem2entityTreeItem.get(event.getSelectedItem());
+				selectEntity(targetItem);
+			}
+			
+		});
 	}
 
 	@Override
@@ -141,10 +138,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 		
 		// Make tree item.
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
-		childItem.setMakeLinks(makeLinks);
-		if (!makeLinks) {	// TODO: better variable name: isSelectable?
+		if (isSelectable) {
 			// Add select functionality.
-			childItem.setNonDefaultClickHandler(new ClickHandler() {
+			childItem.setClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {

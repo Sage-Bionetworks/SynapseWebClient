@@ -130,13 +130,8 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		return entityHeader;
 	}
 	
-	public void setMakeLinks(boolean makeLinks) {
-		view.setMakeLinks(makeLinks);
-	}
-	
-	
-	public void setNonDefaultEntityClickedHandler(ClickHandler handler) {
-		view.setNonDefaultEntityClickedHandler(handler);
+	public void setClickHandler(ClickHandler handler) {
+		view.setClickHandler(handler);
 	}
 
 }

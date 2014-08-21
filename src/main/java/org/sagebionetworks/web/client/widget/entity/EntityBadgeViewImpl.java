@@ -44,7 +44,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	FlowPanel entityContainer;
 	Image iconPicture;
-	boolean makeLinks = true;	// TODO: Default to make links?
 	ClickHandler nonDefaultClickHandler;
 	
 	boolean isPopoverInitialized;
@@ -187,12 +186,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void setMakeLinks(boolean makeLinks) {
-		this.makeLinks = makeLinks;
-	}
-	
-	@Override
-	public void setNonDefaultEntityClickedHandler(ClickHandler handler) {
+	public void setClickHandler(ClickHandler handler) {
 		nonDefaultClickHandler = handler;
 	}
 	

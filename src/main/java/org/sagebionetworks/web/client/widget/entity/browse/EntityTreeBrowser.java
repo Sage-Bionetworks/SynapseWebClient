@@ -190,11 +190,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	/**
-	 * Show links if true
-	 * @param makeLinks Make the labels entity links if true 
+	 * Rather than linking to the Entity Page, a clicked entity
+	 * in the tree will become selected.
 	 */
-	public void setMakeLinks(boolean makeLinks) {
-		view.setMakeLinks(makeLinks);
+	public void makeSelectable() {
+		view.makeSelectable();
 	}
 	
 	/**
