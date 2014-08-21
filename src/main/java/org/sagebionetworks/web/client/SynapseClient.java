@@ -12,6 +12,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -379,6 +380,18 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Start an Asynchronous query.
+	 * @param query
+	 * @return The JSON of the 
+	 * @throws RestServiceException 
+	 */
+	public String startAsynchQuery(String query) throws RestServiceException;
+	
+	public String getAsynchJobStatus(String jobId) throws RestServiceException;
+	
+	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
 }

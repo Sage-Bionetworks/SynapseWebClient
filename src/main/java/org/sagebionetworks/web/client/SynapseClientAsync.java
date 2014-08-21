@@ -9,6 +9,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -308,8 +309,29 @@ public interface SynapseClientAsync {
 	 * @param schemaJSON
 	 * @param callback
 	 */
-	void setTableSchema(String tableId, List<String> schemaJSON,
-			AsyncCallback<List<String>> callback);
+	void setTableSchema(String tableJSON, List<String> newSchema,
+			AsyncCallback<Void> callback);
+	
+	/**
+	 * Start a query as an asynchronous job.
+	 * @param query
+	 * @param callback
+	 */
+	void startAsynchQuery(String query, AsyncCallback<String> callback);
+
+	/**
+	 * Get the status of an asynchronous job.
+	 * @param jobId
+	 * @param callback
+	 */
+	void getAsynchJobStatus(String jobId, AsyncCallback<String> callback);
+	
+	/**
+	 * After an asynchronous query job completes use this to get the query results.
+	 * @param jobId
+	 * @param callback
+	 */
+	void getAsychQueryResult(String jobId, String queryString, AsyncCallback<String> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	

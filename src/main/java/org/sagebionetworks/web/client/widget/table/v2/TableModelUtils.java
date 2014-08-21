@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.query.QueryTableResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -115,5 +117,24 @@ public class TableModelUtils {
 	}
 	
 	
+	/**
+	 * Create an AsynchronousJobStatus from JSON
+	 * @param json
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public AsynchronousJobStatus createAsynchronousJobStatus(String json) throws JSONObjectAdapterException{
+		return new AsynchronousJobStatus(adapterFactory.createNew(json));
+	}
+	
+	/**
+	 * Create a QueryTableResults from JSON
+	 * @param json
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public QueryTableResults createQueryBundleRestuls(String json) throws JSONObjectAdapterException{
+		return new QueryTableResults(adapterFactory.createNew(json));
+	}
 	
 }
