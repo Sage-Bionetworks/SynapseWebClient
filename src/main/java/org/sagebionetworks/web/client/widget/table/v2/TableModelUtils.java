@@ -133,7 +133,7 @@ public class TableModelUtils {
 	 * @return
 	 * @throws JSONObjectAdapterException
 	 */
-	public QueryTableResults createQueryBundleRestuls(String json) throws JSONObjectAdapterException{
+	public QueryTableResults createQueryBundleResults(String json) throws JSONObjectAdapterException{
 		return new QueryTableResults(adapterFactory.createNew(json));
 	}
 	
