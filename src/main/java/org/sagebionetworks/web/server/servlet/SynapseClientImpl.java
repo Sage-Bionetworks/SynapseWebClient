@@ -3553,10 +3553,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				newSchema.add(m.getId());
 			}
 			// Get the table
-			TableEntity table = synapseClient.getEntity(tableId,
+			TableEntity table = (TableEntity)synapseClient.getEntity(tableId,
 					TableEntity.class);
 			table.setColumnIds(newSchema);
-			table = synapseClient.putEntity(table);
+			table = (TableEntity)synapseClient.putEntity(table);
 			// Return the models
 			return tableModelUtils.toJSONList(models);
 		} catch (SynapseException e) {

@@ -645,6 +645,10 @@ a.shortBtn {
 	margin-bottom: 5px;
 }
 
+.margin-bottom-4 {
+	margin-bottom: 4px;
+}
+
 .margin-bottom-15 {
 	margin-bottom: 15px;
 }
@@ -1042,12 +1046,18 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration:underline;
 }
 
-.gwt-TreeItem {
+.entityTreeItem, .entityTreeItem-font {
 	font: normal 11px arial, tahoma, helvetica, sans-serif;
 }
 
-.entityBadge {
-	padding-bottom: 4px !important;
+.entityTreeItem-selected a,
+.entityTreeItem-selected a:hover, 
+.entityTreeItem-selected img,
+.entityTreeItem-selected img:hover {
+    color: black !important;
+    cursor: default !important;
+    font-weight: bold;
+    text-decoration: none !important;
 }
 
 /**table of contents styling **/
@@ -1131,6 +1141,10 @@ ol.lowerroman {
 
 .padding-bottom-15 {
 	padding-bottom: 15px;
+}
+
+.padding-bottom-4-imp {
+	padding-bottom: 4px !important;
 }
 
 .padding-5 {
@@ -1285,6 +1299,11 @@ ol.lowerroman {
 	background-clip: padding-box;
 }
 
+.moveup-35 {
+	position: relative;
+	top: -35px;
+}
+
 .moveup-8 {
 	position: relative;
 	top: -8px;
@@ -1374,6 +1393,10 @@ ol.lowerroman {
 .padding-top-5 {
 	margin-top: 5px;
     position: absolute;
+}
+
+.padding-top-0-imp {
+	padding-top: 0px !important;
 }
 
 .fileTabTopPadding {
@@ -1549,6 +1572,10 @@ a.projectTitle:hover {
 
 .padding-left-0 {
 	padding-left: 0px;
+}
+
+.padding-left-0-imp {
+	padding-left: 0px !important;
 }
 .padding-left-5 {
 	padding-left: 5px;

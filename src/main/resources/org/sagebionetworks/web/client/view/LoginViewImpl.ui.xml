@@ -60,8 +60,6 @@
 					</div>
 				</g:HTMLPanel>
 				</div> <!-- close class="container" -->
-
-				
 <!-- start footer -->
             <div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />

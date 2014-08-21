@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -221,6 +222,7 @@ public interface PortalGinInjector extends Ginjector {
 	public SimpleTableWidget getSimpleTableWidget();
 	
 	public EntityBadge getEntityBadgeWidget();
+	public EntityTreeItem getEntityTreeItemWidget();
 
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();

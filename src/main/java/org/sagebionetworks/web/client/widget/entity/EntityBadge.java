@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -19,6 +19,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,6 +33,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private AdapterFactory adapterFactory;
 	private ClientCache clientCache;
 	private GlobalApplicationState globalAppState;
+	private EntityHeader entityHeader;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -50,6 +52,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	}
 	
 	public void configure(EntityHeader header) {
+		entityHeader = header;
 		view.setEntity(header);
 	}
 	
@@ -81,13 +84,12 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 			@Override
 			public void onSuccess(EntityWrapper result) {
 				try {
-					//If necessary, expand to support other types.  
-					//But do not pull in NodeAdapterFactory for the mapping, as this will cause the initial fragment download size to significantly increase.
-					if (!Project.class.getName().equals(result.getEntityClassName())) {
-						callback.onFailure(new IllegalArgumentException("Entity badge detailed information currently only supports Projects"));
+					final Entity entity = AdapterUtils.getEntityForBadgeInfo(adapterFactory, result.getEntityClassName(), result.getEntityJson());
+					if (entity == null) {
+						callback.onFailure(new IllegalArgumentException("The class " + result.getEntityClassName() + " is not supported for entity badge detailed information."));
+						return;
 					}
 					
-					final Project entity = new Project(adapterFactory.createNew(result.getEntityJson()));
 					UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 						@Override
 						public void onSuccess(UserProfile profile) {
@@ -114,6 +116,22 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	@Override
 	public void entityClicked(EntityHeader entityHeader) {
 		globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));
+	}
+	
+	public void hideLoadingIcon() {
+		view.hideLoadingIcon();
+	}
+
+	public void showLoadingIcon() {
+		view.showLoadingIcon();
+	}
+	
+	public EntityHeader getHeader() {
+		return entityHeader;
+	}
+	
+	public void setClickHandler(ClickHandler handler) {
+		view.setClickHandler(handler);
 	}
 
 }

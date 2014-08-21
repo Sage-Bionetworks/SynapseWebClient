@@ -164,7 +164,7 @@ public class DisplayConstants {
 	public static final String BUTTON_SAVING = "Saving";
 	public static final String BUTTON_CHANGE_PASSWORD = "Change Password";
 	public static final String BUTTON_UPDATE_WITH_LINKED_IN = "Update With LinkedIn";
-	public static final String BUTTON_CHANGE_USER_INFO = "Update";
+	public static final String BUTTON_CHANGE_USER_INFO = "Update Profile";
 	public static final String LABEL_SINGLE_SIGN_ON_LOGGING_IN = "Logging you in.";
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
@@ -551,6 +551,7 @@ public class DisplayConstants {
 	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
 	public static final String PENDING_JOIN_REQUESTS = "Pending Join Requests";
 	public static final String PENDING_INVITATIONS = "Pending Invitations";
+	public static final String PENDING_JOIN_REQUESTS_TOOLTIP = "Team has a pending join request";
 	public static final String DELETE_TEAM_SUCCESS = "Team successfully deleted";
 	public static final String UPDATE_TEAM_SUCCESS = "Team successfully updated";
 	public static final String LEAVE_TEAM_SUCCESS = "Successfully left team";

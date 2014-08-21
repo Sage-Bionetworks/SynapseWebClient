@@ -22,8 +22,6 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	 */
 	void showUserUpdateSuccess();
 	
-	void hideCancelButton();
-	
 	/**
 	 * Alerts the view that updating the user's information failed.
 	 */
@@ -37,7 +35,7 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	public interface Presenter extends SynapsePresenter {
 
 		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, AttachmentData pic, String teamName, String url, String userName);
-
-		void cancelClicked();
+		void redirectToLinkedIn();
+		void rollback();
 	}
 }

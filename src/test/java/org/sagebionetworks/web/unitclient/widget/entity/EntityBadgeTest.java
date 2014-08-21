@@ -4,8 +4,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static junit.framework.Assert.*;
 
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.Entity;
@@ -18,7 +16,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -30,6 +27,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -74,6 +72,7 @@ public class EntityBadgeTest {
 		EntityWrapper wrapper = new EntityWrapper();
 		String entityJson = entity.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		wrapper.setEntityJson(entityJson);
+		wrapper.setEntityClassName(entity.getClass().getName());
 		AsyncMockStubber.callSuccessWith(wrapper).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -139,6 +138,36 @@ public class EntityBadgeTest {
 		widget.entityClicked(header);
 		verify(mockPlaceChanger).goTo(any(Synapse.class));
 	}
-
+	
+	@Test
+	public void testShowTypeIcon() throws Exception {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn93847");
+		widget.hideLoadingIcon();
+		verify(mockView).hideLoadingIcon();
+	}
+	
+	@Test
+	public void testShowLoadingIcon() throws Exception {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn93847");
+		widget.showLoadingIcon();
+		verify(mockView).showLoadingIcon();
+	}
+	
+	@Test
+	public void testGetEntity() {
+		EntityHeader header = new EntityHeader();
+		header.setId("syn12345");
+		widget.configure(header);
+		assertTrue(header == widget.getHeader());
+	}
+	
+	@Test
+	public void testSetClickHandler() {
+		ClickHandler mockClickHandler = mock(ClickHandler.class);
+		widget.setClickHandler(mockClickHandler);
+		verify(mockView).setClickHandler(any(ClickHandler.class));
+	}
 
 }

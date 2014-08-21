@@ -17,6 +17,8 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 
 	public void showLoadError(String principalId);
 	
+	public void setRequestCount(String count);
+	
 	/**
 	 * Presenter interface
 	 */
