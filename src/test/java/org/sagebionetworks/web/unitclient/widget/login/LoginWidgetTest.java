@@ -2,16 +2,25 @@ package org.sagebionetworks.web.unitclient.widget.login;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
+import org.sagebionetworks.web.client.widget.login.UserListener;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -20,16 +29,25 @@ public class LoginWidgetTest {
 	LoginWidget loginWidget;
 	LoginWidgetView mockView;
 	AuthenticationController mockAuthController;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	UserListener mockUserListener;
+	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	@Before
-	public void setup(){		
+	public void setup() throws JSONObjectAdapterException{		
 		mockView = mock(LoginWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		loginWidget = new LoginWidget(mockView, mockAuthController, mockNodeModelCreator, mockGlobalApplicationState);
-		
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		mockUserListener = mock(UserListener.class);
+		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynapseJSNIUtils,adapter);
+		loginWidget.setUserListener(mockUserListener);
+		UserSessionData usd = new UserSessionData();
+		UserProfile p = new UserProfile();
+		p.setOwnerId("12");
+		usd.setProfile(p);
+		String sessionDataJson = usd.writeToJSONObject(adapter.createNew()).toJSONString();
+		AsyncMockStubber.callSuccessWith(sessionDataJson).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		verify(mockView).setPresenter(loginWidget);
 	}
 	
@@ -45,6 +63,18 @@ public class LoginWidgetTest {
 		loginWidget.setUsernameAndPassword(u, p);
 		
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
+		verify(mockUserListener).userChanged(any(UserSessionData.class));
 	}
 
+	@Test
+	public void testSetUsernameAndPasswordErrorHandling() {
+		String u = "user";
+		String p = "pass";
+		String unhandledExceptionMessage = "unhandled exception";
+		AsyncMockStubber.callFailureWith(new Exception(unhandledExceptionMessage)).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		loginWidget.setUsernameAndPassword(u, p);
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
+		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockSynapseJSNIUtils).consoleError(eq(unhandledExceptionMessage));
+	}
 }

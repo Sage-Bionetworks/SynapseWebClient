@@ -142,7 +142,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 */
 	public void checkForTempUsername(){
 		//get my profile, and check for a default username
-		view.hideLoggingInLoader();
 		UserProfile userProfile = authenticationController.getCurrentUserSessionData().getProfile();
 		if (userProfile != null && DisplayUtils.isTemporaryUsername(userProfile.getUserName())) {
 			gotoChangeUsernamePlace();
@@ -187,6 +186,17 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		});
 	}
 	
+	public void userAuthenticated() {
+		view.hideLoggingInLoader();
+		//the user should be logged in now.
+		if (!authenticationController.isLoggedIn()) {
+			view.showErrorMessage("An error occurred during login. Please try logging in again.");
+			view.showLogin(openIdActionUrl, openIdReturnUrl);
+		} else {
+			checkForTempUsername();	
+		}
+	}
+	
 	private void revalidateSession(String token) {
 		// Single Sign on token. try refreshing the token to see if it is valid. if so, log user in
 		// parse token
@@ -226,7 +236,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												public void onSuccess(
 														String result) {
 													// Signed ToU. Check for temp username, passing record, and then forward
-													checkForTempUsername();
+													userAuthenticated();
 												}	
 												
 											});
@@ -256,7 +266,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 							});		
 					} else {
 						// user is logged in. forward to destination after checking for username
-						checkForTempUsername();
+						userAuthenticated();
 					}
 				}
 				@Override
