@@ -384,13 +384,19 @@ public interface SynapseClient extends RemoteService {
 			throws RestServiceException;
 	
 	/**
-	 * Start an Asynchronous query.
-	 * @param query
-	 * @return The JSON of the 
+	 * Start an Asynchronous job with the provided body.
+	 * @param The JSON of the AsynchronousRequestBody
+	 * @return The JSON of the AsynchronousJobStatus
 	 * @throws RestServiceException 
 	 */
-	public String startAsynchQuery(String query) throws RestServiceException;
+	public String startAsynchJob(String jobBodyJSON) throws RestServiceException;
 	
+	/**
+	 * Get the status of a running asynchronous job.
+	 * @param jobId The ID of the job.
+	 * @return The JSON of the AsynchronousJobStatus
+	 * @throws RestServiceException
+	 */
 	public String getAsynchJobStatus(String jobId) throws RestServiceException;
 	
 	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;

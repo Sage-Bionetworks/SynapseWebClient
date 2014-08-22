@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
@@ -37,12 +39,58 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.adapterFactory = adapterFactory;
 	}
 	
-	@Override
-	public void configure(AsynchronousJobStatus toTrack, int waitTimeMS,
-			UpdatingAsynchProgressHandler handler) {
+
+	/**
+	 * Start the job then start tracking the job
+	 */
+	public void start(AsynchronousRequestBody requestBody, final int waitTimeMS,
+			final UpdatingAsynchProgressHandler handler) {
+		// Start the job.
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		try {
+			requestBody.writeToJSONObject(adapter);
+			String jobBodyJSON = adapter.toJSONString();
+			synapseClient.startAsynchJob(jobBodyJSON, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String result) {
+					if (isCanceled) {
+						// Nothing to do if the user has hit cancel.
+						return;
+					}
+					try {
+						AsynchronousJobStatus status = new AsynchronousJobStatus(adapterFactory.createNew());
+						// Track the job.
+						trackJob(status, waitTimeMS, handler);
+					} catch (JSONObjectAdapterException e) {
+						handler.onStatusCheckFailure(null, e);
+					}
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if (isCanceled) {
+						// Nothing to do if the user has hit cancel.
+						return;
+					}
+					handler.onStatusCheckFailure(null, caught);
+					
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			handler.onStatusCheckFailure(null, e);
+		}
+	}
+
+	/**
+	 * Once the job has started 
+	 * @param statusToTrack
+	 * @param waitTimeMS
+	 * @param handler
+	 */
+	private void trackJob(AsynchronousJobStatus statusToTrack, int waitTimeMS, UpdatingAsynchProgressHandler handler) {
 		this.waitTimeMS = waitTimeMS;
-		this.statusToTrack = toTrack;
 		this.handler = handler;
+		this.statusToTrack = statusToTrack;
 		/*
 		 * While update can be called many times we only want to call
 		 * onComplete(), onFailure() and onCancel() once. For example, it would
@@ -52,12 +100,6 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
 		this.isCanceled = false;
-	}
-
-	/**
-	 * Start tracking this job.
-	 */
-	public void start() {
 		// Setup the timer
 		timerProvider.setHandler(new FireHandler() {
 			@Override
@@ -173,5 +215,4 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 			mightBeNull.onStatusCheckFailure(jobId, caught);
 		}
 	}
-
 }

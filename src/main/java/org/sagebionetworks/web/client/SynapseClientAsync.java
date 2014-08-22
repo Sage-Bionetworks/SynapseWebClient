@@ -313,11 +313,12 @@ public interface SynapseClientAsync {
 			AsyncCallback<Void> callback);
 	
 	/**
-	 * Start a query as an asynchronous job.
+	 * Start an asynchronous job passing a job body.
+	 * 
 	 * @param query
 	 * @param callback
 	 */
-	void startAsynchQuery(String query, AsyncCallback<String> callback);
+	void startAsynchJob(String jobBodyJSON, AsyncCallback<String> callback);
 
 	/**
 	 * Get the status of an asynchronous job.

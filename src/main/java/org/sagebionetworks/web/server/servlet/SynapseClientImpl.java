@@ -75,6 +75,7 @@ import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -3570,11 +3571,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String startAsynchQuery(String query) throws RestServiceException {
+	public String startAsynchJob(String bodyJSON) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			AsynchDownloadFromTableRequestBody body = new AsynchDownloadFromTableRequestBody();
-			body.setSql(query);
+			AsynchronousRequestBody body = EntityFactory.createEntityFromJSONString(bodyJSON, AsynchronousRequestBody.class);
 			AsynchronousJobStatus status = synapseClient.startAsynchronousJob(body);
 			return EntityFactory.createJSONStringForEntity(status);
 		}catch (SynapseException e) {
