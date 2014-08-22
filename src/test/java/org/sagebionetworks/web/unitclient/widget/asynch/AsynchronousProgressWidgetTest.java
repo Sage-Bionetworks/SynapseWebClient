@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableRequestBody;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -34,7 +35,7 @@ public class AsynchronousProgressWidgetTest {
 	AsynchronousJobStatus middle;
 	AsynchronousJobStatus done;
 	List<AsynchronousJobStatus> states;
-
+	AsynchDownloadFromTableRequestBody requestBody;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -42,6 +43,8 @@ public class AsynchronousProgressWidgetTest {
 		numberFormatProvider = Mockito.mock(NumberFormatProvider.class);
 		mockHandler = Mockito.mock(AsynchronousProgressHandler.class);
 		states = new LinkedList<AsynchronousJobStatus>();
+		requestBody = new AsynchDownloadFromTableRequestBody();
+		requestBody.setSql("select * from syn123");
 		// Setup three phases for a job.
 		String jobId = "123";
 		// This job will have three phases.
@@ -81,7 +84,7 @@ public class AsynchronousProgressWidgetTest {
 	@Test
 	public void testHappy(){
 		String title = "title";
-		widget.configure(title, start, mockHandler);
+		widget.configure(title, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -94,7 +97,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(null);
 		start.setProgressTotal(null);
-		widget.configure(title, start, mockHandler);
+		widget.configure(title, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -107,7 +110,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.configure(title, start, mockHandler);
+		widget.configure(title, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -120,7 +123,7 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.configure(title, start, mockHandler);
+		widget.configure(title, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
 		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
 		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
@@ -134,7 +137,7 @@ public class AsynchronousProgressWidgetTest {
 		Throwable error = new Throwable("some error");
 		trackerStub = new AsynchronousJobTrackerStub(states, error);
 		widget = new AsynchronousProgressWidget(mockView, numberFormatProvider, trackerStub);
-		widget.configure("title", start, mockHandler);
-		verify(mockHandler).onStatusCheckFailure("123", error);
+		widget.configure("title", requestBody, mockHandler);
+		verify(mockHandler).onStatusCheckFailure(error);
 	}
 }

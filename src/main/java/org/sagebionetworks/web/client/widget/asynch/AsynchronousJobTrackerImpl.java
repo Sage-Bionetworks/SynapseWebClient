@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
@@ -36,12 +38,13 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.timerProvider = timerProvider;
 		this.adapterFactory = adapterFactory;
 	}
-	
-	@Override
-	public void configure(AsynchronousJobStatus toTrack, int waitTimeMS,
-			UpdatingAsynchProgressHandler handler) {
-		this.waitTimeMS = waitTimeMS;
-		this.statusToTrack = toTrack;
+
+	/**
+	 * Start the job then start tracking the job
+	 */
+	public void startAndTrack(AsynchronousRequestBody requestBody,
+			final int waitTimeMS, final UpdatingAsynchProgressHandler handler) {
+		this.isCanceled = false;
 		this.handler = handler;
 		/*
 		 * While update can be called many times we only want to call
@@ -51,13 +54,53 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		 */
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
-		this.isCanceled = false;
+		// Start the job.
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		try {
+			requestBody.writeToJSONObject(adapter);
+			String jobBodyJSON = adapter.toJSONString();
+			synapseClient.startAsynchJob(jobBodyJSON,
+					new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String statusJSON) {
+							// nothing to do if canceled.
+							if (!isCanceled) {
+								try {
+									AsynchronousJobStatus status = new AsynchronousJobStatus(
+											adapterFactory
+													.createNew(statusJSON));
+									// Track the job.
+									trackJob(status, waitTimeMS);
+								} catch (JSONObjectAdapterException e) {
+									oneTimeOnFailure(e);
+								}
+							}
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							if (!isCanceled) {
+								oneTimeOnFailure(caught);
+							}
+						}
+					});
+		} catch (JSONObjectAdapterException e) {
+			if (!isCanceled) {
+				oneTimeOnFailure(e);
+			}
+		}
 	}
 
 	/**
-	 * Start tracking this job.
+	 * Once the job has started
+	 * 
+	 * @param statusToTrack
+	 * @param waitTimeMS
+	 * @param handler
 	 */
-	public void start() {
+	private void trackJob(AsynchronousJobStatus statusToTrack, int waitTimeMS) {
+		this.waitTimeMS = waitTimeMS;
+		this.statusToTrack = statusToTrack;
 		// Setup the timer
 		timerProvider.setHandler(new FireHandler() {
 			@Override
@@ -86,37 +129,36 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 				new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String result) {
-						if (isCanceled) {
-							// Nothing to do if the user has hit cancel.
-							return;
-						}
-						// If the user already canceled
-						// Parse the results
-						try {
-							AsynchronousJobStatus status = new AsynchronousJobStatus(
-									adapterFactory.createNew(result));
-							// Set the current status
-							handler.onUpdate(status);
-							// are we done?
-							if (!AsynchJobState.PROCESSING.equals(status
-									.getJobState())) {
-								oneTimeOnComplete(status);
-							} else {
-								// Start the timer if the user has not canceled
-								timerProvider.schedule(waitTimeMS);
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							// Parse the results
+							try {
+								AsynchronousJobStatus status = new AsynchronousJobStatus(
+										adapterFactory.createNew(result));
+								// Set the current status
+								handler.onUpdate(status);
+								// are we done?
+								if (!AsynchJobState.PROCESSING.equals(status
+										.getJobState())) {
+									oneTimeOnComplete(status);
+								} else {
+									// Start the timer if the user has not canceled
+									timerProvider.schedule(waitTimeMS);
+								}
+							} catch (JSONObjectAdapterException e) {
+								oneTimeOnFailure(e);
 							}
-						} catch (JSONObjectAdapterException e) {
-							oneTimeOnFailure(statusToTrack.getJobId(), e);
 						}
+
 					}
 
 					@Override
 					public void onFailure(Throwable caught) {
-						if (isCanceled) {
-							// Nothing to do if the user has hit cancel.
-							return;
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							oneTimeOnFailure(caught);
 						}
-						oneTimeOnFailure(statusToTrack.getJobId(), caught);
+
 					}
 				});
 	}
@@ -166,12 +208,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * @param jobId
 	 * @param caught
 	 */
-	private void oneTimeOnFailure(String jobId, Throwable caught) {
+	private void oneTimeOnFailure(Throwable caught) {
 		AsynchronousProgressHandler mightBeNull = this.oneTimeReference
 				.getReference();
 		if (mightBeNull != null) {
-			mightBeNull.onStatusCheckFailure(jobId, caught);
+			mightBeNull.onStatusCheckFailure(caught);
 		}
 	}
-
 }

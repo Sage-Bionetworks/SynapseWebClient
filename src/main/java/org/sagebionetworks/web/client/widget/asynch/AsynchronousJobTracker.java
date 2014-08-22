@@ -1,28 +1,26 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 
 /**
  * Abstraction for an AsynchronousJobTracker.
  * 
  * @author John
- *
+ * 
  */
 public interface AsynchronousJobTracker {
 
 	/**
-	 * For each run, configure must be called with the data to track.
-	 * @param toTrack The status to track.
-	 * @param waitTimeMS The amount of time between progress checks.
+	 * Start a new Asynchronous Job from the passed AsynchronousRequestBody and
+	 * track the progress of the job until completion.
+	 * 
+	 * @param requestBody
+	 * @param waitTimeMS
 	 * @param handler
 	 */
-	public void configure(AsynchronousJobStatus toTrack, int waitTimeMS, UpdatingAsynchProgressHandler handler);
-	
-	/**
-	 * Call to start tracking the progress of a job.
-	 */
-	public void start();
-	
+	public void startAndTrack(AsynchronousRequestBody requestBody, int waitTimeMS,
+			UpdatingAsynchProgressHandler handler);
+
 	/**
 	 * Call to cancel tracking the progress of a job.
 	 */
