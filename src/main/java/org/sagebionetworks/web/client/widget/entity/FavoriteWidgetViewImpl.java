@@ -11,7 +11,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.inject.Inject;
 
 public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetView {
@@ -23,7 +22,6 @@ public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetV
 
 	private Anchor favoriteAnchor;
 	boolean isFavorite = false;
-	private InlineHTML emptyDiv;
 	private Tooltip tip;
 	
 	@Inject
@@ -39,11 +37,9 @@ public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetV
 			}
 		});
 		add(favoriteAnchor);
-		emptyDiv = new InlineHTML();
-		add(emptyDiv);
-		tip = new Tooltip(emptyDiv);
+		tip = new Tooltip(favoriteAnchor);
 		tip.setText(DisplayConstants.FAVORITES_REMINDER_TOOLTIP_MESSAGE);
-		tip.setTrigger(Trigger.MANUAL);
+		tip.setTrigger(Trigger.HOVER);
 		tip.setPlacement(Placement.RIGHT);
 		add(tip);
 	}
@@ -57,8 +53,8 @@ public class FavoriteWidgetViewImpl extends FlowPanel implements FavoriteWidgetV
 				tip.hide();
 			}
 		};
-		// Schedule the timer to run once in 10 seconds.
-		t.schedule(10000);
+		// Schedule the timer to hide in 5 seconds.
+		t.schedule(5000);
 	}
 	
 	@Override
