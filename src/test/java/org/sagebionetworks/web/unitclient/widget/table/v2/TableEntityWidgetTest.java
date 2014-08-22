@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,17 +14,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -39,7 +40,7 @@ public class TableEntityWidgetTest {
 	TableBundle tableBundle;
 	TableEntity tableEntity;
 	TableEntityWidgetView mockView;
-	PortalGinInjector mockGinInjector;
+	AsynchronousProgressWidget mockAsynchronousProgressWidget;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
@@ -49,7 +50,7 @@ public class TableEntityWidgetTest {
 	public void before(){
 		// mocks
 		mockView = Mockito.mock(TableEntityWidgetView.class);
-		mockGinInjector = Mockito.mock(PortalGinInjector.class);
+		mockAsynchronousProgressWidget = Mockito.mock(AsynchronousProgressWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		// stubs
@@ -62,7 +63,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockGinInjector, mockSynapseClient, tableModelUtils);
+		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, mockSynapseClient, tableModelUtils);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 	}

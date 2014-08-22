@@ -70,7 +70,6 @@ public class AsynchronousJobTrackerTest {
 		done.setProgressCurrent(100l);
 		done.setProgressTotal(100l);
 		doneJSON =  EntityFactory.createJSONStringForEntity(done);
-//		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider, adapterFactory, waitTimeMS, start, mockHandler);
 	}
 	
 	@Test
