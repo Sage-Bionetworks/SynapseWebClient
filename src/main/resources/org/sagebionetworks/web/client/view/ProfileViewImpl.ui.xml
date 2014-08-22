@@ -30,7 +30,7 @@
 					</div>
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
-							<div class="highlight-box" highlight-box-title="Projects">
+							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 								<g:FlowPanel ui:field="projectsTabContent" styleName="margin-10" />
 							</div>
 							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
@@ -49,18 +49,20 @@
 							</div>
 						</div>
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="favoritesTabContainer">
-					    	<div class="highlight-box" highlight-box-title="Favorites">
+					    	<div class="highlight-box" ui:field="favoritesHighlightBox" highlight-box-title="Favorites">
 					    		<g:FlowPanel ui:field="favoritesTabContent" styleName="margin-10" />
 					    	</div>
 					    </div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="challengesTabContainer">
-					    	<div class="highlight-box" highlight-box-title="Challenges">
+					    	<div class="highlight-box" ui:field="challengesHighlightBox" highlight-box-title="Challenges">
 					    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 					    	</div>
 					    </div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="teamsTabContainer">
-							<g:FlowPanel ui:field="teamsTabContent" />
-							
+							<g:FlowPanel ui:field="openInvitesContainer" />
+							<div class="highlight-box" ui:field="teamsHighlightBox" highlight-box-title="Teams">
+								<g:FlowPanel ui:field="teamsTabContent" styleName="margin-10" />
+							</div>
 							<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-8 col-sm-6">
 									<div class="input-group">
