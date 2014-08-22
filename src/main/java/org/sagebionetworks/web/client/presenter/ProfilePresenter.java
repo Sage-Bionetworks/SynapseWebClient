@@ -505,14 +505,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (invites != null && invites.size() > 0) {
 			teamNotificationCount += invites.size();
 			//update team notification count
-			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+			if (teamNotificationCount > 0)
+				view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 }
 	}
 
 	@Override
 	public void addMembershipRequests(int count) {
 		teamNotificationCount += count;
-		view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+		if (teamNotificationCount > 0)
+			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 	}
 	
 	/**
