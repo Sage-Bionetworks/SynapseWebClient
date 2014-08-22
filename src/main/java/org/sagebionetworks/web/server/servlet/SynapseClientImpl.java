@@ -497,15 +497,23 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		return aa.toJSONString();
 	}
 
+	
+	private org.sagebionetworks.client.SynapseClient createAnonymousSynapseClient() {
+		return createSynapseClient(null);
+	}
+	
+	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
+		return createSynapseClient(tokenProvider.getSessionToken());
+	}
 	/**
 	 * The org.sagebionetworks.client.SynapseClient client is stateful so we
 	 * must create a new one for each request
 	 */
-	private org.sagebionetworks.client.SynapseClient createSynapseClient() {
+	private org.sagebionetworks.client.SynapseClient createSynapseClient(String sessionToken) {
 		// Create a new syanpse
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
 				.createNewClient();
-		synapseClient.setSessionToken(tokenProvider.getSessionToken());
+		synapseClient.setSessionToken(sessionToken);
 		synapseClient.setRepositoryEndpoint(urlProvider
 				.getRepositoryServiceUrl());
 		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
@@ -3163,7 +3171,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
 		try {
 			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
 			new PortalVersionHolder();
@@ -3291,7 +3299,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public Boolean isAliasAvailable(String alias, String aliasType)
 			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
 		try {
 			AliasType type = AliasType.valueOf(aliasType);
 			AliasCheckRequest request = new AliasCheckRequest();
