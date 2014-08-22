@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 
@@ -23,18 +24,20 @@ public class AsynchronousJobTrackerStub implements AsynchronousJobTracker {
 		this.states = states;
 		this.error = error;
 	}
-	
+
 	@Override
-	public void configure(AsynchronousJobStatus toTrack, int waitTimeMS,
-			UpdatingAsynchProgressHandler handler) {
-		this.waitTimeMS = waitTimeMS;
-		this.handler = handler;
+	public void cancel() {
+		// Simulate a cancel
+		handler.onCancel(this.states.get(0));
 	}
 
 	@Override
-	public void start() {
+	public void startAndTrack(AsynchronousRequestBody requestBody,
+			int waitTimeMS, UpdatingAsynchProgressHandler handler) {
+		this.waitTimeMS = waitTimeMS;
+		this.handler = handler;
 		if(error != null){
-			handler.onStatusCheckFailure(this.states.get(0).getJobId(), error);
+			handler.onStatusCheckFailure(error);
 		}else{
 			// cycle through the states.
 			for(AsynchronousJobStatus state: states){
@@ -45,12 +48,6 @@ public class AsynchronousJobTrackerStub implements AsynchronousJobTracker {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void cancel() {
-		// Simulate a cancel
-		handler.onCancel(this.states.get(0));
 	}
 
 }

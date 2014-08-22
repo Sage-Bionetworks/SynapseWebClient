@@ -63,7 +63,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, mockSynapseClient, tableModelUtils);
+		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 	}

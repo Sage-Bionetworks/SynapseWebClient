@@ -2,16 +2,15 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableRequestBody;
 import org.sagebionetworks.repo.model.table.TableBundle;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -30,7 +29,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public static final long DEFAULT_PAGE_SIZE = 10L;
 
 	private TableEntityWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private TableModelUtils tableModelUtils;
 	private AsynchronousProgressWidget asynchProgressWidget;
 	
@@ -40,9 +38,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	QueryChangeHandler queryChangeHandler;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget,  SynapseClientAsync synapseClient, TableModelUtils tableModelUtils){
+	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils){
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.tableModelUtils = tableModelUtils;
 		this.asynchProgressWidget = asynchProgressWidget;
 		this.view.setPresenter(this);
@@ -91,33 +88,18 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			view.setQueryInputLoading(true);
 			
 			// start the job
-			synapseClient.startAsynchQuery(startQuery, new AsyncCallback<String>(){
-				@Override
-				public void onFailure(Throwable caught) {
-					setQueryFailed(caught.getMessage());
-				}
-
-				@Override
-				public void onSuccess(String result) {
-					// Wait for the job to finish
-					AsynchronousJobStatus status;
-					try {
-						status = tableModelUtils.createAsynchronousJobStatus(result);
-						// show the progress
-						waitForQueryResults(status);
-					} catch (JSONObjectAdapterException e) {
-						setQueryFailed(e.getMessage());
-					} 					
-				}});
+			AsynchDownloadFromTableRequestBody body = new AsynchDownloadFromTableRequestBody();
+			body.setSql(startQuery);
+			waitForQueryResults(body);
 		}
 	}
 	
-	private void waitForQueryResults(AsynchronousJobStatus status){
+	private void waitForQueryResults(AsynchronousRequestBody status){
 		view.setQueryProgressVisible(true);
 		this.asynchProgressWidget.configure("Executing query...", status, new AsynchronousProgressHandler() {
 			
 			@Override
-			public void onStatusCheckFailure(String jobId, Throwable failure) {
+			public void onStatusCheckFailure(Throwable failure) {
 				setQueryFailed(failure.getMessage());
 			}
 			

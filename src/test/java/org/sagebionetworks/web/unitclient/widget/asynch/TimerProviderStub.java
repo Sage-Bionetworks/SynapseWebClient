@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 public class TimerProviderStub implements TimerProvider{
 
 	FireHandler handler;
+	boolean isCanceled = false;
 	
 	@Override
 	public void setHandler(FireHandler handler) {
@@ -24,7 +25,10 @@ public class TimerProviderStub implements TimerProvider{
 
 	@Override
 	public void cancel() {
-		// Nothing to do her.
+		isCanceled = true;
 	}
 
+	public boolean isCancled(){
+		return isCanceled;
+	}
 }

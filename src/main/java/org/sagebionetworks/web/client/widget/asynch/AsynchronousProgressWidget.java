@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,7 +27,6 @@ public class AsynchronousProgressWidget implements
 
 	private AsynchronousProgressView view;
 	private NumberFormatProvider numberFormatProvider;
-	private String trackingJobId;
 	private AsynchronousJobTracker jobTracker;
 
 	@Inject
@@ -45,46 +45,31 @@ public class AsynchronousProgressWidget implements
 	 * @param startMessage
 	 * @param statusToTrack
 	 */
-	public void configure(String title, AsynchronousJobStatus statusToTrack,
+	public void configure(String title, AsynchronousRequestBody requestBody,
 			final AsynchronousProgressHandler handler) {
 		view.setTitle(title);
-		// This is the jobId we are currently tracking
-		// Tracking a new job will "disconnect" this widget from any previously
-		// running trackers.
-		trackingJobId = statusToTrack.getJobId();
 		// Configure this job
-		jobTracker.configure(statusToTrack, WAIT_MS, new UpdatingAsynchProgressHandler() {
+		jobTracker.startAndTrack(requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
 					@Override
-					public void onStatusCheckFailure(String jobId, Throwable failure) {
-						// We only care about the current job (not old jobs)
-						if (trackingJobId.equals(jobId)) {
-							handler.onStatusCheckFailure(trackingJobId, failure);
-						}
+					public void onStatusCheckFailure(Throwable failure) {
+						handler.onStatusCheckFailure(failure);
 					}
 
 					@Override
 					public void onComplete(AsynchronousJobStatus status) {
-						if (trackingJobId.equals(status.getJobId())) {
-							handler.onComplete(status);
-						}
+						handler.onComplete(status);
 					}
 
 					@Override
 					public void onCancel(AsynchronousJobStatus status) {
-						if (trackingJobId.equals(status.getJobId())) {
-							handler.onCancel(status);
-						}
+						handler.onCancel(status);
 					}
 
 					@Override
 					public void onUpdate(AsynchronousJobStatus status) {
-						if (trackingJobId.equals(status.getJobId())) {
-							setCurrentStatus(status);
-						}
+						setCurrentStatus(status);
 					}
 				});
-		// Start the tracker
-		jobTracker.start();
 	}
 
 	/**
