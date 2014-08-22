@@ -2,10 +2,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -551,6 +548,23 @@ public class ProfilePresenterTest {
 		int expectedAfterNotificationCount = beforeNotificationCount+1;
 		assertEquals(expectedAfterNotificationCount, profilePresenter.getTeamNotificationCount());
 		verify(mockView).setTeamNotificationCount(eq(Integer.toString(expectedAfterNotificationCount)));
+	}
+	
+	@Test
+	public void testUpdateTeamInvitesZero() {
+		profilePresenter.setTeamNotificationCount(0);
+		profilePresenter.updateTeamInvites(new ArrayList<MembershipInvitationBundle>());
+		
+		assertEquals(0, profilePresenter.getTeamNotificationCount());
+		verify(mockView, never()).setTeamNotificationCount(anyString());
+	}
+	
+	@Test
+	public void testAddMembershipRequestsZero() {
+		profilePresenter.setTeamNotificationCount(0);
+		profilePresenter.addMembershipRequests(0);
+		assertEquals(0, profilePresenter.getTeamNotificationCount());
+		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
 }

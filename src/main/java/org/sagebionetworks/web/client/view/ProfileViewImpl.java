@@ -323,19 +323,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private void resetHighlightBoxes() {
 		setHighlightBoxUser(null);
 	}
+	
 	private void setHighlightBoxUser(String displayName) {
-		setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
-		setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
-		setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
-		setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
+		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
+		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
+		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
-	
-	private void setHighlightBoxUser(DivElement highlightBox, String displayName, String title) {
-		String prefix = displayName != null ? displayName+"'s " : "";
-		highlightBox.setAttribute("highlight-box-title", prefix + title);
-	}
-	
-	
 	
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
 		updateUserInfoPanel.add(profileFormWidget);
