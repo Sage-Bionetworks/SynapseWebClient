@@ -12,6 +12,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -379,8 +380,26 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Start an Asynchronous job with the provided body.
+	 * @param The JSON of the AsynchronousRequestBody
+	 * @return The JSON of the AsynchronousJobStatus
+	 * @throws RestServiceException 
+	 */
+	public String startAsynchJob(String jobBodyJSON) throws RestServiceException;
+	
+	/**
+	 * Get the status of a running asynchronous job.
+	 * @param jobId The ID of the job.
+	 * @return The JSON of the AsynchronousJobStatus
+	 * @throws RestServiceException
+	 */
+	public String getAsynchJobStatus(String jobId) throws RestServiceException;
+	
+	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
 	
 	List<String> getMyProjects() throws RestServiceException;
 	List<String> getUserProjects(String userId) throws RestServiceException;

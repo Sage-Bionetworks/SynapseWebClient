@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -409,12 +410,16 @@ public class HomeViewImpl extends Composite implements HomeView {
 		return createProjectContainer;
 	}
 	
-	private LayoutContainer getFavoritesContainer() {
-		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
-		favoritesContainer.add(favoritesTreeBrowser.asWidget());
-		return favoritesContainer;
+	private FlowPanel getFavoritesContainer() {
+		FlowPanel myFavPanel = new FlowPanel();
+		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+		ScrollPanel favoritesScrollPanel = new ScrollPanel();
+		favoritesScrollPanel.addStyleName("panel panel-default");
+		favoritesScrollPanel.setHeight("45px");		// TODO: Default height?
+		favoritesScrollPanel.add(favoritesTreeBrowser.asWidget());
+		myFavPanel.add(favoritesScrollPanel);
+		return myFavPanel;
+		
 	}
 	
 	@Override
@@ -453,12 +458,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		openTeamInvitesPanel.setVisible(visible);
 	}
 	
-	private LayoutContainer getMyProjectsContainer() {
-		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
-		myProjectsTreeBrowser.setWidgetHeight(180);
-		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
-		return myProjContainer;
+	private FlowPanel getMyProjectsContainer() {
+		FlowPanel myProjPanel = new FlowPanel();
+		myProjPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
+		ScrollPanel myProjectsTreePanel = new ScrollPanel();
+		myProjectsTreePanel.addStyleName("panel panel-default");
+		myProjectsTreePanel.setHeight("180px");
+		myProjectsTreePanel.add(myProjectsTreeBrowser.asWidget());
+		myProjPanel.add(myProjectsTreePanel);
+		return myProjPanel;
 	}
 
 	@Override

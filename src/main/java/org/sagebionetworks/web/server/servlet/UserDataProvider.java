@@ -8,11 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -54,7 +50,7 @@ public class UserDataProvider {
 				}
 			}
 		}
-		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_TOKEN);
+		logger.info("Cannot find user login data in the cookies using cookie.name="	+ CookieKeys.USER_LOGIN_TOKEN, new Exception("Missing " + CookieKeys.USER_LOGIN_TOKEN));
 		return null;
 	}
 	

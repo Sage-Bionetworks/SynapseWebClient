@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -37,15 +38,17 @@ import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, WidgetRendererPresenter {
+public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, WidgetRendererPresenter, IsWidget {
 	
 	private final static Integer DEFAULT_PAGE_SIZE = 50; 
 	private final static Integer DEFAULT_OFFSET = 0; 
 	
 	private SimpleTableWidgetView view;
+	private EntityBundle bundle;
 	private TableEntity table;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
@@ -81,16 +84,16 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 		return view.asWidget();		
 	}
 
-	public void configure(TableEntity table, boolean canEdit) {
-		configure(table, canEdit, null, null, null);
+	public void configure(EntityBundle bundle, boolean canEdit) {
+		configure(bundle, canEdit, null, null, null);
 	}
 	
-	public void configure(TableEntity table, boolean canEdit, String query, QueryChangeHandler queryChangeHandler) {
-		configure(table, canEdit, query, null, queryChangeHandler);
+	public void configure(EntityBundle bundle, boolean canEdit, String query, QueryChangeHandler queryChangeHandler) {
+		configure(bundle, canEdit, query, null, queryChangeHandler);
 	}
 	
-	public void configure(TableEntity table, final boolean canEdit, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
-		configure(table, canEdit, null, rowHeader, queryChangeHandler);
+	public void configure(EntityBundle bundle, final boolean canEdit, TableRowHeader rowHeader, QueryChangeHandler queryChangeHandler) {
+		configure(bundle, canEdit, null, rowHeader, queryChangeHandler);
 	}
 
 	@Override
@@ -107,9 +110,11 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	 * @param rowHeader
 	 * @param queryChangeHandler
 	 */
-	private void configure(final TableEntity table, final boolean canEdit, final String query, final TableRowHeader rowHeader, final QueryChangeHandler queryChangeHandler) {
-		this.table = table;		
+	private void configure(EntityBundle bundle, final boolean canEdit, final String query, final TableRowHeader rowHeader, final QueryChangeHandler queryChangeHandler) {
+		this.table = (TableEntity) bundle.getEntity();		
+		this.bundle = bundle;
 		this.canEdit = canEdit;
+		this.queryChangeHandler = queryChangeHandler;
 		synapseClient.getColumnModelsForTableEntity(table.getId(), new AsyncCallback<List<String>>() {
 			@Override
 			public void onSuccess(List<String> result) {
@@ -414,7 +419,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 						}
 						
 						// send to view
-						view.createNewTable(table.getId(), displayColumns, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails);						
+						view.createNewTable(bundle, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails, queryChangeHandler);						
 					}
 				} catch (JSONObjectAdapterException e1) {
 					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
@@ -538,7 +543,7 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 								Timer t = new Timer() {			
 									@Override
 									public void run() {
-										configure(table, canEdit);
+										configure(bundle, canEdit);
 									}
 								};
 								t.schedule(500);

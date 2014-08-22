@@ -16,7 +16,7 @@ public interface ComingSoonView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);	
 	
 	public interface Presenter extends SynapsePresenter {
-
+		
 	}
 
 	public void setEntity(Entity entity);

@@ -26,8 +26,10 @@ import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -74,10 +76,11 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsWidget;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -214,6 +217,10 @@ public interface PortalGinInjector extends Ginjector {
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
+	public TableEntityWidget createNewTableEntityWidget();
+	
+	// Asynchronous
+	public AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
 	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
@@ -221,6 +228,7 @@ public interface PortalGinInjector extends Ginjector {
 	public SimpleTableWidget getSimpleTableWidget();
 	
 	public EntityBadge getEntityBadgeWidget();
+	public EntityTreeItem getEntityTreeItemWidget();
 
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();

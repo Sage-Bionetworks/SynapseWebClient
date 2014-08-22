@@ -8,6 +8,8 @@ import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -60,7 +62,7 @@ public interface SimpleTableWidgetView extends IsWidget, SynapseView {
 	 * @param limit 
 	 * @param offset 
 	 */
-	public void createNewTable(String tableEntityId, List<ColumnModel> columns, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails);
+	public void createNewTable(EntityBundle bundle, RowSet rowset, int totalRowCount, boolean canEdit, String queryString, QueryDetails queryDetails, EntityUpdatedHandler handler);
 	
 	public void showTableUnavailable(TableStatus status, Integer percentComplete);
 
