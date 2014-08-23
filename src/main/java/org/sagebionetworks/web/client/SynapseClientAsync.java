@@ -311,6 +311,12 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(String tableJSON, List<String> newSchema,
 			AsyncCallback<Void> callback);
+	/**
+	 * Query for table results.
+	 * @param query
+	 * @param callback
+	 */
+	void queryTable(String query, AsyncCallback<String> callback);
 	
 	/**
 	 * Start an asynchronous job passing a job body.

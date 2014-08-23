@@ -49,29 +49,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	Button queryButton;
 	@UiField
-	Panel queryResultsPanel;
-	@UiField
-	ButtonToolBar resultsToolBar;
-	@UiField
-	Button editRowsButton;
-	@UiField
-	Button uploadCSVButton;
-	@UiField
-	Button downloadCSVButton;
-	@UiField
-	CellTable queryResults;
-	@UiField
-	SimplePanel progressContainer;
-	@UiField
-	Modal editRowsModal;
-	@UiField
-	SimplePanel rowEditorModalPanel;
-	@UiField
-	Alert rowEditorAlert;
-	@UiField
-	Button saveRowsButton;
-	@UiField
-	Button cancelRowsButton;
+	SimplePanel queryResultsPanel;
 
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
@@ -147,12 +125,15 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setProgressWidget(
 			AsynchronousProgressWidget asynchProgressWidget) {
-		this.progressContainer.add(asynchProgressWidget);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void setQueryProgressVisible(boolean visible) {
-		this.progressContainer.setVisible(visible);
+	public void setQueryProgressVisible(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
+
 
 }
