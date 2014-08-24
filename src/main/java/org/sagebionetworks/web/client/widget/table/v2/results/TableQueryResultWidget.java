@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2;
+package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -42,7 +42,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter {
 					showError(e);
 				}
 			}
-			
 			@Override
 			public void onFailure(Throwable caught) {
 				showError(caught);

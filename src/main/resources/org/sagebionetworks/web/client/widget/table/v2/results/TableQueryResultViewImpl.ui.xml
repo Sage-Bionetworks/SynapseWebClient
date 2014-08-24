@@ -23,8 +23,6 @@
 			<bh:Div styleName="margin-top-15" />
 			<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
 			<bt:Table ui:field="table">
-				<bt:TableHeader ui:field="tableHeader"></bt:TableHeader>
-				<bt:TBody ui:field="tableBody"></bt:TBody>
 			</bt:Table>
 
 			<!-- This modal dialog will contain the editor for query results -->
