@@ -140,6 +140,7 @@ import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -3592,23 +3593,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	@Override
-	public List<String> getMyProjects() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(0, MAX_LIMIT);
-			List<ProjectHeader> list = headers.getResults();
-			ArrayList<String> listStrings = new ArrayList<String>();
-			for (ProjectHeader t : list) {
-				listStrings.add(EntityFactory.createJSONStringForEntity(t));
-			}
-			return listStrings;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
+	
 
 	@Override
 	public String getAsynchJobStatus(String jobId) throws RestServiceException {
@@ -3622,18 +3607,27 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
 	@Override
-	public List<String> getUserProjects(String userId) throws RestServiceException {
+	public PagedResults getMyProjects(int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(limit, offset);
+			return getPagedResults((List)headers.getResults(), headers.getTotalNumberOfResults());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public PagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			Long userIdLong = Long.parseLong(userId);
-			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, 0, MAX_LIMIT);
-			List<ProjectHeader> list = headers.getResults();
-			ArrayList<String> listStrings = new ArrayList<String>();
-			for (ProjectHeader t : list) {
-				listStrings.add(EntityFactory.createJSONStringForEntity(t));
-			}
-			return listStrings;
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, limit, offset);
+			return getPagedResults((List)headers.getResults(), headers.getTotalNumberOfResults());
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -3641,6 +3635,17 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
+	public PagedResults getPagedResults(List<JSONEntity> list, long totalNumberOfResults) throws JSONObjectAdapterException {
+		ArrayList<String> listStrings = new ArrayList<String>();
+		for (JSONEntity t : list) {
+			listStrings.add(EntityFactory.createJSONStringForEntity(t));
+		}
+		PagedResults pagedResults = new PagedResults();
+		pagedResults.setResults(listStrings);
+		pagedResults.setTotalNumberOfResults(safeLongToInt(totalNumberOfResults));
+		return pagedResults;
+	}
+	
 	@Override
 	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -3659,5 +3664,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
+	}
+	
+	public static int safeLongToInt(long l) {
+	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+	        throw new IllegalArgumentException
+	            ("Cannot safely cast "+l+" to int without changing the value.");
+	    }
+	    return (int) l;
 	}
 }

@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -36,8 +35,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -49,7 +48,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -65,7 +63,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
-	private SearchServiceAsync searchService;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
@@ -83,7 +80,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
-			SearchServiceAsync searchService,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			RequestBuilderWrapper requestBuilder) {
 		this.view = view;
@@ -93,7 +89,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
-		this.searchService = searchService;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.requestBuilder = requestBuilder;
 		this.cookies = cookieProvider;
@@ -213,9 +208,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void refreshProjects() {
 		if (isOwner)
-			getMyProjects(currentUserId);
+			getMyProjects(currentUserId, 100, 0);
 		else
-			getUserProjects(currentUserId);
+			getUserProjects(currentUserId, 100, 0);
 	}
 	@Override
 	public void refreshTeams() {
@@ -340,12 +335,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getMyProjects(String userId) {
-		synapseClient.getMyProjects(new AsyncCallback<List<String>>() {
+	public void getMyProjects(String userId, int limit, int offset) {
+		synapseClient.getMyProjects(limit, offset, new AsyncCallback<PagedResults>() {
 			@Override
-			public void onSuccess(List<String> projectHeaderStrings) {
+			public void onSuccess(PagedResults projectHeaders) {
 				try {
-					List<ProjectHeader> headers = parseResponse(projectHeaderStrings);
+					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
 					view.setProjects(headers);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -358,12 +353,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId) {
-		synapseClient.getUserProjects(userId, new AsyncCallback<List<String>>() {
+	public void getUserProjects(String userId, int limit, int offset) {
+		synapseClient.getUserProjects(userId, limit, offset, new AsyncCallback<PagedResults>() {
 			@Override
-			public void onSuccess(List<String> projectHeaderStrings) {
+			public void onSuccess(PagedResults projectHeaders) {
 				try {
-					List<ProjectHeader> headers = parseResponse(projectHeaderStrings);
+					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
 					view.setProjects(headers);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);

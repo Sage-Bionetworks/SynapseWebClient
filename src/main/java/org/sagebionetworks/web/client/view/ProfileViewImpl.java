@@ -369,6 +369,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			EntityHeader entityHeaderWrapper = new EntityHeader();
 			entityHeaderWrapper.setId(projectHeader.getId());
 			entityHeaderWrapper.setName(projectHeader.getName());
+			entityHeaderWrapper.setType("project");
 			
 			EntityBadge badge = ginInjector.getEntityBadgeWidget();
 			badge.configure(entityHeaderWrapper);
