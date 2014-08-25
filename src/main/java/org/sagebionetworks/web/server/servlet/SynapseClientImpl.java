@@ -3637,8 +3637,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	public PagedResults getPagedResults(List<JSONEntity> list, long totalNumberOfResults) throws JSONObjectAdapterException {
 		ArrayList<String> listStrings = new ArrayList<String>();
-		for (JSONEntity t : list) {
-			listStrings.add(EntityFactory.createJSONStringForEntity(t));
+		if (list != null) {
+			for (JSONEntity t : list) {
+				listStrings.add(EntityFactory.createJSONStringForEntity(t));
+			}
 		}
 		PagedResults pagedResults = new PagedResults();
 		pagedResults.setResults(listStrings);

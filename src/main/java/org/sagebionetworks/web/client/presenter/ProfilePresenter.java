@@ -71,7 +71,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentOffset;
-	private final static int PAGE_SIZE=20;
+	public final static int PROJECT_PAGE_SIZE=20;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -345,13 +345,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getMyProjects(String userId, int offset) {
-		synapseClient.getMyProjects(PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
+		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
 			@Override
 			public void onSuccess(PagedResults projectHeaders) {
 				try {
 					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
 					view.addProjects(headers);
-					updateProjectPagination(projectHeaders.getTotalNumberOfResults());
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}	
@@ -364,13 +364,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getUserProjects(String userId, int offset) {
-		synapseClient.getUserProjects(userId, PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
+		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
 			@Override
 			public void onSuccess(PagedResults projectHeaders) {
 				try {
 					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
 					view.addProjects(headers);
-					updateProjectPagination(projectHeaders.getTotalNumberOfResults());
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}	
@@ -382,8 +382,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void updateProjectPagination(int totalNumberOfResults) {
-		currentOffset += PAGE_SIZE;
+	public void projectPageAdded(int totalNumberOfResults) {
+		currentOffset += PROJECT_PAGE_SIZE;
 		view.setIsMoreProjectsVisible(currentOffset < totalNumberOfResults);
 	}
 	
@@ -577,5 +577,38 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void setTeamNotificationCount(int teamNotificationCount) {
 		this.teamNotificationCount = teamNotificationCount;
 	}
+	
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public int getCurrentOffset() {
+		return currentOffset;
+	}
+
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public void setCurrentOffset(int currentOffset) {
+		this.currentOffset = currentOffset;
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public boolean isOwner() {
+		return isOwner;
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public void setIsOwner(boolean isOwner) {
+		this.isOwner = isOwner;
+	}
+
 }
 
