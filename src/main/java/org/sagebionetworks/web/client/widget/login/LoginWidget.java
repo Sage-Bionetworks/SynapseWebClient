@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -22,16 +23,17 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private UserListener listener;	
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
-	private NodeModelCreator nodeModelCreator;
+	private AdapterFactory adapterFactory;
 	private GlobalApplicationState globalApplicationState;
-	
+	private SynapseJSNIUtils synapseJsniUtils;
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator, GlobalApplicationState globalApplicationState) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils, AdapterFactory adapterFactory) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
-		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
+		this.synapseJsniUtils = synapseJsniUtils;
+		this.adapterFactory = adapterFactory;
 	}
 
 	public Widget asWidget() {
@@ -49,16 +51,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onSuccess(String result) {
 				view.clear();
-				UserSessionData toBeParsed = null;
-				if (result != null){
-					try {
-						toBeParsed = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
+				try {
+					UserSessionData toBeParsed = new UserSessionData(adapterFactory.createNew(result));
+					final UserSessionData userSessionData = toBeParsed;
+					fireUserChange(userSessionData);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				} catch (Exception ex) {
+					onFailure(ex);
 				}
-				final UserSessionData userSessionData = toBeParsed;
-				fireUserChange(userSessionData);
 			}
 
 			@Override
@@ -68,7 +69,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
 				} else if(caught instanceof SynapseDownException) {
 					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
-				} else {				
+				} else {
+					synapseJsniUtils.consoleError(caught.getMessage());
 					view.showAuthenticationFailed();
 				}
 			}
