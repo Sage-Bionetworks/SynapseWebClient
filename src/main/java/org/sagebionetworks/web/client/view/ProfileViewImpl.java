@@ -32,7 +32,6 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -119,6 +118,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createProjectUI;
 	@UiField
 	FlowPanel projectsTabContent;
+	@UiField
+	Button moreProjectsButton;
 	
 	//Teams tab
 	@UiField
@@ -225,6 +226,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new TeamSearch(""));
+			}
+		});
+		
+		moreProjectsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getMoreProjects();
 			}
 		});
 	}
@@ -352,7 +360,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setProjects(List<ProjectHeader> projectHeaders) {
+	public void addProjects(List<ProjectHeader> projectHeaders) {
 		addProjectBadges(projectHeaders, projectsTabContent);
 	}
 
@@ -361,10 +369,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showErrorMessage(error);
 	}
 	
+	@Override
+	public void clearProjects() {
+		projectsTabContent.clear();
+		setIsMoreProjectsVisible(false);
+	}
+	
+	@Override
+	public void setIsMoreProjectsVisible(boolean isVisible) {
+		moreProjectsButton.setVisible(isVisible);
+	}
 	
 	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
 		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
-		targetPanel.clear();
 		for (ProjectHeader projectHeader : projectHeaders) {
 			EntityHeader entityHeaderWrapper = new EntityHeader();
 			entityHeaderWrapper.setId(projectHeader.getId());
@@ -520,7 +537,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
-		projectsTabContent.clear();
+		clearProjects();
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		
@@ -617,4 +634,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
+	
+	
 }

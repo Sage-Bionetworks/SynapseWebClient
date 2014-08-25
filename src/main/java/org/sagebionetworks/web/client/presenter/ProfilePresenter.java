@@ -70,6 +70,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int teamNotificationCount;
 	private String currentUserId;
 	private boolean isOwner;
+	private int currentOffset;
+	private final static int PAGE_SIZE=20;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -207,11 +209,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 
 	public void refreshProjects() {
-		if (isOwner)
-			getMyProjects(currentUserId, 100, 0);
-		else
-			getUserProjects(currentUserId, 100, 0);
+		currentOffset = 0;
+		view.clearProjects();
+		getMoreProjects();
 	}
+
+	public void getMoreProjects() {
+		if (isOwner)
+			getMyProjects(currentUserId, currentOffset);
+		else
+			getUserProjects(currentUserId, currentOffset);
+	}
+	
 	@Override
 	public void refreshTeams() {
 		teamNotificationCount = 0;
@@ -335,13 +344,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getMyProjects(String userId, int limit, int offset) {
-		synapseClient.getMyProjects(limit, offset, new AsyncCallback<PagedResults>() {
+	public void getMyProjects(String userId, int offset) {
+		synapseClient.getMyProjects(PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
 			@Override
 			public void onSuccess(PagedResults projectHeaders) {
 				try {
 					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
-					view.setProjects(headers);
+					view.addProjects(headers);
+					updateProjectPagination(projectHeaders.getTotalNumberOfResults());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}	
@@ -353,13 +363,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId, int limit, int offset) {
-		synapseClient.getUserProjects(userId, limit, offset, new AsyncCallback<PagedResults>() {
+	public void getUserProjects(String userId, int offset) {
+		synapseClient.getUserProjects(userId, PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
 			@Override
 			public void onSuccess(PagedResults projectHeaders) {
 				try {
 					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
-					view.setProjects(headers);
+					view.addProjects(headers);
+					updateProjectPagination(projectHeaders.getTotalNumberOfResults());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
 				}	
@@ -369,6 +380,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setProjectsError("Could not load my projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void updateProjectPagination(int totalNumberOfResults) {
+		currentOffset += PAGE_SIZE;
+		view.setIsMoreProjectsVisible(currentOffset < totalNumberOfResults);
 	}
 	
 	public List<ProjectHeader> parseResponse(List<String> projectHeaderStrings) throws JSONObjectAdapterException {

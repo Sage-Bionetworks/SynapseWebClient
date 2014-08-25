@@ -29,7 +29,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView, ProfileArea initialTab);
 	void refreshHeader();
-	void setProjects(List<ProjectHeader> myProjects);
+	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
 	void setFavorites(List<EntityHeader> headers);
 	void setFavoritesError(String string);
@@ -38,6 +38,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeams(List<Team> teams, boolean showNotifications);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
+	void clearProjects();
+	void setIsMoreProjectsVisible(boolean isVisible);
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -48,5 +50,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateArea(ProfileArea area);
 		void updateTeamInvites(List<MembershipInvitationBundle> invites);
 		void addMembershipRequests(int count);
+		void getMoreProjects();
 	}
 }
