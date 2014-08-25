@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -23,17 +23,17 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private UserListener listener;	
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
-	private NodeModelCreator nodeModelCreator;
+	private AdapterFactory adapterFactory;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJsniUtils;
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, NodeModelCreator nodeModelCreator, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils, AdapterFactory adapterFactory) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
-		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJsniUtils = synapseJsniUtils;
+		this.adapterFactory = adapterFactory;
 	}
 
 	public Widget asWidget() {
@@ -52,7 +52,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			public void onSuccess(String result) {
 				view.clear();
 				try {
-					UserSessionData toBeParsed = nodeModelCreator.createJSONEntity(result, UserSessionData.class);
+					UserSessionData toBeParsed = new UserSessionData(adapterFactory.createNew(result));
 					final UserSessionData userSessionData = toBeParsed;
 					fireUserChange(userSessionData);
 				} catch (JSONObjectAdapterException e) {

@@ -128,6 +128,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement createTeamUI;
 	@UiField
+	FlowPanel openInvitesContainer;
+	@UiField
 	FlowPanel teamsTabContent;
 	@UiField
 	Button teamSearchButton;
@@ -143,6 +145,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Settings
 	@UiField
 	FlowPanel settingsTabContent;
+	
+	
+	//highlight boxes
+	@UiField 
+	DivElement projectsHighlightBox;
+	@UiField 
+	DivElement challengesHighlightBox;
+	@UiField 
+	DivElement favoritesHighlightBox;
+	@UiField 
+	DivElement teamsHighlightBox;
+
+
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -234,8 +249,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget, ProfileArea initialTab) {
 		clear();
-		//when editable, show profile form and linkedin import ui
-		teamsTabContent.clear();
 		DisplayUtils.hide(settingsListItem);
 		//add certificate
 		if (passingRecord != null) {
@@ -262,6 +275,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.add(getProfilePicture(profile, profile.getPic(), synapseJSNIUtils));
 		
 		if (isOwner) {
+			resetHighlightBoxes();
 			DisplayUtils.show(favoritesListItem);
 			DisplayUtils.show(settingsListItem);
 			
@@ -279,8 +293,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}
 			}, openTeamInvitationsCallback);
 			
-			teamsTabContent.add(openInvitesWidget.asWidget());
-			
+			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			
 			//hide my profile by default, and provide link to show it
@@ -295,20 +308,28 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		} else {
 			DisplayUtils.show(viewProfilePanel);
 			DisplayUtils.show(picturePanel);
+			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
 		
 		//Teams
-		SimplePanel wrapper = new SimplePanel();
-		wrapper.add(myTeamsWidget.asWidget());
-		wrapper.addStyleName("highlight-box");
-		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
-		teamsTabContent.add(wrapper);
+		teamsTabContent.add(myTeamsWidget.asWidget());
 		
 		if (initialTab != null)
 			setTabSelected(initialTab);
 		else 
 			setTabSelected(ProfileArea.PROJECTS);
 		DisplayUtils.show(navtabContainer);
+	}
+	
+	private void resetHighlightBoxes() {
+		setHighlightBoxUser(null);
+	}
+	
+	private void setHighlightBoxUser(String displayName) {
+		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
+		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
+		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
 	
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
@@ -515,6 +536,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(favoritesListItem);
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
+		
+		teamsTabContent.clear();
+		openInvitesContainer.clear();
 		
 		//reset tab link text (remove any notifications)
 		teamsLink.setHTML(DisplayConstants.TEAMS);
