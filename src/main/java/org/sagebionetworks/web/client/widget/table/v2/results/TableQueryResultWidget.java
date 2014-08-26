@@ -50,9 +50,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter {
 	}
 	
 	private void renderQueryResult(QueryResultBundle bundle){
-		THead header = new THead();
-		TBody body = new TBody();
-		this.view.configureTableData(header, body);
 		this.view.setTableVisible(true);
 	}
 	

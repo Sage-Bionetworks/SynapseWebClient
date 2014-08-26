@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
-import org.sagebionetworks.web.client.view.bootstrap.table.THead;
+import java.util.List;
+
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 public interface TableQueryResultView {
 
@@ -14,13 +15,13 @@ public interface TableQueryResultView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-
+	
 	/**
-	 * Show the new table data.
-	 * @param header
-	 * @param body
+	 * 
+	 * @param types
+	 * @param rows
 	 */
-	void configureTableData(THead header, TBody body);
+	void resetTableData(List<String> headers, List<ColumnTypeViewEnum> types, List<List<String>> rows);
 
 	/**
 	 * Show or hide the table.
