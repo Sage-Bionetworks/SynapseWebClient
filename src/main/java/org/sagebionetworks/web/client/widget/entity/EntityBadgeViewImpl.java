@@ -136,7 +136,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 					isPopoverInitialized = true;
 					tooltip.setText(content);
 					tooltip.reconfigure();
-					if (isPopover)
+					if (isPopover && entityContainer.isAttached())
 						tooltip.show();
 				}
 			});
