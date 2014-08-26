@@ -37,6 +37,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeams(List<Team> teams, boolean showNotifications);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
+	void clearTeamNotificationCount();
+	void refreshTeamInvites();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
