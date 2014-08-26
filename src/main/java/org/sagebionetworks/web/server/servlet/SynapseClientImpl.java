@@ -61,6 +61,7 @@ import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -139,6 +140,7 @@ import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -3591,6 +3593,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
 
 	@Override
 	public String getAsynchJobStatus(String jobId) throws RestServiceException {
@@ -3604,7 +3607,47 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public PagedResults getMyProjects(int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(limit, offset);
+			return getPagedResults((List)headers.getResults(), headers.getTotalNumberOfResults());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public PagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Long userIdLong = Long.parseLong(userId);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, limit, offset);
+			return getPagedResults((List)headers.getResults(), headers.getTotalNumberOfResults());
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 
+	public PagedResults getPagedResults(List<JSONEntity> list, long totalNumberOfResults) throws JSONObjectAdapterException {
+		ArrayList<String> listStrings = new ArrayList<String>();
+		if (list != null) {
+			for (JSONEntity t : list) {
+				listStrings.add(EntityFactory.createJSONStringForEntity(t));
+			}
+		}
+		PagedResults pagedResults = new PagedResults();
+		pagedResults.setResults(listStrings);
+		pagedResults.setTotalNumberOfResults(safeLongToInt(totalNumberOfResults));
+		return pagedResults;
+	}
+	
 	@Override
 	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -3623,5 +3666,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
+	}
+	
+	public static int safeLongToInt(long l) {
+	    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+	        throw new IllegalArgumentException
+	            ("Cannot safely cast "+l+" to int without changing the value.");
+	    }
+	    return (int) l;
 	}
 }

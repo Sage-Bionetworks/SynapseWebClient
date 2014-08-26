@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -35,8 +35,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -48,7 +48,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -64,7 +63,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
-	private SearchServiceAsync searchService;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
@@ -72,6 +70,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int teamNotificationCount;
 	private String currentUserId;
 	private boolean isOwner;
+	private int currentOffset;
+	public final static int PROJECT_PAGE_SIZE=20;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -82,7 +82,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
-			SearchServiceAsync searchService,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			RequestBuilderWrapper requestBuilder) {
 		this.view = view;
@@ -92,7 +91,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
-		this.searchService = searchService;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.requestBuilder = requestBuilder;
 		this.cookies = cookieProvider;
@@ -201,13 +199,26 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			private void proceed() {
-				getUserProjects(profile.getOwnerId());
+				refreshProjects();
 				refreshTeams();
 				if (isOwner) {
 					getFavorites();
 				}
 			}
 		});
+	}
+	
+	public void refreshProjects() {
+		currentOffset = 0;
+		view.clearProjects();
+		getMoreProjects();
+	}
+
+	public void getMoreProjects() {
+		if (isOwner)
+			getMyProjects(currentUserId, currentOffset);
+		else
+			getUserProjects(currentUserId, currentOffset);
 	}
 	
 	@Override
@@ -336,17 +347,56 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId) {
-		EntityBrowserUtils.loadUserUpdateable(userId, searchService, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+	public void getMyProjects(String userId, int offset) {
+		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
 			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setProjects(result);
+			public void onSuccess(PagedResults projectHeaders) {
+				try {
+					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
+					view.addProjects(headers);
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+			}
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setProjectsError("Could not load Projects: " + caught.getMessage());
+				view.setProjectsError("Could not load my projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void getUserProjects(String userId, int offset) {
+		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<PagedResults>() {
+			@Override
+			public void onSuccess(PagedResults projectHeaders) {
+				try {
+					List<ProjectHeader> headers = parseResponse(projectHeaders.getResults());
+					view.addProjects(headers);
+					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}	
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setProjectsError("Could not load my projects:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public void projectPageAdded(int totalNumberOfResults) {
+		currentOffset += PROJECT_PAGE_SIZE;
+		view.setIsMoreProjectsVisible(currentOffset < totalNumberOfResults);
+	}
+	
+	public List<ProjectHeader> parseResponse(List<String> projectHeaderStrings) throws JSONObjectAdapterException {
+		List<ProjectHeader> headers = new ArrayList<ProjectHeader>();
+		for (String headerString : projectHeaderStrings) {
+			ProjectHeader header = new ProjectHeader(adapterFactory.createNew(headerString));
+			headers.add(header);
+		}
+		return headers;
 	}
 	
 	public void getFavorites() {
@@ -532,19 +582,36 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	/**
-	 * Exposed for testing purposes only
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public int getCurrentOffset() {
+		return currentOffset;
+	}
+
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public void setCurrentOffset(int currentOffset) {
+		this.currentOffset = currentOffset;
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
 	 * @return
 	 */
 	public boolean isOwner() {
 		return isOwner;
 	}
-
+	
 	/**
-	 * Exposed for testing purposes only
+	 * Exposed for unit testing purposes only
 	 * @return
 	 */
 	public void setIsOwner(boolean isOwner) {
 		this.isOwner = isOwner;
 	}
+
 }
 

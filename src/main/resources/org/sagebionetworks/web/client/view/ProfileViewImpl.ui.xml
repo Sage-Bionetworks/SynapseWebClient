@@ -32,6 +32,9 @@
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
 								<g:FlowPanel ui:field="projectsTabContent" styleName="margin-10" />
+								<div class="clearfix">
+								    <g:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12">More Projects...</g:Button>
+								</div>
 							</div>
 							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-12 col-sm-6">

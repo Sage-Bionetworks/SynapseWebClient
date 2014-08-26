@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -28,7 +29,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView, ProfileArea initialTab);
 	void refreshHeader();
-	void setProjects(List<EntityHeader> myProjects);
+	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
 	void setFavorites(List<EntityHeader> headers);
 	void setFavoritesError(String string);
@@ -37,6 +38,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeams(List<Team> teams, boolean showNotifications);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
+	void clearProjects();
+	void setIsMoreProjectsVisible(boolean isVisible);
 	void clearTeamNotificationCount();
 	void refreshTeamInvites();
 	
@@ -49,5 +52,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateArea(ProfileArea area);
 		void updateTeamInvites(List<MembershipInvitationBundle> invites);
 		void addMembershipRequests(int count);
+		void getMoreProjects();
 	}
 }

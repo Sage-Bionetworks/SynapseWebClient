@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -31,7 +32,6 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -118,6 +118,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createProjectUI;
 	@UiField
 	FlowPanel projectsTabContent;
+	@UiField
+	Button moreProjectsButton;
 	
 	//Teams tab
 	@UiField
@@ -224,6 +226,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.goTo(new TeamSearch(""));
+			}
+		});
+		
+		moreProjectsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getMoreProjects();
 			}
 		});
 	}
@@ -354,13 +363,42 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setProjects(List<EntityHeader> projectHeaders) {
-		addEntityBadges(projectHeaders, projectsTabContent);
+	public void addProjects(List<ProjectHeader> projectHeaders) {
+		addProjectBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
 	public void setProjectsError(String error) {
 		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
+	public void clearProjects() {
+		projectsTabContent.clear();
+		setIsMoreProjectsVisible(false);
+	}
+	
+	@Override
+	public void setIsMoreProjectsVisible(boolean isVisible) {
+		moreProjectsButton.setVisible(isVisible);
+	}
+	
+	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
+		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
+		for (ProjectHeader projectHeader : projectHeaders) {
+			EntityHeader entityHeaderWrapper = new EntityHeader();
+			entityHeaderWrapper.setId(projectHeader.getId());
+			entityHeaderWrapper.setName(projectHeader.getName());
+			entityHeaderWrapper.setType("project");
+			
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeaderWrapper);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-top-5");
+			targetPanel.add(widget);
+		}
+		if (projectHeaders.isEmpty())
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
@@ -502,7 +540,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		certificatePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
-		projectsTabContent.clear();
+		clearProjects();
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		
@@ -604,4 +642,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
+	
+	
 }

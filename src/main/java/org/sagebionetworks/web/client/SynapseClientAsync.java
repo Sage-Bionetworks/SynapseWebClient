@@ -15,6 +15,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -347,4 +348,7 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
+	
+	void getMyProjects(int limit, int offset, AsyncCallback<PagedResults> projectHeaders);
+	void getUserProjects(String userId, int limit, int offset, AsyncCallback<PagedResults> projectHeaders);
 }

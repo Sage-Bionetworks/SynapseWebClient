@@ -18,6 +18,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -400,4 +401,7 @@ public interface SynapseClient extends RemoteService {
 	public String getAsynchJobStatus(String jobId) throws RestServiceException;
 	
 	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
+	
+	PagedResults getMyProjects(int limit, int offset) throws RestServiceException;
+	PagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
 }
