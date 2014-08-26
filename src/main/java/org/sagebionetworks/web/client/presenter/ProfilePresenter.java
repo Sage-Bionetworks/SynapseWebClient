@@ -207,7 +207,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		});
 	}
-
+	
 	public void refreshProjects() {
 		currentOffset = 0;
 		view.clearProjects();
@@ -224,6 +224,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void refreshTeams() {
 		teamNotificationCount = 0;
+		view.clearTeamNotificationCount();
+		if (isOwner)
+			view.refreshTeamInvites();
 		getTeamsAndChallenges(currentUserId);
 	}
 	
@@ -354,7 +357,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
-				}	
+			}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

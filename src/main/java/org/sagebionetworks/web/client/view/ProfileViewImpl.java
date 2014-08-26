@@ -287,20 +287,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			DisplayUtils.show(favoritesListItem);
 			DisplayUtils.show(settingsListItem);
 			
-			CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
-				@Override
-				public void invoke(List<MembershipInvitationBundle> invites) {
-					presenter.updateTeamInvites(invites);
-				}
-			};
-			openInvitesWidget.configure(new Callback() {
-				@Override
-				public void invoke() {
-					//refresh the teams and invites
-					presenter.refreshTeams();
-				}
-			}, openTeamInvitationsCallback);
-			
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			
@@ -352,6 +338,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
+	}
+	
+	@Override
+	public void refreshTeamInvites(){
+		CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+			@Override
+			public void invoke(List<MembershipInvitationBundle> invites) {
+				presenter.updateTeamInvites(invites);
+			}
+		};
+		openInvitesWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				//refresh the teams and invites
+				presenter.refreshTeams();
+			}
+		}, openTeamInvitationsCallback);
 	}
 	
 	@Override
@@ -559,6 +562,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		openInvitesContainer.clear();
 		
 		//reset tab link text (remove any notifications)
+		clearTeamNotificationCount();
+	}
+	
+	@Override
+	public void clearTeamNotificationCount() {
 		teamsLink.setHTML(DisplayConstants.TEAMS);
 	}
 	

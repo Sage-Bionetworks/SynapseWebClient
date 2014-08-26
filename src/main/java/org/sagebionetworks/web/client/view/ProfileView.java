@@ -40,6 +40,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamNotificationCount(String count);
 	void clearProjects();
 	void setIsMoreProjectsVisible(boolean isVisible);
+	void clearTeamNotificationCount();
+	void refreshTeamInvites();
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
