@@ -13,6 +13,7 @@ import org.gwtbootstrap3.client.ui.gwt.CellTable;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -130,8 +131,13 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setQueryProgressVisible(boolean b) {
-		// TODO Auto-generated method stub
+	public void setQueryProgressVisible(boolean isVisible) {
+		this.queryResultsPanel.setVisible(isVisible);
+	}
+
+	@Override
+	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget) {
+		this.queryResultsPanel.add(queryResultsWidget);
 		
 	}
 

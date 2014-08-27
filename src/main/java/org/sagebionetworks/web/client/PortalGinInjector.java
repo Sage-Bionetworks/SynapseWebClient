@@ -77,6 +77,9 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -218,6 +221,9 @@ public interface PortalGinInjector extends Ginjector {
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
 	public TableEntityWidget createNewTableEntityWidget();
+	public RowView createNewRowView();
+	public TablePageWidget createNewTablePageWidget();
+	public QueryResultEditorWidget createNewQueryResultEditorWidget();
 	
 	// Asynchronous
 	public AsynchronousProgressWidget creatNewAsynchronousProgressWidget();

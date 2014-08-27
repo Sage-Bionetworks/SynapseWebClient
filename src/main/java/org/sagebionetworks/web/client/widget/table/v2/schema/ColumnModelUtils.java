@@ -1,9 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 
 /**
  * Utilities for working with ColumnModels
@@ -133,5 +137,54 @@ public class ColumnModelUtils {
 			}
 		}
 		return list;
+	}
+	
+	/**
+	 * Pre-process the query
+	 * @param bundle
+	 */
+	public static QueryResultBundle preProcessResutls(QueryResultBundle bundle){
+		// Use the selected columns as the headers when there are none.
+		if(bundle.getQueryResults().getHeaders() == null){
+			 ArrayList<String> headers = new ArrayList<String>(bundle.getSelectColumns().size());
+			bundle.getQueryResults().setHeaders(headers);
+			for(ColumnModel cm: bundle.getSelectColumns()){
+				headers.add(cm.getId());
+			}
+		}
+		return bundle;
+	}
+	
+	/**
+	 * Map ColumnModel IDs to the their ColumnModel.
+	 * @param schema
+	 * @return
+	 */
+	public static Map<String, ColumnModel> buildMapColumnIdtoModel(List<ColumnModel> schema){
+		Map<String, ColumnModel> map = new HashMap<String, ColumnModel>(schema.size());
+		for(ColumnModel cm: schema){
+			map.put(cm.getId(), cm);
+		}
+		return map;
+	}
+	/**
+	 * Given a list of query headers and a list of ColumnModels build up the types fro the columns in the headers.
+	 * @param headers
+	 * @param schema
+	 * @return
+	 */
+	public static List<ColumnTypeViewEnum> buildTypesForQueryResults(List<String> headers, Map<String, ColumnModel> map){
+		List<ColumnTypeViewEnum>  results = new ArrayList<ColumnTypeViewEnum>(headers.size());
+		// lookup each header
+		for(String header: headers){
+			ColumnModel cm = map.get(header);
+			if(cm == null){
+				// Treat the results of 
+				results.add(ColumnTypeViewEnum.String);
+			}else{
+				results.add(ColumnTypeViewEnum.getViewForType(cm.getColumnType()));
+			}
+		}
+		return results;
 	}
 }

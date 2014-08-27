@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,12 +37,14 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	TableBundle  tableBundle;
 	boolean canEdit;
 	QueryChangeHandler queryChangeHandler;
+	TableQueryResultWidget queryResultsWidget;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils){
+	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils, TableQueryResultWidget queryResultsWidget){
 		this.view = view;
 		this.tableModelUtils = tableModelUtils;
 		this.asynchProgressWidget = asynchProgressWidget;
+		this.queryResultsWidget = queryResultsWidget;
 		this.view.setPresenter(this);
 	}
 
@@ -65,6 +68,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
 		this.view.setProgressWidget(this.asynchProgressWidget);
+		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		checkState();
 	}
 
@@ -87,10 +91,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			view.setQueryInputVisible(true);
 			view.setQueryInputLoading(true);
 			
-			// start the job
-			AsynchDownloadFromTableRequestBody body = new AsynchDownloadFromTableRequestBody();
-			body.setSql(startQuery);
-			waitForQueryResults(body);
+			view.setQueryResultsVisible(true);
+			this.queryResultsWidget.configure(startQuery);
 		}
 	}
 	

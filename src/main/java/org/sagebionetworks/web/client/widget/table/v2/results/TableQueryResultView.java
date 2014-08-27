@@ -1,12 +1,16 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import java.util.List;
+import com.google.gwt.user.client.ui.IsWidget;
 
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
-public interface TableQueryResultView {
+public interface TableQueryResultView extends IsWidget {
 
 	public interface Presenter {
+
+		/**
+		 * Called when the user selected the edit row button.
+		 */
+		void onEditRows();
 		
 	}
 
@@ -15,17 +19,40 @@ public interface TableQueryResultView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	
-	/**
-	 * 
-	 * @param types
-	 * @param rows
-	 */
-	void resetTableData(List<String> headers, List<ColumnTypeViewEnum> types, List<List<String>> rows);
 
 	/**
 	 * Show or hide the table.
 	 * @param b
 	 */
 	void setTableVisible(boolean visible);
+
+	/**
+	 * Bind the page widget to this view.
+	 * @param pageWidget
+	 */
+	void setPageWidget(TablePageWidget pageWidget);
+
+	/**
+	 * Show an error message.
+	 * @param message
+	 */
+	void showError(String message);
+
+	/**
+	 * Show or hide the error alert.
+	 * @param b
+	 */
+	void setErrorVisible(boolean visible);
+
+	/**
+	 * Set the editor widget
+	 * @param queryResultEditor
+	 */
+	void setEditorWidget(QueryResultEditorWidget queryResultEditor);
+
+	/**
+	 * Show the editor dialog.
+	 * 
+	 */
+	void showEditor();
 }

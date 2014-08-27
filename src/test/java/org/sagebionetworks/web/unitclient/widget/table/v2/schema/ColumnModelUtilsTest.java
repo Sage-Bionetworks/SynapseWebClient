@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 public class ColumnModelUtilsTest {
 	
@@ -104,6 +106,38 @@ public class ColumnModelUtilsTest {
 		assertEquals("one, two", csv);
 		List<String> clone = ColumnModelUtils.csvToList(csv);
 		assertEquals(list, clone);	
+	}
+	
+	@Test
+	public void testbuildMapColumnIdtoModel(){
+		ColumnModel one = new ColumnModel();
+		one.setId("one");
+		ColumnModel two = new ColumnModel();
+		two.setId("two");
+		List<ColumnModel> models = Arrays.asList(one,two);
+		Map<String, ColumnModel> map = ColumnModelUtils.buildMapColumnIdtoModel(models);
+		assertNotNull(map);
+		assertEquals(2, map.size());
+		assertEquals(one, map.get(one.getId()));
+		assertEquals(two, map.get(two.getId()));
+	}
+	
+	@Test
+	public void testBuildTypesForQueryResults(){
+		ColumnModel one = new ColumnModel();
+		one.setId("one");
+		one.setColumnType(ColumnType.DOUBLE);
+		ColumnModel two = new ColumnModel();
+		two.setId("two");
+		two.setColumnType(ColumnType.STRING);
+		List<ColumnModel> models = Arrays.asList(one,two);
+		Map<String, ColumnModel> map = ColumnModelUtils.buildMapColumnIdtoModel(models);
+		// headers can includes the names of aggregation functions.
+		List<String> headers = Arrays.asList("sum(one)", two.getId(), one.getId());
+		List<ColumnTypeViewEnum> results = ColumnModelUtils.buildTypesForQueryResults(headers, map);
+		List<ColumnTypeViewEnum> expected = Arrays.asList(ColumnTypeViewEnum.String, ColumnTypeViewEnum.String, ColumnTypeViewEnum.Double);
+		assertEquals(expected, results);
+		
 	}
 
 }

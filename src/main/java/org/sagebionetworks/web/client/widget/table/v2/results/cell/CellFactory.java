@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.v2.results;
+package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
@@ -15,7 +15,7 @@ public interface CellFactory {
 	 * @param value
 	 * @return
 	 */
-	public Cell createRenderer(ColumnTypeViewEnum type, String value);
+	public Cell createRenderer(ColumnTypeViewEnum type);
 
 
 	/**
@@ -24,5 +24,5 @@ public interface CellFactory {
 	 * @param value
 	 * @return
 	 */
-	public Cell createEditor(ColumnTypeViewEnum type, String value);
+	public Cell createEditor(ColumnTypeViewEnum type);
 }

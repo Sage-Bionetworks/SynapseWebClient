@@ -5,42 +5,40 @@
 	xmlns:bt="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	<g:HTMLPanel>
+		<b:Panel>
+			<b:PanelBody>
+				<!-- ToolBar for the table results -->
+				<b:ButtonToolBar ui:field="resultsToolBar">
+					<b:ButtonGroup>
+						<b:Button ui:field="editRowsButton" icon="GEAR" type="INFO">Edit
+							Rows</b:Button>
+					</b:ButtonGroup>
+					<b:ButtonGroup>
+						<b:Button ui:field="uploadCSVButton" icon="UPLOAD">Upload</b:Button>
+						<b:Button ui:field="downloadCSVButton" icon="DOWNLOAD">Download</b:Button>
+					</b:ButtonGroup>
+				</b:ButtonToolBar>
+				<bh:Div styleName="margin-top-15" />
+				<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
 
-	<b:Panel ui:field="queryResultsPanel">
-		<b:PanelBody>
-			<!-- ToolBar for the table results -->
-			<b:ButtonToolBar ui:field="resultsToolBar">
-				<b:ButtonGroup>
-					<b:Button ui:field="editRowsButton" icon="GEAR" type="INFO"
-						dataTarget="#editRowsModal" dataToggle="MODAL">Edit
-						Rows</b:Button>
-				</b:ButtonGroup>
-				<b:ButtonGroup>
-					<b:Button ui:field="uploadCSVButton" icon="UPLOAD">Upload</b:Button>
-					<b:Button ui:field="downloadCSVButton" icon="DOWNLOAD">Download</b:Button>
-				</b:ButtonGroup>
-			</b:ButtonToolBar>
-			<bh:Div styleName="margin-top-15" />
-			<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
-			<bt:Table ui:field="table">
-			</bt:Table>
+				<g:SimplePanel ui:field="tablePanel" />
 
-			<!-- This modal dialog will contain the editor for query results -->
-			<b:Modal ui:field="editRowsModal" title="Edit Rows" closable="true"
-				fade="true" dataBackdrop="STATIC" dataKeyboard="true" b:id="editRowsModal"
-				size="LARGE">
-				<b:ModalBody>
-					<g:SimplePanel ui:field="rowEditorModalPanel" />
-					<b:Alert type="DANGER" ui:field="rowEditorAlert" visible="false"
-						title="Error" />
-				</b:ModalBody>
-				<b:ModalFooter>
-					<b:Button ui:field="saveRowsButton" type="PRIMARY"
-						dataLoadingText="Saving...">Save</b:Button>
-					<b:Button ui:field="cancelRowsButton" type="DEFAULT"
-						dataDismiss="MODAL">Cancel</b:Button>
-				</b:ModalFooter>
-			</b:Modal>
-		</b:PanelBody>
-	</b:Panel>
+				<!-- This modal dialog will contain the editor for query results -->
+				<b:Modal ui:field="editRowsModal" title="Edit Rows"
+					closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true"
+					b:id="editRowsModal" size="LARGE">
+					<b:ModalBody>
+						<g:SimplePanel ui:field="rowEditorModalPanel" />
+					</b:ModalBody>
+					<b:ModalFooter>
+						<b:Button ui:field="saveRowsButton" type="PRIMARY"
+							dataLoadingText="Saving...">Save</b:Button>
+						<b:Button ui:field="cancelRowsButton" type="DEFAULT"
+							dataDismiss="MODAL">Cancel</b:Button>
+					</b:ModalFooter>
+				</b:Modal>
+			</b:PanelBody>
+		</b:Panel>
+	</g:HTMLPanel>
 </ui:UiBinder>
