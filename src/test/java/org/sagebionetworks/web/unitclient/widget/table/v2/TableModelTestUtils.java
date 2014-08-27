@@ -349,4 +349,17 @@ public class TableModelTestUtils {
 		StringReader reader = new StringReader(csv);
 		return new CsvNullReader(reader);
 	}
+	
+	/**
+	 * Build a list of column Id from a list of ColumnModels.
+	 * @param models
+	 * @return
+	 */
+	public static List<String> getColumnModelIds(List<ColumnModel> models){
+		LinkedList<String> resutls = new LinkedList<String>();
+		for(ColumnModel cm: models){
+			resutls.add(cm.getId());
+		}
+		return resutls;
+	}
 }

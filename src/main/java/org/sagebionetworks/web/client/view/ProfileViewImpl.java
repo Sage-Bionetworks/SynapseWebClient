@@ -8,18 +8,15 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
-import org.sagebionetworks.repo.model.attachment.UploadResult;
-import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -27,7 +24,6 @@ import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -131,6 +127,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	DivElement createTeamUI;
 	@UiField
+	FlowPanel openInvitesContainer;
+	@UiField
 	FlowPanel teamsTabContent;
 	@UiField
 	Button teamSearchButton;
@@ -146,6 +144,19 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//Settings
 	@UiField
 	FlowPanel settingsTabContent;
+	
+	
+	//highlight boxes
+	@UiField 
+	DivElement projectsHighlightBox;
+	@UiField 
+	DivElement challengesHighlightBox;
+	@UiField 
+	DivElement favoritesHighlightBox;
+	@UiField 
+	DivElement teamsHighlightBox;
+
+
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -237,8 +248,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget, ProfileArea initialTab) {
 		clear();
-		//when editable, show profile form and linkedin import ui
-		teamsTabContent.clear();
 		DisplayUtils.hide(settingsListItem);
 		//add certificate
 		if (passingRecord != null) {
@@ -265,25 +274,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.add(getProfilePicture(profile, profile.getPic(), synapseJSNIUtils));
 		
 		if (isOwner) {
+			resetHighlightBoxes();
 			DisplayUtils.show(favoritesListItem);
 			DisplayUtils.show(settingsListItem);
 			
-			CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
-				@Override
-				public void invoke(List<MembershipInvitationBundle> invites) {
-					presenter.updateTeamInvites(invites);
-				}
-			};
-			openInvitesWidget.configure(new Callback() {
-				@Override
-				public void invoke() {
-					//refresh the teams and invites
-					presenter.refreshTeams();
-				}
-			}, openTeamInvitationsCallback);
-			
-			teamsTabContent.add(openInvitesWidget.asWidget());
-			
+			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			
 			//hide my profile by default, and provide link to show it
@@ -298,20 +293,28 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		} else {
 			DisplayUtils.show(viewProfilePanel);
 			DisplayUtils.show(picturePanel);
+			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
 		
 		//Teams
-		SimplePanel wrapper = new SimplePanel();
-		wrapper.add(myTeamsWidget.asWidget());
-		wrapper.addStyleName("highlight-box");
-		wrapper.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Teams");
-		teamsTabContent.add(wrapper);
+		teamsTabContent.add(myTeamsWidget.asWidget());
 		
 		if (initialTab != null)
 			setTabSelected(initialTab);
 		else 
 			setTabSelected(ProfileArea.PROJECTS);
 		DisplayUtils.show(navtabContainer);
+	}
+	
+	private void resetHighlightBoxes() {
+		setHighlightBoxUser(null);
+	}
+	
+	private void setHighlightBoxUser(String displayName) {
+		DisplayUtils.setHighlightBoxUser(projectsHighlightBox, displayName, "Projects");
+		DisplayUtils.setHighlightBoxUser(challengesHighlightBox, displayName, "Challenges");
+		DisplayUtils.setHighlightBoxUser(teamsHighlightBox, displayName, "Teams");
+		DisplayUtils.setHighlightBoxUser(favoritesHighlightBox, displayName, "Favorites");
 	}
 	
 	private void initEditProfileUI(UserProfile profile, Widget profileFormWidget){
@@ -326,6 +329,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.addMembershipRequests(requestCount.intValue());
 			}
 		});
+	}
+	
+	@Override
+	public void refreshTeamInvites(){
+		CallbackP<List<MembershipInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<MembershipInvitationBundle>>() {
+			@Override
+			public void invoke(List<MembershipInvitationBundle> invites) {
+				presenter.updateTeamInvites(invites);
+			}
+		};
+		openInvitesWidget.configure(new Callback() {
+			@Override
+			public void invoke() {
+				//refresh the teams and invites
+				presenter.refreshTeams();
+			}
+		}, openTeamInvitationsCallback);
 	}
 	
 	@Override
@@ -500,7 +520,15 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		createTeamTextBox.setValue("");
 		createProjectTextBox.setValue("");
 		
+		teamsTabContent.clear();
+		openInvitesContainer.clear();
+		
 		//reset tab link text (remove any notifications)
+		clearTeamNotificationCount();
+	}
+	
+	@Override
+	public void clearTeamNotificationCount() {
 		teamsLink.setHTML(DisplayConstants.TEAMS);
 	}
 	

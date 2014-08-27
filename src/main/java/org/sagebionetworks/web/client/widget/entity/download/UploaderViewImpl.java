@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -32,9 +31,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -58,7 +54,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private boolean isEntity;
 	private String parentEntityId;
 	private FormPanel formPanel, externalLinkFormPanel;
-	LayoutContainer fileUploaderContainer;
+	
 	
 	private FileUploadField fileUploadField;
 	private Button uploadBtn;
@@ -92,7 +88,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
-		createSynapseFileUploaderContainer();
 	}
 
 	@Override
@@ -210,24 +205,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 			tab.addStyleName("pad-text");			
 			formPanel.removeFromParent();
 						
-			if(!DisplayUtils.isInTestWebsite(ginInjector.getCookieProvider())) { // TODO : add logic that shows the FileUploader for only old browsers
-				tab.add(formPanel);			
-				tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-		            public void handleEvent( TabPanelEvent be ) {
-		            	configureUploadButton();
-		            }
-		        });
-			} else {
-				// Show Synapse Uploader and Disable upload button						
-				tab.add(fileUploaderContainer, new MarginData(5));
-				tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-		            public void handleEvent( TabPanelEvent be ) {
-		            	configureUploadButton();
-		            	uploadBtn.disable();
-		            }	     
-		        });
-				tab.layout(true);
-			}
+			tab.add(formPanel);			
+			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
+	            public void handleEvent( TabPanelEvent be ) {
+	            	configureUploadButton();
+	            }
+	        });
+		
 			tabPanel.add(tab);
 			tabPanel.repaint();
 	
@@ -294,12 +278,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		Listener<FormEvent> submitListener = new Listener<FormEvent>() {
 			@Override
 			public void handleEvent(FormEvent be) {
-				presenter.handleSubmitResult(be.getResultHtml(), false);
+				presenter.handleSubmitResult(be.getResultHtml());
 				hideLoading();
 			}
 		};
 		formPanel.addListener(Events.Submit, submitListener);
-		formPanel.setAction(presenter.getDefaultUploadActionUrl(false));
+		formPanel.setAction(presenter.getDefaultUploadActionUrl());
 		fileUploadField.clearState(); // doesn't successfully clear previous selection
 		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
@@ -434,41 +418,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 					return;
 				}
 
-				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), false);
+				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 			}
 		});
 	}
-
-	private void createSynapseFileUploaderContainer() {
-		fileUploaderContainer = new LayoutContainer();
-		
-		HTML oldBrowser = new HTML(
-				"<h4 class=\"display-inline\">You're using an old Browser</h4>" +
-				"<p class=\"display-inline\">Older browsers can use the Synapse File Uploader to upload to Synapse. " +
-				"<a class=\"link\" href=\"http://caniuse.com/cors\" target=\"_blank\">Why is my browser old?</a></p>"				
-				);
-		LayoutContainer left = new LayoutContainer();
-		left.addStyleName("span-8 notopmargin");
-		left.add(oldBrowser);
-		
-		LayoutContainer right = new LayoutContainer();
-		right.addStyleName("span-7 last notopmargin");
-		com.google.gwt.user.client.ui.Button launchBtn = DisplayUtils.createButton(DisplayConstants.LAUNCH_FILE_UPLOADER, ButtonType.PRIMARY);		
-		launchBtn.removeStyleName("gwt-Button");
-		launchBtn.addStyleName("btn btn-large btn-block");
-		launchBtn.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				String url = presenter.getFileUploaderUrl();
-				if(url != null) Window.open(url, "_blank	", "");
-			}
-		});
-		right.add(launchBtn);	
-		right.layout(true);
-		
-		fileUploaderContainer.add(left);
-		fileUploaderContainer.add(right);
-		fileUploaderContainer.layout(true);		
-	}
-	
 }

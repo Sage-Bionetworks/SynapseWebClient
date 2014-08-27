@@ -213,6 +213,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void refreshTeams() {
 		teamNotificationCount = 0;
+		view.clearTeamNotificationCount();
+		if (isOwner)
+			view.refreshTeamInvites();
 		getTeamsAndChallenges(currentUserId);
 	}
 	
@@ -505,14 +508,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (invites != null && invites.size() > 0) {
 			teamNotificationCount += invites.size();
 			//update team notification count
-			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+			if (teamNotificationCount > 0)
+				view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 }
 	}
 
 	@Override
 	public void addMembershipRequests(int count) {
 		teamNotificationCount += count;
-		view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
+		if (teamNotificationCount > 0)
+			view.setTeamNotificationCount(Integer.toString(teamNotificationCount));
 	}
 	
 	/**
@@ -524,6 +529,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void setTeamNotificationCount(int teamNotificationCount) {
 		this.teamNotificationCount = teamNotificationCount;
+	}
+	
+	/**
+	 * Exposed for testing purposes only
+	 * @return
+	 */
+	public boolean isOwner() {
+		return isOwner;
+	}
+
+	/**
+	 * Exposed for testing purposes only
+	 * @return
+	 */
+	public void setIsOwner(boolean isOwner) {
+		this.isOwner = isOwner;
 	}
 }
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+
 import org.sagebionetworks.gwt.client.schema.adapter.GwtAdapterFactory;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONArrayGwt;
 import org.sagebionetworks.gwt.client.schema.adapter.JSONObjectGwt;
@@ -78,6 +79,14 @@ import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
+import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
+import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
+import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbView;
 import org.sagebionetworks.web.client.widget.breadcrumb.BreadcrumbViewImpl;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsListView;
@@ -259,14 +268,16 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditor;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowEditorImpl;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewer;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelTableRowViewerImpl;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsView;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBase;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewBaseImpl;
-import org.sagebionetworks.web.client.widget.table.v2.ColumnModelsViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewerImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBase;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBaseImpl;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
@@ -493,6 +504,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
 		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
 		
+		// Asynchronous progress
+		bind(TimerProvider.class).to(TimerProviderImpl.class);
+		bind(NumberFormatProvider.class).to(NumberFormatProviderImpl.class);
+		bind(AsynchronousProgressView.class).to(AsynchronousProgressViewImpl.class);
+		bind(AsynchronousJobTracker.class).to(AsynchronousJobTrackerImpl.class);
+		
 		/*
 		 * Widgets
 		 */
@@ -704,6 +721,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
 		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
 		bind(ColumnModelTableRowViewer.class).to(ColumnModelTableRowViewerImpl.class);
+		bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
 
 		/*
 		 * Teams Places

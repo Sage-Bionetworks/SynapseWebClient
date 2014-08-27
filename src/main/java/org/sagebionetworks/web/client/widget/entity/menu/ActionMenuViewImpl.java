@@ -301,10 +301,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	public void showUploadDialog(String entityId) {
 		uploaderWindow.removeAll();
 		uploaderWindow.setPlain(true);
-		uploaderWindow.setModal(true);		
+		uploaderWindow.setModal(true);
 		uploaderWindow.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
 		uploaderWindow.setLayout(new FitLayout());		
-		uploaderWindow.add(uploader.asWidget(entityBundle.getEntity(), entityBundle.getAccessRequirements()), new MarginData(5));
+		uploaderWindow.add(uploader.asWidget(entityBundle.getEntity()), new MarginData(5));
 		uploaderWindow.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 		uploaderWindow.show();
 	}
