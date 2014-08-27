@@ -116,7 +116,7 @@ public class UploaderTest {
 		String completedUploadDaemonStatusJson = status.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		AsyncMockStubber.callSuccessWith(completedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		
 		when(gwt.createXMLHttpRequest()).thenReturn(null);
 		cancelHandler = mock(CancelHandler.class);
@@ -133,31 +133,31 @@ public class UploaderTest {
 				gwt, authenticationController);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
+		uploader.asWidget(parentEntityId);
 	}
 	
 	@Test
 	public void testGetUploadActionUrlWithNull() {
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
+		uploader.asWidget(parentEntityId);
 		
-		uploader.getDefaultUploadActionUrl(true);
+		uploader.getDefaultUploadActionUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
 	@Test
 	public void testGetUploadActionUrlWithFileEntity() {
 		FileEntity fileEntity = new FileEntity();
-		uploader.asWidget(fileEntity, null);
-		uploader.getDefaultUploadActionUrl(true);
+		uploader.asWidget(fileEntity);
+		uploader.getDefaultUploadActionUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
 	@Test
 	public void testGetUploadActionUrlWithData() {
 		Data data = new Data();
-		uploader.asWidget(data, null);
-		uploader.getDefaultUploadActionUrl(true);
+		uploader.asWidget(data);
+		uploader.getDefaultUploadActionUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
@@ -166,10 +166,9 @@ public class UploaderTest {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
+		uploader.asWidget(parentEntityId);
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
@@ -178,8 +177,8 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
 
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
+		uploader.asWidget(parentEntityId);
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		
 		verify(view).showErrorMessage(anyString());
 	}
@@ -189,41 +188,27 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
 
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
+		uploader.asWidget(parentEntityId);
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		
 		verify(view).showErrorMessage(anyString());
 	}
 
-	@Test
-	public void testSetExternalPathFailedCreateAccessRequirement() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
-
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
-		
-		verify(view).showErrorMessage(anyString());
-	}
-
-	
 	@Test
 	public void testSetExternalFilePathNotAFileEntity() {
 		//success setting external file path with a Locationable
 		Data data = new Data();
-		uploader.asWidget(data, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
+		uploader.asWidget(data);
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		verify(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 	
 	@Test
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
-		uploader.asWidget(testEntity, null);
-		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", true);
+		uploader.asWidget(testEntity);
+		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		verify(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-		verify(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
 
@@ -237,7 +222,7 @@ public class UploaderTest {
 				gwt, authenticationController);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId, null);
+		uploader.asWidget(parentEntityId);
 
 		uploader.handleUpload("newFile.txt");
 		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
@@ -247,9 +232,9 @@ public class UploaderTest {
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep5(false, null, 1);
+		uploader.directUploadStep5(null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
-		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  anyBoolean(),  any(AsyncCallback.class));
+		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
 	}
 	
@@ -257,10 +242,10 @@ public class UploaderTest {
 	public void testDirectUploadTeamIconHappyCase() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		CallbackP callback = mock(CallbackP.class);
-		uploader.asWidget(null,  null, null, callback, false);
+		uploader.asWidget(null,  null, callback, false);
 		uploader.handleUpload("newFile.txt");
 		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
-		uploader.directUploadStep5(false, null, 1);
+		uploader.directUploadStep5( null, 1);
 		verify(callback).invoke(anyString());
 	}
 	
@@ -330,17 +315,17 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep5(false, null, 1);
+		uploader.directUploadStep5(null, 1);
 		verifyUploadError();
 	}
 	
 	@Test
 	public void testDirectUploadStep5CompleteUploadFailure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader.handleUpload("newFile.txt");
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep5(false, null,1);
+		uploader.directUploadStep5(null,1);
 		verifyUploadError();
 	}
 
@@ -355,7 +340,7 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		uploader.handleUpload("newFile.txt");
-		uploader.directUploadStep5(false, null,1);
+		uploader.directUploadStep5(null,1);
 		verifyUploadError();
 	}
 	

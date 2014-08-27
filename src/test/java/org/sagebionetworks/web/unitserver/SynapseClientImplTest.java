@@ -981,19 +981,16 @@ public class SynapseClientImplTest {
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		boolean isRestricted = true;
 		
 		//parent entity has no immediate children
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
 		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
 		
-		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId");
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
-		//and lock down
-		verify(mockSynapse).createLockAccessRequirement(anyString());
 	}
 	
 	@Test
@@ -1002,7 +999,6 @@ public class SynapseClientImplTest {
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-		boolean isRestricted = false;
 		
 		//parent entity has one child
 		String testChildEntityId = "syn6283185";
@@ -1037,15 +1033,12 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		boolean isRestricted = false;
-		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId");
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
 		//update the data file handle id
 		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-		//do not lock down (restricted=false)
-		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
 	}
 	
 	@Test

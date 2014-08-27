@@ -247,7 +247,7 @@ public class ImageConfigViewImpl extends LayoutContainer implements ImageConfigV
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		
-		String baseURl = GWT.getModuleBaseURL()+"simplefilehandle";
+		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
 		//The ok/submitting button will be enabled when required images are uploaded
 		//or when another tab (external or synapse) is viewed

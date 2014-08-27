@@ -138,7 +138,7 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
 		window.setHeading(DisplayConstants.UPLOAD_FILE);
 		window.setLayout(new FitLayout());
 		
-		Widget widget = uploader.asWidget(null, null, null,
+		Widget widget = uploader.asWidget(null, null,
 				new CallbackP<String>() {
 					@Override
 					public void invoke(String fileHandleId) {

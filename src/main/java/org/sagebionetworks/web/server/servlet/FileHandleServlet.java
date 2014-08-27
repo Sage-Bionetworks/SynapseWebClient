@@ -323,48 +323,17 @@ public class FileHandleServlet extends HttpServlet {
 		// Before we do anything make sure we can get the users token
 		String token = getSessionToken(request);
 		if (token == null) {
-			setForbiddenMessage(response);
+			FileHandleServlet.setForbiddenMessage(response);
 			return;
 		}
 
 		try {
 			//Connect to synapse
 			SynapseClient client = createNewClient(token);
-			String entityId = null;
-			FileHandle newFileHandle = uploadFile(client, request);
-
-			//and update the wiki page (if the wiki key info was given as parameters) or FileEntity (if entity id was given)
-			if (newFileHandle != null) {
-				entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
-				Boolean isCreateEntity = Boolean.parseBoolean(request.getParameter(WebConstants.FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY));
-				FileEntity fileEntity = null;
-				
-				if (isCreateEntity) {
-					//create the file entity
-					String parentEntityId = request.getParameter(WebConstants.FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY);
-					fileEntity = getNewFileEntity(parentEntityId, newFileHandle.getId(), null, client);
-					entityId = fileEntity.getId();
-				}
-				else if (entityId != null) {
-					//get the file entity to update
-					fileEntity = (FileEntity) client.getEntityById(entityId);
-					//update data file handle id
-					fileEntity.setDataFileHandleId(newFileHandle.getId());
-					fileEntity = (FileEntity)client.putEntity(fileEntity);
-				}
-				
-				if (fileEntity != null) {
-					String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
-					if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
-					boolean isRestricted = Boolean.parseBoolean(restrictedParam);
-					fixName(fileEntity, newFileHandle, client);
-					lockDown(fileEntity, isRestricted, client);
-				}
-			}
-			
-			fillResponseWithSuccess(response, entityId);
+			FileHandle newFileHandle = FileHandleServlet.uploadFile(client, request);
+			FileHandleServlet.fillResponseWithSuccess(response, newFileHandle.getId());
 		} catch (Exception e) {
-			fillResponseWithFailure(response, e);
+			FileHandleServlet.fillResponseWithFailure(response, e);
 			return;
 		}
 	}
@@ -424,20 +393,6 @@ public class FileHandleServlet extends HttpServlet {
 		};
 	}
 		
-	public static void lockDown(FileEntity fileEntity, boolean isRestricted, SynapseClient client) throws SynapseException {
-		// now lock down restricted data
-		if (isRestricted) {
-			// we only proceed if there aren't currently any access restrictions
-			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
-			subjectId.setId(fileEntity.getId());
-			subjectId.setType(RestrictableObjectType.ENTITY);
-
-			VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId);
-			if (currentARs.getTotalNumberOfResults()==0L) {
-				client.createLockAccessRequirement(fileEntity.getId());
-			}
-		}
-	}
 	/**
 	 * Get the session token
 	 * @param request
