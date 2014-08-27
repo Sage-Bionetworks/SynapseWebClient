@@ -711,7 +711,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 
 	private String getOldUploadUrl() {
-		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET;
+		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
+		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}
 
 	/**
