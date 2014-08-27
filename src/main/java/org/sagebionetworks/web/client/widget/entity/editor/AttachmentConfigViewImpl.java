@@ -66,7 +66,7 @@ public class AttachmentConfigViewImpl extends LayoutContainer implements Attachm
 	
 	private void initUploadPanel(WikiPageKey wikiKey, final Dialog window) {
 		removeAll();
-		String baseURl = GWT.getModuleBaseURL()+"simplefilehandle";
+		String baseURl = GWT.getModuleBaseURL()+WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
 		
 		//The ok/submitting button will be enabled when attachments are uploaded
 		window.getButtonById(Dialog.OK).disable();

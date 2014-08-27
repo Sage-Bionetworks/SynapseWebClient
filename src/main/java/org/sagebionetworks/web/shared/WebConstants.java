@@ -114,12 +114,6 @@ public class WebConstants {
 
 	public static final String FILE_HANDLE_PREVIEW_PARAM_KEY = "preview";
 
-	public static final String FILE_HANDLE_CREATE_FILEENTITY_PARAM_KEY = "createFileEntity";
-
-	public static final String FILE_HANDLE_FILEENTITY_PARENT_PARAM_KEY = "fileEntityParentId";
-
-	public static final String IS_RESTRICTED_PARAM_KEY = "isRestricted";
-
 	public static final String ADD_TO_ENTITY_ATTACHMENTS_PARAM_KEY = "isAddToAttachments";
 
 	public static final String USER_PROFILE_PARAM_KEY = "userId";
@@ -129,8 +123,6 @@ public class WebConstants {
 	public static final String WAIT_FOR_URL = "waitForUrl";
 
 	public static final String ENTITY_CREATEDBYPRINCIPALID_KEY = "createdByPrincipalId";
-
-	public static final String MAKE_ATTACHMENT_PARAM_KEY = "makeAttachment";
 
 	public static final String ETAG_KEY = "etag";
 
@@ -156,7 +148,10 @@ public class WebConstants {
 	public static final String CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_wiki_id";
 	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
 	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
-
+	
+	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
+	
+	public static final String LEGACY_DATA_UPLOAD_SERVLET = "upload";
 
 	public static final String JIRA_PROJECT_ID ="org.sagebionetworks.portal.jira_project_id";
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";

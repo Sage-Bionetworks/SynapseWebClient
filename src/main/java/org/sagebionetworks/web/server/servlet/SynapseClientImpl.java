@@ -2905,7 +2905,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException {
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			//create entity if we have to
@@ -2921,11 +2921,24 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				fileEntity.setDataFileHandleId(fileHandleId);
 				fileEntity = (FileEntity)synapseClient.putEntity(fileEntity);
 			}
-			//fix name and lock down
-			FileHandleServlet.lockDown(fileEntity, isRestricted, synapseClient);
 			return fileEntity.getId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	public static void lockDown(String entityId, boolean isRestricted, org.sagebionetworks.client.SynapseClient client) throws SynapseException {
+		// now lock down restricted data
+		if (isRestricted) {
+			// we only proceed if there aren't currently any access restrictions
+			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
+			subjectId.setId(entityId);
+			subjectId.setType(RestrictableObjectType.ENTITY);
+
+			VariableContentPaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId);
+			if (currentARs.getTotalNumberOfResults()==0L) {
+				client.createLockAccessRequirement(entityId);
+			}
 		}
 	}
 

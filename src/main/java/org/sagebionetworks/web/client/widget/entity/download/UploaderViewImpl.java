@@ -278,12 +278,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		Listener<FormEvent> submitListener = new Listener<FormEvent>() {
 			@Override
 			public void handleEvent(FormEvent be) {
-				presenter.handleSubmitResult(be.getResultHtml(), false);
+				presenter.handleSubmitResult(be.getResultHtml());
 				hideLoading();
 			}
 		};
 		formPanel.addListener(Events.Submit, submitListener);
-		formPanel.setAction(presenter.getDefaultUploadActionUrl(false));
+		formPanel.setAction(presenter.getDefaultUploadActionUrl());
 		fileUploadField.clearState(); // doesn't successfully clear previous selection
 		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
@@ -418,7 +418,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 					return;
 				}
 
-				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue(), false);
+				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 			}
 		});
 	}

@@ -29,9 +29,9 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		
-		String getDefaultUploadActionUrl(boolean isRestricted);
+		String getDefaultUploadActionUrl();
 
-		void setExternalFilePath(String path, String name, boolean isNewlyRestricted);
+		void setExternalFilePath(String path, String name);
 		
 		void handleUpload(String fileName);
 		
@@ -39,22 +39,14 @@ public interface UploaderView extends IsWidget, SynapseView {
 		 * 
 		 * @param resultHtml
 		 */
-		void handleSubmitResult(String resultHtml, boolean isNewlyRestricted);
+		void handleSubmitResult(String resultHtml);
 		
-		/**
-		 * returns true iff the dataset is currently (initially) restricted
-		 * @return
-		 */
-		boolean isRestricted();
-
 		void clearHandlers();
 		
 		/**
 		 * Called when cancel is clicked in the view
 		 */
 		void cancelClicked();
-
-		String getFileUploaderUrl();
 	}
 
 	public void setShowCancelButton(boolean showCancel);
