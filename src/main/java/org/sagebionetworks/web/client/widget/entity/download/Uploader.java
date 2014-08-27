@@ -70,7 +70,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private Entity entity;
 	private String parentEntityId;
 	//set if we are uploading to an existing file entity
-	private String directUploadFileEntityId;
+	private String entityId;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
@@ -152,6 +152,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void handleUpload(String fileName) {
+		entityId = null;
+		if (entity != null) {
+			entityId = entity.getId();
+		}
+		
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
@@ -198,10 +203,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileName
 	 */
 	public void directUploadStep1(final String fileName) {
-		//set directUploadFileEntityId
-		directUploadFileEntityId = null;
 		if (entity != null) {
-			directUploadFileEntityId = entity.getId();
 			directUploadStep2(fileName);
 		} else {
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
@@ -213,7 +215,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								@Override
 								public void invoke() {
 									//yes, override
-									directUploadFileEntityId = result;
+									entityId = result;
 									directUploadStep2(fileName);
 								}
 							},
@@ -455,7 +457,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			double currentProgress = ((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT;
 			String progressText = percentFormat.format(currentProgress*100.0) + "%";
 			view.updateProgress(currentProgress, progressText);
-			checkStatusAgainLater(status.getDaemonId(), directUploadFileEntityId, parentEntityId, requestList, currentAttempt);
+			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, requestList, currentAttempt);
 		}
 		else if (State.FAILED == state) {
 			combineChunksUploadFailure(requestList, currentAttempt, status.getErrorMessage());
@@ -499,9 +501,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
-		if (directUploadFileEntityId != null || parentEntityId != null) {
+		if (entityId != null || parentEntityId != null) {
 			try {
-				synapseClient.setFileEntityFileHandle(fileHandleId, directUploadFileEntityId, parentEntityId, new AsyncCallback<String>() {
+				synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String entityId) {
 						//to new file handle id, or create new file entity with this file handle id
@@ -717,6 +719,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @return
 	 */
 	public String getDirectUploadFileEntityId() {
-		return directUploadFileEntityId;
+		return entityId;
 	}
 }
