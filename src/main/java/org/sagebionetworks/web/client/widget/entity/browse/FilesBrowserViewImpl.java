@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -27,7 +28,6 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
@@ -50,17 +50,18 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	private Uploader uploader;
 	private QuizInfoWidget quizInfoWidget;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
 			Uploader uploader,
-			EntityTreeBrowser entityTreeBrowser, 
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoWidget quizInfoWidget) {
+			QuizInfoWidget quizInfoWidget,
+			PortalGinInjector ginInjector) {
 		this.uploader = uploader;
-		this.entityTreeBrowser = entityTreeBrowser;
+		this.ginInjector = ginInjector;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoWidget = quizInfoWidget;
 	}
@@ -73,6 +74,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	@Override
 	public void configure(String entityId, boolean canEdit, String title) {
 		this.clear();
+		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
 		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
 		boolean isTitle = (title!=null);
