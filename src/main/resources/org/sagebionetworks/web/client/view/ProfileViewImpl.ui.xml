@@ -11,7 +11,8 @@
 		<div class="margin-10">
 			<div class="row margin-top-5">
 			    <div class="col-md-3 col-xs-12">
-			        <g:SimplePanel ui:field="picturePanel" styleName="margin-10"/>
+		            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+		        	<g:SimplePanel ui:field="certifiedUserBadgePanel" styleName="displayInline" />
 			        <g:FlowPanel ui:field="viewProfilePanel" />
 			    </div>
 			    <div class="col-md-9 col-xs-12">
@@ -75,7 +76,7 @@
 						</div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">
 					        <g:FlowPanel ui:field="settingsTabContent" />
-					        <div class="container">
+					        <div class="">
 						        <div class="highlight-box margin-top-0" highlight-box-title="Profile">
 						            <div class="row">
 										<div class="margin-bottom-20 col-sm-12">

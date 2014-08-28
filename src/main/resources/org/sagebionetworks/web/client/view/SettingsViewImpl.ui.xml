@@ -8,7 +8,7 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="margin-top-10-imp"></div>
 		<div ui:field="separator" class="separator"></div>
-		<div class="container">
+		<div class="">
 			<div style="white-space: normal;">
 				<g:SimplePanel ui:field="breadcrumbsPanel" />
 			</div>

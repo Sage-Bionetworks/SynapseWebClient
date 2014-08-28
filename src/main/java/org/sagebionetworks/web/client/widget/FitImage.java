@@ -19,8 +19,8 @@ public class FitImage extends Image {
 	        public void onLoad(LoadEvent event) {
 	            Element element = event.getRelativeElement();
 	            if (element == getElement()) {
-	            	int originalHeight = getOffsetHeight();
-	                int originalWidth = getOffsetWidth();
+	            	int originalHeight = getHeight();
+	                int originalWidth = getWidth();
 	                if (originalHeight > originalWidth) {
 	                    setHeight(maxHeight + "px");
 	                    addStyleName("autowidth");

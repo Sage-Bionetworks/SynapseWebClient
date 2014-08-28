@@ -1203,6 +1203,10 @@ ol.lowerroman {
 	display: inline;
 }
 
+.displayInlineBlock {
+	display: inline-block;
+}
+
 .smallerText {
 	font-size: 0.8em;
 }
@@ -1438,6 +1442,11 @@ ol.lowerroman {
 .vertical-align-middle {
 	vertical-align: middle;
 }
+
+.vertical-align-top {
+	vertical-align: top;
+}
+
 
 .member-search-button {
 	font-size: 12px !important;
