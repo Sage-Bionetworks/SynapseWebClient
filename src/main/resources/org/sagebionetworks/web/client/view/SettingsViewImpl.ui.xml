@@ -1,7 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
 	<g:HTMLPanel>
 		<div ui:field="colorLine" class="color-line"></div>
@@ -85,9 +86,9 @@
 					indefinite amount of time. It is important that you treat your API
 					key with
 					the same security as your password.</p>
-				<div class="center well fixedWidthFont">
+				<div class="center fixedWidthFont">
 					<span class="strong font-size-15">
-						<span ui:field="apiKeyContainer" />
+					    <b:TextBox ui:field="apiKeyContainer" placeholder="" autoComplete="false" enabled="false"/>
 					</span>
 				</div>
 				<g:Button ui:field="changeApiKey" styleName="btn btn-default margin-top-10">Change API Key</g:Button>

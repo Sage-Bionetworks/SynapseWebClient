@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
@@ -30,9 +30,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter, Presenter<Settings> {
+public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter {
 		
-	private Settings place;
 	private SettingsView view;
 	private AuthenticationController authenticationController;
 	private UserAccountServiceAsync userService;
@@ -73,14 +72,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		
 		// Install the view
 		panel.setWidget(view);
-		updateView();
-	}
-
-	@Override
-	public void setPlace(Settings place) {
-		this.place = place;
-		this.view.setPresenter(this);
-		this.view.clear();
 		updateView();
 	}
 
@@ -175,7 +166,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			@Override
 			public void onSuccess(Void callback) {
 				//success, update view
-				setPlace(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+				goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
 			
 			@Override
