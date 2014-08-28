@@ -93,6 +93,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	public void configure(String entityId, final boolean sort) {
 		view.clear();
+		view.showLoading();
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
