@@ -202,7 +202,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void disableMultipleFileUploads() {
 		this.multipleFileUploads = false;
-		fileUploadHTML.setHTML(createFileUploadHTML().toString());
+		//fileUploadHTML.setHTML(createFileUploadHTML().toString());
+		fileUploadHTML.setHTML("<p>hello this worked</p>");
 	}
 	
 
