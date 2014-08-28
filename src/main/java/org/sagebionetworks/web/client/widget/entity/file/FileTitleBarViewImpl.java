@@ -97,6 +97,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.locationableUploader = locationableUploader;
+		locationableUploader.disableMultipleFileUploads();
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;

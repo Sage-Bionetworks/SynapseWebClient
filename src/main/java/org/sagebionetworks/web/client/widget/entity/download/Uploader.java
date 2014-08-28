@@ -237,7 +237,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 									@Override
 									public void invoke() {
 										//yes, override
-										//directUploadFileEntityId = result;	// TODO: directUploadFileEntityId?
+										entityId = result;
 										directUploadStep2(fileName);
 									}
 								},
@@ -545,7 +545,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String entityId) {
-						//to new file handle id, or create new file entity with this file handle id
+						fileHasBeenUploaded = true;
 						if (currIndex + 1 == fileNames.length) {
 							//to new file handle id, or create new file entity with this file handle id
 							view.hideLoading();
