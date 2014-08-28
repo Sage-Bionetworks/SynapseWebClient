@@ -267,7 +267,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				}
 			});
 			
-			 viewProfilePanel.add(tutorialLink);
+			viewProfilePanel.add(tutorialLink);
 		 }
 		
 		fillInProfileView(profile, viewProfilePanel);
@@ -281,18 +281,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			
-			//hide my profile by default, and provide link to show it
-			DisplayUtils.hide(viewProfilePanel);
-			DisplayUtils.hide(picturePanel);
-			
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
 			
 			initEditProfileUI(profile, profileFormWidget);
 		} else {
-			DisplayUtils.show(viewProfilePanel);
-			DisplayUtils.show(picturePanel);
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
 		
@@ -404,7 +398,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			 //use preview
 			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
 			 return new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
-					 + "<img style=\"margin:auto; display:block;\" src=\"" 
+					 + "<img style=\"display:block;\" src=\"" 
 					 + url+ "\"/>"
 					 + "</div>"));
 		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
