@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -413,6 +414,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * Private Methods
 	 */
+	
+	//@Override	// TODO: private method? JSONObject cannot be resolved in SynaspeClientAsync?
+	private JSONObject query(String query) throws SynapseException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		return synapseClient.query(query);
+	}
 
 	// Convert repo-side EntityBundle to serializable EntityBundleTransport
 	private EntityBundleTransport convertBundleToTransport(String entityId,
@@ -2868,39 +2875,60 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
+	// TODO: Where to put these constants?
+	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
+	public static final String LIMIT_ONE = "' limit 1";
+	
+	// TODO: Check type? File vs folder?
 	@Override
-	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException {
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		String fileEntityId = null;
+//		String fileEntityId = null;
+//		try {
+//			// file entity not set
+//			// determine if we should create a new file entity, or update an
+//			// existing.
+//			if (parentEntityId != null && fileName != null) {
+//				// look for a child (1 generation away) with the same file name
+//				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
+//				// get the EntityHeader for all children
+//				List<Reference> references = new ArrayList<Reference>();
+//				for (EntityId childEntityId : list.getIdList()) {
+//					Reference r = new Reference();
+//					r.setTargetId(childEntityId.getId());
+//					references.add(r);
+//				}
+//				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
+//				for (EntityHeader childEntity : childEntities.getResults()) {
+//					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
+//						// found! add a new version for this file instead of
+//						// creating a new file entity
+//						fileEntityId = childEntity.getId();
+//						break;
+//					}
+//				}
+//			}
+//			if (fileEntityId == null)
+//				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
+//			return fileEntityId;
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
+		// TODO: CONSTANTS CONSTANTS CONSTANTS!!!!!!
+		String queryString =  SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId + "' and name == '"+ fileName + LIMIT_ONE;
+		JSONObject query = query(queryString);
+		if(!query.has("totalNumberOfResults")){
+			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");
+		}
 		try {
-			// file entity not set
-			// determine if we should create a new file entity, or update an
-			// existing.
-			if (parentEntityId != null && fileName != null) {
-				// look for a child (1 generation away) with the same file name
-				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
-				// get the EntityHeader for all children
-				List<Reference> references = new ArrayList<Reference>();
-				for (EntityId childEntityId : list.getIdList()) {
-					Reference r = new Reference();
-					r.setTargetId(childEntityId.getId());
-					references.add(r);
-				}
-				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
-				for (EntityHeader childEntity : childEntities.getResults()) {
-					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
-						// found! add a new version for this file instead of
-						// creating a new file entity
-						fileEntityId = childEntity.getId();
-						break;
-					}
-				}
+			if (query.getLong("totalNumberOfResults") != 0) {
+				JSONArray results = query.getJSONArray("results");
+				return results.getJSONObject(0).getString("entity.id");
+			} else {
+				return null;
 			}
-			if (fileEntityId == null)
-				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
-			return fileEntityId;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONException e) {
+			throw new SynapseClientException(e);
 		}
 	}
 	

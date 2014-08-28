@@ -24,6 +24,10 @@ public interface UploaderView extends IsWidget, SynapseView {
 	public void updateProgress(double value, String text);
 	public void showProgressBar();
 	public void showConfirmDialog(String title, String message, Callback yesCallback, Callback noCallback);
+	void resetToInitialState();
+	void showNoFilesSelectedForUpload();
+	void disableMultipleFileUploads();
+	
 	/**
 	 * Presenter interface
 	 */
@@ -33,7 +37,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 
 		void setExternalFilePath(String path, String name);
 		
-		void handleUpload(String fileName);
+		void handleUploads();
 		
 		/**
 		 * 
@@ -47,6 +51,8 @@ public interface UploaderView extends IsWidget, SynapseView {
 		 * Called when cancel is clicked in the view
 		 */
 		void cancelClicked();
+		
+		void disableMultipleFileUploads();
 	}
 
 	public void setShowCancelButton(boolean showCancel);
