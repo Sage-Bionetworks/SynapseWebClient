@@ -17,11 +17,8 @@ public interface RowView extends IsWidget {
 	/**
 	 * Business logic for this view.
 	 */
-	public interface Presenter {
-		/**
-		 * When the select button becomes selected.
-		 */
-		public void onSelected(boolean isSelected);
+	public interface Presenter extends RowSelectionListener{
+
 	}
 
 	/**
@@ -66,13 +63,6 @@ public interface RowView extends IsWidget {
 	public void setSelected(boolean isSelected);
 	
 	/**
-	 * Toggle the editing state of this row.
-	 * 
-	 * @param isEditing
-	 */
-	public void setEditing(boolean isEditing);
-	
-	/**
 	 * Is this cell currently editing?
 	 * @return
 	 */
@@ -82,7 +72,7 @@ public interface RowView extends IsWidget {
 	 * Initialize a row with the column type information.
 	 * @param types
 	 */
-	public void initializeRow(List<ColumnTypeViewEnum> types);
+	public void initializeRow(List<ColumnTypeViewEnum> types, boolean isEditor);
 	
 	/**
 	 * Set the data for this row.

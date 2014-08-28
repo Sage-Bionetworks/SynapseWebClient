@@ -16,4 +16,5 @@ public interface ToggleCell extends Cell {
 	 * @param isEditing
 	 */
 	public void toggleEdit(boolean isEditing);
+	
 }

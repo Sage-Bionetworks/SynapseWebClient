@@ -21,10 +21,12 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class TablePageWidget implements TablePageView.Presenter, IsWidget {
+public class TablePageWidget implements TablePageView.Presenter, RowView.Presenter, IsWidget {
 
 	TablePageView view;
 	PortalGinInjector ginInjector;
+	List<ColumnTypeViewEnum> types;
+	RowSelectionListener rowSelectionListener;
 	
 	@Inject
 	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector){
@@ -38,7 +40,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget {
 	 * @param bundle
 	 * @param isEditable
 	 */
-	public void configure(QueryResultBundle bundle, boolean isEditable){
+	public void configure(QueryResultBundle bundle, boolean isEditable, RowSelectionListener rowSelectionListener){
+		this.rowSelectionListener = rowSelectionListener;
 		// Transform the query result into view data
 		List<String> headers = new ArrayList<String>();
 		for (String header : bundle.getQueryResults().getHeaders()) {
@@ -47,23 +50,56 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget {
 		view.setTableHeaders(headers);
 		Map<String, ColumnModel> idToModel = ColumnModelUtils.buildMapColumnIdtoModel(bundle.getSelectColumns());
 		// Map the columns to types
-		List<ColumnTypeViewEnum> types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResults().getHeaders(), idToModel);
+		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResults().getHeaders(), idToModel);
 		// if the page is editable then the rows can be selected.
 		boolean isSelectable = isEditable;
 		// Build the rows for this table
 		for(Row row: bundle.getQueryResults().getRows()){
 			// Create the row 
-			RowView rowView = ginInjector.createNewRowView();
-			rowView.initializeRow(types);
-			// fill out the row.
-			rowView.setRowData(row.getRowId(), row.getVersionNumber(), row.getValues(), isSelectable);
-			view.addRow(rowView);
+			addRow(types, isSelectable, row, isEditable);
 		}
+	}
+
+	/**
+	 * @param types
+	 * @param isSelectable
+	 * @param row
+	 */
+	public RowView addRow(List<ColumnTypeViewEnum> types, boolean isSelectable, Row row, boolean isEditor) {
+		RowView rowView = ginInjector.createNewRowView();
+		rowView.initializeRow(types, isEditor);
+		// fill out the row.
+		rowView.setRowData(row.getRowId(), row.getVersionNumber(), row.getValues(), isSelectable);
+		view.addRow(rowView);
+		rowView.setPresenter(this);
+		return rowView;
 	}
 
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	/**
+	 * Add a new row to the table.
+	 */
+	public void addNewRow() {
+		// Add a new row to the page.
+		Row newRow = new Row();
+		List<String> values = new ArrayList<String>(types.size());
+		newRow.setValues(values);
+		// Set empty strings for all values
+		for(ColumnTypeViewEnum type: types){
+			values.add("");
+		}
+		addRow(types, true, newRow, true);
+	}
+
+	@Override
+	public void onSelectedChanged(RowView selected) {
+		if(this.rowSelectionListener != null){
+			this.rowSelectionListener.onSelectedChanged(selected);
+		}
 	}
 	
 }

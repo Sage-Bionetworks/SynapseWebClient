@@ -3,7 +3,7 @@
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<g:HTMLPanel>
-		<b:ButtonToolBar ui:field="buttonToolbar" visible="false">
+		<b:ButtonToolBar ui:field="buttonToolbar">
 			<b:ButtonGroup>
 				<b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />
 				<b:Button ui:field="selectDropDown" dataToggle="DROPDOWN"
@@ -15,6 +15,8 @@
 				</b:DropDownMenu>
 			</b:ButtonGroup>
 			<b:ButtonGroup>
+				<b:Button ui:field="addRowToolButton" icon="PLUS"
+					enabled="true" type="INFO" />
 				<b:Button ui:field="deleteSelectedButton" icon="TRASH_O"
 					enabled="false" />
 			</b:ButtonGroup>

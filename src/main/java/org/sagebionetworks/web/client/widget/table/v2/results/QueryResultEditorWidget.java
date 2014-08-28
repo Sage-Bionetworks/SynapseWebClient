@@ -12,7 +12,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class QueryResultEditorWidget  implements QueryResultEditorView.Presenter, IsWidget{
+public class QueryResultEditorWidget  implements QueryResultEditorView.Presenter, IsWidget, RowSelectionListener{
 
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
@@ -37,6 +37,41 @@ public class QueryResultEditorWidget  implements QueryResultEditorView.Presenter
 	 */
 	public void configure(QueryResultBundle bundle){
 		// configure the widget
-		pageWidget.configure(bundle, true);
+		pageWidget.configure(bundle, true, this);
+	}
+
+	@Override
+	public void onAddRow() {
+		pageWidget.addNewRow();
+	}
+
+	@Override
+	public void onToggleSelect() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSelectAll() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSelectNone() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeleteSelected() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSelectedChanged(RowView selected) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -278,6 +278,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -734,6 +736,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TablePageView.class).to(TablePageViewImpl.class);
 		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
 		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
+		bind(CellFactory.class).to(CellFactoryImpl.class);
 
 		/*
 		 * Teams Places

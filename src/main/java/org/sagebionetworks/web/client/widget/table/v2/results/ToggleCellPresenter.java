@@ -21,6 +21,7 @@ public class ToggleCellPresenter implements ToggleCell {
 	CellFactory factory;
 	Cell renderer;
 	Cell editor;
+	boolean autoFocus;
 
 	/**
 	 * Create a new toggle cell for each cell. This cell can be re-used for any
@@ -51,15 +52,13 @@ public class ToggleCellPresenter implements ToggleCell {
 			// enter edit
 			if (editor == null) {
 				editor = factory.createEditor(type);
-				editor.setVisible(false);
-				this.container.add(editor.asWidget());
 			}
 			// transfer from the view to the editor
-			transferValueAndToggle(renderer, editor);
+			transferValueAndToggle(renderer, editor, container);
 		} else if (!renderer.isVisible()) {
 			// enter render
 			// transfer from the view to the editor
-			transferValueAndToggle(editor, renderer);
+			transferValueAndToggle(editor, renderer, container);
 		}
 	}
 
@@ -75,10 +74,12 @@ public class ToggleCellPresenter implements ToggleCell {
 	 * @param source
 	 * @param destination
 	 */
-	private static void transferValueAndToggle(Cell source, Cell destination) {
+	private static void transferValueAndToggle(Cell source, Cell destination, HasWidgets container) {
 		destination.setValue(source.getValue());
 		source.setVisible(false);
 		destination.setVisible(true);
+		container.clear();
+		container.add(destination.asWidget());
 	}
 
 	@Override
@@ -113,4 +114,5 @@ public class ToggleCellPresenter implements ToggleCell {
 	public void setVisible(boolean isVisible) {
 		asWidget().setVisible(isVisible);
 	}
+
 }

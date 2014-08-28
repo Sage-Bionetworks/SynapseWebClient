@@ -15,6 +15,31 @@ public interface QueryResultEditorView extends IsWidget {
 	 *
 	 */
 	public interface Presenter {
+
+		/**
+		 * Add a row to the table.
+		 */
+		void onAddRow();
+
+		/**
+		 * Toggle the selected rows.
+		 */
+		void onToggleSelect();
+
+		/**
+		 * Select all rows.
+		 */
+		void onSelectAll();
+
+		/**
+		 * Select no rows.
+		 */
+		void onSelectNone();
+
+		/**
+		 * Delete the selected rows.
+		 */
+		void onDeleteSelected();
 		
 	}
 	

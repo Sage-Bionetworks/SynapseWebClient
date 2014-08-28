@@ -6,6 +6,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
@@ -31,7 +32,7 @@ public class RowViewImpl implements RowView {
 	
 	TableRow row;
 	CellFactory factory;
-	List<ToggleCell> cells;
+	List<Cell> cells;
 	Long id;
 	Long version;
 	boolean isEditing;
@@ -39,6 +40,7 @@ public class RowViewImpl implements RowView {
 	@Inject
 	public RowViewImpl(Binder binder, CellFactory factory){
 		row = binder.createAndBindUi(this);
+		this.factory = factory;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class RowViewImpl implements RowView {
 	@Override
 	public Iterable<String> getValues() {
 		List<String> values = new ArrayList<String>(cells.size());
-		for(ToggleCell cell: cells){
+		for(Cell cell: cells){
 			values.add(cell.getValue());
 		}
 		return values;
@@ -76,26 +78,23 @@ public class RowViewImpl implements RowView {
 	}
 
 	@Override
-	public void setEditing(boolean isEditing) {
-		this.isEditing = isEditing;
-		// Toggle the edit of each cell
-		for(ToggleCell cell: this.cells){
-			cell.toggleEdit(isEditing);
-		}
-	}
-
-	@Override
-	public void initializeRow(List<ColumnTypeViewEnum> types) {
-		// the types determine the editors and renderer for this row.
-		this.row.clear();
-		this.cells = new ArrayList<ToggleCell>(types.size());
+	public void initializeRow(List<ColumnTypeViewEnum> types, boolean isEditor) {
+		this.cells = new ArrayList<Cell>(types.size());
 		// Setup each row
+		int i=0;
 		for(ColumnTypeViewEnum type: types){
 			TableData td = new TableData();
 			row.add(td);
 			// Create each cell
-			ToggleCell cell = new ToggleCellPresenter(type, this.factory, td);
+			Cell cell = null;
+			if(isEditor){
+				cell = factory.createEditor(type);
+			}else{
+				cell = factory.createRenderer(type);
+			}
+			td.add(cell);
 			this.cells.add(cell);
+			i++;
 		}
 	}
 
@@ -107,7 +106,7 @@ public class RowViewImpl implements RowView {
 		// Fill in the values
 		int index =0;
 		for(String value: cellValues){
-			ToggleCell cell =  this.cells.get(index);
+			Cell cell =  this.cells.get(index);
 			cell.setValue(value);
 			index++;
 		}
@@ -128,7 +127,7 @@ public class RowViewImpl implements RowView {
 		this.select.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onSelected(select.getValue());
+				presenter.onSelectedChanged(RowViewImpl.this);
 			}
 		});
 	}

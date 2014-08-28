@@ -18,7 +18,7 @@ public class StringRenderer extends FormControlStatic implements Cell {
 
 	@Override
 	public void setValue(String value) {
-		this.setText(SafeHtmlUtils.fromString(value).toString());
+		this.setText(SafeHtmlUtils.htmlEscape(value));
 	}
 
 	@Override
