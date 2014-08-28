@@ -11,6 +11,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -64,6 +65,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private MarkdownWidget markdownWidget;
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
+	private SageImageBundle sageImageBundle;
 //	private Button editButton, addPageButton; 
 	private FlowPanel commandBar;
 	private SimplePanel commandBarWrapper;
@@ -101,11 +103,12 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Inject
 	public WikiPageWidgetViewImpl(MarkdownWidget markdownWidget, MarkdownEditorWidget markdownEditorWidget, 
 			IconsImageBundle iconsImageBundle, Breadcrumb breadcrumb, WikiAttachments wikiAttachments,
-			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget, PortalGinInjector ginInjector) {
+			WidgetRegistrar widgetRegistrar, WikiHistoryWidget historyWidget, PortalGinInjector ginInjector, SageImageBundle sageImageBundle) {
 		super();
 		this.markdownWidget = markdownWidget;
 		this.markdownEditorWidget = markdownEditorWidget;
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 		this.breadcrumb = breadcrumb;
 		this.wikiAttachments = wikiAttachments;
 		this.widgetRegistrar = widgetRegistrar;
@@ -576,6 +579,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 	@Override
 	public void showLoading() {
+		clear();
+		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 	}
 	
 	@Override
