@@ -14,19 +14,17 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
-import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.WikiPlace;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
@@ -101,11 +99,6 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// user's profile page
 					ProfilePresenter presenter = ginjector.getProfilePresenter();
 					presenter.setPlace((Profile) place);
-					presenter.start(panel, eventBus);
-				} else if (place instanceof Settings) {
-					// user's profile page
-					SettingsPresenter presenter = ginjector.getSettingsPresenter();
-					presenter.setPlace((Settings) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof ComingSoon) {
 					// user's profile page

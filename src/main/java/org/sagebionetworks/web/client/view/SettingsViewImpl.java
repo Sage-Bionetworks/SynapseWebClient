@@ -14,6 +14,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
+import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -105,7 +106,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	SpanElement storageUsageSpan;
 	@UiField
-	SpanElement apiKeyContainer;
+	org.gwtbootstrap3.client.ui.TextBox apiKeyContainer;
 	
 	@UiField
 	SimplePanel notificationsPanel;
@@ -395,7 +396,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void setApiKey(String apiKey) {
-		apiKeyContainer.setInnerHTML(apiKey);
+		apiKeyContainer.setValue(apiKey);
 	}
 
 }

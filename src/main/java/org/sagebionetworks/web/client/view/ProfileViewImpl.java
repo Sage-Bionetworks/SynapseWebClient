@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
@@ -68,6 +67,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel certificatePanel;
 	@UiField
 	FlowPanel viewProfilePanel;
+	@UiField
+	SimplePanel certifiedUserBadgePanel;
 	
 	@UiField
 	SimplePanel picturePanel;
@@ -226,6 +227,25 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.goTo(new TeamSearch(""));
 			}
 		});
+		initCertificationBadge();
+	}
+	
+	private void initCertificationBadge() {
+		Image certifiedUserImage = new Image(sageImageBundle.certificate().getSafeUri());
+		certifiedUserImage.setHeight("32px");
+		certifiedUserImage.setWidth("25px");
+		certifiedUserImage.setPixelSize(25, 32);
+		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top");
+		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
+		certifiedUserImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				clear();
+				certificatePanel.setVisible(true);
+				tooltip.hide();
+			}
+		});
+		certifiedUserBadgePanel.add(certifiedUserImage);
 	}
 	
 	@Override
@@ -251,23 +271,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		//add certificate
 		if (passingRecord != null) {
-			 Image tutorialLink = new Image(sageImageBundle.certificate().getSafeUri());
-			 tutorialLink.setHeight("32px");
-			 tutorialLink.setWidth("25px");
-			 tutorialLink.setPixelSize(25, 32);
-			 tutorialLink.addStyleName("imageButton margin-right-5 moveup-8");
-			 certificateWidget.configure(profile, passingRecord);
-			 final Tooltip tooltip = DisplayUtils.addTooltip(tutorialLink.asWidget(), DisplayConstants.CERTIFIED_USER);
-			 tutorialLink.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					clear();
-					certificatePanel.setVisible(true);
-					tooltip.hide();
-				}
-			});
-			
-			 viewProfilePanel.add(tutorialLink);
+			certificateWidget.configure(profile, passingRecord);
+			certifiedUserBadgePanel.setVisible(true); 
 		 }
 		
 		fillInProfileView(profile, viewProfilePanel);
@@ -281,18 +286,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			openInvitesContainer.add(openInvitesWidget.asWidget());
 			settingsTabContent.add(settingsPresenter.asWidget());
 			
-			//hide my profile by default, and provide link to show it
-			DisplayUtils.hide(viewProfilePanel);
-			DisplayUtils.hide(picturePanel);
-			
 			//show create project and team UI
 			DisplayUtils.show(createProjectUI);
 			DisplayUtils.show(createTeamUI);
 			
 			initEditProfileUI(profile, profileFormWidget);
 		} else {
-			DisplayUtils.show(viewProfilePanel);
-			DisplayUtils.show(picturePanel);
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
 		
@@ -400,22 +399,21 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	 public static Widget getProfilePicture(UserProfile profile, AttachmentData pic, SynapseJSNIUtils synapseJSNIUtils) {
+		 Widget profilePicture; 
 		 if (pic != null && pic.getPreviewId() != null && pic.getPreviewId().length() > 0) {
 			 //use preview
 			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getPic().getPreviewId(), null);
-			 return new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"profile-image-loading\" >"
-					 + "<img style=\"margin:auto; display:block;\" src=\"" 
-					 + url+ "\"/>"
-					 + "</div>"));
+			 profilePicture = new FitImage(url, 150, 150);
 		 } else if (pic != null && pic.getTokenId() != null && pic.getTokenId().length() > 0) {
 			 //use token
 			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), pic.getTokenId(), null);
-			 return new FitImage(url, 150, 150);
-		 }
-		 else {
+			 profilePicture = new FitImage(url, 150, 150);
+		 } else {
 			 //use default picture
-			 return defaultProfilePicture;
+			 profilePicture = defaultProfilePicture;
 		 }
+		 profilePicture.addStyleName("margin-10 userProfileImage");
+		 return profilePicture;
 	 }
 	 
 	 public static void fillInProfileView(UserProfile profile, FlowPanel viewProfilePanel) {
@@ -440,6 +438,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 HTML headlineHtml = new HTML(builder.toSafeHtml());
 		 headlineHtml.addStyleName("inline-block");
 		 viewProfilePanel.add(headlineHtml);
+		 
 		 builder = new SafeHtmlBuilder();
 		 
 		 if (position.length()>0 || company.length()>0) {
@@ -501,6 +500,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		viewProfilePanel.clear();
 		picturePanel.clear();
 		certificatePanel.setVisible(false);
+		certifiedUserBadgePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();
 		//init with loading widget

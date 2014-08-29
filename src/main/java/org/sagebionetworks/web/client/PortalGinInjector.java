@@ -121,8 +121,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	public ProfilePresenter getProfilePresenter();
 
-	public SettingsPresenter getSettingsPresenter();
-	
 	public ComingSoonPresenter getComingSoonPresenter();
 	
 	public ChallengeOverviewPresenter getChallengeOverviewPresenter();

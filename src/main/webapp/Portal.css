@@ -675,6 +675,10 @@ a.shortBtn {
 
 .tab-background {
 	background-color: #f9f9f9;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0px 0px 4px 4px;
 }
 
 .file-preview {
@@ -1199,6 +1203,10 @@ ol.lowerroman {
 	display: inline;
 }
 
+.displayInlineBlock {
+	display: inline-block;
+}
+
 .smallerText {
 	font-size: 0.8em;
 }
@@ -1434,6 +1442,11 @@ ol.lowerroman {
 .vertical-align-middle {
 	vertical-align: middle;
 }
+
+.vertical-align-top {
+	vertical-align: top;
+}
+
 
 .member-search-button {
 	font-size: 12px !important;
