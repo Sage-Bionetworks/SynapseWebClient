@@ -109,8 +109,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * Configure tree view to be filled initially with the given headers.
 	 * @param rootEntities
 	 */
-	public void configure(List<EntityHeader> rootEntities, boolean sort) {
-		view.setRootEntities(rootEntities, sort);
+	public void configure(List<EntityHeader> rootEntities) {
+		view.setRootEntities(rootEntities);
 	}
 	
 	

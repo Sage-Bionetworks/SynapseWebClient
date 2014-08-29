@@ -100,20 +100,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {
+	public void setRootEntities(List<EntityHeader> rootEntities) {
 		clear();
-		
-		if (sort) {
-			// TODO: Find already existing sorting code. Reuse that.
-			Collections.sort(rootEntities, new Comparator<EntityHeader>() {
-
-				@Override
-				public int compare(EntityHeader arg0, EntityHeader arg1) {
-					return arg0.getName().toLowerCase().compareTo(arg1.getName().toLowerCase());
-				}
-				
-			});
-		}
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
 		if(rootEntities.size() == 0) {

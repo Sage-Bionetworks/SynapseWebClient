@@ -255,6 +255,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
+				sortEntityHeadersByName(result);
 				view.setMyProjects(result);
 			}
 			@Override
@@ -266,6 +267,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
+				sortEntityHeadersByName(result);
 				view.setFavorites(result);
 			}
 			@Override
@@ -327,13 +329,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 						headers.add(header);
 					}
 					
-					//sort by name
-					Collections.sort(headers, new Comparator<EntityHeader>() {
-				        @Override
-				        public int compare(EntityHeader o1, EntityHeader o2) {
-				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-				        }
-					});
+					sortEntityHeadersByName(headers);
 					
 					view.setMyChallenges(headers);
 				} catch (JSONObjectAdapterException e) {
@@ -345,6 +341,15 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			public void onFailure(Throwable caught) {
 				view.setMyChallengesError("Could not load My Challenges:" + caught.getMessage());
 			}
+		});
+	}
+	
+	public void sortEntityHeadersByName(List<EntityHeader> headers) {
+		Collections.sort(headers, new Comparator<EntityHeader>() {
+	        @Override
+	        public int compare(EntityHeader o1, EntityHeader o2) {
+	        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+	        }
 		});
 	}
 	

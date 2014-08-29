@@ -341,5 +341,26 @@ public class HomePresenterTest {
 		homePresenter.checkIfCertified();
 		verify(mockView, times(0)).showCertificationReminder(anyBoolean());
 	}
+	
+	@Test
+	public void testSortEntityHeadersByName() {
+		EntityHeader header1 = new EntityHeader();
+		EntityHeader header2 = new EntityHeader();
+		EntityHeader header3 = new EntityHeader();
+		header1.setName("Abra");
+		header2.setName("marill");
+		header3.setName("Zubat");
+		
+		
+		List<EntityHeader> list = new ArrayList<EntityHeader>();
+		list.add(header3);
+		list.add(header2);
+		list.add(header1);
+		// [Zubat, marill, Abra]
+		homePresenter.sortEntityHeadersByName(list);
+		assertEquals(list.get(0), header1);
+		assertEquals(list.get(1), header2);
+		assertEquals(list.get(2), header3);
+	}
 
 }
