@@ -98,8 +98,8 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			AuthenticationController authenticationController,
 			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.locationableUploader = locationableUploader;
 		locationableUploader.disableMultipleFileUploads();
+		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;

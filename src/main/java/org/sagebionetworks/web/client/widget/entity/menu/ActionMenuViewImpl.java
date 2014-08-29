@@ -89,6 +89,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		this.sageImageBundle = sageImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
+		locationableUploader.disableMultipleFileUploads();	// TODO: GET RID OF HTIS@!??
 		this.typeProvider = typeProvider;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;

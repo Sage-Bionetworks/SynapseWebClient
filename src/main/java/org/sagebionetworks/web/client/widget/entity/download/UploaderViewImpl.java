@@ -92,7 +92,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		createUploadPanel();
 		createExternalPanel();
 	}
-	
+		
 	@Override
 	public void resetToInitialState() {
 		hideLoading();
@@ -217,7 +217,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.setLayout(new FlowLayout());
-				
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		if (isEntity) {
 			TabPanel tabPanel = new TabPanel();

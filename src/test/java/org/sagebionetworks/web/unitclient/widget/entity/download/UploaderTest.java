@@ -121,12 +121,15 @@ public class UploaderTest {
 		when(gwt.createXMLHttpRequest()).thenReturn(null);
 		cancelHandler = mock(CancelHandler.class);
 		
+		String[] fileNames = {"newFile.txt"};
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				jsonObjectAdapter, synapseJsniUtils,
@@ -225,12 +228,12 @@ public class UploaderTest {
 		uploader.asWidget(parentEntityId);
 
 		uploader.handleUploads();
-		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
+		verify(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
 		
 		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
+		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep5(null, 1);
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -243,7 +246,7 @@ public class UploaderTest {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		CallbackP callback = mock(CallbackP.class);
 		uploader.asWidget(null,  null, callback, false);
-		uploader.handleUpload("newFile.txt");
+		uploader.handleUploads();
 		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
 		uploader.directUploadStep5( null, 1);
 		verify(callback).invoke(anyString());
@@ -313,7 +316,7 @@ public class UploaderTest {
 	public void testDirectUploadStep5Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
-		uploader.handleUpload("newFile.txt");
+		uploader.handleUploads();
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep5(null, 1);
 		verifyUploadError();
@@ -323,7 +326,7 @@ public class UploaderTest {
 	public void testDirectUploadStep5CompleteUploadFailure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		uploader.handleUpload("newFile.txt");
+		uploader.handleUploads();
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep5(null,1);
 		verifyUploadError();
@@ -339,7 +342,7 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(failedUploadDaemonStatusJson).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		uploader.handleUpload("newFile.txt");
+		uploader.handleUploads();
 		uploader.directUploadStep5(null,1);
 		verifyUploadError();
 	}
@@ -387,7 +390,9 @@ public class UploaderTest {
 	public void testChunkUploadSuccessWithFinalChunk() throws RestServiceException {
 		//verify that request json is added to the list, and it calls step 3 since the current chunk number is equal to the total chunk count
 		List<String> requestList = new ArrayList<String>();
-		uploader.chunkUploadSuccess("new request json", "content type",2, 2, 1024, requestList);
+		String[] fileNames = {"arbitraryFileName"};
+		uploader.setFileNames(fileNames);
+		uploader.chunkUploadSuccess("new request json", "content type", 2, 2, 1024, requestList);
 		assertTrue(requestList.size() == 1);
 		//and it should try to get the url for the next chunk
 		verify(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
@@ -438,5 +443,48 @@ public class UploaderTest {
 	public void testChunkCount() {
 		//see SWC-1436
 		assertEquals(2L, uploader.getChunkCount(8404992L));
+	}
+	
+	@Test
+	public void testMultipleFileUploads() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		
+		//initialize uploader
+		uploader = new Uploader(view, nodeModelCreator,
+				synapseClient,
+				jsonObjectAdapter, synapseJsniUtils,
+				gwt, authenticationController);
+		uploader.addCancelHandler(cancelHandler);
+		String parentEntityId = "syn1234";
+		uploader.asWidget(parentEntityId);
+		
+		final String file1 = "file1.txt";
+		final String file2 = "file2.txt";
+		final String file3 = "file3.txt";
+		String[] fileNames = {file1, file2, file3};
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		
+		uploader.handleUploads();
+		
+		verify(synapseClient).getFileEntityIdWithSameName(eq(file1), eq(parentEntityId), any(AsyncCallback.class));
+		verify(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
+		
+		uploader.directUploadStep3(file1, "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		verify(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
+		
+		uploader.directUploadStep5(null, 1);
+		
+		// triggers file2 to upload.
+		verify(synapseClient).getFileEntityIdWithSameName(eq(file2), eq(parentEntityId), any(AsyncCallback.class));
+		
+		uploader.directUploadStep3(file2, "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		uploader.directUploadStep5(null, 1);
+		
+		// triggers file3 to upload
+		verify(synapseClient).getFileEntityIdWithSameName(eq(file3), eq(parentEntityId), any(AsyncCallback.class));
+		
+		uploader.directUploadStep3(file3, "plain/text", "6771718afc12275aa4e58b9bf3a49afe");
+		uploader.directUploadStep5(null, 1);
 	}
 }
