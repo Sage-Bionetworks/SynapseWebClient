@@ -174,7 +174,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		window.setModal(true);
 		window.setLayout(new FitLayout());
 		window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-		window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
+		window.add(uploader.asWidget(entityId), new MarginData(5));
 		window.show();
 		window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 	}

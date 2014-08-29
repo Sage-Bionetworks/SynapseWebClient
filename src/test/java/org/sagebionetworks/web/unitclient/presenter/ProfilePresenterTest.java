@@ -567,4 +567,22 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
+	@Test
+	public void testRefreshTeams() {
+		profilePresenter.setTeamNotificationCount(10);
+		profilePresenter.setIsOwner(true);
+		profilePresenter.refreshTeams();
+		verify(mockView).refreshTeamInvites();
+		assertEquals(0, profilePresenter.getTeamNotificationCount());
+		verify(mockView).clearTeamNotificationCount();
+	}
+	
+	@Test
+	public void testRefreshTeamsNotOwner() {
+		profilePresenter.setIsOwner(false);
+		profilePresenter.refreshTeams();
+		verify(mockView, never()).refreshTeamInvites();
+	}
+
+	
 }

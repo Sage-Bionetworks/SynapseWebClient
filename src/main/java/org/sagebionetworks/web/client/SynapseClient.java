@@ -319,7 +319,7 @@ public interface SynapseClient extends RemoteService {
 	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
 	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException;
-	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;

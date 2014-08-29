@@ -9,16 +9,13 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<div class="margin-10">
-			<div class="row">
-				<div class="col-md-3 col-sm-4 col-xs-12">
-					<g:SimplePanel ui:field="picturePanel"/>
-				</div>
-				<div class="col-md-9 col-sm-8 col-xs-12">
-					<g:FlowPanel ui:field="viewProfilePanel" />
-				</div>
-			</div>
 			<div class="row margin-top-5">
-			    <div class="col-xs-12">
+			    <div class="col-md-3 col-xs-12">
+		            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+		        	<g:SimplePanel ui:field="certifiedUserBadgePanel" styleName="displayInline" />
+			        <g:FlowPanel ui:field="viewProfilePanel" />
+			    </div>
+			    <div class="col-md-9 col-xs-12">
 				    <div class="row" ui:field="navtabContainer">
 					    <ul class="nav nav-tabs entity-tabs margin-top-15">				        
 						    <li class="entity-tab active margin-left-15" ui:field="projectsListItem"><g:Anchor styleName="text-align-center link no-background" text="Projects" ui:field="projectsLink"/></li>
@@ -79,7 +76,7 @@
 						</div>
 					    <div class="tab-background padding-top-bottom-15-left-right-25" ui:field="settingsTabContainer">
 					        <g:FlowPanel ui:field="settingsTabContent" />
-					        <div class="container">
+					        <div class="">
 						        <div class="highlight-box margin-top-0" highlight-box-title="Profile">
 						            <div class="row">
 										<div class="margin-bottom-20 col-sm-12">

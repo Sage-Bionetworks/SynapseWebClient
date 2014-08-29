@@ -1576,20 +1576,18 @@ public class DisplayUtils {
 				window.setModal(true);		
 				window.setHeading(buttonText);
 				window.setLayout(new FitLayout());
-				List<AccessRequirement> ars = null;
 				Entity entity = null;
 				boolean isEntity = true;
 				
 				if (entityBundle != null) {
 					//is entity
-					ars = entityBundle.getAccessRequirements();
 					entity = entityBundle.getEntity();
 				} else {
 					//is something else that just wants a file handle id
 					isEntity = false;
 				}
 				
-				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
+				window.add(uploader.asWidget(entity, null, fileHandleIdCallback,isEntity), new MarginData(5));
 				window.show();
 				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
 			}
