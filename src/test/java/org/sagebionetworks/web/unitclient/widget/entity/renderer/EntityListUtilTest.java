@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 

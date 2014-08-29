@@ -22,7 +22,7 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	 * 
 	 * @param rootEntities list of entities to make root level nodes for in the tree
 	 */
-	void setRootEntities(List<EntityHeader> rootEntities, boolean sort);
+	void setRootEntities(List<EntityHeader> rootEntities);
 	
 	/**
 	 * Remove an entity from the view identified by entityId
@@ -73,6 +73,5 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 		void clearRecordsFetchedChildren();
 
 	}
-
 
 }

@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +45,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private SynapseClientAsync synapseClient;
 	private IconsImageBundle iconsImageBundle;
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
@@ -59,8 +60,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
 			AdapterFactory adapterFactory) {
 		this.view = view;		
@@ -68,7 +67,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.entityTypeProvider = entityTypeProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
 		this.iconsImageBundle = iconsImageBundle;
 		this.adapterFactory = adapterFactory;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
@@ -97,7 +95,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				view.setRootEntities(result, sort);
+				if (sort)
+					EntityBrowserUtils.sortEntityHeadersByName(result);
+				view.setRootEntities(result);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -111,9 +111,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 * @param rootEntities
 	 */
 	public void configure(List<EntityHeader> rootEntities, boolean sort) {
-		view.setRootEntities(rootEntities, sort);
+		if (sort)
+			EntityBrowserUtils.sortEntityHeadersByName(rootEntities);
+		view.setRootEntities(rootEntities);
 	}
-	
 	
 	@Override
 	public Widget asWidget() {
