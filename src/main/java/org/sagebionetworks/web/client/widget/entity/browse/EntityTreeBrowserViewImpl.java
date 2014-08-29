@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,8 +100,20 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {		// TODO: Boolean sort?
+	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {
 		clear();
+		
+		if (sort) {
+			// TODO: Find already existing sorting code. Reuse that.
+			Collections.sort(rootEntities, new Comparator<EntityHeader>() {
+
+				@Override
+				public int compare(EntityHeader arg0, EntityHeader arg1) {
+					return arg0.getName().toLowerCase().compareTo(arg1.getName().toLowerCase());
+				}
+				
+			});
+		}
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();
 		if(rootEntities.size() == 0) {
