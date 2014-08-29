@@ -46,7 +46,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
-	
+
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
@@ -64,7 +64,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private Button cancelBtn; 
 	private ProgressBar progressBar;
 	// external link panel
-	private String fileName;
 	
 	private HTML spinningProgressContainer;
 	private HTML fileUploadHTML;
@@ -202,8 +201,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void disableMultipleFileUploads() {
 		this.multipleFileUploads = false;
-		//fileUploadHTML.setHTML(createFileUploadHTML().toString());
-		fileUploadHTML.setHTML("<p>hello this worked</p>");
+		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
 	
 
@@ -435,6 +433,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 			}
 		});
 	}
+	
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)

@@ -107,7 +107,7 @@ public class UploaderTest {
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(false);
-		when(synapseJsniUtils.getContentType(anyString())).thenReturn("image/png");
+		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
 		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
 		UploadDaemonStatus status = new UploadDaemonStatus();
@@ -224,7 +224,7 @@ public class UploaderTest {
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
 
-		uploader.handleUpload("newFile.txt");
+		uploader.handleUploads();
 		verify(synapseJsniUtils).getFileMd5(anyString(), any(MD5Callback.class));
 		
 		uploader.directUploadStep3("newFile.txt", "plain/text", "6771718afc12275aa4e58b9bf3a49afe");

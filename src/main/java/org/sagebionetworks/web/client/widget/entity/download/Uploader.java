@@ -136,7 +136,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
-		this.fileNames = null;	// TODO: This?
+		this.fileNames = null;
 		this.currIndex = 0;
 		
 	}
