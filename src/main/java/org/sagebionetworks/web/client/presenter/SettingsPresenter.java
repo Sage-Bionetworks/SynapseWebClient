@@ -7,7 +7,6 @@ import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -22,15 +21,12 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SettingsPresenter extends AbstractActivity implements SettingsView.Presenter {
+public class SettingsPresenter implements SettingsView.Presenter {
 		
 	private SettingsView view;
 	private AuthenticationController authenticationController;
@@ -63,16 +59,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		this.adapterFactory = adapterFactory;
 		this.gwt = gwt;
 		view.setPresenter(this);
-	}
-
-	@Override
-	public void start(AcceptsOneWidget panel, EventBus eventBus) {
-		// Set the presenter on the view
-		this.view.render(true);
-		
-		// Install the view
-		panel.setWidget(view);
-		updateView();
 	}
 
 	private void getAPIKey() {
@@ -165,7 +151,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		synapseClient.setNotificationEmail(email, new AsyncCallback<Void>(){
 			@Override
 			public void onSuccess(Void callback) {
-				//success, update view
+				//reload profile
 				goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
 			
@@ -177,7 +163,7 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 		});
 	}
 	
-	private void updateUserStorage() {
+	public void updateUserStorage() {
 		userService.getStorageUsage(new AsyncCallback<String>(){
 			@Override
 			public void onSuccess(String storageUsageSummaryListJson) {
@@ -196,12 +182,6 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 			}
 		});
 	}
-	
-	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
 	
 	@Override
 	public void goTo(Place place) {
@@ -253,13 +233,9 @@ public class SettingsPresenter extends AbstractActivity implements SettingsView.
 	}
 	
 	private void updateView() {
-		//String token = place.toToken();
-		//Support other tokens?
 		updateUserStorage();
 		getUserNotificationEmail();
-
 		getAPIKey();
-		
 		view.updateNotificationCheckbox(authenticationController.getCurrentUserSessionData().getProfile());
 	}
 
