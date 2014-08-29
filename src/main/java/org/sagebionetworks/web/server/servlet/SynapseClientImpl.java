@@ -54,13 +54,13 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Locationable;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -104,7 +104,6 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableRequestBody;
 import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -564,8 +563,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void logError(String message) {
+	public void logError(String message) throws RestServiceException {
 		log.error(message);
+
+		//logging to the portal logs.  uncomment to also log the error to repo
+//		try {
+//			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+//			LogEntry entry = new LogEntry();
+//			entry.setLabel("portal error");
+//			entry.setMessage(message);
+//			synapseClient.logError(entry);
+//		} catch (SynapseException e) {
+//			throw ExceptionUtil.convertSynapseException(e);
+//		}
 	}
 
 	@Override
@@ -589,7 +599,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			Entity entity = parseEntityFromJson(entityJson);
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			entity = synapseClient.putEntity(entity);
-
 			EntityWrapper wrapper = new EntityWrapper();
 			wrapper.setEntityClassName(entity.getClass().getName());
 			wrapper.setEntityJson(entity.writeToJSONObject(

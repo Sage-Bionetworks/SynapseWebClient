@@ -30,6 +30,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -66,12 +67,14 @@ public class UploaderTest {
 	SynapseClientAsync synapseClient;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
+	ClientLogger mockLogger;
 	
 	// JSON utility components
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
 	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
+	
 
 	AutoGenFactory autogenFactory;
 	Uploader uploader;
@@ -88,6 +91,7 @@ public class UploaderTest {
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
 		autogenFactory=mock(AutoGenFactory.class);
 		gwt = mock(GWTWrapper.class);
+		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
@@ -130,7 +134,8 @@ public class UploaderTest {
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				jsonObjectAdapter, synapseJsniUtils,
-				gwt, authenticationController);
+				gwt, authenticationController,
+				mockLogger);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -219,7 +224,7 @@ public class UploaderTest {
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				jsonObjectAdapter, synapseJsniUtils,
-				gwt, authenticationController);
+				gwt, authenticationController, mockLogger);
 		uploader.addCancelHandler(cancelHandler);
 		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -253,6 +258,7 @@ public class UploaderTest {
 		verify(view).showErrorMessage(anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
 		verify(synapseJsniUtils).consoleError(anyString());
+		verify(mockLogger).error(anyString());
 	}
 	
 	@Test

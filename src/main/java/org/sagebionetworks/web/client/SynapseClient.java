@@ -105,8 +105,9 @@ public interface SynapseClient extends RemoteService {
 	/**
 	 * Log an error message in the server-side log.
 	 * @param message
+	 * @throws RestServiceException 
 	 */
-	public void logError(String message);
+	public void logError(String message) throws RestServiceException;
 	
 
 	/**
