@@ -109,7 +109,13 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public void logError(String message) throws RestServiceException;
 	
-
+	/**
+	 * Log an error message to Synapse repository services.  
+	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
+	 * @param message
+	 */
+	public void logErrorToRepositoryServices(String message) throws RestServiceException;
+	
 	/**
 	 * Log an info message in the server-side log.
 	 * @param message

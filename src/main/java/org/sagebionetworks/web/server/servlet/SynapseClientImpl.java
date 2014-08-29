@@ -565,19 +565,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	@Override
 	public void logError(String message) throws RestServiceException {
 		log.error(message);
-
-		//logging to the portal logs.  uncomment to also log the error to repo
-//		try {
-//			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//			LogEntry entry = new LogEntry();
-//			entry.setLabel("portal error");
-//			entry.setMessage(message);
-//			synapseClient.logError(entry);
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
 	}
 
+	@Override
+	public void logErrorToRepositoryServices(String message) throws RestServiceException {
+		try {
+			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+			LogEntry entry = new LogEntry();
+			entry.setLabel("portal error");
+			entry.setMessage(message);
+			synapseClient.logError(entry);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
 	@Override
 	public void logInfo(String message) {
 		log.info(message);

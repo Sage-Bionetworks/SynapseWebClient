@@ -258,7 +258,7 @@ public class UploaderTest {
 		verify(view).showErrorMessage(anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
 		verify(synapseJsniUtils).consoleError(anyString());
-		verify(mockLogger).error(anyString());
+		verify(mockLogger).errorToRepositoryServices(anyString());
 	}
 	
 	@Test

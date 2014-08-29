@@ -692,7 +692,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
 		//send full log to server logs
-		logger.error(uploadLog.toString());
+		logger.errorToRepositoryServices(uploadLog.toString());
 		//and to the console
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();
