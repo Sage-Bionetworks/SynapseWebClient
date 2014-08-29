@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Account;
-import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.AccountView;
 
@@ -56,7 +55,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			public void onSuccess(Void result) {
 				//success, send to Settings to view account state
 				view.showInfo(DisplayConstants.EMAIL_SUCCESS, "");
-				globalAppState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
 			@Override
 			public void onFailure(Throwable caught) {
