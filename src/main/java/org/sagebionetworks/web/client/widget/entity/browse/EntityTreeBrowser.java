@@ -95,7 +95,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				if (sort)
-					sortEntityHeadersByName(result);
+					EntityBrowserUtils.sortEntityHeadersByName(result);
 				view.setRootEntities(result);
 			}
 			@Override
@@ -111,17 +111,8 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	public void configure(List<EntityHeader> rootEntities, boolean sort) {
 		if (sort)
-			sortEntityHeadersByName(rootEntities);
+			EntityBrowserUtils.sortEntityHeadersByName(rootEntities);
 		view.setRootEntities(rootEntities);
-	}
-	
-	public void sortEntityHeadersByName(List<EntityHeader> entityHeaders) {
-		Collections.sort(entityHeaders, new Comparator<EntityHeader>() {
-	        @Override
-	        public int compare(EntityHeader o1, EntityHeader o2) {
-	        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-	        }
-		});
 	}
 	
 	@Override

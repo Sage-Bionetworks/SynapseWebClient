@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -255,7 +256,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		EntityBrowserUtils.loadUserUpdateable(searchService, adapterFactory, globalApplicationState, authenticationController, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				sortEntityHeadersByName(result);
 				view.setMyProjects(result);
 			}
 			@Override
@@ -267,7 +267,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		EntityBrowserUtils.loadFavorites(synapseClient, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				sortEntityHeadersByName(result);
 				view.setFavorites(result);
 			}
 			@Override
@@ -324,12 +323,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				try {
 					//finally, we can tell the view to update the user challenges based on these entity headers
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					
 					for (String headerString : entityHeaderStrings) {
 						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
 						headers.add(header);
 					}
 					
-					sortEntityHeadersByName(headers);
+					EntityBrowserUtils.sortEntityHeadersByName(headers);
 					
 					view.setMyChallenges(headers);
 				} catch (JSONObjectAdapterException e) {
@@ -341,15 +341,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			public void onFailure(Throwable caught) {
 				view.setMyChallengesError("Could not load My Challenges:" + caught.getMessage());
 			}
-		});
-	}
-	
-	public void sortEntityHeadersByName(List<EntityHeader> headers) {
-		Collections.sort(headers, new Comparator<EntityHeader>() {
-	        @Override
-	        public int compare(EntityHeader o1, EntityHeader o2) {
-	        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-	        }
 		});
 	}
 	
