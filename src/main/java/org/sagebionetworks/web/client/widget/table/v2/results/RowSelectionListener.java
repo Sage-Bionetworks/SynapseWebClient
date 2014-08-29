@@ -10,6 +10,6 @@ public interface RowSelectionListener {
 	/**
 	 * Called when a row changes its selection.
 	 */
-	public void onSelectedChanged(RowView selected);
+	public void onSelectionChanged();
 
 }

@@ -270,6 +270,8 @@ public class TableModelTestUtils {
 			}
 		case DOUBLE:
 			return "" + (i * 3.41 + 3.12 + (isUpdate ? 10000 : 0));
+		case ENTITYID:
+			return "syn"+i;
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
 	}

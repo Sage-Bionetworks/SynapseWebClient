@@ -10,9 +10,9 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
  * @author John
  *
  */
-public class StringRenderer extends FormControlStatic implements Cell {
+public class StringRendererCellImpl extends FormControlStatic implements StringRendererCell {
 	
-	public StringRenderer(){
+	public StringRendererCellImpl(){
 		super();
 	}
 

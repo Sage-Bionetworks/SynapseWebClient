@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -100,6 +101,17 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	@Override
 	public void setTablePageWidget(TablePageWidget pageWidget) {
 		this.tablePanel.add(pageWidget);
+	}
+
+	@Override
+	public void setDeleteButtonEnabled(boolean enabled) {
+		if(enabled){
+			this.deleteSelectedButton.setEnabled(true);
+			this.deleteSelectedButton.setType(ButtonType.DANGER);
+		}else{
+			this.deleteSelectedButton.setEnabled(false);
+			this.deleteSelectedButton.setType(ButtonType.DEFAULT);
+		}
 	}
 
 }

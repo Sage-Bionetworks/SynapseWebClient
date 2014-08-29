@@ -11,9 +11,9 @@ import com.google.gwt.user.client.DOM;
  * @author John
  *
  */
-public class StringEditor extends TextBox implements Cell {
+public class StringEditorCellImpl extends TextBox implements  StringEditorCell {
 
-	public StringEditor(){
+	public StringEditorCellImpl(){
 		super();
 		DOM.setStyleAttribute(getElement(), "minWidth", "75px");
 	}

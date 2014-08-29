@@ -21,14 +21,4 @@ public interface Cell extends IsWidget {
 	 */
 	public String getValue();
 	
-	/**
-	 * Is this cell visible?
-	 * @return
-	 */
-	public boolean isVisible();
-	
-	/**
-	 * Show or hide this cell
-	 */
-	public void setVisible(boolean isVisible);
 }

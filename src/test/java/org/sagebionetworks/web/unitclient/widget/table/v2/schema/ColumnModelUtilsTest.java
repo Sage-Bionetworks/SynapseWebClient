@@ -125,19 +125,46 @@ public class ColumnModelUtilsTest {
 	@Test
 	public void testBuildTypesForQueryResults(){
 		ColumnModel one = new ColumnModel();
-		one.setId("one");
+		one.setId("1");
+		one.setName("one");
 		one.setColumnType(ColumnType.DOUBLE);
 		ColumnModel two = new ColumnModel();
-		two.setId("two");
+		two.setId("2");
+		two.setName("two");
 		two.setColumnType(ColumnType.STRING);
 		List<ColumnModel> models = Arrays.asList(one,two);
-		Map<String, ColumnModel> map = ColumnModelUtils.buildMapColumnIdtoModel(models);
 		// headers can includes the names of aggregation functions.
 		List<String> headers = Arrays.asList("sum(one)", two.getId(), one.getId());
-		List<ColumnTypeViewEnum> results = ColumnModelUtils.buildTypesForQueryResults(headers, map);
-		List<ColumnTypeViewEnum> expected = Arrays.asList(ColumnTypeViewEnum.String, ColumnTypeViewEnum.String, ColumnTypeViewEnum.Double);
-		assertEquals(expected, results);
-		
+		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(headers, models);
+		assertNotNull(results);
+		assertEquals(3, results.size());
+		// the first column should have the name of the aggregate function.
+		ColumnModel cm = results.get(0);
+		assertEquals("sum(one)", cm.getName());
+		assertEquals(ColumnType.STRING, cm.getColumnType());
+		assertEquals(null, cm.getId());
+		// the second should match two
+		cm = results.get(1);
+		assertEquals(two, cm);
+		// The last should match first
+		cm = results.get(2);
+		assertEquals(one, cm);
 	}
 
+	
+	@Test
+	public void testBuildTypesForQueryResultsNullHeaders(){
+		ColumnModel one = new ColumnModel();
+		one.setId("1");
+		one.setName("one");
+		one.setColumnType(ColumnType.DOUBLE);
+		ColumnModel two = new ColumnModel();
+		two.setId("2");
+		two.setName("two");
+		two.setColumnType(ColumnType.STRING);
+		List<ColumnModel> models = Arrays.asList(one,two);
+		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(null, models);
+		// For this case the results should match the models
+		assertEquals(models, results);
+	}
 }

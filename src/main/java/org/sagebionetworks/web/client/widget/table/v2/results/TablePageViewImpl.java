@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -16,7 +14,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * UiBound implementation of a TableView;
+ * UiBound implementation of a TableView with zero business logic.
  * @author John
  *
  */
@@ -54,23 +52,13 @@ public class TablePageViewImpl implements TablePageView {
 	}
 
 	@Override
-	public void addRow(RowView newRow) {
+	public void addRow(RowWidget newRow) {
 		body.add(newRow);
 	}
 
 	@Override
-	public Iterable<RowView> getRows() {
-		List<RowView> list = new LinkedList<RowView>();
-		Iterator<Widget> it = body.iterator();
-		while(it.hasNext()){
-			list.add((RowView) it.next());
-		}
-		return list;
-	}
-
-	@Override
-	public void deleteRow(RowView toDelete) {
-		body.remove(toDelete);
+	public void removeRow(RowWidget row) {
+		body.remove(row);
 	}
 
 }

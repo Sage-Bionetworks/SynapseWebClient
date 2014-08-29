@@ -7,18 +7,20 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * This widget wraps a TablePageWidget and provides edit functionaltiy..
+ * This widget wraps a TablePageWidget and provides edit functionality.
  * 
  * @author John
- *
+ * 
  */
-public class QueryResultEditorWidget  implements QueryResultEditorView.Presenter, IsWidget, RowSelectionListener{
+public class QueryResultEditorWidget implements
+		QueryResultEditorView.Presenter, IsWidget, RowSelectionListener {
 
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
-	
+
 	@Inject
-	public QueryResultEditorWidget(QueryResultEditorView view, TablePageWidget pageWidget){
+	public QueryResultEditorWidget(QueryResultEditorView view,
+			TablePageWidget pageWidget) {
 		this.view = view;
 		this.pageWidget = pageWidget;
 		this.view.setTablePageWidget(pageWidget);
@@ -29,49 +31,48 @@ public class QueryResultEditorWidget  implements QueryResultEditorView.Presenter
 	public Widget asWidget() {
 		return this.view.asWidget();
 	}
-	
+
 	/**
 	 * Configure this widget with a single page of a query result.
 	 * 
 	 * @param bundle
 	 */
-	public void configure(QueryResultBundle bundle){
+	public void configure(QueryResultBundle bundle) {
 		// configure the widget
 		pageWidget.configure(bundle, true, this);
 	}
 
 	@Override
 	public void onAddRow() {
-		pageWidget.addNewRow();
+		pageWidget.onAddNewRow();
 	}
 
 	@Override
 	public void onToggleSelect() {
-		// TODO Auto-generated method stub
-		
+		pageWidget.onToggleSelect();
 	}
 
 	@Override
 	public void onSelectAll() {
-		// TODO Auto-generated method stub
-		
+		pageWidget.onSelectAll();
 	}
 
 	@Override
 	public void onSelectNone() {
-		// TODO Auto-generated method stub
-		
+		this.pageWidget.onSelectNone();
 	}
 
 	@Override
 	public void onDeleteSelected() {
-		// TODO Auto-generated method stub
-		
+		pageWidget.onDeleteSelected();
 	}
 
 	@Override
-	public void onSelectedChanged(RowView selected) {
-		// TODO Auto-generated method stub
-		
+	public void onSelectionChanged() {
+		// the delete button should only be enabled when there is at least one
+		// row selected.
+		this.view.setDeleteButtonEnabled(pageWidget
+				.isOneRowOrMoreRowsSelected());
 	}
+
 }

@@ -27,21 +27,15 @@ public interface TablePageView extends IsWidget {
 	
 	/**
 	 * Add a row to this table.o
-	 * @param newRow
+	 * @param rowWidget
 	 */
-	public void addRow(RowView newRow);
+	public void addRow(RowWidget rowWidget);
 	
 	/**
-	 * Iterate over the current rows of this table.
-	 * @return
+	 * Remove this row from the view.
+	 * @param row
 	 */
-	public Iterable<RowView> getRows();
-	
-	/**
-	 * Delete a row.
-	 * @param toDelete
-	 */
-	public void deleteRow(RowView toDelete);
+	public void removeRow(RowWidget row);
 	
 
 }

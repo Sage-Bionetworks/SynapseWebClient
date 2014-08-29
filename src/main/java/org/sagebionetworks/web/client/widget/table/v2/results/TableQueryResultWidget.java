@@ -59,7 +59,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	private void setQueryResults(QueryResultBundle bundle){
-		this.bundle = ColumnModelUtils.preProcessResutls(bundle);
+		this.bundle = bundle;
 		this.view.setErrorVisible(false);
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, false, null);

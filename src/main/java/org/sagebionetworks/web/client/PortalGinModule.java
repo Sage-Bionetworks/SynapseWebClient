@@ -280,6 +280,10 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultVi
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -737,6 +741,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
 		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
 		bind(CellFactory.class).to(CellFactoryImpl.class);
+		
+		/*
+		 * TableEntity cell bindings.
+		 */
+		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
+		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
 
 		/*
 		 * Teams Places

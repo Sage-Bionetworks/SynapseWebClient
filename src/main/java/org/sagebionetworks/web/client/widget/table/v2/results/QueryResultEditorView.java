@@ -56,4 +56,10 @@ public interface QueryResultEditorView extends IsWidget {
 	 */
 	public void setTablePageWidget(TablePageWidget pageWidget);
 
+	/**
+	 * Enable or disable the delete button.
+	 * @param enabled
+	 */
+	public void setDeleteButtonEnabled(boolean enabled);
+
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 
 /**
@@ -140,22 +141,6 @@ public class ColumnModelUtils {
 	}
 	
 	/**
-	 * Pre-process the query
-	 * @param bundle
-	 */
-	public static QueryResultBundle preProcessResutls(QueryResultBundle bundle){
-		// Use the selected columns as the headers when there are none.
-		if(bundle.getQueryResults().getHeaders() == null){
-			 ArrayList<String> headers = new ArrayList<String>(bundle.getSelectColumns().size());
-			bundle.getQueryResults().setHeaders(headers);
-			for(ColumnModel cm: bundle.getSelectColumns()){
-				headers.add(cm.getId());
-			}
-		}
-		return bundle;
-	}
-	
-	/**
 	 * Map ColumnModel IDs to the their ColumnModel.
 	 * @param schema
 	 * @return
@@ -173,16 +158,24 @@ public class ColumnModelUtils {
 	 * @param schema
 	 * @return
 	 */
-	public static List<ColumnTypeViewEnum> buildTypesForQueryResults(List<String> headers, Map<String, ColumnModel> map){
-		List<ColumnTypeViewEnum>  results = new ArrayList<ColumnTypeViewEnum>(headers.size());
+	public static List<ColumnModel> buildTypesForQueryResults(List<String> headers, List<ColumnModel> schema){
+		// If the headers are null or empty then just use the schema
+		if(headers == null || headers.isEmpty()){
+			return schema;
+		}
+		Map<String, ColumnModel> map = buildMapColumnIdtoModel(schema);
+		List<ColumnModel>  results = new ArrayList<ColumnModel>(headers.size());
 		// lookup each header
 		for(String header: headers){
 			ColumnModel cm = map.get(header);
 			if(cm == null){
-				// Treat the results of 
-				results.add(ColumnTypeViewEnum.String);
+				// Aggregate functions will not have a column model. So we create a fake column for it.
+				ColumnModel aggregateColumn = new ColumnModel();
+				aggregateColumn.setName(header);
+				aggregateColumn.setColumnType(ColumnType.STRING);
+				results.add(aggregateColumn);
 			}else{
-				results.add(ColumnTypeViewEnum.getViewForType(cm.getColumnType()));
+				results.add(cm);
 			}
 		}
 		return results;
