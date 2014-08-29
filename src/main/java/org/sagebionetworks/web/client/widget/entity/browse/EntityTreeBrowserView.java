@@ -74,5 +74,4 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 
 	}
 
-
 }
