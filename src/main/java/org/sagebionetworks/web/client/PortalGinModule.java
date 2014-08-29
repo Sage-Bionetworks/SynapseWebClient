@@ -270,6 +270,20 @@ import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -722,6 +736,17 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
 		bind(ColumnModelTableRowViewer.class).to(ColumnModelTableRowViewerImpl.class);
 		bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
+		bind(RowView.class).to(RowViewImpl.class);
+		bind(TablePageView.class).to(TablePageViewImpl.class);
+		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
+		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
+		bind(CellFactory.class).to(CellFactoryImpl.class);
+		
+		/*
+		 * TableEntity cell bindings.
+		 */
+		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
+		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
 
 		/*
 		 * Teams Places

@@ -20,8 +20,8 @@
 					<b:PanelBody ui:field="columnDetailsPanel" />
 				</b:Panel>
 			</b:Collapse>
-			
-			<b:Alert ui:field="tableMessage" type="INFO"/>
+
+			<b:Alert ui:field="tableMessage" type="INFO" />
 
 			<b:InputGroup ui:field="queryInputGroup" visible="true">
 				<b:TextBox ui:field="queryInput" />
@@ -30,48 +30,10 @@
 						dataLoadingText="Executing...">Query</b:Button>
 				</b:InputGroupButton>
 			</b:InputGroup>
-			<b:Alert ui:field="queryResultsMessage" type="DANGER"/>
-			<bh:ClearFix styleName="clearfix margin-top-15" />
-			<b:Panel ui:field="queryResultsPanel">
-				<b:PanelBody>
-					<!-- ToolBar for the table results -->
-					<b:ButtonToolBar ui:field="resultsToolBar">
-						<b:ButtonGroup>
-							<b:Button ui:field="editRowsButton" icon="GEAR" type="INFO"
-								dataTarget="#editRowsModal" dataToggle="MODAL">Edit
-								Rows</b:Button>
-						</b:ButtonGroup>
-						<b:ButtonGroup>
-							<b:Button ui:field="uploadCSVButton" icon="UPLOAD">Upload</b:Button>
-							<b:Button ui:field="downloadCSVButton" icon="DOWNLOAD">Download</b:Button>
-						</b:ButtonGroup>
-					</b:ButtonToolBar>
-					<bh:ClearFix styleName="clearfix margin-top-15" />
-					<!-- This table contains the read-only results from a query -->
-					<bg:CellTable ui:field="queryResults" bordered="true"
-						condensed="true" striped="true" hover="true" />
+			<b:Alert ui:field="queryResultsMessage" type="DANGER" />
+			<bh:Div styleName="margin-top-15" />
+			<g:SimplePanel ui:field="queryResultsPanel" />
 
-					<!-- progress bar -->
-					<g:SimplePanel ui:field="progressContainer"/>
-
-					<!-- This modal dialog will contain the editor for query results -->
-					<b:Modal ui:field="editRowsModal" title="Edit Rows"
-						closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true"
-						b:id="editRowsModal" size="LARGE">
-						<b:ModalBody>
-							<g:SimplePanel ui:field="rowEditorModalPanel" />
-							<b:Alert type="DANGER" ui:field="rowEditorAlert" visible="false"
-								title="Error" />
-						</b:ModalBody>
-						<b:ModalFooter>
-							<b:Button ui:field="saveRowsButton" type="PRIMARY"
-								dataLoadingText="Saving...">Save</b:Button>
-							<b:Button ui:field="cancelRowsButton" type="DEFAULT"
-								dataDismiss="MODAL">Cancel</b:Button>
-						</b:ModalFooter>
-					</b:Modal>
-				</b:PanelBody>
-			</b:Panel>
 		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

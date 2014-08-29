@@ -13,6 +13,7 @@ import org.gwtbootstrap3.client.ui.gwt.CellTable;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -49,29 +50,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	Button queryButton;
 	@UiField
-	Panel queryResultsPanel;
-	@UiField
-	ButtonToolBar resultsToolBar;
-	@UiField
-	Button editRowsButton;
-	@UiField
-	Button uploadCSVButton;
-	@UiField
-	Button downloadCSVButton;
-	@UiField
-	CellTable queryResults;
-	@UiField
-	SimplePanel progressContainer;
-	@UiField
-	Modal editRowsModal;
-	@UiField
-	SimplePanel rowEditorModalPanel;
-	@UiField
-	Alert rowEditorAlert;
-	@UiField
-	Button saveRowsButton;
-	@UiField
-	Button cancelRowsButton;
+	SimplePanel queryResultsPanel;
 
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
@@ -147,12 +126,20 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setProgressWidget(
 			AsynchronousProgressWidget asynchProgressWidget) {
-		this.progressContainer.add(asynchProgressWidget);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void setQueryProgressVisible(boolean visible) {
-		this.progressContainer.setVisible(visible);
+	public void setQueryProgressVisible(boolean isVisible) {
+		this.queryResultsPanel.setVisible(isVisible);
 	}
+
+	@Override
+	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget) {
+		this.queryResultsPanel.add(queryResultsWidget);
+		
+	}
+
 
 }

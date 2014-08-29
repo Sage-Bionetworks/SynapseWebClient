@@ -3590,6 +3590,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public String queryTable(String query) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			QueryResultBundle result = synapseClient.queryTableEntityBundle(query, true, 0x15);
+			return EntityFactory.createJSONStringForEntity(result);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONObjectAdapterException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 
 	@Override
 	public String startAsynchJob(String bodyJSON) throws RestServiceException {

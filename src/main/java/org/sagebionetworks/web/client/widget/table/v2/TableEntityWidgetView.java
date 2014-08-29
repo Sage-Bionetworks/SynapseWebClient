@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -94,6 +95,12 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param b
 	 */
 	public void setQueryProgressVisible(boolean b);
+
+	/**
+	 * Set the query results widget.
+	 * @param queryResultsWidget
+	 */
+	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget);
 
 
 }
