@@ -50,7 +50,9 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-
+	
+	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
+	
 	void logInfo(String message, AsyncCallback<Void> callback);
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);

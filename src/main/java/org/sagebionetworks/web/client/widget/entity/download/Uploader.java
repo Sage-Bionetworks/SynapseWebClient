@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -77,6 +78,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
 	AuthenticationController authenticationController;
+	private ClientLogger logger;
+	
 	private ChunkedFileToken token;
 	NumberFormat percentFormat;
 	private boolean isDirectUploadSupported;
@@ -91,7 +94,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
-			AuthenticationController authenticationController
+			AuthenticationController authenticationController,
+			ClientLogger logger
 			) {
 	
 		this.view = view;		
@@ -101,6 +105,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
+		this.logger = logger;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -686,7 +691,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
-		//TODO: send full log to server logs (once service is available)
+		//send full log to server logs
+		logger.errorToRepositoryServices(uploadLog.toString());
+		//and to the console
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();
 		fireCancelEvent();
