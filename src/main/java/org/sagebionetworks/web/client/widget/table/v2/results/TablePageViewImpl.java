@@ -19,6 +19,8 @@ import com.google.inject.Inject;
  *
  */
 public class TablePageViewImpl implements TablePageView {
+	
+	private static String MIN_WIDTH = "75px";
 
 	public interface Binder extends UiBinder<Table, TablePageViewImpl> {}
 	
@@ -46,6 +48,7 @@ public class TablePageViewImpl implements TablePageView {
 		header.add(new TableHeader());
 		for(String value: headers){
 			TableHeader th = new TableHeader();
+			th.setMinimumWidth(MIN_WIDTH);
 			th.add(new Text(value));
 			header.add(th);
 		}
