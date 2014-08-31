@@ -1256,8 +1256,6 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
-		//and do not cache
-		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	

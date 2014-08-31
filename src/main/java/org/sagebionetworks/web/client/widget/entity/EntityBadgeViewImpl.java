@@ -72,8 +72,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			tooltip.setText(DisplayUtils.getLoadingHtml(sageImageBundle));
 			
 			
-			
-			
 			final Anchor anchor = new Anchor();
 			anchor.setText(entityHeader.getName());
 			anchor.addStyleName("link");
