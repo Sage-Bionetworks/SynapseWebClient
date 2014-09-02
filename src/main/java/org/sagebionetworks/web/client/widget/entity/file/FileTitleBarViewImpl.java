@@ -45,7 +45,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
-//	private Uploader locationableUploader;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -92,8 +91,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			FavoriteWidget favoriteWidget,
 			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
-//		this.locationableUploader = locationableUploader;
-//		locationableUploader.disableMultipleFileUploads();
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
