@@ -13,6 +13,7 @@ public interface NewAccountView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);	
 	void markUsernameUnavailable();
+	void setEmail(String email);
 	
 	public interface Presenter extends SynapsePresenter {
 		void checkUsernameAvailable(String username);

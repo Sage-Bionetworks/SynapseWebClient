@@ -13,7 +13,7 @@
 		<div class="separator margin-top-10-imp"></div>
 		<div class="container margin-top-15">
 			<div class="row">
-			    <div class="col-sm-6 col-sm-offset-3">
+			    <div class="col-sm-8 col-sm-offset-2">
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
 			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">

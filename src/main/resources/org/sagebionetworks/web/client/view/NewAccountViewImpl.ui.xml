@@ -1,36 +1,43 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp "></div>
 				<div class="container margin-top-15">
 			<div class="row">
-			    <div class="col-sm-6 col-sm-offset-3">
+			    <div class="col-sm-8 col-sm-offset-2">
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
 			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">
 				        <form class="form-horizontal" role="form">
+							  <div ui:field="email" class="form-group row">
+							    <label class="col-sm-3 control-label">Email</label>
+							    <div class="col-sm-9">
+							      <b:TextBox ui:field="emailField" enabled="false"/>
+							    </div>
+							  </div>
 							  <div ui:field="userName" class="form-group row">
 							    <label class="col-sm-3 control-label">Username</label>
 							    <div class="col-sm-9">
-							      <g:TextBox ui:field="userNameField" styleName="form-control"/>
-								  <div ui:field="userNameError" style="display:none" class="help-block"></div>
+							      <b:TextBox ui:field="userNameField" />
+							      <div ui:field="userNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="firstName" class="form-group row">
 							    <label class="col-sm-3 control-label">First name</label>
 							    <div class="col-sm-9">
-							       <g:TextBox ui:field="firstNameField" styleName="form-control"/>
-									<div ui:field="firstNameError" style="display:none" class="help-block"></div>
+							       <b:TextBox ui:field="firstNameField" />
+							       <div ui:field="firstNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>				        
 							<div ui:field="lastName" class="form-group row">
 							    <label class="col-sm-3 control-label">Last name</label>
 							    <div class="col-sm-9">
-							       <g:TextBox ui:field="lastNameField" styleName="form-control"/>
+							      <b:TextBox ui:field="lastNameField" />
 							      <div ui:field="lastNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
@@ -54,7 +61,7 @@
 				<div class="col-sm-1" />
 			</div>
 			<div class="row">
-			    <div class="col-sm-6 col-sm-offset-3">
+			    <div class="col-sm-8 col-sm-offset-2">
 					<g:Button ui:field="registerBtn" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Register"/>
 				</div>
 			</div>

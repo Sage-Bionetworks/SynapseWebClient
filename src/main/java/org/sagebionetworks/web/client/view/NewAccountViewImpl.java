@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
@@ -19,7 +20,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -34,6 +34,8 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	
 	
 	@UiField
+	TextBox emailField;
+	@UiField
 	TextBox firstNameField;
 	@UiField
 	TextBox lastNameField;
@@ -43,7 +45,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	PasswordTextBox password1Field;
 	@UiField
 	PasswordTextBox password2Field;
-
 	
 	@UiField
 	DivElement firstName;
@@ -80,7 +81,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			Header headerWidget, Footer footerWidget,
 			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
-		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
@@ -172,6 +172,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		userNameField.setValue("");
 		password1Field.setValue("");
 		password2Field.setValue("");
+		emailField.setValue("");
 		DisplayUtils.hideFormError(userName, userNameError);
 	}
 
@@ -209,5 +210,10 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 			return false;
 		} else
 			return true;
+	}
+	
+	@Override
+	public void setEmail(String email) {
+		emailField.setValue(email);
 	}
 }
