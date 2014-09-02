@@ -416,7 +416,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	 * Private Methods
 	 */
 	
-	//@Override	// TODO: private method? JSONObject cannot be resolved in SynaspeClientAsync?
 	private JSONObject query(String query) throws SynapseException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		return synapseClient.query(query);
@@ -2890,7 +2889,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
 		String queryString =  	"select * from entity where parentId == '" + parentEntityId +
 								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
-		// TODO: insert "' and type == 'org.sagebionetworks.repo.model.FileEntity" or something to make sure it's a file?
 		JSONObject query = query(queryString);
 		if(!query.has("totalNumberOfResults")){
 			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");
