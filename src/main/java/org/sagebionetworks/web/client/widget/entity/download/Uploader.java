@@ -248,7 +248,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 											//cancel the upload
 											fireCancelEvent();
 											view.resetToInitialState();
-											resetUploadProgress();
+											clearState();
 										} else {
 											//finish upload
 											view.updateProgress(.99d, "99%");
@@ -276,7 +276,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								//cancel the upload
 								fireCancelEvent();
 								view.resetToInitialState();
-								resetUploadProgress();
+								clearState();
 							} else {
 								//finish upload
 								view.updateProgress(.99d, "99%");
@@ -791,6 +791,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private void resetUploadProgress() {
 		fileNames = null;
+		fileHasBeenUploaded = false;
 		currIndex = 0;
 	}
 
