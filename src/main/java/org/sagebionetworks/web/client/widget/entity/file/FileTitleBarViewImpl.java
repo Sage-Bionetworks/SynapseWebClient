@@ -83,7 +83,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-//			Uploader locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
