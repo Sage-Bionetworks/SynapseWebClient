@@ -1,11 +1,9 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
-	<ui:style>
-
-	</ui:style>
 	<g:HTMLPanel>
 		<div class="color-line"></div>
 		<div class="clear"></div>
@@ -13,26 +11,24 @@
 		<div class="separator margin-top-10-imp"></div>
 		<div class="container margin-top-15">
 			<div class="row">
-			    <div class="col-sm-8 col-sm-offset-2">
+			    <div class="col-sm-9 col-sm-offset-1">
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
 			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">
 				        <form class="form-horizontal" role="form">
 							  <div ui:field="emailAddress" class="form-group row">
-							    <label class="col-sm-3 control-label">Email</label>
-							    <div class="col-sm-9">
-							      <g:TextBox ui:field="emailAddressField" styleName="form-control"/>
+							    <div class="col-sm-12 margin-bottom-40">
+							      <div class="input-group">
+										<b:TextBox ui:field="emailAddressField" placeholder="Enter email" />
+										<span class="input-group-btn">
+											<g:Button ui:field="registerBtn" styleName="btn btn-primary">Register</g:Button>
+										</span>
+								  </div>
 							      <div ui:field="emailAddressError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 						</form>
 					</div>
-				</div>
-				<div class="col-sm-1" />
-			</div>
-			<div class="row">
-			    <div class="col-sm-6 col-sm-offset-3">
-					<g:Button ui:field="registerBtn" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Register"/>
 				</div>
 			</div>
 			<div class="clear"></div>

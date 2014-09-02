@@ -1,11 +1,9 @@
 package org.sagebionetworks.web.client.view.users;
 
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -20,7 +18,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -45,17 +42,13 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@UiField
 	DivElement contentHtml;
 	
-
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	private Header headerWidget;
 	private Footer footerWidget;
 	
 	@Inject
-	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget, IconsImageBundle iconsImageBundle, QueryFilter filter) {		
+	public RegisterAccountViewImpl(RegisterAccountViewImplUiBinder binder, Header headerWidget, Footer footerWidget) {		
 		initWidget(binder.createAndBindUi(this));
-
-		this.iconsImageBundle = iconsImageBundle;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		init();
@@ -73,7 +66,6 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 			}
 		});
-		emailAddressField.getElement().setAttribute("placeholder", "Enter email");
 		emailAddressField.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {

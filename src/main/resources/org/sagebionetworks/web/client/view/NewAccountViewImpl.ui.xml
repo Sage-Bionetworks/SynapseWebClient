@@ -9,7 +9,7 @@
 		<div class="separator margin-top-10-imp "></div>
 				<div class="container margin-top-15">
 			<div class="row">
-			    <div class="col-sm-8 col-sm-offset-2">
+			    <div class="col-sm-9 col-sm-offset-1">
 			        <h2 class="margin-bottom-40">Register with Synapse</h2>
 			        <div class="margin-bottom-40" ui:field="contentHtml" />
 				    <div ui:field="registrationForm">
@@ -61,7 +61,7 @@
 				<div class="col-sm-1" />
 			</div>
 			<div class="row">
-			    <div class="col-sm-8 col-sm-offset-2">
+			    <div class="col-sm-9 col-sm-offset-1">
 					<g:Button ui:field="registerBtn" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Register"/>
 				</div>
 			</div>
