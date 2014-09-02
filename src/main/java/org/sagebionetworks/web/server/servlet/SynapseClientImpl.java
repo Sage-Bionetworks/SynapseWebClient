@@ -2877,45 +2877,13 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	// TODO: Where to put these constants?
 	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
+	public static final String AND_NAME_EQUALS = "' and name == '";
 	public static final String LIMIT_ONE = "' limit 1";
 	
-	// TODO: Check type? File vs folder?
 	@Override
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-//		String fileEntityId = null;
-//		try {
-//			// file entity not set
-//			// determine if we should create a new file entity, or update an
-//			// existing.
-//			if (parentEntityId != null && fileName != null) {
-//				// look for a child (1 generation away) with the same file name
-//				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
-//				// get the EntityHeader for all children
-//				List<Reference> references = new ArrayList<Reference>();
-//				for (EntityId childEntityId : list.getIdList()) {
-//					Reference r = new Reference();
-//					r.setTargetId(childEntityId.getId());
-//					references.add(r);
-//				}
-//				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
-//				for (EntityHeader childEntity : childEntities.getResults()) {
-//					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
-//						// found! add a new version for this file instead of
-//						// creating a new file entity
-//						fileEntityId = childEntity.getId();
-//						break;
-//					}
-//				}
-//			}
-//			if (fileEntityId == null)
-//				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
-//			return fileEntityId;
-//		} catch (SynapseException e) {
-//			throw ExceptionUtil.convertSynapseException(e);
-//		}
-		// TODO: CONSTANTS CONSTANTS CONSTANTS!!!!!!
-		String queryString =  SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId + "' and name == '"+ fileName + LIMIT_ONE;
+		String queryString =  SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId + AND_NAME_EQUALS + fileName + LIMIT_ONE;
+		// TODO: insert "' and type == 'org.sagebionetworks.repo.model.FileEntity" or something to make sure it's a file?
 		JSONObject query = query(queryString);
 		if(!query.has("totalNumberOfResults")){
 			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");

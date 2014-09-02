@@ -37,8 +37,6 @@ import com.google.inject.Inject;
 
 public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
-
-	private static final String NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE = "No files were selected for upload.";
 	
 	private boolean showCancelButton = true;
 	private boolean multipleFileUploads = true;
@@ -104,7 +102,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public void showNoFilesSelectedForUpload() {
-		showErrorMessage(NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+		showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
 		hideLoading();
 		resetToInitialState();
 	}
