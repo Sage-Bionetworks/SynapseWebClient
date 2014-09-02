@@ -635,9 +635,15 @@ a.shortBtn {
 .margin-bottom-40 {
 	margin-bottom: 40px;
 }
+
 .margin-bottom-20 {
 	margin-bottom: 20px;
 }
+
+.margin-bottom-20-imp {
+	margin-bottom: 20px !important;
+}
+
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
