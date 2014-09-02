@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -33,42 +32,16 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;	
-
-	
-	@UiField
-	TextBox firstNameField;
-	@UiField
-	TextBox lastNameField;
-	@UiField
-	TextBox userNameField;
 	@UiField
 	TextBox emailAddressField;
-	
 	@UiField
 	DivElement emailAddress;
 	@UiField
-	DivElement firstName;
-	@UiField
-	DivElement lastName;
-	@UiField
-	DivElement userName;
-	
-	@UiField
 	DivElement registrationForm;
-	
 	@UiField
 	DivElement emailAddressError;
 	@UiField
-	DivElement firstNameError;
-	@UiField
-	DivElement lastNameError;
-	@UiField
-	DivElement userNameError;
-
-	
-	@UiField
 	Button registerBtn;
-	
 	@UiField
 	DivElement contentHtml;
 	
@@ -92,29 +65,15 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		registerBtn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (checkUsernameFormat() && checkEmailFormat()) {
+				if (checkEmailFormat()) {
 					// formatting is ok. submit to presenter (will fail if one is taken)
 					registerBtn.setEnabled(false);
-					presenter.registerUser(userNameField.getValue(),
-							emailAddressField.getValue(),
-							firstNameField.getValue(), 
-							lastNameField.getValue());
+					presenter.registerUser(emailAddressField.getValue());
 				}
 
 			}
 		});
 		emailAddressField.getElement().setAttribute("placeholder", "Enter email");
-		userNameField.getElement().setAttribute("placeholder", "Enter username");
-		firstNameField.getElement().setAttribute("placeholder", "Enter first name (optional)");
-		lastNameField.getElement().setAttribute("placeholder", "Enter last name (optional)");
-		userNameField.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				if (checkUsernameFormat())
-					presenter.checkUsernameAvailable(userNameField.getValue());
-			}
-		});
-		
 		emailAddressField.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -136,19 +95,6 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		}
 	}
 	
-	private boolean checkUsernameFormat() {
-		DisplayUtils.hideFormError(userName, userNameError);
-		if (LoginPresenter.isValidUsername(userNameField.getValue())) {
-			return true;
-		}
-		else {
-			userNameError.setInnerHTML(DisplayConstants.USERNAME_FORMAT_ERROR);
-			DisplayUtils.showFormError(userName, userNameError);
-			return false;
-		}
-
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -167,8 +113,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	@Override
 	public void showAccountCreated() {
 		clear();
-		String loginPlaceHref = DisplayUtils.getLoginPlaceHistoryToken(LoginPlace.LOGIN_TOKEN);
-		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.ACCOUNT_CREATED + "<a class=\"link\" href=\""+loginPlaceHref+"\">"+DisplayConstants.LOGIN_HERE+"</a>."));				
+		contentHtml.setInnerHTML(DisplayUtils.getInfoHtml(DisplayConstants.ACCOUNT_EMAIL_SENT));				
 	}
 
 	@Override
@@ -183,24 +128,14 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		DisplayUtils.hide(registrationForm);
 		registerBtn.setVisible(false);
 		registerBtn.setEnabled(true);
-		firstNameField.setValue("");
-		lastNameField.setValue("");
-		userNameField.setValue("");
 		emailAddressField.setValue("");
 		DisplayUtils.hideFormError(emailAddress, emailAddressError);
-		DisplayUtils.hideFormError(userName, userNameError);
 		
 		header.clear();
 		footer.clear();
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-	}
-
-	@Override
-	public void markUsernameUnavailable() {
-		userNameError.setInnerHTML(DisplayConstants.ERROR_USERNAME_ALREADY_EXISTS);
-		DisplayUtils.showFormError(userName, userNameError);
 	}
 	
 	@Override

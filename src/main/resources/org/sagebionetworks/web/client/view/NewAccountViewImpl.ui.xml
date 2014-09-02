@@ -1,0 +1,67 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
+	<g:HTMLPanel>
+		<div class="color-line"></div>
+		<g:SimplePanel ui:field="header" />
+		<div class="separator margin-top-10-imp "></div>
+				<div class="container margin-top-15">
+			<div class="row">
+			    <div class="col-sm-6 col-sm-offset-3">
+			        <h2 class="margin-bottom-40">Complete Registration with Synapse</h2>
+			        <div class="margin-bottom-40" ui:field="contentHtml" />
+				    <div ui:field="registrationForm">
+				        <form class="form-horizontal" role="form">
+							  <div ui:field="userName" class="form-group row">
+							    <label class="col-sm-3 control-label">Username</label>
+							    <div class="col-sm-9">
+							      <g:TextBox ui:field="userNameField" styleName="form-control"/>
+								  <div ui:field="userNameError" style="display:none" class="help-block"></div>
+							    </div>
+							  </div>
+							  <div ui:field="firstName" class="form-group row">
+							    <label class="col-sm-3 control-label">First name</label>
+							    <div class="col-sm-9">
+							       <g:TextBox ui:field="firstNameField" styleName="form-control"/>
+									<div ui:field="firstNameError" style="display:none" class="help-block"></div>
+							    </div>
+							  </div>				        
+							<div ui:field="lastName" class="form-group row">
+							    <label class="col-sm-3 control-label">Last name</label>
+							    <div class="col-sm-9">
+							       <g:TextBox ui:field="lastNameField" styleName="form-control"/>
+							      <div ui:field="lastNameError" style="display:none" class="help-block"></div>
+							    </div>
+							  </div>
+							  <div ui:field="password1" class="form-group row">
+							    <label class="col-sm-3 control-label">Password</label>
+							    <div class="col-sm-9">
+							      <g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
+								  <div ui:field="password1Error" style="display:none" class="help-block"></div>
+							    </div>
+							  </div>
+							  <div ui:field="password2" class="form-group row">
+							    <label class="col-sm-3 control-label">Confirm password</label>
+							    <div class="col-sm-9">
+							      <g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
+							      <div ui:field="password2Error" style="display:none" class="help-block"></div>
+							    </div>
+							  </div>
+						</form>
+					</div>
+				</div>
+				<div class="col-sm-1" />
+			</div>
+			<div class="row">
+			    <div class="col-sm-6 col-sm-offset-3">
+					<g:Button ui:field="registerBtn" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 right" text="Register"/>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		
+		<g:SimplePanel ui:field="footer" />
+	</g:HTMLPanel>
+
+</ui:UiBinder> 

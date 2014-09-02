@@ -749,7 +749,9 @@ public class DisplayConstants {
 	public static final String PASSWORD_RESET_SENT = "Your password reset request has been sent. Please check your email.";
 	public static final String PASSWORDS_MISMATCH = "Passwords do not match. Please re-enter your new password.";
 	
-	public static final String ACCOUNT_CREATED = "Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then ";
+	public static final String ACCOUNT_CREATED = "Your Synapse account has been created.";
+	public static final String ACCOUNT_CREATION_FAILURE = "Unable to create your Synapse account:";
+	public static final String ACCOUNT_EMAIL_SENT = "We have sent you an email with instructions on how to complete the registration process.";
 	public static final String EMAIL_ADDED = "We have sent you an email with instructions on how to verify the new email address.";
 	public static final String EMAIL_SUCCESS = "Successfully verified the email address";
 	public static final String EMAIL_FAILURE = "Unable to verify the email address:";

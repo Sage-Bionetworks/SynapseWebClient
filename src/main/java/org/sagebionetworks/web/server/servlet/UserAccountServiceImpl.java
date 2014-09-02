@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.UserAccountService;
@@ -13,7 +14,6 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.users.UserRegistration;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -129,17 +129,33 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void createUser(UserRegistration userInfo) throws RestServiceException {
+	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
 		NewUser user = new NewUser();
-		user.setEmail(userInfo.getEmail());
-		user.setFirstName(userInfo.getFirstName());
-		user.setLastName(userInfo.getLastName());
-		user.setUserName(userInfo.getUserName());
+		user.setEmail(email);
 		try {
-			client.createUser(user);
+			client.newAccountEmailValidation(user, portalEndpoint);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException {
+		validateService();
+
+		SynapseClient client = createAnonymousSynapseClient();
+		try {
+			AccountSetupInfo accountSetup = new AccountSetupInfo();
+			accountSetup.setFirstName(fName);
+			accountSetup.setLastName(lName);
+			accountSetup.setUsername(userName);
+			accountSetup.setPassword(password);
+			accountSetup.setEmailValidationToken(emailValidationToken);
+			Session s = client.createNewAccount(accountSetup);
+			return s.getSessionToken();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
