@@ -177,7 +177,7 @@ public class DisplayConstants {
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
 	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
 	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account with this username/email.  " + FORGOT_PASSWORD_MESSAGE;
-	public static final String ERROR_USERNAME_ALREADY_EXISTS = "There is an existing account with this username.  " + FORGOT_PASSWORD_MESSAGE;
+	public static final String ERROR_USERNAME_ALREADY_EXISTS = "Sorry, that username has already been taken.";
 	public static final String ERROR_EMAIL_ALREADY_EXISTS = "There is an existing account with this email.  " + FORGOT_PASSWORD_MESSAGE;
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
 	public static final String ERROR_UNABLE_TO_UPDATE_ATTACHMENTS = "The attachments could not be updated because this entity has conflicting changes. Please reload the page and try again.";
