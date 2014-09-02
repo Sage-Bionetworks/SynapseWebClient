@@ -137,8 +137,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
-		initializeUploadProgress();
-		
+		resetUploadProgress();
 	}
 
 	@Override
@@ -249,7 +248,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 											//cancel the upload
 											fireCancelEvent();
 											view.resetToInitialState();
-											initializeUploadProgress();
+											resetUploadProgress();
 										} else {
 											//finish upload
 											view.updateProgress(.99d, "99%");
@@ -277,7 +276,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								//cancel the upload
 								fireCancelEvent();
 								view.resetToInitialState();
-								initializeUploadProgress();
+								resetUploadProgress();
 							} else {
 								//finish upload
 								view.updateProgress(.99d, "99%");
@@ -777,7 +776,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
 		view.resetToInitialState();
-		initializeUploadProgress();
+		resetUploadProgress();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
@@ -790,7 +789,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}
 	
-	private void initializeUploadProgress() {
+	private void resetUploadProgress() {
 		fileNames = null;
 		currIndex = 0;
 	}
