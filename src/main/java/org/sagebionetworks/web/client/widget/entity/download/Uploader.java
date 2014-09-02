@@ -228,48 +228,48 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(final String result) {
-					if (result != null) {
-						//there was already a file with this name in the directory.
-						
-						//confirm we can overwrite
-						view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
-								new Callback() {
-									@Override
-									public void invoke() {
-										//yes, override
-										entityId = result;
-										directUploadStep2(fileName);
-									}
-								},
-								new Callback() {
-									@Override
-									public void invoke() {
-										if (currIndex + 1 == fileNames.length) {
-											//uploading the last file
-											if (!fileHasBeenUploaded) {
-												//cancel the upload
-												fireCancelEvent();
-												view.resetToInitialState();
-											} else {
-												//finish upload
-												view.updateProgress(.99d, "99%");
-												uploadSuccess();
-											}
+					//there was already a file with this name in the directory.
+					
+					//confirm we can overwrite
+					view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+							new Callback() {
+								@Override
+								public void invoke() {
+									//yes, override
+									entityId = result;
+									directUploadStep2(fileName);
+								}
+							},
+							new Callback() {
+								@Override
+								public void invoke() {
+									if (currIndex + 1 == fileNames.length) {
+										//uploading the last file
+										if (!fileHasBeenUploaded) {
+											//cancel the upload
+											fireCancelEvent();
+											view.resetToInitialState();
 										} else {
-											//more files to upload
-											currIndex++;
-											handleUploads();
+											//finish upload
+											view.updateProgress(.99d, "99%");
+											uploadSuccess();
 										}
+									} else {
+										//more files to upload
+										currIndex++;
+										handleUploads();
 									}
-								});
-					} else {
-						//there was not already a file with this name in this directory.
-						directUploadStep2(fileName);
-					}
+								}
+							});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					uploadError(caught.getMessage());
+					if (caught instanceof NotFoundException) {
+						//there was not already a file with this name in this directory.
+						directUploadStep2(fileName);
+					} else {
+						uploadError(caught.getMessage());
+					}
 				}
 			});
 		}

@@ -2875,14 +2875,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
-	// TODO: Where to put these constants?
-	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
-	public static final String AND_NAME_EQUALS = "' and name == '";
-	public static final String LIMIT_ONE = "' limit 1";
-	
 	@Override
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
-		String queryString =  SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId + AND_NAME_EQUALS + fileName + LIMIT_ONE;
+		String queryString =  	WebConstants.SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId +
+								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
 		// TODO: insert "' and type == 'org.sagebionetworks.repo.model.FileEntity" or something to make sure it's a file?
 		JSONObject query = query(queryString);
 		if(!query.has("totalNumberOfResults")){
@@ -2893,7 +2889,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				JSONArray results = query.getJSONArray("results");
 				return results.getJSONObject(0).getString("entity.id");
 			} else {
-				return null;
+				throw new NotFoundException();
 			}
 		} catch (JSONException e) {
 			throw new SynapseClientException(e);
