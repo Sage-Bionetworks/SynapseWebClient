@@ -23,35 +23,35 @@
 							  <div ui:field="userName" class="form-group row">
 							    <label class="col-sm-3 control-label">Username</label>
 							    <div class="col-sm-9">
-							      <b:TextBox ui:field="userNameField" />
+							      <b:TextBox ui:field="userNameField" placeholder="Enter username"/>
 							      <div ui:field="userNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="firstName" class="form-group row">
 							    <label class="col-sm-3 control-label">First name</label>
 							    <div class="col-sm-9">
-							       <b:TextBox ui:field="firstNameField" />
+							       <b:TextBox ui:field="firstNameField" placeholder="Enter first name (optional)"/>
 							       <div ui:field="firstNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>				        
 							<div ui:field="lastName" class="form-group row">
 							    <label class="col-sm-3 control-label">Last name</label>
 							    <div class="col-sm-9">
-							      <b:TextBox ui:field="lastNameField" />
+							      <b:TextBox ui:field="lastNameField" placeholder="Enter last name (optional)"/>
 							      <div ui:field="lastNameError" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="password1" class="form-group row">
 							    <label class="col-sm-3 control-label">Password</label>
 							    <div class="col-sm-9">
-							      <g:PasswordTextBox ui:field="password1Field" styleName="form-control"/>
+							      <b:Input type="PASSWORD" ui:field="password1Field" placeholder="Enter password"/>
 								  <div ui:field="password1Error" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>
 							  <div ui:field="password2" class="form-group row">
 							    <label class="col-sm-3 control-label">Confirm password</label>
 							    <div class="col-sm-9">
-							      <g:PasswordTextBox ui:field="password2Field" styleName="form-control"/>
+							      <b:Input type="PASSWORD" ui:field="password2Field" placeholder="Confirm password"/>
 							      <div ui:field="password2Error" style="display:none" class="help-block"></div>
 							    </div>
 							  </div>

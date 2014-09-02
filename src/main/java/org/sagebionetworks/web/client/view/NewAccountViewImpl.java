@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,7 +19,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -42,9 +42,9 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@UiField
 	TextBox userNameField;
 	@UiField
-	PasswordTextBox password1Field;
+	Input password1Field;
 	@UiField
-	PasswordTextBox password2Field;
+	Input password2Field;
 	
 	@UiField
 	DivElement firstName;
@@ -100,9 +100,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 				}
 			}
 		});
-		userNameField.getElement().setAttribute("placeholder", "Enter username");
-		firstNameField.getElement().setAttribute("placeholder", "Enter first name (optional)");
-		lastNameField.getElement().setAttribute("placeholder", "Enter last name (optional)");
+		
 		userNameField.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
@@ -174,6 +172,8 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password2Field.setValue("");
 		emailField.setValue("");
 		DisplayUtils.hideFormError(userName, userNameError);
+		DisplayUtils.hideFormError(password1, password1Error);
+		DisplayUtils.hideFormError(password2, password2Error);
 	}
 
 	@Override
