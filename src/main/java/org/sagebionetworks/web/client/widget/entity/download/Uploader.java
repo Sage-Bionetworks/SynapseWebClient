@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -136,8 +137,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
-		this.fileNames = null;
-		this.currIndex = 0;
+		initializeUploadProgress();
 		
 	}
 
@@ -231,7 +231,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					//there was already a file with this name in the directory.
 					
 					//confirm we can overwrite
-					view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+					view.showConfirmDialog("", "A file named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
 							new Callback() {
 								@Override
 								public void invoke() {
@@ -249,6 +249,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 											//cancel the upload
 											fireCancelEvent();
 											view.resetToInitialState();
+											initializeUploadProgress();
 										} else {
 											//finish upload
 											view.updateProgress(.99d, "99%");
@@ -267,6 +268,26 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					if (caught instanceof NotFoundException) {
 						//there was not already a file with this name in this directory.
 						directUploadStep2(fileName);
+					} else if (caught instanceof ConflictException) {
+						//there was an entity found with same parent ID and name, but
+						//it was not a File Entity.
+						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
+						if (currIndex + 1 == fileNames.length) {
+							if (!fileHasBeenUploaded) {
+								//cancel the upload
+								fireCancelEvent();
+								view.resetToInitialState();
+								initializeUploadProgress();
+							} else {
+								//finish upload
+								view.updateProgress(.99d, "99%");
+								uploadSuccess();
+							}
+						} else {
+							//more files to upload
+							currIndex++;
+							handleUploads();
+						}
 					} else {
 						uploadError(caught.getMessage());
 					}
@@ -756,6 +777,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
 		view.resetToInitialState();
+		initializeUploadProgress();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
@@ -766,6 +788,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private String getOldUploadUrl() {
 		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
+	}
+	
+	private void initializeUploadProgress() {
+		fileNames = null;
+		currIndex = 0;
 	}
 
 	/**

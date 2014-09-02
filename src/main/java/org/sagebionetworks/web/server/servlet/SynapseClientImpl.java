@@ -144,6 +144,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -2875,9 +2876,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
+	/**
+	 * Gets the ID of the file entity with the given name whose parent has the given ID.
+	 * 
+	 * @param fileName The name of the entity to find.
+	 * @param parentEntityId The ID of the parent that the found entity must have.
+	 * @return The ID of the file entity with the given name and parent ID.
+	 * @throws NotFoundException If no file with given name and parent ID was found.
+	 * @throws ConflictException If an entity with given name and parent ID was found, but that
+	 * 							 entity was not a File Entity.
+	 */
 	@Override
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
-		String queryString =  	WebConstants.SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID + parentEntityId +
+		String queryString =  	"select * from entity where parentId == '" + parentEntityId +
 								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
 		// TODO: insert "' and type == 'org.sagebionetworks.repo.model.FileEntity" or something to make sure it's a file?
 		JSONObject query = query(queryString);
@@ -2886,8 +2897,22 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 		try {
 			if (query.getLong("totalNumberOfResults") != 0) {
-				JSONArray results = query.getJSONArray("results");
-				return results.getJSONObject(0).getString("entity.id");
+				JSONObject result = query.getJSONArray("results").getJSONObject(0);
+				
+				// Get types associated with found entity.
+				JSONArray typeArray = result.getJSONArray("entity.concreteType");
+				Set<String> types = new HashSet<String>();
+				for (int i = 0; i < typeArray.length(); i++) {
+					types.add(typeArray.getString(i));
+				}
+				
+				if (types.contains(FileEntity.class.getName())) {
+					// The found entity is a File Entity.
+					return result.getString("entity.id");
+				} else {
+					// The found entity is not a File Entity.
+					throw new ConflictException();
+				}
 			} else {
 				throw new NotFoundException();
 			}
