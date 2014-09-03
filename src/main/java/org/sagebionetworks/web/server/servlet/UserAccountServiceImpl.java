@@ -50,6 +50,15 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	/**
+	 * This allows tests provide mock org.sagebionetworks.client.SynapseClient
+	 * 
+	 * @param provider
+	 */
+	public void setSynapseProvider(SynapseProvider provider) {
+		this.synapseProvider = provider;
+	}
+
+	/**
 	 * Validate that the service is ready to go. If any of the injected data is
 	 * missing then it cannot run. Public for tests.
 	 */
