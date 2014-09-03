@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.TextArea;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -15,10 +18,10 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
-import com.google.gwt.dom.client.InputElement;
-import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -53,11 +56,11 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	@UiField
 	HeadingElement userNameHeading;
 	@UiField
-	InputElement firstNameField;
+	TextBox firstNameField;
 	@UiField
-	InputElement lastNameField;
+	TextBox lastNameField;
 	@UiField
-	InputElement userNameField;
+	TextBox userNameField;
 	@UiField
 	DivElement changeUsernameUi;
 	@UiField
@@ -68,17 +71,17 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	DivElement userNameError;
 	
 	@UiField
-	InputElement currentPositionField;
+	TextBox currentPositionField;
 	@UiField
-	InputElement currentAffiliationField;
+	TextBox currentAffiliationField;
 	@UiField
-	InputElement industryField;
+	TextBox industryField;
 	@UiField
-	InputElement locationField;
+	TextBox locationField;
 	@UiField
-	InputElement moreInfoField;
+	TextBox moreInfoField;
 	@UiField
-	TextAreaElement bioField;
+	TextArea bioField;
 	
 	@UiField
 	SimplePanel updateWithLinkedInPanel;
@@ -195,6 +198,24 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 			}
 		});
 		DisplayUtils.hide(changeUsernameUi);
+		//initialize as 
+		setIsDataModified(false);
+		
+		ValueChangeHandler<String> changeHandler = new ValueChangeHandler<String>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				presenter.startEditing();
+			}
+		};
+		
+		addValueChangeHandler(changeHandler, firstNameField, lastNameField, userNameField, currentPositionField, 
+				currentAffiliationField, industryField, locationField, moreInfoField, bioField);
+	 }
+	 
+	 private void addValueChangeHandler(ValueChangeHandler<String> changeHandler, TextBoxBase ... textBoxes) {
+		for (TextBoxBase textBox : textBoxes) {
+			textBox.addValueChangeHandler(changeHandler);
+		}
 	 }
 	 
 	 private void showChangeUsernameUI(){
@@ -329,5 +350,11 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 	
 	private void linkedInClicked(){
 		presenter.redirectToLinkedIn();
+	}
+	
+	@Override
+	public void setIsDataModified(boolean isModified) {
+		cancelButton.setEnabled(isModified);
+		okButton.setEnabled(isModified);
 	}
 }

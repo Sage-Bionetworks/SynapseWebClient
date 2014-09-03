@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
@@ -78,6 +79,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	
 	@Override
 	public void rollback() {
+		stopEditing();
 		view.updateView(ownerProfile);
 	}
 	
@@ -135,6 +137,7 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 								@Override
 								public void onSuccess(Void result) {
 									view.showUserUpdateSuccess();
+									stopEditing();
 									updateLoginInfo(currentUser);	
 								}
 								
@@ -156,6 +159,17 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		}
 	}
 	
+	@Override
+	public void startEditing() {
+		globalApplicationState.setIsEditing(true);
+		view.setIsDataModified(true);
+	}
+	
+	@Override
+	public void stopEditing() {
+		globalApplicationState.setIsEditing(false);
+		view.setIsDataModified(false);
+	}
 	
 	public static void getMyProfile(SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<UserProfile> callback){
 		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
