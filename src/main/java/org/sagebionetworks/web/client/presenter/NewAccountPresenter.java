@@ -147,6 +147,13 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		}
 	}
 	
+	/**
+	 * Expose for testing purposes only 
+	 * @param emailValidationToken
+	 */
+	public void setEmailValidationToken(String emailValidationToken) {
+		this.emailValidationToken = emailValidationToken;
+	}
 	
 	@Override
     public String mayStop() {

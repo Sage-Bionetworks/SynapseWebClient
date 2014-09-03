@@ -54,6 +54,8 @@ public class RegisterAccountPresenterTest {
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -89,8 +91,8 @@ public class RegisterAccountPresenterTest {
 		reset(mockGlobalApplicationState);
 		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
-		
 		registerAccountPresenter.registerUser(email);
+		verify(mockView).showAccountCreated();
 	}
 
 
