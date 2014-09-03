@@ -32,6 +32,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	Button editRowsButton;
 	@UiField
+	Button saveRowsButton;
+	@UiField
 	Modal editRowsModal;
 	
 	Widget widget;
@@ -50,6 +52,12 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onEditRows();
+			}
+		});
+		saveRowsButton.addClickHandler(new ClickHandler() {	
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onSave();
 			}
 		});
 	}
@@ -87,6 +95,15 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void showEditor() {
 		editRowsModal.show();
+	}
+
+	@Override
+	public void setSaveButtonLoading(boolean isLoading) {
+		if(isLoading){
+			this.saveRowsButton.state().loading();
+		}else{
+			this.saveRowsButton.state().reset();
+		}
 	}
 
 }

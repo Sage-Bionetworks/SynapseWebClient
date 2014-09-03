@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,6 +27,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultBundle bundle;
 	TablePageWidget pageViewerWidget;
 	QueryResultEditorWidget queryResultEditor;
+	String startingQueryString;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
@@ -40,6 +41,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	public void configure(String queryString){
+		this.startingQueryString = queryString;
 		// Run the query
 		this.synapseClient.queryTable(queryString, new AsyncCallback<String>() {
 			@Override
@@ -90,4 +92,30 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.queryResultEditor.configure(this.bundle);
 		view.showEditor();
 	}
+
+	@Override
+	public void onSave() {
+		view.setSaveButtonLoading(true);
+		try {
+			// Extract the delta
+			PartialRowSet prs = this.queryResultEditor.extractDeleta();
+			String json = prs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
+			synapseClient.applyTableDelta(json, new AsyncCallback<Void>() {
+				
+				@Override
+				public void onSuccess(Void result) {
+					// If the save was success full then re-run the query.
+					configure(startingQueryString);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					queryResultEditor.showError(caught.getMessage());
+				}
+			});
+		} catch (JSONObjectAdapterException e) {
+			queryResultEditor.showError(e.getMessage());
+		}
+	}
+	
 }

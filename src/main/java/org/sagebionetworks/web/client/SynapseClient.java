@@ -391,6 +391,14 @@ public interface SynapseClient extends RemoteService {
 	public String queryTable(String query) throws RestServiceException;
 	
 	/**
+	 * Apply PartialRowSet to a table entity.
+	 * 
+	 * @param deltaJson
+	 * @throws RestServiceException
+	 */
+	public void applyTableDelta(String deltaJson) throws RestServiceException;
+	
+	/**
 	 * Start an Asynchronous job with the provided body.
 	 * @param The JSON of the AsynchronousRequestBody
 	 * @return The JSON of the AsynchronousJobStatus

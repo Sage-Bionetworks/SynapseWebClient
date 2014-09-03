@@ -11,6 +11,11 @@ public interface TableQueryResultView extends IsWidget {
 		 * Called when the user selected the edit row button.
 		 */
 		void onEditRows();
+
+		/**
+		 * Called when the save button is pressed.
+		 */
+		void onSave();
 		
 	}
 
@@ -55,4 +60,10 @@ public interface TableQueryResultView extends IsWidget {
 	 * 
 	 */
 	void showEditor();
+
+	/**
+	 * Change the state of the save button while saving.
+	 * @param b
+	 */
+	void setSaveButtonLoading(boolean b);
 }

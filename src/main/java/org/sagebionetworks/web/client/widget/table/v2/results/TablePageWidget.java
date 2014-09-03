@@ -176,6 +176,19 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	
 	/**
+	 * Extract the list of headers (ColumnModel ids), from this page.
+	 * Note: Values can be null for columns that are aggregate functions.
+	 * @return
+	 */
+	public List<String> extractHeaders(){
+		List<String> headers = new ArrayList<String>(types.size());
+		for(ColumnModel cm: types){
+			headers.add(cm.getId());
+		}
+		return headers;
+	}
+	
+	/**
 	 * Called when a row changes its selection.
 	 */
 	public void onSelectionChanged(){

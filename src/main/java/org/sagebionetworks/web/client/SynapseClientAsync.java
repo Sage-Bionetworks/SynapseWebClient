@@ -319,6 +319,13 @@ public interface SynapseClientAsync {
 	void queryTable(String query, AsyncCallback<String> callback);
 	
 	/**
+	 * Apply a PartialRowSet to a table.
+	 * @param deltaJson
+	 * @param callback
+	 */
+	void applyTableDelta(String deltaJson, AsyncCallback<Void> callback);
+	
+	/**
 	 * Start an asynchronous job passing a job body.
 	 * 
 	 * @param query

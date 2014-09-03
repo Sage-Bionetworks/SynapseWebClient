@@ -1,6 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import java.util.List;
+
+import org.sagebionetworks.repo.model.table.PartialRow;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.RowSet;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,6 +22,7 @@ public class QueryResultEditorWidget implements
 
 	QueryResultEditorView view;
 	TablePageWidget pageWidget;
+	QueryResultBundle startingBundle;
 
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -38,6 +44,7 @@ public class QueryResultEditorWidget implements
 	 * @param bundle
 	 */
 	public void configure(QueryResultBundle bundle) {
+		this.startingBundle = bundle;
 		// configure the widget
 		pageWidget.configure(bundle, true, this);
 	}
@@ -73,6 +80,25 @@ public class QueryResultEditorWidget implements
 		// row selected.
 		this.view.setDeleteButtonEnabled(pageWidget
 				.isOneRowOrMoreRowsSelected());
+	}
+	
+	/**
+	 * Extract the new RowSet to be saved.
+	 * @return
+	 */
+	public PartialRowSet extractDeleta(){
+		RowSet updated = new RowSet();
+		updated.setHeaders(pageWidget.extractHeaders());
+		updated.setRows(pageWidget.extractRowSet());
+		return RowSetUtils.buildDelta(startingBundle.getQueryResults(), updated);
+	}
+
+	/**
+	 * Show an error message
+	 * @param message
+	 */
+	public void showError(String message) {
+		this.view.showErrorMessage(message);
 	}
 
 }
