@@ -51,6 +51,8 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
+import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.view.NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
@@ -445,6 +447,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// PasswordResetView
 		bind(PasswordResetViewImpl.class).in(Singleton.class);
 		bind(PasswordResetView.class).to(PasswordResetViewImpl.class);
+		
+		// NewAccountView
+		bind(NewAccountViewImpl.class).in(Singleton.class);
+		bind(NewAccountView.class).to(NewAccountViewImpl.class);
 
 		// RegisterAccountView
 		bind(RegisterAccountViewImpl.class).in(Singleton.class);

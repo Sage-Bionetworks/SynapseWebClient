@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -20,7 +19,8 @@ public interface UserAccountService extends RemoteService {
 	
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException;
 
-	public void createUser(UserRegistration userInfo) throws RestServiceException;
+	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException;
+	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException;
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
 	

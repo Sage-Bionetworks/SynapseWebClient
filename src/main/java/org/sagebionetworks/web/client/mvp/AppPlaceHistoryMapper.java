@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -38,7 +39,8 @@ import com.google.gwt.place.shared.WithTokenizers;
 		Search.Tokenizer.class,
 		Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class,
 		WikiPlace.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, 
-		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class,
+		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, 
+		NewAccount.Tokenizer.class,
 		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }
