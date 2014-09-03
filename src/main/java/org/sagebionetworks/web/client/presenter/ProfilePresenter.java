@@ -459,6 +459,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void showView(Profile place) {
+		view.clear();
 		setupProfileFormCallback();
 		String token = place.toToken();
 		if (authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(place.getUserId())) {
