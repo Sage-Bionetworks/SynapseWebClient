@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Modal;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,6 +30,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	ScrollPanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
+	@UiField
+	ButtonToolBar resultsToolBar;
 	@UiField
 	Button editRowsButton;
 	@UiField
@@ -104,6 +107,21 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 		}else{
 			this.saveRowsButton.state().reset();
 		}
+	}
+
+	@Override
+	public void hideEditor() {
+		editRowsModal.hide();
+	}
+
+	@Override
+	public void setToolbarVisible(boolean visible) {
+		this.resultsToolBar.setVisible(visible);
+	}
+
+	@Override
+	public void setEditEnabled(boolean isEditable) {
+		this.editRowsButton.setVisible(isEditable);
 	}
 
 }

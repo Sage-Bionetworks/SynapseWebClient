@@ -129,6 +129,8 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.table.query.ParseException;
+import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -147,6 +149,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
@@ -3598,6 +3601,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try{
 			QueryResultBundle result = synapseClient.queryTableEntityBundle(query, true, 0x15);
 			return EntityFactory.createJSONStringForEntity(result);
+		} catch (SynapseTableUnavailableException e){
+			try {
+				throw new TableUnavilableException(EntityFactory.createJSONStringForEntity(e.getStatus()));
+			} catch (JSONObjectAdapterException e1) {
+				throw new UnknownErrorException(e.getMessage());
+			}
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -3615,6 +3624,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public void validateTableQuery(String sql) throws RestServiceException {
+		try {
+			TableQueryParser.parserQuery(sql);
+		} catch (ParseException e) {
+			throw new TableQueryParseException(e.getMessage());
 		}
 	}
 
@@ -3664,4 +3682,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
+
 }

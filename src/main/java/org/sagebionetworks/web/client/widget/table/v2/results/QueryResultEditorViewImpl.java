@@ -119,8 +119,12 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 
 	@Override
 	public void showErrorMessage(String message) {
-		errorAlert.setVisible(true);
 		errorAlert.setText(message);
+	}
+
+	@Override
+	public void setErrorMessageVisible(boolean visible) {
+		errorAlert.setVisible(visible);
 	}
 
 }

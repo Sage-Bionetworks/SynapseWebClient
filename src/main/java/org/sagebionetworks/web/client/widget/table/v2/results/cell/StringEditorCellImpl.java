@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.TextBox;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-
 /**
  * An editor for a string.
  * 
@@ -18,7 +16,7 @@ public class StringEditorCellImpl extends TextBox implements  StringEditorCell {
 
 	@Override
 	public void setValue(String value) {
-		super.setValue(SafeHtmlUtils.htmlEscape(value));
+		super.setValue(value);
 	}
 	
 }

@@ -44,6 +44,7 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void setTableHeaders(List<String> headers) {
 		header.clear();
+		body.clear();
 		// Blank header for the selection.
 		header.add(new TableHeader());
 		for(String value: headers){

@@ -66,4 +66,21 @@ public interface TableQueryResultView extends IsWidget {
 	 * @param b
 	 */
 	void setSaveButtonLoading(boolean b);
+
+	/**
+	 * Hide the editor.
+	 */
+	void hideEditor();
+
+	/**
+	 * Show or hide the tool bar.
+	 * @param b
+	 */
+	void setToolbarVisible(boolean visible);
+
+	/**
+	 * Enable the edit button.
+	 * @param isEditable
+	 */
+	void setEditEnabled(boolean isEditable);
 }

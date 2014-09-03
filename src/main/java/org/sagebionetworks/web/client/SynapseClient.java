@@ -382,6 +382,12 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Validate a table query.
+	 * @param sql
+	 */
+	public void validateTableQuery(String sql) throws RestServiceException;
 	/**
 	 * Execute the given query against a table.
 	 * @param query

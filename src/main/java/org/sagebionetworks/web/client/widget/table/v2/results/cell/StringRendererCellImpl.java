@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.FormControlStatic;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-
 /**
  * A non editable renderer for a string.
  * 
@@ -18,7 +16,7 @@ public class StringRendererCellImpl extends FormControlStatic implements StringR
 
 	@Override
 	public void setValue(String value) {
-		this.setText(SafeHtmlUtils.htmlEscape(value));
+		this.setText(value);
 	}
 
 	@Override

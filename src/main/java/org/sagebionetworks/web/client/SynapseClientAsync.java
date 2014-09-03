@@ -326,6 +326,13 @@ public interface SynapseClientAsync {
 	void applyTableDelta(String deltaJson, AsyncCallback<Void> callback);
 	
 	/**
+	 * Validate a table query.
+	 * @param sql
+	 * @param callback
+	 */
+	void validateTableQuery(String sql, AsyncCallback<Void> callback);
+	
+	/**
 	 * Start an asynchronous job passing a job body.
 	 * 
 	 * @param query
@@ -359,5 +366,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
+
 
 }

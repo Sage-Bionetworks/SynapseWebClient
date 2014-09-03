@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.RowSet;
@@ -45,6 +42,7 @@ public class QueryResultEditorWidget implements
 	 */
 	public void configure(QueryResultBundle bundle) {
 		this.startingBundle = bundle;
+		this.view.setErrorMessageVisible(false);
 		// configure the widget
 		pageWidget.configure(bundle, true, this);
 	}
@@ -99,6 +97,7 @@ public class QueryResultEditorWidget implements
 	 */
 	public void showError(String message) {
 		this.view.showErrorMessage(message);
+		this.view.setErrorMessageVisible(true);
 	}
 
 }
