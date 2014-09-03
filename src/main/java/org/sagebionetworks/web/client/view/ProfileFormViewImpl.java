@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
@@ -206,15 +207,15 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 				presenter.startEditing();
 			}
 		};
-		firstNameField.addValueChangeHandler(changeHandler);
-		lastNameField.addValueChangeHandler(changeHandler);
-		userNameField.addValueChangeHandler(changeHandler);
-		currentPositionField.addValueChangeHandler(changeHandler);
-		currentAffiliationField.addValueChangeHandler(changeHandler);
-		industryField.addValueChangeHandler(changeHandler);
-		locationField.addValueChangeHandler(changeHandler);
-		moreInfoField.addValueChangeHandler(changeHandler);
-		bioField.addValueChangeHandler(changeHandler);
+		
+		addValueChangeHandler(changeHandler, firstNameField, lastNameField, userNameField, currentPositionField, 
+				currentAffiliationField, industryField, locationField, moreInfoField, bioField);
+	 }
+	 
+	 private void addValueChangeHandler(ValueChangeHandler<String> changeHandler, TextBoxBase ... textBoxes) {
+		for (TextBoxBase textBox : textBoxes) {
+			textBox.addValueChangeHandler(changeHandler);
+		}
 	 }
 	 
 	 private void showChangeUsernameUI(){
