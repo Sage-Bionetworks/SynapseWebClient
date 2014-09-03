@@ -85,12 +85,6 @@ public class RegisterAccountPresenterTest {
 	
 	@Test
 	public void testRegisterUser() {
-		reset(mockView);
-		reset(mockCookieProvider);
-		reset(mockUserService);
-		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
-		registerAccountPresenter.setPlace(place);
 		registerAccountPresenter.registerUser(email);
 		verify(mockView).showAccountCreated();
 	}
