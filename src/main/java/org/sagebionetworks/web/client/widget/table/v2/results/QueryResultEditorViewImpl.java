@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
@@ -42,6 +43,8 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	Button addRowToolButton;
 	@UiField
 	Button deleteSelectedButton;
+	@UiField
+	Alert errorAlert;
 	Presenter presenter;
 	
 	Widget widget;
@@ -112,6 +115,16 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 			this.deleteSelectedButton.setEnabled(false);
 			this.deleteSelectedButton.setType(ButtonType.DEFAULT);
 		}
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+		errorAlert.setText(message);
+	}
+
+	@Override
+	public void setErrorMessageVisible(boolean visible) {
+		errorAlert.setVisible(visible);
 	}
 
 }

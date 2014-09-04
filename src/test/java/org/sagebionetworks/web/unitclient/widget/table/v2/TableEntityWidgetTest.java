@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
@@ -44,6 +45,7 @@ public class TableEntityWidgetTest {
 	AsynchronousProgressWidget mockAsynchronousProgressWidget;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
+	QueryInputWidget mockQueryInputWidget;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
 	SynapseClientAsync mockSynapseClient;
@@ -56,6 +58,7 @@ public class TableEntityWidgetTest {
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
+		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		tableModelUtils = new TableModelUtils(adapterFactory);
@@ -66,7 +69,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils, mockQueryResultsWidget);
+		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils, mockQueryResultsWidget, mockQueryInputWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 	}

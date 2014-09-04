@@ -270,6 +270,9 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
@@ -747,6 +750,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
 		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
 		bind(CellFactory.class).to(CellFactoryImpl.class);
+		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		
 		/*
 		 * TableEntity cell bindings.

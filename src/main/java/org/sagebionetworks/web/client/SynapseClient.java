@@ -389,6 +389,12 @@ public interface SynapseClient extends RemoteService {
 	 */
 	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Validate a table query.
+	 * @param sql
+	 */
+	public void validateTableQuery(String sql) throws RestServiceException;
 	/**
 	 * Execute the given query against a table.
 	 * @param query
@@ -396,6 +402,14 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 */
 	public String queryTable(String query) throws RestServiceException;
+	
+	/**
+	 * Apply PartialRowSet to a table entity.
+	 * 
+	 * @param deltaJson
+	 * @throws RestServiceException
+	 */
+	public void applyTableDelta(String deltaJson) throws RestServiceException;
 	
 	/**
 	 * Start an Asynchronous job with the provided body.

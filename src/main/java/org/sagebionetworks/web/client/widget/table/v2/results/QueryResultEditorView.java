@@ -62,4 +62,17 @@ public interface QueryResultEditorView extends IsWidget {
 	 */
 	public void setDeleteButtonEnabled(boolean enabled);
 
+	/**
+	 * Show an error message.
+	 * 
+	 * @param message
+	 */
+	public void showErrorMessage(String message);
+
+	/**
+	 * Show or hide the error message alert box.
+	 * @param b
+	 */
+	public void setErrorMessageVisible(boolean visible);
+
 }

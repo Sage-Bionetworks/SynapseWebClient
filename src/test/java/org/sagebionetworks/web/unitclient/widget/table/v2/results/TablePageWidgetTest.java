@@ -40,6 +40,7 @@ public class TablePageWidgetTest {
 	RowSelectionListener mockListner;
 	TablePageWidget widget;
 	List<ColumnModel> schema;
+	List<String> headers;
 	QueryResultBundle bundle;
 	List<Row> rows;
 	
@@ -92,6 +93,11 @@ public class TablePageWidgetTest {
 		widget.configure(bundle, isEditable, null);
 		List<Row> extracted = widget.extractRowSet();
 		assertEquals(rows, extracted);
+		List<String> headers = widget.extractHeaders();
+		List<String> expected = TableModelTestUtils.getColumnModelIds(schema);
+		// there should be a null at the end for the aggregate function.
+		expected.add(null);
+		assertEquals(expected, headers);
 	}
 	
 	@Test

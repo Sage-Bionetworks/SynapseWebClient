@@ -15,7 +15,6 @@
 							Rows</b:Button>
 					</b:ButtonGroup>
 					<b:ButtonGroup>
-						<b:Button ui:field="uploadCSVButton" icon="UPLOAD">Upload</b:Button>
 						<b:Button ui:field="downloadCSVButton" icon="DOWNLOAD">Download</b:Button>
 					</b:ButtonGroup>
 				</b:ButtonToolBar>

@@ -5,35 +5,27 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<g:HTMLPanel>
-			<div class="alert alert-danger">
-				Warning: The Table feature is in a test phase.
-				<strong>All production data will be DELETED at a future date.</strong>
-			</div>
-			<!-- This button toggles the visibility of the the column details panel -->
-			<b:Button ui:field="columnDetailsToggleButton" icon="TH_LIST"
-				dataToggle="COLLAPSE" dataTarget="#editSchemaCollapse">Table
-				Schema</b:Button>
-			<bh:ClearFix styleName="clearfix margin-top-15" />
-			<b:Collapse b:id="editSchemaCollapse" toggle="false">
-				<b:Panel>
-					<b:PanelBody ui:field="columnDetailsPanel" />
-				</b:Panel>
-			</b:Collapse>
+		<div class="alert alert-danger">
+			Warning: The Table feature is in a test phase.
+			<strong>All production data will be DELETED at a future date.</strong>
+		</div>
+		<!-- This button toggles the visibility of the the column details panel -->
+		<b:Button ui:field="columnDetailsToggleButton" icon="TH_LIST"
+			dataToggle="COLLAPSE" dataTarget="#editSchemaCollapse">Table
+			Schema</b:Button>
+		<bh:Div styleName="margin-top-15" />
+		<b:Collapse b:id="editSchemaCollapse" toggle="false">
+			<b:Panel>
+				<b:PanelBody ui:field="columnDetailsPanel" />
+			</b:Panel>
+		</b:Collapse>
 
-			<b:Alert ui:field="tableMessage" type="INFO" />
+		<b:Alert ui:field="tableMessage" type="INFO" />
+		
+		<g:SimplePanel ui:field="queryInputPanel" />
+		
+		<bh:Div styleName="margin-top-15" />
+		<g:SimplePanel ui:field="queryResultsPanel" />
 
-			<b:InputGroup ui:field="queryInputGroup" visible="true">
-				<b:TextBox ui:field="queryInput" />
-				<b:InputGroupButton>
-					<b:Button ui:field="queryButton" icon="SEARCH" type="INFO"
-						dataLoadingText="Executing...">Query</b:Button>
-				</b:InputGroupButton>
-			</b:InputGroup>
-			<b:Alert ui:field="queryResultsMessage" type="DANGER" />
-			<bh:Div styleName="margin-top-15" />
-			<g:SimplePanel ui:field="queryResultsPanel" />
-
-		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

@@ -2,14 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonToolBar;
-import org.gwtbootstrap3.client.ui.InputGroup;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelBody;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.gwt.CellTable;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -42,13 +36,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@UiField
 	Alert tableMessage;
 	@UiField
-	Alert queryResultsMessage;
-	@UiField
-	InputGroup queryInputGroup;
-	@UiField
-	TextBox queryInput;
-	@UiField
-	Button queryButton;
+	SimplePanel queryInputPanel;
 	@UiField
 	SimplePanel queryResultsPanel;
 
@@ -75,10 +63,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 		this.columnModelsWidget.configure(bundle, isEditable, this.presenter);
 	}
 
-	@Override
-	public void setQueryInputVisible(boolean visible) {
-		this.queryInputGroup.setVisible(visible);
-	}
 
 	@Override
 	public void setQueryResultsVisible(boolean visible) {
@@ -97,33 +81,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setInputQueryString(String startQuery) {
-		this.queryInput.setText(startQuery);
-	}
-
-	@Override
-	public void setQueryInputLoading(boolean loading) {
-		this.queryInput.setEnabled(!loading);
-		if (loading) {
-			this.queryButton.state().loading();
-		} else {
-			this.queryButton.state().reset();
-		}
-
-	}
-
-	@Override
-	public void setQueryMessage(AlertType type, String message) {
-		this.queryResultsMessage.setType(type);
-		this.queryResultsMessage.setText(message);
-	}
-
-	@Override
-	public void setQueryResultsMessageVisible(boolean visible) {
-		this.queryResultsMessage.setVisible(visible);
-	}
-
-	@Override
 	public void setProgressWidget(
 			AsynchronousProgressWidget asynchProgressWidget) {
 		// TODO Auto-generated method stub
@@ -139,6 +96,17 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget) {
 		this.queryResultsPanel.add(queryResultsWidget);
 		
+	}
+
+	@Override
+	public void setQueryInputWidget(QueryInputWidget queryInputWidget) {
+		this.queryInputPanel.add(queryInputWidget);
+		
+	}
+
+	@Override
+	public void setQueryInputVisible(boolean visible) {
+		this.queryInputPanel.setVisible(visible);
 	}
 
 
