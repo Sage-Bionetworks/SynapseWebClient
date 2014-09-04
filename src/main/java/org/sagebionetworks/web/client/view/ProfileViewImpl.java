@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Synapse;
-import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -266,7 +265,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget, ProfileArea initialTab) {
+	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		DisplayUtils.hide(settingsListItem);
 		//add certificate
@@ -297,11 +296,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		
 		//Teams
 		teamsTabContent.add(myTeamsWidget.asWidget());
-		
-		if (initialTab != null)
-			setTabSelected(initialTab);
-		else 
-			setTabSelected(ProfileArea.PROJECTS);
 		DisplayUtils.show(navtabContainer);
 	}
 	
@@ -547,7 +541,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 * @param targetTab
 	 * @param userSelected 
 	 */
-	private void setTabSelected(Synapse.ProfileArea targetTab) {
+	@Override
+	public void setTabSelected(Synapse.ProfileArea targetTab) {
 		// tell presenter what tab we're on only if the user clicked
 		if(targetTab == null) targetTab = Synapse.ProfileArea.PROJECTS; // select tab, set default if needed
 		hideTabContainers();
@@ -600,7 +595,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		return new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				setTabSelected(targetTab);					
+				presenter.tabClicked(targetTab);
 			}
 		};
 	}

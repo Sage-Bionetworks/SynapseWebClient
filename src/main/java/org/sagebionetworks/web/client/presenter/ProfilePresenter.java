@@ -31,11 +31,11 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -48,7 +48,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -184,7 +183,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(String passingRecordJson) {
 				try {
 					PassingRecord passingRecord = new PassingRecord(adapterFactory.createNew(passingRecordJson));
-					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget(), area);
+					view.updateView(profile, isOwner, passingRecord, profileForm.asWidget());
+					tabClicked(area);
 					proceed();
 				} catch (JSONObjectAdapterException e) {
 					onFailure(e);
@@ -192,8 +192,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof NotFoundException)
-					view.updateView(profile, isOwner, null, profileForm.asWidget(), area);
+				if (caught instanceof NotFoundException) {
+					view.updateView(profile, isOwner, null, profileForm.asWidget());
+					tabClicked(area);
+				}
 				else
 					view.showErrorMessage(caught.getMessage());
 				
@@ -539,6 +541,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return isOwner;
 	}
 
+	@Override
+	public void tabClicked(ProfileArea tab) {
+		//Project tab is default
+		final ProfileArea areaTab = tab == null ? ProfileArea.PROJECTS : tab; 
+		//if we are editing, then pop up a confirm
+		if (globalApplicationState.isEditing()) {
+			Callback yesCallback = new Callback() {
+				@Override
+				public void invoke() {
+					profileForm.rollback();
+					view.setTabSelected(areaTab);
+				}
+			};
+			DisplayUtils.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
+		} else
+			view.setTabSelected(areaTab);
+	}
+	
 	/**
 	 * Exposed for testing purposes only
 	 * @return
