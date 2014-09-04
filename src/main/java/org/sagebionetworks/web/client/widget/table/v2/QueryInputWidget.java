@@ -17,6 +17,7 @@ import com.google.inject.Inject;
  */
 public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryResultListener{
 	
+	public static final String AN_EMPTY_QUERY_IS_NOT_VALID = "An empty query is not valid.";
 	QueryInputView view;
 	SynapseClientAsync synapseClient;
 	QueryInputListener queryInputListener;
@@ -48,14 +49,22 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	@Override
 	public void onExecuteQuery() {
 		// Get the query from the view
-		final String sql = view.getInputQueryString();
+		view.setQueryInputLoading(true);
+		String sql = view.getInputQueryString();
+		validateInputQuery(sql);
+	}
+
+	/**
+	 * Validate the given query.
+	 * @param sql
+	 */
+	private void validateInputQuery(final String sql) {
 		if(sql == null || "".equals(sql.trim())){
 			view.showInputError(true);
-			view.setInputErrorMessage("An empty query is not valid.");
+			view.setInputErrorMessage(AN_EMPTY_QUERY_IS_NOT_VALID);
 		}else{
 			// validate the query
 			synapseClient.validateTableQuery(sql, new AsyncCallback<Void>() {
-				
 				@Override
 				public void onSuccess(Void result) {
 					view.showInputError(false);
@@ -64,6 +73,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 				
 				@Override
 				public void onFailure(Throwable caught) {
+					view.setQueryInputLoading(false);
 					view.showInputError(true);
 					view.setInputErrorMessage(caught.getMessage());
 				}
@@ -85,6 +95,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public void onReset() {
 		view.setInputQueryString(startQuery);
 		view.showInputError(false);
+		view.setQueryInputLoading(false);
 	}
 
 }

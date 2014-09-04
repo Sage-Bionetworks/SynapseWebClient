@@ -2,10 +2,12 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -116,9 +118,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param caught
 	 */
 	private void showError(Throwable caught){
-		String message = caught.getLocalizedMessage();
-		if(message == null || "".equals(message.trim())){
-			message = "Error with no message: "+caught.getClass().getName();
+		String message = caught.getMessage();
+		if(caught instanceof TableUnavilableException){
+			try {
+				TableStatus status = getTableStatus((TableUnavilableException) caught);
+				message = "Table status: "+status.getState().name();
+			} catch (JSONObjectAdapterException e) {
+				message = e.getMessage();
+			}
 		}
 		this.view.setTableVisible(false);
 		this.view.showError(message);
@@ -172,4 +179,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		queryResultEditor.showError(message);
 	}
 	
+	
+	private TableStatus getTableStatus(TableUnavilableException e) throws JSONObjectAdapterException{
+		return new TableStatus(adapterFactory.createNew(e.getMessage()));
+	}
 }
