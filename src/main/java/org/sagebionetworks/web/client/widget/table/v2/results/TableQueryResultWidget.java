@@ -31,7 +31,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	String startingQueryString;
 	boolean isEditable;
-	QueryResultListener queryListner;
+	QueryResultListener queryListener;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
@@ -53,7 +53,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void configure(String queryString, boolean isEditable, QueryResultListener listener){
 		this.isEditable = isEditable;
 		this.startingQueryString = queryString;
-		this.queryListner = listener;
+		this.queryListener = listener;
 		runQuery();
 	}
 
@@ -99,8 +99,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * Starting a query.
 	 */
 	private void fireStartEvent() {
-		if(this.queryListner != null){
-			this.queryListner.queryExecutionStarted();
+		if(this.queryListener != null){
+			this.queryListener.queryExecutionStarted();
 		}
 	}
 	
@@ -108,8 +108,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * Finished a query.
 	 */
 	private void fireFinishEvent() {
-		if(this.queryListner != null){
-			this.queryListner.queryExecutionFinished();
+		if(this.queryListener != null){
+			this.queryListener.queryExecutionFinished();
 		}
 	}
 	
@@ -154,7 +154,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		view.setSaveButtonLoading(true);
 		try {
 			// Extract the delta
-			PartialRowSet prs = this.queryResultEditor.extractDeleta();
+			PartialRowSet prs = this.queryResultEditor.extractDelta();
 			String json = prs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 			synapseClient.applyTableDelta(json, new AsyncCallback<Void>() {
 				

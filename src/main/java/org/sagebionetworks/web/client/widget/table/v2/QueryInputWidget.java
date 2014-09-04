@@ -51,14 +51,14 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		// Get the query from the view
 		view.setQueryInputLoading(true);
 		String sql = view.getInputQueryString();
-		validateInputQuery(sql);
+		validateAndSendQuery(sql);
 	}
 
 	/**
 	 * Validate the given query.
 	 * @param sql
 	 */
-	private void validateInputQuery(final String sql) {
+	private void validateAndSendQuery(final String sql) {
 		if(sql == null || "".equals(sql.trim())){
 			view.showInputError(true);
 			view.setInputErrorMessage(AN_EMPTY_QUERY_IS_NOT_VALID);
