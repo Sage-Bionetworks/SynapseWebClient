@@ -84,7 +84,7 @@ public class QueryResultEditorWidget implements
 	 * Extract the new RowSet to be saved.
 	 * @return
 	 */
-	public PartialRowSet extractDeleta(){
+	public PartialRowSet extractDelta(){
 		RowSet updated = new RowSet();
 		updated.setHeaders(pageWidget.extractHeaders());
 		updated.setRows(pageWidget.extractRowSet());

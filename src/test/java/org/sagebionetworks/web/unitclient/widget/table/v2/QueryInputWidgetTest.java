@@ -110,7 +110,7 @@ public class QueryInputWidgetTest {
 	}
 	
 	@Test
-	public void testOnRest(){
+	public void testOnReset(){
 		String sql = "select * from syn123";
 		widget.configure(sql, mockQueryInputListener);
 		verify(mockView).setInputQueryString(sql);
