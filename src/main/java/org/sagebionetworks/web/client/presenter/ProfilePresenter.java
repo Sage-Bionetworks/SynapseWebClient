@@ -554,7 +554,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					view.setTabSelected(areaTab);
 				}
 			};
-			DisplayUtils.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
+			view.showConfirmDialog("", DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, yesCallback);
 		} else
 			view.setTabSelected(areaTab);
 	}

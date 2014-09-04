@@ -599,4 +599,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		};
 	}
+	
+	@Override
+	public void showConfirmDialog(
+			String title, 
+			String message,
+			Callback yesCallback
+			) {
+		DisplayUtils.showConfirmDialog(title, message, yesCallback);
+	}
 }
