@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.presenter.TrashPresenter;
+import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
+import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
@@ -77,6 +78,12 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -121,8 +128,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	public ProfilePresenter getProfilePresenter();
 
-	public SettingsPresenter getSettingsPresenter();
-	
 	public ComingSoonPresenter getComingSoonPresenter();
 	
 	public ChallengeOverviewPresenter getChallengeOverviewPresenter();
@@ -142,6 +147,8 @@ public interface PortalGinInjector extends Ginjector {
 	public QuizPresenter getQuizPresenter();
 	
 	public AccountPresenter getAccountPresenter();
+	
+	public NewAccountPresenter getNewAccountPresenter();
 	
 	public ChangeUsernamePresenter getChangeUsernamePresenter();
 	
@@ -212,12 +219,20 @@ public interface PortalGinInjector extends Ginjector {
 	public VersionTimer getVersionTimer();
 	public Md5Link getMd5Link();
 	
-	// TableEntit V2
+	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditor createNewColumnModelTableRowEditor();
 	public TableEntityWidget createNewTableEntityWidget();
+	public RowWidget createRowWidget();
+	public TablePageWidget createNewTablePageWidget();
+	public QueryResultEditorWidget createNewQueryResultEditorWidget();
+	
+	// TableEntity V2 cells
+	public StringRendererCell createStringRendererCell();
+	public StringEditorCell createStringEditorCell();
+
 	
 	// Asynchronous
 	public AsynchronousProgressWidget creatNewAsynchronousProgressWidget();

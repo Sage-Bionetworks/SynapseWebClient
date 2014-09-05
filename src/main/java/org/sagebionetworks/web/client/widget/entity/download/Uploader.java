@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -78,6 +79,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
 	AuthenticationController authenticationController;
+	private ClientLogger logger;
+	
 	private ChunkedFileToken token;
 	NumberFormat percentFormat;
 	private boolean isDirectUploadSupported;
@@ -96,7 +99,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
-			AuthenticationController authenticationController
+			AuthenticationController authenticationController,
+			ClientLogger logger
 			) {
 	
 		this.view = view;		
@@ -106,6 +110,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
+		this.logger = logger;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -242,23 +247,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							new Callback() {
 								@Override
 								public void invoke() {
-									if (currIndex + 1 == fileNames.length) {
-										//uploading the last file
-										if (!fileHasBeenUploaded) {
-											//cancel the upload
-											fireCancelEvent();
-											view.resetToInitialState();
-											clearState();
-										} else {
-											//finish upload
-											view.updateProgress(.99d, "99%");
-											uploadSuccess();
-										}
-									} else {
-										//more files to upload
-										currIndex++;
-										handleUploads();
-									}
+									handleCancelledFileUpload();
 								}
 							});
 				}
@@ -271,27 +260,32 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						//there was an entity found with same parent ID and name, but
 						//it was not a File Entity.
 						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
-						if (currIndex + 1 == fileNames.length) {
-							if (!fileHasBeenUploaded) {
-								//cancel the upload
-								fireCancelEvent();
-								view.resetToInitialState();
-								clearState();
-							} else {
-								//finish upload
-								view.updateProgress(.99d, "99%");
-								uploadSuccess();
-							}
-						} else {
-							//more files to upload
-							currIndex++;
-							handleUploads();
-						}
+						handleCancelledFileUpload();
 					} else {
 						uploadError(caught.getMessage());
 					}
 				}
 			});
+		}
+	}
+	
+	private void handleCancelledFileUpload() {
+		if (currIndex + 1 == fileNames.length) {
+			//uploading the last file
+			if (!fileHasBeenUploaded) {
+				//cancel the upload
+				fireCancelEvent();
+				view.resetToInitialState();
+				clearState();
+			} else {
+				//finish upload
+				view.updateProgress(.99d, "99%");
+				uploadSuccess();
+			}
+		} else {
+			//more files to upload
+			currIndex++;
+			handleUploads();
 		}
 	}
 	
@@ -570,7 +564,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							//to new file handle id, or create new file entity with this file handle id
 							view.hideLoading();
 							refreshAfterSuccessfulUpload(entityId);
-							fileNames = null;
 						} else {
 							//more files to upload
 							currIndex++;
@@ -758,7 +751,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
-		//TODO: send full log to server logs (once service is available)
+		//send full log to server logs
+		logger.errorToRepositoryServices(uploadLog.toString());
+		//and to the console
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();
 		fireCancelEvent();

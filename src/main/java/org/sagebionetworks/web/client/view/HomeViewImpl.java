@@ -416,7 +416,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
 		ScrollPanel favoritesScrollPanel = new ScrollPanel();
 		favoritesScrollPanel.addStyleName("panel panel-default");
-		favoritesScrollPanel.setHeight("45px");		// TODO: Default height?
+		favoritesScrollPanel.setHeight("180px");
 		favoritesScrollPanel.add(favoritesTreeBrowser.asWidget());
 		myFavPanel.add(favoritesScrollPanel);
 		return myFavPanel;

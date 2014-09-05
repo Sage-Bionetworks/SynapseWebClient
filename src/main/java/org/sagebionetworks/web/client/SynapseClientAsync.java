@@ -50,7 +50,9 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-
+	
+	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
+	
 	void logInfo(String message, AsyncCallback<Void> callback);
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
@@ -311,6 +313,26 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(String tableJSON, List<String> newSchema,
 			AsyncCallback<Void> callback);
+	/**
+	 * Query for table results.
+	 * @param query
+	 * @param callback
+	 */
+	void queryTable(String query, AsyncCallback<String> callback);
+	
+	/**
+	 * Apply a PartialRowSet to a table.
+	 * @param deltaJson
+	 * @param callback
+	 */
+	void applyTableDelta(String deltaJson, AsyncCallback<Void> callback);
+	
+	/**
+	 * Validate a table query.
+	 * @param sql
+	 * @param callback
+	 */
+	void validateTableQuery(String sql, AsyncCallback<Void> callback);
 	
 	/**
 	 * Start an asynchronous job passing a job body.
@@ -346,5 +368,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
+
 
 }

@@ -267,6 +267,55 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	    return out;
 	}-*/;
 	
+	@Override
+	public void addDropZoneStyleEventHandling(String fileFieldId) {
+		_addDropZoneStyleEventHandling(fileFieldId);
+	}
+	
+	private static native void _addDropZoneStyleEventHandling(String fileFieldId) /*-{
+		$doc.addEventListener("dragover", function( event ) {
+			// Prevent default to allow drop.
+			if (event.target.id != fileFieldId)
+				event.preventDefault();
+			}, false);
+	
+		$doc.addEventListener("dragenter", function( event ) {
+				// highlight potential drop target when the draggable element enters it
+				if (event.target.id == fileFieldId) {
+					event.target.className += " dropable"
+				}
+			}, false);
+		
+		$doc.addEventListener("drop", function( event ) {
+				if (event.target.id == fileFieldId) {
+					event.target.className =
+							event.target.className.replace
+							( /(?:^|\s)dropable(?!\S)/g , '' );
+				}
+			}, false);
+		
+		$doc.addEventListener("dragleave", function( event ) {
+				if (event.target.id == fileFieldId) {
+					var rect = event.target.getBoundingClientRect();
+					if (	event.clientX < rect.left || event.clientX > rect.right ||
+							event.clientY < rect.top || event.clientY > rect.bottom) {
+						// Out of bounds of the box (not just hovering over contained "choose files" button).
+						event.target.className =
+								event.target.className.replace
+								( /(?:^|\s)dropable(?!\S)/g , '' )
+					}
+				}
+			}, false);
+		
+		$doc.addEventListener("dragend", function( event ) {
+			if (event.target.id == fileFieldId) {
+					event.target.className =
+							event.target.className.replace
+							( /(?:^|\s)dropable(?!\S)/g , '' );
+				}
+			}, false);
+	}-*/;
+	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */

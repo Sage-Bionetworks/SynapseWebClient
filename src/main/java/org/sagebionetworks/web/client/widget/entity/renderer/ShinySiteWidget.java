@@ -20,8 +20,8 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		"http://spark.rstudio.com/",
 		"https://s3.amazonaws.com/static.synapse.org/",
 		"https://belltown.fhcrc.org:9898/",
-		"https://fcommo-shinyapps.shinyapps.io",
-		"http://pipeline.rice.edu/dream9/"
+		"http://pipeline.rice.edu/dream9/",
+		"https://fredcommo.shinyapps.io/"
 		};
 	private ShinySiteWidgetView view;
 	private Map<String, String> descriptor;

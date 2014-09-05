@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 
 import com.google.gwt.core.client.GWT;
@@ -42,12 +45,13 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private Map<EntityHeader, EntityTreeItem> header2entityTreeItem;	// for removing
 	private EntityTreeItem selectedItem;
-	
+	private SageImageBundle sageImageBundle;
 
 	@Inject
-	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector, IconsImageBundle iconsImageBundle) {
+	public EntityTreeBrowserViewImpl(PortalGinInjector ginInjector, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle) {
 		this.ginInjector = ginInjector;
 		this.iconsImageBundle = iconsImageBundle;
+		this.sageImageBundle = sageImageBundle;
 		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		header2entityTreeItem = new HashMap<EntityHeader, EntityTreeItem>();
 		
@@ -82,6 +86,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 
 	@Override
 	public void showLoading() {
+		TreeItem loadingTreeItem = new TreeItem(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingTreeItem.addStyleName("entityTreeItem-font");
+		entityTree.addItem(loadingTreeItem);
 	}
 
 	@Override
@@ -98,7 +105,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements EntityTreeBr
 	}
 
 	@Override
-	public void setRootEntities(List<EntityHeader> rootEntities, boolean sort) {		// TODO: Boolean sort?
+	public void setRootEntities(List<EntityHeader> rootEntities) {
 		clear();
 		
 		if(rootEntities == null) rootEntities = new ArrayList<EntityHeader>();

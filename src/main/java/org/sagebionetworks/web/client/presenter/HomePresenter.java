@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
+import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -322,18 +323,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 				try {
 					//finally, we can tell the view to update the user challenges based on these entity headers
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
+					
 					for (String headerString : entityHeaderStrings) {
 						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
 						headers.add(header);
 					}
 					
-					//sort by name
-					Collections.sort(headers, new Comparator<EntityHeader>() {
-				        @Override
-				        public int compare(EntityHeader o1, EntityHeader o2) {
-				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-				        }
-					});
+					EntityBrowserUtils.sortEntityHeadersByName(headers);
 					
 					view.setMyChallenges(headers);
 				} catch (JSONObjectAdapterException e) {

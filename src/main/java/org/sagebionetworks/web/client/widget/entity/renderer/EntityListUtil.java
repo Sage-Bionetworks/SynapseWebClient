@@ -3,10 +3,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityGroupRecord;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
@@ -273,6 +276,4 @@ public class EntityListUtil {
 				SafeHtmlUtils.EMPTY_SAFE_HTML,
 				null, null, SafeHtmlUtils.EMPTY_SAFE_HTML, SafeHtmlUtils.EMPTY_SAFE_HTML, null, "", SafeHtmlUtils.EMPTY_SAFE_HTML);
 	}
-
-
 }

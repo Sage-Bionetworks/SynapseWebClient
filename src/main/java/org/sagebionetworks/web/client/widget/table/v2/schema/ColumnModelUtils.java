@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 
 /**
  * Utilities for working with ColumnModels
@@ -133,5 +138,46 @@ public class ColumnModelUtils {
 			}
 		}
 		return list;
+	}
+	
+	/**
+	 * Map ColumnModel IDs to the their ColumnModel.
+	 * @param schema
+	 * @return
+	 */
+	public static Map<String, ColumnModel> buildMapColumnIdtoModel(List<ColumnModel> schema){
+		Map<String, ColumnModel> map = new HashMap<String, ColumnModel>(schema.size());
+		for(ColumnModel cm: schema){
+			map.put(cm.getId(), cm);
+		}
+		return map;
+	}
+	/**
+	 * Given a list of query headers and a list of ColumnModels build up the types fro the columns in the headers.
+	 * @param headers
+	 * @param schema
+	 * @return
+	 */
+	public static List<ColumnModel> buildTypesForQueryResults(List<String> headers, List<ColumnModel> schema){
+		// If the headers are null or empty then just use the schema
+		if(headers == null || headers.isEmpty()){
+			return schema;
+		}
+		Map<String, ColumnModel> map = buildMapColumnIdtoModel(schema);
+		List<ColumnModel>  results = new ArrayList<ColumnModel>(headers.size());
+		// lookup each header
+		for(String header: headers){
+			ColumnModel cm = map.get(header);
+			if(cm == null){
+				// Aggregate functions will not have a column model. So we create a fake column for it.
+				ColumnModel aggregateColumn = new ColumnModel();
+				aggregateColumn.setName(header);
+				aggregateColumn.setColumnType(ColumnType.STRING);
+				results.add(aggregateColumn);
+			}else{
+				results.add(cm);
+			}
+		}
+		return results;
 	}
 }

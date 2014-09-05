@@ -136,11 +136,6 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 			addColumnButton.setVisible(true);
 		}
 	}
-	
-	private static native void enableDragging(String targetId)/*-{
-		$wnd.jQuery('#' + targetId).sortable();
-		$wnd.jQuery('#' + targetId).disableSelection();
-	}-*/;
 
 	@Override
 	public void addColumn(ColumnModelTableRow row) {

@@ -26,7 +26,6 @@ public class AccountPresenterTest {
 	AccountPresenter presenter;
 	AccountView mockView;
 	SynapseClientAsync mockSynapseClient;
-	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	Account place;
@@ -34,12 +33,11 @@ public class AccountPresenterTest {
 	@Before
 	public void setup(){
 		mockView = mock(AccountView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new AccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		presenter = new AccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState);
 		
 		verify(mockView).setPresenter(presenter);
 		place = Mockito.mock(Account.class);

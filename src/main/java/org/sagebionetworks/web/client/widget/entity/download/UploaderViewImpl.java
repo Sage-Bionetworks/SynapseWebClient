@@ -446,47 +446,5 @@ public class UploaderViewImpl extends LayoutContainer implements
 			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"" + FILE_FIELD_CSS_STYLE + "\">");
 	}
 	
-	public static native void _addDropZoneStyleEventHandling() /*-{
-		$doc.addEventListener("dragover", function( event ) {
-			// Prevent default to allow drop.
-			if (event.target.id != "fileToUpload")
-				event.preventDefault();
-			}, false);
-
-		$doc.addEventListener("dragenter", function( event ) {
-				// highlight potential drop target when the draggable element enters it
-				if (event.target.id == "fileToUpload") {
-					event.target.className += " dropable"
-				}
-			}, false);
-		
-		$doc.addEventListener("drop", function( event ) {
-				if (event.target.id == "fileToUpload") {
-					event.target.className =
-							event.target.className.replace
-							( /(?:^|\s)dropable(?!\S)/g , '' );
-				}
-			}, false);
-		
-		$doc.addEventListener("dragleave", function( event ) {
-				if (event.target.id == "fileToUpload") {
-					var rect = event.target.getBoundingClientRect();
-					if (	event.clientX < rect.left || event.clientX > rect.right ||
-							event.clientY < rect.top || event.clientY > rect.bottom) {
-						// Out of bounds of the box (not just hovering over contained "choose files" button).
-						event.target.className =
-								event.target.className.replace
-								( /(?:^|\s)dropable(?!\S)/g , '' )
-					}
-				}
-			}, false);
-		
-		$doc.addEventListener("dragend", function( event ) {
-			if (event.target.id == "fileToUpload") {
-					event.target.className =
-							event.target.className.replace
-							( /(?:^|\s)dropable(?!\S)/g , '' );
-				}
-			}, false);
-	}-*/;
+	
 }

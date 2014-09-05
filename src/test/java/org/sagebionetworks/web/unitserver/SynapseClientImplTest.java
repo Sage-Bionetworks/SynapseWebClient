@@ -65,6 +65,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
@@ -1534,5 +1535,12 @@ public class SynapseClientImplTest {
 		String emailAddress = "test@test.com";
 		synapseClient.setNotificationEmail(emailAddress);
 		verify(mockSynapse).setNotificationEmail(eq(emailAddress));
+	}
+	
+	@Test
+	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		String errorMessage = "error has occurred";
+		synapseClient.logErrorToRepositoryServices(errorMessage);
+		verify(mockSynapse).logError(any(LogEntry.class));
 	}
 }
