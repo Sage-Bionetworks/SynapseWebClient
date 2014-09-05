@@ -704,6 +704,10 @@ a.shortBtn {
     border-radius: 4px 0 4px 0;
 }
 
+.dropable {
+	border-color: #33ee33 !important;
+}
+
 .markdownEditor {
     font-family: Lucida Console, monospace !important;
     font-size: 13px;

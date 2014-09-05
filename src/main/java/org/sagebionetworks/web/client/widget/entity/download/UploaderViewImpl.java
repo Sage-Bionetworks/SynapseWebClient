@@ -31,6 +31,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,7 +42,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private boolean showCancelButton = true;
 	private boolean multipleFileUploads = true;
 	
+	private static final int PANEL_HEIGHT = 200;
+	private static final int PANEL_WIDTH = 790;
+	
 	public static final String FILE_FIELD_ID = "fileToUpload";
+	public static final String FILE_FIELD_CSS_STYLE = "width: " + PANEL_WIDTH / 5 * 3 + "px; padding-top: 3em; padding-bottom: 3em; border: 5px; border-style: dashed; padding-left: "+ PANEL_WIDTH / 5 +"px; margin-bottom: 10px;";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
@@ -89,6 +94,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
+		_addDropZoneStyleEventHandling();// TODO: Remove?
 	}
 		
 	@Override
@@ -162,7 +168,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public int getDisplayHeight() {
-		return isEntity ? 350 : 200;
+		return isEntity ? 425 : 200;	//TODO: Was 350 : 200
 	}
 
 	@Override
@@ -334,8 +340,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		progressBar.setVisible(false);
 	}
 		
-	private static final int PANEL_HEIGHT = 100;
-	private static final int PANEL_WIDTH = 790;
+	
 	
 	
 	private Widget createUploadPanel() {
@@ -352,6 +357,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setFieldWidth(PANEL_WIDTH-300);
 		
 		fileUploadHTML = createFileUploadHTML();
+		// TODO: consstant
+		formPanel.add(new HTML("<p>Drag & drop or choose files from your local file system:</p>"));
 		formPanel.add(fileUploadHTML);
 		
 		formPanel.layout(true);	
@@ -434,8 +441,52 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"" + FILE_FIELD_CSS_STYLE + "\" multiple>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"" + FILE_FIELD_CSS_STYLE + "\">");
 	}
+	
+	public static native void _addDropZoneStyleEventHandling() /*-{
+		$doc.addEventListener("dragover", function( event ) {
+			// Prevent default to allow drop.
+			if (event.target.id != "fileToUpload")
+				event.preventDefault();
+			}, false);
+
+		$doc.addEventListener("dragenter", function( event ) {
+				// highlight potential drop target when the draggable element enters it
+				if (event.target.id == "fileToUpload") {
+					event.target.className += " dropable"
+				}
+			}, false);
+		
+		$doc.addEventListener("drop", function( event ) {
+				if (event.target.id == "fileToUpload") {
+					event.target.className =
+							event.target.className.replace
+							( /(?:^|\s)dropable(?!\S)/g , '' );
+				}
+			}, false);
+		
+		$doc.addEventListener("dragleave", function( event ) {
+				if (event.target.id == "fileToUpload") {
+					var rect = event.target.getBoundingClientRect();
+					if (	event.clientX < rect.left || event.clientX > rect.right ||
+							event.clientY < rect.top || event.clientY > rect.bottom) {
+						// Out of bounds of the box (not just hovering over contained "choose files" button).
+						event.target.className =
+								event.target.className.replace
+								( /(?:^|\s)dropable(?!\S)/g , '' )
+					}
+				}
+			}, false);
+		
+		$doc.addEventListener("dragend", function( event ) {
+			if (event.target.id == "fileToUpload") {
+					event.target.className =
+							event.target.className.replace
+							( /(?:^|\s)dropable(?!\S)/g , '' );
+				}
+			}, false);
+	}-*/;
 }
