@@ -1,16 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -135,11 +131,9 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 * @return
 	 */
 	public String getDefaultQueryString(){
-		long pageSize = getDefaultPageSize();
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT * FROM ");
 		builder.append(this.tableId);
-		builder.append(" LIMIT ").append(pageSize).append(" OFFSET 0");
 		return builder.toString();
 	}
 	

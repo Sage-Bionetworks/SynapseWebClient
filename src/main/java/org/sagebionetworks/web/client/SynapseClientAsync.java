@@ -18,6 +18,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
@@ -291,8 +292,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount, AsyncCallback<QueryResult> callback);
-
 	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
 	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
@@ -341,10 +340,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startTableQueryAsynchJob(String queryBundleRequestJSON,
+	void startAsynchJob(AsynchType type, String bodyJSON,
 			AsyncCallback<String> callback);
 
-	void getTableQueryAsynchJob(String jobId, AsyncCallback<String> callback);
-
+	void getAsynchJobResults(AsynchType type, String jobId,
+			AsyncCallback<String> callback);
 
 }

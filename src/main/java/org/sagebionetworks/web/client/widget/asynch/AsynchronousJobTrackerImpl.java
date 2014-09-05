@@ -1,11 +1,16 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
+import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -20,55 +25,71 @@ import com.google.inject.Inject;
  */
 public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 
+	private SynapseClientAsync synapseClient;
 	private TimerProvider timerProvider;
 	private AdapterFactory adapterFactory;
-	AsynchJobRunner runner;
-	private UpdatingAsynchProgressHandler handler;
-	private OneTimeReference<AsynchronousProgressHandler> oneTimeHandler;
-	int waitTimeMS;
+	private int waitTimeMS;
+	private AsynchType type;
 	private String jobId;
+	private UpdatingAsynchProgressHandler handler;
+	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
+	private AsynchronousResponseBodyInstanceFactory bodyFactory;
 
 	@Inject
-	public AsynchronousJobTrackerImpl(TimerProvider timerProvider, AdapterFactory adapterFactory) {
+	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
+			TimerProvider timerProvider, AdapterFactory adapterFactory) {
 		super();
+		this.synapseClient = synapseClient;
 		this.timerProvider = timerProvider;
 		this.adapterFactory = adapterFactory;
+		this.bodyFactory = new AsynchronousResponseBodyInstanceFactory();
 	}
 
 	/**
 	 * Start the job then start tracking the job
 	 */
-	public void startAndTrack(final AsynchJobRunner runner, AsynchronousRequestBody request,
+	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody,
 			final int waitTimeMS, final UpdatingAsynchProgressHandler handler) {
-		this.runner = runner;
 		this.isCanceled = false;
 		this.handler = handler;
+		this.type = type;
 		/*
 		 * While update can be called many times we only want to call
 		 * onComplete(), onFailure() and onCancel() once. For example, it would
 		 * be bad to call onSuccess() if we already called onCancel(). This
 		 * helps ensure that is the case.
 		 */
-		oneTimeHandler = new OneTimeReference<AsynchronousProgressHandler>(handler);
+		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
+				handler);
 		// Start the job.
-		runner.startJob(request, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String jobId) {
-				// nothing to do if canceled.
-				if (!isCanceled) {
-					// Track the job.
-					trackJob(jobId, waitTimeMS);
-				}
-			}
+		JSONObjectAdapter adapter = adapterFactory.createNew();
+		try {
+			requestBody.writeToJSONObject(adapter);
+			String jobBodyJSON = adapter.toJSONString();
+			synapseClient.startAsynchJob(type, jobBodyJSON,
+					new AsyncCallback<String>() {
+						@Override
+						public void onSuccess(String jobId) {
+							// nothing to do if canceled.
+							if (!isCanceled) {
+								// Track the job.
+								trackJob(jobId, waitTimeMS);
+							}
+						}
 
-			@Override
-			public void onFailure(Throwable caught) {
-				if (!isCanceled) {
-					oneTimeOnFailure(caught);
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							if (!isCanceled) {
+								oneTimeOnFailure(caught);
+							}
+						}
+					});
+		} catch (JSONObjectAdapterException e) {
+			if (!isCanceled) {
+				oneTimeOnFailure(e);
 			}
-		});
+		}
 	}
 
 	/**
@@ -89,7 +110,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 				checkAndWait();
 			}
 		});
-		// There is nothing do to if the job already failed
+		// Do the first check and wait.
 		checkAndWait();
 	}
 
@@ -99,36 +120,48 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 */
 	private void checkAndWait() {
 		// Get the current status
-		runner.getJob(this.jobId, new AsyncCallback<AsynchronousResponseBody>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// This can happen if there is a real error or if the job is not ready yet.
-				if(!isCanceled){
-					if(caught instanceof ResultNotReadyException){
-						ResultNotReadyException rnre = (ResultNotReadyException) caught;
-						try {
-							AsynchronousJobStatus status = new AsynchronousJobStatus(adapterFactory.createNew(rnre.getStatusJson()));
-							handler.onUpdate(status);
-							// Start the timer if the user has not canceled
-							timerProvider.schedule(waitTimeMS);
-						} catch (JSONObjectAdapterException e) {
-							oneTimeOnFailure(e);
+		synapseClient.getAsynchJobResults(this.type, this.jobId,
+				new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String resultJSON) {
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							try {
+								// Parse the results
+								AsynchronousResponseBody response = bodyFactory.newInstance(type.getResponseClass().getName());
+								response.initializeFromJSONObject(adapterFactory.createNew(resultJSON));
+								oneTimeOnComplete(response);
+							} catch (JSONObjectAdapterException e) {
+								oneTimeOnFailure(e);
+							}
 						}
-					}else{
-						// This is a real failure
-						oneTimeOnFailure(caught);
 					}
-				}
-			}
 
-			@Override
-			public void onSuccess(AsynchronousResponseBody result) {
-				if(!isCanceled){
-					oneTimeOnComplete(result);
-				}
-			}
-		});
+					@Override
+					public void onFailure(Throwable caught) {
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							// When the job is not
+							if(caught instanceof ResultNotReadyException){
+								ResultNotReadyException rnre = (ResultNotReadyException) caught;
+								// Extract the status
+								try {
+									AsynchronousJobStatus status = new AsynchronousJobStatus(adapterFactory.createNew(rnre.getStatusJson()));
+									handler.onUpdate(status);
+									// start the timer and wait for another push
+									timerProvider.schedule(waitTimeMS);
+								} catch (JSONObjectAdapterException e) {
+									// Failed.
+									oneTimeOnFailure(caught);
+								}
+							}else{
+								// Failed.
+								oneTimeOnFailure(caught);
+							}
+						}
+
+					}
+				});
 	}
 
 	/**
@@ -148,7 +181,8 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * @param status
 	 */
 	private void oneTimeOnCancel() {
-		AsynchronousProgressHandler mightBeNull = oneTimeHandler.getReference();
+		AsynchronousProgressHandler mightBeNull = this.oneTimeReference
+				.getReference();
 		if (mightBeNull != null) {
 			mightBeNull.onCancel();
 		}
@@ -160,10 +194,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * 
 	 * @param status
 	 */
-	private void oneTimeOnComplete(AsynchronousResponseBody results) {
-		AsynchronousProgressHandler mightBeNull = oneTimeHandler.getReference();
+	private void oneTimeOnComplete(AsynchronousResponseBody response) {
+		AsynchronousProgressHandler mightBeNull = this.oneTimeReference
+				.getReference();
 		if (mightBeNull != null) {
-			mightBeNull.onComplete(results);
+			mightBeNull.onComplete(response);
 		}
 	}
 
@@ -175,9 +210,10 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * @param caught
 	 */
 	private void oneTimeOnFailure(Throwable caught) {
-		AsynchronousProgressHandler mightBeNull = oneTimeHandler.getReference();
+		AsynchronousProgressHandler mightBeNull = this.oneTimeReference
+				.getReference();
 		if (mightBeNull != null) {
-			mightBeNull.onStatusCheckFailure(caught);
+			mightBeNull.onFailure(caught);
 		}
 	}
 }

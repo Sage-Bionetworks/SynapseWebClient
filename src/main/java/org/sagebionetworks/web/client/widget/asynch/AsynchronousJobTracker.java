@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 /**
  * Abstraction for an AsynchronousJobTracker.
@@ -18,8 +19,8 @@ public interface AsynchronousJobTracker {
 	 * @param waitTimeMS
 	 * @param handler
 	 */
-	public void startAndTrack(AsynchJobRunner runner, AsynchronousRequestBody request,
-			final int waitTimeMS, final UpdatingAsynchProgressHandler handler);
+	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody, int waitTimeMS,
+			UpdatingAsynchProgressHandler handler);
 
 	/**
 	 * Call to cancel tracking the progress of a job.
