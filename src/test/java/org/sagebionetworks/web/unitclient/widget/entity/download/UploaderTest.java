@@ -81,6 +81,7 @@ public class UploaderTest {
 	GWTWrapper gwt;
 	FileEntity testEntity;
 	CancelHandler cancelHandler;
+	String parentEntityId;
 	
 	@Before
 	public void before() throws Exception {
@@ -133,20 +134,20 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createLockAccessRequirement(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).updateExternalLocationable(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(expectedEntityWrapper).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		//by default, there is no name conflict
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				jsonObjectAdapter, synapseJsniUtils,
 				gwt, authenticationController,
 				mockLogger);
 		uploader.addCancelHandler(cancelHandler);
-		String parentEntityId = "syn1234";
+		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
 	}
 	
 	@Test
 	public void testGetUploadActionUrlWithNull() {
-		String parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
 		
 		uploader.getDefaultUploadActionUrl();
@@ -222,16 +223,12 @@ public class UploaderTest {
 
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		//initialize uploader
-		uploader = new Uploader(view, nodeModelCreator,
-				synapseClient,
-				jsonObjectAdapter, synapseJsniUtils,
-				gwt, authenticationController, mockLogger);
+		uploader.setDirectUploadSupported(true);
 		uploader.addCancelHandler(cancelHandler);
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
-
+		
+		final String file1 = "file1.txt";
+		String[] fileNames = {file1};
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
 		uploader.handleUploads();
 		verify(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
 		
@@ -454,15 +451,7 @@ public class UploaderTest {
 	@Test
 	public void testMultipleFileUploads() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		
-		//initialize uploader
-		uploader = new Uploader(view, nodeModelCreator,
-				synapseClient,
-				jsonObjectAdapter, synapseJsniUtils,
-				gwt, authenticationController);
-		uploader.addCancelHandler(cancelHandler);
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
+		uploader.setDirectUploadSupported(true);
 		
 		final String file1 = "file1.txt";
 		final String file2 = "file2.txt";

@@ -2905,6 +2905,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		String queryString =  	"select * from entity where parentId == '" + parentEntityId +
 								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
 		JSONObject query = query(queryString);
+		if (query == null) {
+			throw new SynapseClientException("Query service call returned null");
+		}
 		if(!query.has("totalNumberOfResults")){
 			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");
 		}
