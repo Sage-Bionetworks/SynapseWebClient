@@ -242,23 +242,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							new Callback() {
 								@Override
 								public void invoke() {
-									if (currIndex + 1 == fileNames.length) {
-										//uploading the last file
-										if (!fileHasBeenUploaded) {
-											//cancel the upload
-											fireCancelEvent();
-											view.resetToInitialState();
-											clearState();
-										} else {
-											//finish upload
-											view.updateProgress(.99d, "99%");
-											uploadSuccess();
-										}
-									} else {
-										//more files to upload
-										currIndex++;
-										handleUploads();
-									}
+									handleCancelledFileUpload();
 								}
 							});
 				}
@@ -271,27 +255,32 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						//there was an entity found with same parent ID and name, but
 						//it was not a File Entity.
 						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
-						if (currIndex + 1 == fileNames.length) {
-							if (!fileHasBeenUploaded) {
-								//cancel the upload
-								fireCancelEvent();
-								view.resetToInitialState();
-								clearState();
-							} else {
-								//finish upload
-								view.updateProgress(.99d, "99%");
-								uploadSuccess();
-							}
-						} else {
-							//more files to upload
-							currIndex++;
-							handleUploads();
-						}
+						handleCancelledFileUpload();
 					} else {
 						uploadError(caught.getMessage());
 					}
 				}
 			});
+		}
+	}
+	
+	private void handleCancelledFileUpload() {
+		if (currIndex + 1 == fileNames.length) {
+			//uploading the last file
+			if (!fileHasBeenUploaded) {
+				//cancel the upload
+				fireCancelEvent();
+				view.resetToInitialState();
+				clearState();
+			} else {
+				//finish upload
+				view.updateProgress(.99d, "99%");
+				uploadSuccess();
+			}
+		} else {
+			//more files to upload
+			currIndex++;
+			handleUploads();
 		}
 	}
 	
@@ -570,7 +559,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							//to new file handle id, or create new file entity with this file handle id
 							view.hideLoading();
 							refreshAfterSuccessfulUpload(entityId);
-							fileNames = null;
 						} else {
 							//more files to upload
 							currIndex++;

@@ -2909,10 +2909,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 					return result.getString("entity.id");
 				} else {
 					// The found entity is not a File Entity.
-					throw new ConflictException();
+					throw new ConflictException("An non-file entity with name " + fileName + " and parentId " + parentEntityId + " already exists.");
 				}
 			} else {
-				throw new NotFoundException();
+				throw new NotFoundException("An entity with name " + fileName + " and parentId " + parentEntityId + " was not found.");
 			}
 		} catch (JSONException e) {
 			throw new SynapseClientException(e);
