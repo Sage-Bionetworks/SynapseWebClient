@@ -210,4 +210,9 @@ public class WebConstants {
 	public static final String HIGHLIGHT_BOX_TITLE = "highlight-box-title";
 	
 	public static final String JOIN_WIDGET_IS_CHALLENGE_KEY = "isChallenge";
+	
+	//query parameters
+	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
+	public static final String AND_NAME_EQUALS = "' and name == '";
+	public static final String LIMIT_ONE = "' limit 1";
 }

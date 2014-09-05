@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -145,6 +146,7 @@ import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -416,6 +418,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	/*
 	 * Private Methods
 	 */
+	
+	private JSONObject query(String query) throws SynapseException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		return synapseClient.query(query);
+	}
 
 	// Convert repo-side EntityBundle to serializable EntityBundleTransport
 	private EntityBundleTransport convertBundleToTransport(String entityId,
@@ -2883,39 +2890,47 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
+	/**
+	 * Gets the ID of the file entity with the given name whose parent has the given ID.
+	 * 
+	 * @param fileName The name of the entity to find.
+	 * @param parentEntityId The ID of the parent that the found entity must have.
+	 * @return The ID of the file entity with the given name and parent ID.
+	 * @throws NotFoundException If no file with given name and parent ID was found.
+	 * @throws ConflictException If an entity with given name and parent ID was found, but that
+	 * 							 entity was not a File Entity.
+	 */
 	@Override
-	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		String fileEntityId = null;
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
+		String queryString =  	"select * from entity where parentId == '" + parentEntityId +
+								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
+		JSONObject query = query(queryString);
+		if(!query.has("totalNumberOfResults")){
+			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");
+		}
 		try {
-			// file entity not set
-			// determine if we should create a new file entity, or update an
-			// existing.
-			if (parentEntityId != null && fileName != null) {
-				// look for a child (1 generation away) with the same file name
-				EntityIdList list = synapseClient.getDescendants(parentEntityId, 1, Integer.MAX_VALUE, null);
-				// get the EntityHeader for all children
-				List<Reference> references = new ArrayList<Reference>();
-				for (EntityId childEntityId : list.getIdList()) {
-					Reference r = new Reference();
-					r.setTargetId(childEntityId.getId());
-					references.add(r);
+			if (query.getLong("totalNumberOfResults") != 0) {
+				JSONObject result = query.getJSONArray("results").getJSONObject(0);
+				
+				// Get types associated with found entity.
+				JSONArray typeArray = result.getJSONArray("entity.concreteType");
+				Set<String> types = new HashSet<String>();
+				for (int i = 0; i < typeArray.length(); i++) {
+					types.add(typeArray.getString(i));
 				}
-				BatchResults<EntityHeader> childEntities = synapseClient.getEntityHeaderBatch(references);
-				for (EntityHeader childEntity : childEntities.getResults()) {
-					if (fileName.equals(childEntity.getName()) && FileEntity.class.getName().equals(childEntity.getType())) {
-						// found! add a new version for this file instead of
-						// creating a new file entity
-						fileEntityId = childEntity.getId();
-						break;
-					}
+				
+				if (types.contains(FileEntity.class.getName())) {
+					// The found entity is a File Entity.
+					return result.getString("entity.id");
+				} else {
+					// The found entity is not a File Entity.
+					throw new ConflictException("An non-file entity with name " + fileName + " and parentId " + parentEntityId + " already exists.");
 				}
+			} else {
+				throw new NotFoundException("An entity with name " + fileName + " and parentId " + parentEntityId + " was not found.");
 			}
-			if (fileEntityId == null)
-				throw new NotFoundException("No file entity named \"" + fileName + "\" found under the parent " + parentEntityId);
-			return fileEntityId;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
+		} catch (JSONException e) {
+			throw new SynapseClientException(e);
 		}
 	}
 	

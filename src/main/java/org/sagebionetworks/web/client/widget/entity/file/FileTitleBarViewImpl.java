@@ -45,7 +45,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
-	private Uploader locationableUploader;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -58,8 +57,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	HTMLPanel fileFoundContainer;
 	@UiField
-	HTMLPanel noFileFoundContainer;
-	@UiField
 	HTMLPanel fileNameContainer;
 	@UiField
 	Anchor entityLink;
@@ -67,8 +64,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SimplePanel md5LinkContainer;
 	@UiField
 	SimplePanel downloadButtonContainer;
-	@UiField
-	SimplePanel uploadButtonContainer;
 	@UiField
 	Image entityIcon;
 	@UiField
@@ -88,7 +83,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@Inject
 	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			Uploader locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
@@ -96,7 +90,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			FavoriteWidget favoriteWidget,
 			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
 		this.iconsImageBundle = iconsImageBundle;
-		this.locationableUploader = locationableUploader;
 		this.licensedDownloader = licensedDownloader;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
@@ -107,7 +100,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
 		entityLink.addStyleName("downloadLink link");
-		uploadButtonContainer.addStyleName("inline-block vertical-align-bottom");
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
@@ -137,48 +129,32 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
-		//configure this view based on if this entity has locations to download
-		boolean isDataWithin = FileTitleBar.isDataPossiblyWithin((FileEntity)entity);
-		noFileFoundContainer.setVisible(!isDataWithin);
-		fileFoundContainer.setVisible(isDataWithin);
-		if (isDataWithin) {
-			//add an anchor with the file name, that redirects to the download button for functionality
-			entityLink.setText(entity.getName());
-			AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
-			synapseIconForEntity.applyTo(entityIcon);
-			//fileHandle is null if user can't access the filehandle associated with this fileentity
-			FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-			boolean isFilenamePanelVisible = fileHandle != null;
-			fileNameContainer.setVisible(isFilenamePanelVisible);
-			if (isFilenamePanelVisible) {
-				//don't ask for the size if it's external, just display that this is external data
-				if (fileHandle instanceof ExternalFileHandle) {
-					fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
-					md5Link.setVisible(false);
-					fileSize.setInnerText("(External Storage)");
-				}
-				else if (fileHandle instanceof S3FileHandleInterface){
-					fileName.setInnerText(fileHandle.getFileName());
-					
-					S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-					
-					fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
-					final String md5 = s3FileHandle.getContentMd5();
-					if (md5 != null) {
-						md5Link.configure(md5);
-					} 
-				}
+		//add an anchor with the file name, that redirects to the download button for functionality
+		entityLink.setText(entity.getName());
+		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
+		synapseIconForEntity.applyTo(entityIcon);
+		//fileHandle is null if user can't access the filehandle associated with this fileentity
+		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+		boolean isFilenamePanelVisible = fileHandle != null;
+		fileNameContainer.setVisible(isFilenamePanelVisible);
+		if (isFilenamePanelVisible) {
+			//don't ask for the size if it's external, just display that this is external data
+			if (fileHandle instanceof ExternalFileHandle) {
+				fileName.setInnerText(((ExternalFileHandle) fileHandle).getExternalURL());
+				md5Link.setVisible(false);
+				fileSize.setInnerText("(External Storage)");
 			}
-		}
-		else {
-			uploadButtonContainer.clear();
-			if (canEdit)
-				uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
-					@Override
-					public void onPersistSuccess(EntityUpdatedEvent event) {
-						presenter.fireEntityUpdatedEvent();
-					}
-				}));
+			else if (fileHandle instanceof S3FileHandleInterface){
+				fileName.setInnerText(fileHandle.getFileName());
+				
+				S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
+				
+				fileSize.setInnerText("("+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true) + " - Synapse Storage)");
+				final String md5 = s3FileHandle.getContentMd5();
+				if (md5 != null) {
+					md5Link.configure(md5);
+				} 
+			}
 		}
 		
 		// Configure the button

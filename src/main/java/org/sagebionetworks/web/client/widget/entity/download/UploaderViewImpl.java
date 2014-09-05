@@ -37,13 +37,14 @@ import com.google.inject.Inject;
 
 public class UploaderViewImpl extends LayoutContainer implements
 		UploaderView {
-
+	
 	private boolean showCancelButton = true;
+	private boolean multipleFileUploads = true;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
-	
+
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
@@ -61,9 +62,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private Button cancelBtn; 
 	private ProgressBar progressBar;
 	// external link panel
-	private String fileName;
 	
 	private HTML spinningProgressContainer;
+	private HTML fileUploadHTML;
 	
 	LayoutContainer container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
@@ -88,6 +89,22 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
+	}
+		
+	@Override
+	public void resetToInitialState() {
+		hideLoading();
+		uploadBtn.setEnabled(true);
+		
+		// Clear previously selected files.
+		fileUploadHTML.setHTML(createFileUploadHTML().toString());
+	}
+	
+	@Override
+	public void showNoFilesSelectedForUpload() {
+		showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
+		hideLoading();
+		resetToInitialState();
 	}
 
 	@Override
@@ -179,6 +196,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.submit();	
 	}
 	
+	@Override
+	public void disableMultipleFileUploads() {
+		this.multipleFileUploads = false;
+		fileUploadHTML.setHTML(createFileUploadHTML().toString());
+	}
+	
 
 	/*
 	 * Private Methods
@@ -192,7 +215,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
 		container.setLayout(new FlowLayout());
-				
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		if (isEntity) {
 			TabPanel tabPanel = new TabPanel();
@@ -328,25 +350,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setAutoWidth(false);
 		formPanel.setWidth(PANEL_WIDTH-170);
 		formPanel.setFieldWidth(PANEL_WIDTH-300);
-
-		fileUploadField.setWidth(PANEL_WIDTH-300);
-		fileUploadField.setAllowBlank(false);
-		fileUploadField.setName("file");
-		fileUploadField.setFieldLabel("File");
-		fileUploadField.addListener(Events.OnChange, new Listener<BaseEvent>() {
-			@Override
-			public void handleEvent(BaseEvent be) {
-				if(fileUploadField.getValue() == null) return;
-				final String fullPath = fileUploadField.getValue();
-				final int lastIndex = fullPath.lastIndexOf('\\');
-				fileName = fullPath.substring(lastIndex + 1);
-				fileUploadField.setValue(fileName);
-				fileUploadField.getFileInput().setId(FILE_FIELD_ID);
-				uploadBtn.setEnabled(true);
-			}
-		});
-		formPanel.add(fileUploadField);
-		formPanel.layout(true);		
+		
+		fileUploadHTML = createFileUploadHTML();
+		formPanel.add(fileUploadHTML);
+		
+		formPanel.layout(true);	
 		
 		configureUploadButton(); // upload tab first by default
 		
@@ -402,7 +410,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 				}
 				uploadBtn.setEnabled(false);
 				initializeProgress();
-				presenter.handleUpload(fileName);
+				presenter.handleUploads();
 			}
 		};
 		uploadBtn.addSelectionListener(uploadListener);
@@ -421,5 +429,13 @@ public class UploaderViewImpl extends LayoutContainer implements
 				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 			}
 		});
+	}
+	
+	
+	private HTML createFileUploadHTML() {
+		if (multipleFileUploads)
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\" multiple>");
+		else
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\">");
 	}
 }
