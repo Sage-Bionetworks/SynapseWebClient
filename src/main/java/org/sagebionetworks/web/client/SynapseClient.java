@@ -395,13 +395,6 @@ public interface SynapseClient extends RemoteService {
 	 * @param sql
 	 */
 	public void validateTableQuery(String sql) throws RestServiceException;
-	/**
-	 * Execute the given query against a table.
-	 * @param query
-	 * @return The json for QueryResultBundle.
-	 * @throws RestServiceException 
-	 */
-	public String queryTable(String query) throws RestServiceException;
 	
 	/**
 	 * Apply PartialRowSet to a table entity.
@@ -412,20 +405,18 @@ public interface SynapseClient extends RemoteService {
 	public void applyTableDelta(String deltaJson) throws RestServiceException;
 	
 	/**
-	 * Start an Asynchronous job with the provided body.
-	 * @param The JSON of the AsynchronousRequestBody
-	 * @return The JSON of the AsynchronousJobStatus
-	 * @throws RestServiceException 
+	 * Start an asynchronous job to run a table query.
+	 * 
+	 * @param queryBundleRequestJSON The JSON of the QueryBundleRequest
+	 * @return The JobId.
 	 */
-	public String startAsynchJob(String jobBodyJSON) throws RestServiceException;
+	public String startTableQueryAsynchJob(String queryBundleRequestJSON);
 	
 	/**
-	 * Get the status of a running asynchronous job.
+	 * Get the results of a table query asynchronous job.
 	 * @param jobId The ID of the job.
-	 * @return The JSON of the AsynchronousJobStatus
-	 * @throws RestServiceException
+	 * @return The JSON of the resulting QueryResultBundle
 	 */
-	public String getAsynchJobStatus(String jobId) throws RestServiceException;
+	public String getTableQueryAsynchJob(String jobId);
 	
-	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
 }

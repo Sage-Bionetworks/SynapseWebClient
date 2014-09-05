@@ -313,12 +313,6 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(String tableJSON, List<String> newSchema,
 			AsyncCallback<Void> callback);
-	/**
-	 * Query for table results.
-	 * @param query
-	 * @param callback
-	 */
-	void queryTable(String query, AsyncCallback<String> callback);
 	
 	/**
 	 * Apply a PartialRowSet to a table.
@@ -333,28 +327,6 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-	
-	/**
-	 * Start an asynchronous job passing a job body.
-	 * 
-	 * @param query
-	 * @param callback
-	 */
-	void startAsynchJob(String jobBodyJSON, AsyncCallback<String> callback);
-
-	/**
-	 * Get the status of an asynchronous job.
-	 * @param jobId
-	 * @param callback
-	 */
-	void getAsynchJobStatus(String jobId, AsyncCallback<String> callback);
-	
-	/**
-	 * After an asynchronous query job completes use this to get the query results.
-	 * @param jobId
-	 * @param callback
-	 */
-	void getAsychQueryResult(String jobId, String queryString, AsyncCallback<String> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
@@ -368,6 +340,11 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
+
+	void startTableQueryAsynchJob(String queryBundleRequestJSON,
+			AsyncCallback<String> callback);
+
+	void getTableQueryAsynchJob(String jobId, AsyncCallback<String> callback);
 
 
 }
