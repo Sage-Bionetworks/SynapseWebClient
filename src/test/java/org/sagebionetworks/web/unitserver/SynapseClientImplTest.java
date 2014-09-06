@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -994,6 +995,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).createEntity(any(FileEntity.class));
 	}
 	
+	@Ignore
 	@Test
 	public void testGetFileEntityIdWithSameName() throws JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity testFileEntity = getTestFileEntity();
