@@ -374,101 +374,101 @@ public class SimpleTableWidget implements SimpleTableWidgetView.Presenter, Widge
 	private void executeQuery(final String queryString, QueryDetails modifyingQueryDetails, final AsyncCallback<RowSet> updateCallback) {
 		final boolean getTotalRowCount = updateCallback == null;
 		// Execute Query String		
-		synapseClient.executeTableQuery(queryString, modifyingQueryDetails, getTotalRowCount, new AsyncCallback<QueryResult>() {
-			@Override
-			public void onSuccess(QueryResult queryResult) {
-				try {
-					// for both new and update queries
-					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
-					currentQuery = queryResult.getExecutedQuery();
-					currentEtag = rowset.getEtag();
-					if(!isFirstDefault && queryChangeHandler != null) queryChangeHandler.onQueryChange(currentQuery);
-					else isFirstDefault = false;
-
-					if(updateCallback != null) {
-						// update query
-						updateCallback.onSuccess(rowset);
-						view.setQuery(currentQuery);
-					} else {
-						// new query
-						currentTotalRowCount = queryResult.getTotalRowCount() == null ? 0 : queryResult.getTotalRowCount();						
-						QueryDetails queryDetails = queryResult.getQueryDetails();
-						
-						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
-						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
-
-						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();
-						List<String> tableColIds = TableUtils.extractHeaders(tableColumns);
-						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
-							// if headers are empty (no results) add table columns						
-							if(tableColumns == null) tableColumns = new ArrayList<ColumnModel>();
-							currentHeaders = tableColIds;
-							displayColumns.addAll(tableColumns); 
-						} else {
-							currentHeaders = rowset.getHeaders();
-							// first add table columns from rowset *in order*
-							for(ColumnModel col : tableColumns) {
-								if(rowset.getHeaders().contains(col.getId())) displayColumns.add(col); 
-							}
-							// then grab any remaining derived columns
-							for(String resultColumnId : rowset.getHeaders()) {
-								if(idToCol.containsKey(resultColumnId)) continue; // skip tableColumns
-								ColumnModel col = TableUtils.wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
-								if(col != null) displayColumns.add(col);
-							}							
-						}
-						
-						// send to view
-						view.createNewTable(bundle, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails, queryChangeHandler);						
-					}
-				} catch (JSONObjectAdapterException e1) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}																		
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof TableUnavilableException) {
-					handleTableUnavailableException(caught);
-				} else if(caught instanceof BadRequestException) {
-						view.showQueryProblem(caught.getMessage());
-				} else {
-					if(updateCallback != null) updateCallback.onFailure(caught);
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY + ": " + caught.getMessage());
-				}
-			}
-		});
+//		synapseClient.executeTableQuery(queryString, modifyingQueryDetails, getTotalRowCount, new AsyncCallback<QueryResult>() {
+//			@Override
+//			public void onSuccess(QueryResult queryResult) {
+//				try {
+//					// for both new and update queries
+//					final RowSet rowset = new RowSet(adapterFactory.createNew(queryResult.getRowSetJson()));
+//					currentQuery = queryResult.getExecutedQuery();
+//					currentEtag = rowset.getEtag();
+//					if(!isFirstDefault && queryChangeHandler != null) queryChangeHandler.onQueryChange(currentQuery);
+//					else isFirstDefault = false;
+//
+//					if(updateCallback != null) {
+//						// update query
+//						updateCallback.onSuccess(rowset);
+//						view.setQuery(currentQuery);
+//					} else {
+//						// new query
+//						currentTotalRowCount = queryResult.getTotalRowCount() == null ? 0 : queryResult.getTotalRowCount();						
+//						QueryDetails queryDetails = queryResult.getQueryDetails();
+//						
+//						final Map<String,ColumnModel> idToCol = new HashMap<String, ColumnModel>();
+//						for(ColumnModel col : tableColumns) idToCol.put(col.getId(), col);
+//
+//						final List<ColumnModel> displayColumns = new ArrayList<ColumnModel>();
+//						List<String> tableColIds = TableUtils.extractHeaders(tableColumns);
+//						if(rowset.getHeaders() == null || rowset.getHeaders().size() == 0) {
+//							// if headers are empty (no results) add table columns						
+//							if(tableColumns == null) tableColumns = new ArrayList<ColumnModel>();
+//							currentHeaders = tableColIds;
+//							displayColumns.addAll(tableColumns); 
+//						} else {
+//							currentHeaders = rowset.getHeaders();
+//							// first add table columns from rowset *in order*
+//							for(ColumnModel col : tableColumns) {
+//								if(rowset.getHeaders().contains(col.getId())) displayColumns.add(col); 
+//							}
+//							// then grab any remaining derived columns
+//							for(String resultColumnId : rowset.getHeaders()) {
+//								if(idToCol.containsKey(resultColumnId)) continue; // skip tableColumns
+//								ColumnModel col = TableUtils.wrapDerivedColumnIfNeeded(idToCol, resultColumnId);
+//								if(col != null) displayColumns.add(col);
+//							}							
+//						}
+//						
+//						// send to view
+//						view.createNewTable(bundle, rowset, currentTotalRowCount, canEdit, currentQuery, queryDetails, queryChangeHandler);						
+//					}
+//				} catch (JSONObjectAdapterException e1) {
+//					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+//				}																		
+//			}
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				if(caught instanceof TableUnavilableException) {
+//					handleTableUnavailableException(caught);
+//				} else if(caught instanceof BadRequestException) {
+//						view.showQueryProblem(caught.getMessage());
+//				} else {
+//					if(updateCallback != null) updateCallback.onFailure(caught);
+//					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY + ": " + caught.getMessage());
+//				}
+//			}
+//		});
 	}
 	
 	/**
 	 * Not fundamentally different from executeQuery, just different process logic
 	 */
 	private void executeRowQuery(TableRowHeader rowHeader) {
-		String query = getDefaultRowQuery(rowHeader);
-		synapseClient.executeTableQuery(query, null, false, new AsyncCallback<QueryResult>() {
-			@Override
-			public void onSuccess(QueryResult result) {
-				RowSet rowset;
-				try {
-					rowset = new RowSet(adapterFactory.createNew(result.getRowSetJson()));
-					// send to view
-					view.createRowView(tableColumns, rowset);						
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(caught instanceof TableUnavilableException) {
-					handleTableUnavailableException(caught);
-				} else if(caught instanceof BadRequestException) {
-						view.showQueryProblem(caught.getMessage());
-				} else {					
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
-				}
-				
-			}
-		});
+//		String query = getDefaultRowQuery(rowHeader);
+//		synapseClient.executeTableQuery(query, null, false, new AsyncCallback<QueryResult>() {
+//			@Override
+//			public void onSuccess(QueryResult result) {
+//				RowSet rowset;
+//				try {
+//					rowset = new RowSet(adapterFactory.createNew(result.getRowSetJson()));
+//					// send to view
+//					view.createRowView(tableColumns, rowset);						
+//				} catch (JSONObjectAdapterException e) {
+//					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+//				}
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				if(caught instanceof TableUnavilableException) {
+//					handleTableUnavailableException(caught);
+//				} else if(caught instanceof BadRequestException) {
+//						view.showQueryProblem(caught.getMessage());
+//				} else {					
+//					view.showErrorMessage(DisplayConstants.ERROR_LOADING_QUERY_PLEASE_RETRY);
+//				}
+//				
+//			}
+//		});
 	}
 	
 	private void handleTableUnavailableException(Throwable caught) {
