@@ -472,8 +472,8 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb
-						.getAccessRequirements()));
+				List<AccessRequirement> downloadARs = filterAccessRequirements(eb.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD); 
+				ebt.setAccessRequirementsJson(createJSONStringFromArray(downloadARs));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb
