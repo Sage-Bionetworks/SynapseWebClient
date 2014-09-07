@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.SynapsePresenter;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -26,7 +27,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	/**
 	 * Renders the view for a given presenter
 	 */
-	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView, ProfileArea initialTab);
+	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
 	void refreshHeader();
 	void setProjects(List<EntityHeader> myProjects);
 	void setProjectsError(String string);
@@ -39,6 +40,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeamNotificationCount(String count);
 	void clearTeamNotificationCount();
 	void refreshTeamInvites();
+	void setTabSelected(ProfileArea areaTab);
+	void showConfirmDialog(String title, String message, Callback yesCallback);
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -49,5 +52,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateArea(ProfileArea area);
 		void updateTeamInvites(List<MembershipInvitationBundle> invites);
 		void addMembershipRequests(int count);
+		void tabClicked(ProfileArea areaTab);
 	}
 }
