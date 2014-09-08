@@ -714,6 +714,13 @@ a.shortBtn {
     border-radius: 4px 0 4px 0;
 }
 
+.dragAndDropUploadBox {
+	width: 475px;
+	padding: 3em 0 3em 40px;
+	border: 5px dashed;
+	margin-bottom: 10px;
+}
+
 .dropable {
 	border-color: #33ee33 !important;
 }

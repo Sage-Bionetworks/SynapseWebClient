@@ -112,6 +112,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.authenticationController = authenticationController;
 		this.logger = logger;
 		view.setPresenter(this);
+		synapseJsniUtils.addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_ID);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
 		uploadLog = new StringBuilder();

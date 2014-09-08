@@ -46,7 +46,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private static final int PANEL_WIDTH = 790;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
-	public static final String FILE_FIELD_CSS_STYLE = "width: " + PANEL_WIDTH / 5 * 3 + "px; padding-top: 3em; padding-bottom: 3em; border: 5px; border-style: dashed; padding-left: "+ PANEL_WIDTH / 5 +"px; margin-bottom: 10px;";
+	//public static final String FILE_FIELD_CSS_STYLENAME = "width: " + PANEL_WIDTH / 5 * 3 + "px; padding-top: 3em; padding-bottom: 3em; border: 5px; border-style: dashed; padding-left: "+ PANEL_WIDTH / 5 +"px; margin-bottom: 10px;";
+	public static final String FILE_FIELD_CSS_STYLENAME = "dragAndDropUploadBox";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
@@ -94,7 +95,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
-		_addDropZoneStyleEventHandling();// TODO: Remove?
 	}
 		
 	@Override
@@ -441,9 +441,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"" + FILE_FIELD_CSS_STYLE + "\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_CSS_STYLENAME + "\" multiple>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"" + FILE_FIELD_CSS_STYLE + "\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_CSS_STYLENAME + "\">");
 	}
 	
 	
