@@ -476,8 +476,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
-				List<AccessRequirement> downloadARs = filterAccessRequirements(eb.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD); 
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(downloadARs));
+				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb
@@ -1338,7 +1337,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						.getAccessRequirements(subjectId);
 			// filter to the targetAccessType
 			if (targetAccessType != null) {
-				List<AccessRequirement> filteredResults = filterAccessRequirements(
+				List<AccessRequirement> filteredResults = AccessRequirementsTransport.filterAccessRequirements(
 						accessRequirements.getResults(), targetAccessType);
 				accessRequirements.setResults(filteredResults);
 				accessRequirements.setTotalNumberOfResults(filteredResults
@@ -1353,19 +1352,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-
-	public List<AccessRequirement> filterAccessRequirements(
-			List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
-		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
-		if (unfilteredList != null) {
-			for (AccessRequirement accessRequirement : unfilteredList) {
-				if (filter.equals(accessRequirement.getAccessType())) {
-					filteredAccessRequirements.add(accessRequirement);
-				}
-			}
-		}
-		return filteredAccessRequirements;
 	}
 
 	@Override
