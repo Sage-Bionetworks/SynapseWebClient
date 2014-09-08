@@ -107,7 +107,7 @@ public class TableEntityWidgetTest {
 	public void testDefaultQueryString(){
 		tableBundle.setMaxRowsPerPage(4L);
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
-		String expected = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
+		String expected = "SELECT * FROM "+tableEntity.getId();
 		assertEquals(expected, widget.getDefaultQueryString());
 	}
 	

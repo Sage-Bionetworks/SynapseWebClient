@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.asynch;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,29 +47,29 @@ public class AsynchronousProgressWidget implements
 	 * @param startMessage
 	 * @param statusToTrack
 	 */
-	public void configure(String title, AsynchronousRequestBody requestBody,
+	public void configure(String title, AsynchType type, AsynchronousRequestBody requestBody,
 			final AsynchronousProgressHandler handler) {
 		view.setTitle(title);
 		// Configure this job
-		jobTracker.startAndTrack(requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
+		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
 					@Override
-					public void onStatusCheckFailure(Throwable failure) {
-						handler.onStatusCheckFailure(failure);
+					public void onFailure(Throwable failure) {
+						handler.onFailure(failure);
 					}
 
 					@Override
-					public void onComplete(AsynchronousJobStatus status) {
-						handler.onComplete(status);
-					}
-
-					@Override
-					public void onCancel(AsynchronousJobStatus status) {
-						handler.onCancel(status);
+					public void onCancel() {
+						handler.onCancel();
 					}
 
 					@Override
 					public void onUpdate(AsynchronousJobStatus status) {
 						setCurrentStatus(status);
+					}
+
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						handler.onComplete(response);
 					}
 				});
 	}

@@ -21,7 +21,9 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
@@ -363,8 +365,6 @@ public interface SynapseClient extends RemoteService {
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
-		
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException;
 	
 	public String sendRowsToTable(String rowSet) throws RestServiceException;
 	
@@ -395,13 +395,6 @@ public interface SynapseClient extends RemoteService {
 	 * @param sql
 	 */
 	public void validateTableQuery(String sql) throws RestServiceException;
-	/**
-	 * Execute the given query against a table.
-	 * @param query
-	 * @return The json for QueryResultBundle.
-	 * @throws RestServiceException 
-	 */
-	public String queryTable(String query) throws RestServiceException;
 	
 	/**
 	 * Apply PartialRowSet to a table entity.
@@ -412,20 +405,23 @@ public interface SynapseClient extends RemoteService {
 	public void applyTableDelta(String deltaJson) throws RestServiceException;
 	
 	/**
-	 * Start an Asynchronous job with the provided body.
-	 * @param The JSON of the AsynchronousRequestBody
-	 * @return The JSON of the AsynchronousJobStatus
-	 * @throws RestServiceException 
-	 */
-	public String startAsynchJob(String jobBodyJSON) throws RestServiceException;
-	
-	/**
-	 * Get the status of a running asynchronous job.
-	 * @param jobId The ID of the job.
-	 * @return The JSON of the AsynchronousJobStatus
+	 * Start a new Asynchronous job of a the given type with the provided request JSON.
+	 * @param type The type of job to run.
+	 * @param bodyJSON The JSON of the AsynchronousRequestBody.
+	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getAsynchJobStatus(String jobId) throws RestServiceException;
+	public String startAsynchJob(AsynchType type, String bodyJSON) throws RestServiceException;
 	
-	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException;
+	/**
+	 * Get the results of an Asynchronous job identified by the provided jobId.
+	 * @param type
+	 * @param jobId
+	 * @return
+	 * @throws RestServiceException
+	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
+	 * is of type AsynchronousJobStatus.
+	 */
+	public String getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
+	
 }

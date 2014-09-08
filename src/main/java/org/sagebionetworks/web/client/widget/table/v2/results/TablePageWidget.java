@@ -47,16 +47,16 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	public void configure(QueryResultBundle bundle, boolean isEditable, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
 		// Map the columns to types
-		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResults().getHeaders(), bundle.getSelectColumns());
+		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
 		// setup the headers from the types
 		List<String> headers = new ArrayList<String>();
 		for (ColumnModel type: types) {
 			headers.add(type.getName());
 		}
 		view.setTableHeaders(headers);
-		rows = new ArrayList<RowWidget>(bundle.getQueryResults().getRows().size());
+		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table
-		for(Row row: bundle.getQueryResults().getRows()){
+		for(Row row: bundle.getQueryResult().getQueryResults().getRows()){
 			// Create the row 
 			addRow(row, isEditable);
 		}

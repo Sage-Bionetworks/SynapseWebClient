@@ -32,10 +32,14 @@ public interface ProfileFormView extends IsWidget, SynapseView {
 	void showInvalidUrlUi();
 	void showInvalidUsernameUi();
 	
+	void setIsDataModified(boolean isEditing);
+	
 	public interface Presenter extends SynapsePresenter {
 
 		void updateProfile(String firstName, String lastName,String summary, String position, String location, String industry, String company, String email, AttachmentData pic, String teamName, String url, String userName);
 		void redirectToLinkedIn();
 		void rollback();
+		void startEditing();
+		void stopEditing();
 	}
 }

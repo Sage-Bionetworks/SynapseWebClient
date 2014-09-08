@@ -31,10 +31,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.Submission;
@@ -77,6 +79,7 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.repo.model.attachment.PresignedUrl;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -105,7 +108,6 @@ import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -145,11 +147,13 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -3361,65 +3365,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	private static long sequence = 0;
 
-	@Override
-	public QueryResult executeTableQuery(String query,
-			QueryDetails modifyingQueryDetails, boolean includeTotalRowCount)
-			throws RestServiceException {
-		if (query == null)
-			throw new BadRequestException("query must be defined");
-
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		// modify query with QueryDetails if requested
-		String executedQuery;
-		if (modifyingQueryDetails != null)
-			executedQuery = ServiceUtils.modifyQuery(query,
-					modifyingQueryDetails);
-		else
-			executedQuery = query;
-
-		// Extract QueryDetails from executed Query
-		QueryDetails queryDetails = ServiceUtils
-				.extractQueryDetails(executedQuery);
-
-		// Get total row count if requested
-		Integer totalRowCount = null;
-		if (includeTotalRowCount) {
-			try {
-				RowSet countSet = synapseClient.queryTableEntity(executedQuery,
-						true, true);
-				if (countSet != null && countSet.getRows() != null
-						&& countSet.getRows().size() > 0
-						&& countSet.getRows().get(0).getValues() != null
-						&& countSet.getRows().get(0).getValues().size() > 0) {
-					totalRowCount = Integer.parseInt(countSet.getRows().get(0)
-							.getValues().get(0));
-				}
-			} catch (SynapseTableUnavailableException e) {
-				handleTableUnavailableException(e);
-			} catch (SynapseException e) {
-				logError(e.getMessage());
-				throw ExceptionUtil.convertSynapseException(e);
-			} catch (NumberFormatException e) {
-				// do nothing
-			}
-		}
-
-		// Execute Query
-		String json = null;
-		try {
-			RowSet rs = synapseClient.queryTableEntity(executedQuery);
-			json = rs.writeToJSONObject(adapterFactory.createNew())
-					.toJSONString();
-		} catch (SynapseTableUnavailableException e) {
-			handleTableUnavailableException(e);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-
-		return new QueryResult(json, executedQuery, queryDetails, totalRowCount);
-	}
 
 	private void handleTableUnavailableException(
 			SynapseTableUnavailableException e) throws TableUnavilableException {
@@ -3625,25 +3570,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String queryTable(String query) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			QueryResultBundle result = synapseClient.queryTableEntityBundle(query, true, 0x15);
-			return EntityFactory.createJSONStringForEntity(result);
-		} catch (SynapseTableUnavailableException e){
-			try {
-				throw new TableUnavilableException(EntityFactory.createJSONStringForEntity(e.getStatus()));
-			} catch (JSONObjectAdapterException e1) {
-				throw new UnknownErrorException(e.getMessage());
-			}
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-	
-	@Override
 	public void applyTableDelta(String json) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
@@ -3664,14 +3590,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new TableQueryParseException(e.getMessage());
 		}
 	}
-
+	
 	@Override
-	public String startAsynchJob(String bodyJSON) throws RestServiceException {
+	public String startAsynchJob(AsynchType type, String bodyJSON)
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			AsynchronousRequestBody body = EntityFactory.createEntityFromJSONString(bodyJSON, AsynchronousRequestBody.class);
-			AsynchronousJobStatus status = synapseClient.startAsynchronousJob(body);
-			return EntityFactory.createJSONStringForEntity(status);
+			AsynchronousRequestBody body = EntityFactory.createEntityFromJSONString(bodyJSON, type.getRequestClass());
+			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {
@@ -3680,31 +3606,21 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getAsynchJobStatus(String jobId) throws RestServiceException {
+	public String getAsynchJobResults(AsynchType type, String jobId)
+			throws RestServiceException, ResultNotReadyException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			AsynchronousJobStatus status = synapseClient.getAsynchronousJobStatus(jobId);
-			return EntityFactory.createJSONStringForEntity(status);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	@Override
-	public String getAsychQueryResult(String jobId, String queryString) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			AsynchronousJobStatus status = synapseClient.getAsynchronousJobStatus(jobId);
-			if(!AsynchJobState.COMPLETE.equals(status.getJobState())){
-				throw new SynapseClientException("Can only get query results from a completed job.");
+			AsynchronousResponseBody response = synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId);
+			return EntityFactory.createJSONStringForEntity(response);
+		} catch (SynapseResultNotReadyException e){
+			// This occurs when the job is not ready.
+			try {
+				String statusJSON = EntityFactory.createJSONStringForEntity(e.getJobStatus());
+				// Re-throw the ResultNotReadyException with the status JSON.
+				throw new ResultNotReadyException(statusJSON);
+			} catch (JSONObjectAdapterException e1) {
+				throw new UnknownErrorException(e.getMessage());
 			}
-			AsynchDownloadFromTableResponseBody body = (AsynchDownloadFromTableResponseBody) status.getRequestBody();
-			// This is a temporary hack until we have the actual service.
-			// Once the service is ready we will get all data from the service.
-			QueryResultBundle bundle = synapseClient.queryTableEntityBundle(queryString, true, 0x15);
-			return  EntityFactory.createJSONStringForEntity(bundle);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} catch (JSONObjectAdapterException e) {

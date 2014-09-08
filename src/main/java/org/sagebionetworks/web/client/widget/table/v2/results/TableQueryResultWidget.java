@@ -1,12 +1,18 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
+import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,6 +38,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	String startingQueryString;
 	boolean isEditable;
 	QueryResultListener queryListener;
+	AsynchronousProgressWidget progressWidget;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
@@ -39,9 +46,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
+		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.adapterFactory = adapterFactory;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
+		this.view.setProgressWidget(this.progressWidget);
 	}
 	
 	/**
@@ -62,22 +71,36 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setToolbarVisible(false);
 		fireStartEvent();
-		// Run the query
-		this.synapseClient.queryTable(this.startingQueryString, new AsyncCallback<String>() {
+		this.view.setTableVisible(false);
+		this.view.setProgressWidgetVisible(true);
+		// run the job
+		QueryBundleRequest qbr = new QueryBundleRequest();
+		qbr.setPartMask(new Long(0x15));
+		Query query = new Query();
+		qbr.setQuery(query);
+		query.setIsConsistent(true);
+		query.setSql(this.startingQueryString);
+		query.setLimit(15L);
+		query.setOffset(0L);
+		this.progressWidget.configure("Running query...", AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			
 			@Override
-			public void onSuccess(String json) {
-				try {
-					QueryResultBundle bundle = new QueryResultBundle(adapterFactory.createNew(json));
-					setQueryResults(bundle);
-				} catch (JSONObjectAdapterException e) {
-					showError(e);
-				}
+			public void onFailure(Throwable failure) {
+				showError(failure);
+				
 			}
+			
 			@Override
-			public void onFailure(Throwable caught) {
-				showError(caught);
+			public void onComplete(AsynchronousResponseBody response) {
+				setQueryResults((QueryResultBundle) response);
+			}
+			
+			@Override
+			public void onCancel() {
+				showError("Query canceled");
 			}
 		});
+
 	}
 	
 	/**
@@ -87,6 +110,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void setQueryResults(QueryResultBundle bundle){
 		this.bundle = bundle;
 		this.view.setErrorVisible(false);
+		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, false, null);
 		this.view.setTableVisible(true);
@@ -119,18 +143,20 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 */
 	private void showError(Throwable caught){
 		String message = caught.getMessage();
-		if(caught instanceof TableUnavilableException){
-			try {
-				TableStatus status = getTableStatus((TableUnavilableException) caught);
-				message = "Table status: "+status.getState().name();
-			} catch (JSONObjectAdapterException e) {
-				message = e.getMessage();
-			}
-		}
+		showError(message);
+	}
+	
+	/**
+	 * Show an error message.
+	 * @param message
+	 */
+	private void showError(String message){
 		this.view.setTableVisible(false);
 		this.view.showError(message);
-		this.view.setErrorVisible(true);
+		this.view.setToolbarVisible(false);
+		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent();
+		this.view.setErrorVisible(true);
 	}
 
 	@Override
