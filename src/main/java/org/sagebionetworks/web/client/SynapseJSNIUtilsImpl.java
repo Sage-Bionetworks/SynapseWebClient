@@ -295,9 +295,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		
 		$doc.addEventListener("dragleave", function( event ) {
 				if (event.target.id == fileFieldId) {
+					var epsilon_divisor = 30;	// For dragleave events called "inside" box due to border radius.
+					var epsilonX = event.target.offsetWidth / epsilon_divisor;
+					var epsilonY = event.target.offsetHeight / epsilon_divisor;
+					
 					var rect = event.target.getBoundingClientRect();
-					if (	event.clientX <= rect.left || event.clientX >= rect.right ||
-							event.clientY <= rect.top || event.clientY >= rect.bottom	) {
+					if (	event.clientX <= rect.left + epsilonX || event.clientX >= rect.right - epsilonX ||
+							event.clientY <= rect.top + epsilonY || event.clientY >= rect.bottom - epsilonY	) {
 						// Out of bounds of the box (not just hovering over contained "choose files" button).
 						event.target.className = event.target.className.replace(dropStyleName, '');
 					}

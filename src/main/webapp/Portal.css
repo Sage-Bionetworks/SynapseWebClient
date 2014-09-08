@@ -714,15 +714,25 @@ a.shortBtn {
     border-radius: 4px 0 4px 0;
 }
 
+.fileUploadLabel {
+	width: 94%;
+	margin: 70px 0 -100px 0;
+	font-size: 13px;
+	font-weight: bold;
+	color:  #3a5bdc;
+	text-align: center;
+}
+
 .dragAndDropUploadBox {
-	width: 475px;
-	padding: 3em 0 3em 160px;
+	width: 97%;
+	padding: 3em 0 6em 38%;
 	border: 5px dashed;
-	margin-bottom: 10px;
+	margin-bottom: 12px;
+	border-radius: 3em;
 }
 
 .dropable {
-	border-color: #33ee33 !important;
+	border-color: #3a5bdc !important;
 }
 
 .markdownEditor {
