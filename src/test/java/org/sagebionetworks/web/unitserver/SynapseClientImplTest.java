@@ -1000,35 +1000,6 @@ public class SynapseClientImplTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void testGetFileEntityIdWithSameNameNotFound() throws JSONObjectAdapterException, SynapseException, RestServiceException, JSONException {
-//		FileEntity testFileEntity = getTestFileEntity();
-//		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-//		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-//		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-//		
-//		//parent entity has one child
-//		String testChildEntityId = "syn6283185";
-//		EntityIdList childEntities = new EntityIdList();
-//		List<EntityId> childEntitiesList = new ArrayList<EntityId>();
-//		EntityId childEntityId = new EntityId();
-//		childEntityId.setId(testChildEntityId);
-//		childEntitiesList.add(childEntityId);
-//		childEntities.setIdList(childEntitiesList);
-//		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
-//		
-//		BatchResults<EntityHeader> childEntityHeaders = new BatchResults<EntityHeader>();
-//		List<EntityHeader> childEntityHeaderList = new ArrayList<EntityHeader>();
-//		EntityHeader header = new EntityHeader();
-//		header.setName(testFileName);
-//		header.setId(testChildEntityId);
-//		header.setType(FileEntity.class.getName());
-//		childEntityHeaderList.add(header);
-//		childEntityHeaders.setResults(childEntityHeaderList);
-//		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(childEntityHeaders);
-//		
-//		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
-//		
-//		//verify that it found the target child entity id
-//		assertEquals(testChildEntityId, fileEntityId);
 		JSONObject queryResult = new JSONObject();
 		queryResult.put("totalNumberOfResults", (long) 0);
 		when(mockSynapse.query(anyString())).thenReturn(queryResult);	// TODO
