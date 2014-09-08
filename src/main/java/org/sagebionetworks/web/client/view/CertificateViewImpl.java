@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 
+import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -34,6 +35,8 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	Panel userNotCertifiedPanel;
 	@UiField
 	Heading userNotCertifiedHeading;
+	@UiField
+	SpanElement loadingUI;
 	
 	@UiField
 	Button okButton;
@@ -85,6 +88,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 
 	@Override
 	public void showLoading() {
+		DisplayUtils.show(loadingUI);
 	}
 
 	@Override
@@ -103,7 +107,9 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	public void showSuccess(UserProfile profile, PassingRecord passingRecord) {
 		//show certificate
 		certificateWidget.configure(profile, passingRecord);
+		hideLoading();
 		certificateContainer.setVisible(true);
+		okButton.setVisible(true);
 		DisplayUtils.scrollToTop();
 	}
 	
@@ -111,15 +117,20 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	private void hideAll() {
 		certificateContainer.setVisible(false);
 		userNotCertifiedPanel.setVisible(false);
+		okButton.setVisible(false);
+		hideLoading();
 	}
 
 	@Override
 	public void hideLoading() {
+		DisplayUtils.hide(loadingUI);
 	}
 	
 	@Override
 	public void showNotCertified(UserProfile profile) {
 		userNotCertifiedHeading.setText(DisplayUtils.getDisplayName(profile) + " is not certified");
+		hideLoading();
 		userNotCertifiedPanel.setVisible(true);
+		okButton.setVisible(true);
 	}
 }
