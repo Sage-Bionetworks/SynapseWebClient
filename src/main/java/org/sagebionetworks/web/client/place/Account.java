@@ -25,7 +25,7 @@ public class Account extends Place{
 			return token;
 	}
 	
-	private final static native boolean _isFirefox() /*-{ 
+	public final static native boolean _isFirefox() /*-{ 
 		return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 	}-*/;
 

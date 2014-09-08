@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -153,4 +154,26 @@ public class ProfileFormPresenterTest {
 		verify(mockLinkedInService).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
+	@Test
+	public void testStartEditingProfile() {
+		profileForm.startEditing();
+		verify(mockView).setIsDataModified(eq(true));
+		verify(mockGlobalApplicationState).setIsEditing(eq(true));
+	}
+	
+	@Test
+	public void testStopEditingProfile() {
+		profileForm.stopEditing();
+		verify(mockView).setIsDataModified(eq(false));
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
+	
+	@Test
+	public void testRollbackProfile() {
+		profileForm.rollback();
+		verify(mockView).setIsDataModified(eq(false));
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+		verify(mockView, Mockito.times(2)).updateView(any(UserProfile.class));
+	}
+
 }

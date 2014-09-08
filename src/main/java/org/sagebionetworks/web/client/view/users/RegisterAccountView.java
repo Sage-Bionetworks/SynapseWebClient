@@ -22,17 +22,11 @@ public interface RegisterAccountView extends IsWidget, SynapseView {
 	 * The account was created view
 	 */
 	public void showAccountCreated();
-	
 	public void showErrorMessage(String message);
-	
-	public void markUsernameUnavailable();
 	public void markEmailUnavailable();
-	
-	
 	public interface Presenter {	
 		void goTo(Place place);
-		void registerUser(String username, String email, String firstName, String lastName);
-		void checkUsernameAvailable(String username);
+		void registerUser(String email);
 		void checkEmailAvailable(String email);
 	}
 }

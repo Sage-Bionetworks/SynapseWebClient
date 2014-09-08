@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -45,43 +46,12 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * @param visible
 	 */
 	public void setTableMessageVisible(boolean visible);
-	/**
-	 * Show or hide the query input
-	 * @param b
-	 */
-	public void setQueryInputVisible(boolean visible);
 
 	/**
 	 * Show or hide the query results
 	 * @param visible
 	 */
 	public void setQueryResultsVisible(boolean visible);
-
-	/**
-	 * Set the text of the query input editor.
-	 * @param startQuery
-	 */
-	public void setInputQueryString(String startQuery);
-
-	/**
-	 * Set the query input loading state.
-	 * @param loading
-	 */
-	public void setQueryInputLoading(boolean isLoading);
-
-	/**
-	 * Query error messages
-	 * 
-	 * @param danger
-	 * @param message
-	 */
-	public void setQueryMessage(AlertType danger, String message);
-
-	/**
-	 * Show or hide the query result message.
-	 * @param b
-	 */
-	public void setQueryResultsMessageVisible(boolean b);
 
 	/**
 	 * Set the AsynchronousProgressWidget to be shown when queries are run.
@@ -93,7 +63,25 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Show or hide the Query Progress widget.
 	 * @param b
 	 */
-	public void setQueryProgressVisible(boolean b);
+	public void setQueryProgressVisible(boolean visible);
+
+	/**
+	 * Set the query results widget.
+	 * @param queryResultsWidget
+	 */
+	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget);
+	
+	/**
+	 * Set the query input widget.
+	 * @param queryInputWidget
+	 */
+	public void setQueryInputWidget(QueryInputWidget queryInputWidget);
+
+	/**
+	 * Show or hide the query input.
+	 * @param b
+	 */
+	public void setQueryInputVisible(boolean visible);
 
 
 }

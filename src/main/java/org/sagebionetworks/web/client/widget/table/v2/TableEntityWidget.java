@@ -1,15 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
-import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableRequestBody;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,13 +34,20 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	TableBundle  tableBundle;
 	boolean canEdit;
 	QueryChangeHandler queryChangeHandler;
+	TableQueryResultWidget queryResultsWidget;
+	QueryInputWidget queryInputWidget;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils){
+	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
 		this.view = view;
 		this.tableModelUtils = tableModelUtils;
 		this.asynchProgressWidget = asynchProgressWidget;
+		this.queryResultsWidget = queryResultsWidget;
+		this.queryInputWidget = queryInputWidget;
 		this.view.setPresenter(this);
+		this.view.setProgressWidget(this.asynchProgressWidget);
+		this.view.setQueryResultsWidget(this.queryResultsWidget);
+		this.view.setQueryInputWidget(this.queryInputWidget);
 	}
 
 	@Override
@@ -64,7 +69,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		this.canEdit = canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
-		this.view.setProgressWidget(this.asynchProgressWidget);
 		checkState();
 	}
 
@@ -82,46 +86,25 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 				// use a default query
 				startQuery = getDefaultQueryString();
 			}
-			// Execute the query
-			view.setInputQueryString(startQuery);
-			view.setQueryInputVisible(true);
-			view.setQueryInputLoading(true);
-			
-			// start the job
-			AsynchDownloadFromTableRequestBody body = new AsynchDownloadFromTableRequestBody();
-			body.setSql(startQuery);
-			waitForQueryResults(body);
+			setQuery(startQuery);
 		}
 	}
 	
-	private void waitForQueryResults(AsynchronousRequestBody status){
-		view.setQueryProgressVisible(true);
-		this.asynchProgressWidget.configure("Executing query...", status, new AsynchronousProgressHandler() {
-			
+	/**
+	 * Set the query used by this widget.
+	 * @param sql
+	 */
+	private void setQuery(String sql){
+		this.queryInputWidget.configure(sql, new QueryInputListener() {
 			@Override
-			public void onStatusCheckFailure(Throwable failure) {
-				setQueryFailed(failure.getMessage());
-			}
-			
-			@Override
-			public void onComplete(AsynchronousJobStatus status) {
-				view.showTableMessage(AlertType.INFO, "Query complete");
-			}
-			
-			@Override
-			public void onCancel(AsynchronousJobStatus status) {
-				view.showTableMessage(AlertType.WARNING, "Query canceled");
+			public void onExecuteQuery(String sql) {
+				setQuery(sql);
 			}
 		});
+		this.view.setQueryResultsVisible(true);
+		this.view.setTableMessageVisible(false);
+		this.queryResultsWidget.configure(sql, this.canEdit, this.queryInputWidget);
 	}
-	
-	private void setQueryFailed(String message){
-		// Set the message
-		view.setQueryMessage(AlertType.DANGER, message);
-		view.setQueryResultsMessageVisible(true);
-		view.setQueryInputLoading(false);
-	}
-	
 
 	/**
 	 * Set the view to show no columns message.
@@ -141,7 +124,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		view.setQueryResultsVisible(false);
 		view.showTableMessage(AlertType.INFO, message);
 		view.setTableMessageVisible(true);
-		view.setQueryResultsMessageVisible(false);
 	}
 	
 	/**
@@ -149,11 +131,9 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 * @return
 	 */
 	public String getDefaultQueryString(){
-		long pageSize = getDefaultPageSize();
 		StringBuilder builder = new StringBuilder();
 		builder.append("SELECT * FROM ");
 		builder.append(this.tableId);
-		builder.append(" LIMIT ").append(pageSize).append(" OFFSET 0");
 		return builder.toString();
 	}
 	

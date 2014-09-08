@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -34,6 +35,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -77,11 +79,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private SynapseJSNIUtils synapseJsniUtils;
 	private GWTWrapper gwt;
 	AuthenticationController authenticationController;
+	private ClientLogger logger;
+	
 	private ChunkedFileToken token;
 	NumberFormat percentFormat;
 	private boolean isDirectUploadSupported;
 	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
 	private StringBuilder uploadLog;
+	
+	private String[] fileNames;
+	private int currIndex;
+	private boolean fileHasBeenUploaded = false;
 	
 	@Inject
 	public Uploader(
@@ -91,7 +99,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
-			AuthenticationController authenticationController
+			AuthenticationController authenticationController,
+			ClientLogger logger
 			) {
 	
 		this.view = view;		
@@ -101,6 +110,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
+		this.logger = logger;
 		view.setPresenter(this);
 		percentFormat = gwt.getNumberFormat("##");
 		clearHandlers();
@@ -132,6 +142,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
+		resetUploadProgress();
 	}
 
 	@Override
@@ -151,7 +162,19 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	@Override
-	public void handleUpload(String fileName) {
+	public void handleUploads() {
+		if (fileNames == null) {
+			//setup upload process.
+			
+			fileHasBeenUploaded = false;
+			currIndex = 0;
+			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
+				//no files selected.
+				view.showNoFilesSelectedForUpload();
+				return;
+			}
+		}
+		
 		entityId = null;
 		if (entity != null) {
 			entityId = entity.getId();
@@ -160,7 +183,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity && isDirectUploadSupported) {
 			//use case C from above
-			directUploadStep1(fileName);
+			directUploadStep1(fileNames[currIndex]);
 		} else {
 			//use case A and B from above
 			//uses the default action url
@@ -177,7 +200,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void checkFileSize() throws IllegalArgumentException{
-		long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+		long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
 		//check
 		if (fileSize > OLD_BROWSER_MAX_SIZE) {
 			throw new IllegalArgumentException(DisplayConstants.LARGE_FILE_ON_UNSUPPORTED_BROWSER);
@@ -209,8 +232,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(final String result) {
+					//there was already a file with this name in the directory.
+					
 					//confirm we can overwrite
-					view.showConfirmDialog("", "An item named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
+					view.showConfirmDialog("", "A file named \""+fileName+"\" ("+result+") already exists in this location. Do you want to replace it with the one you're uploading?", 
 							new Callback() {
 								@Override
 								public void invoke() {
@@ -222,19 +247,45 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							new Callback() {
 								@Override
 								public void invoke() {
-									//no, cancel upload
-									fireCancelEvent();
+									handleCancelledFileUpload();
 								}
 							});
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if (caught instanceof NotFoundException)
+					if (caught instanceof NotFoundException) {
+						//there was not already a file with this name in this directory.
 						directUploadStep2(fileName);
-					else
+					} else if (caught instanceof ConflictException) {
+						//there was an entity found with same parent ID and name, but
+						//it was not a File Entity.
+						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
+						handleCancelledFileUpload();
+					} else {
 						uploadError(caught.getMessage());
+					}
 				}
 			});
+		}
+	}
+	
+	private void handleCancelledFileUpload() {
+		if (currIndex + 1 == fileNames.length) {
+			//uploading the last file
+			if (!fileHasBeenUploaded) {
+				//cancel the upload
+				fireCancelEvent();
+				view.resetToInitialState();
+				clearState();
+			} else {
+				//finish upload
+				view.updateProgress(.99d, "99%");
+				uploadSuccess();
+			}
+		} else {
+			//more files to upload
+			currIndex++;
+			handleUploads();
 		}
 	}
 	
@@ -249,8 +300,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 		//get the chunked file request (includes token)
 		//get the content type
-		final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID), fileName);
-		synapseJsniUtils.getFileMd5(UploaderViewImpl.FILE_FIELD_ID, new MD5Callback() {
+		final String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex), fileName);
+		synapseJsniUtils.getFileMd5(UploaderViewImpl.FILE_FIELD_ID, currIndex, new MD5Callback() {
 			
 			@Override
 			public void setMD5(String hexValue) {
@@ -266,9 +317,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(String result) {
 					try {
 						token = nodeModelCreator.createJSONEntity(result, ChunkedFileToken.class);
-						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID);
+						long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
 						long totalChunkCount = getChunkCount(fileSize);
-						view.showProgressBar();
+						if (!fileHasBeenUploaded)
+							view.showProgressBar();
 						uploadLog.append("fileSize="+fileSize + " totalChunkCount=" + totalChunkCount+"\n");
 						directUploadStep4(contentType, 1, 1, totalChunkCount, fileSize, new ArrayList<String>());
 					} catch (JSONObjectAdapterException e) {
@@ -329,12 +381,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					}
 					ByteRange range = getByteRange(currentChunkNumber, fileSize);
 					uploadLog.append("directUploadStep2: uploading file chunk.  ByteRange="+range.getStart()+"-"+range.getEnd()+" \n");
-					synapseJsniUtils.uploadFileChunk(contentType, UploaderViewImpl.FILE_FIELD_ID, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
+					synapseJsniUtils.uploadFileChunk(contentType, currIndex, UploaderViewImpl.FILE_FIELD_ID, range.getStart(), range.getEnd(), urlString, xhr, new ProgressCallback() {
 						@Override
 						public void updateProgress(double value) {
 							//Note:  0 <= value <= 1
 							//And we need to add this to the chunks that have already been uploaded.  And divide by the total chunk count
-							double currentProgress = (((double)(currentChunkNumber-1)) + value)/((double)totalChunkCount) * UPLOADING_TOTAL_PERCENT;
+							double currentProgress = ((((double)(currentChunkNumber-1)) + value)/((double)totalChunkCount) * UPLOADING_TOTAL_PERCENT + currIndex)/ (double) fileNames.length;
 							String progressText = percentFormat.format(currentProgress*100.0) + "%";
 							view.updateProgress(currentProgress, progressText);
 						}
@@ -445,7 +497,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void processDaemonStatus(UploadDaemonStatus status, List<String> requestList, int currentAttempt){
 		State state = status.getState();
 		if (State.COMPLETED == state) {
-			view.updateProgress(.99d, "99%");
+			if (currIndex + 1 == fileNames.length)
+				view.updateProgress(.99d, "99%");
 			setFileEntityFileHandle(status.getFileHandleId());
 			if (fileHandleIdCallback != null) {
 				fileHandleIdCallback.invoke(status.getFileHandleId());
@@ -454,7 +507,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
-			double currentProgress = ((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT;
+			double currentProgress = ((((status.getPercentComplete()*.01d) * COMBINING_TOTAL_PERCENT) + UPLOADING_TOTAL_PERCENT) + currIndex) / fileNames.length;
 			String progressText = percentFormat.format(currentProgress*100.0) + "%";
 			view.updateProgress(currentProgress, progressText);
 			checkStatusAgainLater(status.getDaemonId(), entityId, parentEntityId, requestList, currentAttempt);
@@ -506,9 +559,16 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
 					@Override
 					public void onSuccess(String entityId) {
-						//to new file handle id, or create new file entity with this file handle id
-						view.hideLoading();
-						refreshAfterSuccessfulUpload(entityId);
+						fileHasBeenUploaded = true;
+						if (currIndex + 1 == fileNames.length) {
+							//to new file handle id, or create new file entity with this file handle id
+							view.hideLoading();
+							refreshAfterSuccessfulUpload(entityId);
+						} else {
+							//more files to upload
+							currIndex++;
+							handleUploads();
+						}
 					}
 					@Override
 					public void onFailure(Throwable t) {
@@ -591,6 +651,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} catch (RestServiceException e) {			
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
+	}
+	
+	@Override
+	public void disableMultipleFileUploads() {
+		view.disableMultipleFileUploads();
 	}
 	
 	@Override
@@ -686,7 +751,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
-		//TODO: send full log to server logs (once service is available)
+		//send full log to server logs
+		logger.errorToRepositoryServices(uploadLog.toString());
+		//and to the console
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();
 		fireCancelEvent();
@@ -703,6 +770,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private void uploadSuccess() {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
+		view.resetToInitialState();
+		resetUploadProgress();
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
@@ -714,6 +783,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}
+	
+	private void resetUploadProgress() {
+		fileNames = null;
+		fileHasBeenUploaded = false;
+		currIndex = 0;
+	}
 
 	/**
 	 * For testing purposes
@@ -721,5 +796,21 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 */
 	public String getDirectUploadFileEntityId() {
 		return entityId;
+	}
+	
+	/**
+	 * For testing purposes
+	 * @return
+	 */
+	public void setFileNames(String[] fileNames) {
+		this.fileNames = fileNames;
+	}
+	
+	/**
+	 * for testing purposes only
+	 * @param isDirectUploadSupported
+	 */
+	public void setDirectUploadSupported(boolean isDirectUploadSupported) {
+		this.isDirectUploadSupported = isDirectUploadSupported;
 	}
 }

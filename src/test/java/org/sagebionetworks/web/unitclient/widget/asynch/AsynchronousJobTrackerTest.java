@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
-import org.sagebionetworks.repo.model.table.AsynchDownloadFromTableRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
+import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -20,10 +22,17 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
+/**
+ * Complex test for the AsynchronousJobTracker
+ * 
+ * @author John
+ *
+ */
 public class AsynchronousJobTrackerTest {
 
 	SynapseClientAsync mockSynapseClient;
@@ -34,11 +43,18 @@ public class AsynchronousJobTrackerTest {
 	AsynchronousJobTrackerImpl tracker;
 	AsynchronousJobStatus start;
 	String startJSON;
+	ResultNotReadyException startNotReady;
 	AsynchronousJobStatus middle;
 	String middleJSON;
+	ResultNotReadyException middleNotReady;
 	AsynchronousJobStatus done;
 	String doneJSON;
-	AsynchDownloadFromTableRequestBody requestBody;
+	ResultNotReadyException doneNotReady;
+	DownloadFromTableRequest requestBody;
+	DownloadFromTableResult responseBody;
+	String responseJSON;
+	AsynchType type;
+	String jobId;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -50,7 +66,7 @@ public class AsynchronousJobTrackerTest {
 		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider, adapterFactory);
 		
 		// Setup three phases for a job.
-		String jobId = "123";
+		jobId = "99999";
 		// This job will have three phases.
 		start = new AsynchronousJobStatus();
 		start.setJobId(jobId);
@@ -58,6 +74,7 @@ public class AsynchronousJobTrackerTest {
 		start.setProgressCurrent(0l);
 		start.setProgressTotal(100l);
 		startJSON = EntityFactory.createJSONStringForEntity(start);
+		startNotReady = new ResultNotReadyException(startJSON);
 		// In the middle
 		middle = new AsynchronousJobStatus();
 		middle.setJobId(jobId);
@@ -65,6 +82,7 @@ public class AsynchronousJobTrackerTest {
 		middle.setProgressCurrent(50l);
 		middle.setProgressTotal(100l);
 		middleJSON =  EntityFactory.createJSONStringForEntity(middle);
+		middleNotReady = new ResultNotReadyException(middleJSON);
 		// done
 		done = new AsynchronousJobStatus();
 		done.setJobId(jobId);
@@ -72,77 +90,80 @@ public class AsynchronousJobTrackerTest {
 		done.setProgressCurrent(100l);
 		done.setProgressTotal(100l);
 		doneJSON =  EntityFactory.createJSONStringForEntity(done);
-		
-		requestBody = new AsynchDownloadFromTableRequestBody();
+		doneNotReady = new ResultNotReadyException(doneJSON);
+		requestBody = new DownloadFromTableRequest();
 		requestBody.setSql("select * from syn123");
+		type = AsynchType.TableCSVDownload;
+		
+		responseBody = new DownloadFromTableResult();
+		responseBody.setEtag("etag123");
+		responseBody.setTableId("syn123");
+		responseJSON = EntityFactory.createJSONStringForEntity(responseBody);
+		
 	}
 	
 	@Test
-	public void testAlreadyDone() throws JSONObjectAdapterException{
-		// Start with a job that is already done.
-		start.setJobState(AsynchJobState.COMPLETE);
-		startJSON = EntityFactory.createJSONStringForEntity(start);
-		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(anyString(), any(AsyncCallback.class));
-		tracker.startAndTrack(requestBody, waitTimeMS, mockHandler);
-		verify(mockHandler).onComplete(start);
-	}
-	
-	@Test
-	public void testAlreadyFailed() throws JSONObjectAdapterException{
-		// Start with a job that is already done.
-		start.setJobState(AsynchJobState.FAILED);
-		startJSON = EntityFactory.createJSONStringForEntity(start);
-		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(anyString(), any(AsyncCallback.class));
-		tracker.startAndTrack(requestBody, waitTimeMS, mockHandler);
-		verify(mockHandler).onComplete(start);
-	}
-	
-	@Test
-	public void testMultipleStatesSuccess() throws JSONObjectAdapterException{
+	public void testMultipleStatesThenSuccess() throws JSONObjectAdapterException{
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(jobId).when(mockSynapseClient).startAsynchJob(any(AsynchType.class), anyString(), any(AsyncCallback.class));
 		// simulate three calls
-		AsyncMockStubber.callSuccessWith(startJSON, middleJSON, doneJSON).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
-		tracker.startAndTrack(requestBody, waitTimeMS, mockHandler);
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseJSON).when(mockSynapseClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsyncCallback.class));
+		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// Update should occur for all three phases
-		verify(mockHandler, times(2)).onUpdate(start);
+		verify(mockHandler).onUpdate(start);
 		verify(mockHandler).onUpdate(middle);
 		verify(mockHandler).onUpdate(done);
 		// It should also be updated when done
-		verify(mockHandler).onComplete(done);
-		verify(mockHandler, never()).onCancel(any(AsynchronousJobStatus.class));
-		verify(mockHandler, never()).onStatusCheckFailure(any(Throwable.class));
+		verify(mockHandler).onComplete(responseBody);
+		verify(mockHandler, never()).onCancel();
+		verify(mockHandler, never()).onFailure(any(Throwable.class));
 	}
 	
 	@Test
 	public void testWithFailure() throws JSONObjectAdapterException{
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(any(AsynchType.class), anyString(), any(AsyncCallback.class));
 		Throwable error = new Throwable("Something went wrong");
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
-		tracker.startAndTrack(requestBody, waitTimeMS, mockHandler);
-		// Even though the call will fail it should still call update once.
-		verify(mockHandler).onUpdate(start);
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsyncCallback.class));
+		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// It should also be updated when done
-		verify(mockHandler, never()).onComplete(any(AsynchronousJobStatus.class));
-		verify(mockHandler, never()).onCancel(any(AsynchronousJobStatus.class));
+		verify(mockHandler, never()).onComplete(any(AsynchronousResponseBody.class));
+		verify(mockHandler, never()).onCancel();
 		// The error must be passed to the handler
-		verify(mockHandler).onStatusCheckFailure(error);
+		verify(mockHandler).onFailure(error);
+	}
+	
+	@Test
+	public void testMultipleStatesThenFailure() throws JSONObjectAdapterException{
+		// Simulate start
+		AsyncMockStubber.callSuccessWith(jobId).when(mockSynapseClient).startAsynchJob(any(AsynchType.class), anyString(), any(AsyncCallback.class));
+		// simulate three calls
+		Throwable exception = new Throwable("Something went wrong");
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, exception).when(mockSynapseClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsyncCallback.class));
+		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
+		// Update should occur for all three phases
+		verify(mockHandler).onUpdate(start);
+		verify(mockHandler).onUpdate(middle);
+		verify(mockHandler).onUpdate(done);
+		// It should also be updated when done
+		verify(mockHandler).onFailure(exception);
+		verify(mockHandler, never()).onCancel();
+		verify(mockHandler, never()).onComplete(any(AsynchronousResponseBody.class));
 	}
 	
 	@Test
 	public void testCancel() throws JSONObjectAdapterException{		
 		// Simulate start
-		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(startJSON).when(mockSynapseClient).startAsynchJob(any(AsynchType.class), anyString(), any(AsyncCallback.class));
 		// These will still be called ever after the cancel.
-		AsyncMockStubber.callSuccessWith(startJSON, middleJSON, doneJSON).when(mockSynapseClient).getAsynchJobStatus(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseJSON).when(mockSynapseClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsyncCallback.class));
 		// Since this test is not using a multiple threads cancel must be called before we start.
-		tracker.startAndTrack(requestBody, waitTimeMS, mockHandler);
+		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		tracker.cancel();
 		assertTrue(this.mockTimerProvider.isCancled());
 		// Since cancel happens after complete, complete should still be called.
-		verify(mockHandler).onComplete(any(AsynchronousJobStatus.class));
+		verify(mockHandler).onComplete(any(AsynchronousResponseBody.class));
 		// The handler should not get the onCancle() because the onComplete() would have already been sent.
-		verify(mockHandler, never()).onCancel(any(AsynchronousJobStatus.class));
+		verify(mockHandler, never()).onCancel();
 	}
 }

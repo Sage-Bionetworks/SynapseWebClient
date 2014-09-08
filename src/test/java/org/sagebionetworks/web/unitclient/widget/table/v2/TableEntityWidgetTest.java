@@ -23,9 +23,11 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 /**
  * Business logic tests for the TableEntityWidget
@@ -42,6 +44,8 @@ public class TableEntityWidgetTest {
 	TableEntityWidgetView mockView;
 	AsynchronousProgressWidget mockAsynchronousProgressWidget;
 	QueryChangeHandler mockQueryChangeHandler;
+	TableQueryResultWidget mockQueryResultsWidget;
+	QueryInputWidget mockQueryInputWidget;
 	TableEntityWidget widget;
 	EntityBundle entityBundle;
 	SynapseClientAsync mockSynapseClient;
@@ -53,6 +57,8 @@ public class TableEntityWidgetTest {
 		mockAsynchronousProgressWidget = Mockito.mock(AsynchronousProgressWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
+		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		tableModelUtils = new TableModelUtils(adapterFactory);
@@ -63,7 +69,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils);
+		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils, mockQueryResultsWidget, mockQueryInputWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 	}
@@ -101,7 +107,7 @@ public class TableEntityWidgetTest {
 	public void testDefaultQueryString(){
 		tableBundle.setMaxRowsPerPage(4L);
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
-		String expected = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
+		String expected = "SELECT * FROM "+tableEntity.getId();
 		assertEquals(expected, widget.getDefaultQueryString());
 	}
 	

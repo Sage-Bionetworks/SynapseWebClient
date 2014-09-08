@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view.bootstrap.table;
 import org.gwtbootstrap3.client.ui.base.ComplexWidget;
 
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.DOM;
 
 /**
  * Simple <td>
@@ -11,7 +12,8 @@ import com.google.gwt.dom.client.Document;
  */
 public class TableData extends ComplexWidget{
 
-    public TableData() {
+	public TableData() {
         setElement(Document.get().createTDElement());
     }
+    
 }

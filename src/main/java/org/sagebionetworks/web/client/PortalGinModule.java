@@ -51,6 +51,8 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.client.view.HomeViewImpl;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
+import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.view.NewAccountViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
@@ -268,8 +270,25 @@ import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
+import org.sagebionetworks.web.client.widget.table.v2.results.TablePageViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
+import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultViewImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactoryImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCellImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCell;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringRendererCellImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -431,6 +450,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// PasswordResetView
 		bind(PasswordResetViewImpl.class).in(Singleton.class);
 		bind(PasswordResetView.class).to(PasswordResetViewImpl.class);
+		
+		// NewAccountView
+		bind(NewAccountViewImpl.class).in(Singleton.class);
+		bind(NewAccountView.class).to(NewAccountViewImpl.class);
 
 		// RegisterAccountView
 		bind(RegisterAccountViewImpl.class).in(Singleton.class);
@@ -722,6 +745,18 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
 		bind(ColumnModelTableRowViewer.class).to(ColumnModelTableRowViewerImpl.class);
 		bind(TableEntityWidgetView.class).to(TableEntityWidgetViewImpl.class);
+		bind(RowView.class).to(RowViewImpl.class);
+		bind(TablePageView.class).to(TablePageViewImpl.class);
+		bind(TableQueryResultView.class).to(TableQueryResultViewImpl.class);
+		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
+		bind(CellFactory.class).to(CellFactoryImpl.class);
+		bind(QueryInputView.class).to(QueryInputViewImpl.class);
+		
+		/*
+		 * TableEntity cell bindings.
+		 */
+		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
+		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
 
 		/*
 		 * Teams Places

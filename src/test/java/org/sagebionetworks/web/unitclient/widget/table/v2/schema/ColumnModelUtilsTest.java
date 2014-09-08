@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnTypeViewEnum;
 
 public class ColumnModelUtilsTest {
 	
@@ -105,5 +107,64 @@ public class ColumnModelUtilsTest {
 		List<String> clone = ColumnModelUtils.csvToList(csv);
 		assertEquals(list, clone);	
 	}
+	
+	@Test
+	public void testbuildMapColumnIdtoModel(){
+		ColumnModel one = new ColumnModel();
+		one.setId("one");
+		ColumnModel two = new ColumnModel();
+		two.setId("two");
+		List<ColumnModel> models = Arrays.asList(one,two);
+		Map<String, ColumnModel> map = ColumnModelUtils.buildMapColumnIdtoModel(models);
+		assertNotNull(map);
+		assertEquals(2, map.size());
+		assertEquals(one, map.get(one.getId()));
+		assertEquals(two, map.get(two.getId()));
+	}
+	
+	@Test
+	public void testBuildTypesForQueryResults(){
+		ColumnModel one = new ColumnModel();
+		one.setId("1");
+		one.setName("one");
+		one.setColumnType(ColumnType.DOUBLE);
+		ColumnModel two = new ColumnModel();
+		two.setId("2");
+		two.setName("two");
+		two.setColumnType(ColumnType.STRING);
+		List<ColumnModel> models = Arrays.asList(one,two);
+		// headers can includes the names of aggregation functions.
+		List<String> headers = Arrays.asList("sum(one)", two.getId(), one.getId());
+		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(headers, models);
+		assertNotNull(results);
+		assertEquals(3, results.size());
+		// the first column should have the name of the aggregate function.
+		ColumnModel cm = results.get(0);
+		assertEquals("sum(one)", cm.getName());
+		assertEquals(ColumnType.STRING, cm.getColumnType());
+		assertEquals(null, cm.getId());
+		// the second should match two
+		cm = results.get(1);
+		assertEquals(two, cm);
+		// The last should match first
+		cm = results.get(2);
+		assertEquals(one, cm);
+	}
 
+	
+	@Test
+	public void testBuildTypesForQueryResultsNullHeaders(){
+		ColumnModel one = new ColumnModel();
+		one.setId("1");
+		one.setName("one");
+		one.setColumnType(ColumnType.DOUBLE);
+		ColumnModel two = new ColumnModel();
+		two.setId("2");
+		two.setName("two");
+		two.setColumnType(ColumnType.STRING);
+		List<ColumnModel> models = Arrays.asList(one,two);
+		List<ColumnModel> results = ColumnModelUtils.buildTypesForQueryResults(null, models);
+		// For this case the results should match the models
+		assertEquals(models, results);
+	}
 }
