@@ -24,8 +24,8 @@
 			<div class="col-sm-6">
 				<div ui:field="changeUsernameUi" class="form-group margin-bottom-10">
 					<label class="control-label">Username</label>
-					<input ui:field="userNameField" type="text" class="form-control"
-						placeholder="Enter username"></input>
+					<b:TextBox ui:field="userNameField" 
+						placeholder="Enter username" />
 					<div ui:field="userNameError" style="display:none" class="help-block">Please enter a valid username</div>
 				</div>
 			</div>
@@ -35,15 +35,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">First name</label>
-					<input ui:field="firstNameField" type="text" class="form-control"
-						placeholder="Enter first name"></input>
+					<b:TextBox ui:field="firstNameField" 
+						placeholder="Enter first name" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Last name</label>
-					<input ui:field="lastNameField" type="text" class="form-control"
-						placeholder="Enter last name"></input>
+					<b:TextBox ui:field="lastNameField" 
+						placeholder="Enter last name" />
 				</div>
 			</div>
 		</div>
@@ -51,15 +51,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Current position</label>
-					<input ui:field="currentPositionField" type="text" class="form-control"
-						placeholder="Enter current position"></input>
+					<b:TextBox ui:field="currentPositionField" 
+						placeholder="Enter current position" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Current affiliation</label>
-					<input ui:field="currentAffiliationField" type="text" class="form-control"
-						placeholder="Enter current affiliation"></input>
+					<b:TextBox ui:field="currentAffiliationField" 
+						placeholder="Enter current affiliation" />
 				</div>
 			</div>
 		</div>
@@ -67,15 +67,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label>Industry/Discipline</label>
-					<input ui:field="industryField" type="text" class="form-control"
-						placeholder="Enter industry/discipline"></input>
+					<b:TextBox ui:field="industryField" 
+						placeholder="Enter industry/discipline" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">City, Country</label>
-					<input ui:field="locationField" type="text" class="form-control"
-						placeholder="Enter City, Country"></input>
+					<b:TextBox ui:field="locationField" 
+						placeholder="Enter City, Country" />
 				</div>
 			</div>
 		</div>
@@ -83,8 +83,8 @@
 			<div class="col-sm-6">
 				<div ui:field="moreInfoUi" class="form-group margin-bottom-10">
 					<label class="control-label">Link to more info</label>
-					<input ui:field="moreInfoField" type="text" class="form-control"
-						placeholder="Enter link to more info"></input>
+					<b:TextBox ui:field="moreInfoField"
+						placeholder="Enter link to more info" />
 					<div ui:field="urlError" style="display:none" class="help-block">Please enter a valid URL</div>
 				</div>
 			</div>
@@ -95,8 +95,8 @@
 			<div class="col-sm-12">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Bio</label>
-					<textarea ui:field="bioField" class="form-control"
-						placeholder="Enter bio" rows="5"></textarea>
+					<b:TextArea ui:field="bioField"
+						placeholder="Enter bio" height="150px" />
 				</div>
 			</div>
 		</div>

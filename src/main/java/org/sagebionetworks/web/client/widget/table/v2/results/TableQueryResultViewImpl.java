@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,6 +27,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	
 	@UiField
 	SimplePanel tablePanel;
+	@UiField
+	SimplePanel progressPanel;
 	@UiField
 	ScrollPanel rowEditorModalPanel;
 	@UiField
@@ -122,6 +125,16 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setEditEnabled(boolean isEditable) {
 		this.editRowsButton.setVisible(isEditable);
+	}
+
+	@Override
+	public void setProgressWidget(AsynchronousProgressWidget progressWidget) {
+		this.progressPanel.add(progressWidget);
+	}
+
+	@Override
+	public void setProgressWidgetVisible(boolean visible) {
+		this.progressPanel.setVisible(visible);
 	}
 
 }

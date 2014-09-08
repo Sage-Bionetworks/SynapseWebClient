@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
@@ -83,7 +84,9 @@ public class TablePageWidgetTest {
 		set.setHeaders(headers);
 		set.setRows(rows);
 		bundle = new QueryResultBundle();
-		bundle.setQueryResults(set);
+		QueryResult qr = new QueryResult();
+		qr.setQueryResults(set);
+		bundle.setQueryResult(qr);
 		bundle.setSelectColumns(schema);
 	}
 	

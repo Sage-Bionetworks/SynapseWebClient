@@ -806,4 +806,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void setFileNames(String[] fileNames) {
 		this.fileNames = fileNames;
 	}
+	
+	/**
+	 * for testing purposes only
+	 * @param isDirectUploadSupported
+	 */
+	public void setDirectUploadSupported(boolean isDirectUploadSupported) {
+		this.isDirectUploadSupported = isDirectUploadSupported;
+	}
 }

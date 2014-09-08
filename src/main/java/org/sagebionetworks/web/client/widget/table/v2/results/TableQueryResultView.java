@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 
@@ -83,4 +85,16 @@ public interface TableQueryResultView extends IsWidget {
 	 * @param isEditable
 	 */
 	void setEditEnabled(boolean isEditable);
+
+	/**
+	 * The progress widget shows query progress.s
+	 * @param progressWidget
+	 */
+	void setProgressWidget(AsynchronousProgressWidget progressWidget);
+
+	/**
+	 * Show or hide the progress widget.
+	 * @param visible
+	 */
+	void setProgressWidgetVisible(boolean visible);
 }

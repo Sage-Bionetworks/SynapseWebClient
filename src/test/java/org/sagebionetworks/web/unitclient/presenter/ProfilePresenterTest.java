@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -167,7 +168,7 @@ public class ProfilePresenterTest {
 		}
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
-
+		when(mockGlobalApplicationState.isEditing()).thenReturn(false);
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
@@ -253,7 +254,8 @@ public class ProfilePresenterTest {
 	public void testGetIsCertifiedAndUpdateView() throws JSONObjectAdapterException {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, true, ProfileArea.SETTINGS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class), eq(ProfileArea.SETTINGS));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), any(PassingRecord.class), any(Widget.class));
+		verify(mockView).setTabSelected(eq(ProfileArea.SETTINGS));
 	}
 	
 	@Test
@@ -264,7 +266,8 @@ public class ProfilePresenterTest {
 		profilePresenter.getIsCertifiedAndUpdateView(userProfile, false, ProfileArea.TEAMS);
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		
-		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class), eq(ProfileArea.TEAMS));
+		verify(mockView).updateView(any(UserProfile.class), anyBoolean(), eq((PassingRecord)null), any(Widget.class));
+		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
 	}
 	
 	@Test
@@ -584,5 +587,32 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).refreshTeamInvites();
 	}
 
+	
+	@Test
+	public void testTabClickedDefault(){
+		profilePresenter.tabClicked(null);
+		verify(mockView).setTabSelected(eq(ProfileArea.PROJECTS));
+	}
+	
+	@Test
+	public void testTabClickedTeams(){
+		profilePresenter.tabClicked(ProfileArea.TEAMS);
+		verify(mockView).setTabSelected(eq(ProfileArea.TEAMS));
+	}
+	
+	@Test
+	public void testTabClickedWhileEditing(){
+		when(mockGlobalApplicationState.isEditing()).thenReturn(true);
+		profilePresenter.tabClicked(ProfileArea.PROJECTS);
+		
+		ArgumentCaptor<Callback> yesCallback = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showConfirmDialog(anyString(), anyString(), yesCallback.capture());
+		verify(mockView, never()).setTabSelected(any(ProfileArea.class));
+		
+		//click yes
+		yesCallback.getValue().invoke();
+		verify(mockProfileForm).rollback();
+		verify(mockView).setTabSelected(any(ProfileArea.class));
+	}
 	
 }
