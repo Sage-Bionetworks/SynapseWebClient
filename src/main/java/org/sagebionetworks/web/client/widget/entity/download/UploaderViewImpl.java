@@ -356,7 +356,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setFieldWidth(PANEL_WIDTH-300);
 		
 		fileUploadHTML = createFileUploadHTML();
-		formPanel.add(new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>")); //TODO: remove UPLOAD_LABEL from DisplayConstants maybe.
+		formPanel.add(new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>"));
 		formPanel.add(fileUploadHTML);
 		
 		formPanel.layout(true);	
