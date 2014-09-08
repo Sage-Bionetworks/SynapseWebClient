@@ -268,50 +268,45 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void addDropZoneStyleEventHandling(String fileFieldId) {
-		_addDropZoneStyleEventHandling(fileFieldId);
+	public void addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) {
+		_addDropZoneStyleEventHandling(fileFieldId, dropStyleName);
 	}
 	
-	private static native void _addDropZoneStyleEventHandling(String fileFieldId) /*-{
+	private static native void _addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) /*-{
 		$doc.addEventListener("dragover", function( event ) {
-			// Prevent default to allow drop.
-			if (event.target.id != fileFieldId)
-				event.preventDefault();
+				// Prevent default to allow drop.
+				if (event.target.id != fileFieldId) {
+					event.preventDefault();
+				}
 			}, false);
 	
 		$doc.addEventListener("dragenter", function( event ) {
 				// highlight potential drop target when the draggable element enters it
-				if (event.target.id == fileFieldId) {
-					event.target.className += " dropable"
+				if (event.target.id == fileFieldId && event.target.className.indexOf(dropStyleName) == -1) {
+					event.target.className += " " + dropStyleName;
 				}
 			}, false);
 		
 		$doc.addEventListener("drop", function( event ) {
 				if (event.target.id == fileFieldId) {
-					event.target.className =
-							event.target.className.replace
-							( /(?:^|\s)dropable(?!\S)/g , '' );
+					event.target.className = event.target.className.replace(dropStyleName, '');
 				}
 			}, false);
 		
 		$doc.addEventListener("dragleave", function( event ) {
 				if (event.target.id == fileFieldId) {
 					var rect = event.target.getBoundingClientRect();
-					if (	event.clientX < rect.left || event.clientX > rect.right ||
-							event.clientY < rect.top || event.clientY > rect.bottom) {
+					if (	event.clientX <= rect.left || event.clientX >= rect.right ||
+							event.clientY <= rect.top || event.clientY >= rect.bottom	) {
 						// Out of bounds of the box (not just hovering over contained "choose files" button).
-						event.target.className =
-								event.target.className.replace
-								( /(?:^|\s)dropable(?!\S)/g , '' )
+						event.target.className = event.target.className.replace(dropStyleName, '');
 					}
 				}
 			}, false);
 		
 		$doc.addEventListener("dragend", function( event ) {
-			if (event.target.id == fileFieldId) {
-					event.target.className =
-							event.target.className.replace
-							( /(?:^|\s)dropable(?!\S)/g , '' );
+				if (event.target.id == fileFieldId) {
+						event.target.className = event.target.className.replace(dropStyleName, '');
 				}
 			}, false);
 	}-*/;

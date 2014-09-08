@@ -31,7 +31,6 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,8 +45,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private static final int PANEL_WIDTH = 790;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
-	//public static final String FILE_FIELD_CSS_STYLENAME = "width: " + PANEL_WIDTH / 5 * 3 + "px; padding-top: 3em; padding-bottom: 3em; border: 5px; border-style: dashed; padding-left: "+ PANEL_WIDTH / 5 +"px; margin-bottom: 10px;";
-	public static final String FILE_FIELD_CSS_STYLENAME = "dragAndDropUploadBox";
+	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
+	public static final String FILE_FIELD_DROP_STYLE_NAME = "dropable";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
@@ -168,7 +167,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public int getDisplayHeight() {
-		return isEntity ? 425 : 200;	//TODO: Was 350 : 200
+		return isEntity ? 425 : 200;
 	}
 
 	@Override
@@ -357,8 +356,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setFieldWidth(PANEL_WIDTH-300);
 		
 		fileUploadHTML = createFileUploadHTML();
-		// TODO: consstant
-		formPanel.add(new HTML("<p>Drag & drop or choose files from your local file system:</p>"));
+		formPanel.add(new HTML("<p>" + DisplayConstants.UPLOAD_LABEL + "</p>"));
 		formPanel.add(fileUploadHTML);
 		
 		formPanel.layout(true);	
@@ -441,10 +439,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_CSS_STYLENAME + "\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_CSS_STYLENAME + "\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\">");
 	}
-	
-	
 }
