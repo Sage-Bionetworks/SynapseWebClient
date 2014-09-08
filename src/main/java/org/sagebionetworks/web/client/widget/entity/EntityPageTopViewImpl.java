@@ -739,7 +739,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		boolean useV2Table = false;
+		boolean useV2Table = true;
 		IsWidget tableWidget = null;
 		if(useV2Table){
 			// V2

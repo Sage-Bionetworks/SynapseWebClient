@@ -94,4 +94,40 @@ public class AsyncMockStubber {
     	}
     	return last;
     }
+    
+    /**
+     * The resulting stubber will call the AsyncCallback.onFailure() for each exceptions, and Asynch.onSuccess() for each non-exception.
+     * 
+     * @param dataArray
+     * @return
+     */
+    public static <T> Stubber callMixedWith(final T...dataArray) {
+    	if(dataArray == null || dataArray.length < 1){
+    		// handle null
+    		throw new IllegalArgumentException("input cannot be null");
+    	}
+    	// each answer will be chained to the resulting stubber.
+    	Stubber last = null;
+    	// The rest are chained to this stubber
+    	for(T data: dataArray){
+    		if(last == null){
+    			if(data instanceof Throwable){
+        			// Start the chain with failure
+        			last =  Mockito.doAnswer(createFailedAnswer((Throwable)data));
+    			}else{
+        			// Start the chain with success.
+        			last =  Mockito.doAnswer(createSuccessAnswer(data));
+    			}
+    		}else{
+    			if(data instanceof Throwable){
+        			// extend the chain with a failure
+            		last = last.doAnswer(createFailedAnswer((Throwable)data));
+    			}else{
+        			// extend the chain with success
+            		last = last.doAnswer(createSuccessAnswer(data));
+    			}
+    		}
+    	}
+    	return last;
+    }
 }

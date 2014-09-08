@@ -22,6 +22,8 @@
 				<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
 
 				<g:SimplePanel ui:field="tablePanel" />
+				
+				<g:SimplePanel ui:field="progressPanel" />
 
 				<!-- This modal dialog will contain the editor for query results -->
 				<b:Modal ui:field="editRowsModal" title="Edit Rows"

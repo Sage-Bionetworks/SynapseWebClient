@@ -88,7 +88,7 @@ public class QueryResultEditorWidget implements
 		RowSet updated = new RowSet();
 		updated.setHeaders(pageWidget.extractHeaders());
 		updated.setRows(pageWidget.extractRowSet());
-		return RowSetUtils.buildDelta(startingBundle.getQueryResults(), updated);
+		return RowSetUtils.buildDelta(startingBundle.getQueryResult().getQueryResults(), updated);
 	}
 
 	/**

@@ -8,8 +8,7 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
  * @author jmhill
  *
  */
-public interface UpdatingAsynchProgressHandler extends
-		AsynchronousProgressHandler {
+public interface UpdatingAsynchProgressHandler extends AsynchronousProgressHandler {
 
 	public void onUpdate(AsynchronousJobStatus status);
 }

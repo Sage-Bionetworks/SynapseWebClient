@@ -18,6 +18,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
@@ -291,8 +292,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount, AsyncCallback<QueryResult> callback);
-
 	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
 	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
@@ -313,12 +312,6 @@ public interface SynapseClientAsync {
 	 */
 	void setTableSchema(String tableJSON, List<String> newSchema,
 			AsyncCallback<Void> callback);
-	/**
-	 * Query for table results.
-	 * @param query
-	 * @param callback
-	 */
-	void queryTable(String query, AsyncCallback<String> callback);
 	
 	/**
 	 * Apply a PartialRowSet to a table.
@@ -333,28 +326,6 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-	
-	/**
-	 * Start an asynchronous job passing a job body.
-	 * 
-	 * @param query
-	 * @param callback
-	 */
-	void startAsynchJob(String jobBodyJSON, AsyncCallback<String> callback);
-
-	/**
-	 * Get the status of an asynchronous job.
-	 * @param jobId
-	 * @param callback
-	 */
-	void getAsynchJobStatus(String jobId, AsyncCallback<String> callback);
-	
-	/**
-	 * After an asynchronous query job completes use this to get the query results.
-	 * @param jobId
-	 * @param callback
-	 */
-	void getAsychQueryResult(String jobId, String queryString, AsyncCallback<String> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
@@ -369,5 +340,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
+	void startAsynchJob(AsynchType type, String bodyJSON,
+			AsyncCallback<String> callback);
+
+	void getAsynchJobResults(AsynchType type, String jobId,
+			AsyncCallback<String> callback);
 
 }
