@@ -53,5 +53,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void updateTeamInvites(List<MembershipInvitationBundle> invites);
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
+		void certificationBadgeClicked();
 	}
 }

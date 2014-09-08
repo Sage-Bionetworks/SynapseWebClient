@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
+import org.sagebionetworks.web.client.presenter.CertificatePresenter;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
@@ -145,6 +146,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamPresenter getTeamPresenter();
 	
 	public QuizPresenter getQuizPresenter();
+	
+	public CertificatePresenter getCertificatePresenter();
 	
 	public AccountPresenter getAccountPresenter();
 	

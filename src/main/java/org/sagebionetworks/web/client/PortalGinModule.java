@@ -33,6 +33,8 @@ import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
 import org.sagebionetworks.web.client.view.CellTableProvider;
 import org.sagebionetworks.web.client.view.CellTableProviderImpl;
+import org.sagebionetworks.web.client.view.CertificateView;
+import org.sagebionetworks.web.client.view.CertificateViewImpl;
 import org.sagebionetworks.web.client.view.ChallengeOverviewView;
 import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
@@ -156,8 +158,8 @@ import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.CertificateView;
-import org.sagebionetworks.web.client.widget.entity.download.CertificateViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
+import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
@@ -498,8 +500,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(QuizViewImpl.class).in(Singleton.class);
 		bind(QuizView.class).to(QuizViewImpl.class);
 		
+		//Certificate place
+		bind(CertificateView.class).to(CertificateViewImpl.class);
+		
 		// Certificate
-		bind(CertificateView.class).to(CertificateViewImpl.class);		
+		bind(CertificateWidgetView.class).to(CertificateWidgetViewImpl.class);		
 		
 		//Account
 		bind(AccountViewImpl.class).in(Singleton.class);
