@@ -126,6 +126,7 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
@@ -1472,24 +1473,24 @@ public class SynapseClientImplTest {
 		List<AccessRequirement> unfilteredAccessRequirements = new ArrayList<AccessRequirement>();
 		List<AccessRequirement> filteredAccessRequirements;
 		//filter empty list should not result in failure
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
 		assertTrue(filteredAccessRequirements.isEmpty());
 		
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
 		//no requirements of type UPDATE
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
 		assertTrue(filteredAccessRequirements.isEmpty());
 		//1 download
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.DOWNLOAD);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.DOWNLOAD);
 		assertEquals(1, filteredAccessRequirements.size());
 		//2 submit
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.SUBMIT);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.SUBMIT);
 		assertEquals(2, filteredAccessRequirements.size());
 		
 		//finally, filter null list - result will be an empty list
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(null, ACCESS_TYPE.SUBMIT);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(null, ACCESS_TYPE.SUBMIT);
 		assertNotNull(filteredAccessRequirements);
 		assertTrue(filteredAccessRequirements.isEmpty());
 	}

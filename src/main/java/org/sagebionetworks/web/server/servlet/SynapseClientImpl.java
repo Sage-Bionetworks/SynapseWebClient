@@ -138,6 +138,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -476,8 +477,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
 			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
-				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb
-						.getAccessRequirements()));
+				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
 			}
 			if ((EntityBundleTransport.UNMET_ACCESS_REQUIREMENTS & partsMask) != 0) {
 				ebt.setUnmetAccessRequirementsJson(createJSONStringFromArray(eb
@@ -1338,7 +1338,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						.getAccessRequirements(subjectId);
 			// filter to the targetAccessType
 			if (targetAccessType != null) {
-				List<AccessRequirement> filteredResults = filterAccessRequirements(
+				List<AccessRequirement> filteredResults = AccessRequirementUtils.filterAccessRequirements(
 						accessRequirements.getResults(), targetAccessType);
 				accessRequirements.setResults(filteredResults);
 				accessRequirements.setTotalNumberOfResults(filteredResults
@@ -1353,19 +1353,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} catch (JSONObjectAdapterException e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
-	}
-
-	public List<AccessRequirement> filterAccessRequirements(
-			List<AccessRequirement> unfilteredList, ACCESS_TYPE filter) {
-		List<AccessRequirement> filteredAccessRequirements = new ArrayList<AccessRequirement>();
-		if (unfilteredList != null) {
-			for (AccessRequirement accessRequirement : unfilteredList) {
-				if (filter.equals(accessRequirement.getAccessType())) {
-					filteredAccessRequirements.add(accessRequirement);
-				}
-			}
-		}
-		return filteredAccessRequirements;
 	}
 
 	@Override

@@ -10,18 +10,22 @@ import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -65,6 +69,7 @@ public class EntityPresenterTest {
 	String entityId = "syn43344";
 	Synapse.EntityArea area = Synapse.EntityArea.FILES;
 	String areaToken = null;
+	long id;
 	
 	@Before
 	public void setup() throws Exception{
@@ -88,6 +93,7 @@ public class EntityPresenterTest {
 		AsyncMockStubber.callSuccessWith(ebt).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntityBundle(eq(ebt))).thenReturn(eb);
 		verify(mockView).setPresenter(entityPresenter);
+		id=0L;
 	}	
 	
 	@Test
@@ -151,6 +157,43 @@ public class EntityPresenterTest {
 		//verify synapse client call
 		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setEntityBundle(eq(eb), eq(version), any(EntityHeader.class), eq(area), eq(areaToken));
+	}
+	
+	private AccessRequirement createNewAR(ACCESS_TYPE type) {
+		AccessRequirement ar = new TermsOfUseAccessRequirement();
+		ar.setAccessType(type);
+		id++;
+		ar.setId(id);
+		return ar;
+	}
+	
+	@Test
+	public void testFilterToDownloadARs() {
+		List<AccessRequirement> unfilteredARs = new ArrayList<AccessRequirement>();
+		List<AccessRequirement> unfilteredUnmetARs = new ArrayList<AccessRequirement>();
+		List<AccessRequirement> expectedFilteredARs = new ArrayList<AccessRequirement>();
+		List<AccessRequirement> expectedFilteredUnmetARs = new ArrayList<AccessRequirement>();
+		
+		unfilteredARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
+		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
+		
+		AccessRequirement ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
+		unfilteredARs.add(ar);
+		expectedFilteredARs.add(ar);
+		
+		ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
+		unfilteredUnmetARs.add(ar);
+		expectedFilteredUnmetARs.add(ar);
+		
+		unfilteredARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
+		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
+		
+		eb.setAccessRequirements(unfilteredARs);
+		eb.setUnmetAccessRequirements(unfilteredUnmetARs);
+		EntityPresenter.filterToDownloadARs(eb);
+		
+		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
+		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
 	}
 	
 }
