@@ -138,6 +138,7 @@ import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
 import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
+import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityConstants;
@@ -1337,7 +1338,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						.getAccessRequirements(subjectId);
 			// filter to the targetAccessType
 			if (targetAccessType != null) {
-				List<AccessRequirement> filteredResults = AccessRequirementsTransport.filterAccessRequirements(
+				List<AccessRequirement> filteredResults = AccessRequirementUtils.filterAccessRequirements(
 						accessRequirements.getResults(), targetAccessType);
 				accessRequirements.setResults(filteredResults);
 				accessRequirements.setTotalNumberOfResults(filteredResults
