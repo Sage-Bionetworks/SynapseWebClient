@@ -2,14 +2,14 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.html.Text;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,23 +22,23 @@ public class TablePageViewImpl implements TablePageView {
 	
 	private static String MIN_WIDTH = "75px";
 
-	public interface Binder extends UiBinder<Table, TablePageViewImpl> {}
+	public interface Binder extends UiBinder<ScrollPanel, TablePageViewImpl> {}
 	
 	@UiField
 	TableRow header;
 	@UiField
 	TBody body;
 	
-	Table table;
+	ScrollPanel scrollPanel;
 	
 	@Inject
 	public TablePageViewImpl(Binder binder){
-		table = binder.createAndBindUi(this);
+		scrollPanel = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return table;
+		return scrollPanel;
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class TablePageViewImpl implements TablePageView {
 		for(String value: headers){
 			TableHeader th = new TableHeader();
 			th.setMinimumWidth(MIN_WIDTH);
-			th.add(new Text(value));
+			th.add(new Strong(value));
 			header.add(th);
 		}
 	}

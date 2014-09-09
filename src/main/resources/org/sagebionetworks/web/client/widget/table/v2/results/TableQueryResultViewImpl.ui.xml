@@ -30,7 +30,7 @@
 					closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true"
 					b:id="editRowsModal" size="LARGE">
 					<b:ModalBody>
-						<g:ScrollPanel ui:field="rowEditorModalPanel" />
+						<g:SimplePanel ui:field="rowEditorModalPanel" />
 					</b:ModalBody>
 					<b:ModalFooter>
 						<b:Button ui:field="saveRowsButton" type="PRIMARY"
