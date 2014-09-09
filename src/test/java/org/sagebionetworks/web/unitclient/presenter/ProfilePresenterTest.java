@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -615,4 +616,10 @@ public class ProfilePresenterTest {
 		verify(mockView).setTabSelected(any(ProfileArea.class));
 	}
 	
+	
+	@Test
+	public void testCertificationBadgeClicked() {
+		profilePresenter.certificationBadgeClicked();
+		verify(mockPlaceChanger).goTo(any(Certificate.class));
+	}
 }
