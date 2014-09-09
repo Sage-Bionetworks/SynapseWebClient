@@ -77,7 +77,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 	
 	public void initStep1(final String principalId) {
 		view.clear();
-		view.showLoading(); //TODO: add loading UI!
+		view.showLoading();
 		UserBadge.getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {

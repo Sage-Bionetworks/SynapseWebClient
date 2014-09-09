@@ -78,7 +78,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 		header.add(headerWidget.asWidget());
 		footer.clear();
 		footer.add(footerWidget.asWidget());
-		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
+		DisplayUtils.scrollToTop();
 	}
 	
 	@Override
