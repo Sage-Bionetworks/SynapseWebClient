@@ -5,15 +5,14 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.TableStatus;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,7 +26,9 @@ import com.google.inject.Inject;
  *
  */
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget {
-	
+	public static final String QUERY_CANCELED = "Query canceled";
+	// Mask to get all parts of a query.
+	private static final Long ALL_PARTS_MASK = new Long(0x15);
 	SynapseClientAsync synapseClient;
 	AdapterFactory adapterFactory;
 	TableQueryResultView view;
@@ -35,10 +36,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultBundle bundle;
 	TablePageWidget pageViewerWidget;
 	QueryResultEditorWidget queryResultEditor;
-	String startingQueryString;
+	Query startingQuery;
 	boolean isEditable;
-	QueryResultListener queryListener;
-	AsynchronousProgressWidget progressWidget;
+	QueryExecutionListener queryListener;
+	JobTrackingWidget progressWidget;
 	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, SynapseClientAsync synapseClient, PortalGinInjector ginInjector, AdapterFactory adapterFactory){
@@ -59,9 +60,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param isEditable Is the user allowed to edit the query results?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(String queryString, boolean isEditable, QueryResultListener listener){
+	public void configure(Query query, boolean isEditable, QueryExecutionListener listener){
 		this.isEditable = isEditable;
-		this.startingQueryString = queryString;
+		this.startingQuery = query;
 		this.queryListener = listener;
 		runQuery();
 	}
@@ -75,19 +76,13 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setProgressWidgetVisible(true);
 		// run the job
 		QueryBundleRequest qbr = new QueryBundleRequest();
-		qbr.setPartMask(new Long(0x15));
-		Query query = new Query();
-		qbr.setQuery(query);
-		query.setIsConsistent(true);
-		query.setSql(this.startingQueryString);
-		query.setLimit(15L);
-		query.setOffset(0L);
-		this.progressWidget.configure("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		qbr.setPartMask(ALL_PARTS_MASK);
+		qbr.setQuery(this.startingQuery);
+		this.progressWidget.startAndTrackJob("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {
 				showError(failure);
-				
 			}
 			
 			@Override
@@ -97,7 +92,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			
 			@Override
 			public void onCancel() {
-				showError("Query canceled");
+				showError(QUERY_CANCELED);
 			}
 		});
 
@@ -116,7 +111,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setTableVisible(true);
 		this.view.setToolbarVisible(true);
 		this.view.setEditEnabled(this.isEditable);
-		fireFinishEvent();
+		fireFinishEvent(true);
 	}
 
 	/**
@@ -131,9 +126,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	/**
 	 * Finished a query.
 	 */
-	private void fireFinishEvent() {
+	private void fireFinishEvent(boolean wasSuccessful) {
 		if(this.queryListener != null){
-			this.queryListener.queryExecutionFinished();
+			this.queryListener.queryExecutionFinished(wasSuccessful);
 		}
 	}
 	
@@ -155,7 +150,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.showError(message);
 		this.view.setToolbarVisible(false);
 		this.view.setProgressWidgetVisible(false);
-		fireFinishEvent();
+		fireFinishEvent(false);
 		this.view.setErrorVisible(true);
 	}
 
@@ -205,8 +200,4 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		queryResultEditor.showError(message);
 	}
 	
-	
-	private TableStatus getTableStatus(TableUnavilableException e) throws JSONObjectAdapterException{
-		return new TableStatus(adapterFactory.createNew(e.getMessage()));
-	}
 }

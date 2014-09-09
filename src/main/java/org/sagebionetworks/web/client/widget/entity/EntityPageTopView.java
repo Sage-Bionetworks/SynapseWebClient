@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -64,13 +65,13 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 
 		void entityDeleted(EntityDeletedEvent event);
 
-		void setTableQuery(String newQuery);
+		void setTableQuery(Query newQuery);
 
 		void setTableRow(TableRowHeader rowHeader);
 		
 		TableRowHeader getTableRowHeader();
 
-		String getTableQuery();
+		Query getTableQuery();
 
 				
 	}
