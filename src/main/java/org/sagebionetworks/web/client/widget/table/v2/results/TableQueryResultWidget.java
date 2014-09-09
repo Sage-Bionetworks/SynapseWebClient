@@ -82,7 +82,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		query.setSql(this.startingQueryString);
 		query.setLimit(15L);
 		query.setOffset(0L);
-		this.progressWidget.configure("Running query...", AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		this.progressWidget.configure("Running query...", false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {

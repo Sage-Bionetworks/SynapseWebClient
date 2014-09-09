@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -26,11 +27,18 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	}
 
 	@UiField
+	Column progressColumn;
+	@UiField
+	Column spinnerColumn;
+	@UiField
 	Text title;
 	@UiField
 	ProgressBar progressBar;
 	@UiField
 	Button cancelButton;
+	@UiField
+	Text message;
+	
 	Presenter presenter;
 
 	Container container;
@@ -62,11 +70,22 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 	}
 
 	@Override
-	public void setProgress(double percent, String text, String toolTips) {
-		progressBar.setPercent(percent);
-		progressBar.setText(text);
-		progressBar.setTitle(toolTips);
+	public void setIsDetermiante(boolean isDeterminate) {
+		spinnerColumn.setVisible(!isDeterminate);
+		progressColumn.setVisible(isDeterminate);
 	}
 
+	@Override
+	public void setDeterminateProgress(double percent, String text,
+			String message) {
+		progressBar.setPercent(percent);
+		progressBar.setText(text);
+		this.message.setText(message);
+	}
+
+	@Override
+	public void setIndetermianteProgress(String message) {
+		this.message.setText(message);
+	}
 
 }

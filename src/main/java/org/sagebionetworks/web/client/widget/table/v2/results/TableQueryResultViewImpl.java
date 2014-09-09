@@ -30,7 +30,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	SimplePanel progressPanel;
 	@UiField
-	ScrollPanel rowEditorModalPanel;
+	SimplePanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
 	@UiField
