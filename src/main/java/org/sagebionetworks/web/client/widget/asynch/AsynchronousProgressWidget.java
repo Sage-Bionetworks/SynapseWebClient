@@ -30,6 +30,7 @@ public class AsynchronousProgressWidget implements
 	private AsynchronousProgressView view;
 	private NumberFormatProvider numberFormatProvider;
 	private AsynchronousJobTracker jobTracker;
+	private boolean isDeterminate;
 
 	@Inject
 	public AsynchronousProgressWidget(AsynchronousProgressView view,
@@ -47,9 +48,11 @@ public class AsynchronousProgressWidget implements
 	 * @param startMessage
 	 * @param statusToTrack
 	 */
-	public void configure(String title, AsynchType type, AsynchronousRequestBody requestBody,
+	public void configure(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,
 			final AsynchronousProgressHandler handler) {
+		this.isDeterminate = isDeterminate;
 		view.setTitle(title);
+		view.setIsDetermiante(isDeterminate);
 		// Configure this job
 		jobTracker.startAndTrack(type, requestBody, WAIT_MS, new UpdatingAsynchProgressHandler() {
 					@Override
@@ -80,9 +83,14 @@ public class AsynchronousProgressWidget implements
 	 * @param status
 	 */
 	private void setCurrentStatus(AsynchronousJobStatus status) {
-		double percent = calculateProgressPercent(status);
-		String text = numberFormatProvider.format(percent) + "%";
-		this.view.setProgress(percent, text, status.getProgressMessage());
+		String message = status.getProgressMessage();
+		if(isDeterminate){
+			double percent = calculateProgressPercent(status);
+			String text = numberFormatProvider.format(percent) + "%";
+			this.view.setDeterminateProgress(percent, text, message);
+		}else{
+			this.view.setIndetermianteProgress(message);
+		}
 	}
 
 	/**
