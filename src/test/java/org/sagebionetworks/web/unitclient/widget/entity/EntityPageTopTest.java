@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +27,13 @@ import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
+import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.SortDirection;
+import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
@@ -52,12 +57,14 @@ import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidgetView;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
+import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.shared.EventBus;
 
 public class EntityPageTopTest {
 
+	QueryTokenProvider queryTokenProvider;
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	NodeModelCreator mockNodeModelCreator;
@@ -87,11 +94,13 @@ public class EntityPageTopTest {
 	Synapse gotoPlace;
 	EntityBundle projectBundle;
 	Project projectEntity = new Project();		
-	AreaChangeHandler areaChangeHandler;	
+	AreaChangeHandler areaChangeHandler;
+	Query query;
 
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -115,7 +124,7 @@ public class EntityPageTopTest {
 				mockEntityTypeProvider,
 				mockIconsImageBundle, 
 				mockWidgetRegistrar, 
-				mockGlobalApplicationState, mockEventBus, new JSONObjectAdapterImpl());
+				mockGlobalApplicationState, mockEventBus, new JSONObjectAdapterImpl(), queryTokenProvider);
 		pageTop.setAreaChangeHandler(areaChangeHandler);
 		
 		// Setup the the entity
@@ -146,6 +155,20 @@ public class EntityPageTopTest {
 		
 		projectEntity.setId(projectId);
 		projectBundle = new EntityBundle(projectEntity, null, null, null, null, null, null, null);
+		
+		// setup a complex query.
+		query = new Query();
+		query.setSql("select one, two, three from syn123 where name=\"bar\" and type in('one','two','three'");
+		query.setLimit(101L);
+		query.setOffset(33L);
+		query.setIsConsistent(true);
+		SortItem one = new SortItem();
+		one.setColumn("one");
+		one.setDirection(SortDirection.ASC);
+		SortItem two = new SortItem();
+		two.setColumn("one");
+		two.setDirection(SortDirection.DESC);
+		query.setSort(Arrays.asList(one, two));
 	}
 		
 	@Test 
@@ -371,9 +394,9 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testSetTableQuery() {
-		String query = "query";
-		pageTop.setTableQuery(query);		
-		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(query));		
+		String queryToken = queryTokenProvider.queryToToken(query);
+		pageTop.setTableQuery(query);
+		verify(areaChangeHandler).areaChanged(eq(EntityArea.TABLES), contains(queryToken));		
 	}
 	
 	@Test
@@ -426,27 +449,27 @@ public class EntityPageTopTest {
 	@Test
 	public void testGetTableQuery() {
 		String queryAreaToken;
-		String query;
-
+		Query query1 = null;
 		queryAreaToken = null;
 		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
-		query = pageTop.getTableQuery();
-		assertNull(query);
+		query1 = pageTop.getTableQuery();
+		assertNull(query1);
 		
 		queryAreaToken = "something else";
 		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
-		query = pageTop.getTableQuery();
-		assertNull(query);
-
-		queryAreaToken = "query/SELECT * FROM syn123 LIMIT 1";
+		query1 = pageTop.getTableQuery();
+		assertNull(query1);
+		String token = queryTokenProvider.queryToToken(query);
+		queryAreaToken = "query/"+token;
 		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
-		query = pageTop.getTableQuery();
-		assertEquals("SELECT * FROM syn123 LIMIT 1", query);
-		
-		queryAreaToken = "query/SELECT 'query/' FROM syn123 LIMIT 1";
+		query1 = pageTop.getTableQuery();
+		assertEquals(query, query1);
+		query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
+		token = queryTokenProvider.queryToToken(query);
+		queryAreaToken = "query/"+token;
 		pageTop.configure(entityBundle, entityVersion, projectHeader, EntityArea.TABLES, queryAreaToken);		
-		query = pageTop.getTableQuery();
-		assertEquals("SELECT 'query/' FROM syn123 LIMIT 1", query);
+		query1 = pageTop.getTableQuery();
+		assertEquals(query, query1);
 		
 	}
 

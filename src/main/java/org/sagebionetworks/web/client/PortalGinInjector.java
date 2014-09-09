@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -235,7 +236,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	
 	// Asynchronous
-	public AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
+	public JobTrackingWidget creatNewAsynchronousProgressWidget();
 	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();

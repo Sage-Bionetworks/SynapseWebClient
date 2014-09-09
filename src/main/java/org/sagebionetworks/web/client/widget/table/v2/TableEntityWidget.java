@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
@@ -21,13 +23,14 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter {
+public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryExecutionListener {
+	public static final long DEFAULT_OFFSET = 0L;
+	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the Table Schema to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
-	public static final long DEFAULT_PAGE_SIZE = 10L;
+	public static final long DEFAULT_LIMIT = 10L;
 
 	private TableEntityWidgetView view;
-	private TableModelUtils tableModelUtils;
 	private AsynchronousProgressWidget asynchProgressWidget;
 	
 	String tableId;
@@ -36,11 +39,11 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	QueryChangeHandler queryChangeHandler;
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
+	Query currentQuery;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableModelUtils tableModelUtils, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
+	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
 		this.view = view;
-		this.tableModelUtils = tableModelUtils;
 		this.asynchProgressWidget = asynchProgressWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
@@ -81,7 +84,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			setNoColumnsState();
 		}else{
 			// There are columns.
-			String startQuery = queryChangeHandler.getQueryString();;
+			Query startQuery = queryChangeHandler.getQueryString();;
 			if(startQuery == null){
 				// use a default query
 				startQuery = getDefaultQueryString();
@@ -90,20 +93,26 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		}
 	}
 	
+	private void setSQL(String sql){
+		this.currentQuery.setSql(sql);
+		setQuery(this.currentQuery);
+	}
+	
 	/**
 	 * Set the query used by this widget.
 	 * @param sql
 	 */
-	private void setQuery(String sql){
-		this.queryInputWidget.configure(sql, new QueryInputListener() {
+	private void setQuery(Query query){
+		this.currentQuery = query;
+		this.queryInputWidget.configure(query.getSql(), new QueryInputListener() {
 			@Override
 			public void onExecuteQuery(String sql) {
-				setQuery(sql);
+				setSQL(sql);
 			}
 		});
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
-		this.queryResultsWidget.configure(sql, this.canEdit, this.queryInputWidget);
+		this.queryResultsWidget.configure(query, this.canEdit, this);
 	}
 
 	/**
@@ -130,11 +139,16 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 * Build the default query based on the current table data.
 	 * @return
 	 */
-	public String getDefaultQueryString(){
+	public Query getDefaultQueryString(){
 		StringBuilder builder = new StringBuilder();
-		builder.append("SELECT * FROM ");
+		builder.append(SELECT_FROM);
 		builder.append(this.tableId);
-		return builder.toString();
+		Query query = new Query();
+		query.setSql(builder.toString());
+		query.setOffset(DEFAULT_OFFSET);
+		query.setLimit(DEFAULT_LIMIT);
+		query.setIsConsistent(true);
+		return query;
 	}
 	
 	/**
@@ -143,16 +157,32 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 */
 	public long getDefaultPageSize(){
 		if(this.tableBundle.getMaxRowsPerPage() == null){
-			return DEFAULT_PAGE_SIZE;
+			return DEFAULT_LIMIT;
 		}
 		long maxRowsPerPage = this.tableBundle.getMaxRowsPerPage();
 		long maxTwoThirds = maxRowsPerPage - maxRowsPerPage/3l;
-		return Math.min(maxTwoThirds, DEFAULT_PAGE_SIZE);
+		return Math.min(maxTwoThirds, DEFAULT_LIMIT);
 	}
 
 	@Override
 	public void onPersistSuccess(EntityUpdatedEvent event) {
 		this.queryChangeHandler.onPersistSuccess(event);
+	}
+
+	@Override
+	public void queryExecutionStarted() {
+		// Pass this along to the input widget.
+		this.queryInputWidget.queryExecutionStarted();
+	}
+
+	@Override
+	public void queryExecutionFinished(boolean wasSuccessful) {
+		// Pass this along to the input widget.
+		this.queryInputWidget.queryExecutionFinished(wasSuccessful);
+		// Set this as the query if it was successful
+		if(wasSuccessful){
+			this.queryChangeHandler.onQueryChange(this.currentQuery);
+		}
 	}
 	
 }

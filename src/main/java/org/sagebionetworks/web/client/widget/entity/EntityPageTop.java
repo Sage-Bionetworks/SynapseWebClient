@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.ObjectSchema;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
+import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.ProjectAreaState;
 
@@ -55,6 +57,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityHeader projectHeader;
 	private AreaChangeHandler areaChangedHandler;
 	private ProjectAreaState projectAreaState;
+	private QueryTokenProvider queryTokenProvider;
 	
 	public static final String TABLE_QUERY_PREFIX = "query/";
 	public static final String TABLE_ROW_PREFIX = "row/";
@@ -70,7 +73,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			IconsImageBundle iconsImageBundle,
 			WidgetRegistrar widgetRegistrar,
 			GlobalApplicationState globalApplicationState,
-			EventBus bus, JSONObjectAdapter jsonObjectAdapter) {
+			EventBus bus, JSONObjectAdapter jsonObjectAdapter,
+			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.nodeModelCreator = nodeModelCreator;
@@ -82,7 +86,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.bus = bus;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalApplicationState = globalApplicationState;	
-		
+		this.queryTokenProvider = queryTokenProvider;
 		this.projectAreaState = new ProjectAreaState();
 		view.setPresenter(this);
 	}
@@ -288,11 +292,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public void setTableQuery(String newQuery) {
-		setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + newQuery);
-	}
-
-	@Override
 	public void setTableRow(TableRowHeader rowHeader) {
 		if(rowHeader != null && rowHeader.getRowId() != null) {
 			String rowStr = rowHeader.getRowId();
@@ -323,9 +322,22 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	}
 
 	@Override
-	public String getTableQuery() {
+	public void setTableQuery(Query newQuery) {
+		if(newQuery != null){
+			String token = queryTokenProvider.queryToToken(newQuery);
+			if(token != null){
+				setArea(EntityArea.TABLES, TABLE_QUERY_PREFIX + token);
+			}
+		}
+	}
+	
+	@Override
+	public Query getTableQuery() {
 		if(areaToken != null && areaToken.startsWith(TABLE_QUERY_PREFIX)) {
-			return areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
+			String token = areaToken.substring(TABLE_QUERY_PREFIX.length(), areaToken.length());
+			if(token != null){
+				return queryTokenProvider.tokenToQuery(token);
+			}
 		}
 		return null;
 	}

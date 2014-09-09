@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -725,12 +726,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		// Table
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
-			public void onQueryChange(String newQuery) {
+			public void onQueryChange(Query newQuery) {
 				presenter.setTableQuery(newQuery);				
 			}
 
 			@Override
-			public String getQueryString() {
+			public Query getQueryString() {
 				return presenter.getTableQuery();
 			}
 
@@ -739,19 +740,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		boolean useV2Table = true;
 		IsWidget tableWidget = null;
-		if(useV2Table){
-			// V2
-			TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
-			v2TableWidget.configure(bundle, canEdit, qch);
-			tableWidget = v2TableWidget;
-		}else{
-			// V1
-			SimpleTableWidget simpleTableWidget = ginInjector.getSimpleTableWidget();
-			simpleTableWidget.configure(bundle, canEdit, presenter.getTableQuery(), qch);	
-			tableWidget = simpleTableWidget;
-		}
+		// V2
+		TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
+		v2TableWidget.configure(bundle, canEdit, qch);
+		tableWidget = v2TableWidget;
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
