@@ -85,6 +85,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressViewImpl;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
@@ -751,6 +753,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(QueryResultEditorView.class).to(QueryResultEditorViewImpl.class);
 		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
+		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
 		
 		/*
 		 * TableEntity cell bindings.

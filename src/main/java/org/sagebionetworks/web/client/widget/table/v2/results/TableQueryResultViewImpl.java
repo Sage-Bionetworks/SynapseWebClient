@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -128,7 +129,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 
 	@Override
-	public void setProgressWidget(AsynchronousProgressWidget progressWidget) {
+	public void setProgressWidget(JobTrackingWidget progressWidget) {
 		this.progressPanel.add(progressWidget);
 	}
 

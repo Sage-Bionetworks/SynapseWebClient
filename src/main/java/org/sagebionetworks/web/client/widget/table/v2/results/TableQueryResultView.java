@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -90,7 +91,7 @@ public interface TableQueryResultView extends IsWidget {
 	 * The progress widget shows query progress.s
 	 * @param progressWidget
 	 */
-	void setProgressWidget(AsynchronousProgressWidget progressWidget);
+	void setProgressWidget(JobTrackingWidget progressWidget);
 
 	/**
 	 * Show or hide the progress widget.

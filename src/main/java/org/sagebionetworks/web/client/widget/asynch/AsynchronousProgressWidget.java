@@ -16,7 +16,7 @@ import com.google.inject.Inject;
  * 
  */
 public class AsynchronousProgressWidget implements
-		AsynchronousProgressView.Presenter, IsWidget {
+		AsynchronousProgressView.Presenter, JobTrackingWidget {
 
 	/**
 	 * The format used to convert doubles to strings.
@@ -48,7 +48,8 @@ public class AsynchronousProgressWidget implements
 	 * @param startMessage
 	 * @param statusToTrack
 	 */
-	public void configure(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,
+	@Override
+	public void startAndTrackJob(String title, boolean isDeterminate, AsynchType type, AsynchronousRequestBody requestBody,
 			final AsynchronousProgressHandler handler) {
 		this.isDeterminate = isDeterminate;
 		view.setTitle(title);

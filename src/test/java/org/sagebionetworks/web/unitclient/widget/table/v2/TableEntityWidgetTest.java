@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 /**
@@ -37,7 +36,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWi
 public class TableEntityWidgetTest {
 
 	AdapterFactory adapterFactory;
-	TableModelUtils tableModelUtils;
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
@@ -61,7 +59,6 @@ public class TableEntityWidgetTest {
 		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
-		tableModelUtils = new TableModelUtils(adapterFactory);
 		columns = TableModelTestUtils.createOneOfEachType();
 		tableEntity = new TableEntity();
 		tableEntity.setId("syn123");
@@ -69,9 +66,14 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, tableModelUtils, mockQueryResultsWidget, mockQueryInputWidget);
+		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, mockQueryResultsWidget, mockQueryInputWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
+		
+		String sql = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
+		Query query = new Query();
+		query.setSql(sql);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
 	}
 	
 	@Test
@@ -86,12 +88,12 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testGetDefaultPageSizeMaxOver(){
-		tableBundle.setMaxRowsPerPage(TableEntityWidget.DEFAULT_PAGE_SIZE *2L);
+		tableBundle.setMaxRowsPerPage(TableEntityWidget.DEFAULT_LIMIT *2L);
 		// Configure with the default values
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
 		// since the size from the bundle is greater than the default
 		// the default should be used.
-		assertEquals(TableEntityWidget.DEFAULT_PAGE_SIZE, widget.getDefaultPageSize());
+		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
 	
 	@Test
@@ -100,7 +102,7 @@ public class TableEntityWidgetTest {
 		// Configure with the default values
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
 		// when null the default should be used.
-		assertEquals(TableEntityWidget.DEFAULT_PAGE_SIZE, widget.getDefaultPageSize());
+		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
 	
 	@Test 
@@ -108,18 +110,12 @@ public class TableEntityWidgetTest {
 		tableBundle.setMaxRowsPerPage(4L);
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
 		String expected = "SELECT * FROM "+tableEntity.getId();
-		assertEquals(expected, widget.getDefaultQueryString());
-	}
-	
-	@Ignore
-	@Test
-	public void testConfigureNullDefaultQuery(){
-		tableBundle.setMaxRowsPerPage(4L);
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
-		String expected = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
-		// since a null query string was passed to the configure, the widget needs to set it
-		// and notify the change listener.
-		verify(mockQueryChangeHandler).onQueryChange(expected);
+		Query query = new Query();
+		query.setSql(expected);
+		query.setIsConsistent(true);
+		query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
+		query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+		assertEquals(query, widget.getDefaultQueryString());
 	}
 	
 	@Test
@@ -127,16 +123,17 @@ public class TableEntityWidgetTest {
 		tableBundle.setMaxRowsPerPage(4L);
 		// This time we pass a query
 		String sql = "SELECT * FROM "+tableEntity.getId()+" LIMIT 3 OFFSET 0";
-		when(mockQueryChangeHandler.getQueryString()).thenReturn(sql);
+		Query query = new Query();
+		query.setSql(sql);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
 		widget.configure(entityBundle, true, mockQueryChangeHandler);
 		// The widget must not change the query when it is passed in.
-		verify(mockQueryChangeHandler, never()).onQueryChange(anyString());
+		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 	}
 	
 	@Test
 	public void testNoColumnsWithEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
-		when(mockQueryChangeHandler.getQueryString()).thenReturn("SELECT * FROM syn123");
 		boolean canEdit = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
 		verify(mockView).setQueryInputVisible(false);
@@ -150,7 +147,6 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testNoColumnsWithWihtouEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
-		when(mockQueryChangeHandler.getQueryString()).thenReturn("SELECT * FROM syn123");
 		boolean canEdit = false;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
 		verify(mockView).setQueryInputVisible(false);
@@ -159,5 +155,39 @@ public class TableEntityWidgetTest {
 		verify(mockView).showTableMessage(AlertType.INFO, TableEntityWidget.NO_COLUMNS_NOT_EDITABLE);
 		// The query should be cleared when there are no columns
 		verify(mockQueryChangeHandler).onQueryChange(null);
+	}
+	
+	@Test
+	public void testQueryExecutionStarted(){
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.queryExecutionStarted();
+		verify(mockQueryInputWidget).queryExecutionStarted();
+	}
+	
+	@Test
+	public void testQueryExecutionFinishedSuccess(){
+		boolean canEdit = true;
+		boolean wasExecutionSuccess = true;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryChangeHandler).onQueryChange(startQuery);
+	}
+	
+	@Test
+	public void testQueryExecutionFinishedFailed(){
+		boolean canEdit = true;
+		boolean wasExecutionSuccess = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 	}
 }
