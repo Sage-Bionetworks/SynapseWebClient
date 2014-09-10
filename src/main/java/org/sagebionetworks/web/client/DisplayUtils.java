@@ -651,6 +651,34 @@ public class DisplayUtils {
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
 		
+		SafeHtml popupHtml = getPopupSafeHtml(title, message, iconStyle);
+		boolean isSecondaryButton = secondaryButtonCallback != null;
+		
+		if (isSecondaryButton) {
+			Bootbox.confirm(popupHtml.asString(), new ConfirmCallback() {
+				@Override
+				public void callback(boolean isConfirmed) {
+					if (isConfirmed) {
+						if (primaryButtonCallback != null)
+							primaryButtonCallback.invoke();
+					} else {
+						if (secondaryButtonCallback != null)
+							secondaryButtonCallback.invoke();
+					}
+				}
+			});
+		} else {
+			Bootbox.alert(popupHtml.asString(), new AlertCallback() {
+				@Override
+				public void callback() {
+					if (primaryButtonCallback != null)
+						primaryButtonCallback.invoke();
+				}
+			});
+		}
+	}
+	
+	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
 			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
@@ -671,30 +699,7 @@ public class DisplayUtils {
 		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
 		builder.appendEscaped(message);
 		builder.appendHtmlConstant("</div></div>");
-		boolean isSecondaryButton = secondaryButtonCallback != null;
-		
-		if (isSecondaryButton) {
-			Bootbox.confirm(builder.toSafeHtml().asString(), new ConfirmCallback() {
-				@Override
-				public void callback(boolean isConfirmed) {
-					if (isConfirmed) {
-						if (primaryButtonCallback != null)
-							primaryButtonCallback.invoke();
-					} else {
-						if (secondaryButtonCallback != null)
-							secondaryButtonCallback.invoke();
-					}
-				}
-			});
-		} else {
-			Bootbox.alert(builder.toSafeHtml().asString(), new AlertCallback() {
-				@Override
-				public void callback() {
-					if (primaryButtonCallback != null)
-						primaryButtonCallback.invoke();
-				}
-			});
-		}
+		return builder.toSafeHtml();
 	}
 	
 	public static void center(Window window) {
