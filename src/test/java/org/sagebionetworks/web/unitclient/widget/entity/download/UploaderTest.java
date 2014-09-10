@@ -275,7 +275,7 @@ public class UploaderTest {
 		String duplicateNameEntityId = "syn007";
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.directUploadStep1("newFile.txt");
-		verify(view).showConfirmDialog(anyString(), anyString(), any(Callback.class), any(Callback.class));
+		verify(view).showConfirmDialog(anyString(), any(Callback.class), any(Callback.class));
 	}
 	
 	@Test
