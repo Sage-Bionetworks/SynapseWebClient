@@ -101,8 +101,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		createUploadPanel();
 		createExternalPanel();
 		
-		// TODO? TODO!
-		this.add(dialog);
+		this.add(dialog);	// Put modal on uploader layer.
 	}
 		
 	@Override
@@ -133,11 +132,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showErrorMessage(String message) {
-//		DisplayUtils.showErrorMessage(message);
-		SafeHtml html = DisplayUtils.getStuff("", message);
-		FlowPanel f = new FlowPanel();
-		f.add(new HTMLPanel(html.asString()));
-		dialog.configure("Preview", f, DisplayConstants.OK, null, null, true);
+		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.WARNING);
+		dialog.configure("", new HTMLPanel(html.asString()), DisplayConstants.OK, null, null, true);	// TODO: "Error"? Title?
 		dialog.show();
 	}
 
@@ -177,7 +173,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		if (nameField != null)
 			nameField.clear();
 	}
-
 	
 	@Override
 	public int getDisplayHeight() {
@@ -309,8 +304,23 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void showConfirmDialog(String title, String message, Callback yesCallback, Callback noCallback) {
-		DisplayUtils.showConfirmDialog(title, message, yesCallback, noCallback);
+	public void showConfirmDialog(String title, String message, final Callback yesCallback, final Callback noCallback) {
+		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.QUESTION);
+		// TODO: Title?
+		dialog.configure(title, new HTMLPanel(html.asString()), DisplayConstants.YES, DisplayConstants.NO, new Dialog.Callback() {
+
+			@Override
+			public void onPrimary() {
+				yesCallback.invoke();
+			}
+
+			@Override
+			public void onDefault() {
+				noCallback.invoke();
+			}
+			
+		}, true);
+		dialog.show();
 	}
 	
 	// set the initial state of the controls when widget is made visible
