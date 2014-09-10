@@ -137,12 +137,11 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
 		this.message = message;
 		this.isAcceptingInvite = isAcceptingInvite;
-		view.setButtonsEnabled(false);
 		sendJoinRequestStep0();
 	}
 	
-
 	public void sendJoinRequestStep0() {
+		view.setButtonsEnabled(false);
 		currentPage = 0;
 		currentAccessRequirement = 0;
 		//initialize the access requirements
