@@ -1,8 +1,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	
 	<g:HTMLPanel>
 		<div class="color-line"></div>
@@ -35,7 +35,7 @@
 									<div class="input-group">
 										<g:TextBox ui:field="createProjectTextBox" styleName="form-control" />
 										<span class="input-group-btn">
-											<g:Button ui:field="createProjectButton" styleName="btn btn-default">Create Project</g:Button>
+											<b:Button ui:field="createProjectButton" type="DEFAULT">Create Project</b:Button>
 										</span>
 									</div>
 								</div>
@@ -65,12 +65,12 @@
 									<div class="input-group">
 										<g:TextBox ui:field="createTeamTextBox" styleName="form-control" />
 										<span class="input-group-btn">
-											<g:Button ui:field="createTeamButton" styleName="btn btn-default">Create Team</g:Button>
+											<b:Button ui:field="createTeamButton" type="DEFAULT">Create Team</b:Button>
 										</span>
 									</div>
 								</div>
 								 <div class="col-xs-4 col-sm-6">
-									<g:Button ui:field="teamSearchButton" styleName="btn btn-default right"><span class="glyphicon glyphicon-search"></span> Team Search</g:Button>
+								    <b:Button ui:field="teamSearchButton" type="DEFAULT" icon="SEARCH" pull="RIGHT" text="Team Search" />
 								</div>
 							</div>
 						</div>
@@ -88,14 +88,6 @@
 					    </div>
 					</div>
 				</div>
-			</div>
-			<div class="row margin-top-5">
-			    <div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10">
-					<g:SimplePanel ui:field="certificatePanel" />
-				</div>
-			</div>
-			<div class="row margin-top-5">				
-				
 			</div>
 			<p>&nbsp;</p>
 		</div>

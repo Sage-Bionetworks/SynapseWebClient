@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
@@ -41,7 +41,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -62,8 +61,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel updateUserInfoPanel;
-	@UiField
-	SimplePanel certificatePanel;
 	@UiField
 	FlowPanel viewProfilePanel;
 	@UiField
@@ -169,7 +166,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private OpenTeamInvitationsWidget openInvitesWidget;
 	private TeamListWidget myTeamsWidget;
-	private CertificateWidget certificateWidget;
 	private SettingsPresenter settingsPresenter;
 	private PortalGinInjector ginInjector;
 	
@@ -182,7 +178,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			OpenTeamInvitationsWidget openInvitesWidget, 
 			TeamListWidget myTeamsWidget,
-			CertificateWidget certificateWidget,
 			SettingsPresenter settingsPresenter,
 			PortalGinInjector ginInjector) {		
 		initWidget(binder.createAndBindUi(this));
@@ -192,14 +187,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.openInvitesWidget = openInvitesWidget;
 		this.myTeamsWidget = myTeamsWidget;
-		this.certificateWidget = certificateWidget;
 		this.settingsPresenter = settingsPresenter;
 		this.ginInjector = ginInjector;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-		certificatePanel.setWidget(certificateWidget.asWidget());
 		
 		picturePanel.clear();
 		initTabs();
@@ -240,8 +233,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			@Override
 			public void onClick(ClickEvent event) {
 				clear();
-				certificatePanel.setVisible(true);
 				tooltip.hide();
+				presenter.certificationBadgeClicked();
 			}
 		});
 		certifiedUserBadgePanel.add(certifiedUserImage);
@@ -268,9 +261,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormWidget) {
 		clear();
 		DisplayUtils.hide(settingsListItem);
-		//add certificate
 		if (passingRecord != null) {
-			certificateWidget.configure(profile, passingRecord);
 			certifiedUserBadgePanel.setVisible(true); 
 		 }
 		
@@ -493,7 +484,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		picturePanel.clear();
-		certificatePanel.setVisible(false);
 		certifiedUserBadgePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();

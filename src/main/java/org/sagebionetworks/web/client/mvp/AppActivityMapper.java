@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -87,6 +88,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(Down.class);
 		openAccessPlaces.add(Profile.class);
+		openAccessPlaces.add(Certificate.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);

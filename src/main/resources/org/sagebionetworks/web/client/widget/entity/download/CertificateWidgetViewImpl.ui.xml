@@ -19,9 +19,6 @@
 		        
 		        <div class="margin-top-30 margin-bottom-60 center"> <g:Image resource='{sageImageBundle.certificate}' /> </div>
 		    </div>
-			<div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10">
-			    <g:Button ui:field="continueButton" styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right" text="Continue"/>
-			</div>
-			</div>
+		</div>
 	</g:HTMLPanel>
 </ui:UiBinder>

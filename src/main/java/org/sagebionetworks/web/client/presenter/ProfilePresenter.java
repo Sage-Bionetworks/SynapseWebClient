@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -566,6 +567,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	 */
 	public void setIsOwner(boolean isOwner) {
 		this.isOwner = isOwner;
+	}
+	
+	@Override
+	public void certificationBadgeClicked() {
+		goTo(new Certificate(currentUserId));
 	}
 }
 
