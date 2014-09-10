@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultListener;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,7 +15,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryResultListener{
+public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, QueryExecutionListener{
 	
 	public static final String AN_EMPTY_QUERY_IS_NOT_VALID = "An empty query is not valid.";
 	QueryInputView view;
@@ -87,7 +87,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	}
 
 	@Override
-	public void queryExecutionFinished() {
+	public void queryExecutionFinished(boolean wasSuccessful) {
 		view.setQueryInputLoading(false);
 	}
 

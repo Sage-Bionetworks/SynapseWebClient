@@ -90,11 +90,11 @@ public class AsynchronousProgressWidgetTest {
 	@Test
 	public void testHappy(){
 		String title = "title";
-		widget.configure(title, type, requestBody, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
-		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
-		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
-		verify(mockView).setProgress(100.00, "100.00%", done.getProgressMessage());
+		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
+		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
+		verify(mockView).setDeterminateProgress(100.00, "100.00%", done.getProgressMessage());
 		verify(mockHandler).onComplete(responseBody);
 	}
 	
@@ -103,11 +103,11 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(null);
 		start.setProgressTotal(null);
-		widget.configure(title, type, requestBody, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
-		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
-		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
-		verify(mockView).setProgress(100.00, "100.00%", done.getProgressMessage());
+		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
+		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
+		verify(mockView).setDeterminateProgress(100.00, "100.00%", done.getProgressMessage());
 		verify(mockHandler).onComplete(responseBody);
 	}
 	
@@ -116,11 +116,11 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.configure(title, type, requestBody, mockHandler);
+		widget.startAndTrackJob(title, true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
-		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
-		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
-		verify(mockView).setProgress(100.00, "100.00%", done.getProgressMessage());
+		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
+		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
+		verify(mockView).setDeterminateProgress(100.00, "100.00%", done.getProgressMessage());
 		verify(mockHandler).onComplete(responseBody);
 	}
 	
@@ -129,11 +129,11 @@ public class AsynchronousProgressWidgetTest {
 		String title = "title";
 		start.setProgressCurrent(1l);
 		start.setProgressTotal(0l);
-		widget.configure(title, type, requestBody, mockHandler);
+		widget.startAndTrackJob(title,true, type, requestBody, mockHandler);
 		verify(mockView).setTitle(title);
-		verify(mockView).setProgress(0.0, "0.00%", start.getProgressMessage());
-		verify(mockView).setProgress(50.00, "50.00%", middle.getProgressMessage());
-		verify(mockView).setProgress(100.00, "100.00%", done.getProgressMessage());
+		verify(mockView).setDeterminateProgress(0.0, "0.00%", start.getProgressMessage());
+		verify(mockView).setDeterminateProgress(50.00, "50.00%", middle.getProgressMessage());
+		verify(mockView).setDeterminateProgress(100.00, "100.00%", done.getProgressMessage());
 		widget.onCancel();
 		verify(mockHandler).onCancel();
 	}
@@ -143,7 +143,19 @@ public class AsynchronousProgressWidgetTest {
 		Throwable error = new Throwable("some error");
 		trackerStub = new AsynchronousJobTrackerStub(states, error, responseBody);
 		widget = new AsynchronousProgressWidget(mockView, numberFormatProvider, trackerStub);
-		widget.configure("title", type, requestBody, mockHandler);
+		widget.startAndTrackJob("title", true, type, requestBody, mockHandler);
 		verify(mockHandler).onFailure(error);
+	}
+	
+	@Test
+	public void testIndeterminate(){
+		String title = "title";
+		start.setProgressCurrent(1l);
+		start.setProgressTotal(0l);
+		widget.startAndTrackJob(title,false, type, requestBody, mockHandler);
+		verify(mockView).setTitle(title);
+		verify(mockView).setIndetermianteProgress(start.getProgressMessage());
+		verify(mockView).setIndetermianteProgress(middle.getProgressMessage());
+		verify(mockView).setIndetermianteProgress(done.getProgressMessage());
 	}
 }

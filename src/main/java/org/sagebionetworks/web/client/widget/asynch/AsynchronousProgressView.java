@@ -28,11 +28,24 @@ public interface AsynchronousProgressView extends IsWidget{
 	 * @param title
 	 */
 	public void setTitle(String title);
+	
+	/**
+	 * Is this determinate or indeterminate.
+	 * @param isDeterminate
+	 */
+	public void setIsDetermiante(boolean isDeterminate);
 
 	/**
-	 * Set the progress data
+	 * Set the determinate progress data
 	 * @param percent
 	 * @param text
 	 */
-	public void setProgress(double percent, String text, String toolTips);
+	public void setDeterminateProgress(double percent, String text, String message);
+	
+	/**
+	 * Set the indeterminate progress data
+	 * @param text
+	 * @param message
+	 */
+	public void setIndetermianteProgress(String message);
 }

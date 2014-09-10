@@ -28,6 +28,9 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 			String arText,
 			final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
+	
+	void setButtonsEnabled(boolean enable);
+	
 	public interface Presenter extends SynapsePresenter {
 		public void sendJoinRequest(String message, boolean isAcceptingInvite);
 		//service may be added later to query for current user requests to allow deletion

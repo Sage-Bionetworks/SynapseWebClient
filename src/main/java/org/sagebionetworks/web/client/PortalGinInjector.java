@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.AccountPresenter;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
+import org.sagebionetworks.web.client.presenter.CertificatePresenter;
 import org.sagebionetworks.web.client.presenter.ChallengeOverviewPresenter;
 import org.sagebionetworks.web.client.presenter.ChangeUsernamePresenter;
 import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
@@ -28,6 +29,7 @@ import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
@@ -146,6 +148,8 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public QuizPresenter getQuizPresenter();
 	
+	public CertificatePresenter getCertificatePresenter();
+	
 	public AccountPresenter getAccountPresenter();
 	
 	public NewAccountPresenter getNewAccountPresenter();
@@ -235,7 +239,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	
 	// Asynchronous
-	public AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
+	public JobTrackingWidget creatNewAsynchronousProgressWidget();
 	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();

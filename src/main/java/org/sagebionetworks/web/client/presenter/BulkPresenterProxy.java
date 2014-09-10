@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.Account;
+import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -147,6 +148,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// Test page
 					QuizPresenter presenter = ginjector.getQuizPresenter();
 					presenter.setPlace((Quiz) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof Certificate) {
+					CertificatePresenter presenter = ginjector.getCertificatePresenter();
+					presenter.setPlace((Certificate) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Account) {
 					AccountPresenter presenter = ginjector.getAccountPresenter();
