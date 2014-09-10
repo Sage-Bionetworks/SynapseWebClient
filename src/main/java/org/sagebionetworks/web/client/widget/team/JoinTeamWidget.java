@@ -137,6 +137,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public void sendJoinRequest(String message, boolean isAcceptingInvite) {
 		this.message = message;
 		this.isAcceptingInvite = isAcceptingInvite;
+		view.setButtonsEnabled(false);
 		sendJoinRequestStep0();
 	}
 	
@@ -156,6 +157,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				} catch (Throwable e) {
 					onFailure(e);
 				}
+				view.setButtonsEnabled(true);
 				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
 				if (isChallengeSignup) {
 					startChallengeSignup();
@@ -169,6 +171,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setButtonsEnabled(true);
 				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + caught.getMessage());
 			}
 		});
