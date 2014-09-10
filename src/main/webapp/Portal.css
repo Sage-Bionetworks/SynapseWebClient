@@ -729,6 +729,7 @@ a.shortBtn {
 	border: 5px dashed;
 	margin-bottom: 12px;
 	border-radius: 3em;
+	display: inline !important;
 }
 
 .dropable {
