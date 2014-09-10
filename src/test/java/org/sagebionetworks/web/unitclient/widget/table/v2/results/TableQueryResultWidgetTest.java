@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -32,7 +33,7 @@ public class TableQueryResultWidgetTest {
 	
 	TablePageWidget mockPageWidget;
 	JobTrackingWidgetStub jobTrackingStub;
-	QueryExecutionListener mockListner;
+	QueryResultsListner mockListner;
 	TableQueryResultView mockView;
 	SynapseClientAsync mockSynapseClient;
 	QueryResultEditorWidget mockQueryResultEditor;
@@ -46,7 +47,7 @@ public class TableQueryResultWidgetTest {
 	@Before
 	public void before(){
 		jobTrackingStub = new JobTrackingWidgetStub();
-		mockListner = Mockito.mock(QueryExecutionListener.class);
+		mockListner = Mockito.mock(QueryResultsListner.class);
 		mockView = Mockito.mock(TableQueryResultView.class);
 		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);

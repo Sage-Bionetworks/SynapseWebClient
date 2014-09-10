@@ -250,6 +250,9 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowViewImpl;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView.Presenter;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
@@ -584,7 +587,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Evaluation ACL Editor
 		bind(EvaluationAccessControlListEditorView.class).to(EvaluationAccessControlListEditorViewImpl.class);
-				
+		
+		// basic pagination
+		bind(BasicPaginationView.class).to(BasicPaginationViewImpl.class);
 		
 		// EntityPageTop
 		bind(EntityPageTopViewImpl.class).in(Singleton.class);

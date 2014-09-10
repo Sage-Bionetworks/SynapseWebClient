@@ -39,7 +39,6 @@ public class QueryTokenProviderTest {
 	public void testRoundTrip(){
 		// To JSON
 		String json = provider.queryToToken(query);
-		System.out.println(json);
 		Query clone = provider.tokenToQuery(json);
 		assertEquals(query, clone);
 	}

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -98,4 +99,18 @@ public interface TableQueryResultView extends IsWidget {
 	 * @param visible
 	 */
 	void setProgressWidgetVisible(boolean visible);
+	
+	/**
+	 * Set the pagination widget
+	 * 
+	 * @param paginationWidget
+	 */
+	public void setPaginationWidget(BasicPaginationWidget paginationWidget);
+	
+	/**
+	 * Show or hide the pagination widgets
+	 * 
+	 * @param visible
+	 */
+	public void setPaginationWidgetVisible(boolean visible);
 }
