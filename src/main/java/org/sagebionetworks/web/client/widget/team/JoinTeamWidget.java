@@ -140,8 +140,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		sendJoinRequestStep0();
 	}
 	
-
 	public void sendJoinRequestStep0() {
+		view.setButtonsEnabled(false);
 		currentPage = 0;
 		currentAccessRequirement = 0;
 		//initialize the access requirements
@@ -156,6 +156,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				} catch (Throwable e) {
 					onFailure(e);
 				}
+				view.setButtonsEnabled(true);
 				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
 				if (isChallengeSignup) {
 					startChallengeSignup();
@@ -169,6 +170,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setButtonsEnabled(true);
 				view.showErrorMessage(DisplayConstants.JOIN_TEAM_ERROR + caught.getMessage());
 			}
 		});

@@ -110,6 +110,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		joinWidget.sendJoinRequestStep1(challengeInfoKey);
 		verify(mockView).showChallengeInfoPage(any(UserProfile.class), eq(challengeInfoKey), any(Callback.class));
+		verify(mockView, times(2)).setButtonsEnabled(anyBoolean());
 	}
 	
 
