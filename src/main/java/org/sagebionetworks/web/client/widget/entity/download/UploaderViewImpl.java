@@ -88,7 +88,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
 		this.dialog = dialog;
-		dialog.setSize(ModalSize.LARGE);
+		dialog.setSize(ModalSize.MEDIUM);
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
@@ -133,7 +133,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void showErrorMessage(String message) {
 		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.WARNING);
-		dialog.configure("", new HTMLPanel(html.asString()), DisplayConstants.OK, null, null, true);	// TODO: "Error"? Title?
+		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.OK, null, null, true);
 		dialog.show();
 	}
 
@@ -304,10 +304,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void showConfirmDialog(String title, String message, final Callback yesCallback, final Callback noCallback) {
+	public void showConfirmDialog(String message, final Callback yesCallback, final Callback noCallback) {
 		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.QUESTION);
-		// TODO: Title?
-		dialog.configure(title, new HTMLPanel(html.asString()), DisplayConstants.YES, DisplayConstants.NO, new Dialog.Callback() {
+		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.YES, DisplayConstants.NO, new Dialog.Callback() {
 
 			@Override
 			public void onPrimary() {
