@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
@@ -31,7 +34,11 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -48,6 +55,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
+	private Dialog dialog;
 	
 	TextField<String> pathField, nameField;
 	
@@ -73,11 +81,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
-			SharingAndDataUseConditionWidget sharingDataUseWidget, PortalGinInjector ginInjector) {
+			SharingAndDataUseConditionWidget sharingDataUseWidget, PortalGinInjector ginInjector,
+			Dialog dialog) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
+		this.dialog = dialog;
+		dialog.setSize(ModalSize.LARGE);
 		this.uploadBtn = new Button();
 		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
@@ -89,6 +100,9 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
+		
+		// TODO? TODO!
+		this.add(dialog);
 	}
 		
 	@Override
@@ -119,7 +133,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+//		DisplayUtils.showErrorMessage(message);
+		SafeHtml html = DisplayUtils.getStuff("", message);
+		FlowPanel f = new FlowPanel();
+		f.add(new HTMLPanel(html.asString()));
+		dialog.configure("Preview", f, DisplayConstants.OK, null, null, true);
+		dialog.show();
 	}
 
 	@Override
