@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -115,7 +115,7 @@ public class TableEntityWidgetTest {
 		query.setIsConsistent(true);
 		query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
-		assertEquals(query, widget.getDefaultQueryString());
+		assertEquals(query, widget.getDefaultQuery());
 	}
 	
 	@Test
@@ -189,5 +189,29 @@ public class TableEntityWidgetTest {
 		widget.queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
+	}
+	
+	@Test
+	public void testOnExecuteQuery(){
+		boolean canEdit = true;
+		// Start with a query that is not on the first page
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		startQuery.setLimit(100L);
+		startQuery.setOffset(101L);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		// Start query get passed to the results
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, widget);
+		reset(mockQueryResultsWidget);
+		// Set new sql
+		String newSQL = "select 1,2,3 from syn123";
+		widget.onExecuteQuery(newSQL);
+		// Limit and offset should be back to default, and the new SQL included.
+		Query expected = new Query();
+		expected.setSql(newSQL);
+		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
+		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+		verify(mockQueryResultsWidget).configure(expected, canEdit, widget);
 	}
 }
