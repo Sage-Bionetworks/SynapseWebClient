@@ -12,7 +12,7 @@ import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -21,11 +21,7 @@ import org.sagebionetworks.web.client.widget.team.MemberListWidget;
 import org.sagebionetworks.web.client.widget.team.OpenMembershipRequestsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -69,7 +65,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private Header headerWidget;
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Uploader uploader;
+	private UploadDialogWidget uploader;
 	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
@@ -83,7 +79,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			Header headerWidget, 
 			Footer footerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
-			Uploader uploader,
+			UploadDialogWidget uploader,
 			IconsImageBundle iconsImageBundle
 			) {
 		initWidget(binder.createAndBindUi(this));
@@ -163,8 +159,14 @@ public class TeamViewImpl extends Composite implements TeamView {
 					presenter.updateTeamInfo(team.getName(), team.getDescription(), TeamSearchPresenter.getCanPublicJoin(team), fileHandleId);
 				}
 			};
-			Widget uploadLink = DisplayUtils.getUploadButton(fileHandleIdCallback, uploader, iconsImageBundle, "Update Icon", ButtonType.LINK); 
-			uploadLink.addStyleName("updateTeamIconLink");
+			uploader.configure("Update Icon", null, null, null, fileHandleIdCallback);
+			Anchor uploadLink = new Anchor("Update Icon");
+			uploadLink.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					uploader.show();
+				}
+			});
 			//only show upload link if direct upload is supported
 			if (synapseJSNIUtils.isDirectUploadSupported())
 				mainContainer.add(uploadLink);

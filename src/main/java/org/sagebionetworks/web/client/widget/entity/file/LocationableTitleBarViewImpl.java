@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.LocationData;
@@ -20,7 +21,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -44,7 +45,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
-	private Uploader locationableUploader;
+	private UploadDialogWidget locationableUploader;
 	private LicensedDownloader licensedDownloader;
 	private Widget downloadButton = null;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -52,6 +53,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	private FavoriteWidget favoriteWidget;	
 	AuthenticationController authenticationController;
 	NodeModelCreator nodeModelCreator;
+	private Button uploadButton;
 	
 	@UiField
 	HTMLPanel panel;
@@ -89,7 +91,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 	@Inject
 	public LocationableTitleBarViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle, 
-			Uploader locationableUploader, 
+			UploadDialogWidget locationableUploader, 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
@@ -114,7 +116,19 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
+		
+		initUploadButton();
 	}
+	
+	private void initUploadButton(){
+		uploadButton = new Button(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				locationableUploader.show();
+			}
+		});
+	}
+	
 	public static String getLocationablePath(EntityBundle bundle) {
 		String locationPath = null;
 		if (!(bundle.getEntity() instanceof Locationable))
@@ -186,13 +200,17 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			}
 			else {
 				uploadButtonContainer.clear();
-				if (canEdit)
-					uploadButtonContainer.add(DisplayUtils.getUploadButton(entityBundle, entityType, locationableUploader, iconsImageBundle, new EntityUpdatedHandler() {				
+				if (canEdit) {
+					EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
 						@Override
 						public void onPersistSuccess(EntityUpdatedEvent event) {
 							presenter.fireEntityUpdatedEvent();
 						}
-					}));
+					};
+					
+					locationableUploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null);
+					uploadButtonContainer.add(uploadButton);
+				}
 			}
 		}
 		

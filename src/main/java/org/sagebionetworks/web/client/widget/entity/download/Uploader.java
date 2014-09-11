@@ -43,6 +43,7 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -135,7 +136,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.showUploaderUI();
 		return this.view.asWidget();
 	}
-
+	
 	public void clearState() {
 		view.clear();
 		// remove handlers

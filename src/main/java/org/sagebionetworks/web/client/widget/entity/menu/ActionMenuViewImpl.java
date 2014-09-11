@@ -15,8 +15,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -26,19 +24,16 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.extjs.gxt.ui.client.widget.Window;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -55,7 +50,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private AccessControlListEditor accessControlListEditor;
-	private Uploader uploader;
+	private UploadDialogWidget uploader;
 	private EntityTypeProvider typeProvider;
 	private EntityFinder entityFinder;
 	private QuizInfoWidget quizInfoWidget;
@@ -70,13 +65,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	private String typeDisplay;
 	private Anchor addDescriptionCommand;
 	private Callback addDescriptionCallback;
-	private Window uploaderWindow;
 	private EntityBundle entityBundle;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
 			AccessControlListEditor accessControlListEditor,
-			Uploader locationableUploader, 
+			UploadDialogWidget locationableUploader, 
 			EntityTypeProvider typeProvider,
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
@@ -98,6 +92,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.authenticationController = authenticationController;
+		add(uploader.asWidget()); //add uploader dialog to page
 	}
 
 	@Override
@@ -272,21 +267,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
-			uploaderWindow = new Window();
-			uploader.clearHandlers();
-			uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {				
-				@Override
-				public void onPersistSuccess(EntityUpdatedEvent event) {
-					uploaderWindow.hide();
-					presenter.fireEntityUpdatedEvent();
-				}
-			});
-			uploader.addCancelHandler(new CancelHandler() {				
-				@Override
-				public void onCancel(CancelEvent event) {
-					uploaderWindow.hide();
-				}
-			});
 			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
@@ -300,14 +280,14 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	
 	@Override
 	public void showUploadDialog(String entityId) {
-		uploaderWindow.removeAll();
-		uploaderWindow.setPlain(true);
-		uploaderWindow.setModal(true);
-		uploaderWindow.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-		uploaderWindow.setLayout(new FitLayout());		
-		uploaderWindow.add(uploader.asWidget(entityBundle.getEntity()), new MarginData(5));
-		uploaderWindow.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-		uploaderWindow.show();
+		EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		};
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null);
+		uploader.show();
 	}
 	
 	@Override
