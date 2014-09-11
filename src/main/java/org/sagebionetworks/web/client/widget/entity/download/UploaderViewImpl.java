@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
@@ -35,8 +34,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,7 +102,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
-		
+		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, FILE_FIELD_DROP_STYLE_NAME);
 		this.add(dialog);	// Put modal on uploader layer.
 	}
 		
