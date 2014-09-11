@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
@@ -35,8 +34,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -65,7 +62,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private FormPanel formPanel, externalLinkFormPanel;
 	
 	
-	private FileUploadField fileUploadField;
 	private Button uploadBtn;
 	private Button cancelBtn; 
 	private ProgressBar progressBar;
@@ -81,7 +77,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
-			SharingAndDataUseConditionWidget sharingDataUseWidget, PortalGinInjector ginInjector,
+			SharingAndDataUseConditionWidget sharingDataUseWidget,
+			PortalGinInjector ginInjector,
 			Dialog dialog) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
@@ -94,8 +91,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		uploadBtn.setWidth(BUTTON_WIDTH_PX);
 		this.progressBar = new ProgressBar();
 		this.formPanel = new FormPanel();
-		this.fileUploadField = new FileUploadField();
-		fileUploadField.setHeight(BUTTON_HEIGHT_PX);
 		spinningProgressContainer = new HTML();
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
@@ -150,8 +145,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void clear() {
 		removeAll();
-		if (fileUploadField.isRendered())
-			fileUploadField.clear();
 		if (pathField != null && pathField.isRendered())
 			pathField.clear();
 		if (nameField != null && nameField.isRendered())
@@ -334,7 +327,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		};
 		formPanel.addListener(Events.Submit, submitListener);
 		formPanel.setAction(presenter.getDefaultUploadActionUrl());
-		fileUploadField.clearState(); // doesn't successfully clear previous selection
 		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
 
 		configureUploadButton();
