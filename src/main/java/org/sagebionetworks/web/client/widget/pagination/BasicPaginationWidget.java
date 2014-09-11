@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -9,7 +8,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class BasicPaginationWidget implements BasicPaginationView.Presenter, IsWidget {
+public class BasicPaginationWidget implements BasicPaginationView.Presenter, PaginationWidget {
 	
 	BasicPaginationView view;
 	PageChangeListener listener;
@@ -28,6 +27,7 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, IsW
 	 * @param offset
 	 * @param count
 	 */
+	@Override
 	public void configure(Long limit, Long offset, Long count, PageChangeListener listener){
 		this.listener = listener;
 		if(count == null || limit == null || offset == null || count < 1 || limit < 1){

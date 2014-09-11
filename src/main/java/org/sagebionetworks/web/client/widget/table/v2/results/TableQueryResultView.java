@@ -100,17 +100,4 @@ public interface TableQueryResultView extends IsWidget {
 	 */
 	void setProgressWidgetVisible(boolean visible);
 	
-	/**
-	 * Set the pagination widget
-	 * 
-	 * @param paginationWidget
-	 */
-	public void setPaginationWidget(BasicPaginationWidget paginationWidget);
-	
-	/**
-	 * Show or hide the pagination widgets
-	 * 
-	 * @param visible
-	 */
-	public void setPaginationWidgetVisible(boolean visible);
 }

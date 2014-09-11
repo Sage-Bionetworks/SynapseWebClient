@@ -10,9 +10,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -37,7 +35,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	PortalGinInjector ginInjector;
 	QueryResultBundle bundle;
 	TablePageWidget pageViewerWidget;
-	BasicPaginationWidget paginationWidget;
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
@@ -51,12 +48,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
 		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
-		this.paginationWidget = ginInjector.createBasicPaginationWidget();
 		this.adapterFactory = adapterFactory;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
 		this.view.setProgressWidget(this.progressWidget);
-		this.view.setPaginationWidget(this.paginationWidget);
 	}
 	
 	/**
@@ -76,7 +71,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.hideEditor();
 		this.view.setErrorVisible(false);
 		this.view.setToolbarVisible(false);
-		this.view.setPaginationWidgetVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
@@ -113,12 +107,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, false, null);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
 		this.view.setTableVisible(true);
 		this.view.setToolbarVisible(true);
 		this.view.setEditEnabled(this.isEditable);
-		this.view.setPaginationWidgetVisible(true);
-		this.paginationWidget.configure(this.startingQuery.getLimit(), this.startingQuery.getOffset(), bundle.getQueryCount(), this);
 		fireFinishEvent(true);
 	}
 
@@ -215,4 +207,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		}
 	}
 	
+	public Query getStartingQuery(){
+		return this.startingQuery;
+	}
 }

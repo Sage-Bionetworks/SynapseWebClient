@@ -30,8 +30,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	SimplePanel progressPanel;
 	@UiField
-	SimplePanel paginationPanel;
-	@UiField
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	Alert errorAlert;
@@ -137,17 +135,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setProgressWidgetVisible(boolean visible) {
 		this.progressPanel.setVisible(visible);
-	}
-
-	@Override
-	public void setPaginationWidget(BasicPaginationWidget paginationWidget) {
-		this.paginationPanel.add(paginationWidget);
-		
-	}
-
-	@Override
-	public void setPaginationWidgetVisible(boolean visible) {
-		this.paginationPanel.setVisible(visible);
 	}
 
 }
