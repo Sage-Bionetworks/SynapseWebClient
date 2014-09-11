@@ -286,7 +286,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null);
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null, true);
 		uploader.show();
 	}
 	

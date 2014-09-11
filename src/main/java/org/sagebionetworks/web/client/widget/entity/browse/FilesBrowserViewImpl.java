@@ -145,7 +145,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null);
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null, true);
 		uploader.show();
 	}
 	

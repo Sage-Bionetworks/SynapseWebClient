@@ -69,6 +69,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private Form externalLinkFormPanel;
 	private FormGroup externalUrlFormGroup;
 	
+	private FlowPanel uploadPanel;
 	
 	private Button uploadBtn;
 	private Button cancelBtn; 
@@ -77,7 +78,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private HTML spinningProgressContainer;
 	private HTML fileUploadHTML;
-	
+	private static final HTML DRAG_AND_DROP_HTML = new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>");
 	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
@@ -114,7 +115,6 @@ public class UploaderViewImpl extends FlowPanel implements
 
 		pathField = new TextBox();
 		initUploadPanel();
-
 		initExternalPanel();
 		
 		this.add(dialog);	// Put modal on uploader layer.
@@ -129,7 +129,7 @@ public class UploaderViewImpl extends FlowPanel implements
 				if (isExternal) {
 					String url = pathField.getValue();
 					
-					if (LoginPresenter.isValidUrl(url, false)) {
+					if (!LoginPresenter.isValidUrl(url, false)) {
 						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
 						return;
 					}
@@ -290,6 +290,7 @@ public class UploaderViewImpl extends FlowPanel implements
 			container.clear();
 		
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
+		uploadPanel.removeFromParent();
 		if (isEntity) {
 			//create tabs
 			NavTabs tabs = new NavTabs();
@@ -300,14 +301,10 @@ public class UploaderViewImpl extends FlowPanel implements
 			tab.setDataTarget("#uploadTab");
 			tab.setActive(true);
 			tabs.add(tab);
-			formPanel.removeFromParent();
 			TabPane tabPanel = new TabPane();
 			tabPanel.setActive(true);
 			tabPanel.setId("uploadTab");
-			tabPanel.add(new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>"));
-			tabPanel.add(formPanel);
-			tabPanel.add(spinningProgressContainer);
-			tabPanel.add(progressBar);
+			tabPanel.add(uploadPanel);
 			tabContent.add(tabPanel);
 			tab.addClickHandler(new ClickHandler() {
 				@Override
@@ -335,8 +332,7 @@ public class UploaderViewImpl extends FlowPanel implements
 			container.add(tabs);
 			container.add(tabContent);
 		} else {
-			formPanel.removeFromParent();
-			container.add(formPanel);
+			container.add(uploadPanel);
 			configureUploadButton();
 		}
 
@@ -353,7 +349,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		}
 		container.add(bar);
 	}
-
+	
 	@Override
 	public void showUploaderUI() {
 		clear();
@@ -412,6 +408,12 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadHTML = createFileUploadHTML();
 		formPanel.add(fileUploadHTML);
 		configureUploadButton(); // upload tab first by default
+		
+		uploadPanel = new FlowPanel();
+		uploadPanel.add(DRAG_AND_DROP_HTML);
+		uploadPanel.add(formPanel);
+		uploadPanel.add(spinningProgressContainer);
+		uploadPanel.add(progressBar);
 	}
 
 	private void initExternalPanel() {

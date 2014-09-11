@@ -133,6 +133,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId, isDirectUploadSupported);
+		view.resetToInitialState();
+		resetUploadProgress();
 		view.showUploaderUI();
 		return this.view.asWidget();
 	}

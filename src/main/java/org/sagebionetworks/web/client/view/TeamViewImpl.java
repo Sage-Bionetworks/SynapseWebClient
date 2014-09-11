@@ -159,7 +159,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 					presenter.updateTeamInfo(team.getName(), team.getDescription(), TeamSearchPresenter.getCanPublicJoin(team), fileHandleId);
 				}
 			};
-			uploader.configure("Update Icon", null, null, null, fileHandleIdCallback);
+			uploader.configure("Update Icon", null, null, null, fileHandleIdCallback, false);
 			Anchor uploadLink = new Anchor("Update Icon");
 			uploadLink.addClickHandler(new ClickHandler() {
 				@Override

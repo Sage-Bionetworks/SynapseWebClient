@@ -32,8 +32,7 @@ public class UploadDialogWidget implements UploadDialogWidgetView.Presenter, Syn
 		return view.asWidget();
 	}
 
-	public void configure(String title, Entity entity, String parentEntityId, EntityUpdatedHandler handler, final CallbackP<String> fileHandleIdCallback){
-		boolean isEntity = entity != null;
+	public void configure(String title, Entity entity, String parentEntityId, EntityUpdatedHandler handler, final CallbackP<String> fileHandleIdCallback, boolean isEntity){
 		Widget body = uploader.asWidget(entity, parentEntityId, fileHandleIdCallback,isEntity);
 		uploadDialog.configure(title, body, null, null, null, false);
 		uploader.clearHandlers();

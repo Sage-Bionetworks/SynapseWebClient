@@ -208,7 +208,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 						}
 					};
 					
-					locationableUploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null);
+					locationableUploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, handler, null, true);
 					uploadButtonContainer.add(uploadButton);
 				}
 			}
