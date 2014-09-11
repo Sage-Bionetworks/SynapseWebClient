@@ -6,9 +6,11 @@ import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,7 +25,7 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryExecutionListener {
+public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryResultsListner, QueryInputListener {
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the Table Schema to add columns to the this table.";
@@ -84,18 +86,13 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 			setNoColumnsState();
 		}else{
 			// There are columns.
-			Query startQuery = queryChangeHandler.getQueryString();;
+			Query startQuery = queryChangeHandler.getQueryString();
 			if(startQuery == null){
 				// use a default query
-				startQuery = getDefaultQueryString();
+				startQuery = getDefaultQuery();
 			}
 			setQuery(startQuery);
 		}
-	}
-	
-	private void setSQL(String sql){
-		this.currentQuery.setSql(sql);
-		setQuery(this.currentQuery);
 	}
 	
 	/**
@@ -104,12 +101,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 */
 	private void setQuery(Query query){
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), new QueryInputListener() {
-			@Override
-			public void onExecuteQuery(String sql) {
-				setSQL(sql);
-			}
-		});
+		this.queryInputWidget.configure(query.getSql(), this);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		this.queryResultsWidget.configure(query, this.canEdit, this);
@@ -139,7 +131,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 * Build the default query based on the current table data.
 	 * @return
 	 */
-	public Query getDefaultQueryString(){
+	public Query getDefaultQuery(){
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
 		builder.append(this.tableId);
@@ -183,6 +175,24 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 		if(wasSuccessful){
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
+	}
+
+	/**
+	 * Called when the user executes a new query from the query input box.
+	 * When the SQL changes reset back to the first page.
+	 */
+	@Override
+	public void onExecuteQuery(String sql) {
+		this.currentQuery.setSql(sql);
+		this.currentQuery.setLimit(DEFAULT_LIMIT);
+		this.currentQuery.setOffset(DEFAULT_OFFSET);
+		setQuery(this.currentQuery);
+	}
+
+	@Override
+	public void onPageChange(Long newOffset) {
+		this.currentQuery.setOffset(newOffset);
+		setQuery(this.currentQuery);
 	}
 	
 }

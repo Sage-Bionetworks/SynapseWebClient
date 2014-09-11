@@ -5,9 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,6 +30,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
 	RowSelectionListener rowSelectionListener;
+	PaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
@@ -33,19 +38,30 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	boolean isSelectionChanging;
 	
 	@Inject
-	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector){
+	public TablePageWidget(TablePageView view, PortalGinInjector ginInjector, PaginationWidget paginationWidget){
 		this.ginInjector = ginInjector;
+		this.paginationWidget = paginationWidget;
 		this.view = view;
+		this.view.setPaginationWidget(paginationWidget);
 	}
 	
 	/**
 	 * Configure this page with query results.
-	 * 
-	 * @param bundle
-	 * @param isEditable
+	 * @param bundle The query results.
+	 * @param query The query used to generate this page.
+	 * @param isEditable Is this page editable.
+	 * @param rowSelectionListener If null then selection will be disabled.
+	 * @param pageChangeListener If null then pagination will be disabled.
 	 */
-	public void configure(QueryResultBundle bundle, boolean isEditable, RowSelectionListener rowSelectionListener){
+	public void configure(QueryResultBundle bundle, Query query, boolean isEditable, RowSelectionListener rowSelectionListener, PageChangeListener pageChangeListener){
 		this.rowSelectionListener = rowSelectionListener;
+		// The pagination widget is only visible if a listener was provider
+		if(pageChangeListener != null){
+			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
+			view.setPaginationWidgetVisible(true);
+		}else{
+			view.setPaginationWidgetVisible(false);
+		}
 		// Map the columns to types
 		types = ColumnModelUtils.buildTypesForQueryResults(bundle.getQueryResult().getQueryResults().getHeaders(), bundle.getSelectColumns());
 		// setup the headers from the types

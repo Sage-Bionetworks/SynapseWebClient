@@ -10,8 +10,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -25,10 +25,10 @@ import com.google.inject.Inject;
  * @author jmhill
  *
  */
-public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget {
+public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PageChangeListener {
 	public static final String QUERY_CANCELED = "Query canceled";
 	// Mask to get all parts of a query.
-	private static final Long ALL_PARTS_MASK = new Long(0x15);
+	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
 	AdapterFactory adapterFactory;
 	TableQueryResultView view;
@@ -38,7 +38,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	QueryExecutionListener queryListener;
+	QueryResultsListner queryListener;
 	JobTrackingWidget progressWidget;
 	
 	@Inject
@@ -60,7 +60,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param isEditable Is the user allowed to edit the query results?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, QueryExecutionListener listener){
+	public void configure(Query query, boolean isEditable, QueryResultsListner listener){
 		this.isEditable = isEditable;
 		this.startingQuery = query;
 		this.queryListener = listener;
@@ -107,7 +107,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, false, null);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
 		this.view.setTableVisible(true);
 		this.view.setToolbarVisible(true);
 		this.view.setEditEnabled(this.isEditable);
@@ -199,5 +199,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		view.setSaveButtonLoading(false);
 		queryResultEditor.showError(message);
 	}
+
+	@Override
+	public void onPageChange(Long newOffset) {
+		if(this.queryListener != null){
+			this.queryListener.onPageChange(newOffset);
+		}
+	}
 	
+	public Query getStartingQuery(){
+		return this.startingQuery;
+	}
 }

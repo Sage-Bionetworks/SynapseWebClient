@@ -6,10 +6,12 @@ import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,23 +24,25 @@ public class TablePageViewImpl implements TablePageView {
 	
 	private static String MIN_WIDTH = "75px";
 
-	public interface Binder extends UiBinder<ScrollPanel, TablePageViewImpl> {}
+	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
 	
 	@UiField
 	TableRow header;
 	@UiField
 	TBody body;
+	@UiField
+	SimplePanel paginationPanel;
 	
-	ScrollPanel scrollPanel;
+	Widget widget;
 	
 	@Inject
 	public TablePageViewImpl(Binder binder){
-		scrollPanel = binder.createAndBindUi(this);
+		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return scrollPanel;
+		return widget;
 	}
 
 	@Override
@@ -63,6 +67,16 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void removeRow(RowWidget row) {
 		body.remove(row);
+	}
+
+	@Override
+	public void setPaginationWidget(PaginationWidget paginationWidget) {
+		this.paginationPanel.add(paginationWidget);
+	}
+
+	@Override
+	public void setPaginationWidgetVisible(boolean visible) {
+		this.paginationPanel.setVisible(visible);
 	}
 
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.xerces.impl.dv.xs.AnyURIDV;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,8 +19,10 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
+import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -32,7 +35,7 @@ public class TableQueryResultWidgetTest {
 	
 	TablePageWidget mockPageWidget;
 	JobTrackingWidgetStub jobTrackingStub;
-	QueryExecutionListener mockListner;
+	QueryResultsListner mockListner;
 	TableQueryResultView mockView;
 	SynapseClientAsync mockSynapseClient;
 	QueryResultEditorWidget mockQueryResultEditor;
@@ -46,7 +49,7 @@ public class TableQueryResultWidgetTest {
 	@Before
 	public void before(){
 		jobTrackingStub = new JobTrackingWidgetStub();
-		mockListner = Mockito.mock(QueryExecutionListener.class);
+		mockListner = Mockito.mock(QueryResultsListner.class);
 		mockView = Mockito.mock(TableQueryResultView.class);
 		mockPageWidget = Mockito.mock(TablePageWidget.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -61,6 +64,7 @@ public class TableQueryResultWidgetTest {
 		query.setSql("select * from syn123");
 		bundle = new QueryResultBundle();
 		bundle.setMaxRowsPerPage(123L);
+		bundle.setQueryCount(88L);
 		
 		// delta
 		delta = new PartialRowSet();
@@ -80,7 +84,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setTableVisible(false);
 		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, false, null);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setToolbarVisible(true);
@@ -103,7 +107,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setTableVisible(false);
 		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, false, null);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setToolbarVisible(true);
@@ -126,7 +130,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setTableVisible(false);
 		verify(mockView, times(2)).setToolbarVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget, never()).configure(bundle, false, null);
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false);
@@ -150,7 +153,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setTableVisible(false);
 		verify(mockView, times(2)).setToolbarVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget, never()).configure(bundle, false, null);
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false);
@@ -188,7 +190,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setTableVisible(false);
 		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
-		verify(mockPageWidget).configure(bundle, false, null);
+		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setToolbarVisible(true);
