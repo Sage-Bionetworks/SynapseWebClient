@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -270,9 +271,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) {
+	public void addDropZoneStyleEventHandling(String fileFieldId) {
 		if (FILE_FIELD_ID == null) {
-			_addDropZoneStyleEventHandling(dropStyleName);
+			_addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_DROP_STYLE_NAME);
 		}
 		FILE_FIELD_ID = fileFieldId;
 	}

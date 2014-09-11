@@ -102,7 +102,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
-		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, FILE_FIELD_DROP_STYLE_NAME);
+		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID);
 		this.add(dialog);	// Put modal on uploader layer.
 	}
 		
