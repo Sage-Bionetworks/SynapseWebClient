@@ -272,34 +272,35 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	@Override
 	public void addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) {
 		if (FILE_FIELD_ID == null) {
-			FILE_FIELD_ID = fileFieldId;
-			_addDropZoneStyleEventHandling(fileFieldId, dropStyleName);
+			_addDropZoneStyleEventHandling(dropStyleName);
 		}
+		FILE_FIELD_ID = fileFieldId;
 	}
 	
-	private static native void _addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) /*-{
+	private static native void _addDropZoneStyleEventHandling(String dropStyleName) /*-{
 		$doc.addEventListener("dragover", function( event ) {
 				// Prevent default to allow drop.
-				if (event.target.id != fileFieldId) {
+				if (event.target.id != @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.preventDefault();
 				}
 			}, false);
 	
 		$doc.addEventListener("dragenter", function( event ) {
 				// highlight potential drop target when the draggable element enters it
-				if (event.target.id == fileFieldId && event.target.className.indexOf(dropStyleName) == -1) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID
+					&& event.target.className.indexOf(dropStyleName) == -1) {
 					event.target.className += " " + dropStyleName;
 				}
 			}, false);
 		
 		$doc.addEventListener("drop", function( event ) {
-				if (event.target.id == fileFieldId) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
 				}
 			}, false);
 		
 		$doc.addEventListener("dragleave", function( event ) {
-				if (event.target.id == fileFieldId) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					var epsilon_divisor = 30;	// For dragleave events called "inside" box due to border radius.
 					var epsilonX = event.target.offsetWidth / epsilon_divisor;
 					var epsilonY = event.target.offsetHeight / epsilon_divisor;
@@ -314,7 +315,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			}, false);
 		
 		$doc.addEventListener("dragend", function( event ) {
-				if (event.target.id == fileFieldId) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 						event.target.className = event.target.className.replace(dropStyleName, '');
 				}
 			}, false);
