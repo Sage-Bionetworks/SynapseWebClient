@@ -26,6 +26,8 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
+	public static String FILE_FIELD_ID;
+	
 	private static ProgressCallback progressCallback;
 	
 	@Override
@@ -269,7 +271,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	@Override
 	public void addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) {
-		_addDropZoneStyleEventHandling(fileFieldId, dropStyleName);
+		if (FILE_FIELD_ID == null) {
+			FILE_FIELD_ID = fileFieldId;
+			_addDropZoneStyleEventHandling(fileFieldId, dropStyleName);
+		}
 	}
 	
 	private static native void _addDropZoneStyleEventHandling(String fileFieldId, String dropStyleName) /*-{
