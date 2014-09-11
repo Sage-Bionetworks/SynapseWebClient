@@ -714,6 +714,28 @@ a.shortBtn {
     border-radius: 4px 0 4px 0;
 }
 
+.fileUploadLabel {
+	width: 94%;
+	margin: 70px 0 -100px 0;
+	font-size: 13px;
+	font-weight: bold;
+	color:  #3a5bdc;
+	text-align: center;
+}
+
+.dragAndDropUploadBox {
+	width: 97%;
+	padding: 3em 0 6em 38%;
+	border: 5px dashed;
+	margin-bottom: 12px;
+	border-radius: 3em;
+	display: inline !important;
+}
+
+.dropable {
+	border-color: #3a5bdc !important;
+}
+
 .markdownEditor {
     font-family: Lucida Console, monospace !important;
     font-size: 13px;

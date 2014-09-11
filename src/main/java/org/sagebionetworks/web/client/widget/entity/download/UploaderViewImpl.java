@@ -44,7 +44,12 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private boolean showCancelButton = true;
 	private boolean multipleFileUploads = true;
 	
+	
+	
 	public static final String FILE_FIELD_ID = "fileToUpload";
+	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
+	public static final String FILE_FIELD_DROP_STYLE_NAME = "dropable";
+	public static final String FILE_UPLOAD_LABEL_STYLENAME = "fileUploadLabel";
 	public static final int BUTTON_HEIGHT_PX = 25;
 	public static final int BUTTON_WIDTH_PX = 100;
 
@@ -94,7 +99,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		// apparently the file upload dialog can only be generated once
 		createUploadPanel();
 		createExternalPanel();
-		
+		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID);
 		this.add(dialog);	// Put modal on uploader layer.
 	}
 		
@@ -168,7 +173,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public int getDisplayHeight() {
-		return isEntity ? 350 : 200;
+		return isEntity ? 440 : 200;
 	}
 
 	@Override
@@ -353,9 +358,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 		progressBar.setVisible(false);
 	}
 		
-	private static final int PANEL_HEIGHT = 100;
+	private static final int PANEL_HEIGHT = 210;
 	private static final int PANEL_WIDTH = 790;
-	
 	
 	private Widget createUploadPanel() {
 		formPanel.setHeaderVisible(false);
@@ -371,6 +375,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 		formPanel.setFieldWidth(PANEL_WIDTH-300);
 		
 		fileUploadHTML = createFileUploadHTML();
+		formPanel.add(new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>"));
 		formPanel.add(fileUploadHTML);
 		
 		formPanel.layout(true);	
@@ -453,8 +458,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\">");
 	}
 }
