@@ -509,6 +509,10 @@ public class ProvenanceWidgetTest {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			
+			@Override
+			public void addDropZoneStyleEventHandling(String fileFieldId) {
+			}
 		};
 	}
 

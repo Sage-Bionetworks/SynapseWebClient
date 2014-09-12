@@ -148,10 +148,11 @@ public class UploaderTest {
 	
 	@Test
 	public void testGetUploadActionUrlWithNull() {
-		uploader.asWidget(parentEntityId);
-		
 		uploader.getDefaultUploadActionUrl();
 		verify(gwt).getModuleBaseURL();
+		
+		//also check view reset
+		verify(view).resetToInitialState();
 	}
 	
 	@Test
@@ -174,8 +175,6 @@ public class UploaderTest {
 	public void testSetNewExternalPath() throws Exception {
 		//this is the full success test
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
@@ -184,9 +183,6 @@ public class UploaderTest {
 	@Test
 	public void testSetExternalPathFailedCreate() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("failed to create")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		
 		verify(view).showErrorMessage(anyString());
@@ -195,9 +191,6 @@ public class UploaderTest {
 	@Test
 	public void testSetExternalPathFailedUpdateFile() throws Exception {
 		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), any(AsyncCallback.class));
-
-		String parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "");
 		
 		verify(view).showErrorMessage(anyString());
@@ -276,6 +269,16 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.directUploadStep1("newFile.txt");
 		verify(view).showConfirmDialog(anyString(), any(Callback.class), any(Callback.class));
+	}
+	
+	@Test
+	public void testDirectUploadStep1NoParentEntityId() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		uploader.asWidget(null, null, null, false);
+		uploader.directUploadStep1("newFile.txt");
+		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		//should jump to step 2
+		verify(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
 	}
 	
 	@Test

@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -17,12 +15,15 @@ public class UploadDialogWidgetViewImpl extends Composite implements UploadDialo
 	
 	@UiField
 	SimplePanel dialogContainer;
-	
+	Dialog uploadDialog;
 	public interface Binder extends UiBinder<Widget, UploadDialogWidgetViewImpl> {}
 	
 	@Inject
-	public UploadDialogWidgetViewImpl(Binder uiBinder) {
+	public UploadDialogWidgetViewImpl(Binder uiBinder, Dialog uploadDialog) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.uploadDialog = uploadDialog;
+		uploadDialog.setSize(ModalSize.LARGE);
+		dialogContainer.setWidget(uploadDialog);
 	}
 	
 	@Override
@@ -50,10 +51,19 @@ public class UploadDialogWidgetViewImpl extends Composite implements UploadDialo
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-	
+
 	@Override
-	public void setUploadDialog(Dialog uploadDialog) {
-		dialogContainer.setWidget(uploadDialog);
+	public void configureDialog(String title, Widget body) {
+		uploadDialog.configure(title, body, null, null, null, false);
 	}
 	
+	@Override
+	public void hideDialog() {
+		uploadDialog.hide();
+	}
+	
+	@Override
+	public void showDialog() {
+		uploadDialog.show();
+	}
 }
