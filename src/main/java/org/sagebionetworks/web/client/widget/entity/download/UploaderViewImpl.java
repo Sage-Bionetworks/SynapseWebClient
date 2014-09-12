@@ -222,10 +222,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void clear() {
 		super.clear();
-		if (pathField != null && pathField.isVisible())
+		if (pathField != null)
 			externalUrlFormGroup.setValidationState(ValidationState.NONE);
 			pathField.clear();
-		if (nameField != null && nameField.isVisible())
+		if (nameField != null)
 			nameField.clear();
 	}
 	
