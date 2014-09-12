@@ -116,6 +116,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		clearHandlers();
 		uploadLog = new StringBuilder();
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
+		if (!isDirectUploadSupported)
+			disableMultipleFileUploads();
 	}		
 		
 	public Widget asWidget(Entity entity) {
