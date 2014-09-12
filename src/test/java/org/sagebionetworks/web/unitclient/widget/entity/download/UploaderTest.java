@@ -279,6 +279,16 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testDirectUploadStep1NoParentEntityId() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		uploader.asWidget(null, null, null, false);
+		uploader.directUploadStep1("newFile.txt");
+		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
+		//should jump to step 2
+		verify(synapseJsniUtils).getFileMd5(anyString(), anyInt(), any(MD5Callback.class));
+	}
+	
+	@Test
 	public void testDirectUploadStep3Failure() throws Exception {
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
