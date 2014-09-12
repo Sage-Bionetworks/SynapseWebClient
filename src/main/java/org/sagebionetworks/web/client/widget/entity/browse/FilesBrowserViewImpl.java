@@ -1,23 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.ArrayList;
-
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -32,7 +27,6 @@ import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -47,7 +41,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
-	private Uploader uploader;
+	private UploadDialogWidget uploader;
 	private QuizInfoWidget quizInfoWidget;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private PortalGinInjector ginInjector;
@@ -55,7 +49,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
-			Uploader uploader,
+			UploadDialogWidget uploader,
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
 			QuizInfoWidget quizInfoWidget,
@@ -74,6 +68,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	@Override
 	public void configure(String entityId, boolean canEdit, String title) {
 		this.clear();
+		this.add(uploader.asWidget());	//add the upload dialog
 		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
 		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
@@ -150,35 +145,8 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-
-		final Window window = new Window();
-		uploader.clearHandlers();
-		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
-		
-		// add handlers for closing the window
-		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-			}
-		});
-		uploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		
-		//let the uploader create the FileEntity
-		window.removeAll();
-		window.setPlain(true);
-		window.setModal(true);
-		window.setLayout(new FitLayout());
-		window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-		window.add(uploader.asWidget(entityId), new MarginData(5));
-		window.show();
-		window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null, true);
+		uploader.show();
 	}
 	
 	@Override

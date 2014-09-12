@@ -132,10 +132,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId, isDirectUploadSupported);
+		view.resetToInitialState();
+		resetUploadProgress();
 		view.showUploaderUI();
 		return this.view.asWidget();
 	}
-
+	
 	public void clearState() {
 		view.clear();
 		// remove handlers
@@ -226,7 +228,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileName
 	 */
 	public void directUploadStep1(final String fileName) {
-		if (entity != null) {
+		if (entity != null || parentEntityId == null) {
 			directUploadStep2(fileName);
 		} else {
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
@@ -500,10 +502,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if (currIndex + 1 == fileNames.length)
 				view.updateProgress(.99d, "99%");
 			setFileEntityFileHandle(status.getFileHandleId());
-			if (fileHandleIdCallback != null) {
-				fileHandleIdCallback.invoke(status.getFileHandleId());
-				uploadSuccess();
-			}
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
@@ -578,6 +576,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			} catch (RestServiceException e) {
 				uploadError(e.getMessage());
 			}
+		}
+		if (fileHandleIdCallback != null) {
+			fileHandleIdCallback.invoke(fileHandleId);
+			uploadSuccess();
 		}
 	}
 	

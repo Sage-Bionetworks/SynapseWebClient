@@ -1,50 +1,55 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.FieldSet;
+import org.gwtbootstrap3.client.ui.Form;
+import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.ModalSize;
-import org.sagebionetworks.web.client.ClientProperties;
+import org.gwtbootstrap3.client.ui.NavTabs;
+import org.gwtbootstrap3.client.ui.Progress;
+import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.TabContent;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FormEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.TabPanelEvent;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.ProgressBar;
-import com.extjs.gxt.ui.client.widget.TabItem;
-import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.button.ButtonBar;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.Encoding;
-import com.extjs.gxt.ui.client.widget.form.FormPanel.Method;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UploaderViewImpl extends LayoutContainer implements
+public class UploaderViewImpl extends FlowPanel implements
 		UploaderView {
 	
 	private boolean showCancelButton = true;
 	private boolean multipleFileUploads = true;
-	
-	
+	private boolean isExternal;
 	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
@@ -58,23 +63,28 @@ public class UploaderViewImpl extends LayoutContainer implements
 	private SageImageBundle sageImageBundle;
 	private Dialog dialog;
 	
-	TextField<String> pathField, nameField;
+	TextBox pathField, nameField;
 	
 	// initialized in constructor
 	private boolean isEntity;
 	private String parentEntityId;
-	private FormPanel formPanel, externalLinkFormPanel;
+	private FormPanel formPanel;
 	
+	private Form externalLinkFormPanel;
+	private FormGroup externalUrlFormGroup;
+	
+	private FlowPanel uploadPanel;
 	
 	private Button uploadBtn;
 	private Button cancelBtn; 
+	private Progress progressContainer;
 	private ProgressBar progressBar;
 	// external link panel
 	
 	private HTML spinningProgressContainer;
 	private HTML fileUploadHTML;
-	
-	LayoutContainer container;
+	private static final HTML DRAG_AND_DROP_HTML = new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>");
+	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
 	
@@ -90,24 +100,86 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.ginInjector = ginInjector;
 		this.dialog = dialog;
 		dialog.setSize(ModalSize.MEDIUM);
-		this.uploadBtn = new Button();
-		uploadBtn.setHeight(BUTTON_HEIGHT_PX);
-		uploadBtn.setWidth(BUTTON_WIDTH_PX);
-		this.progressBar = new ProgressBar();
-		this.formPanel = new FormPanel();
-		spinningProgressContainer = new HTML();
-		// apparently the file upload dialog can only be generated once
-		createUploadPanel();
-		createExternalPanel();
-		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID);
-		this.add(dialog);	// Put modal on uploader layer.
-	}
 		
+		this.progressContainer = new Progress();
+		progressContainer.setMarginTop(10);
+		this.progressBar = new ProgressBar();
+		progressBar.setType(ProgressBarType.INFO);
+		progressContainer.add(progressBar);
+		
+		this.formPanel = new FormPanel();
+		this.externalLinkFormPanel = new Form();
+		
+		spinningProgressContainer = new HTML();
+		
+		uploadBtn = new Button();
+		uploadBtn.setType(ButtonType.PRIMARY);
+		uploadBtn.setPull(Pull.RIGHT);
+		
+		cancelBtn = new Button(DisplayConstants.BUTTON_CANCEL);
+		cancelBtn.setType(ButtonType.DEFAULT);
+		cancelBtn.setPull(Pull.RIGHT);
+		cancelBtn.setMarginRight(5);
+
+		pathField = new TextBox();
+		initUploadPanel();
+		initExternalPanel();
+		
+		this.add(dialog);	// Put modal on uploader layer.
+
+		initHandlers();
+	}
+	
+	private void initHandlers() {
+		uploadBtn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (isExternal) {
+					String url = pathField.getValue();
+					
+					if (!LoginPresenter.isValidUrl(url, false)) {
+						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
+						return;
+					}
+
+					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
+				} else {
+					fileUploadHTML.setVisible(false);
+					DRAG_AND_DROP_HTML.setVisible(false);
+					uploadBtn.setEnabled(false);
+					initializeProgress();
+					presenter.handleUploads();	
+				}
+				
+			}
+		});
+		
+		cancelBtn.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.cancelClicked();
+			}
+		});
+		
+		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
+			@Override
+			public void onSubmitComplete(SubmitCompleteEvent event) {
+				presenter.handleSubmitResult(event.getResults());
+				hideLoading();
+			}
+		};
+		formPanel.addSubmitCompleteHandler(submitHandler);
+		
+		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID);
+	}
+	
 	@Override
 	public void resetToInitialState() {
 		hideLoading();
 		uploadBtn.setEnabled(true);
-		
+		fileUploadHTML.setVisible(true);
+		DRAG_AND_DROP_HTML.setVisible(true);
 		// Clear previously selected files.
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
@@ -139,6 +211,7 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void showLoading() {
 		spinningProgressContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.addStyleName("margin-top-10");
 	}
 
 	@Override
@@ -148,10 +221,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 
 	@Override
 	public void clear() {
-		removeAll();
-		if (pathField != null && pathField.isRendered())
+		super.clear();
+		if (pathField != null)
+			externalUrlFormGroup.setValidationState(ValidationState.NONE);
 			pathField.clear();
-		if (nameField != null && nameField.isRendered())
+		if (nameField != null)
 			nameField.clear();
 	}
 	
@@ -161,7 +235,6 @@ public class UploaderViewImpl extends LayoutContainer implements
 		this.parentEntityId = parentEntityId;
 		initializeControls();
 		
-		setSize(PANEL_WIDTH, PANEL_HEIGHT);
 		createUploadContents(isDirectUploadSupported);
 		
 		// reset
@@ -183,7 +256,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public void updateProgress(double value, String text) {
-		progressBar.updateProgress(value, text);
+		progressBar.setText(text);
+		progressBar.setPercent(value*100);
 	}
 	
 	@Override
@@ -194,10 +268,14 @@ public class UploaderViewImpl extends LayoutContainer implements
 	@Override
 	public void hideLoading() {
 		//try to hide the loading progress bar.  ignore any errors
-		progressBar.reset();
-		progressBar.setVisible(false);
+		resetProgress();
+		progressContainer.setVisible(false);
 		spinningProgressContainer.setHTML("");
 		spinningProgressContainer.setVisible(false);
+	}
+	private void resetProgress() {
+		progressBar.setPercent(0.0);
+		progressBar.setText("");
 	}
 	
 	@Override
@@ -219,52 +297,54 @@ public class UploaderViewImpl extends LayoutContainer implements
 	 */	
 	private void createUploadContents(boolean isDirectUploadSupported) {
 		if (container == null)
-			this.container = new LayoutContainer();
+			this.container = new FlowPanel();
 		else
-			container.removeAll();
+			container.clear();
 		
-		this.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
-		container.addStyleName(ClientProperties.STYLE_WHITE_BACKGROUND);
-		container.setLayout(new FlowLayout());
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
+		uploadPanel.removeFromParent();
 		if (isEntity) {
-			TabPanel tabPanel = new TabPanel();
-			tabPanel.setPlain(true);
-			tabPanel.setHeight(PANEL_HEIGHT);		
-			TabItem tab;
+			//create tabs
+			NavTabs tabs = new NavTabs();
+			TabContent tabContent = new TabContent();
 			
-			// Upload File
-			tab = new TabItem(DisplayConstants.UPLOAD_FILE);
-			tab.addStyleName("pad-text");			
-			formPanel.removeFromParent();
-						
-			tab.add(formPanel);			
-			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-	            public void handleEvent( TabPanelEvent be ) {
-	            	configureUploadButton();
-	            }
-	        });
-		
-			tabPanel.add(tab);
-			tabPanel.repaint();
-	
-			// External URL
-			tab = new TabItem(DisplayConstants.LINK_TO_URL);
-			tab.addStyleName("pad-text");
+			//Upload File
+			TabListItem tab = new TabListItem(DisplayConstants.UPLOAD_FILE);
+			tab.setDataTarget("#uploadTab");
+			tab.setActive(true);
+			tabs.add(tab);
+			TabPane tabPanel = new TabPane();
+			tabPanel.setActive(true);
+			tabPanel.setId("uploadTab");
+			tabPanel.add(uploadPanel);
+			tabContent.add(tabPanel);
+			tab.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					configureUploadButton();
+				}
+			});
+			
+			//External URL
+			tab = new TabListItem(DisplayConstants.LINK_TO_URL);
+			tab.setDataTarget("#externalTab");
+			tabs.add(tab);
 			externalLinkFormPanel.removeFromParent();
-			tab.add(externalLinkFormPanel);		
-			tab.addListener(Events.Select, new Listener<TabPanelEvent>() {
-	            public void handleEvent( TabPanelEvent be ) {
-	            	configureUploadButtonForExternal();
-	            }
-	        
-	        });
-			tabPanel.add(tab);
-			tabPanel.recalculate();
-			container.add(tabPanel, new MarginData(0, 10, 10, 10));
+			tabPanel = new TabPane();
+			tabPanel.setId("externalTab");
+			tabPanel.add(externalLinkFormPanel);
+			tabContent.add(tabPanel);
+			tab.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					configureUploadButtonForExternal();
+				}
+			});
+			
+			container.add(tabs);
+			container.add(tabContent);
 		} else {
-			formPanel.removeFromParent();
-			container.add(formPanel);
+			container.add(uploadPanel);
 			configureUploadButton();
 		}
 
@@ -274,30 +354,20 @@ public class UploaderViewImpl extends LayoutContainer implements
 			container.add(sharingDataUseWidget.asWidget());
 		}
 		
-		ButtonBar bar = new ButtonBar();
-		bar.setAlignment(HorizontalAlignment.RIGHT);
-		bar.add(uploadBtn);
+		Row row = new Row();
+		Column col = new Column(ColumnSize.XS_12);
+		col.add(uploadBtn);
 		if(showCancelButton) {
-			cancelBtn = new Button(DisplayConstants.BUTTON_CANCEL);
-			cancelBtn.setHeight(BUTTON_HEIGHT_PX);
-			cancelBtn.setWidth(BUTTON_WIDTH_PX);			
-			cancelBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					presenter.cancelClicked();
-				}
-			});
-			bar.add(cancelBtn);
+			col.add(cancelBtn);
 		}
-		container.add(bar);
-		container.layout(true);
+		row.add(col);
+		container.add(row);
 	}
-
+	
 	@Override
 	public void showUploaderUI() {
-		removeAll();
+		clear();
 		add(container);
-		layout(true);
 	}
 	
 	@Override
@@ -321,23 +391,11 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
-		formPanel.removeAllListeners();
-		Listener<FormEvent> submitListener = new Listener<FormEvent>() {
-			@Override
-			public void handleEvent(FormEvent be) {
-				presenter.handleSubmitResult(be.getResultHtml());
-				hideLoading();
-			}
-		};
-		formPanel.addListener(Events.Submit, submitListener);
 		formPanel.setAction(presenter.getDefaultUploadActionUrl());
-		if(formPanel.isRendered()) formPanel.reset(); // clear file choice from fileUploadField
+		if(formPanel.isVisible()) formPanel.reset(); // clear file choice from fileUploadField
 
 		configureUploadButton();
-		progressBar.setVisible(false);
-		formPanel.add(spinningProgressContainer);
-		formPanel.add(progressBar);
-		formPanel.layout(true);
+		progressContainer.setVisible(false);
 	}
 	
 	private void initializeProgress() {
@@ -347,119 +405,80 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	@Override
 	public void showProgressBar() {
-		progressBar.setVisible(true);
-		progressBar.reset();
+		resetProgress();
+		progressContainer.setVisible(true);
 		spinningProgressContainer.setVisible(false);
 	}
 	
 	private void showSpinningProgress() {
 		spinningProgressContainer.setVisible(true);
-		progressBar.reset();
-		progressBar.setVisible(false);
+		resetProgress();
+		progressContainer.setVisible(false);
 	}
 		
-	private static final int PANEL_HEIGHT = 210;
-	private static final int PANEL_WIDTH = 790;
-	
-	private Widget createUploadPanel() {
-		formPanel.setHeaderVisible(false);
-		formPanel.setFrame(false);
-		formPanel.setEncoding(Encoding.MULTIPART);
-		formPanel.setMethod(Method.POST);
-		formPanel.setButtonAlign(HorizontalAlignment.LEFT);		
-		formPanel.setAutoHeight(false);
-		formPanel.setHeight(PANEL_HEIGHT);
-		formPanel.setBorders(false);
-		formPanel.setAutoWidth(false);
-		formPanel.setWidth(PANEL_WIDTH-170);
-		formPanel.setFieldWidth(PANEL_WIDTH-300);
-		
+	private void initUploadPanel() {
+		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
+		formPanel.setMethod(FormPanel.METHOD_POST);
 		fileUploadHTML = createFileUploadHTML();
-		formPanel.add(new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>"));
 		formPanel.add(fileUploadHTML);
-		
-		formPanel.layout(true);	
-		
 		configureUploadButton(); // upload tab first by default
 		
-		progressBar.setWidth(PANEL_WIDTH - 230);
-								
-		formPanel.layout(true);
+		uploadPanel = new FlowPanel();
+		uploadPanel.add(DRAG_AND_DROP_HTML);
+		uploadPanel.add(formPanel);
 		
-		return formPanel;
+		Row row = new Row();
+		Column col = new Column(ColumnSize.XS_12);
+		col.add(spinningProgressContainer);
+		col.add(progressContainer);
+		row.add(col);
+		uploadPanel.add(row);
 	}
 
-	private Widget createExternalPanel() {
-		externalLinkFormPanel = new FormPanel();
-		pathField = new TextField<String>();
-		externalLinkFormPanel.setHeaderVisible(false);
-		externalLinkFormPanel.setAutoHeight(false);
-		externalLinkFormPanel.setHeight(PANEL_HEIGHT);
-		externalLinkFormPanel.setFrame(false);
-		externalLinkFormPanel.setButtonAlign(HorizontalAlignment.LEFT);
-		externalLinkFormPanel.setLabelWidth(110);
-		externalLinkFormPanel.setBorders(false);
-		externalLinkFormPanel.setFieldWidth(PANEL_WIDTH-350);
-		externalLinkFormPanel.setAutoWidth(false);
-		externalLinkFormPanel.setWidth(PANEL_WIDTH-270);
-		pathField.setFieldLabel("URL");
-		pathField.addListener(Events.KeyPress, new Listener<BaseEvent>() {
+	private void initExternalPanel() {
+		pathField = new TextBox();
+		nameField = new TextBox();
+		
+		FieldSet set = new FieldSet();
+		
+		externalUrlFormGroup = new FormGroup();
+		FormLabel l = new FormLabel();
+		l.setText("URL");
+		externalUrlFormGroup.add(l);
+		externalUrlFormGroup.add(pathField);
+		set.add(externalUrlFormGroup);
+		
+		FormGroup fg = new FormGroup();
+		l = new FormLabel();
+		l.setText("Name (Optional)");
+		fg.add(l);
+		fg.add(nameField);
+		set.add(fg);
+		
+		externalLinkFormPanel.add(set);
+		pathField.addKeyPressHandler(new KeyPressHandler() {
 			@Override
-			public void handleEvent(BaseEvent be) {
+			public void onKeyPress(KeyPressEvent event) {
 				uploadBtn.setEnabled(true);
-			}			
+			}
 		});
-		
-		externalLinkFormPanel.add(pathField);
-		
-		nameField = new TextField<String>();
-		nameField.setFieldLabel("Name (Optional)");
-		nameField.setAllowBlank(true);
-		nameField.setRegex(WebConstants.VALID_ENTITY_NAME_REGEX);
-		nameField.getMessages().setRegexText(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
-		
-		externalLinkFormPanel.add(nameField);			
-		externalLinkFormPanel.layout(true);
-		return externalLinkFormPanel;
 	}
 
 	private void configureUploadButton() {
+		isExternal = false;
 		uploadBtn.setText("Upload");
-		uploadBtn.removeAllListeners();
-		SelectionListener<ButtonEvent> uploadListener = new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (!formPanel.isValid()) {
-					return;
-				}
-				uploadBtn.setEnabled(false);
-				initializeProgress();
-				presenter.handleUploads();
-			}
-		};
-		uploadBtn.addSelectionListener(uploadListener);
 	}
 
-	private void configureUploadButtonForExternal() {		
+	private void configureUploadButtonForExternal() {
+		isExternal = true;
 		uploadBtn.setText("Save");
-		uploadBtn.removeAllListeners();
-		uploadBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				if (!externalLinkFormPanel.isValid()) {
-					return;
-				}
-
-				presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
-			}
-		});
 	}
 	
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple></input>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" /></input>");
 	}
 }
