@@ -477,8 +477,8 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple></input>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" /></input>");
 	}
 }
