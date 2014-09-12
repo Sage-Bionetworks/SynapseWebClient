@@ -66,7 +66,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private UploadDialogWidget uploader;
-	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
@@ -79,8 +78,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 			Header headerWidget, 
 			Footer footerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
-			UploadDialogWidget uploader,
-			IconsImageBundle iconsImageBundle
+			UploadDialogWidget uploader			
 			) {
 		initWidget(binder.createAndBindUi(this));
 		this.sageImageBundle = sageImageBundle;
@@ -93,7 +91,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.uploader = uploader;
-		this.iconsImageBundle = iconsImageBundle;
+		uploader.disableMultipleFileUploads();
 		
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());

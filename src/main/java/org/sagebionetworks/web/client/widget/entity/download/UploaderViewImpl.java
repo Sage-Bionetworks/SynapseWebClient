@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.NavTabs;
+import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.TabContent;
 import org.gwtbootstrap3.client.ui.TabListItem;
@@ -73,6 +74,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private Button uploadBtn;
 	private Button cancelBtn; 
+	private Progress progressContainer;
 	private ProgressBar progressBar;
 	// external link panel
 	
@@ -96,8 +98,10 @@ public class UploaderViewImpl extends FlowPanel implements
 		this.dialog = dialog;
 		dialog.setSize(ModalSize.MEDIUM);
 		
+		this.progressContainer = new Progress();
 		this.progressBar = new ProgressBar();
-		progressBar.setType(ProgressBarType.DEFAULT);
+		progressBar.setType(ProgressBarType.INFO);
+		progressContainer.add(progressBar);
 		
 		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
@@ -136,6 +140,8 @@ public class UploaderViewImpl extends FlowPanel implements
 
 					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 				} else {
+					fileUploadHTML.setVisible(false);
+					DRAG_AND_DROP_HTML.setVisible(false);
 					uploadBtn.setEnabled(false);
 					initializeProgress();
 					presenter.handleUploads();	
@@ -168,7 +174,8 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void resetToInitialState() {
 		hideLoading();
 		uploadBtn.setEnabled(true);
-		
+		fileUploadHTML.setVisible(true);
+		DRAG_AND_DROP_HTML.setVisible(true);
 		// Clear previously selected files.
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
@@ -257,7 +264,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void hideLoading() {
 		//try to hide the loading progress bar.  ignore any errors
 		resetProgress();
-		progressBar.setVisible(false);
+		progressContainer.setVisible(false);
 		spinningProgressContainer.setHTML("");
 		spinningProgressContainer.setVisible(false);
 	}
@@ -381,7 +388,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		if(formPanel.isVisible()) formPanel.reset(); // clear file choice from fileUploadField
 
 		configureUploadButton();
-		progressBar.setVisible(false);
+		progressContainer.setVisible(false);
 	}
 	
 	private void initializeProgress() {
@@ -391,15 +398,15 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void showProgressBar() {
-		progressBar.setVisible(true);
 		resetProgress();
+		progressContainer.setVisible(true);
 		spinningProgressContainer.setVisible(false);
 	}
 	
 	private void showSpinningProgress() {
 		spinningProgressContainer.setVisible(true);
 		resetProgress();
-		progressBar.setVisible(false);
+		progressContainer.setVisible(false);
 	}
 		
 	private void initUploadPanel() {
@@ -413,7 +420,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(DRAG_AND_DROP_HTML);
 		uploadPanel.add(formPanel);
 		uploadPanel.add(spinningProgressContainer);
-		uploadPanel.add(progressBar);
+		uploadPanel.add(progressContainer);
 	}
 
 	private void initExternalPanel() {
