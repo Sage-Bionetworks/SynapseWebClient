@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -9,11 +10,13 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.TabContent;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
@@ -99,6 +102,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		dialog.setSize(ModalSize.MEDIUM);
 		
 		this.progressContainer = new Progress();
+		progressContainer.setMarginTop(10);
 		this.progressBar = new ProgressBar();
 		progressBar.setType(ProgressBarType.INFO);
 		progressContainer.add(progressBar);
@@ -207,6 +211,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void showLoading() {
 		spinningProgressContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.addStyleName("margin-top-10");
 	}
 
 	@Override
@@ -252,7 +257,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void updateProgress(double value, String text) {
 		progressBar.setText(text);
-		progressBar.setPercent(value);
+		progressBar.setPercent(value*100);
 	}
 	
 	@Override
@@ -349,12 +354,14 @@ public class UploaderViewImpl extends FlowPanel implements
 			container.add(sharingDataUseWidget.asWidget());
 		}
 		
-		FlowPanel bar = new FlowPanel();
-		bar.add(uploadBtn);
+		Row row = new Row();
+		Column col = new Column(ColumnSize.XS_12);
+		col.add(uploadBtn);
 		if(showCancelButton) {
-			bar.add(cancelBtn);
+			col.add(cancelBtn);
 		}
-		container.add(bar);
+		row.add(col);
+		container.add(row);
 	}
 	
 	@Override
@@ -419,8 +426,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel = new FlowPanel();
 		uploadPanel.add(DRAG_AND_DROP_HTML);
 		uploadPanel.add(formPanel);
-		uploadPanel.add(spinningProgressContainer);
-		uploadPanel.add(progressContainer);
+		
+		Row row = new Row();
+		Column col = new Column(ColumnSize.XS_12);
+		col.add(spinningProgressContainer);
+		col.add(progressContainer);
+		row.add(col);
+		uploadPanel.add(row);
 	}
 
 	private void initExternalPanel() {
