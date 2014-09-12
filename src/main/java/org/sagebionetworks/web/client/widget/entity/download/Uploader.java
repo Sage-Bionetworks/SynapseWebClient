@@ -226,7 +226,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param fileName
 	 */
 	public void directUploadStep1(final String fileName) {
-		if (entity != null) {
+		if (entity != null || parentEntityId == null) {
 			directUploadStep2(fileName);
 		} else {
 			synapseClient.getFileEntityIdWithSameName(fileName, parentEntityId, new AsyncCallback<String>() {
