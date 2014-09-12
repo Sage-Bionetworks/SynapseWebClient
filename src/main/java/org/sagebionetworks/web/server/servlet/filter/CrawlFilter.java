@@ -163,8 +163,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = null;
 		try{
-			String userProfileJson = synapseClient.getUserProfile(entity.getCreatedBy());
-			UserProfile profile = EntityFactory.createEntityFromJSONString(userProfileJson, UserProfile.class);
+			UserProfile profile = synapseClient.getUserProfile(entity.getCreatedBy());
 			StringBuilder createdByBuilder = new StringBuilder();
 			if (profile.getFirstName() != null)
 				createdByBuilder.append(profile.getFirstName() + " ");

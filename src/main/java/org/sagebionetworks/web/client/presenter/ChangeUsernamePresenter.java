@@ -82,25 +82,18 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 	}
 	
 	public void updateProfile(final UserProfile newProfile, final AsyncCallback<Void> callback) {
-		try { 
-			JSONObjectAdapter adapter = newProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-			String userProfileJson = adapter.toJSONString();
-	
-			synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					authController.updateCachedProfile(newProfile);
-					callback.onSuccess(result);
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-		}
+		synapseClient.updateUserProfile(newProfile, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				authController.updateCachedProfile(newProfile);
+				callback.onSuccess(result);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
 	}
 	
 	@Override

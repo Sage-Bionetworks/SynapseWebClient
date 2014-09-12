@@ -191,37 +191,31 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	@Override
 	public void updateMyNotificationSettings(final boolean sendEmailNotifications, final boolean markEmailedMessagesAsRead){
 		//get my profile
-		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+		synapseClient.getUserProfile(null, new AsyncCallback<UserProfile>() {
 			@Override
-			public void onSuccess(String userProfileJson) {
-				try {
-					final UserProfile myProfile = new UserProfile(adapterFactory.createNew(userProfileJson));
-					org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
-					if (settings == null) {
-						settings = new org.sagebionetworks.repo.model.message.Settings();
-						settings.setMarkEmailedMessagesAsRead(false);
-						settings.setSendEmailNotifications(true);
-						myProfile.setNotificationSettings(settings);
+			public void onSuccess(final UserProfile myProfile) {
+				org.sagebionetworks.repo.model.message.Settings settings = myProfile.getNotificationSettings();
+				if (settings == null) {
+					settings = new org.sagebionetworks.repo.model.message.Settings();
+					settings.setMarkEmailedMessagesAsRead(false);
+					settings.setSendEmailNotifications(true);
+					myProfile.setNotificationSettings(settings);
+				}
+				settings.setSendEmailNotifications(sendEmailNotifications);
+				settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
+				
+				synapseClient.updateUserProfile(myProfile, new AsyncCallback<Void>() {
+					@Override
+					public void onSuccess(Void result) {
+						view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
+						authenticationController.updateCachedProfile(myProfile);
 					}
-					settings.setSendEmailNotifications(sendEmailNotifications);
-					settings.setMarkEmailedMessagesAsRead(markEmailedMessagesAsRead);
-					JSONObjectAdapter adapter = myProfile.writeToJSONObject(adapterFactory.createNew());
-					userProfileJson = adapter.toJSONString();
-					synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-						@Override
-						public void onSuccess(Void result) {
-							view.showInfo(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS, "");
-							authenticationController.updateCachedProfile(myProfile);
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						view.showErrorMessage(caught.getMessage());
+					}
+				});
 			}
 			@Override
 			public void onFailure(Throwable caught) {

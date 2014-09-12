@@ -62,13 +62,13 @@ public class ProfileFormPresenterTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockLinkedInService = mock(LinkedInServiceAsync.class);
 		mockCookies = mock(CookieProvider.class);
-		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, mockGlobalApplicationState, adapterFactory, mockCookies, mockLinkedInService, mockGWTWrapper);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, mockGlobalApplicationState, adapterFactory, mockCookies, mockLinkedInService, mockGWTWrapper);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
 		userProfile.writeToJSONObject(adapter.createNew());
 		String userProfileJson = adapter.toJSONString();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(testUser);		
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
@@ -125,7 +125,7 @@ public class ProfileFormPresenterTest {
 	@Test
 	public void testUpdateProfileFailureUpdateUserProfile() {
 		Exception myException = new Exception("another test exception");
-		AsyncMockStubber.callFailureWith(myException).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(myException).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		profileForm.updateProfile(userProfile.getFirstName(), 
 				userProfile.getLastName() + "_modifiedlastname", 
 				userProfile.getSummary(), 

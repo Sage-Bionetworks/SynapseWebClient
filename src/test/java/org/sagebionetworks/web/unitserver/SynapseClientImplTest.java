@@ -595,8 +595,8 @@ public class SynapseClientImplTest {
 		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
 		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
-		String userProfile = synapseClient.getUserProfile(testUserId);
-		assertEquals(userProfile, EntityFactory.createJSONStringForEntity(testUserProfile));
+		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
+		assertEquals(userProfile, testUserProfile);
 	}
 	
 	@Test

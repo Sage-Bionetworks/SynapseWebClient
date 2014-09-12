@@ -86,7 +86,7 @@ public class ChangeUsernamePresenterTest {
 		presenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(presenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(profile, any(AsyncCallback.class));
 	}	
 	
 	private void setPlace() {
@@ -101,20 +101,20 @@ public class ChangeUsernamePresenterTest {
 		profile.setOwnerId("1233");
 		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
 		presenter.updateProfile(profile, mockCallback);
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		verify(mockAuthenticationController).updateCachedProfile(eq(profile));
 		verify(mockCallback).onSuccess(any(Void.class));
 	}
 	
 	@Test
 	public void testUpdateProfileFailed() {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		setPlace();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		AsyncCallback<Void> mockCallback = mock(AsyncCallback.class);
 		presenter.updateProfile(profile, mockCallback);
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 	
@@ -122,7 +122,7 @@ public class ChangeUsernamePresenterTest {
 	@Test 
 	public void testSetUsernameSuccess()throws JSONObjectAdapterException {
 		presenter.setUsername("newname");
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		//go to the last place
 		verify(mockPlaceChanger).goTo(any(Place.class));
 	}
@@ -132,7 +132,7 @@ public class ChangeUsernamePresenterTest {
 	public void testSetUsernameFailure()throws JSONObjectAdapterException {
 		String exceptionMessage = "unhandled";
 		Exception t = new Exception(exceptionMessage);
-		AsyncMockStubber.callFailureWith(t).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(t).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		presenter.setUsername("newname");
 		verify(mockView).showSetUsernameError(eq(t));
 	}
