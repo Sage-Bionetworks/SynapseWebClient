@@ -267,7 +267,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
-			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK));
+			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_NEW_VERSION_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
