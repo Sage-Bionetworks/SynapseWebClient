@@ -434,8 +434,8 @@ public class UploaderViewImpl extends LayoutContainer implements
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\" multiple>");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" style=\"padding: 5px;\" multiple>");
 		else
-			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" type=\"file\" style=\"padding: 5px;\">");
+			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" style=\"padding: 5px;\">");
 	}
 }
