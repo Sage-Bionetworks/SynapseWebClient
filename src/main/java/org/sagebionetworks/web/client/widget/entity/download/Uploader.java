@@ -43,7 +43,6 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
@@ -117,7 +116,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		clearHandlers();
 		uploadLog = new StringBuilder();
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
-		isDirectUploadSupported = false;
 	}		
 		
 	public Widget asWidget(Entity entity) {
@@ -504,10 +502,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if (currIndex + 1 == fileNames.length)
 				view.updateProgress(.99d, "99%");
 			setFileEntityFileHandle(status.getFileHandleId());
-			if (fileHandleIdCallback != null) {
-				fileHandleIdCallback.invoke(status.getFileHandleId());
-				uploadSuccess();
-			}
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later
@@ -582,6 +576,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			} catch (RestServiceException e) {
 				uploadError(e.getMessage());
 			}
+		}
+		if (fileHandleIdCallback != null) {
+			fileHandleIdCallback.invoke(fileHandleId);
+			uploadSuccess();
 		}
 	}
 	
