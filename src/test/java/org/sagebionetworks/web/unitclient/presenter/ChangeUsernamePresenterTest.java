@@ -86,7 +86,7 @@ public class ChangeUsernamePresenterTest {
 		presenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(presenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(profile, any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}	
 	
 	private void setPlace() {

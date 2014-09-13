@@ -74,8 +74,7 @@ public class CertificatePresenterTest {
 		principalId = "1239";
 		profile.setOwnerId(principalId);
 		profile.setUserName("Fooooo");
-		String userProfileJson = profile.writeToJSONObject(adapterFactory.createNew()).toJSONString(); 
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 		passingRecord = new PassingRecord();
 		String passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();

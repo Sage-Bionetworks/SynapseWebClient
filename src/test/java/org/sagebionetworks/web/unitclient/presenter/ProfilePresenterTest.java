@@ -173,11 +173,7 @@ public class ProfilePresenterTest {
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		userProfile.writeToJSONObject(adapter);
-		String userProfileJson = adapter.toJSONString(); 
-
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
