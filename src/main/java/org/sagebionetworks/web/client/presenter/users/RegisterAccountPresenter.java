@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter.users;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -10,7 +11,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -27,17 +27,20 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			GWTWrapper gwt) {
 		this.view = view;
 		// Set the presenter on the view
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		this.gwt = gwt;
 		view.setPresenter(this);
 	}
 
@@ -59,28 +62,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		view.showDefault();
 	}
 
-	/**
-	 * Check that the username/alias is available
-	 * @param username
-	 */
-	public void checkUsernameAvailable(String username) {
-		if (username.trim().length() > 3) {
-			synapseClient.isAliasAvailable(username, AliasType.USER_NAME.toString(), new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean isAvailable) {
-					if (!isAvailable)
-						view.markUsernameUnavailable();
-				}
-				
-				@Override
-				public void onFailure(Throwable e) {
-					//do nothing.  validation has failed, but updating the username will fail if it's already taken.
-					e.printStackTrace();
-				}
-			});
-		}
-	}
-	
 	/**
 	 * check that the email is available
 	 * @param username
@@ -112,9 +93,9 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	 * @param lastName
 	 */
 	@Override
-	public void registerUser(String username, String email, String firstName, String lastName) {
-		UserRegistration userInfo = new UserRegistration(username, email, firstName, lastName);
-		userService.createUser(userInfo, new AsyncCallback<Void>() {			
+	public void registerUser(String email) {
+		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
+		userService.createUserStep1(email, callbackUrl, new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {
 				view.showAccountCreated();

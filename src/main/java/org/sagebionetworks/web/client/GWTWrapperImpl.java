@@ -31,8 +31,20 @@ public class GWTWrapperImpl implements GWTWrapper {
 	
 	@Override
 	public String encodeQueryString(String queryString){
+		if (queryString == null)
+			return "";
+		
 		return URL.encodeQueryString(queryString);
 	}
+	
+	@Override
+	public String decodeQueryString(String queryString){
+		if (queryString == null)
+			return "";
+		
+		return URL.decodeQueryString(queryString);
+	}
+
 	
 	@Override
 	public XMLHttpRequest createXMLHttpRequest() {

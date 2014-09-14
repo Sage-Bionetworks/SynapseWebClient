@@ -16,8 +16,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.Settings;
 import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
@@ -222,7 +222,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
         	settings.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					globalApplicationState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+					globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId(), ProfileArea.SETTINGS));
 				}
 			});
 		 	

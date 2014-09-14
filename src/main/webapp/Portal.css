@@ -635,14 +635,24 @@ a.shortBtn {
 .margin-bottom-40 {
 	margin-bottom: 40px;
 }
+
 .margin-bottom-20 {
 	margin-bottom: 20px;
 }
+
+.margin-bottom-20-imp {
+	margin-bottom: 20px !important;
+}
+
 .margin-bottom-10 {
 	margin-bottom: 10px;
 }
 .margin-bottom-5 {
 	margin-bottom: 5px;
+}
+
+.margin-bottom-4 {
+	margin-bottom: 4px;
 }
 
 .margin-bottom-15 {
@@ -671,6 +681,10 @@ a.shortBtn {
 
 .tab-background {
 	background-color: #f9f9f9;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0px 0px 4px 4px;
 }
 
 .file-preview {
@@ -698,6 +712,28 @@ a.shortBtn {
     -webkit-border-radius: 4px 0 4px 0;
     -moz-border-radius: 4px 0 4px 0;
     border-radius: 4px 0 4px 0;
+}
+
+.fileUploadLabel {
+	width: 94%;
+	margin: 70px 0 -100px 0;
+	font-size: 13px;
+	font-weight: bold;
+	color:  #3a5bdc;
+	text-align: center;
+}
+
+.dragAndDropUploadBox {
+	width: 97%;
+	padding: 3em 0 6em 38%;
+	border: 5px dashed;
+	margin-bottom: 12px;
+	border-radius: 3em;
+	display: inline !important;
+}
+
+.dropable {
+	border-color: #3a5bdc !important;
 }
 
 .markdownEditor {
@@ -1042,6 +1078,20 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration:underline;
 }
 
+.entityTreeItem, .entityTreeItem-font {
+	font: normal 11px arial, tahoma, helvetica, sans-serif;
+}
+
+.entityTreeItem-selected a,
+.entityTreeItem-selected a:hover, 
+.entityTreeItem-selected img,
+.entityTreeItem-selected img:hover {
+    color: black !important;
+    cursor: default !important;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
 /**table of contents styling **/
 /** .8em to 1.2em **/
 .toc-indent4 {
@@ -1125,6 +1175,10 @@ ol.lowerroman {
 	padding-bottom: 15px;
 }
 
+.padding-bottom-4-imp {
+	padding-bottom: 4px !important;
+}
+
 .padding-5 {
 	padding: 5px;
 }
@@ -1175,6 +1229,10 @@ ol.lowerroman {
 
 .displayInline {
 	display: inline;
+}
+
+.displayInlineBlock {
+	display: inline-block;
 }
 
 .smallerText {
@@ -1277,6 +1335,11 @@ ol.lowerroman {
 	background-clip: padding-box;
 }
 
+.moveup-35 {
+	position: relative;
+	top: -35px;
+}
+
 .moveup-8 {
 	position: relative;
 	top: -8px;
@@ -1368,6 +1431,10 @@ ol.lowerroman {
     position: absolute;
 }
 
+.padding-top-0-imp {
+	padding-top: 0px !important;
+}
+
 .fileTabTopPadding {
 	padding-top: 5px;
 }
@@ -1403,6 +1470,11 @@ ol.lowerroman {
 .vertical-align-middle {
 	vertical-align: middle;
 }
+
+.vertical-align-top {
+	vertical-align: top;
+}
+
 
 .member-search-button {
 	font-size: 12px !important;
@@ -1541,6 +1613,10 @@ a.projectTitle:hover {
 
 .padding-left-0 {
 	padding-left: 0px;
+}
+
+.padding-left-0-imp {
+	padding-left: 0px !important;
 }
 .padding-left-5 {
 	padding-left: 5px;

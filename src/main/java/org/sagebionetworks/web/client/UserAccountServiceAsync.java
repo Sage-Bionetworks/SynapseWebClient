@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.users.UserRegistration;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -17,7 +16,8 @@ public interface UserAccountServiceAsync {
 	
 	void signTermsOfUse(String sessionToken, boolean acceptsTerms, AsyncCallback<Void> callback);
 
-	void createUser(UserRegistration userInfo, AsyncCallback<Void> callback);
+	void createUserStep1(String email, String portalEndpoint, AsyncCallback<Void> callback);
+	void createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken, AsyncCallback<String> callback);
 	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
 

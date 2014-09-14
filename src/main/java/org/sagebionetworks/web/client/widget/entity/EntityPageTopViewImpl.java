@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Study;
 import org.sagebionetworks.repo.model.Summary;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableRowHeader;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -68,6 +70,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -721,23 +724,30 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(tablesTabContainer, bundle, canEdit, wikiPageId, null);
 
 		// Table
-		SimpleTableWidget tableWidget = ginInjector.getSimpleTableWidget();
 		QueryChangeHandler qch = new QueryChangeHandler() {			
 			@Override
-			public void onQueryChange(String newQuery) {
+			public void onQueryChange(Query newQuery) {
 				presenter.setTableQuery(newQuery);				
 			}
-		};		
-		TableRowHeader rowHeader = presenter.getTableRowHeader();
-		if(rowHeader != null) {
-			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, rowHeader, qch);									
-		} else {
-			tableWidget.configure((TableEntity) bundle.getEntity(), canEdit, presenter.getTableQuery(), qch);						
-		}
+
+			@Override
+			public Query getQueryString() {
+				return presenter.getTableQuery();
+			}
+
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		};
+		IsWidget tableWidget = null;
+		// V2
+		TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
+		v2TableWidget.configure(bundle, canEdit, qch);
+		tableWidget = v2TableWidget;
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
-		
 		// TODO (maybe):
 //		// Programmatic Clients
 //		tablesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));

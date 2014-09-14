@@ -16,12 +16,8 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Locationable;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -90,33 +86,23 @@ public class FileUpload extends HttpServlet {
         
         try{ 
 			FileItemIterator fileItemIterator = upload.getItemIterator(request);
-
 			String entityId = request.getParameter(WebConstants.ENTITY_PARAM_KEY);
-			String makeAttachment=null;
-			SynapseClient synapseClient=null;
-			Entity locationable=null;
-			if (entityId!=null) {
-	            TokenProvider tokenProvider = new TokenProvider() {					
-					@Override
-					public String getSessionToken() {
-						return UserDataProvider.getThreadLocalUserToken(request);
-					}
-				};
-				makeAttachment = request.getParameter(WebConstants.MAKE_ATTACHMENT_PARAM_KEY);
-				synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
+			if(entityId == null) {
+				throw new IllegalArgumentException("entityId is a required parameter");
 			}
 			
-			String restrictedParam = request.getParameter(WebConstants.IS_RESTRICTED_PARAM_KEY);
-			if (restrictedParam==null) throw new RuntimeException("restrictedParam=null");
-			boolean isRestricted = Boolean.parseBoolean(restrictedParam);
+			TokenProvider tokenProvider = new TokenProvider() {					
+				@Override
+				public String getSessionToken() {
+					return UserDataProvider.getThreadLocalUserToken(request);
+				}
+			};
+			SynapseClient synapseClient = ServiceUtils.createSynapseClient(synapseProvider, urlProvider, tokenProvider.getSessionToken());						
 			
-			boolean uploadedAny = false;
-
 			while (fileItemIterator.hasNext()) {
                 FileItemStream item = fileItemIterator.next();
 
                 InputStream stream = item.openStream();
-
 
                 // Process the input stream
                 File tempDir = Files.createTempDir();
@@ -130,44 +116,22 @@ public class FileUpload extends HttpServlet {
 				
 				try{	                
 					// get Entity and store file in location
-					if(entityId != null) {					
-						locationable = synapseClient.getEntityById(entityId);
-						if(!(locationable instanceof Locationable)) {
-							throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
-						}						
-						if("true".equals(makeAttachment)) {
-							// TODO : create Attachment entity, and set locationable
-							// locationable = new attachment entity
-						}
-						Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
-						logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
-						OutputStream os = response.getOutputStream();						
-						PrintStream printStream = new PrintStream(os);
-						printStream.print(DisplayConstants.UPLOAD_SUCCESS);
-						printStream.close();
-						uploadedAny = true; // uploaded at least one file
-					} else {
-						throw new IllegalArgumentException("entityId is a required parameter");
-					}					
+					Entity locationable = synapseClient.getEntityById(entityId);
+					if(!(locationable instanceof Locationable)) {
+						throw new RuntimeException("Upload failed. Entity id: " + locationable.getId() + " is not Locationable.");
+					}						
+					
+					Locationable uploaded = synapseClient.uploadLocationableToSynapse((Locationable)locationable, file);
+					logger.info("Uploaded file " + item.getName() + " ("+ file.getName() +") to Synapse id: " + uploaded.getId());
+					OutputStream os = response.getOutputStream();						
+					PrintStream printStream = new PrintStream(os);
+					printStream.print(DisplayConstants.UPLOAD_SUCCESS);
+					printStream.close();
 				}finally{
 					// Unconditionally delete the temp file.
 					file.delete();
 				}
             } // end while
-			
-			
-			// now lock down restricted data
-			if (isRestricted && entityId!=null && uploadedAny) {
-				// we only proceed if there aren't currently any access restrictions
-				RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
-				subjectId.setId(entityId);
-				subjectId.setType(RestrictableObjectType.ENTITY);
-
-				VariableContentPaginatedResults<AccessRequirement> currentARs = synapseClient.getAccessRequirements(subjectId);
-				if (currentARs.getTotalNumberOfResults()==0L) {
-					synapseClient.createLockAccessRequirement(entityId);
-				}
-			}
         } catch(Exception e){
             throw new RuntimeException(e);
         }

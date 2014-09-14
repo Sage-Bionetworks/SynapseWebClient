@@ -15,15 +15,5 @@
 				<span class="boldText">File:</span> <span ui:field="fileName"/><span style="margin-left: 5px;" class="file-size" ui:field="fileSize" /><g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
 			</g:HTMLPanel>
 		</g:HTMLPanel>
-		<g:HTMLPanel ui:field="noFileFoundContainer">
-			<div class="well">
-				<div>
-					<h3><span style="margin-right: 10px;">No File Found</span><g:SimplePanel ui:field="uploadButtonContainer"/></h3>
-				</div>
-				<div>
-					It is recommended that you upload a file or link to an external location as this object is intended to reference a file.
-				</div>
-			</div>
-		</g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder>

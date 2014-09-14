@@ -17,7 +17,12 @@ import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowReference;
+import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.csv.CsvNullReader;
+import org.sagebionetworks.web.client.transform.JSONEntityFactoryImpl;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -270,6 +275,8 @@ public class TableModelTestUtils {
 			}
 		case DOUBLE:
 			return "" + (i * 3.41 + 3.12 + (isUpdate ? 10000 : 0));
+		case ENTITYID:
+			return "syn"+i;
 		}
 		throw new IllegalArgumentException("Unknown ColumnType: " + cm.getColumnType());
 	}
@@ -348,5 +355,45 @@ public class TableModelTestUtils {
 		String csv = createCSVString(input);
 		StringReader reader = new StringReader(csv);
 		return new CsvNullReader(reader);
+	}
+	
+	/**
+	 * Build a list of column Id from a list of ColumnModels.
+	 * @param models
+	 * @return
+	 */
+	public static List<String> getColumnModelIds(List<ColumnModel> models){
+		LinkedList<String> resutls = new LinkedList<String>();
+		for(ColumnModel cm: models){
+			resutls.add(cm.getId());
+		}
+		return resutls;
+	}
+	
+	/**
+	 * Clone a JSONEntity.
+	 * @param toClone
+	 * @param clazz
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public static <T extends JSONEntity> T cloneObject(T toClone, Class<T> clazz) throws JSONObjectAdapterException{
+		String json = EntityFactory.createJSONStringForEntity(toClone);
+		return EntityFactory.createEntityFromJSONString(json, clazz);
+	}
+	
+	/**
+	 * Clone a list of JSONEntity.
+	 * @param toClone
+	 * @param clazz
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public static <T extends JSONEntity> List<T> cloneObject(List<T> toClone, Class<T> clazz) throws JSONObjectAdapterException{
+		List<T> result = new ArrayList<T>(toClone.size());
+		for(T e: toClone){
+			result.add(cloneObject(e, clazz));
+		}
+		return result;
 	}
 }

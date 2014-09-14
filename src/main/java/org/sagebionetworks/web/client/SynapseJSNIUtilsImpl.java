@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
@@ -25,6 +26,8 @@ import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
+	
+	public static String FILE_FIELD_ID;
 	
 	private static ProgressCallback progressCallback;
 	
@@ -184,14 +187,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadFileChunk(String contentType, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
-		_directUploadFile(contentType, fileFieldId, startByte, endByte, url, xhr);
+		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
 	}
 	
-	private final static native void _directUploadFile(String contentType, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
+	private final static native void _directUploadFile(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileToUpload = fileToUploadElement.files[0];
+		var fileToUpload = fileToUploadElement.files[index];
 		var start = parseInt(startByte) || 0;
 		var end = parseInt(endByte) || fileToUpload.size - 1;
 		var fileSliceToUpload;
@@ -230,34 +233,105 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public String getContentType(String fileFieldId) {
-		return _getContentType(fileFieldId);
+	public String getContentType(String fileFieldId, int index) {
+		return _getContentType(fileFieldId, index);
 	}
-	private final static native String _getContentType(String fileFieldId) /*-{
+	private final static native String _getContentType(String fileFieldId, int index) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		return fileToUploadElement.files[0].type;
+		return fileToUploadElement.files[index].type;
 	}-*/;
 	
 	@Override
-	public double getFileSize(String fileFieldId) {
-		return _getFileSize(fileFieldId);
+	public double getFileSize(String fileFieldId, int index) {
+		return _getFileSize(fileFieldId, index);
 	}
-	private final static native double _getFileSize(String fileFieldId) /*-{
+	private final static native double _getFileSize(String fileFieldId, int index) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[0].size : 0;
+		var fileSize = ('files' in fileToUploadElement) ? fileToUploadElement.files[index].size : 0;
 		return fileSize;
+	}-*/;
+	
+	@Override
+	public String[] getMultipleUploadFileNames(String fileFieldId) {
+		String unSplitNames = _getFilesSelected(fileFieldId);
+		if (unSplitNames.equals(""))
+			return null;
+		return unSplitNames.split(";");
+	}
+	
+	private static native String _getFilesSelected(String fileFieldId) /*-{
+		var fileToUploadElement = $doc.getElementById(fileFieldId);
+	    var out = "";
+	
+	    for (i = 0; i < fileToUploadElement.files.length; i++) {
+	        var file = fileToUploadElement.files[i];
+	        out += file.name + ';';
+	    }
+	    return out;
+	}-*/;
+	
+	@Override
+	public void addDropZoneStyleEventHandling(String fileFieldId) {
+		if (FILE_FIELD_ID == null) {
+			_addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_DROP_STYLE_NAME);
+		}
+		FILE_FIELD_ID = fileFieldId;
+	}
+	
+	private static native void _addDropZoneStyleEventHandling(String dropStyleName) /*-{
+		$doc.addEventListener("dragover", function( event ) {
+				// Prevent default to allow drop.
+				if (event.target.id != @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
+					event.preventDefault();
+				}
+			}, false);
+	
+		$doc.addEventListener("dragenter", function( event ) {
+				// highlight potential drop target when the draggable element enters it
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID
+					&& event.target.className.indexOf(dropStyleName) == -1) {
+					event.target.className += " " + dropStyleName;
+				}
+			}, false);
+		
+		$doc.addEventListener("drop", function( event ) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
+					event.target.className = event.target.className.replace(dropStyleName, '');
+				}
+			}, false);
+		
+		$doc.addEventListener("dragleave", function( event ) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
+					var epsilon_divisor = 30;	// For dragleave events called "inside" box due to border radius.
+					var epsilonX = event.target.offsetWidth / epsilon_divisor;
+					var epsilonY = event.target.offsetHeight / epsilon_divisor;
+					
+					var rect = event.target.getBoundingClientRect();
+					if (	event.clientX <= rect.left + epsilonX || event.clientX >= rect.right - epsilonX ||
+							event.clientY <= rect.top + epsilonY || event.clientY >= rect.bottom - epsilonY	) {
+						// Out of bounds of the box (not just hovering over contained "choose files" button).
+						event.target.className = event.target.className.replace(dropStyleName, '');
+					}
+				}
+			}, false);
+		
+		$doc.addEventListener("dragend", function( event ) {
+				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
+						event.target.className = event.target.className.replace(dropStyleName, '');
+				}
+			}, false);
 	}-*/;
 	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */
 	@Override
-	public void getFileMd5(String fileFieldId, MD5Callback md5Callback) {
-		_getFileMd5(fileFieldId, md5Callback);
+	public void getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) {
+		_getFileMd5(fileFieldId, index, md5Callback);
 	}
-	private final static native void _getFileMd5(String fileFieldId, MD5Callback md5Callback) /*-{
+	private final static native void _getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[0];
+		var file = fileToUploadElement.files[index];
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		chunkSize = 2097152; // read in chunks of 2MB
         chunks = Math.ceil(file.size / chunkSize);

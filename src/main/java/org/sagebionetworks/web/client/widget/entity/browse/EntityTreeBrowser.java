@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -21,6 +25,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -40,10 +45,10 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
-	private SynapseClientAsync synapseClient;
 	private IconsImageBundle iconsImageBundle;
 	AdapterFactory adapterFactory;
 	EntityTypeProvider entityTypeProvider;
+	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	
 	private String currentSelection;
 	
@@ -55,8 +60,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			IconsImageBundle iconsImageBundle,
 			AdapterFactory adapterFactory) {
 		this.view = view;		
@@ -64,9 +67,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		this.entityTypeProvider = entityTypeProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
 		this.iconsImageBundle = iconsImageBundle;
 		this.adapterFactory = adapterFactory;
+		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		
 		view.setPresenter(this);
 	}	
@@ -88,10 +91,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	public void configure(String entityId, final boolean sort) {
 		view.clear();
+		view.showLoading();
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
-				view.setRootEntities(result, sort);
+				if (sort)
+					EntityBrowserUtils.sortEntityHeadersByName(result);
+				view.setRootEntities(result);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -100,18 +106,15 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 		});
 	}
 	
-	public void setWidgetHeight(int height) {
-		view.setWidgetHeight(height);
-	}
-	
 	/**
 	 * Configure tree view to be filled initially with the given headers.
 	 * @param rootEntities
 	 */
 	public void configure(List<EntityHeader> rootEntities, boolean sort) {
-		view.setRootEntities(rootEntities, sort);
+		if (sort)
+			EntityBrowserUtils.sortEntityHeadersByName(rootEntities);
+		view.setRootEntities(rootEntities);
 	}
-	
 	
 	@Override
 	public Widget asWidget() {
@@ -189,13 +192,60 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	/**
-	 * Show links if true
-	 * @param makeLinks Make the labels entity links if true 
+	 * Rather than linking to the Entity Page, a clicked entity
+	 * in the tree will become selected.
 	 */
-	public void setMakeLinks(boolean makeLinks) {
-		view.setMakeLinks(makeLinks);
+	public void makeSelectable() {
+		view.makeSelectable();
 	}
 	
+	/**
+	 * When a node is expanded, if its children have not already
+	 * been fetched and placed into the tree, it will delete the dummy
+	 * child node and fetch the actual children of the expanded node.
+	 * During this process, the icon of the expanded node is switched
+	 * to a loading indicator.
+	 */
+	@Override
+	public void expandTreeItemOnOpen(final EntityTreeItem target) {
+		if (!alreadyFetchedEntityChildren.contains(target)) {
+			// We have not already fetched children for this entity.
+			
+			// Change to loading icon.
+			target.showLoadingIcon();
+			
+			getFolderChildren(target.getHeader().getId(), new AsyncCallback<List<EntityHeader>>() {
+				
+				@Override
+				public void onSuccess(List<EntityHeader> result) {
+					// We got the children.
+					alreadyFetchedEntityChildren.add(target);
+					target.asTreeItem().removeItems();	// Remove the dummy item.
+					
+					// Make a tree item for each child and place them in the tree.
+					for (EntityHeader header : result) {
+						view.createAndPlaceTreeItem(header, target, false);
+					}
+					
+					// Change back to type icon.
+					target.showTypeIcon();
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
+						view.showErrorMessage(caught.getMessage());
+					}
+				}
+				
+			});
+		}
+	}
+	
+	@Override
+	public void clearRecordsFetchedChildren() {
+		alreadyFetchedEntityChildren.clear();
+	}
 	
 	/*
 	 * Private Methods

@@ -34,8 +34,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -62,9 +65,11 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.LayerTypeNames;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.LocationTypeNames;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
@@ -124,11 +129,13 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
+import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -981,53 +988,72 @@ public class SynapseClientImplTest {
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		boolean isRestricted = true;
 		
 		//parent entity has no immediate children
 		EntityIdList childEntities = new EntityIdList();
 		childEntities.setIdList(new ArrayList());
 		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
 		
-		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, null, "parentEntityId");
 		
 		//it should have tried to create a new entity (since entity id was null)
 		verify(mockSynapse).createEntity(any(FileEntity.class));
-		//and lock down
-		verify(mockSynapse).createLockAccessRequirement(anyString());
+	}
+	
+	@Test(expected = NotFoundException.class)
+	public void testGetFileEntityIdWithSameNameNotFound() throws JSONObjectAdapterException, SynapseException, RestServiceException, JSONException {
+		JSONObject queryResult = new JSONObject();
+		queryResult.put("totalNumberOfResults", (long) 0);
+		when(mockSynapse.query(anyString())).thenReturn(queryResult);	// TODO
+		
+		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
+	}
+	
+	@Test(expected = ConflictException.class)
+	public void testGetFileEntityIdWithSameNameConflict() throws JSONObjectAdapterException, SynapseException, RestServiceException, JSONException {
+		Folder folder = new Folder();
+		folder.setName(testFileName);
+		JSONObject queryResult = new JSONObject();
+		JSONArray results = new JSONArray();
+		
+		// Set up results.
+		JSONObject objectResult = EntityFactory.createJSONObjectForEntity(folder);
+		JSONArray typeArray = new JSONArray();
+		typeArray.put("Folder");
+		objectResult.put("entity.concreteType", typeArray);
+		results.put(objectResult);
+		
+		// Set up query result.
+		queryResult.put("totalNumberOfResults", (long) 1);
+		queryResult.put("results", results);
+		
+		// Have results returned in query.
+		when(mockSynapse.query(anyString())).thenReturn(queryResult);
+		
+		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 	}
 	
 	@Test
-	public void testGetFileEntityIdWithSameName() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		FileEntity testFileEntity = getTestFileEntity();
-		when(mockSynapse.createEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
-		boolean isRestricted = false;
+	public void testGetFileEntityIdWithSameNameFound() throws JSONException, JSONObjectAdapterException, SynapseException, RestServiceException {
+		FileEntity file = getTestFileEntity();
+		JSONObject queryResult = new JSONObject();
+		JSONArray results = new JSONArray();
 		
-		//parent entity has one child
-		String testChildEntityId = "syn6283185";
-		EntityIdList childEntities = new EntityIdList();
-		List<EntityId> childEntitiesList = new ArrayList<EntityId>();
-		EntityId childEntityId = new EntityId();
-		childEntityId.setId(testChildEntityId);
-		childEntitiesList.add(childEntityId);
-		childEntities.setIdList(childEntitiesList);
-		when(mockSynapse.getDescendants(anyString(), anyInt(), anyInt(), anyString())).thenReturn(childEntities);
+		// Set up results.
+		JSONObject objectResult = EntityFactory.createJSONObjectForEntity(file);
+		JSONArray typeArray = new JSONArray();
+		typeArray.put(FileEntity.class.getName());
+		objectResult.put("entity.concreteType", typeArray);
+		objectResult.put("entity.id", file.getId());
+		results.put(objectResult);
+		queryResult.put("totalNumberOfResults", (long) 1);
+		queryResult.put("results", results);
 		
-		BatchResults<EntityHeader> childEntityHeaders = new BatchResults<EntityHeader>();
-		List<EntityHeader> childEntityHeaderList = new ArrayList<EntityHeader>();
-		EntityHeader header = new EntityHeader();
-		header.setName(testFileName);
-		header.setId(testChildEntityId);
-		header.setType(FileEntity.class.getName());
-		childEntityHeaderList.add(header);
-		childEntityHeaders.setResults(childEntityHeaderList);
-		when(mockSynapse.getEntityHeaderBatch(anyList())).thenReturn(childEntityHeaders);
+		// Have results returned in query.
+		when(mockSynapse.query(anyString())).thenReturn(queryResult);
 		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
-		
-		//verify that it found the target child entity id
-		assertEquals(testChildEntityId, fileEntityId);
+		assertEquals(fileEntityId, file.getId());
 	}
 	
 	@Test
@@ -1037,15 +1063,12 @@ public class SynapseClientImplTest {
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
 		when(mockSynapse.putEntity(any(FileEntity.class))).thenReturn(testFileEntity);
-		boolean isRestricted = false;
-		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId", isRestricted);
+		synapseClient.setFileEntityFileHandle(null, entityId, "parentEntityId");
 		
 		//it should have tried to find the entity
 		verify(mockSynapse).getEntityById(anyString());
 		//update the data file handle id
 		verify(mockSynapse, Mockito.times(1)).putEntity(any(FileEntity.class));
-		//do not lock down (restricted=false)
-		verify(mockSynapse, Mockito.times(0)).createLockAccessRequirement(anyString());
 	}
 	
 	@Test
@@ -1476,24 +1499,24 @@ public class SynapseClientImplTest {
 		List<AccessRequirement> unfilteredAccessRequirements = new ArrayList<AccessRequirement>();
 		List<AccessRequirement> filteredAccessRequirements;
 		//filter empty list should not result in failure
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
 		assertTrue(filteredAccessRequirements.isEmpty());
 		
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
 		unfilteredAccessRequirements.add(createAccessRequirement(ACCESS_TYPE.SUBMIT));
 		//no requirements of type UPDATE
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.UPDATE);
 		assertTrue(filteredAccessRequirements.isEmpty());
 		//1 download
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.DOWNLOAD);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.DOWNLOAD);
 		assertEquals(1, filteredAccessRequirements.size());
 		//2 submit
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.SUBMIT);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(unfilteredAccessRequirements, ACCESS_TYPE.SUBMIT);
 		assertEquals(2, filteredAccessRequirements.size());
 		
 		//finally, filter null list - result will be an empty list
-		filteredAccessRequirements = synapseClient.filterAccessRequirements(null, ACCESS_TYPE.SUBMIT);
+		filteredAccessRequirements = AccessRequirementUtils.filterAccessRequirements(null, ACCESS_TYPE.SUBMIT);
 		assertNotNull(filteredAccessRequirements);
 		assertTrue(filteredAccessRequirements.isEmpty());
 	}
@@ -1541,5 +1564,12 @@ public class SynapseClientImplTest {
 		String emailAddress = "test@test.com";
 		synapseClient.setNotificationEmail(emailAddress);
 		verify(mockSynapse).setNotificationEmail(eq(emailAddress));
+	}
+	
+	@Test
+	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		String errorMessage = "error has occurred";
+		synapseClient.logErrorToRepositoryServices(errorMessage);
+		verify(mockSynapse).logError(any(LogEntry.class));
 	}
 }

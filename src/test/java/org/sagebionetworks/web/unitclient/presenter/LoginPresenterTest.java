@@ -245,5 +245,12 @@ public class LoginPresenterTest {
 		verify(mockView).showTermsOfUse(anyString(), argument.capture());
 	}
 
+	@Test
+	public void testUserAuthenticated() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		loginPresenter.userAuthenticated();
+		verify(mockView).showErrorMessage(anyString());
+		verify(mockView).showLogin(anyString(), anyString());
+	}
 	
 }

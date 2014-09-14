@@ -35,7 +35,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Settings;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -58,7 +58,6 @@ public class SettingsPresenterTest {
 	PlaceChanger mockPlaceChanger;	
 	CookieProvider mockCookieProvider;
 	NodeModelCreator mockNodeModelCreator;
-	Settings place = Mockito.mock(Settings.class);
 	SynapseClientAsync mockSynapseClient;
 	GWTWrapper mockGWT;
 	
@@ -110,43 +109,12 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testStart() {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);	
-		profilePresenter.setPlace(place);
-
-		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
-		EventBus eventBus = mock(EventBus.class);		
-		
-		profilePresenter.start(panel, eventBus);		
-		verify(panel).setWidget(mockView);
-	}
-	
-	@Test
-	public void testSetPlace() {
-		Settings newPlace = Mockito.mock(Settings.class);
-		profilePresenter.setPlace(newPlace);
-		
-		verify(mockView).setApiKey(APIKEY);		
-	}
-	
-	@Test
-	public void testSetPlaceFailAPIKey() {
-		Settings newPlace = Mockito.mock(Settings.class);
-		AsyncMockStubber.callFailureWith(null).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
-		profilePresenter.setPlace(newPlace);
-				
-		verify(mockView).setApiKey(DisplayConstants.ERROR_LOADING);
-		
-	}
-	
-	@Test
 	public void testResetPassword() throws RestServiceException {
 		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
-		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();		
@@ -157,7 +125,6 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callFailureWith(null).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
-		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).passwordChangeFailed(anyString());		
@@ -169,7 +136,6 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
-		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).passwordChangeFailed(anyString());		
@@ -182,7 +148,6 @@ public class SettingsPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
-		profilePresenter.setPlace(place);
 		
 		profilePresenter.resetPassword(password, newPassword);
 		verify(mockView).showPasswordChangeSuccess();
@@ -191,7 +156,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testUsage() throws RestServiceException, JSONObjectAdapterException {
-		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);	
+		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
 		
 		StorageUsageSummaryList usageSummary = new StorageUsageSummaryList();
 		Long totalSize = 12345l;
@@ -201,15 +166,14 @@ public class SettingsPresenterTest {
 		
 		when(mockNodeModelCreator.createJSONEntity(any(String.class), eq(StorageUsageSummaryList.class))).thenReturn(usageSummary);
 		AsyncMockStubber.callSuccessWith(EntityFactory.createJSONStringForEntity(usageSummary)).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
-		profilePresenter.setPlace(place);
+		profilePresenter.updateUserStorage();
 		verify(mockView).updateStorageUsage(eq(totalSize));
 	}
 	@Test
 	public void testUsageFailure() throws RestServiceException {
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);	
-		
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));		
-		profilePresenter.setPlace(place);
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserService).getStorageUsage(any(AsyncCallback.class));
+		profilePresenter.updateUserStorage();
 		verify(mockView).clearStorageUsageUI();
 	}
 	
@@ -218,7 +182,6 @@ public class SettingsPresenterTest {
 		//creates new UserProfile notification settings
 		boolean sendEmailNotifications = true;
 		boolean markEmailedMessagesAsRead = true;
-		profilePresenter.setPlace(place);
 		assertNull(profile.getNotificationSettings());
 		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
 		
@@ -238,7 +201,7 @@ public class SettingsPresenterTest {
 		//updates existing UserProfile notification settings
 		boolean sendEmailNotifications = false;
 		boolean markEmailedMessagesAsRead = false;
-		profilePresenter.setPlace(place);
+		
 		org.sagebionetworks.repo.model.message.Settings notificationSettings = new org.sagebionetworks.repo.model.message.Settings();
 		notificationSettings.setMarkEmailedMessagesAsRead(true);
 		notificationSettings.setSendEmailNotifications(true);
@@ -258,7 +221,6 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
-		profilePresenter.setPlace(place);
 		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
 		profilePresenter.updateMyNotificationSettings(true, true);
 		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
@@ -284,7 +246,8 @@ public class SettingsPresenterTest {
 	public void testSetUserNotificationEmail() throws JSONObjectAdapterException {
 		profilePresenter.setUserNotificationEmail(email);
 		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
-		verify(mockView).showNotificationEmailAddress(eq(email));
+		//reload profile
+		verify(mockPlaceChanger).goTo(any(Profile.class));
 	}
 	
 	@Test

@@ -1,0 +1,1 @@
+package org.sagebionetworks.web.client.place;public interface RestartActivityOptional {	void setNoRestartActivity(boolean noRestart);	boolean isNoRestartActivity();}

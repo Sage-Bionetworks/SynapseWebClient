@@ -1,22 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.ArrayList;
-
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.CancelEvent;
-import org.sagebionetworks.web.client.events.CancelHandler;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
+import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -27,49 +23,42 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.util.KeyNav;
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowserView {
+public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView {
 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
-	private Uploader uploader;
+	private UploadDialogWidget uploader;
 	private QuizInfoWidget quizInfoWidget;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public FilesBrowserViewImpl(SageImageBundle sageImageBundle,
 			IconsImageBundle iconsImageBundle,
-			Uploader uploader,
-			EntityTreeBrowser entityTreeBrowser, 
+			UploadDialogWidget uploader,
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoWidget quizInfoWidget) {
+			QuizInfoWidget quizInfoWidget,
+			PortalGinInjector ginInjector) {
 		this.uploader = uploader;
-		this.entityTreeBrowser = entityTreeBrowser;
+		this.ginInjector = ginInjector;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.quizInfoWidget = quizInfoWidget;
-		this.setLayout(new FitLayout());
 	}
-	
-	@Override
-	protected void onRender(com.google.gwt.user.client.Element parent, int index) {
-		super.onRender(parent, index);		
-		
-	};
 
 	@Override
 	public void configure(String entityId, boolean canEdit) {
@@ -78,11 +67,11 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 	
 	@Override
 	public void configure(String entityId, boolean canEdit, String title) {
-		this.removeAll(true);
-		LayoutContainer lc = new LayoutContainer();
-		lc.setAutoWidth(true);
-		lc.setAutoHeight(true);
-		LayoutContainer topbar = new LayoutContainer();		
+		this.clear();
+		this.add(uploader.asWidget());	//add the upload dialog
+		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
+		FlowPanel fp = new FlowPanel();
+		FlowPanel topbar = new FlowPanel();
 		boolean isTitle = (title!=null);
 		if(isTitle) {
 			SafeHtmlBuilder shb = new SafeHtmlBuilder();
@@ -104,21 +93,21 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 			});
 		
 			topbar.add(upload);
-			topbar.add(addFolder, new MarginData(0, 3, 0, 0));
+			topbar.add(addFolder);
 		}
 		
-		LayoutContainer files = new LayoutContainer();
+		SimplePanel files = new SimplePanel();
+		files.addStyleName("highlight-box padding-top-0-imp");
 		entityTreeBrowser.configure(entityId, true);
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
-		files.add(etbW);
+		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
-		if (canEdit || isTitle)
-			lc.add(topbar);
-		lc.add(files);
-		lc.layout();
-		this.add(lc);
-		this.layout(true);
+		if (canEdit || isTitle) {
+			fp.add(topbar);
+		}
+		fp.add(files);
+		this.add(fp);
 	}
 	
 	@Override
@@ -156,35 +145,8 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 				presenter.fireEntityUpdatedEvent();
 			}
 		};
-
-		final Window window = new Window();
-		uploader.clearHandlers();
-		// add user defined handler
-		uploader.addPersistSuccessHandler(handler);
-		
-		// add handlers for closing the window
-		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-			}
-		});
-		uploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		
-		//let the uploader create the FileEntity
-		window.removeAll();
-		window.setPlain(true);
-		window.setModal(true);
-		window.setLayout(new FitLayout());
-		window.setHeading(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-		window.add(uploader.asWidget(entityId, new ArrayList<AccessRequirement>()), new MarginData(5));
-		window.show();
-		window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
+		uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null, entityId, handler, null, true);
+		uploader.show();
 	}
 	
 	@Override
@@ -300,6 +262,7 @@ public class FilesBrowserViewImpl extends LayoutContainer implements FilesBrowse
 
 	@Override
 	public void clear() {
+		super.clear();
 	}
 
 	@Override

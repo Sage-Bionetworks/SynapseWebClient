@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -22,7 +23,6 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.users.UserRegistration;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
@@ -36,13 +36,10 @@ public class RegisterAccountPresenterTest {
 	CookieProvider mockCookieProvider;
 	UserAccountServiceAsync mockUserService;
 	GlobalApplicationState mockGlobalApplicationState;
+	GWTWrapper mockGWTWrapper;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	SynapseClientAsync mockSynapseClient;
-	
-	String username = "Ms.Information";
 	String email = "test@test.com";
-	String firstName = "Hello";
-	String lastName = "Goodbye";
 	
 	@Before
 	public void setup() {
@@ -51,11 +48,14 @@ public class RegisterAccountPresenterTest {
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);			
+		mockGWTWrapper = mock(GWTWrapper.class);
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);			
 		verify(mockView).setPresenter(registerAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -64,7 +64,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -85,14 +85,8 @@ public class RegisterAccountPresenterTest {
 	
 	@Test
 	public void testRegisterUser() {
-		reset(mockView);
-		reset(mockCookieProvider);
-		reset(mockUserService);
-		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
-		registerAccountPresenter.setPlace(place);
-		
-		registerAccountPresenter.registerUser(username, email, firstName, lastName);
+		registerAccountPresenter.registerUser(email);
+		verify(mockView).showAccountCreated();
 	}
 
 
@@ -102,12 +96,12 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 		
-		registerAccountPresenter.registerUser(username, email, firstName, lastName);
+		registerAccountPresenter.registerUser(email);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
 	}
@@ -118,36 +112,14 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).createUser(any(UserRegistration.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 		
-		registerAccountPresenter.registerUser(username, email, firstName, lastName);
+		registerAccountPresenter.registerUser(email);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
-	}
-	
-	@Test
-	public void testIsUsernameAvailableTooSmall() {
-		//should not check if too short
-		registerAccountPresenter.checkUsernameAvailable("abc");
-		verify(mockSynapseClient, never()).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testIsUsernameAvailableTrue() {
-		registerAccountPresenter.checkUsernameAvailable("abcd");
-		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-		verify(mockView, never()).markUsernameUnavailable();
-	}
-	
-	@Test
-	public void testIsUsernameAvailableFalse() {
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-		registerAccountPresenter.checkUsernameAvailable("abcd");
-		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-		verify(mockView).markUsernameUnavailable();
 	}
 	
 	@Test

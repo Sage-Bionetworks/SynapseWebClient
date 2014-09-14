@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
@@ -19,9 +20,11 @@ import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.RestartActivityOptional;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -71,6 +74,7 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(LoginPlace.class);
 		openAccessPlaces.add(PasswordReset.class);
 		openAccessPlaces.add(RegisterAccount.class);
+		openAccessPlaces.add(NewAccount.class);
 		openAccessPlaces.add(Synapse.class);
 		openAccessPlaces.add(Wiki.class);
 		openAccessPlaces.add(ProjectsHome.class);
@@ -84,11 +88,13 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(TeamSearch.class);
 		openAccessPlaces.add(Down.class);
 		openAccessPlaces.add(Profile.class);
+		openAccessPlaces.add(Certificate.class);
 		
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(LoginPlace.class);
 		excludeFromLastPlace.add(PasswordReset.class);
 		excludeFromLastPlace.add(RegisterAccount.class);
+		excludeFromLastPlace.add(NewAccount.class);
 		excludeFromLastPlace.add(Quiz.class);
 		excludeFromLastPlace.add(ChangeUsername.class);
 		excludeFromLastPlace.add(Trash.class);
@@ -138,7 +144,7 @@ public class AppActivityMapper implements ActivityMapper {
 			return presenter;
 		} else {
 			// check if this is a no-restart place change
-			if(place instanceof Synapse && ((Synapse)place).isNoRestartActivity() && lastActivity != null) {
+			if(place instanceof RestartActivityOptional && ((RestartActivityOptional)place).isNoRestartActivity() && lastActivity != null) {
 				return lastActivity;
 			}
 			if(loading != null) loading.showWidget();

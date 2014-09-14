@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
@@ -49,6 +50,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -130,7 +132,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
 	
-	private static final Date LOCKDOWN = new Date(114, 9, 15);
+	private static final Date LOCKDOWN = new Date(114, 9, 20);
 	public static final String LOCKDOWN_DATE_STRING = DateTimeFormat.getFormat("MMMM d").format(LOCKDOWN);
 	
 	@Inject
@@ -215,7 +217,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		userProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
+				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId(), ProfileArea.TEAMS));
 			}
 		});
 	}
@@ -409,17 +411,21 @@ public class HomeViewImpl extends Composite implements HomeView {
 		return createProjectContainer;
 	}
 	
-	private LayoutContainer getFavoritesContainer() {
-		LayoutContainer favoritesContainer = new LayoutContainer();
-		favoritesContainer.add(
-				new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
-		favoritesContainer.add(favoritesTreeBrowser.asWidget());
-		return favoritesContainer;
+	private FlowPanel getFavoritesContainer() {
+		FlowPanel myFavPanel = new FlowPanel();
+		myFavPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>" + DisplayConstants.MY_FAVORITES + " " + FavoriteWidgetViewImpl.favoriteStarHtml + "</h3>")));
+		ScrollPanel favoritesScrollPanel = new ScrollPanel();
+		favoritesScrollPanel.addStyleName("panel panel-default");
+		favoritesScrollPanel.setHeight("180px");
+		favoritesScrollPanel.add(favoritesTreeBrowser.asWidget());
+		myFavPanel.add(favoritesScrollPanel);
+		return myFavPanel;
+		
 	}
 	
 	@Override
 	public void refreshMyTeams(List<Team> teams) {
-		teamsListWidget.configure(teams, false);
+		teamsListWidget.configure(teams, false, true);
 	}
 	
 	private LayoutContainer getTeamsContainer() {
@@ -453,12 +459,15 @@ public class HomeViewImpl extends Composite implements HomeView {
 		openTeamInvitesPanel.setVisible(visible);
 	}
 	
-	private LayoutContainer getMyProjectsContainer() {
-		LayoutContainer myProjContainer = new LayoutContainer();
-		myProjContainer.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
-		myProjectsTreeBrowser.setWidgetHeight(180);
-		myProjContainer.add(myProjectsTreeBrowser.asWidget());					
-		return myProjContainer;
+	private FlowPanel getMyProjectsContainer() {
+		FlowPanel myProjPanel = new FlowPanel();
+		myProjPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<h3>"+ DisplayConstants.MY_PROJECTS +"</h3>")));
+		ScrollPanel myProjectsTreePanel = new ScrollPanel();
+		myProjectsTreePanel.addStyleName("panel panel-default");
+		myProjectsTreePanel.setHeight("180px");
+		myProjectsTreePanel.add(myProjectsTreeBrowser.asWidget());
+		myProjPanel.add(myProjectsTreePanel);
+		return myProjPanel;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,6 +22,12 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 
 	void showLoadError(String entityId);
 	
+	void showLoadingIcon();
+	
+	void hideLoadingIcon();
+	
+	void setClickHandler(ClickHandler handler);
+		
 	/**
 	 * Presenter interface
 	 */
@@ -29,5 +36,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView {
 		void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback);
 		void entityClicked(EntityHeader entityHeader);
 	}
+
+	
 
 }

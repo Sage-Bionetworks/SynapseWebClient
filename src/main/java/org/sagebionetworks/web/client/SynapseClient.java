@@ -12,6 +12,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -20,7 +21,9 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
 
@@ -104,10 +107,17 @@ public interface SynapseClient extends RemoteService {
 	/**
 	 * Log an error message in the server-side log.
 	 * @param message
+	 * @throws RestServiceException 
 	 */
-	public void logError(String message);
+	public void logError(String message) throws RestServiceException;
 	
-
+	/**
+	 * Log an error message to Synapse repository services.  
+	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
+	 * @param message
+	 */
+	public void logErrorToRepositoryServices(String message) throws RestServiceException;
+	
 	/**
 	 * Log an info message in the server-side log.
 	 * @param message
@@ -317,8 +327,8 @@ public interface SynapseClient extends RemoteService {
 	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
 	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
 	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
-	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException;
-	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted) throws RestServiceException;
+	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
+	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 	
 	public String getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
@@ -355,8 +365,6 @@ public interface SynapseClient extends RemoteService {
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
-		
-	public QueryResult executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount) throws RestServiceException;
 	
 	public String sendRowsToTable(String rowSet) throws RestServiceException;
 	
@@ -379,6 +387,41 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public List<String> setTableSchema(String tableId, List<String> schemaJSON)
+	public void setTableSchema(String tableJSON, List<String> newSchema)
 			throws RestServiceException;
+	
+	/**
+	 * Validate a table query.
+	 * @param sql
+	 */
+	public void validateTableQuery(String sql) throws RestServiceException;
+	
+	/**
+	 * Apply PartialRowSet to a table entity.
+	 * 
+	 * @param deltaJson
+	 * @throws RestServiceException
+	 */
+	public void applyTableDelta(String deltaJson) throws RestServiceException;
+	
+	/**
+	 * Start a new Asynchronous job of a the given type with the provided request JSON.
+	 * @param type The type of job to run.
+	 * @param bodyJSON The JSON of the AsynchronousRequestBody.
+	 * @return
+	 * @throws RestServiceException
+	 */
+	public String startAsynchJob(AsynchType type, String bodyJSON) throws RestServiceException;
+	
+	/**
+	 * Get the results of an Asynchronous job identified by the provided jobId.
+	 * @param type
+	 * @param jobId
+	 * @return
+	 * @throws RestServiceException
+	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
+	 * is of type AsynchronousJobStatus.
+	 */
+	public String getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
+	
 }

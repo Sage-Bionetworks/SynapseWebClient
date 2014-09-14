@@ -17,6 +17,7 @@ public class DisplayConstants {
 	public static final String UPLOAD_SUCCESS = "Upload Success";
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
+	public static final String NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE = "No files were selected for upload.";
 	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";
@@ -164,7 +165,7 @@ public class DisplayConstants {
 	public static final String BUTTON_SAVING = "Saving";
 	public static final String BUTTON_CHANGE_PASSWORD = "Change Password";
 	public static final String BUTTON_UPDATE_WITH_LINKED_IN = "Update With LinkedIn";
-	public static final String BUTTON_CHANGE_USER_INFO = "Update";
+	public static final String BUTTON_CHANGE_USER_INFO = "Update Profile";
 	public static final String LABEL_SINGLE_SIGN_ON_LOGGING_IN = "Logging you in.";
 	public static final String LABEL_SEARCHING = "Searching...";
 	public static final String LABEL_FOUND_FORWARDING = "Found. Forwarding now.";
@@ -177,7 +178,7 @@ public class DisplayConstants {
 	public static final String ERROR_FAILED_PERSIST_AGREEMENT_TEXT = "Your license acceptance was not saved. You will need to sign it again in the future.";
 	public static final String FORGOT_PASSWORD_MESSAGE = "If you have forgotten your password, please click the \"Forgot Password\" button on the login page.";
 	public static final String ERROR_USER_ALREADY_EXISTS = "There is an existing account with this username/email.  " + FORGOT_PASSWORD_MESSAGE;
-	public static final String ERROR_USERNAME_ALREADY_EXISTS = "There is an existing account with this username.  " + FORGOT_PASSWORD_MESSAGE;
+	public static final String ERROR_USERNAME_ALREADY_EXISTS = "Sorry, that username has already been taken.";
 	public static final String ERROR_EMAIL_ALREADY_EXISTS = "There is an existing account with this email.  " + FORGOT_PASSWORD_MESSAGE;
 	public static final String ERROR_UNABLE_TO_LOAD = "An error occurred trying to load.";
 	public static final String ERROR_UNABLE_TO_UPDATE_ATTACHMENTS = "The attachments could not be updated because this entity has conflicting changes. Please reload the page and try again.";
@@ -258,6 +259,7 @@ public class DisplayConstants {
 	public static final String LABEL_PROJECT_CREATED = "Project Created";
 	public static final String LABEL_TEAM_CREATED = "Team Created";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
+	public static final String TEXT_UPLOAD_NEW_VERSION_FILE_OR_LINK = "Upload a New Version of the File";
 	public static final String TEXT_USER_SETTINGS = "Settings";
 	public static final String TEXT_USER_TRASH = "Trash";
 	public static final String TEXT_USER_HOME = "Home";
@@ -551,6 +553,7 @@ public class DisplayConstants {
 	public static final String PENDING_TEAM_INVITATIONS = "Pending Team Invitations";
 	public static final String PENDING_JOIN_REQUESTS = "Pending Join Requests";
 	public static final String PENDING_INVITATIONS = "Pending Invitations";
+	public static final String PENDING_JOIN_REQUESTS_TOOLTIP = "Team has a pending join request";
 	public static final String DELETE_TEAM_SUCCESS = "Team successfully deleted";
 	public static final String UPDATE_TEAM_SUCCESS = "Team successfully updated";
 	public static final String LEAVE_TEAM_SUCCESS = "Successfully left team";
@@ -681,6 +684,7 @@ public class DisplayConstants {
 	public static final String API_DOCUMENTATION = "API Documentation";
 	public static final String EXAMPLE_CODE = "Example Code";
 	public static final String LAUNCH_FILE_UPLOADER = "Launch File Uploader";
+	public static final String UPLOAD_DIALOG_TITLE = "Upload";
 	public static final String MORE_DETAILS_SYNAPSE = "Read more about Synapse";
 	public static final String REST_API_DOCUMENTATION = "REST API documentation";
 	public static final String ERROR_LOADING_CYTOSCAPE = "An error occurred loading the Cytoscape Graph";
@@ -748,7 +752,9 @@ public class DisplayConstants {
 	public static final String PASSWORD_RESET_SENT = "Your password reset request has been sent. Please check your email.";
 	public static final String PASSWORDS_MISMATCH = "Passwords do not match. Please re-enter your new password.";
 	
-	public static final String ACCOUNT_CREATED = "Your Synapse account has been created. We have sent you an email with instructions on how to setup a password for your account. Follow the directions in the email, and then ";
+	public static final String ACCOUNT_CREATED = "Your Synapse account has been created.";
+	public static final String ACCOUNT_CREATION_FAILURE = "Unable to create your Synapse account:";
+	public static final String ACCOUNT_EMAIL_SENT = "We have sent you an email with instructions on how to complete the registration process.";
 	public static final String EMAIL_ADDED = "We have sent you an email with instructions on how to verify the new email address.";
 	public static final String EMAIL_SUCCESS = "Successfully verified the email address";
 	public static final String EMAIL_FAILURE = "Unable to verify the email address:";

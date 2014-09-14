@@ -79,6 +79,26 @@ public class ClientLoggerImpl implements ClientLogger{
 	}
 	
 	/**
+	 * Log an error message to Synapse repository services.  
+	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
+	 * @param message
+	 */
+	public void errorToRepositoryServices(String message){
+		this.synapseClient.logErrorToRepositoryServices(message, new AsyncCallback<Void>() {
+			
+			@Override
+			public void onSuccess(Void result) {
+				// Nothing to do here.
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// Nothing to do here.
+			}
+		});
+	}
+	
+	/**
 	 * Log an error message in the server-side log.
 	 * Since a Java stack trace is not an option of the client-side code, this method captures some of 
 	 * the basic information need to print a rudimentary stack trace.

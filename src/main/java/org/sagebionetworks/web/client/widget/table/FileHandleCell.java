@@ -114,7 +114,8 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
      * Private Methods
      */
     private void showUploadForm(final TableCellFileHandle value, final ValueUpdater<TableCellFileHandle> valueUpdater) {
-		if (uploader == null)
+		//gxt to bootstrap conversion more difficult, not sure where to put the upload dialog (see UploadDialogWidget which hasa Uploader)
+    	if (uploader == null)
 			uploader = ginInjector.getUploaderWidget();
 		uploader.clearHandlers();
 		final com.extjs.gxt.ui.client.widget.Window window = new com.extjs.gxt.ui.client.widget.Window();
@@ -138,7 +139,7 @@ public class FileHandleCell extends AbstractCell<TableCellFileHandle> {
 		window.setHeading(DisplayConstants.UPLOAD_FILE);
 		window.setLayout(new FitLayout());
 		
-		Widget widget = uploader.asWidget(null, null, null,
+		Widget widget = uploader.asWidget(null, null,
 				new CallbackP<String>() {
 					@Override
 					public void invoke(String fileHandleId) {

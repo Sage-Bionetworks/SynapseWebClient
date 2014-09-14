@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.presenter;
 
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Account;
-import org.sagebionetworks.web.client.place.Settings;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.view.AccountView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -22,17 +20,14 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	private AccountView view;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalAppState;
-	private AuthenticationController authController;
 	
 	@Inject
 	public AccountPresenter(AccountView view, 
 			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalAppState,
-			AuthenticationController authController){
+			GlobalApplicationState globalAppState){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
-		this.authController = authController;
 		view.setPresenter(this);
 	}
 
@@ -56,7 +51,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			public void onSuccess(Void result) {
 				//success, send to Settings to view account state
 				view.showInfo(DisplayConstants.EMAIL_SUCCESS, "");
-				globalAppState.getPlaceChanger().goTo(new Settings(ClientProperties.DEFAULT_PLACE_TOKEN));
+				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
 			@Override
 			public void onFailure(Throwable caught) {

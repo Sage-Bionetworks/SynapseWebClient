@@ -9,6 +9,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -17,6 +18,7 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.table.QueryDetails;
 import org.sagebionetworks.web.shared.table.QueryResult;
@@ -49,7 +51,9 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-
+	
+	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
+	
 	void logInfo(String message, AsyncCallback<Void> callback);
 
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
@@ -228,7 +232,7 @@ public interface SynapseClientAsync {
 	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
 	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
-	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, boolean isRestricted,AsyncCallback<String> callback) throws RestServiceException;
+	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
 	
 	
 	void getEntityDoi(String entityId, Long versionNumber, AsyncCallback<String> callback);
@@ -288,8 +292,6 @@ public interface SynapseClientAsync {
 	
 	void isAliasAvailable(String alias, String aliasType, AsyncCallback<Boolean> callback);
 
-	void executeTableQuery(String query, QueryDetails modifyingQueryDetails, boolean includeTotalRowCount, AsyncCallback<QueryResult> callback);
-
 	void sendRowsToTable(String rowSet, AsyncCallback<String> callback);
 	
 	void getHelpPages(AsyncCallback<HashMap<String, WikiPageKey>> callback);
@@ -308,8 +310,22 @@ public interface SynapseClientAsync {
 	 * @param schemaJSON
 	 * @param callback
 	 */
-	void setTableSchema(String tableId, List<String> schemaJSON,
-			AsyncCallback<List<String>> callback);
+	void setTableSchema(String tableJSON, List<String> newSchema,
+			AsyncCallback<Void> callback);
+	
+	/**
+	 * Apply a PartialRowSet to a table.
+	 * @param deltaJson
+	 * @param callback
+	 */
+	void applyTableDelta(String deltaJson, AsyncCallback<Void> callback);
+	
+	/**
+	 * Validate a table query.
+	 * @param sql
+	 * @param callback
+	 */
+	void validateTableQuery(String sql, AsyncCallback<Void> callback);
 
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
@@ -323,5 +339,11 @@ public interface SynapseClientAsync {
 			AsyncCallback<String> callback);
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
+
+	void startAsynchJob(AsynchType type, String bodyJSON,
+			AsyncCallback<String> callback);
+
+	void getAsynchJobResults(AsynchType type, String jobId,
+			AsyncCallback<String> callback);
 
 }

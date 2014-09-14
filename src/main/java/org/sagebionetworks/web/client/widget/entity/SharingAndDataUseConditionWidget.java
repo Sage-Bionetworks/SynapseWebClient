@@ -9,6 +9,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -53,6 +54,7 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 				EntityBundle bundle = null;
 				try {
 					bundle = nodeModelCreator.createEntityBundle(result);
+					EntityPresenter.filterToDownloadARs(bundle);
 					setEntity(bundle);
 				} catch (JSONObjectAdapterException ex) {					
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));					

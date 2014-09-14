@@ -25,4 +25,11 @@ public interface ClientLogger {
 	 */
 	public void info(String message);
 
+	/**
+	 * Log an error message to Synapse repository services.  
+	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
+	 * @param message
+	 */
+	void errorToRepositoryServices(String message);
+	
 }

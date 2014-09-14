@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -20,11 +21,13 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieKeys;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget;
 import org.sagebionetworks.web.client.presenter.ProfileFormWidget.ProfileUpdatedCallback;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -40,6 +43,8 @@ public class ProfileFormPresenterTest {
 	GWTWrapper mockGWTWrapper;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	ProfileUpdatedCallback mockProfileUpdatedCallback;
+	LinkedInServiceAsync mockLinkedInService;
+	CookieProvider mockCookies;
 	
 	UserSessionData testUser = new UserSessionData();
 	UserProfile userProfile = new UserProfile();
@@ -55,7 +60,9 @@ public class ProfileFormPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockProfileUpdatedCallback = mock(ProfileUpdatedCallback.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, mockGlobalApplicationState, adapterFactory);
+		mockLinkedInService = mock(LinkedInServiceAsync.class);
+		mockCookies = mock(CookieProvider.class);
+		profileForm = new ProfileFormWidget(mockView, mockAuthenticationController, mockSynapseClient, adapter, mockGlobalApplicationState, adapterFactory, mockCookies, mockLinkedInService, mockGWTWrapper);
 		profileForm.configure(userProfile, mockProfileUpdatedCallback);
 		verify(mockView).setPresenter(profileForm);
 		userProfile.writeToJSONObject(adapter.createNew());
@@ -100,12 +107,6 @@ public class ProfileFormPresenterTest {
 	}
 	
 	@Test
-	public void testCancelled() {
-		profileForm.cancelClicked();
-		verify(mockProfileUpdatedCallback).profileUpdateCancelled();//callback with cancel
-	}
-	
-	@Test
 	public void testUpdateProfileFailureGetUserProfile() {
 		Exception myException = new Exception("a test exception");
 		AsyncMockStubber.callFailureWith(myException).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
@@ -137,4 +138,42 @@ public class ProfileFormPresenterTest {
 		verify(mockProfileUpdatedCallback).onFailure(eq(myException));//exception is thrown back
 	}
 	
+	@Test
+	public void testRedirectToLinkedIn() {
+		profileForm.redirectToLinkedIn();
+		verify(mockLinkedInService).returnAuthUrl(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUpdateProfileWithLinkedIn() {
+		String secret = "secret";
+		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
+		String requestToken = "token";
+		String verifier = "12345";
+		profileForm.updateProfileWithLinkedIn(requestToken, verifier);
+		verify(mockLinkedInService).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testStartEditingProfile() {
+		profileForm.startEditing();
+		verify(mockView).setIsDataModified(eq(true));
+		verify(mockGlobalApplicationState).setIsEditing(eq(true));
+	}
+	
+	@Test
+	public void testStopEditingProfile() {
+		profileForm.stopEditing();
+		verify(mockView).setIsDataModified(eq(false));
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+	}
+	
+	@Test
+	public void testRollbackProfile() {
+		profileForm.rollback();
+		verify(mockView).setIsDataModified(eq(false));
+		verify(mockGlobalApplicationState).setIsEditing(eq(false));
+		verify(mockView, Mockito.times(2)).updateView(any(UserProfile.class));
+	}
+
 }

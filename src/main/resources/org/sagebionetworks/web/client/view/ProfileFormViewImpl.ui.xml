@@ -1,18 +1,22 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style>
-		div.center {
-		margin-left: auto;
-		margin-right: auto;
-		width: 8em;
-		padding:15px;
-		}
-	</ui:style>
-
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
+         <div class="row">
+            <div class="col-sm-12">
+				<g:SimplePanel ui:field="updateWithLinkedInPanel" />
+			</div>
+               <div class="margin-bottom-10 col-sm-12">
+				<g:SimplePanel ui:field="editPicturePanel"/>
+			</div>
+			<div class="margin-bottom-20 col-sm-12">
+				<g:SimplePanel ui:field="editPictureButtonPanel"/>
+			</div>
+		</div>    
+
 		<div class="row margin-bottom-10">
-			<div class="col-sm-6">
+		    <div class="col-sm-6">
 				<h3 ui:field="userNameHeading" class="inline-block margin-right-10"></h3>
 				<g:Button ui:field="changeUsernameButton" styleName="btn btn-default btn-xs"
 					text="Change username" />
@@ -20,8 +24,8 @@
 			<div class="col-sm-6">
 				<div ui:field="changeUsernameUi" class="form-group margin-bottom-10">
 					<label class="control-label">Username</label>
-					<input ui:field="userNameField" type="text" class="form-control"
-						placeholder="Enter username"></input>
+					<b:TextBox ui:field="userNameField" 
+						placeholder="Enter username" />
 					<div ui:field="userNameError" style="display:none" class="help-block">Please enter a valid username</div>
 				</div>
 			</div>
@@ -31,15 +35,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">First name</label>
-					<input ui:field="firstNameField" type="text" class="form-control"
-						placeholder="Enter first name"></input>
+					<b:TextBox ui:field="firstNameField" 
+						placeholder="Enter first name" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Last name</label>
-					<input ui:field="lastNameField" type="text" class="form-control"
-						placeholder="Enter last name"></input>
+					<b:TextBox ui:field="lastNameField" 
+						placeholder="Enter last name" />
 				</div>
 			</div>
 		</div>
@@ -47,15 +51,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Current position</label>
-					<input ui:field="currentPositionField" type="text" class="form-control"
-						placeholder="Enter current position"></input>
+					<b:TextBox ui:field="currentPositionField" 
+						placeholder="Enter current position" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Current affiliation</label>
-					<input ui:field="currentAffiliationField" type="text" class="form-control"
-						placeholder="Enter current affiliation"></input>
+					<b:TextBox ui:field="currentAffiliationField" 
+						placeholder="Enter current affiliation" />
 				</div>
 			</div>
 		</div>
@@ -63,15 +67,15 @@
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label>Industry/Discipline</label>
-					<input ui:field="industryField" type="text" class="form-control"
-						placeholder="Enter industry/discipline"></input>
+					<b:TextBox ui:field="industryField" 
+						placeholder="Enter industry/discipline" />
 				</div>
 			</div>
 			<div class="col-sm-6">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">City, Country</label>
-					<input ui:field="locationField" type="text" class="form-control"
-						placeholder="Enter City, Country"></input>
+					<b:TextBox ui:field="locationField" 
+						placeholder="Enter City, Country" />
 				</div>
 			</div>
 		</div>
@@ -79,8 +83,8 @@
 			<div class="col-sm-6">
 				<div ui:field="moreInfoUi" class="form-group margin-bottom-10">
 					<label class="control-label">Link to more info</label>
-					<input ui:field="moreInfoField" type="text" class="form-control"
-						placeholder="Enter link to more info"></input>
+					<b:TextBox ui:field="moreInfoField"
+						placeholder="Enter link to more info" />
 					<div ui:field="urlError" style="display:none" class="help-block">Please enter a valid URL</div>
 				</div>
 			</div>
@@ -91,22 +95,39 @@
 			<div class="col-sm-12">
 				<div class="form-group margin-bottom-10">
 					<label class="control-label">Bio</label>
-					<textarea ui:field="bioField" class="form-control"
-						placeholder="Enter bio" rows="5"></textarea>
+					<b:TextArea ui:field="bioField"
+						placeholder="Enter bio" height="150px" />
 				</div>
 			</div>
 		</div>
 
 		<div class="row">
-			<div class="col-md-12">
-				<g:Button ui:field="cancelButton"
-					styleName="btn btn-large btn-default margin-top-10 margin-bottom-40 margin-right-10 right"
-					text="Cancel" />
-				<g:Button ui:field="okButton"
-					styleName="btn btn-large btn-primary margin-top-10 margin-bottom-40 margin-right-10 right"
-					text="Update" />
+		   	<div class="col-sm-6">
+				<b:Button ui:field="previewButton" type="DEFAULT">Preview</b:Button>
+			</div>
+			<div class="col-sm-6">
+				<b:Button ui:field="okButton" type="DEFAULT">Update Profile</b:Button>
+				<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 			</div>
 		</div>
+		
+		<b:Modal ui:field="previewDialog" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+		  <b:ModalBody>
+		      <g:HTMLPanel>
+			  	<div class="row">
+					<div class="col-md-3 col-sm-4 col-xs-12">
+						<g:SimplePanel ui:field="picturePanel"/>
+					</div>
+					<div class="col-md-9 col-sm-8 col-xs-12">
+						<g:FlowPanel ui:field="viewProfilePanel" />
+					</div>
+				</div>
+			</g:HTMLPanel>
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="previewDialogOkButton" type="PRIMARY">OK</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

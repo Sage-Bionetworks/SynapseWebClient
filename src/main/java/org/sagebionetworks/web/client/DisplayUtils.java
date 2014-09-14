@@ -134,6 +134,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -163,6 +164,7 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
+	private static DateTimeFormat prettyFormat = null; 
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
@@ -430,6 +432,15 @@ public class DisplayUtils {
 		button.addStyleName("disabled");
 		button.setHTML(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "..."));
 	}
+
+	/*
+	 * Button Saving 
+	 */
+	public static void changeButtonToSaving(org.gwtbootstrap3.client.ui.Button button) {
+		button.setEnabled(false);
+		button.setText(SafeHtmlUtils.fromSafeConstant(DisplayConstants.BUTTON_SAVING + "...").asString());
+	}
+
 	
 	/**
 	 * Check if an Annotation key is valid with the repository service
@@ -640,6 +651,34 @@ public class DisplayUtils {
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
 		
+		SafeHtml popupHtml = getPopupSafeHtml(title, message, iconStyle);
+		boolean isSecondaryButton = secondaryButtonCallback != null;
+		
+		if (isSecondaryButton) {
+			Bootbox.confirm(popupHtml.asString(), new ConfirmCallback() {
+				@Override
+				public void callback(boolean isConfirmed) {
+					if (isConfirmed) {
+						if (primaryButtonCallback != null)
+							primaryButtonCallback.invoke();
+					} else {
+						if (secondaryButtonCallback != null)
+							secondaryButtonCallback.invoke();
+					}
+				}
+			});
+		} else {
+			Bootbox.alert(popupHtml.asString(), new AlertCallback() {
+				@Override
+				public void callback() {
+					if (primaryButtonCallback != null)
+						primaryButtonCallback.invoke();
+				}
+			});
+		}
+	}
+	
+	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
 			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
@@ -660,30 +699,7 @@ public class DisplayUtils {
 		builder.appendHtmlConstant("<div class=\""+messageWidth+"\">");
 		builder.appendEscaped(message);
 		builder.appendHtmlConstant("</div></div>");
-		boolean isSecondaryButton = secondaryButtonCallback != null;
-		
-		if (isSecondaryButton) {
-			Bootbox.confirm(builder.toSafeHtml().asString(), new ConfirmCallback() {
-				@Override
-				public void callback(boolean isConfirmed) {
-					if (isConfirmed) {
-						if (primaryButtonCallback != null)
-							primaryButtonCallback.invoke();
-					} else {
-						if (secondaryButtonCallback != null)
-							secondaryButtonCallback.invoke();
-					}
-				}
-			});
-		} else {
-			Bootbox.alert(builder.toSafeHtml().asString(), new AlertCallback() {
-				@Override
-				public void callback() {
-					if (primaryButtonCallback != null)
-						primaryButtonCallback.invoke();
-				}
-			});
-		}
+		return builder.toSafeHtml();
 	}
 	
 	public static void center(Window window) {
@@ -805,7 +821,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getBadgeHtml(String i) {
-		return "<span class=\"badge\">"+i+"</span>";
+		return "<span class=\"badge moveup-4\">"+i+"</span>";
 	}
 
 	
@@ -820,7 +836,10 @@ public class DisplayUtils {
 	 */
 	public static String converDataToPrettyString(Date toFormat) {
 		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		return DateUtils.convertDateToString(FORMAT.DATE_TIME, toFormat).replaceAll("T", " ");
+		if (prettyFormat == null) {
+			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+		}
+		return prettyFormat.format(toFormat);
 	}
 	
 	
@@ -1242,8 +1261,6 @@ public class DisplayUtils {
 		builder.append("&"+WebConstants.TOKEN_ID_PARAM_KEY+"=");
 		builder.append(tokenId);
 		builder.append("&"+WebConstants.WAIT_FOR_URL+"=true");
-		//and do not cache
-		builder.append(getParamForNoCaching());
 		return builder.toString();
 	}
 	
@@ -1506,84 +1523,6 @@ public class DisplayUtils {
 						+ DisplayConstants.UNAUTHORIZED_DESC + "</p></div></div>");
 	}
 	
-	/**
-	 * 'Upload File' button for an entity
-	 * @param entity 
-	 * @param entityType 
-	 */
-	public static Widget getUploadButton(final EntityBundle entityBundle,
-			EntityType entityType, final Uploader uploader,
-			IconsImageBundle iconsImageBundle, EntityUpdatedHandler handler) {
-		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, ButtonType.DEFAULT, "glyphicon-arrow-up");
-		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, null, entityBundle, handler, entityType, DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK);
-	}
-
-	/**
-	 * 'Upload File' button something other than an entity (for example the team icon)
-	 */
-	public static Widget getUploadButton(final CallbackP<String> fileHandleIdCallback, final Uploader uploader,	IconsImageBundle iconsImageBundle, String buttonText, ButtonType buttonType) {
-		com.google.gwt.user.client.ui.Button uploadButton = DisplayUtils.createIconButton(buttonText, buttonType, null);
-		return configureUploadWidget(uploadButton, uploader, iconsImageBundle, fileHandleIdCallback, null, null, null, buttonText);
-	}
-	
-	/**
-	 * 'Upload File' button
-	 * @param entity 
-	 * @param entityType 
-	 */
-	private static Widget configureUploadWidget(final FocusWidget uploadButton, final Uploader uploader,
-			IconsImageBundle iconsImageBundle, final CallbackP<String> fileHandleIdCallback, final EntityBundle entityBundle, EntityUpdatedHandler handler, EntityType entityType, final String buttonText) {
-		final Window window = new Window();  
-		
-		uploader.clearHandlers();
-		// add user defined handler
-		if (handler != null)
-			uploader.addPersistSuccessHandler(handler);
-		
-		// add handlers for closing the window
-		uploader.addPersistSuccessHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				window.hide();
-			}
-		});
-		uploader.addCancelHandler(new CancelHandler() {				
-			@Override
-			public void onCancel(CancelEvent event) {
-				window.hide();
-			}
-		});
-		uploadButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				window.removeAll();
-				window.setPlain(true);
-				window.setModal(true);		
-				window.setHeading(buttonText);
-				window.setLayout(new FitLayout());
-				List<AccessRequirement> ars = null;
-				Entity entity = null;
-				boolean isEntity = true;
-				
-				if (entityBundle != null) {
-					//is entity
-					ars = entityBundle.getAccessRequirements();
-					entity = entityBundle.getEntity();
-				} else {
-					//is something else that just wants a file handle id
-					isEntity = false;
-				}
-				
-				window.add(uploader.asWidget(entity, null,ars, fileHandleIdCallback,isEntity), new MarginData(5));
-				window.show();
-				window.setSize(uploader.getDisplayWidth(), uploader.getDisplayHeight());
-			}
-		});
-		
-		return uploadButton;
-	}
-
 	/**
 	 * Provides same functionality as java.util.Pattern.quote().
 	 * @param pattern
@@ -2296,5 +2235,19 @@ public class DisplayUtils {
 				content.layout(true);
 			}
 		});
+	}
+	
+	/**
+	  * just return the empty string if input string parameter s is null, otherwise returns s.
+	  */
+	 public static String replaceWithEmptyStringIfNull(String s) {
+		if (s == null)
+			return "";
+		else return s;
+	 }
+
+	public static void setHighlightBoxUser(DivElement highlightBox, String displayName, String title) {
+		String prefix = displayName != null ? displayName+"'s " : "";
+		highlightBox.setAttribute("highlight-box-title", prefix + title);
 	}
 }

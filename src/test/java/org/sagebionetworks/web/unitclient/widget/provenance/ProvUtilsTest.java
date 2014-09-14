@@ -356,22 +356,6 @@ public class ProvUtilsTest {
 			public boolean isDirectUploadSupported() {
 				return false;
 			}
-			@Override
-			public String getContentType(String fileFieldId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			@Override
-			public void uploadFileChunk(String contentType, String fileFieldId,
-					Long startByte, Long endByte, String url, XMLHttpRequest xhr,
-					ProgressCallback callback) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public double getFileSize(String fileFieldId) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url) {
@@ -381,12 +365,6 @@ public class ProvUtilsTest {
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url, String filename) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void getFileMd5(String fileFieldId, MD5Callback callback) {
 				// TODO Auto-generated method stub
 				
 			}
@@ -414,6 +392,45 @@ public class ProvUtilsTest {
 			
 			@Override
 			public void consoleLog(String message) {
+			}
+
+			@Override
+			public void uploadFileChunk(String contentType, int index,
+					String fileFieldId, Long startByte, Long endByte,
+					String url, XMLHttpRequest xhr, ProgressCallback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public String getContentType(String fileFieldId, int index) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void getFileMd5(String fileFieldId, int index,
+					MD5Callback callback) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public double getFileSize(String fileFieldId, int index) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
+
+			@Override
+			public String[] getMultipleUploadFileNames(String fileFieldId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void addDropZoneStyleEventHandling(String fileFieldId) {
+				// TODO Auto-generated method stub
+				
 			}
 		};
 	}

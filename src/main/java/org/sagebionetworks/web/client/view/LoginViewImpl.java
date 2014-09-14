@@ -18,7 +18,6 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,7 +29,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -73,7 +71,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	private LoginWidget loginWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
-	private Window logginInWindow;
+	private Window loggingInWindow;
 	private Header headerWidget;
 	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, LoginViewImpl> {}
@@ -107,18 +105,18 @@ public class LoginViewImpl extends Composite implements LoginView {
 		footer.add(footerWidget.asWidget());
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
+
 	@Override
 	public void showLoggingInLoader() {
-		if(logginInWindow == null) {
-			logginInWindow = DisplayUtils.createLoadingWindow(sageImageBundle, DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
+		if(loggingInWindow == null) {
+			loggingInWindow = DisplayUtils.createLoadingWindow(sageImageBundle, DisplayConstants.LABEL_SINGLE_SIGN_ON_LOGGING_IN);
 		}
-		logginInWindow.show();
+		loggingInWindow.show();
 	}
 
 	@Override
 	public void hideLoggingInLoader() {
-		logginInWindow.hide();
+		loggingInWindow.hide();
 	}
 
 	@Override
@@ -167,7 +165,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 			public void userChanged(UserSessionData newUser) {
 				presenter.setNewUser(newUser);
 			}
-		});				
+		});
 	}
 	
 	@Override
@@ -188,7 +186,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 
 	@Override
 	public void clear() {
-		if(logginInWindow != null) logginInWindow.hide();
+		if(loggingInWindow != null) loggingInWindow.hide();
 		loginWidget.clear();
 		loginWidgetPanel.clear();
 		logoutPanel.clear();
