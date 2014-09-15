@@ -26,14 +26,14 @@ public class MySuggestOracle extends SuggestOracle {
 			 * query for a single character is still executed. Workaround for this
 			 * is to check for an empty string field here.
              */
-			if (!suggestBox.getText().trim().isEmpty()) {
+			if (suggestBox != null && !suggestBox.getText().trim().isEmpty()) {
 				getSuggestions();
 			}
 		}
 		
 	};
 	
-	public MySuggestOracle(SuggestBox suggestBox) {
+	public void setSuggestBox(SuggestBox suggestBox) {
 		this.suggestBox = suggestBox;
 	}
 	
@@ -64,31 +64,31 @@ public class MySuggestOracle extends SuggestOracle {
 		callback.onSuggestionsReady(request, response);
 	}
 
-	class ItemSuggestCallback implements AsyncCallback {
-		private SuggestOracle.Request req;
-		private SuggestOracle.Callback callback;
-
-		public ItemSuggestCallback(SuggestOracle.Request _req,
-					SuggestOracle.Callback _callback) {
-			req = _req;
-			callback = _callback;
-		}
-
-		public void onFailure(Throwable error) {
-			callback.onSuggestionsReady(req, new SuggestOracle.Response());
-		}
-
-		public void onSuccess(Object retValue) {
-			callback.onSuggestionsReady(req,
-					(SuggestOracle.Response) retValue);
-		}
-	}
+//	class ItemSuggestCallback implements AsyncCallback {
+//		private SuggestOracle.Request request;
+//		private SuggestOracle.Callback callback;
+//
+//		public ItemSuggestCallback(SuggestOracle.Request request,
+//					SuggestOracle.Callback callback) {
+//			this.request = request;
+//			this.callback = callback;
+//		}
+//
+//		public void onFailure(Throwable error) {
+//			callback.onSuggestionsReady(request, new SuggestOracle.Response());
+//		}
+//
+//		public void onSuccess(Object retValue) {
+//			callback.onSuggestionsReady(request,
+//					(SuggestOracle.Response) retValue);
+//		}
+//	}
 	
 	public class ItemSuggestion implements IsSerializable, Suggestion {
 
 		private String s;
 		// Required for IsSerializable to work
-		public ItemSuggestion() {}
+		//public ItemSuggestion() {}	// TODO: this?
 
 		// Convenience method for creation of a suggestion
 		public ItemSuggestion(String s) {

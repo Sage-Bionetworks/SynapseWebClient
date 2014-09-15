@@ -188,8 +188,10 @@ public class UserGroupSearchBox {
 //		oracle.add("Dog");
 //		oracle.add("Horse");
 //		oracle.add("Canary");
-		SuggestBox result = new SuggestBox();
-		MySuggestOracle oracle = new MySuggestOracle(result);
+		
+		MySuggestOracle oracle = new MySuggestOracle();
+		SuggestBox result = new SuggestBox(oracle);
+		oracle.setSuggestBox(result);
 		return result;
 	}
 
