@@ -62,7 +62,7 @@ public class EntityBundleTransport implements Serializable {
 	public String getAnnotationsJson() {
 		return annotationsJson;
 	}
-	public void setAnnotations(String annotationsJson) {
+	public void setAnnotationsJson(String annotationsJson) {
 		this.annotationsJson = annotationsJson;
 	}
 	public UserEntityPermissions getPermissions() {

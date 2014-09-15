@@ -433,7 +433,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
 				Annotations a = eb.getAnnotations();
-				ebt.setAnnotations(EntityFactory.createJSONStringForEntity(a));
+				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
 			}
 			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
 				UserEntityPermissions uep = eb.getPermissions();
