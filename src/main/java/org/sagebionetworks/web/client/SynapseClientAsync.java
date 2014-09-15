@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -74,15 +77,15 @@ public interface SynapseClientAsync {
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
-	void getUserProfile(AsyncCallback<String> callback);
+	void getUserProfile(AsyncCallback<UserProfile> callback);
 	
-	void getUserProfile(String userId, AsyncCallback<String> callback);
+	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
 	
-	void getTeam(String teamId, AsyncCallback<String> callback);
+	void getTeam(String teamId, AsyncCallback<Team> callback);
 	
 	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
 	
-	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
+	void updateUserProfile(UserProfile userProfile, AsyncCallback<Void> callback);
 	
 	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	
@@ -149,7 +152,7 @@ public interface SynapseClientAsync {
 	
 	//wiki crud
 	public void createWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void getWikiPage(WikiPageKey key, AsyncCallback<String> callback);
+	public void getWikiPage(WikiPageKey key, AsyncCallback<WikiPage> callback);
 	public void updateWikiPage(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
 	public void deleteWikiPage(WikiPageKey key, AsyncCallback<Void> callback);
 	
@@ -175,8 +178,8 @@ public interface SynapseClientAsync {
 	
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson, AsyncCallback<String> callback);
-	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<String> callback);
-	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<String> callback);
+	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
+	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
 	public void getPlainTextWikiPage(WikiPageKey key, AsyncCallback<String> callback);	
 	

@@ -10,9 +10,12 @@ import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -142,18 +145,18 @@ public interface SynapseClient extends RemoteService {
 	public String createOrUpdateEntity(String entityJson, String annoJson, boolean isNew) throws RestServiceException;
 
 	/**
-	 * Returns the user's profile object in json string
+	 * Returns the user's profile object
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getUserProfile() throws RestServiceException;
+	public UserProfile getUserProfile() throws RestServiceException;
 	
 	/**
 	 * Returns the specified user's profile object in json string
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getUserProfile(String userId) throws RestServiceException;
+	public UserProfile getUserProfile(String userId) throws RestServiceException;
 	
 	/**
 	 * Return the specified team object in json string
@@ -161,7 +164,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String getTeam(String teamId) throws RestServiceException;
+	public Team getTeam(String teamId) throws RestServiceException;
 	
 	/**
 	 * Batch get headers for users/groups matching a list of Synapse IDs.
@@ -177,7 +180,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param userProfileJson json object of the user's profile
 	 * @throws RestServiceException
 	 */
-	public void updateUserProfile(String userProfileJson) throws RestServiceException;
+	public void updateUserProfile(UserProfile userProfile) throws RestServiceException;
 	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
 	
@@ -257,7 +260,7 @@ public interface SynapseClient extends RemoteService {
 	
 	//wiki crud
 	public String createWikiPage(String ownerId, String ownerType, String wikiPageJson) throws RestServiceException;
-	public String getWikiPage(WikiPageKey key)  throws RestServiceException;
+	public WikiPage getWikiPage(WikiPageKey key)  throws RestServiceException;
 	public String updateWikiPage(String ownerId, String ownerType, String wikiPageJson)  throws RestServiceException;
 	public void deleteWikiPage(WikiPageKey key)  throws RestServiceException;
 	
@@ -283,8 +286,8 @@ public interface SynapseClient extends RemoteService {
 	
 	public String createV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
 	public String updateV2WikiPageWithV1(String ownerId, String ownerType, String wikiPageJson) throws IOException, RestServiceException;
-	public String getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
-	public String getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
+	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
+	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
 	public String getPlainTextWikiPage(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	

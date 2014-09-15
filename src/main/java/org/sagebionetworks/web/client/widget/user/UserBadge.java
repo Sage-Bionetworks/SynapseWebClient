@@ -5,6 +5,7 @@ import java.util.Map;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -80,11 +81,17 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		if (profileString != null) {
 			parseProfile(profileString, adapterFactory, callback);
 		} else {
-		synapseClient.getUserProfile(principalId, new AsyncCallback<String>() {			
+		synapseClient.getUserProfile(principalId, new AsyncCallback<UserProfile>() {			
 			@Override
-			public void onSuccess(String result) {
-					clientCache.put(principalId + WebConstants.USER_PROFILE_SUFFIX, result);
-					parseProfile(result, adapterFactory, callback);
+			public void onSuccess(UserProfile result) {
+					JSONObjectAdapter adapter = adapterFactory.createNew();
+					try {
+						result.writeToJSONObject(adapter);
+						clientCache.put(principalId + WebConstants.USER_PROFILE_SUFFIX, adapter.toJSONString());
+						callback.onSuccess(result);
+					} catch (JSONObjectAdapterException e) {
+						onFailure(e);
+					}
 				}
 			
 			@Override

@@ -595,8 +595,8 @@ public class SynapseClientImplTest {
 		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
 		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
-		String userProfile = synapseClient.getUserProfile(testUserId);
-		assertEquals(userProfile, EntityFactory.createJSONStringForEntity(testUserProfile));
+		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
+		assertEquals(userProfile, testUserProfile);
 	}
 	
 	@Test
@@ -1472,25 +1472,25 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testMarkdownCache() throws Exception {
-		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito.mock(Cache.class);
 		synapseClient.setMarkdownCache(mockCache);
-		String pageJson = "test only";
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		WikiPage page = new WikiPage();
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
 		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
-		String actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
-		assertEquals(pageJson, actualResult);
+		WikiPage actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
+		assertEquals(page, actualResult);
 		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 	
 	@Test
 	public void testMarkdownCacheWithVersion() throws Exception {
-		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito.mock(Cache.class);
 		synapseClient.setMarkdownCache(mockCache);
-		String pageJson = "test only";
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		WikiPage page = new WikiPage();
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
 		Mockito.when(mockSynapse.getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), anyLong())).thenReturn(v2Page);
-		String actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
-		assertEquals(pageJson, actualResult);
+		WikiPage actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
+		assertEquals(page, actualResult);
 		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 	

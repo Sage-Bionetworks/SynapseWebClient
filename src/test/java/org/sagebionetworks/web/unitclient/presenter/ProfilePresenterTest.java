@@ -111,7 +111,7 @@ public class ProfilePresenterTest {
 				mockSynapseJSNIUtils, mockRequestBuilder);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
@@ -173,11 +173,7 @@ public class ProfilePresenterTest {
 	}
 	
 	private void setupGetUserProfile() throws JSONObjectAdapterException {
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		userProfile.writeToJSONObject(adapter);
-		String userProfileJson = adapter.toJSONString(); 
-
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -15,14 +13,12 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	
 	private TeamBadgeView view;
 	SynapseClientAsync synapseClient;
-	NodeModelCreator nodeModelCreator;
 	private Integer maxNameLength;
 	
 	@Inject
-	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator) {
+	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		view.setPresenter(this);
 	}
 	
@@ -33,15 +29,10 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	public void configure(final String teamId) {
 		if (teamId != null && teamId.trim().length() > 0) {
 			view.showLoading();
-			synapseClient.getTeam(teamId, new AsyncCallback<String>() {
+			synapseClient.getTeam(teamId, new AsyncCallback<Team>() {
 				@Override
-				public void onSuccess(String teamString) {
-					try {
-						Team team = nodeModelCreator.createJSONEntity(teamString, Team.class);
+				public void onSuccess(Team team) {
 						configure(team);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(e);
-					}
 				}
 				@Override
 				public void onFailure(Throwable caught) {

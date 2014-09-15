@@ -156,20 +156,15 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.clear();
 		isOwner = authenticationController.isLoggedIn() && authenticationController.getCurrentUserPrincipalId().equals(userId);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
-		synapseClient.getUserProfile(currentUserId, new AsyncCallback<String>() {
+		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 				@Override
-				public void onSuccess(String userProfileJson) {
-					try {
-						final UserProfile profile = new UserProfile(adapterFactory.createNew(userProfileJson));
-						if (isOwner) {
-							//only configure the profile form (editor) if owner of this profile
-							profileForm.configure(profile, profileUpdatedCallback);
-						}
-						
-						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
+				public void onSuccess(UserProfile profile) {
+					if (isOwner) {
+						//only configure the profile form (editor) if owner of this profile
+						profileForm.configure(profile, profileUpdatedCallback);
 					}
+					
+					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 				}
 				@Override
 				public void onFailure(Throwable caught) {

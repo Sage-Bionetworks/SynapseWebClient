@@ -26,7 +26,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class TeamBadgeTest {
 
-	NodeModelCreator mockNodeModelCreator;
 	SynapseClientAsync mockSynapseClient;
 	TeamBadgeView mockView;
 	TeamBadge badge;
@@ -39,11 +38,9 @@ public class TeamBadgeTest {
 		team = new Team();
 		team.setName("name");
 		team.setId(principalId);
-
-		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(TeamBadgeView.class);
-		badge = new TeamBadge(mockView, mockSynapseClient, mockNodeModelCreator);
+		badge = new TeamBadge(mockView, mockSynapseClient);
 	}
 	
 	@Test
@@ -54,8 +51,7 @@ public class TeamBadgeTest {
 	
 	@Test
 	public void testConfigureAsync() throws Exception {
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(Team.class))).thenReturn(team);
+		AsyncMockStubber.callSuccessWith(team).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(team);
 		verify(mockView).setTeam(team, max);
