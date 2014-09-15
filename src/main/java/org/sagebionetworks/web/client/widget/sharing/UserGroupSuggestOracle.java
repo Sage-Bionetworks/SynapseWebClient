@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -10,8 +11,8 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
-//TODO: PUT THIS ELSEWHERE
-public class MySuggestOracle extends SuggestOracle {
+//TODO: PUT THIS ELSEWHERE??
+public class UserGroupSuggestOracle extends SuggestOracle {
 	public static final int DELAY = 750;
 	
 	private SuggestOracle.Request request;
