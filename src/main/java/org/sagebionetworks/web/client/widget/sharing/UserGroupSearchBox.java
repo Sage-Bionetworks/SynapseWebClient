@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Timer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -20,6 +23,12 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ListModelPropertyEditor;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
+import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class UserGroupSearchBox {
 	
@@ -167,6 +176,16 @@ public class UserGroupSearchBox {
 		combo.setPageSize(10);
 		return combo;
 	}
+	
+	public static SuggestBox createUserGroupSearchGWTSuggestBox(String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
+//		MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
+//		oracle.add("Cat");
+//		oracle.add("Dog");
+//		oracle.add("Horse");
+//		oracle.add("Canary");
+		MySuggestOracle oracle = new MySuggestOracle();
+		return new SuggestBox(oracle);
+	}
 
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',
@@ -193,5 +212,9 @@ public class UserGroupSearchBox {
 				'</tpl>' ].join("");
 				
 	}-*/;
-
+	
+	
+	
+	
 }
+

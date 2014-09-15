@@ -62,6 +62,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -89,7 +90,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private ComboBox<ModelData> peopleCombo;
+//	private ComboBox<ModelData> peopleCombo;
+	private SuggestBox peopleCombo;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
@@ -226,17 +228,17 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				
 				// user/group combobox
-				peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-				peopleCombo.setEmptyText("Enter name...");
-				peopleCombo.setFieldLabel("Name");
-				peopleCombo.setForceSelection(true);
-				peopleCombo.setTriggerAction(TriggerAction.ALL);
-				peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-					@Override
-					public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-						presenter.setUnsavedViewChanges(true);
-					}
-				});
+				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+//				peopleCombo.setEmptyText("Enter name...");
+//				peopleCombo.setFieldLabel("Name");
+//				peopleCombo.setForceSelection(true);
+//				peopleCombo.setTriggerAction(TriggerAction.ALL);
+//				peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
+//					@Override
+//					public void selectionChanged(SelectionChangedEvent<ModelData> se) {
+//						presenter.setUnsavedViewChanges(true);
+//					}
+//				});
 				fieldSet.add(peopleCombo);
 				
 				// permission level combobox
@@ -264,7 +266,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						addPersonToAcl();
+						//addPersonToAcl();	// TODO!!
 					}
 				});
 	
@@ -609,32 +611,32 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				new Callback() {
 					@Override
 					public void invoke() {
-						addPersonToAcl();
+						//addPersonToAcl();	// TODO!
 						presenter.setUnsavedViewChanges(false);
 						saveCallback.invoke();
 					}
 				});
 	}
 
-	private void addPersonToAcl() {
-		if(peopleCombo.getValue() != null) {
-			ModelData selectedModel = peopleCombo.getValue();
-			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-			Long principalId = (Long.parseLong(principalIdStr));
-			
-			if(permissionLevelCombo.getValue() != null) {
-				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
-				presenter.setAccess(principalId, level);
-				
-				// clear selections
-				peopleCombo.clearSelections();
-				permissionLevelCombo.clearSelections();
-				presenter.setUnsavedViewChanges(false);
-			} else {
-				showAddMessage("Please select a permission level to grant.");
-			}
-		} else {
-			showAddMessage("Please select a user or team to grant permission to.");
-		}
-	}
+//	private void addPersonToAcl() {	// TODO!
+//		if(peopleCombo.getValue() != null) {
+//			ModelData selectedModel = peopleCombo.getValue();
+//			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+//			Long principalId = (Long.parseLong(principalIdStr));
+//			
+//			if(permissionLevelCombo.getValue() != null) {
+//				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
+//				presenter.setAccess(principalId, level);
+//				
+//				// clear selections
+//				peopleCombo.clearSelections();
+//				permissionLevelCombo.clearSelections();
+//				presenter.setUnsavedViewChanges(false);
+//			} else {
+//				showAddMessage("Please select a permission level to grant.");
+//			}
+//		} else {
+//			showAddMessage("Please select a user or team to grant permission to.");
+//		}
+//	}
 }

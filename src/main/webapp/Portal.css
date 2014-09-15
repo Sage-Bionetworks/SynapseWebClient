@@ -63,6 +63,11 @@
 	width: 400px;
 }
 
+.gwt-SuggestBoxPopup {
+	z-index: 2000;
+	background-color: #fff;
+}
+
 .dialogVPanel {
 	margin: 5px;
 }
