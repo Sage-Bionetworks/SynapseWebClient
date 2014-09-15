@@ -178,13 +178,19 @@ public class UserGroupSearchBox {
 	}
 	
 	public static SuggestBox createUserGroupSearchGWTSuggestBox(String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
+		String url = repositoryUrl + USER_GROUP_HEADER_URL;
+		ScriptTagProxy<PagingLoadResult<ModelData>> proxy = 
+				new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
+		
+		
 //		MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
 //		oracle.add("Cat");
 //		oracle.add("Dog");
 //		oracle.add("Horse");
 //		oracle.add("Canary");
-		MySuggestOracle oracle = new MySuggestOracle();
-		return new SuggestBox(oracle);
+		SuggestBox result = new SuggestBox();
+		MySuggestOracle oracle = new MySuggestOracle(result);
+		return result;
 	}
 
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
