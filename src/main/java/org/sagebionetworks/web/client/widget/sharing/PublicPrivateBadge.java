@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
@@ -19,7 +18,6 @@ import com.google.inject.Inject;
 public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 
 	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
@@ -29,10 +27,9 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	private AccessControlList acl;
 	
 	@Inject
-	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, NodeModelCreator nodeModelCreator,GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
+	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.userAccountService = userAccountService;
@@ -118,7 +115,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			public void onSuccess(EntityBundleTransport bundle) {
 				// retrieve ACL and user entity permissions from bundle
 				try {
-					callback.onSuccess(nodeModelCreator.createJSONEntity(bundle.getAclJson(), AccessControlList.class));
+					callback.onSuccess(bundle.getAcl());
 				} catch (Exception e) {
 					onFailure(e);
 				}

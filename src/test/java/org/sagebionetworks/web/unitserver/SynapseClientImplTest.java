@@ -414,8 +414,8 @@ public class SynapseClientImplTest {
 		// We should have all of the strings
 		assertNotNull(bundle.getEntityJson());
 		assertNotNull(bundle.getAnnotationsJson());
-		assertNotNull(bundle.getEntityPathJson());
-		assertNotNull(bundle.getPermissionsJson());
+		assertNotNull(bundle.getEntityPath());
+		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
 		assertNotNull(bundle.getAccessRequirementsJson());
 		assertNotNull(bundle.getUnmetAccessRequirementsJson());
@@ -430,8 +430,8 @@ public class SynapseClientImplTest {
 		// We should have all of the strings
 		assertNull(bundle.getEntityJson());
 		assertNull(bundle.getAnnotationsJson());
-		assertNull(bundle.getEntityPathJson());
-		assertNull(bundle.getPermissionsJson());
+		assertNull(bundle.getEntityPath());
+		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
 		assertNull(bundle.getAccessRequirementsJson());
 		assertNull(bundle.getUnmetAccessRequirementsJson());

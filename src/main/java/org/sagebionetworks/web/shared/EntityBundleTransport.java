@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import java.io.Serializable;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityPath;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
+import org.sagebionetworks.repo.model.table.TableBundle;
 
 /**
  * The transport object for a bundle of entity data.
@@ -10,7 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author John
  *
  */
-public class EntityBundleTransport implements IsSerializable {
+public class EntityBundleTransport implements Serializable {
 	
 	/**
 	 * Masks for requesting what should be included in the bundle.s
@@ -31,15 +35,15 @@ public class EntityBundleTransport implements IsSerializable {
 
 	private String entityJson;
 	private String annotationsJson;
-	private String permissionsJson;
-	private String entityPathJson;
+	private UserEntityPermissions permissions;
+	private EntityPath entityPath;
 	private String entityReferencedByJson;
 	private Boolean hasChildren;
-	private String aclJson;
+	private AccessControlList acl;
 	private String accessRequirementsJson;
 	private String unmetAccessRequirementsJson;
 	private String fileHandlesJson;
-	private String tableData;
+	private TableBundle tableData;
 	
 	private Boolean isWikiBasedEntity;
 	
@@ -58,20 +62,20 @@ public class EntityBundleTransport implements IsSerializable {
 	public String getAnnotationsJson() {
 		return annotationsJson;
 	}
-	public void setAnnotationsJson(String annotationsJson) {
+	public void setAnnotations(String annotationsJson) {
 		this.annotationsJson = annotationsJson;
 	}
-	public String getPermissionsJson() {
-		return permissionsJson;
+	public UserEntityPermissions getPermissions() {
+		return permissions;
 	}
-	public void setPermissionsJson(String permissionsJson) {
-		this.permissionsJson = permissionsJson;
+	public void setPermissions(UserEntityPermissions permissions) {
+		this.permissions = permissions;
 	}
-	public String getEntityPathJson() {
-		return entityPathJson;
+	public EntityPath getEntityPath() {
+		return entityPath;
 	}
-	public void setEntityPathJson(String entityPathJson) {
-		this.entityPathJson = entityPathJson;
+	public void setEntityPath(EntityPath entityPath) {
+		this.entityPath = entityPath;
 	}	
 	public String getEntityReferencedByJson() {
 		return entityReferencedByJson;
@@ -79,11 +83,11 @@ public class EntityBundleTransport implements IsSerializable {
 	public void setEntityReferencedByJson(String entityReferencedByJson) {
 		this.entityReferencedByJson = entityReferencedByJson;
 	}	
-	public String getAclJson() {
-		return aclJson;
+	public AccessControlList getAcl() {
+		return acl;
 	}
-	public void setAclJson(String aclJson) {
-		this.aclJson = aclJson;
+	public void setAcl(AccessControlList acl) {
+		this.acl = acl;
 	}	
 	public String getAccessRequirementsJson() {
 		return accessRequirementsJson;
@@ -112,47 +116,28 @@ public class EntityBundleTransport implements IsSerializable {
 		this.isWikiBasedEntity = isWikiBasedEntity;
 	}
 	
-	public String getTableData() {
+	public TableBundle getTableData() {
 		return tableData;
 	}
-	public void setTableData(String tableData) {
+	public void setTableData(TableBundle tableData) {
 		this.tableData = tableData;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((accessRequirementsJson == null) ? 0
-						: accessRequirementsJson.hashCode());
-		result = prime * result + ((aclJson == null) ? 0 : aclJson.hashCode());
-		result = prime * result
-				+ ((annotationsJson == null) ? 0 : annotationsJson.hashCode());
-		result = prime * result
-				+ ((entityJson == null) ? 0 : entityJson.hashCode());
-		result = prime * result
-				+ ((entityPathJson == null) ? 0 : entityPathJson.hashCode());
-		result = prime
-				* result
-				+ ((entityReferencedByJson == null) ? 0
-						: entityReferencedByJson.hashCode());
-		result = prime * result
-				+ ((fileHandlesJson == null) ? 0 : fileHandlesJson.hashCode());
-		result = prime * result
-				+ ((hasChildren == null) ? 0 : hasChildren.hashCode());
-		result = prime
-				* result
-				+ ((isWikiBasedEntity == null) ? 0 : isWikiBasedEntity
-						.hashCode());
-		result = prime * result
-				+ ((permissionsJson == null) ? 0 : permissionsJson.hashCode());
-		result = prime * result
-				+ ((tableData == null) ? 0 : tableData.hashCode());
-		result = prime
-				* result
-				+ ((unmetAccessRequirementsJson == null) ? 0
-						: unmetAccessRequirementsJson.hashCode());
+		result = prime * result + ((accessRequirementsJson == null) ? 0 : accessRequirementsJson.hashCode());
+		result = prime * result + ((acl == null) ? 0 : acl.hashCode());
+		result = prime * result + ((annotationsJson == null) ? 0 : annotationsJson.hashCode());
+		result = prime * result + ((entityJson == null) ? 0 : entityJson.hashCode());
+		result = prime * result + ((entityPath == null) ? 0 : entityPath.hashCode());
+		result = prime * result + ((entityReferencedByJson == null) ? 0 : entityReferencedByJson.hashCode());
+		result = prime * result + ((fileHandlesJson == null) ? 0 : fileHandlesJson.hashCode());
+		result = prime * result + ((hasChildren == null) ? 0 : hasChildren.hashCode());
+		result = prime * result + ((isWikiBasedEntity == null) ? 0 : isWikiBasedEntity.hashCode());
+		result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
+		result = prime * result + ((tableData == null) ? 0 : tableData.hashCode());
+		result = prime * result + ((unmetAccessRequirementsJson == null) ? 0 : unmetAccessRequirementsJson.hashCode());
 		return result;
 	}
 	@Override
@@ -169,10 +154,10 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!accessRequirementsJson.equals(other.accessRequirementsJson))
 			return false;
-		if (aclJson == null) {
-			if (other.aclJson != null)
+		if (acl == null) {
+			if (other.acl != null)
 				return false;
-		} else if (!aclJson.equals(other.aclJson))
+		} else if (!acl.equals(other.acl))
 			return false;
 		if (annotationsJson == null) {
 			if (other.annotationsJson != null)
@@ -184,10 +169,10 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!entityJson.equals(other.entityJson))
 			return false;
-		if (entityPathJson == null) {
-			if (other.entityPathJson != null)
+		if (entityPath == null) {
+			if (other.entityPath != null)
 				return false;
-		} else if (!entityPathJson.equals(other.entityPathJson))
+		} else if (!entityPath.equals(other.entityPath))
 			return false;
 		if (entityReferencedByJson == null) {
 			if (other.entityReferencedByJson != null)
@@ -209,10 +194,10 @@ public class EntityBundleTransport implements IsSerializable {
 				return false;
 		} else if (!isWikiBasedEntity.equals(other.isWikiBasedEntity))
 			return false;
-		if (permissionsJson == null) {
-			if (other.permissionsJson != null)
+		if (permissions == null) {
+			if (other.permissions != null)
 				return false;
-		} else if (!permissionsJson.equals(other.permissionsJson))
+		} else if (!permissions.equals(other.permissions))
 			return false;
 		if (tableData == null) {
 			if (other.tableData != null)
@@ -222,25 +207,15 @@ public class EntityBundleTransport implements IsSerializable {
 		if (unmetAccessRequirementsJson == null) {
 			if (other.unmetAccessRequirementsJson != null)
 				return false;
-		} else if (!unmetAccessRequirementsJson
-				.equals(other.unmetAccessRequirementsJson))
+		} else if (!unmetAccessRequirementsJson.equals(other.unmetAccessRequirementsJson))
 			return false;
 		return true;
 	}
-	
 	@Override
 	public String toString() {
-		return "EntityBundleTransport [entityJson=" + entityJson
-				+ ", annotationsJson=" + annotationsJson + ", permissionsJson="
-				+ permissionsJson + ", entityPathJson=" + entityPathJson
-				+ ", entityReferencedByJson=" + entityReferencedByJson
-				+ ", hasChildren=" + hasChildren + ", aclJson=" + aclJson
-				+ ", accessRequirementsJson=" + accessRequirementsJson
-				+ ", unmetAccessRequirementsJson="
-				+ unmetAccessRequirementsJson + ", fileHandlesJson="
-				+ fileHandlesJson + ", tableData=" + tableData
-				+ ", isWikiBasedEntity=" + isWikiBasedEntity + "]";
+		return "EntityBundleTransport [entityJson=" + entityJson + ", annotationsJson=" + annotationsJson + ", permissions=" + permissions + ", entityPath=" + entityPath + ", entityReferencedByJson=" + entityReferencedByJson + ", hasChildren=" + hasChildren + ", acl=" + acl + ", accessRequirementsJson=" + accessRequirementsJson + ", unmetAccessRequirementsJson=" + unmetAccessRequirementsJson + ", fileHandlesJson=" + fileHandlesJson + ", tableData=" + tableData + ", isWikiBasedEntity=" + isWikiBasedEntity + "]";
 	}
+
 	
 	
 }

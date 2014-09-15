@@ -173,8 +173,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			public void onSuccess(EntityBundleTransport bundle) {
 				try {
 					// retrieve ACL and user entity permissions from bundle
-					acl = nodeModelCreator.createJSONEntity(bundle.getAclJson(), AccessControlList.class);
-					uep = nodeModelCreator.createJSONEntity(bundle.getPermissionsJson(), UserEntityPermissions.class);
+					acl = bundle.getAcl();
+					uep = bundle.getPermissions();
 					//initialize original principal id set
 					originalPrincipalIdSet = new HashSet<String>();
 					for (final ResourceAccess ra : acl.getResourceAccess()) {

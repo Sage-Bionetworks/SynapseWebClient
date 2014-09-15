@@ -338,11 +338,11 @@ public class GwtTestSuite extends GWTTestCase {
 		// the is our transport object
 		EntityBundleTransport transport = new EntityBundleTransport();
 		transport.setEntityJson(factory.createJsonStringForEntity(entity));
-		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
-		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
-		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
+		transport.setAnnotations(factory.createJsonStringForEntity(annos));
+		transport.setPermissions(uep);
+		transport.setEntityPath(path);
 		transport.setFileHandlesJson(entityListToString(fileHandles));
-		transport.setTableData(factory.createJsonStringForEntity(tableBundle));
+		transport.setTableData(tableBundle);
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));

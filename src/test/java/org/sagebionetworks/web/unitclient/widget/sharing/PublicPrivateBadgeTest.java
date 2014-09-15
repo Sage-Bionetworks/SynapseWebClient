@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.sharing;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +28,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
@@ -47,7 +47,6 @@ public class PublicPrivateBadgeTest {
 	AuthenticationController mockAuthenticationController;
 	UserAccountServiceAsync mockUserService;
 	SynapseClientAsync mockSynapseClient;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;	
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
@@ -63,16 +62,17 @@ public class PublicPrivateBadgeTest {
 		mockPlaceChanger = mock(PlaceChanger.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
-		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseClient, mockNodeModelCreator, mockGlobalApplicationState, mockAuthenticationController, mockUserService);
+		
+		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockUserService);
 		acl = new AccessControlList();
 		acl.setResourceAccess(resourceAccessSet);
 		testEntity = new FileEntity();
 		testEntity.setId("syn12345");
 		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
-		when(mockNodeModelCreator.createJSONEntity(anyString(), eq(AccessControlList.class))).thenReturn(acl);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		AsyncMockStubber.callSuccessWith(new EntityBundleTransport()).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
+		EntityBundleTransport transport = new EntityBundleTransport();
+		transport.setAcl(acl);
+		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(publicPrincipalIds).when(mockUserService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		DisplayUtils.publicPrincipalIds = null;
 	}
