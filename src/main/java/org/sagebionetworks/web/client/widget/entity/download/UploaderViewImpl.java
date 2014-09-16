@@ -169,8 +169,6 @@ public class UploaderViewImpl extends FlowPanel implements
 			}
 		};
 		formPanel.addSubmitCompleteHandler(submitHandler);
-		
-		//synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, (Uploader) presenter);
 	}
 	
 	@Override

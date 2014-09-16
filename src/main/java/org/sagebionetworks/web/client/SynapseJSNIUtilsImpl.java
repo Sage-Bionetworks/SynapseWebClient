@@ -300,9 +300,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		$doc.addEventListener("drop", function( event ) {
 				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
-					//@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::handleUploads()();
-					//$wnd.alert("hi");
-					//@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::setFileNames()();
   					var files = event.dataTransfer.files;
   					
   					// Can't make an array in native JavaScript and pass to Java method. Workaround is this
