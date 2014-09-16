@@ -47,8 +47,6 @@ public class APITableColumnRendererUserIDTest {
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockJsniUtils = mock(SynapseJSNIUtils.class);
 		
-		EntityWrapper entity = new EntityWrapper();
-		entity.setEntityJson("entity json");
 		UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();
 		List<UserGroupHeader> userGroupHeaders = new ArrayList<UserGroupHeader>();
 		UserGroupHeader ugh = new UserGroupHeader();
@@ -57,9 +55,8 @@ public class APITableColumnRendererUserIDTest {
 		ugh.setLastName(lastName);
 		userGroupHeaders.add(ugh);
 		responsePage.setChildren(userGroupHeaders);
-		when(mockNodeModelCreator.createJSONEntity("entity json", UserGroupHeaderResponsePage.class)).thenReturn(responsePage);
 		
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(responsePage).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		
 		renderer = new APITableColumnRendererUserId(mockSynapseClient, mockNodeModelCreator, mockJsniUtils);
 		columnData = new HashMap<String, List<String>>();
@@ -105,7 +102,7 @@ public class APITableColumnRendererUserIDTest {
 	@Test
 	public void testGetUserGroupHeadersFailure() {
 		Exception thrownException = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(thrownException).when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(thrownException).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		renderer.init(columnData, config, mockCallback);
 		verify(mockCallback).onFailure(eq(thrownException));
 	}

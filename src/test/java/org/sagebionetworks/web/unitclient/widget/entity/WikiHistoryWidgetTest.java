@@ -65,13 +65,11 @@ public class WikiHistoryWidgetTest {
 		AsyncMockStubber.callSuccessWith("fake json response")
 			.when(mockSynapseClient).getV2WikiHistory(any(WikiPageKey.class), any(Long.class), any(Long.class), any(AsyncCallback.class));
 		
-		EntityWrapper entity = new EntityWrapper();
-		entity.setEntityJson("entity json");
 		UserGroupHeaderResponsePage responsePage = new UserGroupHeaderResponsePage();
 		responsePage.setChildren(new ArrayList<UserGroupHeader>());
-		when(mockNodeModelCreator.createJSONEntity("entity json", UserGroupHeaderResponsePage.class)).thenReturn(responsePage);
-		AsyncMockStubber.callSuccessWith(entity)
-			.when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(responsePage)
+			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -115,7 +113,7 @@ public class WikiHistoryWidgetTest {
 	@Test
 	public void testConfigureNextPageFailure2() {
 		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockSynapseClient).getUserGroupHeadersById(any(List.class), any(AsyncCallback.class));
+			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		presenter.configureNextPage(new Long(0), new Long(10));
 		verify(mockView).showErrorMessage(anyString());
 	}

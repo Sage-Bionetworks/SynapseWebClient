@@ -49,9 +49,9 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		this.teamId = teamId;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		//using the given team, try to show all pending membership requests (or nothing if empty)
-		synapseClient.getOpenRequests(teamId, new AsyncCallback<List<MembershipRequestBundle>>() {
+		synapseClient.getOpenRequests(teamId, new AsyncCallback<ArrayList<MembershipRequestBundle>>() {
 			@Override
-			public void onSuccess(List<MembershipRequestBundle> result) {
+			public void onSuccess(ArrayList<MembershipRequestBundle> result) {
 				try {
 					//create the associated object list, and pass to the view to render
 					List<UserProfile> profiles = new ArrayList<UserProfile>();

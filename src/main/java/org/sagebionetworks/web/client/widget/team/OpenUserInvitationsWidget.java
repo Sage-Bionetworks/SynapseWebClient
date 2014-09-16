@@ -76,9 +76,9 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	@Override
 	public void getNextBatch() {
 		//using the given team, try to show all pending membership requests (or nothing if empty)
-		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<List<MembershipInvitationBundle>>() {
+		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
 			@Override
-			public void onSuccess(List<MembershipInvitationBundle> result) {
+			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
 				try {
 					currentOffset += result.size();
 					

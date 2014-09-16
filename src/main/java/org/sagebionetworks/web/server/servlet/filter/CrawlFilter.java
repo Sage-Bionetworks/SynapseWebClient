@@ -42,7 +42,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -122,13 +121,8 @@ public class CrawlFilter implements Filter {
 		//add direct links to all public projects in the system
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
-		String queryJson = "";
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		query.writeToJSONObject(adapter);
-		queryJson = adapter.toJSONString();
-
-		EntityWrapper entityWrapper = synapseClient.search(queryJson);
-		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+		
+		SearchResults results = synapseClient.search(query);
 		
 		//append this set to the list
 		while(results.getHits().size() > 0) {
@@ -138,13 +132,7 @@ public class CrawlFilter implements Filter {
 			}
 			long newStart = results.getStart() + results.getHits().size();
 			query.setStart(newStart);
-			
-			adapter = jsonObjectAdapter.createNew();
-			query.writeToJSONObject(adapter);
-			queryJson = adapter.toJSONString();
-			
-			entityWrapper = synapseClient.search(queryJson);
-			results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+			results = synapseClient.search(query);
 		}
 		
 		html.append("</body></html>");
@@ -233,9 +221,9 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
-		EntityWrapper entityWrapper = synapseClient.search(searchQueryJson);
-		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
+		SearchResults results = synapseClient.search(inputQuery);
+		
 		//append this set to the list
 		StringBuilder html = new StringBuilder();
 		html.append("<!DOCTYPE html><html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");

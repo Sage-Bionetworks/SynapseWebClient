@@ -93,7 +93,7 @@ public class ProvenanceWidgetTest {
 	Data outputEntity;
 	String entity456Id = "syn456";
 	BatchResults<EntityHeader> referenceHeaders;
-	String activityJSON;
+	
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
@@ -150,13 +150,12 @@ public class ProvenanceWidgetTest {
 		generatedBy.setResults(Arrays.asList(new Reference[] { ref123 }));		
 						
 		EntityWrapper ew = new EntityWrapper(outputEntity.writeToJSONObject(adapterFactory.createNew()).toJSONString(), Data.class.getName());		
-		activityJSON = act.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceListJSON = referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceHeadersJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		
 		AsyncMockStubber.callSuccessWith(ew).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(ew)).thenReturn(outputEntity);
-		AsyncMockStubber.callSuccessWith(activityJSON).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(referenceHeadersJSON).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));		
 		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)referenceHeaders);
 		AsyncMockStubber.callSuccessWith(generatedResult).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));

@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -27,9 +26,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -258,21 +255,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
-		List<String> ids = new ArrayList<String>();
+		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
-		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<EntityWrapper>(){
+		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
 			@Override
-			public void onSuccess(EntityWrapper wrapper) {
-				try {	
-					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), UserGroupHeaderResponsePage.class);
-					for (UserGroupHeader ugh : response.getChildren())
-						userGroupHeaders.put(ugh.getOwnerId(), ugh);
-					if (callback != null)
-						callback.onSuccess(null);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(UserGroupHeaderResponsePage response) {
+				for (UserGroupHeader ugh : response.getChildren())
+					userGroupHeaders.put(ugh.getOwnerId(), ugh);
+				if (callback != null)
+					callback.onSuccess(null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -383,11 +375,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}		
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
-		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<EntityWrapper>() {
+		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
 			@Override
-			public void onSuccess(EntityWrapper wrapper) {
+			public void onSuccess(AccessControlList result) {
 				try {
-					acl = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), AccessControlList.class);
+					acl = result;
 					unsavedChanges = hasLocalACL_inRepo;
 					fetchUserGroupHeaders(updateViewDetailsCallback());					
 				} catch (Throwable e) {
@@ -403,7 +395,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	@Override
-	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
+	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<AccessControlList> changesPushedCallback) {
 		if(unsavedViewChanges) {
 			view.alertUnsavedViewChanges(new Callback() {
 				
@@ -421,30 +413,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		} 
 		validateEditorState();
 		
-		// Wrap the current ACL
-		EntityWrapper aclEW = null;
-		try {
-			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEW = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName());
-		} catch (JSONObjectAdapterException e) {
-			showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
-			return;
-		}
-		
 		// Create an async callback to receive the updated ACL from Synapse
-		AsyncCallback<EntityWrapper> callback = new AsyncCallback<EntityWrapper>(){
+		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>(){
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					acl = nodeModelCreator.createJSONEntity(result.getEntityJson(), AccessControlList.class);
-					hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
-					unsavedChanges = false;					
-					setViewDetails();
-					view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
-					changesPushedCallback.onSuccess(result);
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
+			public void onSuccess(AccessControlList result) {
+				acl = result;
+				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
+				unsavedChanges = false;					
+				setViewDetails();
+				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
+				changesPushedCallback.onSuccess(result);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -460,12 +438,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (hasLocalACL_inPortal && !hasLocalACL_inRepo) {
 			// Local ACL exists in Portal, but does not exist in Repo
 			// Create local ACL in Repo
-			synapseClient.createAcl(aclEW, callback);
+			synapseClient.createAcl(acl, callback);
 			notifyNewUsers();
 		} else if (hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL exists in both Portal and Repo
 			// Apply updates to local ACL in Repo
-			synapseClient.updateAcl(aclEW, recursive, callback);
+			synapseClient.updateAcl(acl, recursive, callback);
 			notifyNewUsers();
 		} else if (!hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL does not exist in Portal but does exist in Repo

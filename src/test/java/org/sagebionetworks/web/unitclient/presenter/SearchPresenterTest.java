@@ -51,7 +51,7 @@ public class SearchPresenterTest {
 
 	String exampleTerm;
 	String exampleTermSearchQueryJson;
-	
+	SearchQuery exampleTermSearchQuery;
 	@Before
 	public void setup() throws Exception{
 		mockView = mock(SearchView.class);
@@ -73,10 +73,9 @@ public class SearchPresenterTest {
 				mockIconsImageBundle);
 		
 		exampleTerm = "searchQueryTerm";
-		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
-		query.setQueryTerm(Arrays.asList(new String[] {exampleTerm}));
-		exampleTermSearchQueryJson = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-
+		exampleTermSearchQuery = SearchQueryUtils.getDefaultSearchQuery();
+		exampleTermSearchQuery.setQueryTerm(Arrays.asList(new String[] {exampleTerm}));
+		exampleTermSearchQueryJson = exampleTermSearchQuery.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
 	}	
 
 	@Test 
@@ -98,7 +97,7 @@ public class SearchPresenterTest {
 	public void testQueryTerm() throws Exception {		
 		
 		searchPresenter.setPlace(new Search(exampleTerm));
-		verify(mockSynapseClient).search(eq(exampleTermSearchQueryJson), any(AsyncCallback.class));
+		verify(mockSynapseClient).search(eq(exampleTermSearchQuery), any(AsyncCallback.class));
 
 	}
 
@@ -107,7 +106,7 @@ public class SearchPresenterTest {
 	public void testSearchQuery() throws Exception {		
 		Search place = new Search(exampleTermSearchQueryJson);
 		searchPresenter.setPlace(place);
-		verify(mockSynapseClient).search(eq(exampleTermSearchQueryJson), any(AsyncCallback.class));
+		verify(mockSynapseClient).search(eq(exampleTermSearchQuery), any(AsyncCallback.class));
 
 	}
 
@@ -119,10 +118,9 @@ public class SearchPresenterTest {
 
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		query.setQueryTerm(Arrays.asList(new String[] {term}));
-		String json = query.writeToJSONObject(jsonObjectAdapter.createNew()).toJSONString();
-
+		
 		searchPresenter.setPlace(new Search(term));
-		verify(mockSynapseClient).search(eq(json), any(AsyncCallback.class));
+		verify(mockSynapseClient).search(eq(query), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")

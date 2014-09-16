@@ -288,26 +288,20 @@ public class ProvUtils {
 			final ClientCache clientCache,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			ActivityGraphNode atNode) {
-		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<String>() {
+		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<Activity>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					final Activity activity = nodeModelCreator.createJSONEntity(result, Activity.class);
-					UserBadge.getUserProfile(activity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-						@Override
-						public void onSuccess(UserProfile profile) {
-							callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
-						}
-						
-						@Override
-						public void onFailure(Throwable caught) {
-							callback.onFailure(caught);
-						}
-					});
-								
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(final Activity activity) {
+				UserBadge.getUserProfile(activity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
+					@Override
+					public void onSuccess(UserProfile profile) {
+						callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						callback.onFailure(caught);
+					}
+				});
 			}		
 			@Override
 			public void onFailure(Throwable caught) {

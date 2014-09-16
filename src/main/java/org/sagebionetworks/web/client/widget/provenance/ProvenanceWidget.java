@@ -281,16 +281,10 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 				
 		// lookup generatedBy activity for ref
-		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<String>() {
+		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<Activity>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					Activity activity = new Activity(adapterFactory.createNew(result));
-					addActivityToStack(activity);
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);				
-					onFailure(e);
-				}
+			public void onSuccess(Activity activity) {
+				addActivityToStack(activity);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

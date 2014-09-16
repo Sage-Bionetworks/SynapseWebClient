@@ -48,9 +48,9 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		//using the current user, ask for all of the open invitations extended to this user.
 		if (authenticationController.isLoggedIn()) {
 			//get the open invitations
-			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
 				@Override
-				public void onSuccess(List<MembershipInvitationBundle> result) {
+				public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
 					if (openTeamInvitationsCallback != null)
 						openTeamInvitationsCallback.invoke(result);
 					configure(teamUpdatedCallback, result);
