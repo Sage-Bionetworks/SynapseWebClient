@@ -105,7 +105,7 @@ public class WikiPageWidgetTest {
 		
 
 		when(mockNodeModelCreator.createJSONEntity("fake json response", WikiPage.class)).thenReturn(testPage);
-		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith("fake json response").when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), anyString(), any(AsyncCallback.class));

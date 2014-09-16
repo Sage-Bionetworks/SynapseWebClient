@@ -116,6 +116,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		clearHandlers();
 		uploadLog = new StringBuilder();
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
+		if (!isDirectUploadSupported)
+			disableMultipleFileUploads();
 	}		
 		
 	public Widget asWidget(Entity entity) {
@@ -277,7 +279,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if (!fileHasBeenUploaded) {
 				//cancel the upload
 				fireCancelEvent();
-				view.resetToInitialState();
 				clearState();
 			} else {
 				//finish upload
@@ -767,6 +768,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.hideLoading();
 		view.clear();
 		handlerManager.fireEvent(new CancelEvent());
+		view.resetToInitialState();
 	}
 	
 	private void uploadSuccess() {

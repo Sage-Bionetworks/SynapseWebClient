@@ -141,6 +141,8 @@ public class UploaderTest {
 				jsonObjectAdapter, synapseJsniUtils,
 				gwt, authenticationController,
 				mockLogger);
+		//direct upload is disabled in the test by default
+		verify(view).disableMultipleFileUploads();
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);

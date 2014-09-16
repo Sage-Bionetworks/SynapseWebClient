@@ -7,7 +7,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -163,8 +162,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = null;
 		try{
-			String userProfileJson = synapseClient.getUserProfile(entity.getCreatedBy());
-			UserProfile profile = EntityFactory.createEntityFromJSONString(userProfileJson, UserProfile.class);
+			UserProfile profile = synapseClient.getUserProfile(entity.getCreatedBy());
 			StringBuilder createdByBuilder = new StringBuilder();
 			if (profile.getFirstName() != null)
 				createdByBuilder.append(profile.getFirstName() + " ");
@@ -175,8 +173,7 @@ public class CrawlFilter implements Filter {
 			createdBy = createdByBuilder.toString();
 		}  catch (Exception e) {}
 		try{
-			String wikiPageJson = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
-			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
+			WikiPage rootPage = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			markdown = escapeHtml(rootPage.getMarkdown());
 		} catch (Exception e) {}
 		

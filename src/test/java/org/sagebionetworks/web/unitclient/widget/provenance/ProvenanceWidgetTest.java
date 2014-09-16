@@ -321,22 +321,6 @@ public class ProvenanceWidgetTest {
 		assertEquals(1, oldVersions.size());		
 	}
 
-
-	/*
-	 * Private Methods
-	 */
-	private static EntityBundleTransport createEBT(JSONEntity entity, AccessControlList acl, UserEntityPermissions uep) {
-		try {
-			EntityBundleTransport ebt = new EntityBundleTransport();
-			ebt.setEntityJson(EntityFactory.createJSONStringForEntity(entity));
-			ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
-			ebt.setPermissionsJson(EntityFactory.createJSONStringForEntity(uep));
-			return ebt;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private ProvGraph verifyBuildGraphCalls() throws Exception {
 		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceListJSON), any(AsyncCallback.class));		

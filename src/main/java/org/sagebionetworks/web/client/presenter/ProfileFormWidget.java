@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -14,7 +13,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
@@ -35,7 +33,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private UserProfile ownerProfile;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private AdapterFactory adapterFactory;
 	private GlobalApplicationState globalApplicationState;
@@ -48,7 +45,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	public ProfileFormWidget(ProfileFormView view,
 			AuthenticationController authenticationController,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
 			AdapterFactory adapterFactory,
 			CookieProvider cookieProvider,
@@ -57,7 +53,6 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
 		this.cookieProvider = cookieProvider;
@@ -106,50 +101,43 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 				ProfileFormWidget.getMyProfile(synapseClient, adapterFactory, new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
-						try {
-							ownerProfile = profile;
-							ownerProfile.setFirstName(firstName);
-							ownerProfile.setLastName(lastName);
-							ownerProfile.setSummary(summary);
-							ownerProfile.setPosition(position);
-							ownerProfile.setLocation(location);
-							ownerProfile.setIndustry(industry);
-							ownerProfile.setCompany(company);
-							ownerProfile.setDisplayName(firstName + " " + lastName);
-							if (teamName != null)
-								ownerProfile.setTeamName(teamName);
-							if (url != null)
-								ownerProfile.setUrl(url);
-							if (userName != null)
-								ownerProfile.setUserName(userName);
-							final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
-							if (isUpdatingEmail) {
-								ownerProfile.setEmail(email);
-							}
-								
-							if (pic != null)
-								ownerProfile.setPic(pic);
+						ownerProfile = profile;
+						ownerProfile.setFirstName(firstName);
+						ownerProfile.setLastName(lastName);
+						ownerProfile.setSummary(summary);
+						ownerProfile.setPosition(position);
+						ownerProfile.setLocation(location);
+						ownerProfile.setIndustry(industry);
+						ownerProfile.setCompany(company);
+						ownerProfile.setDisplayName(firstName + " " + lastName);
+						if (teamName != null)
+							ownerProfile.setTeamName(teamName);
+						if (url != null)
+							ownerProfile.setUrl(url);
+						if (userName != null)
+							ownerProfile.setUserName(userName);
+						final boolean isUpdatingEmail = email != null && !email.equals(profile.getEmail()); 
+						if (isUpdatingEmail) {
+							ownerProfile.setEmail(email);
+						}
 							
-							JSONObjectAdapter adapter = ownerProfile.writeToJSONObject(jsonObjectAdapter.createNew());
-							String userProfileJson = adapter.toJSONString();
-
-							synapseClient.updateUserProfile(userProfileJson, new AsyncCallback<Void>() {
-								@Override
-								public void onSuccess(Void result) {
-									view.showUserUpdateSuccess();
-									stopEditing();
-									updateLoginInfo(currentUser);	
-								}
-								
-								@Override
-								public void onFailure(Throwable caught) {
-									view.userUpdateFailed();
-									profileUpdatedCallback.onFailure(caught);
-								}
-							});
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}    				
+						if (pic != null)
+							ownerProfile.setPic(pic);
+						
+						synapseClient.updateUserProfile(ownerProfile, new AsyncCallback<Void>() {
+							@Override
+							public void onSuccess(Void result) {
+								view.showUserUpdateSuccess();
+								stopEditing();
+								updateLoginInfo(currentUser);	
+							}
+							
+							@Override
+							public void onFailure(Throwable caught) {
+								view.userUpdateFailed();
+								profileUpdatedCallback.onFailure(caught);
+							}
+						});
 					}
 					@Override
 					public void onFailure(Throwable caught) {
@@ -172,14 +160,10 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	public static void getMyProfile(SynapseClientAsync synapseClient, final AdapterFactory adapterFactory, final AsyncCallback<UserProfile> callback){
-		synapseClient.getUserProfile(null, new AsyncCallback<String>() {
+		synapseClient.getUserProfile(null, new AsyncCallback<UserProfile>() {
 			@Override
-			public void onSuccess(String userProfileJson) {
-				try {
-					callback.onSuccess(new UserProfile(adapterFactory.createNew(userProfileJson)));
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}    				
+			public void onSuccess(UserProfile userProfile) {
+				callback.onSuccess(userProfile);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -8,12 +8,9 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityClassHelper;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -21,7 +18,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityTypeResponse;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -106,17 +102,17 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		if(transport.getEntityJson() != null){
 			entity = factory.createEntity(transport.getEntityJson());
 		}
-		// annotaions?
+		// annotations?
 		if(transport.getAnnotationsJson() != null){
 			annotations = factory.initializeEntity(transport.getAnnotationsJson(), new Annotations());
 		}
 		// permissions?
-		if(transport.getPermissionsJson() != null){
-			permissions = factory.createEntity(transport.getPermissionsJson(), UserEntityPermissions.class);
+		if(transport.getPermissions() != null){
+			permissions = transport.getPermissions();
 		}
 		// path?
-		if(transport.getEntityPathJson() != null){
-			path =  factory.createEntity(transport.getEntityPathJson() , EntityPath.class);
+		if(transport.getEntityPath() != null){
+			path =  transport.getEntityPath();
 		}
 		// accessRequirements?
 		if(transport.getAccessRequirementsJson() != null){
@@ -148,8 +144,7 @@ public class NodeModelCreatorImpl implements NodeModelCreator {
 		}
 		// Table data
 		if (transport.getTableData() != null) {
-			tableBundle = factory.createEntity(transport.getTableData(),
-					TableBundle.class);
+			tableBundle = transport.getTableData();
 		}
 		
 		// put it all together.
