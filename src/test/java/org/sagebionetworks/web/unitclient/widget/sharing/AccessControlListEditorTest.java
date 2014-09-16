@@ -98,9 +98,11 @@ public class AccessControlListEditorTest {
 		// set up test Synapse objects
 		project = createProject();
 		localACL = createACL(ENTITY_ID);
+		AccessControlList localAclClone = createACL(ENTITY_ID); 
 		inheritedACL = createACL(INHERITED_ACL_ID);
-		entityBundleTransport_localACL = createEBT(localACL, createUEP());
-		entityBundleTransport_inheritedACL = createEBT(inheritedACL, createUEP());
+		AccessControlList inheritedAclClone = createACL(INHERITED_ACL_ID);
+		entityBundleTransport_localACL = createEBT(localAclClone, createUEP());
+		entityBundleTransport_inheritedACL = createEBT(inheritedAclClone, createUEP());
 		userGroupHeaderRP = createUGHRP();
 		userGroupHeaderRPWrapper = new EntityWrapper(userGroupHeaderRP.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName());
 		
@@ -144,8 +146,8 @@ public class AccessControlListEditorTest {
 	private static EntityBundleTransport createEBT(AccessControlList acl, UserEntityPermissions uep) {
 		try {
 			EntityBundleTransport ebt = new EntityBundleTransport();
-			ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
-			ebt.setPermissionsJson(EntityFactory.createJSONStringForEntity(uep));
+			ebt.setAcl(acl);
+			ebt.setPermissions(uep);
 			return ebt;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

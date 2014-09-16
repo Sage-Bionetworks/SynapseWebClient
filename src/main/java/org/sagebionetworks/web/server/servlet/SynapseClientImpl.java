@@ -52,7 +52,6 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -76,8 +75,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VariableContentPaginatedResults;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.asynch.AsynchJobState;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -110,7 +107,6 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.RowSelection;
 import org.sagebionetworks.repo.model.table.RowSet;
@@ -158,8 +154,6 @@ import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -439,18 +433,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			}
 			if ((EntityBundleTransport.ANNOTATIONS & partsMask) > 0) {
 				Annotations a = eb.getAnnotations();
-				ebt.setAnnotationsJson(EntityFactory
-						.createJSONStringForEntity(a));
+				ebt.setAnnotationsJson(EntityFactory.createJSONStringForEntity(a));
 			}
 			if ((EntityBundleTransport.PERMISSIONS & partsMask) > 0) {
 				UserEntityPermissions uep = eb.getPermissions();
-				ebt.setPermissionsJson(EntityFactory
-						.createJSONStringForEntity(uep));
+				ebt.setPermissions(uep);
 			}
 			if ((EntityBundleTransport.ENTITY_PATH & partsMask) > 0) {
 				EntityPath path = eb.getPath();
-				ebt.setEntityPathJson(EntityFactory
-						.createJSONStringForEntity(path));
+				ebt.setEntityPath(path);
 			}
 			if ((EntityBundleTransport.ENTITY_REFERENCEDBY & partsMask) > 0) {
 				List<EntityHeader> rbList = eb.getReferencedBy();
@@ -473,7 +464,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 						e.printStackTrace();
 					}
 				}
-				ebt.setAclJson(EntityFactory.createJSONStringForEntity(acl));
+				ebt.setAcl(acl);
 			}
 			if ((EntityBundleTransport.ACCESS_REQUIREMENTS & partsMask) != 0) {
 				ebt.setAccessRequirementsJson(createJSONStringFromArray(eb.getAccessRequirements()));
@@ -487,8 +478,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			
 			if ((EntityBundleTransport.TABLE_DATA & partsMask) != 0
 					&& eb.getTableBundle() != null) {
-				ebt.setTableData(EntityFactory.createJSONStringForEntity(eb
-						.getTableBundle()));
+				ebt.setTableData(eb.getTableBundle());
 			}
 			
 			ebt.setIsWikiBasedEntity(getWikiBasedEntities().contains(entityId));
