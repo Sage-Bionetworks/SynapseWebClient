@@ -345,7 +345,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		fileNames[currFileIndex] = fileName;
 		if (currFileIndex + 1 == numFiles) {
 			UPLOADER.setFileNames(fileNames);
-			UPLOADER.handleUploads();
+			UPLOADER.uploadFiles();
 			fileNames = null;
 		}
 	}

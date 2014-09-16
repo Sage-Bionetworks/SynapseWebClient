@@ -176,7 +176,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void resetToInitialState() {
 		hideLoading();
-		setUploadButtonEnabled(true);
+		uploadBtn.setEnabled(true);
 		fileUploadHTML.setVisible(true);
 		DRAG_AND_DROP_HTML.setVisible(true);
 		// Clear previously selected files.
@@ -193,6 +193,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public Widget asWidget() {
 		return this;
+	}
+	
+	@Override
+	public void triggerUpload() {
+		uploadBtn.click();
 	}
 
 	@Override
@@ -472,11 +477,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private void configureUploadButtonForExternal() {
 		isExternal = true;
 		uploadBtn.setText("Save");
-	}
-	
-	@Override
-	public void setUploadButtonEnabled(boolean enable) {
-		uploadBtn.setEnabled(enable);
 	}
 	
 	private HTML createFileUploadHTML() {

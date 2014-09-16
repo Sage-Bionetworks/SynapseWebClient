@@ -169,6 +169,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return uploadUrl;
 	}
 	
+	public void uploadFiles() {
+		view.triggerUpload();
+	}
+	
 	@Override
 	public void handleUploads() {
 		if (fileNames == null) {
@@ -182,7 +186,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				return;
 			}
 		}
-		view.setUploadButtonEnabled(false);
 		
 		entityId = null;
 		if (entity != null) {
