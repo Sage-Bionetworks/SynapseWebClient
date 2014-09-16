@@ -66,6 +66,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public static final int MAX_RETRY = 5;
 	public static final int RETRY_DELAY = 1000;
 	
+	public String getHi() {
+		return "HI!";
+	}
+	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;
@@ -178,6 +182,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				return;
 			}
 		}
+		view.setUploadButtonEnabled(false);
 		
 		entityId = null;
 		if (entity != null) {

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
@@ -28,6 +29,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	public static String FILE_FIELD_ID;
+	public static Uploader UPLOADER;
 	
 	private static ProgressCallback progressCallback;
 	
@@ -271,11 +273,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void addDropZoneStyleEventHandling(String fileFieldId) {
+	public void addDropZoneStyleEventHandling(String fileFieldId, Uploader uploader) {
 		if (FILE_FIELD_ID == null) {
 			_addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_DROP_STYLE_NAME);
 		}
 		FILE_FIELD_ID = fileFieldId;
+		UPLOADER = uploader;
 	}
 	
 	private static native void _addDropZoneStyleEventHandling(String dropStyleName) /*-{
@@ -297,6 +300,16 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		$doc.addEventListener("drop", function( event ) {
 				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
+					//@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::handleUploads()();
+					//$wnd.alert("hi");
+					//@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::setFileNames()();
+  					var files = event.dataTransfer.files;
+  					
+  					// Can't make an array in native JavaScript and pass to Java method. Workaround is this
+  					// buildFileNamesArrayAndUpload method.
+  					for (var i = 0; i < files.length; i++) {
+  						@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::buildFileNamesArrayAndUpload(Ljava/lang/String;II)(files[i].name, i, files.length);
+  					}
 				}
 			}, false);
 		
@@ -321,6 +334,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				}
 			}, false);
 	}-*/;
+	
+	// Workaround for not being able to pass native JavaScript array to Java method
+	// for automatic upload when dropping files into the drop zone.
+	private static String[] fileNames;
+	private static void buildFileNamesArrayAndUpload(String fileName, int currFileIndex, int numFiles) {
+		if (currFileIndex == 0) {
+			fileNames = new String[numFiles];
+		}
+		fileNames[currFileIndex] = fileName;
+		if (currFileIndex + 1 == numFiles) {
+			UPLOADER.setFileNames(fileNames);
+			UPLOADER.handleUploads();
+			fileNames = null;
+		}
+	}
 	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.

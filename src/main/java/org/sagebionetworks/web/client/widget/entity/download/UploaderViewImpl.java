@@ -126,7 +126,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		initExternalPanel();
 		
 		this.add(dialog);	// Put modal on uploader layer.
-
 		initHandlers();
 	}
 	
@@ -171,13 +170,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		};
 		formPanel.addSubmitCompleteHandler(submitHandler);
 		
-		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID);
+		//synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, (Uploader) presenter);
 	}
 	
 	@Override
 	public void resetToInitialState() {
 		hideLoading();
-		uploadBtn.setEnabled(true);
+		setUploadButtonEnabled(true);
 		fileUploadHTML.setVisible(true);
 		DRAG_AND_DROP_HTML.setVisible(true);
 		// Clear previously selected files.
@@ -199,6 +198,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, (Uploader) presenter);
 	}
 
 	@Override
@@ -474,6 +474,10 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadBtn.setText("Save");
 	}
 	
+	@Override
+	public void setUploadButtonEnabled(boolean enable) {
+		uploadBtn.setEnabled(enable);
+	}
 	
 	private HTML createFileUploadHTML() {
 		if (multipleFileUploads)

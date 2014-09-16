@@ -26,6 +26,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void resetToInitialState();
 	void showNoFilesSelectedForUpload();
 	void disableMultipleFileUploads();
+	void setUploadButtonEnabled(boolean enable);
 	
 	/**
 	 * Presenter interface
