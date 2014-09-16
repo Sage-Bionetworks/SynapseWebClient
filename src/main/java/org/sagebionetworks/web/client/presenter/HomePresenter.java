@@ -281,9 +281,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			callback.onSuccess(false);
 			return;
 		}
-		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
 			@Override
-			public void onSuccess(List<MembershipInvitationBundle> result) {
+			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
 				callback.onSuccess(result.size() > 0);
 			}
 			

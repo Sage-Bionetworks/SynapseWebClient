@@ -532,43 +532,32 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetNodeAcl() throws Exception {
-		EntityWrapper ew = synapseClient.getNodeAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.getNodeAcl("syn101");
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testCreateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.createAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.createAcl(acl);
 		assertEquals(acl, clone);
 	}
 
 	@Test
 	public void testUpdateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl);
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testUpdateAclRecursive() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in, true);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl, true);
 		assertEquals(acl, clone);
 		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
 	}
 
 	@Test
 	public void testDeleteAcl() throws Exception {
-		EntityWrapper ew = synapseClient.deleteAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
 	}
 
@@ -684,41 +673,11 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testCreateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
-	}
-	
-	@Test
-	public void testDeleteWikiPage() throws Exception {
-		synapseClient.deleteWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-		verify(mockSynapse).deleteWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
 	public void testGetWikiHeaderTree() throws Exception {
 		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
 		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
 		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
-	}
-	
-	@Test
-	public void testGetWikiPage() throws Exception {
-		Mockito.when(mockSynapse.getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
-		synapseClient.getWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-	    verify(mockSynapse).getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
-	public void testUpdateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-		
-		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
 
 	@Test

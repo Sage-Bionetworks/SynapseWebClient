@@ -34,6 +34,7 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
@@ -1967,9 +1968,9 @@ public class DisplayUtils {
 				public void componentSelected(ButtonEvent ce) {
 					// confirm close action if there are unsaved changes
 					if (accessControlListEditor.hasUnsavedChanges()) {
-						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
+						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<AccessControlList>() {
 							@Override
-							public void onSuccess(EntityWrapper result) {
+							public void onSuccess(AccessControlList result) {
 								callback.invoke();
 							}
 							@Override
