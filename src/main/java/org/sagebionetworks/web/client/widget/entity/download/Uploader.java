@@ -39,9 +39,11 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -167,6 +169,19 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void uploadFiles() {
 		view.triggerUpload();
+	}
+	
+	/**
+	 * For uploading files from native JavaScript.
+	 * @param jsFileNames Array of file names to be uploaded.
+	 */
+	public void uploadFiles(JsArrayString jsFileNames) {
+		int length = jsFileNames.length();
+		fileNames = new String[length];
+		for (int i = 0; i < length; i++) {
+			fileNames[i] = jsFileNames.get(i);
+		}
+		uploadFiles();
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
@@ -23,6 +24,7 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -301,12 +303,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
   					var files = event.dataTransfer.files;
-  					
-  					// Can't make an array in native JavaScript and pass to Java method. Workaround is this
-  					// buildFileNamesArrayAndUpload method.
-  					for (var i = 0; i < files.length; i++) {
-  						@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::buildFileNamesArrayAndUpload(Ljava/lang/String;II)(files[i].name, i, files.length);
-  					}
+					var fileNames = [];
+					for (var i = 0; i < files.length; i++) {
+						fileNames[i] = files[i].name;
+					}
+					// UPLOADER.uploadFiles(fileNames);
+					@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::uploadFiles(Lcom/google/gwt/core/client/JsArrayString;)(fileNames);
 				}
 			}, false);
 		
@@ -331,21 +333,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				}
 			}, false);
 	}-*/;
-	
-	// Workaround for not being able to pass native JavaScript array to Java method
-	// for automatic upload when dropping files into the drop zone.
-	private static String[] fileNames;
-	private static void buildFileNamesArrayAndUpload(String fileName, int currFileIndex, int numFiles) {
-		if (currFileIndex == 0) {
-			fileNames = new String[numFiles];
-		}
-		fileNames[currFileIndex] = fileName;
-		if (currFileIndex + 1 == numFiles) {
-			UPLOADER.setFileNames(fileNames);
-			UPLOADER.uploadFiles();
-			fileNames = null;
-		}
-	}
 	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
