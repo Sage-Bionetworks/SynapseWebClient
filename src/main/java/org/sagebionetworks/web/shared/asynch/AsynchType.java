@@ -8,8 +8,12 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryNextPageToken;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
+import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableResult;
+
+
 
 
 
@@ -27,6 +31,7 @@ public enum AsynchType implements IsSerializable{
 	TableQuery(QueryBundleRequest.class, QueryResultBundle.class),
 	TableQueryNextPage(QueryNextPageToken.class, QueryResult.class),
 	TableCSVUpload(UploadToTableRequest.class, UploadToTableResult.class),
+	TableCSVUploadPreview(UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
 	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class);
 	
 	Class<? extends AsynchronousRequestBody> requestClass;

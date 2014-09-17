@@ -33,7 +33,6 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public static final long DEFAULT_LIMIT = 10L;
 
 	private TableEntityWidgetView view;
-	private AsynchronousProgressWidget asynchProgressWidget;
 	
 	String tableId;
 	TableBundle  tableBundle;
@@ -44,13 +43,11 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	Query currentQuery;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, AsynchronousProgressWidget asynchProgressWidget, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
 		this.view = view;
-		this.asynchProgressWidget = asynchProgressWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.view.setPresenter(this);
-		this.view.setProgressWidget(this.asynchProgressWidget);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
 	}

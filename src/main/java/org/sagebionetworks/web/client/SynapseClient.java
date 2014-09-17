@@ -18,9 +18,13 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -393,7 +397,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return The list of ColumnModel JSON strings.
 	 * @throws RestServiceException
 	 */
-	public void setTableSchema(String tableJSON, List<String> newSchema)
+	public void setTableSchema(TableEntity entity, List<ColumnModel> newSchema)
 			throws RestServiceException;
 	
 	/**
@@ -408,7 +412,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param deltaJson
 	 * @throws RestServiceException
 	 */
-	public void applyTableDelta(String deltaJson) throws RestServiceException;
+	public void applyTableDelta(PartialRowSet delta) throws RestServiceException;
 	
 	/**
 	 * Start a new Asynchronous job of a the given type with the provided request JSON.
@@ -417,7 +421,7 @@ public interface SynapseClient extends RemoteService {
 	 * @return
 	 * @throws RestServiceException
 	 */
-	public String startAsynchJob(AsynchType type, String bodyJSON) throws RestServiceException;
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body) throws RestServiceException;
 	
 	/**
 	 * Get the results of an Asynchronous job identified by the provided jobId.
@@ -428,6 +432,6 @@ public interface SynapseClient extends RemoteService {
 	 * @throws ResultNotReadyException Thrown when the job is not ready.  The status JOSN of this exception
 	 * is of type AsynchronousJobStatus.
 	 */
-	public String getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
 	
 }
