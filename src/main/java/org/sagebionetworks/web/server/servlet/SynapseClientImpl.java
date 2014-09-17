@@ -3349,12 +3349,10 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public void setTableSchema(String tableJson, List<String> schemaJSON)
+	public void setTableSchema(TableEntity table, List<ColumnModel> models)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			List<ColumnModel> models = tableModelUtils
-					.columnModelFromJSON(schemaJSON);
 			// Create any models that do not have an ID
 			List<String> newSchema = new LinkedList<String>();
 			for (ColumnModel m : models) {
@@ -3365,26 +3363,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				newSchema.add(m.getId());
 			}
 			// Get the table
-			TableEntity table = tableModelUtils.tableEntityFromJSON(tableJson);
 			table.setColumnIds(newSchema);
 			table = synapseClient.putEntity(table);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		} 
 	}
 	
 	@Override
-	public void applyTableDelta(String json) throws RestServiceException {
+	public void applyTableDelta(PartialRowSet delta) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			PartialRowSet prs = EntityFactory.createEntityFromJSONString(json, PartialRowSet.class);
-			synapseClient.appendPartialRowsToTable(prs);
+			synapseClient.appendPartialRowsToTable(delta);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 	
@@ -3398,40 +3390,29 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 	
 	@Override
-	public String startAsynchJob(AsynchType type, String bodyJSON)
+	public String startAsynchJob(AsynchType type, AsynchronousRequestBody body )
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			AsynchronousRequestBody body = EntityFactory.createEntityFromJSONString(bodyJSON, type.getRequestClass());
 			return synapseClient.startAsynchJob(AsynchJobType.valueOf(type.name()), body);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
 	@Override
-	public String getAsynchJobResults(AsynchType type, String jobId)
+	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId)
 			throws RestServiceException, ResultNotReadyException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
-			AsynchronousResponseBody response = synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId);
-			return EntityFactory.createJSONStringForEntity(response);
+			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId);
 		} catch (SynapseResultNotReadyException e){
 			// This occurs when the job is not ready.
-			try {
-				String statusJSON = EntityFactory.createJSONStringForEntity(e.getJobStatus());
-				// Re-throw the ResultNotReadyException with the status JSON.
-				throw new ResultNotReadyException(statusJSON);
-			} catch (JSONObjectAdapterException e1) {
-				throw new UnknownErrorException(e.getMessage());
-			}
+			// Re-throw the ResultNotReadyException with the status JSON.
+			throw new ResultNotReadyException(e.getJobStatus());
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		} 
 	}
 
 }

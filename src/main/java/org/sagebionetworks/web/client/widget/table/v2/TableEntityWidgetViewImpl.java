@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
@@ -78,13 +77,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setTableMessageVisible(boolean visible) {
 		this.tableMessage.setVisible(visible);
-	}
-
-	@Override
-	public void setProgressWidget(
-			AsynchronousProgressWidget asynchProgressWidget) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

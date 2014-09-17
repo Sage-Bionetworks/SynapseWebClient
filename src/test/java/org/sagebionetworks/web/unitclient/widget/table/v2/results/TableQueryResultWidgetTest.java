@@ -176,7 +176,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).showEditor();
 		// Setup success
 		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
 		// reset mocks
 		reset(mockView);
 		reset(mockPageWidget);
@@ -215,7 +215,7 @@ public class TableQueryResultWidgetTest {
 		// Setup success
 		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
 		Throwable error = new Throwable("Things went bad!");
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).applyTableDelta(anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
 		// reset mocks
 		reset(mockView);
 		reset(mockPageWidget);

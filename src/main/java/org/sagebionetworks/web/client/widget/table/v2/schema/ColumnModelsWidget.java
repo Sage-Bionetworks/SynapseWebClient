@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -154,30 +155,23 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 
 	@Override
 	public void onSave() {
-		
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = getEditedColumnModels();
-		List<String> json;
-		try {
-			baseView.setLoading();
-			json = tableModelUtils.toJSONList(newSchema);
-			String tableEntityJSON = tableModelUtils.toJSON(this.bundle.getEntity());
-			synapseClient.setTableSchema(tableEntityJSON, json, new AsyncCallback<Void>(){
+		baseView.setLoading();
+		TableEntity entity = (TableEntity) this.bundle.getEntity();
+		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
 
-				@Override
-				public void onFailure(Throwable caught) {
-					baseView.showError(caught.getMessage());
-				}
-				
-				@Override
-				public void onSuccess(Void result) {
-					// Hide the dialog
-					baseView.hideEditor();
-					updateHandler.onPersistSuccess(new EntityUpdatedEvent());
-				}});
-		} catch (JSONObjectAdapterException e) {
-			baseView.showError(e.getMessage());
-		}
+			@Override
+			public void onFailure(Throwable caught) {
+				baseView.showError(caught.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(Void result) {
+				// Hide the dialog
+				baseView.hideEditor();
+				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}}); 
 	}
 
 	@Override

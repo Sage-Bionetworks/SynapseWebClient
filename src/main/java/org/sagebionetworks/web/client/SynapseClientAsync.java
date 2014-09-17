@@ -15,9 +15,13 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -312,11 +316,11 @@ public interface SynapseClientAsync {
 	 * Set a table's schema. Any ColumnModel that does not have an ID will be
 	 * treated as a column add.
 	 * 
-	 * @param tableId
-	 * @param schemaJSON
+	 * @param entity
+	 * @param newSchema
 	 * @param callback
 	 */
-	void setTableSchema(String tableJSON, List<String> newSchema,
+	void setTableSchema(TableEntity entity, List<ColumnModel> newSchema,
 			AsyncCallback<Void> callback);
 	
 	/**
@@ -324,7 +328,7 @@ public interface SynapseClientAsync {
 	 * @param deltaJson
 	 * @param callback
 	 */
-	void applyTableDelta(String deltaJson, AsyncCallback<Void> callback);
+	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
 	
 	/**
 	 * Validate a table query.
@@ -346,10 +350,10 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, String bodyJSON,
+	void startAsynchJob(AsynchType type, AsynchronousRequestBody body,
 			AsyncCallback<String> callback);
 
 	void getAsynchJobResults(AsynchType type, String jobId,
-			AsyncCallback<String> callback);
+			AsyncCallback<AsynchronousResponseBody> callback);
 
 }

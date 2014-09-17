@@ -169,7 +169,7 @@ public class ColumnModelsWidgetTest {
 		List<ColumnModel> expectedNewScheam = new LinkedList<ColumnModel>(schema);
 		expectedNewScheam.add(ColumnModelUtils.extractColumnModel(editor));
 		List<String> results = tableModelUtils.toJSONList(expectedNewScheam);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setTableSchema(any(TableEntity.class), any(List.class), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();
@@ -190,7 +190,7 @@ public class ColumnModelsWidgetTest {
 		ColumnModelTableRowEditor editor = widget.addNewColumn();
 		editor.setColumnName("a name");
 		String errorMessage = "Something went wrong";
-		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(anyString(), any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new RestServiceException(errorMessage)).when(mockSynapseClient).setTableSchema(any(TableEntity.class), any(List.class), any(AsyncCallback.class));
 		// Now call save
 		widget.onSave();
 		verify(mockBaseView, times(1)).setLoading();

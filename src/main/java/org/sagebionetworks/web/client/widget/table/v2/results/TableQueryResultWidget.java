@@ -173,26 +173,21 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	@Override
 	public void onSave() {
 		view.setSaveButtonLoading(true);
-		try {
-			// Extract the delta
-			PartialRowSet prs = this.queryResultEditor.extractDelta();
-			String json = prs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.applyTableDelta(json, new AsyncCallback<Void>() {
-				
-				@Override
-				public void onSuccess(Void result) {
-					// If the save was success full then re-run the query.
-					runQuery();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					showEditError(caught.getMessage());
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			showEditError(e.getMessage());
-		}
+		// Extract the delta
+		PartialRowSet prs = this.queryResultEditor.extractDelta();
+		synapseClient.applyTableDelta(prs, new AsyncCallback<Void>() {
+			
+			@Override
+			public void onSuccess(Void result) {
+				// If the save was success full then re-run the query.
+				runQuery();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				showEditError(caught.getMessage());
+			}
+		});
 	}
 	
 	private void showEditError(String message){
