@@ -11,6 +11,7 @@ import java.util.Set;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -171,7 +172,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException
 	 */
 	public EntityWrapper getUserGroupHeadersById(List<String> ids) throws RestServiceException;
-
+	
+	UserGroupHeaderResponsePage getUserGroupHeadersByPrefix(String prefix, long limit, long offset) throws RestServiceException;
+	
 	/**
 	 * Updates the user's profile json object 
 	 * @param userProfileJson json object of the user's profile
