@@ -1691,6 +1691,17 @@ a.projectTitle:hover {
 	opacity: 1 !important;
 }
 
+/* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
+iframe[seamless] {
+    background-color: transparent;
+    border: 0px none transparent;
+    padding: 0px;
+    overflow: hidden;
+    width: 100%;
+    min-height: 300px;
+}
+
+
 /*==================================*/
 /* GXT Overrides */
 .x-tree3-node-text {
