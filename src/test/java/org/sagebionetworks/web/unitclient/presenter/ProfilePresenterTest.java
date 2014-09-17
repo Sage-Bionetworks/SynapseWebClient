@@ -163,10 +163,8 @@ public class ProfilePresenterTest {
 		testEvaluationResults.add(testEvaluation);
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
-		ArrayList<String> testBatchResultsList = new ArrayList<String>();
-		for(EntityHeader eh : testBatchResults.getResults()) {
-			testBatchResultsList.add(eh.writeToJSONObject(adapter.createNew()).toJSONString());
-		}
+		ArrayList<EntityHeader> testBatchResultsList = new ArrayList<EntityHeader>();
+		testBatchResultsList.addAll(testBatchResults.getResults());
 		
 		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isEditing()).thenReturn(false);

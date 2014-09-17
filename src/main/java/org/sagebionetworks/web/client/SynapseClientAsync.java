@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Team;
@@ -76,7 +77,7 @@ public interface SynapseClientAsync {
 	void getEntityHeaderBatch(String referenceList,
 			AsyncCallback<String> callback);
 
-	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<List<String>> callback);
+	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback);
 	
 	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
 	
