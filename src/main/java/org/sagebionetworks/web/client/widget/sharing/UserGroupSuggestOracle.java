@@ -1,8 +1,14 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,6 +24,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 	private SuggestOracle.Request request;
 	private SuggestOracle.Callback callback;
 	private SuggestBox suggestBox;
+	private SynapseClientAsync synapseClient;
 	private Timer timer = new Timer() {
 
 		@Override
@@ -34,8 +41,9 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		
 	};
 	
-	public void setSuggestBox(SuggestBox suggestBox) {
+	public void configure(SuggestBox suggestBox, SynapseClientAsync synapseClient) {
 		this.suggestBox = suggestBox;
+		this.synapseClient = synapseClient;
 	}
 	
 	public boolean isDisplayStringHTML() {
@@ -51,18 +59,35 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 	}
 	
 	public void getSuggestions() {
-		String query = request.getQuery();
-		Set<Suggestion> suggestions = new HashSet<Suggestion>();
-		suggestions.add(new ItemSuggestion("Dog"));
-		suggestions.add(new ItemSuggestion("Cat"));
-		suggestions.add(new ItemSuggestion("Doge"));
-		suggestions.add(new ItemSuggestion("Catamaran"));
-		suggestions.add(new ItemSuggestion(query));
+		String prefix = request.getQuery();
+		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
+//		suggestions.add(new ItemSuggestion("Dog"));
+//		suggestions.add(new ItemSuggestion("Cat"));
+//		suggestions.add(new ItemSuggestion("Doge"));
+//		suggestions.add(new ItemSuggestion("Catamaran"));
+//		suggestions.add(new ItemSuggestion(query));
 		
-		// Set up response
-		SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
-		    	   
-		callback.onSuggestionsReady(request, response);
+		synapseClient.getUserGroupHeadersByPrefix(prefix, 10, 0, new AsyncCallback<UserGroupHeaderResponsePage>() {
+
+			@Override
+			public void onSuccess(UserGroupHeaderResponsePage result) {
+				for (UserGroupHeader header : result.getChildren()) {
+					suggestions.add(new UserGroupSuggestion(header.getDisplayName()));
+				}
+				
+				// Set up response
+				SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
+				    	   
+				callback.onSuggestionsReady(request, response);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				System.out.println("CRY!!");
+				// TODO: Something appropriate.
+			}
+
+		});
 	}
 
 //	class ItemSuggestCallback implements AsyncCallback {
@@ -85,14 +110,14 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 //		}
 //	}
 	
-	public class ItemSuggestion implements IsSerializable, Suggestion {
+	public class UserGroupSuggestion implements IsSerializable, Suggestion {
 
 		private String s;
 		// Required for IsSerializable to work
 		//public ItemSuggestion() {}	// TODO: this?
 
 		// Convenience method for creation of a suggestion
-		public ItemSuggestion(String s) {
+		public UserGroupSuggestion(String s) {
 			this.s = s;
 		}
 

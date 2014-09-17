@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -84,6 +85,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
+	private SynapseClientAsync synapseClient;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
@@ -97,12 +99,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			CookieProvider cookies, SynapseClientAsync synapseClient) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
+		this.synapseClient = synapseClient;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -228,7 +232,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				
 				// user/group combobox
-				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
 //				peopleCombo.setEmptyText("Enter name...");
 //				peopleCombo.setFieldLabel("Name");
 //				peopleCombo.setForceSelection(true);

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -81,6 +82,8 @@ public interface SynapseClientAsync {
 	void getTeam(String teamId, AsyncCallback<String> callback);
 	
 	void getUserGroupHeadersById(List<String> ids, AsyncCallback<EntityWrapper> headers);
+	
+	void getUserGroupHeadersByPrefix(String prefix, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback);
 	
 	void updateUserProfile(String userProfileJson, AsyncCallback<Void> callback);
 	
