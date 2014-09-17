@@ -26,6 +26,9 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void resetToInitialState();
 	void showNoFilesSelectedForUpload();
 	void disableMultipleFileUploads();
+	void setShowCancelButton(boolean showCancel);
+	void showUploaderUI();
+	void triggerUpload();
 	
 	/**
 	 * Presenter interface
@@ -52,7 +55,4 @@ public interface UploaderView extends IsWidget, SynapseView {
 		
 		void disableMultipleFileUploads();
 	}
-
-	public void setShowCancelButton(boolean showCancel);
-	public void showUploaderUI();
 }
