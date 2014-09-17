@@ -365,7 +365,7 @@ public class DisplayUtils {
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
