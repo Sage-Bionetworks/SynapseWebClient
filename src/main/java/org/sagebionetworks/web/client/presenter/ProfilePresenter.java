@@ -301,30 +301,21 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
 		List<String> challengeProjectIds = new ArrayList<String>();
 		challengeProjectIds.addAll(challengeProjectIdsSet);
-		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
+		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<ArrayList<EntityHeader>>() {
 			
 			@Override
-			public void onSuccess(List<String> entityHeaderStrings) {
-				try {
-					//finally, we can tell the view to update the user challenges based on these entity headers
-					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for (String headerString : entityHeaderStrings) {
-						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
-						headers.add(header);
-					}
-					
-					//sort by name
-					Collections.sort(headers, new Comparator<EntityHeader>() {
-				        @Override
-				        public int compare(EntityHeader o1, EntityHeader o2) {
-				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-				        }
-					});
-					
-					view.setChallenges(headers);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}	
+			public void onSuccess(ArrayList<EntityHeader> headers) {
+				//finally, we can tell the view to update the user challenges based on these entity headers
+				
+				//sort by name
+				Collections.sort(headers, new Comparator<EntityHeader>() {
+			        @Override
+			        public int compare(EntityHeader o1, EntityHeader o2) {
+			        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+			        }
+				});
+				
+				view.setChallenges(headers);
 			}
 			
 			@Override

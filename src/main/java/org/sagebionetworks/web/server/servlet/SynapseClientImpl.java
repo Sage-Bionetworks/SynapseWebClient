@@ -717,7 +717,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public List<String> getEntityHeaderBatch(List<String> entityIds)
+	public ArrayList<EntityHeader> getEntityHeaderBatch(List<String> entityIds)
 			throws RestServiceException {
 		try {
 			List<Reference> list = new ArrayList<Reference>();
@@ -729,15 +729,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			BatchResults<EntityHeader> results = synapseClient
 					.getEntityHeaderBatch(list);
-			List<String> returnList = new ArrayList<String>();
-			for (EntityHeader header : results.getResults()) {
-				returnList.add(EntityFactory.createJSONStringForEntity(header));
-			}
+			ArrayList<EntityHeader> returnList = new ArrayList<EntityHeader>();
+			returnList.addAll(results.getResults());
 			return returnList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
