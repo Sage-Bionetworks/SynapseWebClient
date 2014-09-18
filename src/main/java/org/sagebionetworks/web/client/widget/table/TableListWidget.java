@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -16,14 +15,12 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -77,7 +74,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 					}
 				}				
-				view.configure(configuredTables, canEdit, showAddTable);
+				configure(configuredTables, canEdit, showAddTable);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -95,7 +92,11 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		this.canEdit = canEdit;
 		this.showAddTable = showAddTable;
 
-		view.configure(tables, canEdit, showAddTable);
+		view.configure(tables);
+		//Must have edit and showAddTables for the buttons to be visible.
+		boolean buttonsVisible = canEdit && showAddTable;
+		view.setAddTableVisible(buttonsVisible);
+		view.setUploadTableVisible(buttonsVisible);
 	}
     
 	@Override
@@ -114,7 +115,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		
 	}
 
-	@Override
+	
 	public void createTableEntity(final String name) {
 		if(projectOwnerId == null) {
 			view.showErrorMessage("Can not create Table outside of project context.");
@@ -149,23 +150,15 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 	}
 
 	@Override
-	public void getTableDetails(EntityHeader table, final AsyncCallback<TableEntity> callback) {
-		synapseClient.getEntity(table.getId(), new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					TableEntity tableEntity = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-					callback.onSuccess(tableEntity);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
+	public void onAddTable() {
+		// TODO Auto-generated method stub
+		
+	}
 
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
+	@Override
+	public void onUploadTable() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

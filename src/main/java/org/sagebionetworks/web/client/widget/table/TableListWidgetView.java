@@ -3,10 +3,8 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseView;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface TableListWidgetView extends IsWidget, SynapseView {
@@ -21,18 +19,42 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		
+		/**
+		 * Add table button pushed
+		 */
+		void onAddTable();
 
-		void createTableEntity(String name);
-
-		void getTableDetails(EntityHeader table, AsyncCallback<TableEntity> asyncCallback);
+		/**
+		 * Upload table button pushed.
+		 */
+		void onUploadTable();
 				
 	}
 
-	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable);
+	/**
+	 * Configure or reconfigure the view.
+	 * @param tables
+	 */
+	public void configure(List<EntityHeader> tables);
 
-	public void showLoadingError();
-
+	/**
+	 * Add a table to the list.
+	 * @param table
+	 */
 	public void addTable(EntityHeader table);
+	
+	/**
+	 * Show/hide the add table button.
+	 * @param enabled
+	 */
+	public void setAddTableVisible(boolean enabled);
+	
+	/**
+	 * Show or hide the upload tables button.
+	 * @param enabled
+	 */
+	public void setUploadTableVisible(boolean enabled);
 	
 	
 }
