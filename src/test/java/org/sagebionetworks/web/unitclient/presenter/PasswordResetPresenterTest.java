@@ -104,7 +104,7 @@ public class PasswordResetPresenterTest {
 	
 	@Test
 	public void testSetPasswordLoad() {
-		AsyncMockStubber.callSuccessWith("tokenIsValid").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(currentUserSessionData).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
 		PasswordReset place = new PasswordReset("someSessionToken");
 		presenter.setPlace(place);		
 		verify(mockView).showResetForm();
