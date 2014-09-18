@@ -40,14 +40,13 @@ public class LoginWidgetTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockUserListener = mock(UserListener.class);
-		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynapseJSNIUtils,adapter);
+		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynapseJSNIUtils);
 		loginWidget.setUserListener(mockUserListener);
 		UserSessionData usd = new UserSessionData();
 		UserProfile p = new UserProfile();
 		p.setOwnerId("12");
 		usd.setProfile(p);
-		String sessionDataJson = usd.writeToJSONObject(adapter.createNew()).toJSONString();
-		AsyncMockStubber.callSuccessWith(sessionDataJson).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		verify(mockView).setPresenter(loginWidget);
 	}
 	
@@ -62,7 +61,7 @@ public class LoginWidgetTest {
 		String p = "pass";
 		loginWidget.setUsernameAndPassword(u, p);
 		
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener).userChanged(any(UserSessionData.class));
 	}
 
@@ -73,7 +72,7 @@ public class LoginWidgetTest {
 		String unhandledExceptionMessage = "unhandled exception";
 		AsyncMockStubber.callFailureWith(new Exception(unhandledExceptionMessage)).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
-		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<String>) any());
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockSynapseJSNIUtils).consoleError(eq(unhandledExceptionMessage));
 	}

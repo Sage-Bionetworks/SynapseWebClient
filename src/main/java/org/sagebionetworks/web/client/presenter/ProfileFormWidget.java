@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
@@ -193,14 +192,14 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	private void updateLoginInfo(UserSessionData currentUser) {
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
+		AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				sendSuccessMessageBackToOwner();
 			}
 
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(UserSessionData result) {
 				sendSuccessMessageBackToOwner();
 			}
 			

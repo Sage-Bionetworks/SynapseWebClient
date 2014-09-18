@@ -203,9 +203,9 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		if(token != null) {
 			final String sessionToken = token;
 			
-			AsyncCallback<String> callback = new AsyncCallback<String>() {	
+			AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {	
 				@Override
-				public void onSuccess(String result) {
+				public void onSuccess(UserSessionData result) {
 					if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
 						showTermsOfUse(new AcceptTermsOfUseCallback() {
 								public void accepted() {
@@ -222,7 +222,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 										public void onSuccess(Void result) {
 											// Have to get the UserSessionData again, 
 											// since it won't contain the UserProfile if the terms haven't been signed
-											authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
+											authenticationController.revalidateSession(sessionToken, new AsyncCallback<UserSessionData>() {
 
 												@Override
 												public void onFailure(
@@ -232,8 +232,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 												}
 
 												@Override
-												public void onSuccess(
-														String result) {
+												public void onSuccess(UserSessionData result) {
 													// Signed ToU. Check for temp username, passing record, and then forward
 													userAuthenticated();
 												}	
