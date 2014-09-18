@@ -180,19 +180,10 @@ public class UserGroupSearchBox {
 	
 	public static SuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
 		String url = repositoryUrl + USER_GROUP_HEADER_URL;
-		ScriptTagProxy<PagingLoadResult<ModelData>> proxy = 
-				new ScriptTagProxy<PagingLoadResult<ModelData>>(url);
-		
-		
-//		MultiWordSuggestOracle oracle = new MultiWordSuggestOracle();
-//		oracle.add("Cat");
-//		oracle.add("Dog");
-//		oracle.add("Horse");
-//		oracle.add("Canary");
 		
 		UserGroupSuggestOracle oracle = new UserGroupSuggestOracle();
 		SuggestBox result = new SuggestBox(oracle);
-		oracle.configure(result, synapseClient);
+		oracle.configure(result, synapseClient, baseFileHandleUrl, baseProfileAttachmentUrl);
 		return result;
 	}
 

@@ -270,7 +270,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						//addPersonToAcl();	// TODO!!
+						addPersonToAcl();	// TODO!!
 					}
 				});
 	
@@ -615,32 +615,34 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				new Callback() {
 					@Override
 					public void invoke() {
-						//addPersonToAcl();	// TODO!
+						addPersonToAcl();	// TODO!
 						presenter.setUnsavedViewChanges(false);
 						saveCallback.invoke();
 					}
 				});
 	}
 
-//	private void addPersonToAcl() {	// TODO!
-//		if(peopleCombo.getValue() != null) {
-//			ModelData selectedModel = peopleCombo.getValue();
-//			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-//			Long principalId = (Long.parseLong(principalIdStr));
-//			
-//			if(permissionLevelCombo.getValue() != null) {
-//				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
-//				presenter.setAccess(principalId, level);
-//				
-//				// clear selections
-//				peopleCombo.clearSelections();
-//				permissionLevelCombo.clearSelections();
-//				presenter.setUnsavedViewChanges(false);
-//			} else {
-//				showAddMessage("Please select a permission level to grant.");
-//			}
-//		} else {
-//			showAddMessage("Please select a user or team to grant permission to.");
-//		}
-//	}
+	private void addPersonToAcl() {	// // TODO: This doesn't quite work. Can change text and stuff after selection, then it will error.
+		if(peopleCombo.getText() != null && peopleCombo.getText().contains("|")) {
+			String selectedString = peopleCombo.getText();
+			// TODO: Encapsulate this somehow?
+			//String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+			String principalIdStr = peopleCombo.getText().split("\\|  ")[1].trim();
+			Long principalId = (Long.parseLong(principalIdStr));
+			
+			if(permissionLevelCombo.getValue() != null) {
+				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
+				presenter.setAccess(principalId, level);
+				
+				// clear selections
+				peopleCombo.setValue(null);	// clear
+				permissionLevelCombo.clearSelections();
+				presenter.setUnsavedViewChanges(false);
+			} else {
+				showAddMessage("Please select a permission level to grant.");
+			}
+		} else {
+			showAddMessage("Please select a user or team to grant permission to.");
+		}
+	}
 }
