@@ -1,15 +1,12 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,17 +20,15 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private UserListener listener;	
 	private String openIdActionUrl;
 	private String openIdReturnUrl;
-	private AdapterFactory adapterFactory;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseJSNIUtils synapseJsniUtils;
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils, AdapterFactory adapterFactory) {
+	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.adapterFactory = adapterFactory;
 	}
 
 	public Widget asWidget() {
@@ -47,16 +42,12 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	
 	@Override
 	public void setUsernameAndPassword(final String username, final String password) {		
-		authenticationController.loginUser(username, password, new AsyncCallback<String>() {
+		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(UserSessionData userSessionData) {
 				view.clear();
 				try {
-					UserSessionData toBeParsed = new UserSessionData(adapterFactory.createNew(result));
-					final UserSessionData userSessionData = toBeParsed;
 					fireUserChange(userSessionData);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				} catch (Exception ex) {
 					onFailure(ex);
 				}

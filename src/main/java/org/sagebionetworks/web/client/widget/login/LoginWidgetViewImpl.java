@@ -40,7 +40,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
 	
 	@UiField
-	FormPanel synapseLoginFieldsContainer;
+	FlowPanel synapseLoginFieldsContainer;
 	
 	@UiField
 	SimplePanel googleSSOContainer;
@@ -55,12 +55,12 @@ public class LoginWidgetViewImpl extends Composite implements
 	TextBox username = null;
 	
 	private Presenter presenter;
-	private IconsImageBundle iconsImageBundle;
 	
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, IconsImageBundle iconsImageBundle) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
-		this.iconsImageBundle = iconsImageBundle;		
+		final FormPanel form = new FormPanel();
+		form.setAction("/expect_404");
 		signInBtn = new SubmitButton();
 		signInBtn.addStyleName("btn btn-large btn-primary margin-top-10");
 		signInBtn.setText(DisplayConstants.SIGN_IN);
@@ -94,7 +94,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		    @Override
 		    public void onKeyDown(KeyDownEvent event) {
 		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	synapseLoginFieldsContainer.submit();
+		        	form.submit();
 		        }
 		    }
 		});
@@ -104,9 +104,10 @@ public class LoginWidgetViewImpl extends Composite implements
 		loginFieldsPanel.add(password);
 		loginFieldsPanel.add(signInBtn);
 		loginFieldsPanel.add(forgotPasswordLink);
-		synapseLoginFieldsContainer.setWidget(loginFieldsPanel);
-		synapseLoginFieldsContainer.setMethod(FormPanel.METHOD_POST);
-		synapseLoginFieldsContainer.addSubmitHandler(new FormPanel.SubmitHandler() {
+		synapseLoginFieldsContainer.add(form);
+		form.setWidget(loginFieldsPanel);
+		form.setMethod(FormPanel.METHOD_POST);
+		form.addSubmitHandler(new FormPanel.SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
 				loginUser();
