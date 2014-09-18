@@ -13,13 +13,13 @@ public interface AuthenticationController {
 	 * @param password
 	 * @return
 	 */
-	public void loginUser(String username, String password, AsyncCallback<String> callback);
+	public void loginUser(String username, String password, AsyncCallback<UserSessionData> callback);
 	
 	/**
 	 * revalidates the given session token
 	 * @param token
 	 */
-	public void revalidateSession(String token, AsyncCallback<String> callback);
+	public void revalidateSession(String token, AsyncCallback<UserSessionData> callback);
 	
 	/**
 	 * Terminates the session of the current user
@@ -54,7 +54,7 @@ public interface AuthenticationController {
 	/**
 	 * Redownload the user's session data 
 	 */
-	void reloadUserSessionData(AsyncCallback<String> callback);
+	void reloadUserSessionData(AsyncCallback<UserSessionData> callback);
 
 	public void getTermsOfUse(AsyncCallback<String> callback);
 	

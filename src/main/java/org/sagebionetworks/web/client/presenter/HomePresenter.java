@@ -132,9 +132,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 		
 	public void validateToken() {
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
+		AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(UserSessionData result) {
 				//do nothing
 			}
 			@Override

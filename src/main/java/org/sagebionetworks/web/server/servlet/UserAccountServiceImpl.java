@@ -111,15 +111,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override 
-	public String getUserSessionData(String sessionToken) throws RestServiceException {
+	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
 		validateService();
 		
 		SynapseClient synapseClient = createSynapseClient(sessionToken);
 		try {
-			UserSessionData userData = synapseClient.getUserSessionData();
-			return EntityFactory.createJSONStringForEntity(userData);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnauthorizedException(e.getMessage());
+			return synapseClient.getUserSessionData();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
