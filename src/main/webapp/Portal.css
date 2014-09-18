@@ -66,6 +66,11 @@
 .gwt-SuggestBoxPopup {
 	z-index: 2000;
 	background-color: #fff;
+	border-radius: 0px 0px 5px 5px;
+}
+
+.suggestPopupContent tr:nth-child(2n) {
+	background-color: #F0F4F9;
 }
 
 .dialogVPanel {
@@ -735,6 +740,17 @@ a.shortBtn {
 	margin-bottom: 12px;
 	border-radius: 3em;
 	display: inline !important;
+}
+
+.userGroupSuggestBox {
+	width: 380px;
+	margin-bottom: 12px;
+	margin-left: 80px;
+}
+
+.item-selected > .userGroupSuggestion {
+	background-color: #2C5ECE;
+	color: white;
 }
 
 .dropable {

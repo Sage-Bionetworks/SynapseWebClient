@@ -8,7 +8,10 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -17,6 +20,9 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 //TODO: PUT THIS ELSEWHERE??
 public class UserGroupSuggestOracle extends SuggestOracle {
 	public static final int DELAY = 750;
+	public static final int PAGE_SIZE = 10;
+	
+	private int offset;
 	
 	private SuggestOracle.Request request;
 	private SuggestOracle.Callback callback;
@@ -36,6 +42,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 			 * is to check for an empty string field here.
              */
 			if (suggestBox != null && !suggestBox.getText().trim().isEmpty()) {
+				offset = 0;
 				getSuggestions();
 			}
 		}
@@ -47,6 +54,30 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		this.synapseClient = synapseClient;
 		this.baseFileHandleUrl = baseFileHandleUrl;
 		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
+		
+		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+
+			@Override
+			public void onSelection(SelectionEvent<Suggestion> event) {
+				if (event.getSelectedItem() instanceof DownSuggestion) {
+					offset += PAGE_SIZE;
+					getSuggestions();
+				}
+			}
+			
+		});
+		
+		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+
+			@Override
+			public void onSelection(SelectionEvent<Suggestion> event) {
+				if (event.getSelectedItem() instanceof UpSuggestion) {
+					offset -= PAGE_SIZE;
+					getSuggestions();
+				}
+			}
+			
+		});
 	}
 	
 	public boolean isDisplayStringHTML() {
@@ -66,6 +97,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		// Loading
 		List<Suggestion> load = new LinkedList<Suggestion>();
 		load.add(new LoadingSuggestion());
+		Suggestion sugg = new LoadingSuggestion();
 		// Set up response
 		SuggestOracle.Response loadResponse = new SuggestOracle.Response(load);
 		callback.onSuggestionsReady(null, loadResponse);
@@ -74,13 +106,19 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		String prefix = request.getQuery();
 		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
 		
-		synapseClient.getUserGroupHeadersByPrefix(prefix, 10, 0, new AsyncCallback<UserGroupHeaderResponsePage>() {
-
+		synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
+			
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
+				if (offset != 0)
+					suggestions.add(new UpSuggestion());
+				
 				for (UserGroupHeader header : result.getChildren()) {
 					suggestions.add(new UserGroupSuggestion(header, baseFileHandleUrl, baseProfileAttachmentUrl));
 				}
+				
+				if (offset + PAGE_SIZE < result.getTotalNumberOfResults())
+					suggestions.add(new DownSuggestion());
 				
 				// Set up response
 				SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
@@ -99,26 +137,6 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		
 	}
 
-//	class ItemSuggestCallback implements AsyncCallback {
-//		private SuggestOracle.Request request;
-//		private SuggestOracle.Callback callback;
-//
-//		public ItemSuggestCallback(SuggestOracle.Request request,
-//					SuggestOracle.Callback callback) {
-//			this.request = request;
-//			this.callback = callback;
-//		}
-//
-//		public void onFailure(Throwable error) {
-//			callback.onSuggestionsReady(request, new SuggestOracle.Response());
-//		}
-//
-//		public void onSuccess(Object retValue) {
-//			callback.onSuggestionsReady(request,
-//					(SuggestOracle.Response) retValue);
-//		}
-//	}
-	
 	public class LoadingSuggestion implements IsSerializable, Suggestion {
 		
 		@Override
@@ -131,6 +149,34 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		public String getReplacementString() {
 			// TODO Auto-generated method stub
 			return "OH NO DON't CLICK ME!!";
+		}
+		
+	}
+	
+	public class DownSuggestion implements IsSerializable, Suggestion {
+		
+		@Override
+		public String getDisplayString() {
+			return "DOWN";
+		}
+		
+		@Override
+		public String getReplacementString() {
+			return suggestBox.getText();
+		}
+		
+	}
+	
+	public class UpSuggestion implements IsSerializable, Suggestion {
+		
+		@Override
+		public String getDisplayString() {
+			return "UP";
+		}
+		
+		@Override
+		public String getReplacementString() {
+			return suggestBox.getText();
 		}
 		
 	}
@@ -172,7 +218,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		
 		public String getDisplayStringHtml() {
 			StringBuilder result = new StringBuilder();
-			result.append("<div class=\"margin-left-5\" style=\"height:23px\">");
+			result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:375px;\">");
 			result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
 			if (header.getIsIndividual()) {
 				result.append(baseProfileAttachmentUrl);
@@ -194,7 +240,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 			return result.toString();
 		}
 		
-	} // end inner class ItemSuggestion
+	} // end inner class UserGroupSuggestion
 	
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',

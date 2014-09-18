@@ -183,6 +183,7 @@ public class UserGroupSearchBox {
 		
 		UserGroupSuggestOracle oracle = new UserGroupSuggestOracle();
 		SuggestBox result = new SuggestBox(oracle);
+		result.addStyleName("userGroupSuggestBox");
 		oracle.configure(result, synapseClient, baseFileHandleUrl, baseProfileAttachmentUrl);
 		return result;
 	}
