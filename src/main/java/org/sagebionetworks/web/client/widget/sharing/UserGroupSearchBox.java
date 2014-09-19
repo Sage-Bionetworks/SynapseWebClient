@@ -9,6 +9,7 @@ import java.util.Timer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
@@ -181,8 +182,9 @@ public class UserGroupSearchBox {
 	public static SuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
 		String url = repositoryUrl + USER_GROUP_HEADER_URL;
 		
-		UserGroupSuggestOracle oracle = new UserGroupSuggestOracle();
-		SuggestBox result = new SuggestBox(oracle);
+		UserGroupSuggestBox.UserGroupSuggestOracle oracle = new UserGroupSuggestBox.UserGroupSuggestOracle();
+		UserGroupSuggestBox.UserGroupSuggestionDisplay display = new UserGroupSuggestBox.UserGroupSuggestionDisplay();
+		UserGroupSuggestBox result = new UserGroupSuggestBox(oracle, display);
 		result.addStyleName("userGroupSuggestBox");
 		oracle.configure(result, synapseClient, baseFileHandleUrl, baseProfileAttachmentUrl);
 		return result;
