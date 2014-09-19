@@ -179,9 +179,7 @@ public class UserGroupSearchBox {
 		return combo;
 	}
 	
-	public static SuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
-		String url = repositoryUrl + USER_GROUP_HEADER_URL;
-		
+	public static UserGroupSuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
 		UserGroupSuggestBox.UserGroupSuggestOracle oracle = new UserGroupSuggestBox.UserGroupSuggestOracle();
 		UserGroupSuggestBox.UserGroupSuggestionDisplay display = new UserGroupSuggestBox.UserGroupSuggestionDisplay();
 		UserGroupSuggestBox result = new UserGroupSuggestBox(oracle, display);

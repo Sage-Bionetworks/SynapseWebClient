@@ -4,9 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ListItem;
-import org.gwtbootstrap3.client.ui.Pager;
-import org.gwtbootstrap3.client.ui.html.UnorderedList;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -25,14 +23,9 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class UserGroupSuggestBox extends SuggestBox {
 	private UserGroupSuggestOracle.UserGroupSuggestion selectedSuggestion;
-	
-	public UserGroupSuggestBox(SuggestOracle oracle) {
-		super(oracle);
-	}
 	
 	public UserGroupSuggestBox(UserGroupSuggestOracle oracle, UserGroupSuggestionDisplay display) {
 		super(oracle, new TextBox(), display);
@@ -44,15 +37,24 @@ public class UserGroupSuggestBox extends SuggestBox {
 		return selectedSuggestion;
 	}
 	
+	public void clear() {
+		setSelectedUserGroupSuggestion(null);
+		getValueBox().setText(null);
+	}
+	
 	private void setSelectedUserGroupSuggestion(UserGroupSuggestOracle.UserGroupSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
 	}
 	
+	
+	/*
+	 * SuggestionDisplay
+	 */
 	public static class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
 		private UserGroupSuggestOracle oracle;
 		private Label resultsLabel;
-		private org.gwtbootstrap3.client.ui.Button prevButton;
-		private org.gwtbootstrap3.client.ui.Button nextButton;
+		private Button prevButton;
+		private Button nextButton;
 		private Widget popupContents; // to save when loading.
 		
 		@Override
@@ -68,6 +70,10 @@ public class UserGroupSuggestBox extends SuggestBox {
 			return suggestList;
 		}
 		
+		public Label getResultsLabel() { return resultsLabel; }
+		public Button getPrevButton() { return prevButton; }
+		public Button getNextButton() { return nextButton; }
+		
 		public void setOracle(UserGroupSuggestOracle oracle) {
 			this.oracle = oracle;
 		}
@@ -82,24 +88,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 			getPopupPanel().setWidget(popupContents);
 		}
 		
-		public Label getResultsLabel() { return resultsLabel; }
-		public Button getPrevButton() { return prevButton; }
-		public Button getNextButton() { return nextButton; }
-		
-		private org.gwtbootstrap3.client.ui.ButtonGroup createPager() {
-			
-//			Button prevButton = new Button("Prev");
-//			prevButton.setEnabled(false);
-//			Button nextButton = new Button("Next");
-//			ListItem prevItem = new ListItem();
-//			ListItem nextItem = new ListItem();
-//			prevItem.add(prevButton);
-//			nextItem.add(nextButton);
-//			UnorderedList list = new UnorderedList(prevItem, nextItem);
-//			list.addStyleName("pager");
-//			return list;
+		private ButtonGroup createPager() {
 			setUpFields();
-			org.gwtbootstrap3.client.ui.ButtonGroup group = new org.gwtbootstrap3.client.ui.ButtonGroup();
+			ButtonGroup group = new ButtonGroup();
 			group.addStyleName("btn-group btn-group-xs userGroupSuggestionPager");
 			group.add(prevButton);
 			group.add(nextButton);
@@ -111,9 +102,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 		private void setUpFields() {
 			resultsLabel = new Label();
 			resultsLabel.addStyleName("userGroupSuggesionResultsLabel");
-			prevButton = new org.gwtbootstrap3.client.ui.Button("Prev");
+			prevButton = new Button("Prev");
 			prevButton.setEnabled(false);
-			nextButton = new org.gwtbootstrap3.client.ui.Button("Next");
+			nextButton = new Button("Next");
 			
 			prevButton.addClickHandler(new ClickHandler() {
 
@@ -133,7 +124,12 @@ public class UserGroupSuggestBox extends SuggestBox {
 				
 			});
 		}
-	}
+	} // end of inner class UserGroupSuggestionDisplay
+	
+	
+	/*
+	 * SuggestOracle
+	 */
 	
 	public static class UserGroupSuggestOracle extends SuggestOracle {
 		public static final int DELAY = 750;
@@ -181,13 +177,12 @@ public class UserGroupSuggestBox extends SuggestBox {
 
 				@Override
 				public void onSelection(SelectionEvent<Suggestion> event) {
-					if (event.getSelectedItem() instanceof UserGroupSuggestion) {
-						UserGroupSuggestion suggestion = (UserGroupSuggestion) event.getSelectedItem();
-						suggestBox.getValueBox().setFocus(false);
-						// Update the SuggestBox's selected suggestion.
-						suggestBox.setSelectedUserGroupSuggestion(suggestion);
-						suggestBox.setText(suggestion.getReplacementString());
-					}
+					UserGroupSuggestion suggestion = (UserGroupSuggestion) event.getSelectedItem();
+					suggestBox.getValueBox().setFocus(false);
+					
+					// Update the SuggestBox's selected suggestion.
+					suggestBox.setSelectedUserGroupSuggestion(suggestion);
+					suggestBox.setText(suggestion.getReplacementString());
 				}
 				
 			});
@@ -197,6 +192,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (suggestBox.getSelectedUserGroupSuggestion() != null) {
+						// If a user/group is selected, the text in the input box should not
+						// be editable. If the user tries to edit it, the text will revert to
+						// what it was before they selected the element.
 						suggestBox.setText(suggestBox.getSelectedUserGroupSuggestion().getPrefix());
 						suggestBox.showSuggestionList();
 						suggestBox.setSelectedUserGroupSuggestion(null);
@@ -206,7 +204,6 @@ public class UserGroupSuggestBox extends SuggestBox {
 			});
 		}
 		
-		// For display showRelativeTo.
 		public UserGroupSuggestBox getSuggestBox() {
 			return suggestBox;
 		}
@@ -223,7 +220,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 		
 		public boolean isDisplayStringHTML() {
 	           return true;
-	       }
+		}
 		
 		public void requestSuggestions(SuggestOracle.Request request, SuggestOracle.Callback callback) {
 			this.request = request;
@@ -242,6 +239,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 			synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 				@Override
 				public void onSuccess(UserGroupHeaderResponsePage result) {
+					// Update display fields.
 					display.getPrevButton().setEnabled(offset != 0);
 					boolean moreResults = offset + PAGE_SIZE < result.getTotalNumberOfResults();
 					display.getNextButton().setEnabled(moreResults);
@@ -249,13 +247,13 @@ public class UserGroupSuggestBox extends SuggestBox {
 											+ " of " + result.getTotalNumberOfResults();
 					display.getResultsLabel().setText(resultsLabel);
 					
+					// Load suggestions.
 					for (UserGroupHeader header : result.getChildren()) {
 						suggestions.add(new UserGroupSuggestion(header, baseFileHandleUrl, baseProfileAttachmentUrl));
 					}
-					
+
 					// Set up response
 					SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
-							    	   
 					callback.onSuggestionsReady(request, response);
 					
 					display.hideLoading();
@@ -270,7 +268,10 @@ public class UserGroupSuggestBox extends SuggestBox {
 			});
 			
 		}
-
+		
+		/*
+		 * Suggestion
+		 */
 		public class UserGroupSuggestion implements IsSerializable, Suggestion {
 
 			private UserGroupHeader header;
@@ -285,38 +286,12 @@ public class UserGroupSuggestBox extends SuggestBox {
 				prefix = suggestBox.getText();
 			}
 			
+			public UserGroupHeader getHeader() { return header; }
+			public String getPrefix() { return prefix; }
+			public void setPrefix(String prefix) { this.prefix = prefix; }
+			
+			@Override
 			public String getDisplayString() {
-				return getDisplayStringHtml();
-			}
-
-			public String getReplacementString() {
-				// Example output:
-				// Pac Man  |  114085
-				StringBuilder sb = new StringBuilder();
-				if (!header.getIsIndividual())
-					sb.append("(Team) ");
-				
-				String firstName = header.getFirstName();
-				String lastName = header.getLastName();
-				String username = header.getUserName();
-				sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
-				sb.append("  |  " + header.getOwnerId());
-				return sb.toString();
-			}
-			
-			public UserGroupHeader getHeader() {
-				return header;
-			}
-			
-			public String getPrefix() {
-				return prefix;
-			}
-			
-			public void setPrefix(String prefix) {
-				this.prefix = prefix;
-			}
-			
-			public String getDisplayStringHtml() {
 				StringBuilder result = new StringBuilder();
 				result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:375px;\">");
 				result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
@@ -339,7 +314,23 @@ public class UserGroupSuggestBox extends SuggestBox {
 				result.append("</div>");
 				return result.toString();
 			}
+
+			@Override
+			public String getReplacementString() {
+				// Example output:
+				// Pac Man  |  114085
+				StringBuilder sb = new StringBuilder();
+				if (!header.getIsIndividual())
+					sb.append("(Team) ");
+				
+				String firstName = header.getFirstName();
+				String lastName = header.getLastName();
+				String username = header.getUserName();
+				sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
+				sb.append("  |  " + header.getOwnerId());
+				return sb.toString();
+			}
 			
 		} // end inner class UserGroupSuggestion	
-	}
+	} // end inner class UserGroupSuggestOracle
 }

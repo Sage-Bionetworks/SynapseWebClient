@@ -753,6 +753,24 @@ a.shortBtn {
 	color: white;
 }
 
+.userGroupSuggestionPagingArea {
+	border: 2px solid black;
+	border-radius: 0px 0px 5px 5px;
+	overflow: hidden;
+}
+
+.userGroupSuggestionPager {
+	display: inline;
+}
+
+.userGroupSuggesionResultsLabel {
+	font-size: 11px;
+	text-align: right;
+	vertical-align: middle;
+	margin-right: 5px;
+	margin-top: 3px;
+}
+
 .dropable {
 	border-color: #3a5bdc !important;
 }

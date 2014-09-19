@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -93,7 +94,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 //	private ComboBox<ModelData> peopleCombo;
-	private SuggestBox peopleCombo;
+	private UserGroupSuggestBox peopleCombo;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
@@ -623,11 +624,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	private void addPersonToAcl() {	// // TODO: This doesn't quite work. Can change text and stuff after selection, then it will error.
-		if(peopleCombo.getText() != null && peopleCombo.getText().contains("|")) {
-			String selectedString = peopleCombo.getText();
-			// TODO: Encapsulate this somehow?
-			//String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-			String principalIdStr = peopleCombo.getText().split("\\|  ")[1].trim();
+		if(peopleCombo.getSelectedUserGroupSuggestion() != null) {
+			String principalIdStr = peopleCombo.getSelectedUserGroupSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
@@ -635,8 +633,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
-				peopleCombo.setValue(null);	// clear
-				permissionLevelCombo.clearSelections();
+				peopleCombo.clear();
 				presenter.setUnsavedViewChanges(false);
 			} else {
 				showAddMessage("Please select a permission level to grant.");
