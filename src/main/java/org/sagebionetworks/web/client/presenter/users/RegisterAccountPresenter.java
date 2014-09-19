@@ -104,7 +104,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					view.showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
+					view.markEmailUnavailable();
 				} else {
 					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, false, view))
 						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);

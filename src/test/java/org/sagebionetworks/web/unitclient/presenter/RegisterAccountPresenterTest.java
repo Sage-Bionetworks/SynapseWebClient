@@ -103,7 +103,7 @@ public class RegisterAccountPresenterTest {
 		
 		registerAccountPresenter.registerUser(email);
 		
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
+		verify(mockView).markEmailUnavailable();
 	}
 
 	@Test

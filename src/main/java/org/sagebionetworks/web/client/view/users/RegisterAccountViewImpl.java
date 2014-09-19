@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.view.users;
 
-import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -73,8 +72,10 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 		emailAddressField.addBlurHandler(new BlurHandler() {
 			@Override
 			public void onBlur(BlurEvent event) {
-				if (checkEmailFormat())
+				if (checkEmailFormat()) {
+					registerBtn.setEnabled(true);
 					presenter.checkEmailAvailable(emailAddressField.getValue());
+				}
 			}
 		});
 		
@@ -147,6 +148,7 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	public void markEmailUnavailable() {
 		emailAddressError.setInnerHTML(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
 		DisplayUtils.showFormError(emailAddress, emailAddressError);
+		registerBtn.setEnabled(false);
 	}
 	
 	@Override
