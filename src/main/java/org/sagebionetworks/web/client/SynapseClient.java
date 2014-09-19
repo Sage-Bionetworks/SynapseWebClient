@@ -33,6 +33,8 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -132,7 +134,7 @@ public interface SynapseClient extends RemoteService {
 	 * @param message
 	 */
 	public void logErrorToRepositoryServices(String message) throws RestServiceException;
-	
+
 	/**
 	 * Log an info message in the server-side log.
 	 * @param message
@@ -375,7 +377,7 @@ public interface SynapseClient extends RemoteService {
 	public String sendMessage(Set<String> recipients, String subject, String message) throws RestServiceException;
 	
 	public Boolean isAliasAvailable(String alias, String aliasType) throws RestServiceException;
-	
+		
 	public String sendRowsToTable(String rowSet) throws RestServiceException;
 	
 	public HashMap<String, WikiPageKey> getHelpPages() throws RestServiceException; 
@@ -410,7 +412,7 @@ public interface SynapseClient extends RemoteService {
 	 * Apply PartialRowSet to a table entity.
 	 * 
 	 * @param deltaJson
-	 * @throws RestServiceException
+	 * @throws RestServiceException 
 	 */
 	public void applyTableDelta(PartialRowSet delta) throws RestServiceException;
 	
@@ -433,5 +435,7 @@ public interface SynapseClient extends RemoteService {
 	 * is of type AsynchronousJobStatus.
 	 */
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
-	
+
+	ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException;
+	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
 }

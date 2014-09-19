@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -50,6 +51,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.PagedResults;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -77,7 +80,6 @@ public class ProfilePresenterTest {
 	PlaceChanger mockPlaceChanger;	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	GWTWrapper mockGWTWrapper;
-	SearchServiceAsync mockSearchService;
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	RequestBuilderWrapper mockRequestBuilder;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
@@ -88,13 +90,14 @@ public class ProfilePresenterTest {
 	UserProfile userProfile = new UserProfile();
 	String testUserJson;
 	String password = "password";
-	List<String> myProjectsJson;
-	List<EntityHeader> myProjects;
+	List<String> myFavoritesJson;
+	List<EntityHeader> myFavorites;
 	List<Team> myTeams;
+	ProjectPagedResults projects;
+	List<ProjectHeader> myProjects;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
-		mockSearchService = mock(SearchServiceAsync.class);
 		mockView = mock(ProfileView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
@@ -107,7 +110,7 @@ public class ProfilePresenterTest {
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockCookies, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, mockSearchService, 
+				mockSynapseClient, mockCookies, mockGWTWrapper, adapter, mockProfileForm, adapterFactory, 
 				mockSynapseJSNIUtils, mockRequestBuilder);	
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -137,15 +140,29 @@ public class ProfilePresenterTest {
 		EntityHeader project2 = new EntityHeader();
 		project2.setId("syn2");
 		
-		myProjectsJson = new ArrayList<String>();
-		myProjectsJson.add(project1.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		myProjectsJson.add(project2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
-		myProjects = new ArrayList<EntityHeader>();
-		myProjects.add(project1);
-		myProjects.add(project2);
-		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		myFavoritesJson = new ArrayList<String>();
+		myFavoritesJson.add(project1.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		myFavoritesJson.add(project2.writeToJSONObject(adapterFactory.createNew()).toJSONString());
+		myFavorites = new ArrayList<EntityHeader>();
+		myFavorites.add(project1);
+		myFavorites.add(project2);
 		
-		AsyncMockStubber.callSuccessWith(myProjectsJson).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
+		projects = new ProjectPagedResults();
+		ProjectHeader projectHeader1 = new ProjectHeader();
+		projectHeader1.setId("syn1");
+		ProjectHeader projectHeader2 = new ProjectHeader();
+		projectHeader2.setId("syn2");
+		
+		myProjects = new ArrayList<ProjectHeader>();
+		myProjects.add(projectHeader1);
+		myProjects.add(projectHeader2);
+		projects.setResults(myProjects);
+		projects.setTotalNumberOfResults(2);
+		
+		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(myFavoritesJson).when(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		//set up create project test
 		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
@@ -276,18 +293,92 @@ public class ProfilePresenterTest {
 	}
 	
 	@Test
+	public void testRefreshProjects() {
+		profilePresenter.setCurrentOffset(22);
+		//on refresh, current project offset should be reset to 0
+		profilePresenter.refreshProjects();
+		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		verify(mockView).clearProjects();
+	}
+	
+	@Test
+	public void testGetMoreOfMyProjects() {
+		profilePresenter.setIsOwner(true);
+		//when asking for more projects, it should get MyProjects if I am the owner
+		profilePresenter.getMoreProjects();
+		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testGetMoreOfTheirProjects() {
+		profilePresenter.setIsOwner(false);
+		//when asking for more projects, it should get their if I am not the owner
+		profilePresenter.getMoreProjects();
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testGetMyProjects() {
+		profilePresenter.getMyProjects("anyUserId", 1);
+		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
+	}
+	
+	@Test
+	public void testGetMyProjectsError() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getMyProjects(anyInt(), anyInt(),  any(AsyncCallback.class));
+		profilePresenter.getMyProjects("anyUserId", 1);
+		verify(mockSynapseClient).getMyProjects(anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).setProjectsError(anyString());
+	}
+	
+	@Test
 	public void testGetUserProjects() {
-		profilePresenter.getUserProjects("anyUserId");
-		verify(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		verify(mockView).setProjects(eq(myProjects));
+		profilePresenter.getUserProjects("anyUserId", 1);
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		verify(mockView).addProjects(eq(myProjects));
 	}
 	
 	@Test
 	public void testGetUserProjectsError() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSearchService).searchEntities(anyString(), anyList(), anyInt(), anyInt(), anyString(), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.getUserProjects("anyUserId");
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(),  any(AsyncCallback.class));
+		profilePresenter.getUserProjects("anyUserId", 1);
+		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setProjectsError(anyString());
 	}
+
+	@Test
+	public void testProjectPageAdded() {
+		//add a page (where the full project list fits in a single page
+		profilePresenter.setCurrentOffset(0);
+		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE - 10);
+		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		verify(mockView).setIsMoreProjectsVisible(eq(false));
+	}
+	
+	@Test
+	public void testProjectPageAddedZeroResults() {
+		profilePresenter.setCurrentOffset(0);
+		profilePresenter.projectPageAdded(0);
+		verify(mockView).setIsMoreProjectsVisible(eq(false));
+	}
+	
+	@Test
+	public void testProjectPageAddedWithMoreResults() {
+		profilePresenter.setCurrentOffset(0);
+		profilePresenter.projectPageAdded(ProfilePresenter.PROJECT_PAGE_SIZE + 10);
+		assertEquals(ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		verify(mockView).setIsMoreProjectsVisible(eq(true));
+	}
+	
+	@Test
+	public void testProjectPageTwoAddedWithMoreResults() {
+		profilePresenter.setCurrentOffset(ProfilePresenter.PROJECT_PAGE_SIZE);
+		profilePresenter.projectPageAdded(2*ProfilePresenter.PROJECT_PAGE_SIZE + 10);
+		assertEquals(2*ProfilePresenter.PROJECT_PAGE_SIZE, profilePresenter.getCurrentOffset());
+		verify(mockView).setIsMoreProjectsVisible(eq(true));
+	}
+
 	
 	@Test
 	public void testCreateProject() {
@@ -461,7 +552,7 @@ public class ProfilePresenterTest {
 	public void testGetFavorites() {
 		profilePresenter.getFavorites();
 		verify(mockSynapseClient).getFavoritesList(anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).setFavorites(eq(myProjects));
+		verify(mockView).setFavorites(eq(myFavorites));
 	}
 	
 	@Test
