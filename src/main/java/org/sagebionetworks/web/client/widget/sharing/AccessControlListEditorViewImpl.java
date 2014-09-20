@@ -233,7 +233,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				
 				// user/group combobox
-				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, sageImageBundle, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
 //				peopleCombo.setEmptyText("Enter name...");
 //				peopleCombo.setFieldLabel("Name");
 //				peopleCombo.setForceSelection(true);
@@ -634,6 +634,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				// clear selections
 				peopleCombo.clear();
+				permissionLevelCombo.clearSelections();
 				presenter.setUnsavedViewChanges(false);
 			} else {
 				showAddMessage("Please select a permission level to grant.");

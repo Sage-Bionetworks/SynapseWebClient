@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -31,6 +33,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 		super(oracle, new TextBox(), display);
 		oracle.setDisplay(display);
 		display.setOracle(oracle);
+		getElement().setAttribute("placeHolder", "Enter Name...");
 	}
 	
 	public UserGroupSuggestOracle.UserGroupSuggestion getSelectedUserGroupSuggestion() {
@@ -56,6 +59,12 @@ public class UserGroupSuggestBox extends SuggestBox {
 		private Button prevButton;
 		private Button nextButton;
 		private Widget popupContents; // to save when loading.
+		private SageImageBundle sageImageBundle;
+		
+		public UserGroupSuggestionDisplay(SageImageBundle sageImageBundle) {
+			super();
+			this.sageImageBundle = sageImageBundle;
+		}
 		
 		@Override
 		protected Widget decorateSuggestionList(Widget suggestionList) {
@@ -70,9 +79,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 			return suggestList;
 		}
 		
-		public Label getResultsLabel() { return resultsLabel; }
-		public Button getPrevButton() { return prevButton; }
-		public Button getNextButton() { return nextButton; }
+		public Label getResultsLabel() 	{	return resultsLabel;	}
+		public Button getPrevButton() 	{ 	return prevButton;		}
+		public Button getNextButton() 	{ 	return nextButton;		}
 		
 		public void setOracle(UserGroupSuggestOracle oracle) {
 			this.oracle = oracle;
@@ -80,7 +89,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 		
 		public void showLoading() {
 			popupContents = getPopupPanel().getWidget();
-			getPopupPanel().setWidget(new Label("Loading..."));
+			HTMLPanel loading = new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle));
+			loading.setWidth(oracle.getSuggestBox().getOffsetWidth() + "px");
+			getPopupPanel().setWidget(loading);
 			getPopupPanel().showRelativeTo(oracle.getSuggestBox());
 		}
 		
@@ -151,10 +162,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 			@Override
 			public void run() {
 				
-				/* If you backspace quickly the contents of the field are emptied but a
-				 * query for a single character is still executed. Workaround for this
-				 * is to check for an empty string field here.
-	             */
+				// If you backspace quickly the contents of the field are emptied but a
+				// query for a single character is still executed. Workaround for this
+				// is to check for an empty string field here.
 				if (suggestBox != null && !suggestBox.getText().trim().isEmpty()) {
 					offset = 0;
 					getSuggestions();
@@ -192,6 +202,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (suggestBox.getSelectedUserGroupSuggestion() != null) {
+						
 						// If a user/group is selected, the text in the input box should not
 						// be editable. If the user tries to edit it, the text will revert to
 						// what it was before they selected the element.
