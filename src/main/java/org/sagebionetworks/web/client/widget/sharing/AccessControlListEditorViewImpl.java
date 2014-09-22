@@ -234,17 +234,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				// user/group combobox
 				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, sageImageBundle, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-//				peopleCombo.setEmptyText("Enter name...");
-//				peopleCombo.setFieldLabel("Name");
-//				peopleCombo.setForceSelection(true);
-//				peopleCombo.setTriggerAction(TriggerAction.ALL);
-//				peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-//					@Override
-//					public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-//						presenter.setUnsavedViewChanges(true);
-//					}
-//				});
-				fieldSet.add(peopleCombo);
+				
+				HorizontalPanel userGroupPanel = new HorizontalPanel();
+				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
+				userGroupPanel.add(new Label("Name:"));
+				userGroupPanel.add(peopleCombo);
+				fieldSet.add(userGroupPanel);
 				
 				// permission level combobox
 				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();

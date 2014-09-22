@@ -14,6 +14,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
@@ -79,9 +81,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 			return suggestList;
 		}
 		
-		public Label getResultsLabel() 	{	return resultsLabel;	}
-		public Button getPrevButton() 	{ 	return prevButton;		}
-		public Button getNextButton() 	{ 	return nextButton;		}
+		public Label getResultsLabel()	{	return resultsLabel;	}
+		public Button getPrevButton()	{	return prevButton;		}
+		public Button getNextButton()	{	return nextButton;		}
 		
 		public void setOracle(UserGroupSuggestOracle oracle) {
 			this.oracle = oracle;
@@ -107,7 +109,6 @@ public class UserGroupSuggestBox extends SuggestBox {
 			group.add(nextButton);
 			
 			return group;
-			
 		}
 		
 		private void setUpFields() {
@@ -141,7 +142,6 @@ public class UserGroupSuggestBox extends SuggestBox {
 	/*
 	 * SuggestOracle
 	 */
-	
 	public static class UserGroupSuggestOracle extends SuggestOracle {
 		public static final int DELAY = 750;
 		public static final int PAGE_SIZE = 10;
@@ -197,15 +197,15 @@ public class UserGroupSuggestBox extends SuggestBox {
 				
 			});
 			
-			suggestBox.getValueBox().addClickHandler(new ClickHandler() {
+			suggestBox.getValueBox().addFocusHandler(new FocusHandler() {
 
 				@Override
-				public void onClick(ClickEvent event) {
+				public void onFocus(FocusEvent event) {
 					if (suggestBox.getSelectedUserGroupSuggestion() != null) {
 						
 						// If a user/group is selected, the text in the input box should not
-						// be editable. If the user tries to edit it, the text will revert to
-						// what it was before they selected the element.
+						// be editable. If the user tries to edit it (focus event on value box),
+						// the text will revert to what it was before they selected the element.
 						suggestBox.setText(suggestBox.getSelectedUserGroupSuggestion().getPrefix());
 						suggestBox.showSuggestionList();
 						suggestBox.setSelectedUserGroupSuggestion(null);
@@ -230,7 +230,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 		}
 		
 		public boolean isDisplayStringHTML() {
-	           return true;
+			return true;
 		}
 		
 		public void requestSuggestions(SuggestOracle.Request request, SuggestOracle.Callback callback) {
@@ -284,7 +284,6 @@ public class UserGroupSuggestBox extends SuggestBox {
 		 * Suggestion
 		 */
 		public class UserGroupSuggestion implements IsSerializable, Suggestion {
-
 			private UserGroupHeader header;
 			private String prefix;
 			private String baseFileHandleUrl;
@@ -297,9 +296,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 				prefix = suggestBox.getText();
 			}
 			
-			public UserGroupHeader getHeader() { return header; }
-			public String getPrefix() { return prefix; }
-			public void setPrefix(String prefix) { this.prefix = prefix; }
+			public UserGroupHeader getHeader()		{	return header;			}
+			public String getPrefix() 				{	return prefix;			}
+			public void setPrefix(String prefix)	{	this.prefix = prefix;	}
 			
 			@Override
 			public String getDisplayString() {
