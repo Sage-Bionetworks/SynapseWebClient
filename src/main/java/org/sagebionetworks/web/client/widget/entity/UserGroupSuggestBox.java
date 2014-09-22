@@ -272,8 +272,9 @@ public class UserGroupSuggestBox extends SuggestBox {
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					System.out.println("CRY!!");
-					// TODO: Something appropriate.
+					if (caught != null) {
+						DisplayUtils.showErrorMessage(caught.getMessage());
+					}
 				}
 
 			});

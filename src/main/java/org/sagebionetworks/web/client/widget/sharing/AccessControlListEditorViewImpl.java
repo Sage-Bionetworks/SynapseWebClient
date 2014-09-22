@@ -93,7 +93,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-//	private ComboBox<ModelData> peopleCombo;
 	private UserGroupSuggestBox peopleCombo;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
@@ -266,7 +265,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
 					@Override
 					public void componentSelected(ButtonEvent ce) {
-						addPersonToAcl();	// TODO!!
+						addPersonToAcl();
 					}
 				});
 	
@@ -611,14 +610,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				new Callback() {
 					@Override
 					public void invoke() {
-						addPersonToAcl();	// TODO!
+						addPersonToAcl();
 						presenter.setUnsavedViewChanges(false);
 						saveCallback.invoke();
 					}
 				});
 	}
 
-	private void addPersonToAcl() {	// // TODO: This doesn't quite work. Can change text and stuff after selection, then it will error.
+	private void addPersonToAcl() {
 		if(peopleCombo.getSelectedUserGroupSuggestion() != null) {
 			String principalIdStr = peopleCombo.getSelectedUserGroupSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
