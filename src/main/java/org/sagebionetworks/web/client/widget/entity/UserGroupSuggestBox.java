@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,20 +26,47 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class UserGroupSuggestBox extends SuggestBox {
-	private UserGroupSuggestOracle.UserGroupSuggestion selectedSuggestion;
+	private UserGroupSuggestion selectedSuggestion;
 	
 	public UserGroupSuggestBox(UserGroupSuggestOracle oracle, UserGroupSuggestionDisplay display) {
 		super(oracle, new TextBox(), display);
 		oracle.setDisplay(display);
 		display.setOracle(oracle);
 		getElement().setAttribute("placeHolder", "Enter Name...");
+		
+		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+
+			@Override
+			public void onSelection(SelectionEvent<Suggestion> event) {
+				selectSuggestion((UserGroupSuggestion) event.getSelectedItem());
+			}
+			
+		});
+		
+		getValueBox().addFocusHandler(new FocusHandler() {
+
+			@Override
+			public void onFocus(FocusEvent event) {
+				if (getSelectedUserGroupSuggestion() != null) {
+					
+					// If a user/group is selected, the text in the input box should not
+					// be editable. If the user tries to edit it (focus event on value box),
+					// the text will revert to what it was before they selected the element.
+					setText(selectedSuggestion.getPrefix());
+					showSuggestionList();
+					setSelectedUserGroupSuggestion(null);
+				}
+			}
+			
+		});
 	}
 	
-	public UserGroupSuggestOracle.UserGroupSuggestion getSelectedUserGroupSuggestion() {
+	public UserGroupSuggestion getSelectedUserGroupSuggestion() {
 		return selectedSuggestion;
 	}
 	
@@ -47,8 +75,17 @@ public class UserGroupSuggestBox extends SuggestBox {
 		getValueBox().setText(null);
 	}
 	
-	private void setSelectedUserGroupSuggestion(UserGroupSuggestOracle.UserGroupSuggestion selectedSuggestion) {
+	private void setSelectedUserGroupSuggestion(UserGroupSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
+	}
+	
+	// for testing.
+	public void selectSuggestion(UserGroupSuggestion suggestion) {
+		getValueBox().setFocus(false);
+		
+		// Update the SuggestBox's selected suggestion.
+		setSelectedUserGroupSuggestion(suggestion);
+		setText(suggestion.getReplacementString());
 	}
 	
 	
@@ -62,6 +99,8 @@ public class UserGroupSuggestBox extends SuggestBox {
 		private Button nextButton;
 		private Widget popupContents; // to save when loading.
 		private SageImageBundle sageImageBundle;
+		
+		private HTMLPanel loadingPanel;
 		
 		public UserGroupSuggestionDisplay(SageImageBundle sageImageBundle) {
 			super();
@@ -85,15 +124,17 @@ public class UserGroupSuggestBox extends SuggestBox {
 		public Button getPrevButton()	{	return prevButton;		}
 		public Button getNextButton()	{	return nextButton;		}
 		
-		public void setOracle(UserGroupSuggestOracle oracle) {
+		private void setOracle(UserGroupSuggestOracle oracle) {
 			this.oracle = oracle;
 		}
 		
 		public void showLoading() {
 			popupContents = getPopupPanel().getWidget();
-			HTMLPanel loading = new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle));
-			loading.setWidth(oracle.getSuggestBox().getOffsetWidth() + "px");
-			getPopupPanel().setWidget(loading);
+			if (loadingPanel == null) {
+				loadingPanel = new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle));
+				loadingPanel.setWidth(oracle.getSuggestBox().getOffsetWidth() + "px");
+			}
+			getPopupPanel().setWidget(loadingPanel);
 			getPopupPanel().showRelativeTo(oracle.getSuggestBox());
 		}
 		
@@ -173,7 +214,7 @@ public class UserGroupSuggestBox extends SuggestBox {
 			
 		};
 		
-		public void setDisplay(UserGroupSuggestionDisplay display) {
+		private void setDisplay(UserGroupSuggestionDisplay display) {
 			this.display = display;
 		}
 		
@@ -182,37 +223,6 @@ public class UserGroupSuggestBox extends SuggestBox {
 			this.synapseClient = synapseClient;
 			this.baseFileHandleUrl = baseFileHandleUrl;
 			this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
-			
-			suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
-
-				@Override
-				public void onSelection(SelectionEvent<Suggestion> event) {
-					UserGroupSuggestion suggestion = (UserGroupSuggestion) event.getSelectedItem();
-					suggestBox.getValueBox().setFocus(false);
-					
-					// Update the SuggestBox's selected suggestion.
-					suggestBox.setSelectedUserGroupSuggestion(suggestion);
-					suggestBox.setText(suggestion.getReplacementString());
-				}
-				
-			});
-			
-			suggestBox.getValueBox().addFocusHandler(new FocusHandler() {
-
-				@Override
-				public void onFocus(FocusEvent event) {
-					if (suggestBox.getSelectedUserGroupSuggestion() != null) {
-						
-						// If a user/group is selected, the text in the input box should not
-						// be editable. If the user tries to edit it (focus event on value box),
-						// the text will revert to what it was before they selected the element.
-						suggestBox.setText(suggestBox.getSelectedUserGroupSuggestion().getPrefix());
-						suggestBox.showSuggestionList();
-						suggestBox.setSelectedUserGroupSuggestion(null);
-					}
-				}
-				
-			});
 		}
 		
 		public UserGroupSuggestBox getSuggestBox() {
