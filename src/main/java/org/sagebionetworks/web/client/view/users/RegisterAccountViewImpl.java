@@ -9,8 +9,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -63,19 +61,9 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 			public void onClick(ClickEvent event) {
 				if (checkEmailFormat()) {
 					// formatting is ok. submit to presenter (will fail if one is taken)
-					registerBtn.setEnabled(false);
 					presenter.registerUser(emailAddressField.getValue());
 				}
 
-			}
-		});
-		emailAddressField.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				if (checkEmailFormat()) {
-					registerBtn.setEnabled(true);
-					presenter.checkEmailAvailable(emailAddressField.getValue());
-				}
 			}
 		});
 		
@@ -124,10 +112,14 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 
 	@Override
 	public void showErrorMessage(String errorMessage) {
-		registerBtn.setEnabled(true);
 		DisplayUtils.showErrorMessage(errorMessage);
 	}
-
+	
+	@Override
+	public void enableRegisterButton(boolean enable) {
+		registerBtn.setEnabled(enable);
+	}
+	
 	@Override
 	public void clear() {		
 		if(contentHtml != null) contentHtml.setInnerHTML("");
@@ -148,7 +140,6 @@ public class RegisterAccountViewImpl extends Composite implements RegisterAccoun
 	public void markEmailUnavailable() {
 		emailAddressError.setInnerHTML(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
 		DisplayUtils.showFormError(emailAddress, emailAddressError);
-		registerBtn.setEnabled(false);
 	}
 	
 	@Override
