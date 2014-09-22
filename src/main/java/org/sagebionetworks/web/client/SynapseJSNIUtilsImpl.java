@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
@@ -24,7 +23,6 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -303,12 +301,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
   					var files = event.dataTransfer.files;
-					var fileNames = [];
-					for (var i = 0; i < files.length; i++) {
-						fileNames[i] = files[i].name;
-					}
-					// UPLOADER.uploadFiles(fileNames);
-					@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::uploadFiles(Lcom/google/gwt/core/client/JsArrayString;)(fileNames);
+					$doc.getElementById(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID).files = files;
+					// UPLOADER.uploadFiles();
+					@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::uploadFiles()();
 				}
 			}, false);
 		
