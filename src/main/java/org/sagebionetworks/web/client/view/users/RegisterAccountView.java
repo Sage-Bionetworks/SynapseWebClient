@@ -24,9 +24,9 @@ public interface RegisterAccountView extends IsWidget, SynapseView {
 	public void showAccountCreated();
 	public void showErrorMessage(String message);
 	public void markEmailUnavailable();
+	void enableRegisterButton(boolean enable);
 	public interface Presenter {	
 		void goTo(Place place);
 		void registerUser(String email);
-		void checkEmailAvailable(String email);
 	}
 }
