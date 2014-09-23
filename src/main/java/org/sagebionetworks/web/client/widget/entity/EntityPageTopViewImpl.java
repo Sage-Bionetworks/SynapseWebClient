@@ -880,7 +880,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private Widget createTableListWidget(String parentId, boolean canEdit) {		
 		final TableListWidget listWidget = ginInjector.getTableListWidget();		
-		listWidget.configure(parentId, canEdit, true);
+		listWidget.configure(parentId, canEdit);
 		return listWidget.asWidget();		
 	}
 	

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.PaginatedResults;
@@ -362,5 +363,8 @@ public interface SynapseClientAsync {
 
 	void executeEntityQuery(EntityQuery query,
 			AsyncCallback<EntityQueryResults> callback);
+
+	void createTableEntity(TableEntity entity,
+			AsyncCallback<TableEntity> callback);
 
 }

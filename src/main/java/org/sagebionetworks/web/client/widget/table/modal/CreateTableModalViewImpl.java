@@ -74,6 +74,7 @@ public class CreateTableModalViewImpl implements CreateTableModalView {
 
 	@Override
 	public void clear() {
+		this.createButton.state().reset();
 		this.alert.setVisible(false);
 		this.tableNameField.clear();
 	}

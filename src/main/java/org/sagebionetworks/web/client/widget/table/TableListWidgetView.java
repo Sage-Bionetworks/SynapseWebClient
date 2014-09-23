@@ -64,8 +64,11 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void addCreateTableModal(IsWidget createTableModal);
 
-	public void setLoading(boolean b);
 
+	/**
+	 * Add the pagination widget to the view.
+	 * @param paginationWidget
+	 */
 	public void addPaginationWidget(PaginationWidget paginationWidget);
 
 	/**

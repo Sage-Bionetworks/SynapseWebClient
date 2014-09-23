@@ -6,6 +6,11 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
 		<b:LinkedGroup ui:field="tablesList" />
+		<b:Row>
+			<b:Column size="XS_2" offset="XS_5">
+				<g:SimplePanel ui:field="paginationPanel" visible="false"/>
+			</b:Column>
+		</b:Row>
 		<b:ButtonToolBar>
 			<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
 			<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>

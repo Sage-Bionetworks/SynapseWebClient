@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * View of a widget that lists table entites.
+ * View of a widget that lists table entities.  
  * 
  * @author jmhill
  *
@@ -39,6 +39,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Button uploadTable;
 	@UiField
 	SimplePanel createTableModalPanel;
+	@UiField
+	SimplePanel paginationPanel;
 	
 	HTMLPanel panel;
 	
@@ -116,21 +118,13 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 
 	@Override
-	public void setLoading(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void addPaginationWidget(PaginationWidget paginationWidget) {
-		// TODO Auto-generated method stub
-		
+		paginationPanel.add(paginationWidget);
 	}
 
 	@Override
 	public void showPaginationVisible(boolean visible) {
-		// TODO Auto-generated method stub
-		
+		paginationPanel.setVisible(visible);
 	}
 
 }

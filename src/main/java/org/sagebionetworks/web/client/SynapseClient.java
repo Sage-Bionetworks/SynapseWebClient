@@ -11,6 +11,7 @@ import java.util.Set;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.PaginatedResults;
@@ -445,5 +446,15 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 */
 	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException;
+
+	/**
+	 * Create or update an Entity.
+	 * @param entity
+	 * @param annoJson
+	 * @param isNew
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException;
 	
 }
