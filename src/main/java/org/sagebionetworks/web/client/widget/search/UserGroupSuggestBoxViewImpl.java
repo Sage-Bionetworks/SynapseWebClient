@@ -30,6 +30,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new UserGroupSuggestionDisplay(sageImageBundle));
 		getElement().setAttribute("placeHolder", "Enter Name...");
+		addStyleName("userGroupSuggestBox");
 		
 		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 
