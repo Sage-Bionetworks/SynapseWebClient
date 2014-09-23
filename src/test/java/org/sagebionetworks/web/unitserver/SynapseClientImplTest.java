@@ -378,7 +378,7 @@ public class SynapseClientImplTest {
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		accessRequirement.setConcreteType(TermsOfUseAccessRequirement.class.getName());
 		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
 		descriptor.setId("101");
 		descriptor.setType(RestrictableObjectType.ENTITY);
