@@ -177,14 +177,14 @@ public class ProfileFormWidget implements ProfileFormView.Presenter {
 	}
 	
 	private void updateLoginInfo(UserSessionData currentUser) {
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
+		AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				sendSuccessMessageBackToOwner();
 			}
 
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(UserSessionData result) {
 				sendSuccessMessageBackToOwner();
 			}
 			

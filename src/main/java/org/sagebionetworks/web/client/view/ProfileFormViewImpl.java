@@ -20,8 +20,8 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -201,9 +201,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 		//initialize as 
 		setIsDataModified(false);
 		
-		ValueChangeHandler<String> changeHandler = new ValueChangeHandler<String>() {
+		KeyPressHandler changeHandler = new KeyPressHandler() {
 			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
+			public void onKeyPress(KeyPressEvent event) {
 				presenter.startEditing();
 			}
 		};
@@ -212,9 +212,9 @@ public class ProfileFormViewImpl extends Composite implements ProfileFormView {
 				currentAffiliationField, industryField, locationField, moreInfoField, bioField);
 	 }
 	 
-	 private void addValueChangeHandler(ValueChangeHandler<String> changeHandler, TextBoxBase ... textBoxes) {
+	 private void addValueChangeHandler(KeyPressHandler changeHandler, TextBoxBase ... textBoxes) {
 		for (TextBoxBase textBox : textBoxes) {
-			textBox.addValueChangeHandler(changeHandler);
+			textBox.addKeyPressHandler(changeHandler);
 		}
 	 }
 	 

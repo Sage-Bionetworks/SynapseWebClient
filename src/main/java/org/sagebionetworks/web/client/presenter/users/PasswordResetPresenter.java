@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter.users;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -77,9 +78,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			sessionToken = place.toToken();
 			// validate that session token is still valid before showing form
 			view.showLoading();
-			authenticationController.revalidateSession(sessionToken, new AsyncCallback<String>() {
+			authenticationController.revalidateSession(sessionToken, new AsyncCallback<UserSessionData>() {
 				@Override
-				public void onSuccess(String result) {
+				public void onSuccess(UserSessionData result) {
 					view.showResetForm();	
 				}
 				@Override
@@ -143,9 +144,9 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 	
 	public void reloginUser(String username, String newPassword) {
 		// login user as session token has changed
-        authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
+        authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
                 @Override
-                public void onSuccess(String result) {
+                public void onSuccess(UserSessionData result) {
                 	DisplayUtils.goToLastPlace(globalApplicationState);// redirect to last place
                 }
                 @Override

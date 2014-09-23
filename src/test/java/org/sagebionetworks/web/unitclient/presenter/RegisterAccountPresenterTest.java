@@ -38,7 +38,6 @@ public class RegisterAccountPresenterTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	GWTWrapper mockGWTWrapper;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
-	SynapseClientAsync mockSynapseClient;
 	String email = "test@test.com";
 	
 	@Before
@@ -47,13 +46,9 @@ public class RegisterAccountPresenterTest {
 		mockCookieProvider = mock(CookieProvider.class);
 		mockUserService = mock(UserAccountServiceAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);			
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockGWTWrapper);			
 		verify(mockView).setPresenter(registerAccountPresenter);
-		
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -64,7 +59,7 @@ public class RegisterAccountPresenterTest {
 		reset(mockCookieProvider);
 		reset(mockUserService);
 		reset(mockGlobalApplicationState);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
@@ -98,12 +93,12 @@ public class RegisterAccountPresenterTest {
 		reset(mockGlobalApplicationState);
 		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 		
 		registerAccountPresenter.registerUser(email);
 		
-		verify(mockView).showErrorMessage(DisplayConstants.ERROR_USER_ALREADY_EXISTS);
+		verify(mockView).markEmailUnavailable();
 	}
 
 	@Test
@@ -114,26 +109,11 @@ public class RegisterAccountPresenterTest {
 		reset(mockGlobalApplicationState);
 		AsyncMockStubber.callFailureWith(new RestServiceException("unknown error")).when(mockUserService).createUserStep1(anyString(), anyString(), any(AsyncCallback.class));
 		
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockSynapseClient, mockGWTWrapper);	
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockUserService, mockGlobalApplicationState, mockGWTWrapper);	
 		registerAccountPresenter.setPlace(place);
 		
 		registerAccountPresenter.registerUser(email);
 		
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
-	}
-	
-	@Test
-	public void testIsEmailAvailableTrue() {
-		registerAccountPresenter.checkEmailAvailable("abcd@efg.com");
-		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
-		verify(mockView, never()).markEmailUnavailable();
-	}
-	
-	@Test
-	public void testIsEmailAvailableFalse() {
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
-		registerAccountPresenter.checkEmailAvailable("abcd@efg.com");
-		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
-		verify(mockView).markEmailUnavailable();
 	}
 }

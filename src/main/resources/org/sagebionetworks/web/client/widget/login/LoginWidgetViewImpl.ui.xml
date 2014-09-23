@@ -10,7 +10,7 @@
 			<g:SimplePanel ui:field="googleSSOContainer" />
 				<div class="signin-panel panel panel-body margin-top-15">
 	   				<h4 class="form-signin-heading">Sign in with a Synapse Account</h4>
-	   				<g:FormPanel ui:field="synapseLoginFieldsContainer" />
+	   				<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
 					<span ui:field="messageLabel" />
 				</div>
 			<g:Button ui:field="registerBtn" styleName="btn btn-default"/>
