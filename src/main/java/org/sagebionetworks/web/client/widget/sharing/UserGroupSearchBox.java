@@ -10,7 +10,7 @@ import java.util.Timer;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.entity.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.extjs.gxt.ui.client.data.BasePagingLoader;
@@ -180,14 +180,12 @@ public class UserGroupSearchBox {
 		return combo;
 	}
 	
-	public static UserGroupSuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, SageImageBundle sageImageBundle, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
-		UserGroupSuggestBox.UserGroupSuggestOracle oracle = new UserGroupSuggestBox.UserGroupSuggestOracle();
-		UserGroupSuggestBox.UserGroupSuggestionDisplay display = new UserGroupSuggestBox.UserGroupSuggestionDisplay(sageImageBundle);
-		UserGroupSuggestBox result = new UserGroupSuggestBox(oracle, display);
-		result.addStyleName("userGroupSuggestBox");
-		oracle.configure(result, synapseClient, baseFileHandleUrl, baseProfileAttachmentUrl);
-		return result;
-	}
+//	public static UserGroupSuggestBox createUserGroupSearchGWTSuggestBox(SynapseClientAsync synapseClient, SageImageBundle sageImageBundle, String repositoryUrl, String baseFileHandleUrl, String baseProfileAttachmentUrl, final PublicPrincipalIds publicPrincipalIds) {
+//		UserGroupSuggestBox result = new UserGroupSuggestBox();
+//		result.addStyleName("userGroupSuggestBox");
+//		oracle.configure(result, synapseClient, baseFileHandleUrl, baseProfileAttachmentUrl);
+//		return result;
+//	}
 
 	private static native String getTemplate(String baseFileHandleUrl, String baseProfileAttachmentUrl) /*-{
 		return [ '<tpl for=".">',

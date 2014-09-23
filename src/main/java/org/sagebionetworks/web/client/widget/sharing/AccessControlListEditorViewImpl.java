@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.UserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -100,13 +100,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookies, SynapseClientAsync synapseClient) {
+			CookieProvider cookies, SynapseClientAsync synapseClient, UserGroupSuggestBox peopleCombo) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
 		this.synapseClient = synapseClient;
+		this.peopleCombo = peopleCombo;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -232,12 +233,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				
 				// user/group combobox
-				peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, sageImageBundle, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+				//peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, sageImageBundle, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
 				
 				HorizontalPanel userGroupPanel = new HorizontalPanel();
 				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
 				userGroupPanel.add(new Label("Name:"));
-				userGroupPanel.add(peopleCombo);
+				userGroupPanel.add(peopleCombo.asWidget());
 				fieldSet.add(userGroupPanel);
 				
 				// permission level combobox
@@ -618,8 +619,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	private void addPersonToAcl() {
-		if(peopleCombo.getSelectedUserGroupSuggestion() != null) {
-			String principalIdStr = peopleCombo.getSelectedUserGroupSuggestion().getHeader().getOwnerId();
+		if(peopleCombo.getSelectedSuggestion() != null) {
+			String principalIdStr = peopleCombo.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
