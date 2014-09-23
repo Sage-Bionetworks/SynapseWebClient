@@ -4,18 +4,19 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.LinkedGroup;
-import org.gwtbootstrap3.client.ui.ListGroup;
-import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -27,7 +28,7 @@ import com.google.inject.Inject;
  */
 public class TableListWidgetViewImpl implements TableListWidgetView {
 	
-	public interface Binder extends UiBinder<Panel, TableListWidgetViewImpl> {}
+	public interface Binder extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {}
 	
 
 	@UiField
@@ -36,21 +37,20 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Button addTable;
 	@UiField
 	Button uploadTable;
+	@UiField
+	SimplePanel createTableModalPanel;
 	
-	private Presenter presenter;
-	Panel panel;
-	GlobalApplicationState globalApplicationState;
+	HTMLPanel panel;
 	
 	@Inject
-	public TableListWidgetViewImpl(Binder binder, GlobalApplicationState globalApplicationState, IconsImageBundle iconsImageBundle) {
+	public TableListWidgetViewImpl(Binder binder) {
 		this.panel = binder.createAndBindUi(this);
-		this.globalApplicationState = globalApplicationState;	
 	}
 
 	@Override
-	public void configure(List<EntityHeader> tables) {
+	public void configure(List<EntityQueryResult> tables) {
 		tablesList.clear();
-		for(EntityHeader header: tables){
+		for(EntityQueryResult header: tables){
 			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header));
 		}
 	}
@@ -62,7 +62,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
 		this.addTable.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -109,6 +108,29 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void setUploadTableVisible(boolean visibile) {
 		this.uploadTable.setVisible(visibile);
+	}
+
+	@Override
+	public void addCreateTableModal(IsWidget createTableModal) {
+		this.createTableModalPanel.add(createTableModal);
+	}
+
+	@Override
+	public void setLoading(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addPaginationWidget(PaginationWidget paginationWidget) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showPaginationVisible(boolean visible) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

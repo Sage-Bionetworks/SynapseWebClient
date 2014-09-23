@@ -3,7 +3,9 @@ package org.sagebionetworks.web.client.widget.table;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -36,7 +38,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * Configure or reconfigure the view.
 	 * @param tables
 	 */
-	public void configure(List<EntityHeader> tables);
+	public void configure(List<EntityQueryResult> tables);
 
 	/**
 	 * Add a table to the list.
@@ -55,6 +57,23 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * @param enabled
 	 */
 	public void setUploadTableVisible(boolean enabled);
+	
+	/**
+	 * Add the create table modal to the page.
+	 * @param createTableModal
+	 */
+	public void addCreateTableModal(IsWidget createTableModal);
+
+	public void setLoading(boolean b);
+
+	public void addPaginationWidget(PaginationWidget paginationWidget);
+
+	/**
+	 * Show or hide the pagination widget.
+	 * @param b
+	 */
+	public void showPaginationVisible(boolean visible);
+
 	
 	
 }

@@ -1,10 +1,21 @@
 package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -15,6 +26,10 @@ import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
 import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WhereCondition;
@@ -24,34 +39,48 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.steadystate.css.parser.selectors.PseudoClassConditionImpl;
 
-public class TableListWidget implements TableListWidgetView.Presenter, WidgetRendererPresenter {
+public class TableListWidget implements TableListWidgetView.Presenter, WidgetRendererPresenter, CreateTableModalView.Presenter, PageChangeListener {
 	
+	private static final long PAGE_SIZE = 10L;
+	private static final long OFFSET_ZERO = 0L;
+	protected static final String TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTERS = "Table name must include at least one characters.";
 	private TableListWidgetView view;
 	private SynapseClientAsync synapseClient;
 	private SearchServiceAsync searchService;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private AdapterFactory adapterFactory;
+	private CreateTableModalView createTableModalView;
+	PaginationWidget paginationWidget;
 	
 	private String projectOwnerId;
 	private boolean canEdit;
 	private boolean showAddTable;
-	private List<EntityHeader> configuredTables;
+	private List<EntityQueryResult> configuredTables;
+	private EntityQuery query;
 	
 	@Inject
 	public TableListWidget(TableListWidgetView view,
 			SynapseClientAsync synapseClient, SearchServiceAsync searchService,
 			AuthenticationController authenticationController,
 			AdapterFactory adapterFactory,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			CreateTableModalView createTableModalView,
+			PaginationWidget paginationWidget) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.searchService = searchService;
 		this.authenticationController = authenticationController;
 		this.adapterFactory = adapterFactory;
 		this.globalApplicationState = globalApplicationState;
-		view.setPresenter(this);
+		this.createTableModalView = createTableModalView;
+		this.view.setPresenter(this);
+		this.view.addCreateTableModal(createTableModalView);
+		this.createTableModalView.setPresenter(this);
+		this.paginationWidget = paginationWidget;
+		this.view.addPaginationWidget(paginationWidget);
 	}	
 	
 	public void configure(String projectOwnerId, final boolean canEdit, final boolean showAddTable) {
@@ -60,39 +89,42 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		this.canEdit = canEdit;
 		this.showAddTable = showAddTable;
 		
-		List<WhereCondition> where = new ArrayList<WhereCondition>();
-		where.add(new WhereCondition(WebConstants.ENTITY_PARENT_ID_KEY, WhereOperator.EQUALS, projectOwnerId));
-		where.add(new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.EQUALS, TableEntity.class.getName()));
-		searchService.searchEntities("entity", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
-			@Override
-			public void onSuccess(List<String> result) {
-				configuredTables = new ArrayList<EntityHeader>();
-				for(String entityHeaderJson : result) {
-					try {
-						configuredTables.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}				
-				configure(configuredTables, canEdit, showAddTable);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-			}	
-		});
-		
-
+		this.query = new EntityQuery();
+		this.query.setFilterByType(EntityType.table);
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.createdOn.name());
+		sort.setDirection(SortDirection.DESC);
+		this.query.setSort(sort);
+		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, projectOwnerId);
+		this.query.setConditions(Arrays.asList(condition));
+		this.query.setLimit(PAGE_SIZE);
+		queryForOnePage(OFFSET_ZERO);
 	}
 	
-	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable) {
-		this.projectOwnerId = null;
-		this.configuredTables = tables;
-		this.canEdit = canEdit;
-		this.showAddTable = showAddTable;
+	private void queryForOnePage(final Long offset){
+		this.query.setOffset(offset);
+		this.view.setLoading(true);
+		synapseClient.executeEntityQuery(this.query, new AsyncCallback<EntityQueryResults>() {
+			
+			@Override
+			public void onSuccess(EntityQueryResults results) {
+				paginationWidget.configure(query.getLimit(), query.getOffset(), results.getTotalEntityCount(), TableListWidget.this);
+				view.showPaginationVisible(results.getTotalEntityCount() > query.getLimit());
+				setResults(results);
+			}
+			
+			@Override
+			public void onFailure(Throwable arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+	
+	private void setResults(EntityQueryResults results) {
+		this.configuredTables = results.getEntities();
 
-		view.configure(tables);
+		view.configure(results.getEntities());
 		//Must have edit and showAddTables for the buttons to be visible.
 		boolean buttonsVisible = canEdit && showAddTable;
 		view.setAddTableVisible(buttonsVisible);
@@ -124,6 +156,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 		TableEntity newTable = new TableEntity();
 		String json;
 		try {
+			this.createTableModalView.setLoading(true);
 			newTable.setName(name);
 			newTable.setParentId(projectOwnerId);
 			newTable.setEntityType(TableEntity.class.getName());
@@ -131,32 +164,57 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 			synapseClient.createOrUpdateEntity(json, null, true, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String result) {
+					createTableModalView.hide();
 					// add shell header to view instead of query
 					EntityHeader header = new EntityHeader();
 					header.setId(result);
 					header.setName(name);
 					view.addTable(header);
 					view.showInfo(DisplayConstants.TABLE_CREATED, "");
+					queryForOnePage(OFFSET_ZERO);
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.TABLE_CREATION_FAILED);
+					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)){
+						createTableModalView.showError(caught.getMessage());
+						createTableModalView.setLoading(false);
+					}
+
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			createTableModalView.showError(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
+			createTableModalView.setLoading(false);
 		}
 	}
 
 	@Override
 	public void onAddTable() {
+		// Clear and show the create table dialog
+		this.createTableModalView.setLoading(false);
+		this.createTableModalView.clear();
+		this.createTableModalView.show();
+	}
+
+	@Override
+	public void onUploadTable() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onUploadTable() {
+	public void onCreateTable() {
+		String tableName = createTableModalView.getTableName();
+		if(tableName == null || "".equals(tableName)){
+			createTableModalView.showError(TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTERS);
+		}else{
+			// Create the table
+			createTableEntity(tableName);
+		}
+	}
+
+	@Override
+	public void onPageChange(Long newOffset) {
 		// TODO Auto-generated method stub
 		
 	}

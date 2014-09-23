@@ -20,6 +20,10 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -433,5 +437,13 @@ public interface SynapseClient extends RemoteService {
 	 * is of type AsynchronousJobStatus.
 	 */
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId) throws RestServiceException, ResultNotReadyException;
+	
+	/**
+	 * Execute a generic entity entity query.
+	 * @param query
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException;
 	
 }
