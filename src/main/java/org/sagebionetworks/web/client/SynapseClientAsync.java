@@ -10,9 +10,7 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -22,7 +20,6 @@ import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
-import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -30,13 +27,12 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -66,7 +62,7 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-	
+
 	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
@@ -329,14 +325,14 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
-	
+
 	/**
 	 * Validate a table query.
 	 * @param sql
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-
+	
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
 	void purgeTrashForUser(AsyncCallback<Void> callback);
@@ -356,4 +352,6 @@ public interface SynapseClientAsync {
 	void getAsynchJobResults(AsynchType type, String jobId,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
+	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 }
