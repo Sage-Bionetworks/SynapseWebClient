@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
 
@@ -97,7 +96,8 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 		boolean moreResults = offset + UserGroupSuggestBox.PAGE_SIZE < responsePage.getTotalNumberOfResults();
 		nextBtn.setEnabled(moreResults);
 		
-		String resultsLabel = "Displaying " + (offset + 1) + " - " + (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : responsePage.getTotalNumberOfResults())
+		String resultsLabel = "Displaying " + (offset + 1) + " - "
+								+ (moreResults ? offset + UserGroupSuggestBox.PAGE_SIZE : responsePage.getTotalNumberOfResults())
 								+ " of " + responsePage.getTotalNumberOfResults();
 		resultsLbl.setText(resultsLabel);
 	}

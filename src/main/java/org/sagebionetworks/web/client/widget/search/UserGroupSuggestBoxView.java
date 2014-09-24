@@ -2,12 +2,10 @@ package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.search.SearchBoxView.Presenter;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SuggestOracle;
 
 public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	

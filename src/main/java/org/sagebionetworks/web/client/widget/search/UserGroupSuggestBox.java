@@ -35,6 +35,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	private static String baseProfileAttachmentUrl;
 	
 	private UserGroupSuggestion selectedSuggestion;
+	private int offset;		// suggestion offset for paging
 	
 	@Inject
 	public UserGroupSuggestBox(UserGroupSuggestBoxView view,
@@ -48,7 +49,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		this.synapseClient = synapseClient;
 		
 		oracle = view.getUserGroupSuggestOracle();
-		//oracle.configure(synapseClient, view, this);
 		view.setPresenter(this);
 	}
 	
@@ -75,7 +75,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		getSuggestions(oracle.getRequest(), oracle.getCallback());
 	}
 	
-	int offset = 0;
 	public void getSuggestions(final SuggestOracle.Request request, final SuggestOracle.Callback callback) {
 		view.showLoading();
 		
@@ -102,9 +101,9 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 			
 			@Override
 			public void onFailure(Throwable caught) {
-//				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
+				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
 					view.showErrorMessage(caught.getMessage());
-//				}
+				}
 			}
 
 		});
@@ -133,18 +132,12 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	 * SuggestOracle
 	 */
 	public static class UserGroupSuggestOracle extends SuggestOracle {
-		private int offset;		// suggestion offset
 		private SuggestOracle.Request request;
 		private SuggestOracle.Callback callback;
 		
-		// TODO: Test.
-		//private SynapseClientAsync synapseClient;
-		//private UserGroupSuggestBoxView view;
 		private UserGroupSuggestBox suggestBox;
 		
 		public void configure(UserGroupSuggestBoxView view, UserGroupSuggestBox suggestBox) {
-			//this.synapseClient = synapseClient;
-			//this.view = view;
 			this.suggestBox = suggestBox;
 		}
 		
@@ -157,24 +150,11 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 				// query for a single character is still executed. Workaround for this
 				// is to check for an empty string field here.
 				if (!suggestBox.getText().trim().isEmpty()) {
-					offset = 0;
 					suggestBox.getSuggestions(request, callback);
 				}
 			}
 			
 		};
-		
-//		public void getNextSuggestions() {
-////			offset += PAGE_SIZE;
-////			getSuggestions();
-//			suggestBox.getNextSuggestions(request, callback);
-//		}
-		
-//		public void getPrevSuggestions() {
-////			offset -= PAGE_SIZE;
-////			getSuggestions();
-//			suggestBox.getPrevSuggestions(request, callback);
-//		}
 		
 		@Override
 		public boolean isDisplayStringHTML() {
@@ -190,52 +170,10 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 			timer.schedule(DELAY);
 		}
 		
-		public SuggestOracle.Request getRequest() {
-			return request;
-		}
-		
-		public SuggestOracle.Callback getCallback() {
-			return callback;
-		}
-		
-//		public void getSuggestions() {
-////			view.showLoading();
-////			
-////			String prefix = request.getQuery();
-////			final List<Suggestion> suggestions = new LinkedList<Suggestion>();
-////			
-////			synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
-////				@Override
-////				public void onSuccess(UserGroupHeaderResponsePage result) {
-////					// Update view fields.
-////					view.updateFieldStateForSuggestions(result, offset);
-////					
-////					// Load suggestions.
-////					for (UserGroupHeader header : result.getChildren()) {
-////						suggestions.add(new UserGroupSuggestion(header, view.getText()));
-////					}
-////
-////					// Set up response
-////					SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
-////					callback.onSuggestionsReady(request, response);
-////					
-////					view.hideLoading();
-////				}
-////				
-////				@Override
-////				public void onFailure(Throwable caught) {
-//////					if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {                    
-////						view.showErrorMessage(caught.getMessage());
-//////					}
-////				}
-////
-////			});
-//			
-//			// TODO: This?
-//			suggestBox.getSuggestions(request, callback);
-//			
-//		}
-		
+		public SuggestOracle.Request getRequest()	{	return request;		}
+		public SuggestOracle.Callback getCallback()	{	return callback;	}
+
+
 		/*
 		 * Suggestion
 		 */
