@@ -49,7 +49,7 @@ public class CreateTableModalWidgetTest {
 		widget.showCreateModal();
 		when(mockView.getTableName()).thenReturn(null);
 		widget.onCreateTable();
-		verify(mockView).showError(CreateTableModalWidgetImpl.TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTERS);
+		verify(mockView).showError(CreateTableModalWidgetImpl.TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		verify(mockSynapseClient, never()).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
 	}
 	
