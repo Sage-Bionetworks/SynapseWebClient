@@ -327,7 +327,9 @@ public class UploaderTest {
 		uploader.handleUploads();
 		//kick off what would happen after a successful upload
 		uploader.directUploadStep5(null, 1);
-		verifyUploadError();
+		executeScheduledCallback();
+		//should try twice
+		verify(synapseClient, Mockito.times(2)).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -336,7 +338,7 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).setFileEntityFileHandle(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		uploader.handleUploads();
 		//kick off what would happen after a successful upload
-		uploader.directUploadStep5(null,1);
+		uploader.directUploadStep5(null,Uploader.MAX_RETRY);
 		verifyUploadError();
 	}
 
@@ -351,7 +353,8 @@ public class UploaderTest {
 		
 		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		uploader.handleUploads();
-		uploader.directUploadStep5(null,1);
+		uploader.directUploadStep5(null,Uploader.MAX_RETRY - 1);
+		executeScheduledCallback();
 		verifyUploadError();
 	}
 	

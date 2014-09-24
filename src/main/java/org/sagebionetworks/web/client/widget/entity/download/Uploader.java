@@ -39,11 +39,9 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -169,19 +167,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void uploadFiles() {
 		view.triggerUpload();
-	}
-	
-	/**
-	 * For uploading files from native JavaScript.
-	 * @param jsFileNames Array of file names to be uploaded.
-	 */
-	public void uploadFiles(JsArrayString jsFileNames) {
-		int length = jsFileNames.length();
-		fileNames = new String[length];
-		for (int i = 0; i < length; i++) {
-			fileNames[i] = jsFileNames.get(i);
-		}
-		uploadFiles();
 	}
 	
 	@Override
@@ -535,11 +520,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void combineChunksUploadFailure(List<String> requestList, int currentAttempt, String errorMessage) {
+	public void combineChunksUploadFailure(final List<String> requestList, final int currentAttempt, String errorMessage) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
-		else //retry
-			directUploadStep5(requestList, currentAttempt+1);
+		else {
+			//sleep for a second on the client, then try again.
+			gwt.scheduleExecution(new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep5(requestList, currentAttempt+1);
+				}
+			}, RETRY_DELAY);
+		}
 	}
 	
 	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final List<String> requestList, final int currentAttempt) {

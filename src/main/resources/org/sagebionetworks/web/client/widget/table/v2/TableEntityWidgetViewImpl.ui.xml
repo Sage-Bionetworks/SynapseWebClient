@@ -5,10 +5,6 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<div class="alert alert-danger">
-			Warning: The Table feature is in a test phase.
-			<strong>All production data will be DELETED at a future date.</strong>
-		</div>
 		<!-- This button toggles the visibility of the the column details panel -->
 		<b:Button ui:field="columnDetailsToggleButton" icon="TH_LIST"
 			dataToggle="COLLAPSE" dataTarget="#editSchemaCollapse">Table
