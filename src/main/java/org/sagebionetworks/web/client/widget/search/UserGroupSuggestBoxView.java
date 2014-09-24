@@ -15,7 +15,6 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	 */
 	String getText();
 	UserGroupSuggestOracle getUserGroupSuggestOracle();
-	
 	void hideLoading();
 	void clear();
 	void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset);

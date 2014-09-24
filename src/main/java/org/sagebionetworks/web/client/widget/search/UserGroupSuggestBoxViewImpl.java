@@ -148,7 +148,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	
 	/*
-	 * SuggestionDisplay
+	 * SuggestionDisplay (for decorating the SuggestionBox Popup)
 	 */
 	public static class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
 		private SageImageBundle sageImageBundle;

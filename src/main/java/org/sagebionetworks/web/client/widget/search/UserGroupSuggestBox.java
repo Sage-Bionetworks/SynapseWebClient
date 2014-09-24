@@ -203,7 +203,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 					result.append("?teamId=" + header.getOwnerId() + "\" />");
 				}
 				result.append("<span class=\"search-item movedown-1 margin-right-5\">");
-				if (header.getIsIndividual()) {	// TODO: This?? Seems like it.
+				if (header.getIsIndividual()) {
 					result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
 				}
 				result.append("<span>" + header.getUserName() + "</span> ");

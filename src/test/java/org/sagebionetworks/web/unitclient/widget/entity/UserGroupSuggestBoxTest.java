@@ -54,6 +54,7 @@ public class UserGroupSuggestBoxTest {
 		} catch(NullPointerException e) {
 			
 		} finally {
+			verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 			verify(mockView).updateFieldStateForSuggestions(any(UserGroupHeaderResponsePage.class), anyInt());
 		}
 	}
@@ -80,5 +81,4 @@ public class UserGroupSuggestBoxTest {
 		
 		return testPage;
 	}
-	
 }
