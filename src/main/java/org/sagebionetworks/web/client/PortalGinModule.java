@@ -280,6 +280,10 @@ import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -765,6 +769,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
 		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
+		bind(UploadTableModalView.class).to(UploadTableModalViewImpl.class);
+		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
 		
 		/*
 		 * TableEntity cell bindings.
