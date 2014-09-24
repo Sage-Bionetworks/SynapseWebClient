@@ -56,11 +56,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 			tablesList.add(new EntityLinkedGroupItem(HeadingSize.H3, header));
 		}
 	}
-
-	@Override
-	public void addTable(final EntityHeader table) {
-
-	}
 	
 	@Override
 	public void setPresenter(final Presenter presenter) {

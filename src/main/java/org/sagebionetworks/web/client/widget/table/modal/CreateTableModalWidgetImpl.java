@@ -17,7 +17,7 @@ import com.google.inject.Inject;
  */
 public class CreateTableModalWidgetImpl implements CreateTableModalView.Presenter, CreateTableModalWidget {
 
-	public static final String TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTERS = "Table name must include at least one characters.";
+	public static final String TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Table name must include at least one character.";
 	
 	CreateTableModalView view;
 	SynapseClientAsync synapseClient;
@@ -76,7 +76,7 @@ public class CreateTableModalWidgetImpl implements CreateTableModalView.Presente
 	public void onCreateTable() {
 		String tableName = view.getTableName();
 		if(tableName == null || "".equals(tableName)){
-			view.showError(TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTERS);
+			view.showError(TABLE_NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else{
 			// Create the table
 			createTableEntity(tableName);

@@ -39,12 +39,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * @param tables
 	 */
 	public void configure(List<EntityQueryResult> tables);
-
-	/**
-	 * Add a table to the list.
-	 * @param table
-	 */
-	public void addTable(EntityHeader table);
 	
 	/**
 	 * Show/hide the add table button.
