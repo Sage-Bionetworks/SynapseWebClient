@@ -233,7 +233,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				
 				
 				// user/group combobox
-				//peopleCombo = UserGroupSearchBox.createUserGroupSearchGWTSuggestBox(synapseClient, sageImageBundle, urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
+				peopleCombo.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 				
 				HorizontalPanel userGroupPanel = new HorizontalPanel();
 				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
 
@@ -22,11 +23,13 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
+import com.google.inject.Inject;
 
 public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroupSuggestBoxView {
 	
 	private Presenter presenter;
 	
+	@Inject
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new UserGroupSuggestionDisplay(sageImageBundle));
 		getElement().setAttribute("placeHolder", "Enter Name...");
@@ -80,6 +83,11 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	}
 	
 	@Override
+	public Widget asWidget() {
+		return this;
+	}
+	
+	@Override
 	public void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset) {
 		Button prevBtn = ((UserGroupSuggestionDisplay) getSuggestionDisplay()).getPrevButton();
 		Button nextBtn = ((UserGroupSuggestionDisplay) getSuggestionDisplay()).getNextButton();
@@ -130,6 +138,12 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		getUserGroupSuggestOracle().configure(this, (UserGroupSuggestBox) presenter);
+	}
+	
+	@Override
+	public UserGroupSuggestOracle getUserGroupSuggestOracle() {
+		return (UserGroupSuggestOracle) getSuggestOracle();
 	}
 	
 	
