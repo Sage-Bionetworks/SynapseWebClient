@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.PaginatedResults;
@@ -17,6 +18,10 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -355,5 +360,11 @@ public interface SynapseClientAsync {
 
 	void getAsynchJobResults(AsynchType type, String jobId,
 			AsyncCallback<AsynchronousResponseBody> callback);
+
+	void executeEntityQuery(EntityQuery query,
+			AsyncCallback<EntityQueryResults> callback);
+
+	void createTableEntity(TableEntity entity,
+			AsyncCallback<TableEntity> callback);
 
 }

@@ -276,6 +276,10 @@ import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -742,11 +746,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
-		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 		
 		/*
 		 * TableEntity related bindings
 		 */
+		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
+		bind(CreateTableModalWidget.class).to(CreateTableModalWidgetImpl.class);
 		bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
 		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
@@ -759,6 +764,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
+		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
 		
 		/*
 		 * TableEntity cell bindings.

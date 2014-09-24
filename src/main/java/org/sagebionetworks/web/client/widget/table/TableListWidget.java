@@ -1,101 +1,118 @@
 package org.sagebionetworks.web.client.widget.table;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.QueryConstants.WhereOperator;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WhereCondition;
-import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TableListWidget implements TableListWidgetView.Presenter, WidgetRendererPresenter {
+/**
+ * This widget lists the tables of a given project.
+ * 
+ * @author John
+ *
+ */
+public class TableListWidget implements TableListWidgetView.Presenter, PageChangeListener, TableCreatedHandler, IsWidget {
 	
+	public static final Long PAGE_SIZE = 10L;
+	public static final Long OFFSET_ZERO = 0L;
+
 	private TableListWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private SearchServiceAsync searchService;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
-	private AdapterFactory adapterFactory;
-	
-	private String projectOwnerId;
+	private PaginationWidget paginationWidget;
+	private CreateTableModalWidget createTableModalWidget;
 	private boolean canEdit;
-	private boolean showAddTable;
-	private List<EntityHeader> configuredTables;
+	private EntityQuery query;
 	
 	@Inject
 	public TableListWidget(TableListWidgetView view,
-			SynapseClientAsync synapseClient, SearchServiceAsync searchService,
-			AuthenticationController authenticationController,
-			AdapterFactory adapterFactory,
-			GlobalApplicationState globalApplicationState) {
+			SynapseClientAsync synapseClient,
+			CreateTableModalWidget createTableModalWidget,
+			PaginationWidget paginationWidget) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.searchService = searchService;
-		this.authenticationController = authenticationController;
-		this.adapterFactory = adapterFactory;
-		this.globalApplicationState = globalApplicationState;
-		view.setPresenter(this);
+		this.createTableModalWidget = createTableModalWidget;
+		this.view.setPresenter(this);
+		this.view.addCreateTableModal(createTableModalWidget);
+		this.paginationWidget = paginationWidget;
+		this.view.addPaginationWidget(paginationWidget);
 	}	
 	
-	public void configure(String projectOwnerId, final boolean canEdit, final boolean showAddTable) {
-		this.configuredTables = null;
-		this.projectOwnerId = projectOwnerId;
+	/**
+	 * Configure this widget before use.
+	 * @param projectOwnerId
+	 * @param canEdit
+	 * @param showAddTable
+	 */
+	public void configure(String projectOwnerId, final boolean canEdit) {
 		this.canEdit = canEdit;
-		this.showAddTable = showAddTable;
-		
-		List<WhereCondition> where = new ArrayList<WhereCondition>();
-		where.add(new WhereCondition(WebConstants.ENTITY_PARENT_ID_KEY, WhereOperator.EQUALS, projectOwnerId));
-		where.add(new WhereCondition(WebConstants.CONCRETE_TYPE_KEY, WhereOperator.EQUALS, TableEntity.class.getName()));
-		searchService.searchEntities("entity", where, 1, 1000, null, false, new AsyncCallback<List<String>>() {
-			@Override
-			public void onSuccess(List<String> result) {
-				configuredTables = new ArrayList<EntityHeader>();
-				for(String entityHeaderJson : result) {
-					try {
-						configuredTables.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}
-				}				
-				view.configure(configuredTables, canEdit, showAddTable);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-			}	
-		});
-		
+		this.createTableModalWidget.configure(projectOwnerId, this);
+		this.query = createQuery(projectOwnerId);
+		queryForOnePage(OFFSET_ZERO);
+	}
 
+	/**
+	 * Create a new query.
+	 * @param parentId
+	 * @return
+	 */
+	public EntityQuery createQuery(String parentId) {
+		EntityQuery newQuery = new EntityQuery();
+		newQuery.setFilterByType(EntityType.table);
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.createdOn.name());
+		sort.setDirection(SortDirection.DESC);
+		newQuery.setSort(sort);
+		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
+		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setLimit(PAGE_SIZE);
+		newQuery.setOffset(OFFSET_ZERO);
+		return newQuery;
+	}
+	/**
+	 * Run a query and populate the page with the results.
+	 * @param offset The offset used by the query.
+	 */
+	private void queryForOnePage(final Long offset){
+		this.query.setOffset(offset);
+		synapseClient.executeEntityQuery(this.query, new AsyncCallback<EntityQueryResults>() {
+			
+			@Override
+			public void onSuccess(EntityQueryResults results) {
+				paginationWidget.configure(query.getLimit(), query.getOffset(), results.getTotalEntityCount(), TableListWidget.this);
+				boolean showPagination = results.getTotalEntityCount() > query.getLimit();
+				view.showPaginationVisible(showPagination);
+				setResults(results);
+			}
+			
+			@Override
+			public void onFailure(Throwable error) {
+				view.showErrorMessage(error.getMessage());
+			}
+		});
 	}
 	
-	public void configure(List<EntityHeader> tables, boolean canEdit, boolean showAddTable) {
-		this.projectOwnerId = null;
-		this.configuredTables = tables;
-		this.canEdit = canEdit;
-		this.showAddTable = showAddTable;
-
-		view.configure(tables, canEdit, showAddTable);
+	private void setResults(EntityQueryResults results) {
+		view.configure(results.getEntities());
+		//Must have edit and showAddTables for the buttons to be visible.
+		view.setAddTableVisible(this.canEdit);
+		view.setUploadTableVisible(this.canEdit);
 	}
     
 	@Override
@@ -105,67 +122,25 @@ public class TableListWidget implements TableListWidgetView.Presenter, WidgetRen
 	}
 
 	@Override
-	public void configure(
-			WikiPageKey wikiKey,
-			Map<String, String> widgetDescriptor,
-			org.sagebionetworks.web.client.utils.Callback widgetRefreshRequired,
-			Long wikiVersionInView) {
-		// TODO Auto-generated method stub
-		
+	public void onUploadTable() {
+		// to do.
+	}
+
+
+	@Override
+	public void onPageChange(Long newOffset) {
+		queryForOnePage(newOffset);
 	}
 
 	@Override
-	public void createTableEntity(final String name) {
-		if(projectOwnerId == null) {
-			view.showErrorMessage("Can not create Table outside of project context.");
-			return;
-		}
-		TableEntity newTable = new TableEntity();
-		String json;
-		try {
-			newTable.setName(name);
-			newTable.setParentId(projectOwnerId);
-			newTable.setEntityType(TableEntity.class.getName());
-			json = newTable.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.createOrUpdateEntity(json, null, true, new AsyncCallback<String>() {
-				@Override
-				public void onSuccess(String result) {
-					// add shell header to view instead of query
-					EntityHeader header = new EntityHeader();
-					header.setId(result);
-					header.setName(name);
-					view.addTable(header);
-					view.showInfo(DisplayConstants.TABLE_CREATED, "");
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-						view.showErrorMessage(DisplayConstants.TABLE_CREATION_FAILED);
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-		}
+	public void onAddTable() {
+		this.createTableModalWidget.showCreateModal();
 	}
 
 	@Override
-	public void getTableDetails(EntityHeader table, final AsyncCallback<TableEntity> callback) {
-		synapseClient.getEntity(table.getId(), new AsyncCallback<EntityWrapper>() {
-			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					TableEntity tableEntity = new TableEntity(adapterFactory.createNew(result.getEntityJson()));
-					callback.onSuccess(tableEntity);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
+	public void tableCreated(TableEntity table) {
+		// Back to page one.
+		queryForOnePage(OFFSET_ZERO);
 	}
 	
 }

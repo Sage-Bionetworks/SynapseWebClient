@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -83,6 +84,14 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.EntityType;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -3414,5 +3423,26 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
+
+	@Override
+	public EntityQueryResults executeEntityQuery(EntityQuery query) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.entityQuery(query);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.createEntity(entity);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
 
 }
