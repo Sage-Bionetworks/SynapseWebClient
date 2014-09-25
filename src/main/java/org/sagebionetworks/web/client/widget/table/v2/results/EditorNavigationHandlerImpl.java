@@ -8,9 +8,14 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.ui.ValueBoxBase;
 
 /**
  * This implementation currently uses brute force to find the address of a
@@ -23,6 +28,7 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 	ArrayList<TableRow> rows;
 	Map<CellEditor, Address> cellAddressMap;
 	int columnCount;
+	boolean needsRecalcualteAdressess;
 
 	public EditorNavigationHandlerImpl() {
 		rows = new ArrayList<TableRow>();
@@ -40,12 +46,13 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 			bindEditor(editor);
 			columnCount++;
 		}
+		needsRecalcualteAdressess = true;
 	}
 
 	private void bindEditor(final CellEditor editor) {
-		editor.addKeyPressHandler(new KeyPressHandler() {
+		editor.addKeyDownHandler(new KeyDownHandler() {
 			@Override
-			public void onKeyPress(KeyPressEvent event) {
+			public void onKeyDown(KeyDownEvent event) {
 				editorKeyPressed(editor, event);
 			}
 		});
@@ -54,10 +61,10 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 	@Override
 	public void removeRow(TableRow row) {
 		rows.remove(row);
+		needsRecalcualteAdressess = true;
 	}
 
-	@Override
-	public void recalculateAddresses() {
+	private void recalculateAddresses() {
 		// Walk cells and calculate their address.
 		int rowIndex = 0;
 		for (TableRow row : rows) {
@@ -74,6 +81,15 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 				columnIndex++;
 			}
 			rowIndex++;
+		}
+		needsRecalcualteAdressess = false;
+	}
+	/**
+	 * Check the addresses and rebuild them if needed.
+	 */
+	private void checkAddresses(){
+		if(needsRecalcualteAdressess){
+			recalculateAddresses();
 		}
 	}
 
@@ -97,7 +113,11 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 	 * @param editor
 	 * @param event
 	 */
-	private void editorKeyPressed(CellEditor editor, KeyPressEvent event) {
+	private void editorKeyPressed(CellEditor editor, KeyDownEvent event) {
+		// Check the addresses. If they are stale then they will need to be
+		// recalculated before proceeding.
+		checkAddresses();
+		// Event Switch.
 		switch (event.getNativeEvent().getKeyCode()) {
 		case KeyCodes.KEY_ENTER:
 			onDown(editor);
@@ -107,8 +127,24 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 			break;
 		case KeyCodes.KEY_UP:
 			onUp(editor);
-			break;			
+			break;
+		case KeyCodes.KEY_LEFT:
+			onLeft(editor);
+			break;
+		case KeyCodes.KEY_RIGHT:
+			onRight(editor);
+			break;				
 		}
+	}
+
+	private void onRight(CellEditor editor) {
+		Address current = cellAddressMap.get(editor);
+		focusTo(current.columnIndex+1, current.rowIndex);
+	}
+
+	private void onLeft(CellEditor editor) {
+		Address current = cellAddressMap.get(editor);
+		focusTo(current.columnIndex-1, current.rowIndex);
 	}
 
 	private void onDown(CellEditor editor) {
@@ -132,12 +168,15 @@ public class EditorNavigationHandlerImpl implements EditorNavigationHandler {
 	}
 
 	private void setFocus(final CellEditor widget) {
-//		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-//			@Override
-//			public void execute() {
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+			@Override 
+			public void execute() {
 				widget.setFocus(true);
-//			}
-//		});
+				if(widget instanceof ValueBoxBase){
+					((ValueBoxBase)widget).selectAll();
+				}
+			}
+		});
 	}
 
 }

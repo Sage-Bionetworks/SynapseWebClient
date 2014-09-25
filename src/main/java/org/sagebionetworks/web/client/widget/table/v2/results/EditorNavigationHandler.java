@@ -24,9 +24,4 @@ public interface EditorNavigationHandler {
 	 */
 	public void removeRow(TableRow row);
 	
-	/**
-	 * Recalculate the address of each editor.
-	 * This method should be called once after all row changes have been made.
-	 */
-	public void recalculateAddresses();
 }

@@ -85,9 +85,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
-		if(this.editorNavigationHandler != null){
-			this.editorNavigationHandler.recalculateAddresses();
-		}
 	}
 
 	/**
@@ -121,9 +118,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 */
 	public void onAddNewRow() {
 		addRow(new Row(), true);
-		if(this.editorNavigationHandler != null){
-			this.editorNavigationHandler.recalculateAddresses();
-		}
 	}
 
 	/**
@@ -147,6 +141,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			if(row.isSelected()){
 				view.removeRow(row);
 				it.remove();
+				if(this.editorNavigationHandler != null){
+					this.editorNavigationHandler.removeRow(row);
+				}
 			}
 		}
 		onSelectionChanged();

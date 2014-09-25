@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,17 +32,6 @@ public class CellStub implements CellEditor {
 		return value;
 	}
 
-	@Override
-	public HandlerRegistration addKeyPressHandler(KeyPressHandler handler) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void fireEvent(GwtEvent<?> event) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public int getTabIndex() {
@@ -65,6 +53,18 @@ public class CellStub implements CellEditor {
 
 	@Override
 	public void setTabIndex(int index) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public HandlerRegistration addKeyDownHandler(KeyDownHandler handler) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
 		// TODO Auto-generated method stub
 		
 	}
