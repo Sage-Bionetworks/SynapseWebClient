@@ -6,8 +6,8 @@ import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -152,7 +152,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		getUserGroupSuggestOracle().configure(this, (UserGroupSuggestBox) presenter);
+		getUserGroupSuggestOracle().configure((UserGroupSuggestBox) presenter);
 	}
 	
 	@Override

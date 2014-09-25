@@ -11,11 +11,9 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
 
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,8 +29,8 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	
-	private static String baseFileHandleUrl;
-	private static String baseProfileAttachmentUrl;
+	private String baseFileHandleUrl;
+	private String baseProfileAttachmentUrl;
 	
 	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
@@ -57,6 +55,9 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		this.baseProfileAttachmentUrl = baseProfileAttachmentUrl;
 	}
 	
+	public String getBaseFileHandleUrl()		{	return baseFileHandleUrl;		}
+	public String getBaseProfileAttachmentUrl() {	return baseProfileAttachmentUrl;	}
+	
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
@@ -69,6 +70,10 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	public void setWidth(String width) {
 		view.setDisplayWidth(width);
+	}
+	
+	public int getWidth() {
+		return view.getWidth();
 	}
 	
 	@Override
@@ -121,10 +126,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	public UserGroupSuggestion getSelectedSuggestion() {
 		return selectedSuggestion;
 	}
-	
-	private String getDisplayString(UserGroupHeader header) {
-		return getDisplayString(header, view.getWidth() + "px");
-	}
 
 	@Override
 	public void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion) {
@@ -137,116 +138,5 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	public void clear() {
 		view.clear();
-	}
-	
-	
-	/*
-	 * SuggestOracle
-	 */
-	public static class UserGroupSuggestOracle extends SuggestOracle {
-		private SuggestOracle.Request request;
-		private SuggestOracle.Callback callback;
-		
-		private UserGroupSuggestBox suggestBox;
-		
-		public void configure(UserGroupSuggestBoxView view, UserGroupSuggestBox suggestBox) {
-			this.suggestBox = suggestBox;
-		}
-		
-		private Timer timer = new Timer() {
-
-			@Override
-			public void run() {
-				
-				// If you backspace quickly the contents of the field are emptied but a
-				// query for a single character is still executed. Workaround for this
-				// is to check for an empty string field here.
-				if (!suggestBox.getText().trim().isEmpty()) {
-					suggestBox.getSuggestions(request, callback);
-				}
-			}
-			
-		};
-		
-		@Override
-		public boolean isDisplayStringHTML() {
-			return true;
-		}
-		
-		@Override
-		public void requestSuggestions(SuggestOracle.Request request, SuggestOracle.Callback callback) {
-			this.request = request;
-			this.callback = callback;
-			
-			timer.cancel();
-			timer.schedule(DELAY);
-		}
-		
-		public SuggestOracle.Request getRequest()	{	return request;		}
-		public SuggestOracle.Callback getCallback()	{	return callback;	}
-
-
-		/*
-		 * Suggestion
-		 */
-		public class UserGroupSuggestion implements IsSerializable, Suggestion {
-			private UserGroupHeader header;
-			private String prefix;
-			
-			public UserGroupSuggestion(UserGroupHeader header, String prefix) {
-				this.header = header;
-				this.prefix = prefix;
-			}
-			
-			public UserGroupHeader getHeader()		{	return header;			}
-			public String getPrefix() 				{	return prefix;			}
-			public void setPrefix(String prefix)	{	this.prefix = prefix;	}
-			
-			@Override
-			public String getDisplayString() {
-				return suggestBox.getDisplayString(header);
-			}
-
-			@Override
-			public String getReplacementString() {
-				// Example output:
-				// Pac Man  |  114085
-				StringBuilder sb = new StringBuilder();
-				if (!header.getIsIndividual())
-					sb.append("(Team) ");
-				
-				String firstName = header.getFirstName();
-				String lastName = header.getLastName();
-				String username = header.getUserName();
-				sb.append(DisplayUtils.getDisplayName(firstName, lastName, username));
-				sb.append("  |  " + header.getOwnerId());
-				return sb.toString();
-			}
-			
-		} // end inner class UserGroupSuggestion	
-	} // end inner class UserGroupSuggestOracle
-	
-	protected static String getDisplayString(UserGroupHeader header, String width) {
-		StringBuilder result = new StringBuilder();
-		result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
-		result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-		if (header.getIsIndividual()) {
-			result.append(baseProfileAttachmentUrl);
-			result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
-		} else {
-			result.append(baseFileHandleUrl);
-			result.append("?teamId=" + header.getOwnerId() + "\" />");
-		}
-		result.append("<span class=\"search-item movedown-1 margin-right-5\">");
-		if (header.getIsIndividual()) {
-			result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
-		}
-		result.append("<span>" + header.getUserName() + "</span> ");
-		result.append("</span>");
-		if (!header.getIsIndividual()) {
-			result.append("(Team)");
-		}
-		result.append("</div>");
-		return result.toString();
 	}
 }
