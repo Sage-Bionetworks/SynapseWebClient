@@ -274,6 +274,10 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
+import org.sagebionetworks.web.client.widget.table.FocusSetter;
+import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandlerImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
@@ -759,6 +763,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
+		
+		// Keyboard navigation
+		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);
+		bind(FocusSetter.class).to(FocusSetterImpl.class);
 		
 		/*
 		 * TableEntity cell bindings.

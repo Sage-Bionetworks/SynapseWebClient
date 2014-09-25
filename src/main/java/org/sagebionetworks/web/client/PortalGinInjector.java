@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -250,4 +251,6 @@ public interface PortalGinInjector extends Ginjector {
 	public CookieProvider getCookieProvider();
 
 	public BasicPaginationWidget createBasicPaginationWidget();
+
+	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 }

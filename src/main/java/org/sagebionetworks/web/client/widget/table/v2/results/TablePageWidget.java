@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,6 +33,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	RowSelectionListener rowSelectionListener;
 	PaginationWidget paginationWidget;
 	List<RowWidget> rows;
+	KeyboardNavigationHandler keyboardNavigationHandler;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -69,6 +71,14 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		for (ColumnModel type: types) {
 			headers.add(type.getName());
 		}
+		// Create a navigation handler
+		if(isEditable){
+			// We only need key press navigation for editors.
+			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
+		}else{
+			keyboardNavigationHandler = null;
+		}
+
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table
@@ -94,6 +104,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		rowWidget.configure(types, isEditor, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
+		if(keyboardNavigationHandler != null){
+			this.keyboardNavigationHandler.bindRow(rowWidget);
+		}
 	}
 
 	@Override
@@ -129,6 +142,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			if(row.isSelected()){
 				view.removeRow(row);
 				it.remove();
+				if(this.keyboardNavigationHandler != null){
+					this.keyboardNavigationHandler.removeRow(row);
+				}
 			}
 		}
 		onSelectionChanged();
