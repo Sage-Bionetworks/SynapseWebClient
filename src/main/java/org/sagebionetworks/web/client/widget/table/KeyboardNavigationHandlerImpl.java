@@ -4,17 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
-
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.ValueBoxBase;
+import com.google.inject.Inject;
 
 /**
  * This implementation keeps track of the address of each widget and listens to key down events.
@@ -30,10 +25,13 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	Map<IsWidget, Address> cellAddressMap;
 	int columnCount;
 	boolean needsRecalcualteAdressess;
+	FocusSetter focusSetter;
 
-	public KeyboardNavigationHandlerImpl() {
+	@Inject
+	public KeyboardNavigationHandlerImpl(FocusSetter focusSetter) {
 		rows = new ArrayList<RowOfWidgets>();
 		cellAddressMap = new HashMap<IsWidget, Address>();
+		this.focusSetter = focusSetter;
 	}
 
 	@Override
@@ -105,20 +103,6 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	}
 
 	/**
-	 * The address of a cell in the table.
-	 *
-	 */
-	private static class Address {
-		int columnIndex;
-		int rowIndex;
-		@Override
-		public String toString() {
-			return "Address [columnIndex=" + columnIndex + ", rowIndex="
-					+ rowIndex + "]";
-		}
-	}
-
-	/**
 	 * Key pressed on this editor.
 	 * 
 	 * @param editor
@@ -129,7 +113,7 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 		// recalculated before proceeding.
 		recalculateAddressesIfNeeded();
 		// Event Switch.
-		switch (event.getNativeEvent().getKeyCode()) {
+		switch (event.getNativeKeyCode()) {
 		case KeyCodes.KEY_ENTER:
 			onDown(editor);
 			break;
@@ -143,9 +127,6 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 			onLeft(editor);
 			break;
 		case KeyCodes.KEY_RIGHT:
-			onRight(editor);
-			break;
-		case KeyCodes.KEY_TAB:
 			onRight(editor);
 			break;
 		}
@@ -197,27 +178,26 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 		if (rowIndex < rows.size() && rowIndex > -1) {
 			RowOfWidgets row = rows.get(rowIndex);
 			if (columnIndex < row.getWidgetCount() && columnIndex > -1) {
+				// set the focus on the target.
 				IsWidget editor = row.getWidget(columnIndex);
-				setFocus(editor);
+				boolean shouldSelectAll = true;
+				this.focusSetter.attemptSetFocus(editor, shouldSelectAll);
 			}
 		}
 	}
 	
 
-	private void setFocus(final IsWidget widget) {
-		// Can only set focus on a focusable
-		if(widget instanceof Focusable){
-			final Focusable focusableWidget = (Focusable) widget;
-			Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-				@Override 
-				public void execute() {
-					focusableWidget.setFocus(true);
-					// Select all if we can.
-					if(widget instanceof ValueBoxBase){
-						((ValueBoxBase)widget).selectAll();
-					}
-				}
-			});
+	/**
+	 * The address of a cell in the table.
+	 *
+	 */
+	private static class Address {
+		int columnIndex;
+		int rowIndex;
+		@Override
+		public String toString() {
+			return "Address [columnIndex=" + columnIndex + ", rowIndex="
+					+ rowIndex + "]";
 		}
 	}
 
