@@ -32,6 +32,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	RowSelectionListener rowSelectionListener;
 	PaginationWidget paginationWidget;
 	List<RowWidget> rows;
+	EditorNavigationHandler editorNavigationHandler;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -69,12 +70,23 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		for (ColumnModel type: types) {
 			headers.add(type.getName());
 		}
+		// Create a navigation handler
+		if(isEditable){
+			// We only need key press navigation for editors.
+			editorNavigationHandler = ginInjector.createEditorNavigationHandler();
+		}else{
+			editorNavigationHandler = null;
+		}
+
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
 		// Build the rows for this table
 		for(Row row: bundle.getQueryResult().getQueryResults().getRows()){
 			// Create the row 
 			addRow(row, isEditable);
+		}
+		if(this.editorNavigationHandler != null){
+			this.editorNavigationHandler.recalculateAddresses();
 		}
 	}
 
@@ -94,6 +106,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		rowWidget.configure(types, isEditor, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
+		if(editorNavigationHandler != null){
+			this.editorNavigationHandler.bindRow(rowWidget);
+		}
 	}
 
 	@Override
@@ -106,6 +121,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	 */
 	public void onAddNewRow() {
 		addRow(new Row(), true);
+		if(this.editorNavigationHandler != null){
+			this.editorNavigationHandler.recalculateAddresses();
+		}
 	}
 
 	/**

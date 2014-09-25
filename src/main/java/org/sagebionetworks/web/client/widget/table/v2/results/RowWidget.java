@@ -18,7 +18,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class RowWidget implements IsWidget, RowView.Presenter {
+public class RowWidget implements IsWidget, RowView.Presenter, TableRow {
 	
 	RowView view;
 	RowSelectionListener rowSelectionListener;
@@ -116,6 +116,24 @@ public class RowWidget implements IsWidget, RowView.Presenter {
 	 */
 	public void setSelected(boolean isSelected) {
 		view.setSelected(isSelected);
+	}
+	
+	/**
+	 * Allow for iteration over cells.
+	 * @return
+	 */
+	public Iterable<Cell> getCells(){
+		return cells;
+	}
+
+	@Override
+	public Cell getCell(int index) {
+		return cells.get(index);
+	}
+
+	@Override
+	public int getCellCount() {
+		return cells.size();
 	}
 
 }

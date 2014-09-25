@@ -78,6 +78,7 @@ import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
+import org.sagebionetworks.web.client.widget.table.v2.results.EditorNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
@@ -250,4 +251,6 @@ public interface PortalGinInjector extends Ginjector {
 	public CookieProvider getCookieProvider();
 
 	public BasicPaginationWidget createBasicPaginationWidget();
+
+	public EditorNavigationHandler createEditorNavigationHandler();
 }
