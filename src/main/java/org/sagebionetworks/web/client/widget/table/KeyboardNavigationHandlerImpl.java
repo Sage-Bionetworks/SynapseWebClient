@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 
 /**
  * This implementation keeps track of the address of each widget and listens to key down events.
- * When navigation key event occurs, the address of the source source widget is used to calculate
+ * When navigation key event occurs, the address of the source widget is used to calculate
  * the new focus widget.
  * 
  * @author jhill
