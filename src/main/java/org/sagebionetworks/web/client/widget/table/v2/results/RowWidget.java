@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 
@@ -18,7 +19,7 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class RowWidget implements IsWidget, RowView.Presenter, TableRow {
+public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigationHandler.RowOfWidgets {
 	
 	RowView view;
 	RowSelectionListener rowSelectionListener;
@@ -117,23 +118,16 @@ public class RowWidget implements IsWidget, RowView.Presenter, TableRow {
 	public void setSelected(boolean isSelected) {
 		view.setSelected(isSelected);
 	}
-	
-	/**
-	 * Allow for iteration over cells.
-	 * @return
-	 */
-	public Iterable<Cell> getCells(){
-		return cells;
-	}
 
 	@Override
-	public Cell getCell(int index) {
+	public IsWidget getWidget(int index) {
 		return cells.get(index);
 	}
 
 	@Override
-	public int getCellCount() {
+	public int getWidgetCount() {
 		return cells.size();
 	}
+	
 
 }

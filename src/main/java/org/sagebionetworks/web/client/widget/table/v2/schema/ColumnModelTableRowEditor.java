@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+
 /**
  * Editor add more business logic to the column model process.
  * 
  * @author John
  *
  */
-public interface ColumnModelTableRowEditor extends ColumnModelTableRow {
+public interface ColumnModelTableRowEditor extends ColumnModelTableRow, KeyboardNavigationHandler.RowOfWidgets {
 
 	/**
 	 * Control for this view.

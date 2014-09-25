@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,7 +33,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	RowSelectionListener rowSelectionListener;
 	PaginationWidget paginationWidget;
 	List<RowWidget> rows;
-	EditorNavigationHandler editorNavigationHandler;
+	KeyboardNavigationHandler keyboardNavigationHandler;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -73,9 +74,9 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		// Create a navigation handler
 		if(isEditable){
 			// We only need key press navigation for editors.
-			editorNavigationHandler = ginInjector.createEditorNavigationHandler();
+			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
 		}else{
-			editorNavigationHandler = null;
+			keyboardNavigationHandler = null;
 		}
 
 		view.setTableHeaders(headers);
@@ -103,8 +104,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		rowWidget.configure(types, isEditor, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
-		if(editorNavigationHandler != null){
-			this.editorNavigationHandler.bindRow(rowWidget);
+		if(keyboardNavigationHandler != null){
+			this.keyboardNavigationHandler.bindRow(rowWidget);
 		}
 	}
 
@@ -141,8 +142,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			if(row.isSelected()){
 				view.removeRow(row);
 				it.remove();
-				if(this.editorNavigationHandler != null){
-					this.editorNavigationHandler.removeRow(row);
+				if(this.keyboardNavigationHandler != null){
+					this.keyboardNavigationHandler.removeRow(row);
 				}
 			}
 		}
