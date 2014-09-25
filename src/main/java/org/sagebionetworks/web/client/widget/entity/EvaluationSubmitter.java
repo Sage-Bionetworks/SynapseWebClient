@@ -149,7 +149,7 @@ public class EvaluationSubmitter implements Presenter {
 							@Override
 							public void invoke() {
 								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement.getId(), evalIndex, evaluations);
+								setLicenseAccepted(firstUnmetAccessRequirement, evalIndex, evaluations);
 							}
 						};
 						//pop up the requirement
@@ -174,7 +174,7 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void setLicenseAccepted(Long	arId, final int evalIndex, final List<Evaluation> evaluations) {	
+	public void setLicenseAccepted(AccessRequirement ar, final int evalIndex, final List<Evaluation> evaluations) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -196,7 +196,7 @@ public class EvaluationSubmitter implements Presenter {
 		
 		GovernanceServiceHelper.signTermsOfUse(
 				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
+				ar, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 

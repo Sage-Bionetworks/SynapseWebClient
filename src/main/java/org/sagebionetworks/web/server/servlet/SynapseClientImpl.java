@@ -1194,18 +1194,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getUnmetTeamAccessRequirements(String teamId)
-			throws RestServiceException {
-		return getTeamAccessRequirements(teamId, true);
-	}
-
-	@Override
-	public String getTeamAccessRequirements(String teamId)
+	public List<AccessRequirement> getTeamAccessRequirements(String teamId)
 			throws RestServiceException {
 		return getTeamAccessRequirements(teamId, false);
 	}
 
-	private String getTeamAccessRequirements(String teamId, boolean unmetOnly)
+	private List<AccessRequirement> getTeamAccessRequirements(String teamId, boolean unmetOnly)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -1219,13 +1213,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			else
 				accessRequirements = synapseClient
 						.getAccessRequirements(subjectId);
-			JSONObjectAdapter arJson = accessRequirements
-					.writeToJSONObject(adapterFactory.createNew());
-			return arJson.toJSONString();
+			return accessRequirements.getResults();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 

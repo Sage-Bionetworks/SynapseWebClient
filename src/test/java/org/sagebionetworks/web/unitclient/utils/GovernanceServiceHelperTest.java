@@ -77,9 +77,10 @@ public class GovernanceServiceHelperTest {
 		);
 		
 		final JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-		
+		TermsOfUseAccessRequirement touAr = new TermsOfUseAccessRequirement();
+		touAr.setId(accessRequirementId);
 		GovernanceServiceHelper.signTermsOfUse(principalId,
-				accessRequirementId,
+				touAr,
 				onSuccess,
 				onFailure,
 				synapseClient,

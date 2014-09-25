@@ -143,8 +143,7 @@ public interface SynapseClientAsync {
 	 */
 	public void getUnmetEvaluationAccessRequirements(String evalId, AsyncCallback<String> callback);
 	
-	public void getUnmetTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
-	public void getTeamAccessRequirements(String teamId, AsyncCallback<String> callback);
+	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
 	public void getAllEntityUploadAccessRequirements(String entityId, AsyncCallback<String> callback);
 	
 	public void createAccessApproval(EntityWrapper aaEW, AsyncCallback<EntityWrapper> callback);

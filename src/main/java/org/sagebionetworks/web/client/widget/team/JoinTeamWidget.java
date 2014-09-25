@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -21,11 +21,11 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -49,7 +49,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private String message, isMemberMessage, successMessage, buttonText;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
-	private List<TermsOfUseAccessRequirement> accessRequirements;
+	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
 	private int currentAccessRequirement;
 	
@@ -145,17 +145,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		currentPage = 0;
 		currentAccessRequirement = 0;
 		//initialize the access requirements
-		accessRequirements = new ArrayList<TermsOfUseAccessRequirement>();
-		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<String>() {
+		accessRequirements = new ArrayList<AccessRequirement>();
+		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<List<AccessRequirement>>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(List<AccessRequirement> results) {
 				//are there access restrictions?
-				try{
-					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
-					accessRequirements = ar.getResults();
-				} catch (Throwable e) {
-					onFailure(e);
-				}
+				accessRequirements = results;
 				view.setButtonsEnabled(true);
 				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
 				if (isChallengeSignup) {
@@ -236,23 +231,33 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			sendJoinRequestStep3();
 		} else {
 			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);
-			String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 			Callback termsOfUseCallback = new Callback() {
 				@Override
 				public void invoke() {
 					//agreed to terms of use.
 					currentAccessRequirement++;
 					currentPage++;
-					setLicenseAccepted(accessRequirement.getId());
+					setLicenseAccepted(accessRequirement);
 				}
 			};
 			//pop up the requirement
 			view.updateWizardProgress(currentPage, getTotalPageCount());
-			view.showAccessRequirement(text, termsOfUseCallback);
+			APPROVAL_TYPE type = GovernanceServiceHelper.accessRequirementApprovalType(accessRequirement);
+			if (APPROVAL_TYPE.USER_AGREEMENT.equals(type) || APPROVAL_TYPE.ACT_APPROVAL.equals(type)) {
+				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+				view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);
+			} else if (APPROVAL_TYPE.POST_MESSAGE.equals(type)) {
+				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
+				view.showPostMessageContentAccessRequirement(url, termsOfUseCallback);
+			} else {
+				view.showErrorMessage("Unsupported access restriction type - " + type);
+			}
+				
+				
 		}		
 	}
 	
-	public void setLicenseAccepted(Long arId) {	
+	public void setLicenseAccepted(AccessRequirement ar) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -270,7 +275,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		
 		GovernanceServiceHelper.signTermsOfUse(
 				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
+				ar, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 
