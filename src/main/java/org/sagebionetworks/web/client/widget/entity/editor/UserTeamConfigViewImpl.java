@@ -30,6 +30,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	@Override
 	public void initView() {
 		clear();
+		// TODO: To UserGroupSuggestBox?
 		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
 		peopleCombo.setWidth(330);
 		peopleCombo.setEmptyText("Enter name...");

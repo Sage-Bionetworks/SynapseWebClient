@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -29,6 +30,7 @@ import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -77,15 +79,17 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	private Boolean isOpenParticipation;
 	private Button openParticipationButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private ComboBox<ModelData> peopleCombo;
+	private UserGroupSuggestBox peopleSuggestBox;
 	
 	@Inject
 	public EvaluationAccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			UserGroupSuggestBox peopleSuggestBox) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.peopleSuggestBox = peopleSuggestBox;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
@@ -195,20 +199,20 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		fieldSet.setCollapsible(false);			
 		fieldSet.setLayout(layout);
 		fieldSet.setWidth(FIELD_WIDTH);
+
+		// user/group Suggest Box
+		peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+		peopleSuggestBox.setPlaceholderText("Enter a user or group name...");
+		peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
+		HorizontalPanel userGroupPanel = new HorizontalPanel();
+		userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
 		
-		// user/group combobox
-		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-		peopleCombo.setEmptyText("Enter a user or group name...");
-		peopleCombo.setFieldLabel("User/Group");
-		peopleCombo.setForceSelection(true);
-		peopleCombo.setTriggerAction(TriggerAction.ALL);
-		peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-			@Override
-			public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-				presenter.setUnsavedViewChanges(true);
-			}
-		});
-		fieldSet.add(peopleCombo);			
+		Label boxLbl = new Label("User/Group:");
+		boxLbl.addStyleName("width-80");
+		
+		userGroupPanel.add(boxLbl);
+		userGroupPanel.add(peopleSuggestBox.asWidget());
+		fieldSet.add(userGroupPanel);	
 
 		// permission level combobox
 		permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
@@ -410,9 +414,8 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	}
 
 	private void addPersonToAcl() {
-		if(peopleCombo.getValue() != null) {
-			ModelData selectedModel = peopleCombo.getValue();
-			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+		if(peopleSuggestBox.getSelectedSuggestion() != null) {
+			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
@@ -420,7 +423,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
-				peopleCombo.clearSelections();
+				peopleSuggestBox.clear();
 				permissionLevelCombo.clearSelections();
 				presenter.setUnsavedViewChanges(false);
 			} else {
@@ -430,5 +433,4 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 			showAddMessage("Please select a user or group to grant permission to.");
 		}
 	}
-
 }

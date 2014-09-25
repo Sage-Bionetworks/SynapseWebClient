@@ -18,6 +18,15 @@ public interface UserGroupSuggestBoxView extends IsWidget, SynapseView {
 	void hideLoading();
 	void clear();
 	void updateFieldStateForSuggestions(UserGroupHeaderResponsePage responsePage, int offset);
+	void setPlaceholderText(String text);
+	int getWidth();
+	
+	/**
+	 * Sets the displays width. This width does not include decorations
+	 * such as margin, border, or padding.
+	 * @param width The CSS unit of width (e.g. "10px", "1em")
+	 */
+	void setDisplayWidth(String width);
 	
 	
 	/**

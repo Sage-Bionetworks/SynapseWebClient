@@ -63,6 +63,14 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		return view.asWidget();
 	}
 	
+	public void setPlaceholderText(String text) {
+		view.setPlaceholderText(text);
+	}
+	
+	public void setWidth(String width) {
+		view.setDisplayWidth(width);
+	}
+	
 	@Override
 	public void getPrevSuggestions() {
 		offset -= PAGE_SIZE;
@@ -112,6 +120,10 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	@Override
 	public UserGroupSuggestion getSelectedSuggestion() {
 		return selectedSuggestion;
+	}
+	
+	private String getDisplayString(UserGroupHeader header) {
+		return getDisplayString(header, view.getWidth() + "px");
 	}
 
 	@Override
@@ -192,27 +204,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 			
 			@Override
 			public String getDisplayString() {
-				StringBuilder result = new StringBuilder();
-				result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:375px;\">");
-				result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
-				if (header.getIsIndividual()) {
-					result.append(baseProfileAttachmentUrl);
-					result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
-				} else {
-					result.append(baseFileHandleUrl);
-					result.append("?teamId=" + header.getOwnerId() + "\" />");
-				}
-				result.append("<span class=\"search-item movedown-1 margin-right-5\">");
-				if (header.getIsIndividual()) {
-					result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
-				}
-				result.append("<span>" + header.getUserName() + "</span> ");
-				result.append("</span>");
-				if (!header.getIsIndividual()) {
-					result.append("(Team)");
-				}
-				result.append("</div>");
-				return result.toString();
+				return suggestBox.getDisplayString(header);
 			}
 
 			@Override
@@ -233,4 +225,28 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 			
 		} // end inner class UserGroupSuggestion	
 	} // end inner class UserGroupSuggestOracle
+	
+	protected static String getDisplayString(UserGroupHeader header, String width) {
+		StringBuilder result = new StringBuilder();
+		result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
+		result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
+		if (header.getIsIndividual()) {
+			result.append(baseProfileAttachmentUrl);
+			result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
+		} else {
+			result.append(baseFileHandleUrl);
+			result.append("?teamId=" + header.getOwnerId() + "\" />");
+		}
+		result.append("<span class=\"search-item movedown-1 margin-right-5\">");
+		if (header.getIsIndividual()) {
+			result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
+		}
+		result.append("<span>" + header.getUserName() + "</span> ");
+		result.append("</span>");
+		if (!header.getIsIndividual()) {
+			result.append("(Team)");
+		}
+		result.append("</div>");
+		return result.toString();
+	}
 }

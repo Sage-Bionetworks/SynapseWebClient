@@ -31,7 +31,6 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	@Inject
 	public UserGroupSuggestBoxViewImpl(UserGroupSuggestOracle oracle, SageImageBundle sageImageBundle) {
 		super(oracle, new TextBox(), new UserGroupSuggestionDisplay(sageImageBundle));
-		getElement().setAttribute("placeHolder", "Enter Name...");
 		addStyleName("userGroupSuggestBox");
 		
 		addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
@@ -133,6 +132,21 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	
+	@Override
+	public void setPlaceholderText(String text) {
+		getElement().setAttribute("placeHolder", text);
+	}
+	
+	@Override
+	public void setDisplayWidth(String width) {
+		setWidth(width);
+	}
+	
+	@Override
+	public int getWidth() {
+		return getOffsetWidth();
 	}
 
 	@Override

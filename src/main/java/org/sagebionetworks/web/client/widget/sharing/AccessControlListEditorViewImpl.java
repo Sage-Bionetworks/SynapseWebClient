@@ -93,7 +93,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private UserGroupSuggestBox peopleCombo;
+	private UserGroupSuggestBox peopleSuggestBox;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
@@ -107,7 +107,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
 		this.synapseClient = synapseClient;
-		this.peopleCombo = peopleCombo;
+		this.peopleSuggestBox = peopleCombo;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -232,13 +232,17 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				fieldSet.setWidth(FIELD_WIDTH);
 				
 				
-				// user/group combobox
-				peopleCombo.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
-				
+				// user/group Suggest Box
+				peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+				peopleSuggestBox.setPlaceholderText("Enter name...");
+				peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
 				HorizontalPanel userGroupPanel = new HorizontalPanel();
 				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
-				userGroupPanel.add(new Label("Name:"));
-				userGroupPanel.add(peopleCombo.asWidget());
+				
+				Label nameLbl = new Label("Name:");
+				nameLbl.addStyleName("width-80");
+				userGroupPanel.add(nameLbl);
+				userGroupPanel.add(peopleSuggestBox.asWidget());
 				fieldSet.add(userGroupPanel);
 				
 				// permission level combobox
@@ -619,8 +623,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	private void addPersonToAcl() {
-		if(peopleCombo.getSelectedSuggestion() != null) {
-			String principalIdStr = peopleCombo.getSelectedSuggestion().getHeader().getOwnerId();
+		if(peopleSuggestBox.getSelectedSuggestion() != null) {
+			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
@@ -628,7 +632,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
-				peopleCombo.clear();
+				peopleSuggestBox.clear();
 				permissionLevelCombo.clearSelections();
 				presenter.setUnsavedViewChanges(false);
 			} else {

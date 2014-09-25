@@ -1,4 +1,4 @@
-/** Add css rules here for your application. */
+./** Add css rules here for your application. */
 /** Example rules used by the template application (remove for your app) */
 /* h1 {
 	font-size: 2em;
@@ -740,11 +740,6 @@ a.shortBtn {
 	margin-bottom: 12px;
 	border-radius: 3em;
 	display: inline !important;
-}
-
-.userGroupSuggestBox {
-	width: 380px;
-	margin-left: 40px;
 }
 
 .item-selected > .userGroupSuggestion {
@@ -1686,6 +1681,10 @@ a.projectTitle:hover {
 
 .width-150 {
 	width: 150px;
+}
+
+.width-80 {
+	width: 80px;
 }
 
 .signin-panel input[type="text"] {
