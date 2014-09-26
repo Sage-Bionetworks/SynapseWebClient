@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class UserGroupSuggestOracle extends SuggestOracle {
 	private SuggestOracle.Request request;
@@ -49,6 +48,10 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 	
 	public SuggestOracle.Request getRequest()	{	return request;		}
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
+	
+	public UserGroupSuggestion makeUserGroupSuggestion(UserGroupHeader header, String prefix) {
+		return new UserGroupSuggestion(header, prefix);
+	}
 
 
 	/*

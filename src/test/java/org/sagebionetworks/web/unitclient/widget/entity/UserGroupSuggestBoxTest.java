@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -30,6 +31,7 @@ public class UserGroupSuggestBoxTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	UserGroupSuggestBox suggestBox;
+	UserGroupSuggestOracle mockOracle;
 	
 	
 	@Before
@@ -39,24 +41,27 @@ public class UserGroupSuggestBoxTest {
 		mockSageImageBundle = mock(SageImageBundle.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		mockOracle = mock(UserGroupSuggestOracle.class);
 		suggestBox = new UserGroupSuggestBox(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockSageImageBundle);
+		suggestBox.setOracle(mockOracle);
 	}
 	
 	@Test
 	public void testGetSuggestions() throws RestServiceException {
 		UserGroupHeaderResponsePage testPage = getResponsePage();
 		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		when(mockOracle.makeUserGroupSuggestion(any(UserGroupHeader.class), anyString())).thenReturn(null);
 		
-		SuggestOracle.Request request = new SuggestOracle.Request();
-		request.setQuery("test");
-		try {
-			suggestBox.getSuggestions(request, null);
-		} catch(NullPointerException e) {
-			
-		} finally {
-			verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
-			verify(mockView).updateFieldStateForSuggestions(any(UserGroupHeaderResponsePage.class), anyInt());
-		}
+		SuggestOracle.Request mockRequest = mock(SuggestOracle.Request.class);
+		when(mockRequest.getQuery()).thenReturn("test");
+		SuggestOracle.Callback mockCallback = mock(SuggestOracle.Callback.class);
+		
+		suggestBox.getSuggestions(mockRequest, mockCallback);
+		
+		verify(mockRequest).getQuery();
+		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		verify(mockView).updateFieldStateForSuggestions(any(UserGroupHeaderResponsePage.class), anyInt());
+		verify(mockCallback).onSuggestionsReady(any(SuggestOracle.Request.class), any(SuggestOracle.Response.class));
 	}
 	
 	private UserGroupHeaderResponsePage getResponsePage() {

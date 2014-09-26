@@ -102,7 +102,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 				
 				// Load suggestions.
 				for (UserGroupHeader header : result.getChildren()) {
-					suggestions.add(oracle.new UserGroupSuggestion(header, view.getText()));
+					suggestions.add(oracle.makeUserGroupSuggestion(header, view.getText()));
 				}
 
 				// Set up response
@@ -138,5 +138,14 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	public void clear() {
 		view.clear();
+	}
+	
+	/**
+	 * For testing. This would not work as intended, as it does
+	 * not update the view's oracle.
+	 * @param oracle
+	 */
+	public void setOracle(UserGroupSuggestOracle oracle) {
+		this.oracle = oracle;
 	}
 }
