@@ -44,7 +44,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	}
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (suggestBox.getSelectedSuggestion() == null)	// TODO: was peopleCombo.isValid(). Does this work?
+		if (suggestBox.getSelectedSuggestion() == null)
 			throw new IllegalArgumentException("No user or team was selected.");
 	}
 	@Override
