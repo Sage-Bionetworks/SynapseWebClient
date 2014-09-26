@@ -41,9 +41,7 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	@Override
 	public void bindRow(RowOfWidgets row) {
 		// Make sure this row is not already bound.
-		unBindRow(row);
-		// Remove this row if it is already in the list.
-		rows.remove(row);
+		removeRow(row);
 		// Add this row.
 		rows.add(row);
 		// Listen to each row
