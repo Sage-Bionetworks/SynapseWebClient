@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.widget.sharing.UserGroupSearchBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
@@ -30,13 +33,16 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	private LayoutContainer inviteUIPanel;
 	private Button inviteButton;
 	private TextArea messageArea;
-	private ComboBox<ModelData> peopleCombo;
+	private UserGroupSuggestBox peopleSuggestBox;
+	
 	@Inject
 	public InviteWidgetViewImpl(SageImageBundle sageImageBundle,
-			UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+			UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			UserGroupSuggestBox peopleSuggestBox) {
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.peopleSuggestBox = peopleSuggestBox;
 	}
 	
 	@Override
@@ -45,7 +51,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		clear();
 		add(inviteButton);
 		add(inviteUIPanel);
-		peopleCombo.clearSelections();
+		peopleSuggestBox.clear();
 		inviteUIPanel.setVisible(false);
 	}
 	
@@ -62,12 +68,11 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 				}
 			});
 			
-			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
-			peopleCombo.setEmptyText("Enter a user name...");
-			peopleCombo.setWidth(FIELD_WIDTH);
-			peopleCombo.setForceSelection(true);
-			peopleCombo.setTriggerAction(TriggerAction.ALL);
-			inviteUIPanel.add(peopleCombo);
+			// user/group Suggest Box
+			peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+			peopleSuggestBox.setPlaceholderText("Enter a user name...");
+			peopleSuggestBox.setWidth(FIELD_WIDTH + "px");
+			inviteUIPanel.add(peopleSuggestBox.asWidget());
 			
 			messageArea = new TextArea();
 			messageArea.setWidth(FIELD_WIDTH);
@@ -81,16 +86,16 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					if(peopleCombo.getValue() != null) {
-						ModelData selectedModel = peopleCombo.getValue();
-						String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-						String firstName = (String) selectedModel.get(UserGroupSearchBox.KEY_FIRSTNAME);
-						String lastName = (String) selectedModel.get(UserGroupSearchBox.KEY_LASTNAME);
-						String userName = (String) selectedModel.get(UserGroupSearchBox.KEY_USERNAME);
+					if(peopleSuggestBox.getSelectedSuggestion() != null) {
+						UserGroupHeader header = peopleSuggestBox.getSelectedSuggestion().getHeader();
+						String principalIdStr = header.getOwnerId();
+						String firstName = header.getFirstName();
+						String lastName = header.getLastName();
+						String userName = header.getUserName();
 						
 						presenter.sendInvitation(principalIdStr, messageArea.getValue(), DisplayUtils.getDisplayName(firstName, lastName, userName));
 						//do not clear message, but do clear the target user
-						peopleCombo.clearSelections();
+						peopleSuggestBox.clear();
 					}
 					else {
 						showErrorMessage("Please select a user to send an invite to.");

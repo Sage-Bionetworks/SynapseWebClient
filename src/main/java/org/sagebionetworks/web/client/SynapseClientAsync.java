@@ -102,7 +102,9 @@ public interface SynapseClientAsync {
 	
 	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
 	
-	void updateUserProfile(UserProfile userProfile, AsyncCallback<Void> callback);
+	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
+	
+	void getUserGroupHeadersByPrefix(String prefix, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback);
 	
 	void createUserProfileAttachmentPresignedUrl(String id, String tokenOrPreviewId, AsyncCallback<String> callback);
 	

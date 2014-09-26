@@ -9,11 +9,13 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -62,6 +64,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -83,24 +86,28 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
+	private SynapseClientAsync synapseClient;
 	private ListStore<PermissionsTableEntry> permissionsStore;
 	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private ComboBox<ModelData> peopleCombo;
+	private UserGroupSuggestBox peopleSuggestBox;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, CookieProvider cookies) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			CookieProvider cookies, SynapseClientAsync synapseClient, UserGroupSuggestBox peopleCombo) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookies = cookies;
+		this.synapseClient = synapseClient;
+		this.peopleSuggestBox = peopleCombo;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -225,19 +232,18 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				fieldSet.setWidth(FIELD_WIDTH);
 				
 				
-				// user/group combobox
-				peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-				peopleCombo.setEmptyText("Enter name...");
-				peopleCombo.setFieldLabel("Name");
-				peopleCombo.setForceSelection(true);
-				peopleCombo.setTriggerAction(TriggerAction.ALL);
-				peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-					@Override
-					public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-						presenter.setUnsavedViewChanges(true);
-					}
-				});
-				fieldSet.add(peopleCombo);
+				// user/group Suggest Box
+				peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+				peopleSuggestBox.setPlaceholderText("Enter name...");
+				peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
+				HorizontalPanel userGroupPanel = new HorizontalPanel();
+				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
+				
+				Label nameLbl = new Label("Name:");
+				nameLbl.addStyleName("width-80");
+				userGroupPanel.add(nameLbl);
+				userGroupPanel.add(peopleSuggestBox.asWidget());
+				fieldSet.add(userGroupPanel);
 				
 				// permission level combobox
 				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
@@ -617,9 +623,8 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	}
 
 	private void addPersonToAcl() {
-		if(peopleCombo.getValue() != null) {
-			ModelData selectedModel = peopleCombo.getValue();
-			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+		if(peopleSuggestBox.getSelectedSuggestion() != null) {
+			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
@@ -627,7 +632,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
-				peopleCombo.clearSelections();
+				peopleSuggestBox.clear();
 				permissionLevelCombo.clearSelections();
 				presenter.setUnsavedViewChanges(false);
 			} else {

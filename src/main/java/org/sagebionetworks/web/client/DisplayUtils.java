@@ -209,6 +209,38 @@ public class DisplayUtils {
 		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
 	}
 	
+	/**
+	 * Returns an HTML String of the suggestion of the user/group associated with the given header.
+	 * @param header header of the displayed usergroup.
+	 * @param width css style width of the created element (e.g. "150px", "3em")
+	 * @param baseFileHandleUrl
+	 * @param baseProfileAttachmentUrl
+	 * @return
+	 */
+	public static String getUserGroupDisplaySuggestionHtml(UserGroupHeader header, String width, String baseFileHandleUrl, String baseProfileAttachmentUrl) {
+		StringBuilder result = new StringBuilder();
+		result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
+		result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
+		if (header.getIsIndividual()) {
+			result.append(baseProfileAttachmentUrl);
+			result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
+		} else {
+			result.append(baseFileHandleUrl);
+			result.append("?teamId=" + header.getOwnerId() + "\" />");
+		}
+		result.append("<span class=\"search-item movedown-1 margin-right-5\">");
+		if (header.getIsIndividual()) {
+			result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
+		}
+		result.append("<span>" + header.getUserName() + "</span> ");
+		result.append("</span>");
+		if (!header.getIsIndividual()) {
+			result.append("(Team)");
+		}
+		result.append("</div>");
+		return result.toString();
+	}
+	
 	
 	/**
 	 * Returns html for a thumbnail image.

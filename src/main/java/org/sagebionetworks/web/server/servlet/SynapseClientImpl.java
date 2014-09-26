@@ -892,6 +892,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public UserGroupHeaderResponsePage getUserGroupHeadersByPrefix(String prefix, long limit, long offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getUserGroupHeadersByPrefix(prefix, limit, offset);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
 
 	@Override
 	public void updateUserProfile(UserProfile profile)
