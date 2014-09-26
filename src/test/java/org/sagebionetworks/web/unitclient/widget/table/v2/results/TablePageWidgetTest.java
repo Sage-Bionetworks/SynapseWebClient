@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -13,6 +11,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -24,6 +23,8 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView;
@@ -46,6 +47,7 @@ public class TablePageWidgetTest {
 	RowSelectionListener mockListner;
 	PageChangeListener mockPageChangeListner;
 	PaginationWidget mockPaginationWidget;
+	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TablePageWidget widget;
 	List<ColumnModel> schema;
 	List<String> headers;
@@ -61,6 +63,8 @@ public class TablePageWidgetTest {
 		mockListner = Mockito.mock(RowSelectionListener.class);
 		mockPaginationWidget = Mockito.mock(PaginationWidget.class);
 		mockPageChangeListner = Mockito.mock(PageChangeListener.class);
+		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
+		
 		// Use stubs for all cells.
 		Answer<Cell> cellAnswer = new Answer<Cell>() {
 			@Override
@@ -76,7 +80,7 @@ public class TablePageWidgetTest {
 					throws Throwable {
 				return new RowWidget(new RowViewStub(), mockCellFactory);
 			}});
-		
+		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();
@@ -118,6 +122,8 @@ public class TablePageWidgetTest {
 		// there should be a null at the end for the aggregate function.
 		expected.add(null);
 		assertEquals(expected, headers);
+		// are the rows registered?
+		verify(mockKeyboardNavigationHandler, times(extracted.size())).bindRow(any(RowOfWidgets.class));
 	}
 	
 	@Test
@@ -158,12 +164,14 @@ public class TablePageWidgetTest {
 		assertTrue(widget.isOneRowOrMoreRowsSelected());
 		reset(mockListner);
 		widget.onDeleteSelected();
+		// Are the rows removed from the keyboard navigator?
+		verify(mockKeyboardNavigationHandler, times(3)).removeRow(any(RowOfWidgets.class));
 		// The handler should be called once
 		verify(mockListner).onSelectionChanged();
 		assertFalse(widget.isOneRowOrMoreRowsSelected());
 		List<Row> extracted = widget.extractRowSet();
 		assertTrue(extracted.isEmpty());
-		
+
 	}
 	
 	@Test

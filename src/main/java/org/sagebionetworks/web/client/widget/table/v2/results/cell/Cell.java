@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -8,17 +9,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jmhill
  *
  */
-public interface Cell extends IsWidget {
+public interface Cell extends IsWidget, TakesValue<String> {
 
-	/**
-	 * Set the value for this cell
-	 */
-	public void setValue(String value);
-	
-	/**
-	 * Get the value for this cell
-	 * @return
-	 */
-	public String getValue();
 	
 }

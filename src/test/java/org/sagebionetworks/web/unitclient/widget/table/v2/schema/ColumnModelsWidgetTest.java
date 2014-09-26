@@ -4,8 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,15 +29,17 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
+import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBase;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
-import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
-import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
@@ -56,6 +61,7 @@ public class ColumnModelsWidgetTest {
 	EntityUpdatedHandler mockUpdateHandler;
 	PortalGinInjector mockGinInjector;
 	SynapseClientAsync mockSynapseClient;
+	KeyboardNavigationHandler mockKeyboardNavigationHandler;
 	TableModelUtils tableModelUtils;
 	ColumnModelsWidget widget;
 	EntityBundle mockBundle;
@@ -71,6 +77,7 @@ public class ColumnModelsWidgetTest {
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockUpdateHandler = Mockito.mock(EntityUpdatedHandler.class);
+		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
 		adapterFactory = new AdapterFactoryImpl();
 		tableModelUtils = new TableModelUtils(adapterFactory);
 		table = new TableEntity();
@@ -93,6 +100,7 @@ public class ColumnModelsWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
+		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		widget = new ColumnModelsWidget(mockBaseView, mockGinInjector, mockSynapseClient, tableModelUtils);
 		verify(mockBaseView, times(1)).setViewer(mockViewer);
 		verify(mockBaseView, times(1)).setEditor(mockEditor);
@@ -120,6 +128,8 @@ public class ColumnModelsWidgetTest {
 		verify(mockEditor, times(1)).configure(ViewType.EDITOR, isEdtiable);
 		verify(mockEditor, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 		verify(mockBaseView, times(1)).showEditor();
+		// are the rows registered?
+		verify(mockKeyboardNavigationHandler, times(1)).removeAllRows();
 		// Extract the columns from the editor
 		List<ColumnModel> clone = widget.getEditedColumnModels();
 		assertEquals(schema, clone);
@@ -145,6 +155,8 @@ public class ColumnModelsWidgetTest {
 		widget.onEditColumns();
 		// This should add a new string column
 		widget.addNewColumn();
+		// the new row should be added to the keyboard navigator
+		verify(mockKeyboardNavigationHandler).bindRow(any(RowOfWidgets.class));
 		// A string should be added...
 		ColumnModel newModel = new ColumnModel();
 		newModel.setColumnType(ColumnModelsWidget.DEFAULT_NEW_COLUMN_TYPE);

@@ -5,11 +5,13 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -119,5 +121,28 @@ public class ColumnModelTableRowEditorImpl extends AbstractColumnModelTableRow i
 	@Override
 	public List<String> getEnumValues() {
 		return ColumnModelUtils.csvToList(restrictValues.getText());
+	}
+
+	@Override
+	public IsWidget getWidget(int index) {
+		switch (index) {
+		case 0:
+			return name;
+		case 1:
+			return type;
+		case 2:
+			return maxSize;
+		case 3:
+			return defaultValue;
+		case 4:
+			return restrictValues;
+		default:
+			throw new IllegalArgumentException("Unknown index: "+index);
+		}
+	}
+
+	@Override
+	public int getWidgetCount() {
+		return 5;
 	}
 }
