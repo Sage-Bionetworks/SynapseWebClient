@@ -69,25 +69,11 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 				}
 			});
 			
-//			peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
-//			peopleCombo.setEmptyText("Enter a user name...");
-//			peopleCombo.setWidth(FIELD_WIDTH);
-//			peopleCombo.setForceSelection(true);
-//			peopleCombo.setTriggerAction(TriggerAction.ALL);
-//			inviteUIPanel.add(peopleCombo);
-			
 			// user/group Suggest Box
 			peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 			peopleSuggestBox.setPlaceholderText("Enter a user name...");
 			peopleSuggestBox.setWidth(FIELD_WIDTH + "px");
-//			HorizontalPanel userGroupPanel = new HorizontalPanel();
-//			userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
-//			userGroupPanel.add(new Label("Name:"));
-//			userGroupPanel.add(peopleSuggestBox.asWidget());
 			inviteUIPanel.add(peopleSuggestBox.asWidget());
-			
-			
-			
 			
 			messageArea = new TextArea();
 			messageArea.setWidth(FIELD_WIDTH);

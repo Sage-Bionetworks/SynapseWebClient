@@ -60,7 +60,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	
 	@Override
 	public Widget asWidget() {
-		view.setPresenter(this);
+		//view.setPresenter(this);
 		return view.asWidget();
 	}
 	
@@ -141,7 +141,7 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 	}
 	
 	/**
-	 * For testing. This would not work as intended, as it does
+	 * For testing. This would break the suggest box, as it does
 	 * not update the view's oracle.
 	 * @param oracle
 	 */

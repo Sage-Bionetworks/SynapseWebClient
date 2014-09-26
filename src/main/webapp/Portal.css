@@ -63,16 +63,6 @@
 	width: 400px;
 }
 
-.gwt-SuggestBoxPopup {
-	z-index: 2000;
-	background-color: #fff;
-	border-radius: 0px 0px 5px 5px;
-}
-
-.suggestPopupContent tr:nth-child(2n) {
-	background-color: #F0F4F9;
-}
-
 .dialogVPanel {
 	margin: 5px;
 }
@@ -740,6 +730,17 @@ a.shortBtn {
 	margin-bottom: 12px;
 	border-radius: 3em;
 	display: inline !important;
+}
+
+
+.userGroupSuggestBoxPopup {
+	z-index: 2000;
+	background-color: #fff;
+	border-radius: 0px 0px 5px 5px;
+}
+
+.userGroupSuggestBoxPopup .suggestPopupContent tr:nth-child(2n) {
+	background-color: #F0F4F9;
 }
 
 .item-selected > .userGroupSuggestion {

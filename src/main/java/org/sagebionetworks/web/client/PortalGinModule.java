@@ -628,7 +628,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
 		
 		// User Suggest Box
-		bind(UserGroupSuggestBoxViewImpl.class).in(Singleton.class);
 		bind(UserGroupSuggestBoxView.class).to(UserGroupSuggestBoxViewImpl.class);
 
 		// Home Search Box

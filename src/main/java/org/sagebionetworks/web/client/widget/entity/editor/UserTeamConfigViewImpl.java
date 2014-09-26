@@ -39,7 +39,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 		suggestBox.setPlaceholderText("Enter name...");
 		suggestBox.setWidth(330 + "px");
 		SimplePanel panel = new SimplePanel();
-		panel.add(suggestBox.asWidget());
+		panel.setWidget(suggestBox.asWidget());
 		panel.addStyleName("margin-10");
 		setWidget(panel);
 	}
@@ -94,9 +94,4 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	public int getAdditionalWidth() {
 		return 0;
 	}
-	
-	/*
-	 * Private Methods
-	 */
-
 }

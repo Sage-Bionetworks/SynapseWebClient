@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /*
- * SuggestionDisplay (for decorating the SuggestionBox Popup)
+ * SuggestionDisplay (for decorating the SuggestBox Popup)
  */
 public class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
 	private SageImageBundle sageImageBundle;
@@ -29,8 +29,12 @@ public class UserGroupSuggestionDisplay extends SuggestBox.DefaultSuggestionDisp
 	public UserGroupSuggestionDisplay(SageImageBundle sageImageBundle) {
 		super();
 		this.sageImageBundle = sageImageBundle;
+		getPopupPanel().addStyleName("userGroupSuggestBoxPopup");
 	}
 	
+	/**
+	 * Decorates the SuggestBox Popup
+	 */
 	@Override
 	protected Widget decorateSuggestionList(Widget suggestionList) {
 		setUpFields();

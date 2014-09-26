@@ -101,7 +101,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	
 	public void clear() {
 		presenter.setSelectedSuggestion(null);
-		getValueBox().setText(null);
+		getValueBox().setText(null);	// Empty text box
 	}
 	
 	public void selectSuggestion(UserGroupSuggestion suggestion) {
@@ -148,7 +148,7 @@ public class UserGroupSuggestBoxViewImpl extends SuggestBox implements UserGroup
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
+	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		getUserGroupSuggestOracle().configure((UserGroupSuggestBox) presenter);
 	}
