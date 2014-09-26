@@ -36,7 +36,9 @@ public class IsWidgetStub implements IsWidget, HasKeyDownHandlers {
 
 	@Override
 	public void fireEvent(GwtEvent<?> event) {
-		this.handler.onKeyDown((KeyDownEvent) event);
+		if(this.handler != null){
+			this.handler.onKeyDown((KeyDownEvent) event);
+		}
 	}
 
 	@Override
