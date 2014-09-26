@@ -2,12 +2,14 @@ package org.sagebionetworks.web.client.widget.table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
@@ -23,6 +25,7 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 
 	ArrayList<RowOfWidgets> rows;
 	Map<IsWidget, Address> cellAddressMap;
+	Map<RowOfWidgets, List<HandlerRegistration>> registrationMap;
 	int columnCount;
 	boolean needsRecalcualteAdressess;
 	FocusSetter focusSetter;
@@ -31,44 +34,80 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	public KeyboardNavigationHandlerImpl(FocusSetter focusSetter) {
 		rows = new ArrayList<RowOfWidgets>();
 		cellAddressMap = new HashMap<IsWidget, Address>();
+		this.registrationMap = new HashMap<RowOfWidgets, List<HandlerRegistration>>();
 		this.focusSetter = focusSetter;
 	}
 
 	@Override
 	public void bindRow(RowOfWidgets row) {
+		// Make sure this row is not already bound.
+		unBindRow(row);
+		// Remove this row if it is already in the list.
+		rows.remove(row);
 		// Add this row.
 		rows.add(row);
 		// Listen to each row
 		columnCount = 0;
+		List<HandlerRegistration> registration = new ArrayList<HandlerRegistration>(row.getWidgetCount());
 		for (int i=0; i<row.getWidgetCount(); i++) {
 			IsWidget cell = row.getWidget(i);
-			bindEditor(cell);
+			HandlerRegistration hr = bindEditor(cell);
+			if(hr != null){
+				registration.add(hr);
+			}
 			columnCount++;
 		}
+		// keep track of the handler registration so we can do future cleanup.
+		this.registrationMap.put(row, registration);
 		needsRecalcualteAdressess = true;
 	}
+	
+	/**
+	 * Unbind a row.  Does nothing if the row is not currently bound.
+	 * @param row
+	 */
+	private void unBindRow(RowOfWidgets row){
+		List<HandlerRegistration> current = this.registrationMap.remove(row);
+		if(current != null){
+			for(HandlerRegistration hr: current){
+				hr.removeHandler();
+			}
+		}
+	}
 
-	private void bindEditor(final IsWidget editor) {
+	/**
+	 * Register for key down events for this widget.
+	 * @param editor
+	 * @return
+	 */
+	private HandlerRegistration bindEditor(final IsWidget editor) {
 		// Can only listen to widget that implement HasKeyDownHandlers
 		if(editor instanceof HasKeyDownHandlers){
 			HasKeyDownHandlers keyDownCell = (HasKeyDownHandlers) editor;
-			keyDownCell.addKeyDownHandler(new KeyDownHandler() {
+			return keyDownCell.addKeyDownHandler(new KeyDownHandler() {
 				@Override
 				public void onKeyDown(KeyDownEvent event) {
 					editorKeyPressed(editor, event);
 				}
 			});
 		}
+		// There is no handler if this is not an instanceof HasKeyDownHandlers
+		return null;
 	}
 
 	@Override
 	public void removeRow(RowOfWidgets row) {
+		unBindRow(row);
 		rows.remove(row);
 		needsRecalcualteAdressess = true;
 	}
 
 	@Override
 	public void removeAllRows() {
+		// Unbind all rows
+		for(RowOfWidgets row: rows){
+			unBindRow(row);
+		}
 		this.rows.clear();
 		this.needsRecalcualteAdressess = true;
 	}
@@ -138,7 +177,9 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	 */
 	private void onRight(IsWidget editor) {
 		Address current = cellAddressMap.get(editor);
-		attemptSetFocus(current.columnIndex+1, current.rowIndex);
+		if(current != null){
+			attemptSetFocus(current.columnIndex+1, current.rowIndex);
+		}
 	}
 
 	/**
@@ -147,7 +188,9 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	 */
 	private void onLeft(IsWidget editor) {
 		Address current = cellAddressMap.get(editor);
-		attemptSetFocus(current.columnIndex-1, current.rowIndex);
+		if (current != null) {
+			attemptSetFocus(current.columnIndex - 1, current.rowIndex);
+		}
 	}
 
 	/**
@@ -156,7 +199,9 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	 */
 	private void onDown(IsWidget editor) {
 		Address current = cellAddressMap.get(editor);
-		attemptSetFocus(current.columnIndex, current.rowIndex+1);
+		if (current != null) {
+			attemptSetFocus(current.columnIndex, current.rowIndex + 1);
+		}
 	}
 	
 	/**
@@ -165,7 +210,9 @@ public class KeyboardNavigationHandlerImpl implements KeyboardNavigationHandler 
 	 */
 	private void onUp(IsWidget editor) {
 		Address current = cellAddressMap.get(editor);
-		attemptSetFocus(current.columnIndex, current.rowIndex-1);
+		if (current != null) {
+			attemptSetFocus(current.columnIndex, current.rowIndex - 1);
+		}
 	}
 
 	/**

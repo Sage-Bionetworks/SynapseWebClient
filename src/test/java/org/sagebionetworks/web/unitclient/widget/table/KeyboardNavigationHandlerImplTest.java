@@ -160,4 +160,38 @@ public class KeyboardNavigationHandlerImplTest {
 		verify(mockFocusSetter).attemptSetFocus(table[2][1], true);
 	}
 	
+	@Test
+	public void testKeyDownAfterRemove(){
+		// Remove the middle row.
+		keyboardNavigation.removeRow(rows.get(1));
+		// Any event fired from the removed row should have no effect.
+		table[1][1].fireEvent(mockDownArrowEvent);
+		// should trigger focus on the cell bellow
+		verify(mockFocusSetter, never()).attemptSetFocus(any(IsWidget.class), anyBoolean());
+	}
+	
+	@Test
+	public void testKeyDownAfterRemoveAll(){
+		// Remove all rows
+		keyboardNavigation.removeAllRows();
+		// Any event fired from the removed row should have no effect.
+		table[1][1].fireEvent(mockDownArrowEvent);
+		// should trigger focus on the cell bellow
+		verify(mockFocusSetter, never()).attemptSetFocus(any(IsWidget.class), anyBoolean());
+	}
+	
+	@Test
+	public void testDoubleBind(){
+		// bind a row that is already bound.  This should move that row to the last row.
+		keyboardNavigation.bindRow(rows.get(1));
+		// Now fire an event down on this row.
+		table[1][1].fireEvent(mockDownArrowEvent);
+		// If the row is moved to the bottom then a key down should have no effect.
+		verify(mockFocusSetter, never()).attemptSetFocus(any(IsWidget.class), anyBoolean());
+		// a move up should work
+		table[1][1].fireEvent(mockUpArrowEvent);
+		// The last row should now be the middle row so a move up from the bottom should land there.
+		verify(mockFocusSetter).attemptSetFocus(table[2][1], true);
+	}
+	
 }
