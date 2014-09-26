@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -117,7 +118,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		} 		
 	}
 	
-	public void showPopover(Anchor anchor, final String entityId, final String entityName) {
+	public void showPopover(final Anchor anchor, final String entityId, final String entityName) {
 		if (!isPopoverInitialized) {
 			presenter.getInfo(entityId, new AsyncCallback<KeyValueDisplay<String>>() {						
 				@Override
@@ -130,12 +131,19 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 					renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
 				}
 				
-				private void renderPopover(String content) {
+				private void renderPopover(final String content) {
 					isPopoverInitialized = true;
-					tooltip.setText(content);
-					tooltip.reconfigure();
-					if (isPopover && entityContainer.isAttached())
-						tooltip.show();
+					Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+						@Override
+						public void execute() {
+							if (entityContainer.isAttached()) {
+								tooltip.setText(content);
+								tooltip.reconfigure();
+								if (isPopover)
+									tooltip.show();
+							}
+						}
+					});
 				}
 			});
 		}
