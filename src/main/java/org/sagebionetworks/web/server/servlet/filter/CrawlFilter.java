@@ -7,7 +7,6 @@ import static org.sagebionetworks.web.shared.EntityBundleTransport.ENTITY;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -43,7 +42,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -123,13 +121,8 @@ public class CrawlFilter implements Filter {
 		//add direct links to all public projects in the system
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		html.append("<h1>"+DisplayConstants.DEFAULT_PAGE_TITLE+"</h1>" + DisplayConstants.DEFAULT_PAGE_DESCRIPTION + "<br />");
-		String queryJson = "";
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		query.writeToJSONObject(adapter);
-		queryJson = adapter.toJSONString();
-
-		EntityWrapper entityWrapper = synapseClient.search(queryJson);
-		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+		
+		SearchResults results = synapseClient.search(query);
 		
 		//append this set to the list
 		while(results.getHits().size() > 0) {
@@ -139,13 +132,7 @@ public class CrawlFilter implements Filter {
 			}
 			long newStart = results.getStart() + results.getHits().size();
 			query.setStart(newStart);
-			
-			adapter = jsonObjectAdapter.createNew();
-			query.writeToJSONObject(adapter);
-			queryJson = adapter.toJSONString();
-			
-			entityWrapper = synapseClient.search(queryJson);
-			results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
+			results = synapseClient.search(query);
 		}
 		
 		html.append("</body></html>");
@@ -163,8 +150,7 @@ public class CrawlFilter implements Filter {
 		String markdown = null;
 		String createdBy = null;
 		try{
-			String userProfileJson = synapseClient.getUserProfile(entity.getCreatedBy());
-			UserProfile profile = EntityFactory.createEntityFromJSONString(userProfileJson, UserProfile.class);
+			UserProfile profile = synapseClient.getUserProfile(entity.getCreatedBy());
 			StringBuilder createdByBuilder = new StringBuilder();
 			if (profile.getFirstName() != null)
 				createdByBuilder.append(profile.getFirstName() + " ");
@@ -175,8 +161,7 @@ public class CrawlFilter implements Filter {
 			createdBy = createdByBuilder.toString();
 		}  catch (Exception e) {}
 		try{
-			String wikiPageJson = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
-			WikiPage rootPage = EntityFactory.createEntityFromJSONString(wikiPageJson, WikiPage.class);
+			WikiPage rootPage = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), null));
 			markdown = escapeHtml(rootPage.getMarkdown());
 		} catch (Exception e) {}
 		
@@ -236,9 +221,9 @@ public class CrawlFilter implements Filter {
 	}
 	
 	private String getAllProjectsHtml(String searchQueryJson) throws RestServiceException, JSONObjectAdapterException{
-		EntityWrapper entityWrapper = synapseClient.search(searchQueryJson);
-		SearchResults results = EntityFactory.createEntityFromJSONString(entityWrapper.getEntityJson(), SearchResults.class);
 		SearchQuery inputQuery = EntityFactory.createEntityFromJSONString(searchQueryJson, SearchQuery.class);
+		SearchResults results = synapseClient.search(inputQuery);
+		
 		//append this set to the list
 		StringBuilder html = new StringBuilder();
 		html.append("<!DOCTYPE html><html><head><title>Sage Synapse: All Projects - starting from "+inputQuery.getStart()+"</title><meta name=\"description\" content=\"\" /></head><body>");

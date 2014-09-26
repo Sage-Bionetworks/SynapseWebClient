@@ -163,9 +163,9 @@ index++;seg=segments[index];}}
 if(!start_offset||start_offset==min_offset){self.svg.change(p.data('name_path'),{'startOffset':start_offset});return;}
 var len_right=seg.len_range[1];var segs=[seg];index++;seg=segments[index];while(seg&&len_right<start_offset+name_len){segs.push(seg);len_right=seg.len_range[1];index++;seg=segments[index];}
 for(var i=0;i<skip_points.length;i++){var pt=skip_points[i];var pt_rad=pt[2];for(var j=0;j<segs.length;j++){var s=segs[j];if(s.x_range[0]==pt[0]){if(start_offset<s.len_range[0]+pt_rad){start_offset=s.len_range[0]+pt_rad;}}else if(s.x_range[1]==pt[0]){if(start_offset+name_len>s.len_range[1]-pt_rad){start_offset=s.len_range[1]-name_len-pt_rad;}}}}
-self.svg.change(p.data('name_path'),{'startOffset':start_offset});};};NChart.SvgDrawer.prototype.segment_search=function(a,b){return a>b.x_range[1]?1:a<b.x_range[0]?-1:0;};$(function(){goog.math.Bezier.prototype.length=function(){var old={'x':0,'y':0},len=0;for(var i=0;i<1.01;i+=.1){var dot=this.getPoint(i);i&&(len+=Math.sqrt(Math.pow(old.x-dot.x,2)+Math.pow(old.y-dot.y,2)));old=dot;}
+self.svg.change(p.data('name_path'),{'startOffset':start_offset});};};NChart.SvgDrawer.prototype.segment_search=function(a,b){return a>b.x_range[1]?1:a<b.x_range[0]?-1:0;};function bezier_prototype_length_and_lengthAtPoint(){goog.math.Bezier.prototype.length=function(){var old={'x':0,'y':0},len=0;for(var i=0;i<1.01;i+=.1){var dot=this.getPoint(i);i&&(len+=Math.sqrt(Math.pow(old.x-dot.x,2)+Math.pow(old.y-dot.y,2)));old=dot;}
 return len;}
-goog.math.Bezier.prototype.lengthAtPoint=function(t){var clone=this.clone();clone.subdivideLeft(t);return clone.length();}});function intersect(arr1,arr2){if(arr1.length<=arr2.length){var short_arr=arr1,long_arr=arr2;}else{var short_arr=arr2,long_arr=arr1;}
+goog.math.Bezier.prototype.lengthAtPoint=function(t){var clone=this.clone();clone.subdivideLeft(t);return clone.length();}};function intersect(arr1,arr2){if(arr1.length<=arr2.length){var short_arr=arr1,long_arr=arr2;}else{var short_arr=arr2,long_arr=arr1;}
 return goog.array.filter(short_arr,function(el){return goog.array.contains(long_arr,el);});}
 function next2power(x){x--;x|=x>>1;x|=x>>2;x|=x>>4;x|=x>>8;x|=x>>16;return x+1;}
 window.NChart=NChart;

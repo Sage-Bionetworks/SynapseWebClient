@@ -40,7 +40,6 @@ public class TableEntityWidgetTest {
 	TableBundle tableBundle;
 	TableEntity tableEntity;
 	TableEntityWidgetView mockView;
-	AsynchronousProgressWidget mockAsynchronousProgressWidget;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
 	QueryInputWidget mockQueryInputWidget;
@@ -52,7 +51,6 @@ public class TableEntityWidgetTest {
 	public void before(){
 		// mocks
 		mockView = Mockito.mock(TableEntityWidgetView.class);
-		mockAsynchronousProgressWidget = Mockito.mock(AsynchronousProgressWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
@@ -66,7 +64,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, mockQueryResultsWidget, mockQueryInputWidget);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 		

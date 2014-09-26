@@ -44,9 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
-import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
-import org.sagebionetworks.web.client.widget.table.TableRowHeader;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -882,7 +880,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 
 	private Widget createTableListWidget(String parentId, boolean canEdit) {		
 		final TableListWidget listWidget = ginInjector.getTableListWidget();		
-		listWidget.configure(parentId, canEdit, true);
+		listWidget.configure(parentId, canEdit);
 		return listWidget.asWidget();		
 	}
 	

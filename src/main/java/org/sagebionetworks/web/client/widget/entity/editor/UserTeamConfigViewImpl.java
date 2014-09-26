@@ -4,7 +4,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.sharing.UserGroupSearchBox;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;

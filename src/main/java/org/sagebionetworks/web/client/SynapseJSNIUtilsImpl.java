@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
@@ -28,6 +29,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	public static String FILE_FIELD_ID;
+	public static Uploader UPLOADER;
 	
 	private static ProgressCallback progressCallback;
 	
@@ -271,11 +273,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void addDropZoneStyleEventHandling(String fileFieldId) {
+	public void addDropZoneStyleEventHandling(String fileFieldId, Uploader uploader) {
 		if (FILE_FIELD_ID == null) {
 			_addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_DROP_STYLE_NAME);
 		}
 		FILE_FIELD_ID = fileFieldId;
+		UPLOADER = uploader;
 	}
 	
 	private static native void _addDropZoneStyleEventHandling(String dropStyleName) /*-{
@@ -297,6 +300,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		$doc.addEventListener("drop", function( event ) {
 				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
 					event.target.className = event.target.className.replace(dropStyleName, '');
+  					var files = event.dataTransfer.files;
+					$doc.getElementById(@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID).files = files;
+					// UPLOADER.uploadFiles();
+					@org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::UPLOADER.@org.sagebionetworks.web.client.widget.entity.download.Uploader::uploadFiles()();
 				}
 			}, false);
 		

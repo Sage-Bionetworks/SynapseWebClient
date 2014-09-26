@@ -87,11 +87,8 @@ public class SettingsPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
-		profile.writeToJSONObject(adapter);
-		String userProfileJson = adapter.toJSONString(); 
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -110,9 +107,9 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
 		
@@ -132,7 +129,7 @@ public class SettingsPresenterTest {
 
 	@Test
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
@@ -143,7 +140,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
@@ -185,11 +182,11 @@ public class SettingsPresenterTest {
 		assertNull(profile.getNotificationSettings());
 		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
 		
-		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<UserProfile> argument = ArgumentCaptor.forClass(UserProfile.class);
 		//should have called updateUserProfile
 		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
 		//with our new notification settings
-		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		UserProfile updatedProfile = argument.getValue();
 		assertNotNull(updatedProfile.getNotificationSettings());
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
@@ -209,11 +206,11 @@ public class SettingsPresenterTest {
 		assertNotNull(profile.getNotificationSettings());
 		profilePresenter.updateMyNotificationSettings(sendEmailNotifications, markEmailedMessagesAsRead);
 		
-		ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<UserProfile> argument = ArgumentCaptor.forClass(UserProfile.class);
 		//should have called updateUserProfile
 		verify(mockSynapseClient).updateUserProfile(argument.capture(), any(AsyncCallback.class));
 		//with our new notification settings
-		UserProfile updatedProfile = new UserProfile(adapterFactory.createNew(argument.getValue()));
+		UserProfile updatedProfile = argument.getValue();
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
 		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
@@ -221,9 +218,9 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testUpdateMyNotificationSettingsFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unexpected exception")).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		profilePresenter.updateMyNotificationSettings(true, true);
-		verify(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 	}
 	

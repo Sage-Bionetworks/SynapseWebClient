@@ -116,6 +116,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		clearHandlers();
 		uploadLog = new StringBuilder();
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
+		if (!isDirectUploadSupported)
+			disableMultipleFileUploads();
 	}		
 		
 	public Widget asWidget(Entity entity) {
@@ -161,6 +163,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				//old way
 				getOldUploadUrl();
 		return uploadUrl;
+	}
+	
+	public void uploadFiles() {
+		view.triggerUpload();
 	}
 	
 	@Override
@@ -277,7 +283,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if (!fileHasBeenUploaded) {
 				//cancel the upload
 				fireCancelEvent();
-				view.resetToInitialState();
 				clearState();
 			} else {
 				//finish upload
@@ -515,11 +520,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void combineChunksUploadFailure(List<String> requestList, int currentAttempt, String errorMessage) {
+	public void combineChunksUploadFailure(final List<String> requestList, final int currentAttempt, String errorMessage) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
-		else //retry
-			directUploadStep5(requestList, currentAttempt+1);
+		else {
+			//sleep for a second on the client, then try again.
+			gwt.scheduleExecution(new Callback() {
+				@Override
+				public void invoke() {
+					directUploadStep5(requestList, currentAttempt+1);
+				}
+			}, RETRY_DELAY);
+		}
 	}
 	
 	public void checkStatusAgainLater(final String daemonId, final String entityId, final String parentEntityId, final List<String> requestList, final int currentAttempt) {
@@ -767,6 +779,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.hideLoading();
 		view.clear();
 		handlerManager.fireEvent(new CancelEvent());
+		view.resetToInitialState();
 	}
 	
 	private void uploadSuccess() {

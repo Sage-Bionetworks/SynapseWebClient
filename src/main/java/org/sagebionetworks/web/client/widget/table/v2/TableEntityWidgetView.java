@@ -54,12 +54,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	public void setQueryResultsVisible(boolean visible);
 
 	/**
-	 * Set the AsynchronousProgressWidget to be shown when queries are run.
-	 * @param asynchProgressWidget
-	 */
-	public void setProgressWidget(AsynchronousProgressWidget asynchProgressWidget);
-
-	/**
 	 * Show or hide the Query Progress widget.
 	 * @param b
 	 */

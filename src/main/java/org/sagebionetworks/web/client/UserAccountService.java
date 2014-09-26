@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -15,7 +16,7 @@ public interface UserAccountService extends RemoteService {
 
 	public String initiateSession(String username, String password) throws RestServiceException;
 	
-	public String getUserSessionData(String sessionToken) throws RestServiceException;
+	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException;
 	
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException;
 

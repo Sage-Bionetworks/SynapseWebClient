@@ -26,9 +26,7 @@ import org.sagebionetworks.web.client.view.SearchView;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.search.PaginationUtil;
 import org.sagebionetworks.web.shared.EntityType;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.SearchQueryUtils;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -296,32 +294,22 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			return;
 		}
 		
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			currentSearch.writeToJSONObject(adapter);
-			synapseClient.search(adapter.toJSONString(), new AsyncCallback<EntityWrapper>() {			
-				@Override
-				public void onSuccess(EntityWrapper result) {
-					currentResult = new SearchResults();		
-					try {
-						currentResult = nodeModelCreator.createJSONEntity(result.getEntityJson(), SearchResults.class);
-					} catch (JSONObjectAdapterException e) {
-						onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-					}									
-					view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
-					newQuery = false;
+		
+		synapseClient.search(currentSearch, new AsyncCallback<SearchResults>() {			
+			@Override
+			public void onSuccess(SearchResults result) {
+				currentResult = result;		
+				view.setSearchResults(currentResult, join(currentSearch.getQueryTerm(), " "), newQuery);
+				newQuery = false;
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
+					view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {
-						view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-					}
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
+			}
+		});
 	}
 
 	private boolean isEmptyQuery() {

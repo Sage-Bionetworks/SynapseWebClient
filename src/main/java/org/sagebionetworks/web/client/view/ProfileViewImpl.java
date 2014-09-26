@@ -63,7 +63,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	SimplePanel updateUserInfoPanel;
 	@UiField
 	FlowPanel viewProfilePanel;
-	@UiField
+	
 	SimplePanel certifiedUserBadgePanel;
 	
 	@UiField
@@ -223,11 +223,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void initCertificationBadge() {
+		certifiedUserBadgePanel = new SimplePanel();
+		certifiedUserBadgePanel.addStyleName("displayInline");
 		Image certifiedUserImage = new Image(sageImageBundle.certificate().getSafeUri());
 		certifiedUserImage.setHeight("32px");
 		certifiedUserImage.setWidth("25px");
 		certifiedUserImage.setPixelSize(25, 32);
-		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top");
+		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
 		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
 			@Override
@@ -262,7 +264,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		clear();
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
-			certifiedUserBadgePanel.setVisible(true); 
+			viewProfilePanel.add(certifiedUserBadgePanel);
 		 }
 		
 		fillInProfileView(profile, viewProfilePanel);
@@ -416,12 +418,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 
 		 //build profile html
 		 SafeHtmlBuilder builder = new SafeHtmlBuilder();
-		  builder.appendHtmlConstant("<h2>");
+		 builder.appendHtmlConstant("<h2 class=\"displayInline\">");
 		 builder.appendEscapedLines(name);
 		 builder.appendHtmlConstant("</h2>");
 		 
 		 HTML headlineHtml = new HTML(builder.toSafeHtml());
-		 headlineHtml.addStyleName("inline-block");
+		 headlineHtml.addStyleName("displayInline");
 		 viewProfilePanel.add(headlineHtml);
 		 
 		 builder = new SafeHtmlBuilder();
@@ -484,7 +486,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		picturePanel.clear();
-		certifiedUserBadgePanel.setVisible(false);
 		DisplayUtils.hide(navtabContainer);
 		projectsTabContent.clear();
 		//init with loading widget

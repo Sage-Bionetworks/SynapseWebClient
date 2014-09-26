@@ -807,7 +807,6 @@ a.shortBtn {
 
 .markdown code {
 	background-clip: padding-box;
-    border: 1px solid #DDDDDD;
     border-radius: 3px 3px 3px 3px;
     color: #666666;
     font: 12px/1.4 arial,FreeSans,Helvetica,sans-serif;
@@ -1729,6 +1728,17 @@ a.projectTitle:hover {
 .fullOpacityImp {
 	opacity: 1 !important;
 }
+
+/* seamless attribute is not yet supported on most browsers, so define the style here for all iframes with this attribute */
+iframe[seamless] {
+    background-color: transparent;
+    border: 0px none transparent;
+    padding: 0px;
+    overflow: hidden;
+    width: 100%;
+    min-height: 300px;
+}
+
 
 /*==================================*/
 /* GXT Overrides */

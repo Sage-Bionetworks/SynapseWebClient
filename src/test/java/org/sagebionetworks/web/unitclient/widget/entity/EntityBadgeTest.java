@@ -58,14 +58,10 @@ public class EntityBadgeTest {
 		widget = new EntityBadge(mockView, mockEntityIconsCache, mockSynapseClient, adapterFactory, mockGlobalApplicationState, mockClientCache);
 		
 		//set up user profile
-		JSONObjectAdapter adapter = new JSONObjectAdapterImpl().createNew();
 		UserProfile userProfile =  new UserProfile();
 		userProfile.setOwnerId("4444");
 		userProfile.setUserName("Bilbo");
-		userProfile.writeToJSONObject(adapter);
-		String userProfileJson = adapter.toJSONString(); 
-
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void setupEntity(Entity entity) throws JSONObjectAdapterException {

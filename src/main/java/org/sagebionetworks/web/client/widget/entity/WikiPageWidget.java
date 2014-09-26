@@ -112,11 +112,11 @@ SynapseWidgetPresenter {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
 				//get the wiki page
-				synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
+				synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 					@Override
-					public void onSuccess(String result) {
+					public void onSuccess(WikiPage result) {
 						try {
-							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);
@@ -317,7 +317,7 @@ SynapseWidgetPresenter {
 		setOwnerObjectName(new OwnerObjectNameCallback() {
 			@Override
 			public void ownerObjectNameInitialized(final String ownerObjectName, final boolean isDescription) {
-				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<String>() {
+				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<WikiPage>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -335,9 +335,9 @@ SynapseWidgetPresenter {
 					}
 
 					@Override
-					public void onSuccess(String result) {
+					public void onSuccess(WikiPage result) {
 						try {
-							currentPage = nodeModelCreator.createJSONEntity(result, WikiPage.class);
+							currentPage = result;
 							wikiKey.setWikiPageId(currentPage.getId());
 							boolean isRootWiki = currentPage.getParentWikiId() == null;
 							view.configure(currentPage.getMarkdown(), wikiKey, ownerObjectName, canEdit, isRootWiki, isDescription, isCurrentVersion, versionInView, isEmbeddedInOwnerPage);

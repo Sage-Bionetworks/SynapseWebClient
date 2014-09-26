@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableModelUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
@@ -42,6 +44,7 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 	List<ColumnModelTableRow> editorRows;
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
+	KeyboardNavigationHandler keyboardNavigationHandler;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -85,6 +88,11 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 			rowViewer.setSelectable(false);
 			viewer.addColumn(rowViewer);
 		}
+		if(isEditable){
+			keyboardNavigationHandler = ginInjector.createKeyboardNavigationHandler();
+		}else{
+			keyboardNavigationHandler = null;
+		}
 	}
 
 	@Override
@@ -109,6 +117,10 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		cm.setMaximumSize(DEFAULT_STRING_MAX_SIZE);
 		// Assign an id to this column
 		ColumnModelTableRowEditor rowEditor = ginInjector.createNewColumnModelTableRowEditor();
+		// bind this row for navigation.
+		if(this.keyboardNavigationHandler != null){
+			this.keyboardNavigationHandler.bindRow(rowEditor);
+		}
 		ColumnModelUtils.applyColumnModelToRow(cm, rowEditor);
 		rowEditor.setSelectionPresenter(this);
 		editor.addColumn(rowEditor);
@@ -136,9 +148,13 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 		baseView.showEditor();
 	}
 	/**
-	 * Reset the 
+	 * Reset the editor.
 	 */
 	private void resetEditor(){
+		// clear the current navigation editor
+		if(this.keyboardNavigationHandler != null){
+			this.keyboardNavigationHandler.removeAllRows();
+		}
 		this.editorRows.clear();
 		editor.configure(ViewType.EDITOR, this.isEditable);
 		for(ColumnModel cm: this.startingModels){
@@ -154,30 +170,23 @@ public class ColumnModelsWidget implements ColumnModelsView.Presenter, ColumnMod
 
 	@Override
 	public void onSave() {
-		
 		// Get the models from the view and save them
 		List<ColumnModel> newSchema = getEditedColumnModels();
-		List<String> json;
-		try {
-			baseView.setLoading();
-			json = tableModelUtils.toJSONList(newSchema);
-			String tableEntityJSON = tableModelUtils.toJSON(this.bundle.getEntity());
-			synapseClient.setTableSchema(tableEntityJSON, json, new AsyncCallback<Void>(){
+		baseView.setLoading();
+		TableEntity entity = (TableEntity) this.bundle.getEntity();
+		synapseClient.setTableSchema(entity, newSchema, new AsyncCallback<Void>(){
 
-				@Override
-				public void onFailure(Throwable caught) {
-					baseView.showError(caught.getMessage());
-				}
-				
-				@Override
-				public void onSuccess(Void result) {
-					// Hide the dialog
-					baseView.hideEditor();
-					updateHandler.onPersistSuccess(new EntityUpdatedEvent());
-				}});
-		} catch (JSONObjectAdapterException e) {
-			baseView.showError(e.getMessage());
-		}
+			@Override
+			public void onFailure(Throwable caught) {
+				baseView.showError(caught.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(Void result) {
+				// Hide the dialog
+				baseView.hideEditor();
+				updateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}}); 
 	}
 
 	@Override

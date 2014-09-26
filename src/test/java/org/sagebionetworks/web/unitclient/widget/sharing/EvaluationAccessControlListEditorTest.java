@@ -86,7 +86,6 @@ public class EvaluationAccessControlListEditorTest {
 	private static UserEvaluationPermissions uep;
 	private static Evaluation evaluation;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
-	private static EntityWrapper userGroupHeaderRPWrapper;
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	
@@ -102,7 +101,6 @@ public class EvaluationAccessControlListEditorTest {
 		uep = createUEP();
 		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
 		
-		userGroupHeaderRPWrapper = new EntityWrapper(userGroupHeaderRP.writeToJSONObject(adapterFactory.createNew()).toJSONString(), AccessControlList.class.getName());
 		// set up mocks
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
@@ -117,7 +115,7 @@ public class EvaluationAccessControlListEditorTest {
 		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockSynapseClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
-		AsyncMockStubber.callSuccessWith(userGroupHeaderRPWrapper).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<List<String>>any(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
 		mockPushToSynapseCallback = mock(AsyncCallback.class);
 		

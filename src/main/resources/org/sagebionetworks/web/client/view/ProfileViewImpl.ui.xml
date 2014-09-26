@@ -11,9 +11,10 @@
 		<div class="margin-10">
 			<div class="row margin-top-5">
 			    <div class="col-md-3 col-xs-12">
-		            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
-		        	<g:SimplePanel ui:field="certifiedUserBadgePanel" styleName="displayInline" />
-			        <g:FlowPanel ui:field="viewProfilePanel" />
+			        <div class="padding-15 light-border">
+			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+			        	<g:FlowPanel ui:field="viewProfilePanel" />
+			        </div>
 			    </div>
 			    <div class="col-md-9 col-xs-12">
 				    <div class="row" ui:field="navtabContainer">

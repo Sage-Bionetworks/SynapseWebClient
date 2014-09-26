@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityWrapper;
@@ -102,7 +103,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * will be deleted in Synapse. These descendant entities will 
 		 * consequently inherit access permissions from this entity's ACL.
 		 */
-		void pushChangesToSynapse(boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback);
+		void pushChangesToSynapse(boolean recursive, final AsyncCallback<AccessControlList> changesPushedCallback);
 		
 		/**
 		 * The view tells the presenter that there are unsaved changes in the view

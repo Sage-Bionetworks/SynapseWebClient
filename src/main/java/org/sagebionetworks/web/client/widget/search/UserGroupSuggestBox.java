@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestOracle.UserGroupSuggestion;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -93,7 +94,6 @@ public class UserGroupSuggestBox implements UserGroupSuggestBoxView.Presenter, S
 		
 		String prefix = request.getQuery();
 		final List<Suggestion> suggestions = new LinkedList<Suggestion>();
-		
 		synapseClient.getUserGroupHeadersByPrefix(prefix, PAGE_SIZE, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {

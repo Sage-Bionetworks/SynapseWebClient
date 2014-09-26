@@ -71,7 +71,7 @@ public class UserGroupSuggestOracle extends SuggestOracle {
 		
 		@Override
 		public String getDisplayString() {
-			return DisplayUtils.getUserGroupDisplayStringHtml(header, suggestBox.getWidth() + "px",
+			return DisplayUtils.getUserGroupDisplaySuggestionHtml(header, suggestBox.getWidth() + "px",
 					suggestBox.getBaseFileHandleUrl(), suggestBox.getBaseProfileAttachmentUrl());
 		}
 

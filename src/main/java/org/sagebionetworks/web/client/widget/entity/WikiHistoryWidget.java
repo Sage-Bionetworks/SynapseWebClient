@@ -10,9 +10,6 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -20,6 +17,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -88,7 +87,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 					view.updateHistoryList(historyAsListOfHeaders);
 					
 					// Prepare ids that are not mapped to a display name in the map
-					final List<String> idsToSearch = new ArrayList<String>();
+					final ArrayList<String> idsToSearch = new ArrayList<String>();
 					for(int i = 0; i < historyAsListOfHeaders.size(); i++) {
 						String modifiedById = historyAsListOfHeaders.get(i).getModifiedBy();
 						// Only add unique ids to the list being built
@@ -97,26 +96,21 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 						}
 					}
 					// Call to get user headers from the list of needed ids
-					synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<EntityWrapper>() {
+					synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
 							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
 						}
 						@Override
-						public void onSuccess(EntityWrapper result) {
-							try {
-								UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(result.getEntityJson(), UserGroupHeaderResponsePage.class);
-								// Store display names along with the associated id in the map
-								List<UserGroupHeader> headers = response.getChildren();
-								for(int i = 0; i < headers.size(); i++) {
-									mapIdToName.put(idsToSearch.get(i), DisplayUtils.getDisplayName(headers.get(i)));
-								}
-								// Now we're ready to build the history widget
-								view.buildHistoryWidget();
-							} catch (JSONObjectAdapterException e) {
-								onFailure(e);
+						public void onSuccess(UserGroupHeaderResponsePage response) {
+							// Store display names along with the associated id in the map
+							List<UserGroupHeader> headers = response.getChildren();
+							for(int i = 0; i < headers.size(); i++) {
+								mapIdToName.put(idsToSearch.get(i), DisplayUtils.getDisplayName(headers.get(i)));
 							}
+							// Now we're ready to build the history widget
+							view.buildHistoryWidget();
 						}
 						
 					});

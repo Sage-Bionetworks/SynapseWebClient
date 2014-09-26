@@ -378,7 +378,7 @@ public class SynapseClientImplTest {
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		accessRequirement.setConcreteType(TermsOfUseAccessRequirement.class.getName());
 		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
 		descriptor.setId("101");
 		descriptor.setType(RestrictableObjectType.ENTITY);
@@ -414,8 +414,8 @@ public class SynapseClientImplTest {
 		// We should have all of the strings
 		assertNotNull(bundle.getEntityJson());
 		assertNotNull(bundle.getAnnotationsJson());
-		assertNotNull(bundle.getEntityPathJson());
-		assertNotNull(bundle.getPermissionsJson());
+		assertNotNull(bundle.getEntityPath());
+		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
 		assertNotNull(bundle.getAccessRequirementsJson());
 		assertNotNull(bundle.getUnmetAccessRequirementsJson());
@@ -430,8 +430,8 @@ public class SynapseClientImplTest {
 		// We should have all of the strings
 		assertNull(bundle.getEntityJson());
 		assertNull(bundle.getAnnotationsJson());
-		assertNull(bundle.getEntityPathJson());
-		assertNull(bundle.getPermissionsJson());
+		assertNull(bundle.getEntityPath());
+		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
 		assertNull(bundle.getAccessRequirementsJson());
 		assertNull(bundle.getUnmetAccessRequirementsJson());
@@ -532,43 +532,32 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetNodeAcl() throws Exception {
-		EntityWrapper ew = synapseClient.getNodeAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.getNodeAcl("syn101");
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testCreateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.createAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.createAcl(acl);
 		assertEquals(acl, clone);
 	}
 
 	@Test
 	public void testUpdateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl);
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testUpdateAclRecursive() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in, true);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl, true);
 		assertEquals(acl, clone);
 		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
 	}
 
 	@Test
 	public void testDeleteAcl() throws Exception {
-		EntityWrapper ew = synapseClient.deleteAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
 	}
 
@@ -595,8 +584,8 @@ public class SynapseClientImplTest {
 		String testUserId = "myUserId";
 		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
 		when(mockSynapse.getUserProfile(eq(testUserId))).thenReturn(testUserProfile);
-		String userProfile = synapseClient.getUserProfile(testUserId);
-		assertEquals(userProfile, EntityFactory.createJSONStringForEntity(testUserProfile));
+		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
+		assertEquals(userProfile, testUserProfile);
 	}
 	
 	@Test
@@ -684,41 +673,11 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testCreateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
-	}
-	
-	@Test
-	public void testDeleteWikiPage() throws Exception {
-		synapseClient.deleteWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-		verify(mockSynapse).deleteWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
 	public void testGetWikiHeaderTree() throws Exception {
 		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
 		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
 		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
-	}
-	
-	@Test
-	public void testGetWikiPage() throws Exception {
-		Mockito.when(mockSynapse.getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
-		synapseClient.getWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-	    verify(mockSynapse).getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
-	public void testUpdateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-		
-		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
 	}
 
 	@Test
@@ -1402,11 +1361,10 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetEntityHeaderBatch() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		List<String> headers = synapseClient.getEntityHeaderBatch(new ArrayList());
-		//in the setup, we told the mockSynapse.getEntityHeaderBatch to return batchHeaderResults, so verify that this is batchHeaderResults (json string versions)
+		List<EntityHeader> headers = synapseClient.getEntityHeaderBatch(new ArrayList());
+		//in the setup, we told the mockSynapse.getEntityHeaderBatch to return batchHeaderResults
 		for (int i = 0; i < batchHeaderResults.size(); i++) {
-			EntityHeader returnedHeader = new EntityHeader(adapterFactory.createNew(headers.get(i)));
-			assertEquals(batchHeaderResults.get(i), returnedHeader);
+			assertEquals(batchHeaderResults.get(i), headers.get(i));
 		}
 	}
 	
@@ -1472,25 +1430,25 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testMarkdownCache() throws Exception {
-		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito.mock(Cache.class);
 		synapseClient.setMarkdownCache(mockCache);
-		String pageJson = "test only";
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		WikiPage page = new WikiPage();
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
 		Mockito.when(mockSynapse.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(v2Page);
-		String actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
-		assertEquals(pageJson, actualResult);
+		WikiPage actualResult = synapseClient.getV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"));
+		assertEquals(page, actualResult);
 		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 	
 	@Test
 	public void testMarkdownCacheWithVersion() throws Exception {
-		Cache<MarkdownCacheRequest, String> mockCache = Mockito.mock(Cache.class);
+		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito.mock(Cache.class);
 		synapseClient.setMarkdownCache(mockCache);
-		String pageJson = "test only";
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(pageJson);
+		WikiPage page = new WikiPage();
+		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
 		Mockito.when(mockSynapse.getVersionOfV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class), anyLong())).thenReturn(v2Page);
-		String actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
-		assertEquals(pageJson, actualResult);
+		WikiPage actualResult = synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(), "12"), 5L);
+		assertEquals(page, actualResult);
 		verify(mockCache).get(any(MarkdownCacheRequest.class));
 	}
 	

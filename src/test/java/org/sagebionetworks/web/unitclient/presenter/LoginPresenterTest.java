@@ -90,7 +90,7 @@ public class LoginPresenterTest {
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}	
 	
 	private void setPlace() {
@@ -140,7 +140,7 @@ public class LoginPresenterTest {
 	public void testSetPlaceSSOLogin() throws JSONObjectAdapterException {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		LoginPlace place = new LoginPlace(fakeToken);
-		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
@@ -188,7 +188,7 @@ public class LoginPresenterTest {
 	public void testOpenInvitations() throws JSONObjectAdapterException {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		LoginPlace place = new LoginPlace(fakeToken);
-		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
@@ -231,7 +231,7 @@ public class LoginPresenterTest {
 
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		LoginPlace place = new LoginPlace(fakeToken);
-		AsyncMockStubber.callSuccessWith("success").when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		

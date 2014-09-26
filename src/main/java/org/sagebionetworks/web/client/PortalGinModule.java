@@ -55,8 +55,6 @@ import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
-import org.sagebionetworks.web.client.view.TrashView;
-import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -75,6 +73,8 @@ import org.sagebionetworks.web.client.view.TeamSearchView;
 import org.sagebionetworks.web.client.view.TeamSearchViewImpl;
 import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
+import org.sagebionetworks.web.client.view.TrashView;
+import org.sagebionetworks.web.client.view.TrashViewImpl;
 import org.sagebionetworks.web.client.view.WikiView;
 import org.sagebionetworks.web.client.view.WikiViewImpl;
 import org.sagebionetworks.web.client.view.table.ColumnFactory;
@@ -258,7 +258,6 @@ import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView.Presenter;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetView;
 import org.sagebionetworks.web.client.widget.preview.CytoscapeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
@@ -277,15 +276,18 @@ import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
-import org.sagebionetworks.web.client.widget.table.QueryServiceTableView;
-import org.sagebionetworks.web.client.widget.table.QueryServiceTableViewGxtImpl;
-import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetView;
-import org.sagebionetworks.web.client.widget.table.SimpleTableWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.FocusSetter;
+import org.sagebionetworks.web.client.widget.table.FocusSetterImpl;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandlerImpl;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
-import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
@@ -452,9 +454,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// ProjectsHomeView
 		bind(ProjectsHomeViewImpl.class).in(Singleton.class);
 		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
-				
-		// QueryService View
-		bind(QueryServiceTableView.class).to(QueryServiceTableViewGxtImpl.class);
 		
 		// LoginView
 		bind(LoginViewImpl.class).in(Singleton.class);
@@ -756,12 +755,12 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CytoscapeWidgetView.class).to(CytoscapeWidgetViewImpl.class);
 		
 		bind(PublicPrivateBadgeView.class).to(PublicPrivateBadgeViewImpl.class);
-		bind(SimpleTableWidgetView.class).to(SimpleTableWidgetViewImpl.class);
-		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
 		
 		/*
 		 * TableEntity related bindings
 		 */
+		bind(TableListWidgetView.class).to(TableListWidgetViewImpl.class);
+		bind(CreateTableModalWidget.class).to(CreateTableModalWidgetImpl.class);
 		bind(ColumnModelsViewBase.class).to(ColumnModelsViewBaseImpl.class);
 		bind(ColumnModelsView.class).to(ColumnModelsViewImpl.class);
 		bind(ColumnModelTableRowEditor.class).to(ColumnModelTableRowEditorImpl.class);
@@ -774,6 +773,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CellFactory.class).to(CellFactoryImpl.class);
 		bind(QueryInputView.class).to(QueryInputViewImpl.class);
 		bind(JobTrackingWidget.class).to(AsynchronousProgressWidget.class);
+		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
+		
+		// Keyboard navigation
+		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);
+		bind(FocusSetter.class).to(FocusSetterImpl.class);
 		
 		/*
 		 * TableEntity cell bindings.

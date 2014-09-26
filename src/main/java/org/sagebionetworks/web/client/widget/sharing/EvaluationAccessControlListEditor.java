@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,9 +23,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -244,23 +241,18 @@ public class EvaluationAccessControlListEditor implements EvaluationAccessContro
 	}
 
 	private void fetchUserGroupHeaders() {
-		List<String> ids = new ArrayList<String>();
+		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
 		if (ids.contains(uep.getOwnerPrincipalId().toString())) {
 			ids.add(uep.getOwnerPrincipalId().toString());
 		}
-		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<EntityWrapper>(){
+		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
 			@Override
-			public void onSuccess(EntityWrapper wrapper) {
-				try {	
-					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), UserGroupHeaderResponsePage.class);
-					for (UserGroupHeader ugh : response.getChildren())
-						userGroupHeaders.put(ugh.getOwnerId(), ugh);
-					setViewDetails();
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(UserGroupHeaderResponsePage response) {
+				for (UserGroupHeader ugh : response.getChildren())
+					userGroupHeaders.put(ugh.getOwnerId(), ugh);
+				setViewDetails();
 			}
 			@Override
 			public void onFailure(Throwable caught) {

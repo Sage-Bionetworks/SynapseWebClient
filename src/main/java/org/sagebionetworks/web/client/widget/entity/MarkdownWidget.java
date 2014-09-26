@@ -85,16 +85,11 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 	
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isPreview) {
 		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<String>() {
+		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
-			public void onSuccess(String result) {
-				try {
-					WikiPage page = nodeModelCreator.createJSONEntity(result, WikiPage.class);
-					wikiKey.setWikiPageId(page.getId());
-					setMarkdown(page.getMarkdown(), wikiKey, true, isPreview, null);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
+			public void onSuccess(WikiPage page) {
+				wikiKey.setWikiPageId(page.getId());
+				setMarkdown(page.getMarkdown(), wikiKey, true, isPreview, null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {

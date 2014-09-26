@@ -330,7 +330,7 @@ public class GwtTestSuite extends GWTTestCase {
 		
 		List<AccessRequirement> ars = new ArrayList<AccessRequirement>();
 		TermsOfUseAccessRequirement ar = new TermsOfUseAccessRequirement();
-		ar.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		ar.setConcreteType(TermsOfUseAccessRequirement.class.getName());
 		ar.setTermsOfUse("foo");
 		ars.add(ar);
 		
@@ -339,10 +339,10 @@ public class GwtTestSuite extends GWTTestCase {
 		EntityBundleTransport transport = new EntityBundleTransport();
 		transport.setEntityJson(factory.createJsonStringForEntity(entity));
 		transport.setAnnotationsJson(factory.createJsonStringForEntity(annos));
-		transport.setPermissionsJson(factory.createJsonStringForEntity(uep));
-		transport.setEntityPathJson(factory.createJsonStringForEntity(path));
+		transport.setPermissions(uep);
+		transport.setEntityPath(path);
 		transport.setFileHandlesJson(entityListToString(fileHandles));
-		transport.setTableData(factory.createJsonStringForEntity(tableBundle));
+		transport.setTableData(tableBundle);
 	
 		transport.setAccessRequirementsJson(entityListToString(ars));
 		transport.setUnmetAccessRequirementsJson(entityListToString(ars));
