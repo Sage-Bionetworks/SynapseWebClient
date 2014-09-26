@@ -9,6 +9,9 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -45,6 +48,11 @@ public class QueryInputViewImpl implements QueryInputView{
 	@Inject
 	public QueryInputViewImpl(Binder binder){
 		this.panel = binder.createAndBindUi(this);
+	}
+	
+	@Override
+	public void setPresenter(final Presenter presenter) {
+		this.presenter = presenter;
 		queryButton.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -59,11 +67,15 @@ public class QueryInputViewImpl implements QueryInputView{
 				presenter.onReset();
 			}
 		});
-	}
-	
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
+		// Enter key should execute the query.
+		queryInput.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+					presenter.onExecuteQuery();
+				}
+			}
+		});
 	}
 	
 	@Override
