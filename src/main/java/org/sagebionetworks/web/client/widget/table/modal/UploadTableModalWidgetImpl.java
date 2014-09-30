@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -15,10 +16,12 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 	
 	
 	UploadTableModalView view;
+	Uploader uploader;
 
 	@Inject
-	public UploadTableModalWidgetImpl(UploadTableModalView view) {
+	public UploadTableModalWidgetImpl(UploadTableModalView view, Uploader uploader) {
 		this.view = view;
+		this.uploader = uploader;
 		this.view.setPresenter(this);
 	}
 
