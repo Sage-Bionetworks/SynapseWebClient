@@ -40,6 +40,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	SimplePanel createTableModalPanel;
 	@UiField
+	SimplePanel uploadTableModalPanel;
+	@UiField
 	SimplePanel paginationPanel;
 	
 	HTMLPanel panel;
@@ -120,6 +122,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void showPaginationVisible(boolean visible) {
 		paginationPanel.setVisible(visible);
+	}
+
+	@Override
+	public void addUploadTableModal(IsWidget uploadTableModalWidget) {
+		this.uploadTableModalPanel.add(uploadTableModalWidget);
 	}
 
 }

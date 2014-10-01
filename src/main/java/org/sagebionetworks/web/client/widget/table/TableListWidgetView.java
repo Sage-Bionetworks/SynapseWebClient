@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -70,6 +71,12 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 * @param b
 	 */
 	public void showPaginationVisible(boolean visible);
+
+	/**
+	 * Add the modal dialog to the view.
+	 * @param uploadTableModalWidget
+	 */
+	public void addUploadTableModal(IsWidget uploadTableModalWidget);
 
 	
 	

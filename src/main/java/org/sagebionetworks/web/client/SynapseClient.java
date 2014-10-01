@@ -25,6 +25,9 @@ import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -340,10 +343,10 @@ public interface SynapseClient extends RemoteService {
 	
 	public String getDescendants(String nodeId, int pageSize, String lastDescIdExcl) throws RestServiceException;
 	
-	public String getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException;
-	public String getChunkedPresignedUrl(String requestJson) throws RestServiceException;
-	public String combineChunkedFileUpload(List<String> requests) throws RestServiceException;
-	public String getUploadDaemonStatus(String daemonId) throws RestServiceException;
+	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType, String contentMD5) throws RestServiceException;
+	public String getChunkedPresignedUrl(ChunkRequest chunkRequest) throws RestServiceException;
+	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests) throws RestServiceException;
+	public UploadDaemonStatus getUploadDaemonStatus(String daemonId) throws RestServiceException;
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
 	public String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 	
