@@ -44,14 +44,7 @@ import com.google.inject.Inject;
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, FileUploadHandler {
 	
-	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
-	public static final double UPLOADING_TOTAL_PERCENT = .9d;
-	public static final double COMBINING_TOTAL_PERCENT = .1d;
-	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
-	public static final long BYTES_PER_CHUNK = (long)ClientProperties.MB * 5; //5MB
-	public static final int MAX_RETRY = 5;
-	public static final int RETRY_DELAY = 1000;
-	
+	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB	
 	private UploaderView view;
 	private NodeModelCreator nodeModelCreator;
 	private HandlerManager handlerManager;

@@ -338,10 +338,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	private void uploadError(String message) {
 		uploadLog.append(message+"\n");
-		String details = "";
-		if (message != null && message.length() > 0)
-			details = "  \n" + message;
-		handler.uploadFailed(DisplayConstants.ERROR_UPLOAD + details);
+		handler.uploadFailed(message);
 		//send full log to server logs
 		logger.errorToRepositoryServices(uploadLog.toString());
 		//and to the console

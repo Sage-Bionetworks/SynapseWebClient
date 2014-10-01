@@ -11,11 +11,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
@@ -125,16 +127,17 @@ public class MultipartUploaderTest {
 		uploader.uploadSelectedFile("123", mockHandler);
 		verify(mockHandler).uploadFailed(error);
 	}
-//
-//	@Test
-//	public void testDirectUploadStep4Failure() throws Exception {
-//		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-//		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-//		uploader.directUploadStep4("", 0, 0, 1, 12345, new ArrayList<String>());
-//		executeScheduledCallback();
-//		//should have called twice
-//		verify(synapseClient, Mockito.times(2)).getChunkedPresignedUrl(anyString(), any(AsyncCallback.class));
-//	}
+
+	@Test
+	public void testDirectUploadStep4Failure() throws Exception {
+		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
+		uploader.uploadSelectedFile("123", mockHandler);
+		uploader.directUploadStep3(0, 0, 1, 12345, new ArrayList<ChunkRequest>());
+		executeScheduledCallback();
+		//should have called twice
+		verify(synapseClient, Mockito.times(2)).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
+	}
 
 	/**
 	 * Verifies that gwt.scheduleExecution was called, and invokes the callback that it was given
