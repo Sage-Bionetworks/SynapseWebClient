@@ -39,7 +39,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 		if(error != null){
 			handler.uploadFailed(error);
 		}else{
-			handler.setFileHandleId(fileHandle);
+			handler.uploadSuccess(fileHandle);
 		}
 	}
 

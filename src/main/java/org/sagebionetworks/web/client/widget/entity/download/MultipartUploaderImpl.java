@@ -10,7 +10,6 @@ import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -35,6 +34,8 @@ import com.google.inject.Inject;
  */
 public class MultipartUploaderImpl implements MultipartUploader {
 
+	public static final String EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK = "Exceeded the maximum number of attempts to upload a single file chunk. ";
+	public static final String EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS = "Exceeded the maximum number of attempts to combine all of the parts. ";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
 	//we are dedicating 90% of the progress bar to uploading the chunks, reserving 10% for the final combining (last) step
 	public static final double UPLOADING_TOTAL_PERCENT = .9d;
@@ -231,9 +232,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	private void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList, String detailedMessage) {
+	public void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList, String detailedMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError("Exceeded the maximum number of attempts to upload a single file chunk. " + detailedMessage);
+			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage);
 		else { //retry
 			//sleep for a second on the client, then try again.
 			gwt.scheduleExecution(new Callback() {
@@ -254,7 +255,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	private void chunkUploadSuccess(ChunkRequest chunkedRequest, int currentChunkNumber, long totalChunkCount, long fileSize, List<ChunkRequest> requestList){
+	public void chunkUploadSuccess(ChunkRequest chunkedRequest, int currentChunkNumber, long totalChunkCount, long fileSize, List<ChunkRequest> requestList){
 		//are there more chunks to upload?
 		requestList.add(chunkedRequest);
 		if (currentChunkNumber >= totalChunkCount)
@@ -265,7 +266,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	private void combineChunksUploadFailure(List<ChunkRequest> requestList, int currentAttempt, String errorMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError("Exceeded the maximum number of attempts to combine all of the parts. " + errorMessage);
+			uploadError(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS + errorMessage);
 		else //retry
 			directUploadStep4(requestList, currentAttempt+1);
 	}
@@ -297,7 +298,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		State state = status.getState();
 		if (State.COMPLETED == state) {
 			handler.updateProgress(.99d, "99%");
-			handler.setFileHandleId(status.getFileHandleId());
+			handler.uploadSuccess(status.getFileHandleId());
 		}
 		else if (State.PROCESSING == state){
 			//still processing.  update the progress bar and check again later

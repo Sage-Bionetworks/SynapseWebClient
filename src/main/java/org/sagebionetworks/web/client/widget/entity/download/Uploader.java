@@ -523,7 +523,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 
 	@Override
-	public void setFileHandleId(String fileHandleId) {
+	public void uploadSuccess(String fileHandleId) {
 		this.setFileEntityFileHandle(fileHandleId);
 	}
 

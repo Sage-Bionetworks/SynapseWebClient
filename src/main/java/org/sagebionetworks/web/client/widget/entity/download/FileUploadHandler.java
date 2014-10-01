@@ -21,7 +21,7 @@ public interface FileUploadHandler {
 	 * 
 	 * @param fileHandleId The ID of the newly created file handle.  This is the result of the upload.
 	 */
-	void setFileHandleId(String fileHandleId);
+	void uploadSuccess(String fileHandleId);
 
 	/**
 	 * Called if an upload fails for any reason.
