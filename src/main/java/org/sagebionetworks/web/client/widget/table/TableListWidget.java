@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,6 +38,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	private SynapseClientAsync synapseClient;
 	private PaginationWidget paginationWidget;
 	private CreateTableModalWidget createTableModalWidget;
+	private UploadTableModalWidget uploadTableModalWidget;
 	private boolean canEdit;
 	private EntityQuery query;
 	
@@ -44,14 +46,17 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public TableListWidget(TableListWidgetView view,
 			SynapseClientAsync synapseClient,
 			CreateTableModalWidget createTableModalWidget,
-			PaginationWidget paginationWidget) {
+			PaginationWidget paginationWidget,
+			UploadTableModalWidget uploadTableModalWidget) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.createTableModalWidget = createTableModalWidget;
+		this.uploadTableModalWidget = uploadTableModalWidget;
+		this.paginationWidget = paginationWidget;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
-		this.paginationWidget = paginationWidget;
 		this.view.addPaginationWidget(paginationWidget);
+		this.view.addUploadTableModal(uploadTableModalWidget);
 	}	
 	
 	/**
@@ -123,7 +128,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 
 	@Override
 	public void onUploadTable() {
-		// to do.
+		this.uploadTableModalWidget.showModal();
 	}
 
 

@@ -2626,7 +2626,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public String getChunkedFileToken(String fileName, String contentType,
+	public ChunkedFileToken getChunkedFileToken(String fileName, String contentType,
 			String contentMD5) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2635,51 +2635,34 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			ccftr.setContentType(contentType);
 			ccftr.setContentMD5(contentMD5);
 			// Start the upload
-			ChunkedFileToken token = synapseClient
-					.createChunkedFileUploadToken(ccftr);
+			return synapseClient.createChunkedFileUploadToken(ccftr);
 
-			JSONObjectAdapter requestJson = token
-					.writeToJSONObject(adapterFactory.createNew());
-			return requestJson.toJSONString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		} 
 	}
 
 	@Override
-	public String getChunkedPresignedUrl(String requestJson)
+	public String getChunkedPresignedUrl(ChunkRequest request)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			ChunkRequest request = jsonEntityFactory.createEntity(requestJson,
-					ChunkRequest.class);
 			return synapseClient.createChunkedPresignedUrl(request).toString();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
 	@Override
-	public String combineChunkedFileUpload(List<String> requests)
+	public UploadDaemonStatus combineChunkedFileUpload(List<ChunkRequest> requests)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			// re-create each request
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
 			// reconstruct all part numbers, and token
 			ChunkedFileToken token = null;
 			List<Long> parts = new ArrayList<Long>();
 
-			for (String requestJson : requests) {
-				ChunkRequest request = jsonEntityFactory.createEntity(
-						requestJson, ChunkRequest.class);
+			for (ChunkRequest request : requests) {
 				token = request.getChunkedFileToken();
 				parts.add(request.getChunkNumber());
 			}
@@ -2689,19 +2672,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			cacr.setChunkNumbers(parts);
 
 			// Start the daemon
-			UploadDaemonStatus status = synapseClient.startUploadDeamon(cacr);
-			JSONObjectAdapter requestJson = status
-					.writeToJSONObject(adapterFactory.createNew());
-			return requestJson.toJSONString();
+			return synapseClient.startUploadDeamon(cacr);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
+		} 
 	}
 
 	@Override
-	public String getUploadDaemonStatus(String daemonId)
+	public UploadDaemonStatus getUploadDaemonStatus(String daemonId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2710,13 +2688,9 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			if (State.FAILED == status.getState()) {
 				logError(status.getErrorMessage());
 			}
-			JSONObjectAdapter requestJson = status
-					.writeToJSONObject(adapterFactory.createNew());
-			return requestJson.toJSONString();
+			return status;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} catch (JSONObjectAdapterException e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 
 	}

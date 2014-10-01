@@ -910,21 +910,20 @@ public class SynapseClientImplTest {
 	}
 
 	
-	private List<String> getTestChunkRequestJson() throws JSONObjectAdapterException {
+	private List<ChunkRequest> getTestChunkRequestJson() throws JSONObjectAdapterException {
 		ChunkRequest chunkRequest = new ChunkRequest();
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setKey("test key");
 		chunkRequest.setChunkedFileToken(token);
 		chunkRequest.setChunkNumber(1l);
-		String chunkRequestJson = EntityFactory.createJSONStringForEntity(chunkRequest);
-		List<String> chunkRequests = new ArrayList<String>();
-		chunkRequests.add(chunkRequestJson);
+		List<ChunkRequest> chunkRequests = new ArrayList<ChunkRequest>();
+		chunkRequests.add(chunkRequest);
 		return chunkRequests;
 	}
 	
 	@Test
 	public void testCombineChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		List<String> chunkRequests = getTestChunkRequestJson();
+		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
 		synapseClient.combineChunkedFileUpload(chunkRequests);
 		verify(mockSynapse).startUploadDeamon(any(CompleteAllChunksRequest.class));
 	}
@@ -1017,7 +1016,7 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		List<String> chunkRequests = getTestChunkRequestJson();
+		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
@@ -1042,8 +1041,7 @@ public class SynapseClientImplTest {
 		testToken.setContentMD5(md5);
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType, md5);
-		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
+		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName, contentType, md5);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
 		assertEquals(testToken, token);
 	}

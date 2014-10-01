@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -32,6 +33,7 @@ public class TableListWidgetTest {
 	private SynapseClientAsync mockSynapseClient;
 	private PaginationWidget mockpaginationWidget;
 	private CreateTableModalWidget mockcreateTableModalWidget;
+	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
 	
 	@Before
@@ -40,7 +42,8 @@ public class TableListWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockpaginationWidget = Mockito.mock(PaginationWidget.class);
 		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
-		widget = new TableListWidget(mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget);
+		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
+		widget = new TableListWidget(mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget);
 	}
 	
 	@Test

@@ -17,5 +17,7 @@
 		</b:ButtonToolBar>
 		<!-- Slot for the create table model dialog -->
 		<g:SimplePanel ui:field="createTableModalPanel" />
+		<!-- Slot for the upload table model dialog -->
+		<g:SimplePanel ui:field="uploadTableModalPanel" />
 	</g:HTMLPanel>
 </ui:UiBinder>
