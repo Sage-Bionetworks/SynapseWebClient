@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
@@ -14,7 +15,9 @@ import com.google.inject.Inject;
  */
 public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter {
 	
-	
+	String parentId;
+	TableCreatedHandler handler;
+	String fileHandleId;
 	UploadTableModalView view;
 	Uploader uploader;
 
@@ -38,14 +41,28 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void configure(String parentId, TableCreatedHandler handler) {
-		// TODO Auto-generated method stub
-		
+		this.parentId = parentId;
+		this.handler = handler;
 	}
 
 	@Override
 	public void showModal() {
-		view.clear();
+		Widget uploadWidget = uploader.asWidget(null, parentId, new CallbackP<String>() {
+			@Override
+			public void invoke(String fileHandlId) {
+				onFileHandleCreated(fileHandlId);
+			}
+		}, false);
+		view.setBody(uploadWidget);
 		view.showModal();
+	}
+	
+	/**
+	 * Called when the file handle is created.
+	 * @param fileHandlId
+	 */
+	private void onFileHandleCreated(String fileHandlId){
+		
 	}
 
 

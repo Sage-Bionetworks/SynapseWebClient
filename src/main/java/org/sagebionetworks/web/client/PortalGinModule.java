@@ -162,6 +162,8 @@ import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescrip
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.MultipartUploader;
+import org.sagebionetworks.web.client.widget.entity.download.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetView;
@@ -627,6 +629,8 @@ public class PortalGinModule extends AbstractGinModule {
 		// Home Search Box
 		bind(HomeSearchBoxViewImpl.class).in(Singleton.class);
 		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
+		
+		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
 
 		// LocationableUploader
 		bind(UploaderView.class).to(UploaderViewImpl.class);

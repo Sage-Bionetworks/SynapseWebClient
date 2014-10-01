@@ -32,12 +32,13 @@ public interface UploadTableModalView extends IsWidget{
 	public void setPresenter(Presenter presenter);
 
 	/**
-	 * Clear all data in the view.
-	 */
-	public void clear();
-
-	/**
 	 * Show the modal dialog.
 	 */
 	public void showModal();
+	
+	/**
+	 * Set the widget for the body.
+	 * @param body
+	 */
+	public void setBody(IsWidget body);
 }

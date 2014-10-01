@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
+import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
@@ -17,6 +18,7 @@ import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
@@ -35,6 +37,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -79,6 +82,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private Button cancelBtn; 
 	private Progress progressContainer;
 	private ProgressBar progressBar;
+
 	// external link panel
 	
 	private HTML spinningProgressContainer;
@@ -483,4 +487,5 @@ public class UploaderViewImpl extends FlowPanel implements
 		else
 			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" /></input>");
 	}
+
 }

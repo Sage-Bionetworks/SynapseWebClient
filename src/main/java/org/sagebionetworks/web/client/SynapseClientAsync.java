@@ -22,6 +22,9 @@ import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.file.ChunkRequest;
+import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -242,10 +245,10 @@ public interface SynapseClientAsync {
 	void getFavoritesList(Integer limit, Integer offset, AsyncCallback<ArrayList<String>> callback);
 
 	void getDescendants(String nodeId, int pageSize, String lastDescIdExcl, AsyncCallback<String> callback);
-	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<String> callback) throws RestServiceException;
-	void getChunkedPresignedUrl(String requestJson, AsyncCallback<String> callback) throws RestServiceException;
-	void combineChunkedFileUpload(List<String> requests, AsyncCallback<String> callback) throws RestServiceException;
-	void getUploadDaemonStatus(String daemonId,AsyncCallback<String> callback) throws RestServiceException;
+	void getChunkedFileToken(String fileName,  String contentType, String contentMD5, AsyncCallback<ChunkedFileToken> callback) throws RestServiceException;
+	void getChunkedPresignedUrl(ChunkRequest requestJson, AsyncCallback<String> callback) throws RestServiceException;
+	void combineChunkedFileUpload(List<ChunkRequest> requests, AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
+	void getUploadDaemonStatus(String daemonId,AsyncCallback<UploadDaemonStatus> callback) throws RestServiceException;
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
 	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
 	
