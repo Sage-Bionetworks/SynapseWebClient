@@ -42,6 +42,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		WikiPlace.Tokenizer.class, Down.Tokenizer.class, Team.Tokenizer.class, 
 		TeamSearch.Tokenizer.class, Quiz.Tokenizer.class, Account.Tokenizer.class, Certificate.Tokenizer.class, 
 		NewAccount.Tokenizer.class,
-		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class})
+		ChangeUsername.Tokenizer.class, Trash.Tokenizer.class, TeamSearch.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

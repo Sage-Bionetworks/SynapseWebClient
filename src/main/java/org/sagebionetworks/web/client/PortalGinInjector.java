@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
+import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -157,6 +158,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TrashPresenter getTrashPresenter();
 	
 	public TeamSearchPresenter getTeamSearchPresenter();
+	
+	public PeopleSearchPresenter getPeopleSearchPresenter();
 	
 	public EventBus getEventBus();
 	
