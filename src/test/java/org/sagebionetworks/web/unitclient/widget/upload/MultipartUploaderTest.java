@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.entity.download;
+package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

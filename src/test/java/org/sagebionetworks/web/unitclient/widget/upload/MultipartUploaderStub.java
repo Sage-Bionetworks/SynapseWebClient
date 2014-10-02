@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.unitclient.widget.entity.download;
+package org.sagebionetworks.web.unitclient.widget.upload;
 
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
