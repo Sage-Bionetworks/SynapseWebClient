@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -13,18 +13,19 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter {
+public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, FileUploadHandler {
 	
+	private static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
 	String parentId;
 	TableCreatedHandler handler;
 	String fileHandleId;
 	UploadTableModalView view;
-	Uploader uploader;
+	FileInputWidget fileInputWidget;
 
 	@Inject
-	public UploadTableModalWidgetImpl(UploadTableModalView view, Uploader uploader) {
+	public UploadTableModalWidgetImpl(UploadTableModalView view, FileInputWidget fileInputWidget) {
 		this.view = view;
-		this.uploader = uploader;
+		this.fileInputWidget = fileInputWidget;
 		this.view.setPresenter(this);
 	}
 
@@ -35,8 +36,10 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void onPrimary() {
-		// TODO Auto-generated method stub
-		
+		view.setErrorVisible(false);
+		view.setPrimaryEnabled(false);
+		// Upload the file
+		fileInputWidget.uploadSelectedFile();
 	}
 
 	@Override
@@ -47,22 +50,27 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void showModal() {
-		Widget uploadWidget = uploader.asWidget(null, parentId, new CallbackP<String>() {
-			@Override
-			public void invoke(String fileHandlId) {
-				onFileHandleCreated(fileHandlId);
-			}
-		}, false);
-		view.setBody(uploadWidget);
+		view.setPrimaryEnabled(true);
+		view.setInstructionsVisible(true);
+		view.setInstructionsMessage(CHOOSE_A_CSV_OR_TSV_FILE);
+		view.setErrorVisible(false);
+		fileInputWidget.configure(this);
+		view.setBody(fileInputWidget);
 		view.showModal();
 	}
-	
-	/**
-	 * Called when the file handle is created.
-	 * @param fileHandlId
-	 */
-	private void onFileHandleCreated(String fileHandlId){
-		
+
+	@Override
+	public void uploadSuccess(String fileHandleId) {
+		view.setPrimaryEnabled(true);
+		view.showError("Uploaded file handle: "+fileHandleId);
+		view.setErrorVisible(true);
+	}
+
+	@Override
+	public void uploadFailed(String error) {
+		view.setPrimaryEnabled(true);
+		view.showError(error);
+		view.setErrorVisible(true);
 	}
 
 

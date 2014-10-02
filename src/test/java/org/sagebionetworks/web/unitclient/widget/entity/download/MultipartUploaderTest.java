@@ -6,11 +6,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.entity.download.MultipartUploaderImpl.*;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +30,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.download.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.entity.download.MultipartUploaderImpl;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -45,7 +42,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class MultipartUploaderTest {
 	
-	FileUploadHandler mockHandler;
+	ProgressingFileUploadHandler mockHandler;
 	SynapseClientAsync synapseClient;
 	SynapseJSNIUtils synapseJsniUtils;
 	ClientLogger mockLogger;
@@ -57,7 +54,7 @@ public class MultipartUploaderTest {
 	
 	@Before
 	public void before() throws Exception {
-		mockHandler = mock(FileUploadHandler.class);
+		mockHandler = mock(ProgressingFileUploadHandler.class);
 		synapseClient = mock(SynapseClientAsync.class);
 		synapseJsniUtils =mock(SynapseJSNIUtils.class);
 		gwt = mock(GWTWrapper.class);
@@ -119,7 +116,7 @@ public class MultipartUploaderTest {
 	public void testDirectUploadHappyCase() throws Exception {
 		uploader.uploadSelectedFile("123", mockHandler);
 		// jump to step three
-		uploader.directUploadStep4(null, 1);
+		uploader.attemptCombineChunks(null, 1);
 		verify(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		verify(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), anyInt(), anyString(), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
@@ -156,7 +153,7 @@ public class MultipartUploaderTest {
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.uploadSelectedFile("123", mockHandler);
 		// jump to the end
-		uploader.directUploadStep4(null, 1);
+		uploader.attemptCombineChunks(null, 1);
 		verify(synapseClient, Mockito.times(MAX_RETRY)).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		// Things should end with an error.s
 		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS+error);
@@ -173,7 +170,7 @@ public class MultipartUploaderTest {
 		AsyncMockStubber.callSuccessWith(status).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.uploadSelectedFile("123", mockHandler);
 		// jump to the end
-		uploader.directUploadStep4(null, 1);
+		uploader.attemptCombineChunks(null, 1);
 		verify(synapseClient, Mockito.times(MAX_RETRY)).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		// Things should end with an error.s
 		verify(mockHandler).uploadFailed(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS+status.getErrorMessage());

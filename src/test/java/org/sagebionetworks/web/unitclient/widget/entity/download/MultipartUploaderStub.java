@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import org.sagebionetworks.web.client.widget.entity.download.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.entity.download.MultipartUploader;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 
 /**
  * Test helper for MultipartUploader.
@@ -15,13 +15,13 @@ public class MultipartUploaderStub implements MultipartUploader {
 	String[] progressText;
 
 	@Override
-	public void uploadSelectedFile(String fileInputId, FileUploadHandler handler) {
+	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler) {
 		respond(handler);
 	}
 
 	@Override
 	public void uploadFile(String fileName, String fileInputId, int fileIndex,
-			FileUploadHandler handler) {
+			ProgressingFileUploadHandler handler) {
 		respond(handler);
 	}
 	
@@ -29,7 +29,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 	 * Respond to the handler.
 	 * @param handler
 	 */
-	private void respond(FileUploadHandler handler){
+	private void respond(ProgressingFileUploadHandler handler){
 		if(this.progressText != null){
 			int index = 0;
 			for(String message: progressText){

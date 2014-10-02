@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.download;
+package org.sagebionetworks.web.client.widget.upload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	int fileIndex;
 	private String contentType;
 	private String md5;
-	private FileUploadHandler handler;
+	private ProgressingFileUploadHandler handler;
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
@@ -78,7 +78,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * 
 	 */
 	@Override
-	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, FileUploadHandler handler) {
+	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler) {
 		this.token = null;
 		this.fileName = fileName;
 		this.fileInputId = fileInputId;
@@ -113,7 +113,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					long fileSize = (long)synapseJsniUtils.getFileSize(fileInputId, fileIndex);
 					long totalChunkCount = getChunkCount(fileSize);
 					uploadLog.append("fileSize="+fileSize + " totalChunkCount=" + totalChunkCount+"\n");
-					directUploadStep3(1, 1, totalChunkCount, fileSize, new ArrayList<ChunkRequest>());
+					attemptChunkUpload(1, 1, totalChunkCount, fileSize, new ArrayList<ChunkRequest>());
 				}
 				@Override
 				public void onFailure(Throwable t) {
@@ -144,7 +144,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param fileSize
 	 * @param requestList
 	 */
-	public void directUploadStep3(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList){
+	public void attemptChunkUpload(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList){
 		//get the presigned upload url
 		//and upload the file
 		try {
@@ -202,7 +202,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @param requestList
 	 * @param currentAttempt
 	 */
-	public void directUploadStep4(final List<ChunkRequest> requestList, final int currentAttempt){
+	public void attemptCombineChunks(final List<ChunkRequest> requestList, final int currentAttempt){
 		uploadLog.append("directUploadStep5: currentAttempt=" + currentAttempt+"\n");
 		//complete the file upload, and refresh
 		try {
@@ -240,7 +240,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			gwt.scheduleExecution(new Callback() {
 				@Override
 				public void invoke() {
-					directUploadStep3(currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
+					attemptChunkUpload(currentChunkNumber, currentAttempt+1, totalChunkCount, fileSize, requestList);
 				}
 			}, RETRY_DELAY);
 		}
@@ -259,16 +259,16 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		//are there more chunks to upload?
 		requestList.add(chunkedRequest);
 		if (currentChunkNumber >= totalChunkCount)
-			directUploadStep4(requestList, 1);
+			attemptCombineChunks(requestList, 1);
 		else
-			directUploadStep3(currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
+			attemptChunkUpload(currentChunkNumber+1, 1, totalChunkCount, fileSize, requestList);
 	}
 	
 	private void combineChunksUploadFailure(List<ChunkRequest> requestList, int currentAttempt, String errorMessage) {
 		if (currentAttempt >= MAX_RETRY)
 			uploadError(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS + errorMessage);
 		else //retry
-			directUploadStep4(requestList, currentAttempt+1);
+			attemptCombineChunks(requestList, currentAttempt+1);
 	}
 	
 	public class ByteRange {
@@ -363,7 +363,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 
 
 	@Override
-	public void uploadSelectedFile(String fileInputId,FileUploadHandler handler) {
+	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler) {
 		// First get the name of the file
 		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(names == null || names.length < 1){

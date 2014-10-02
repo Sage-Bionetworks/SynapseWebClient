@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 
@@ -19,7 +20,11 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	@UiField
 	Button primaryButton;
 	@UiField
+	Alert instructions;
+	@UiField
 	SimplePanel bodyPanel;
+	@UiField
+	Alert alert;
 	
 	Modal modal;
 	
@@ -36,8 +41,7 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 			public void onClick(ClickEvent event) {
 				presenter.onPrimary();
 			}
-		});
-		
+		});	
 	}
 
 	@Override
@@ -57,4 +61,33 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 		bodyPanel.add(body);
 	}
 
+	@Override
+	public void setErrorVisible(boolean visible) {
+		this.alert.setVisible(visible);
+	}
+
+	@Override
+	public void showError(String error) {
+		this.alert.setText(error);
+	}
+
+	@Override
+	public void setInstructionsVisible(boolean visible) {
+		this.instructions.setVisible(visible);
+	}
+
+	@Override
+	public void setInstructionsMessage(String message) {
+		this.instructions.setText(message);
+	}
+
+	@Override
+	public void setPrimaryEnabled(boolean enabled) {
+		if(enabled){
+			this.primaryButton.state().reset();
+		}else{
+			this.primaryButton.state().loading();
+		}
+	}
+	
 }

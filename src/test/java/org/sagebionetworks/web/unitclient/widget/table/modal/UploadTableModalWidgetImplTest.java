@@ -2,9 +2,9 @@ package org.sagebionetworks.web.unitclient.widget.table.modal;
 
 import org.junit.Before;
 import org.mockito.Mockito;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 
 /**
  * 
@@ -13,15 +13,15 @@ import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetI
  */
 public class UploadTableModalWidgetImplTest {
 	
-	Uploader mockUploader;
+	FileInputWidget fileInputWidget;
 	UploadTableModalView mockView;
 	UploadTableModalWidgetImpl widget;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(UploadTableModalView.class);
-		mockUploader = Mockito.mock(Uploader.class);
-		widget = new UploadTableModalWidgetImpl(mockView, mockUploader);
+		fileInputWidget = Mockito.mock(FileInputWidget.class);
+		widget = new UploadTableModalWidgetImpl(mockView, fileInputWidget);
 	}
 
 }
