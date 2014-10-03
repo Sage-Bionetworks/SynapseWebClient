@@ -35,20 +35,21 @@ public class FileInputWidgetImpl implements FileInputWidget,
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
+		doMultipartUpload();
+	}
+
+	private void doMultipartUpload() {
 		// The uploader does the real work
 		multipartUploader.uploadSelectedFile(view.getInputElement().getId(),
 				new ProgressingFileUploadHandler() {
 					@Override
 					public void uploadSuccess(String fileHandleId) {
-						view.showProgress(false);
-						view.setInputEnabled(true);
+						view.updateProgress(100, "100%");
 						handler.uploadSuccess(fileHandleId);
 					}
 
 					@Override
 					public void uploadFailed(String error) {
-						view.showProgress(false);
-						view.setInputEnabled(true);
 						handler.uploadFailed(error);
 					}
 
@@ -58,15 +59,18 @@ public class FileInputWidgetImpl implements FileInputWidget,
 						view.updateProgress(currentProgress*100, progressText);
 					}
 				});
-
 	}
 
 	@Override
 	public void configure(final FileUploadHandler handler) {
 		this.handler = handler;
+		resetView();
+	}
+
+	private void resetView() {
 		view.showProgress(false);
-		view.resetForm();
 		view.setInputEnabled(true);
+		view.resetForm();
 	}
 
 }
