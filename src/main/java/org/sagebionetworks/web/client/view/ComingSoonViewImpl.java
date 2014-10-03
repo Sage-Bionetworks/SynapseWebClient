@@ -1,29 +1,41 @@
 package org.sagebionetworks.web.client.view;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.TeamMember;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -47,27 +59,57 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
 	SynapseJSNIUtils synapseJSNIUtils;
+	NodeModelCreator nodeModelCreator;
 	JiraURLHelper jiraErrorHelper;
+	SynapseClientAsync synapseClient;
 	AuthenticationController authenticationController;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
+			SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
 			PortalGinInjector ginInjector,
-			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController) {		
+			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController,
+			final UserGroupListWidget userGroupList) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
 		this.jiraErrorHelper = jiraErrorHelper;
 		this.provenanceWidget = provenanceWidget;
 		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());		
+		footer.add(footerWidget.asWidget());	
+		
+		synapseClient.getTeamMembers("273957", "", 500, 0, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				try {
+					PaginatedResults<TeamMember> memberJSONList = nodeModelCreator.createPaginatedResults(result, TeamMember.class);
+					//view.configure(memberList.getResults(), searchTerm, isAdmin);
+					List<TeamMember> memberList = memberJSONList.getResults();
+					List<UserGroupHeader> headerList = new LinkedList<UserGroupHeader>();
+					for (TeamMember member : memberList) {
+						headerList.add(member.getMember());
+					}
+					userGroupList.configure(headerList, true);
+				} catch (JSONObjectAdapterException e) {
+					onFailure(e);
+				}
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				System.out.println("Heck!!");
+			}
+		});
+		
+		treePanel.add(userGroupList.asWidget());
 	}
 
 	@Override
