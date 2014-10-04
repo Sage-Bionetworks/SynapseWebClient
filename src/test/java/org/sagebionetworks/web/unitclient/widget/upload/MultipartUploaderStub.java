@@ -51,7 +51,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 		this.error = error;
 	}
 
-	public void setProgressText(String[] progressText) {
+	public void setProgressText(String...progressText) {
 		this.progressText = progressText;
 	}
 

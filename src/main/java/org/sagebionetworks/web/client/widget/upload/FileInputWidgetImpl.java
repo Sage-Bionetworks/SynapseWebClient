@@ -31,7 +31,6 @@ public class FileInputWidgetImpl implements FileInputWidget,
 
 	@Override
 	public void uploadSelectedFile() {
-		view.setInputEnabled(false);
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);

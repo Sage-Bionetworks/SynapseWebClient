@@ -31,8 +31,11 @@ public class FileInputWidgetImplTest {
 		verify(mockView).setInputEnabled(true);
 	}
 	
-	public void testDoUploadSuccess(){
+	public void testUploadSelectedFile(){
+		widget.configure(mockHandler);
 		String fileHandleId = "123";
 		multipartUploaderStub.setFileHandle(fileHandleId);
+		multipartUploaderStub.setProgressText("one","two", "three");
+		widget.uploadSelectedFile();
 	}
 }

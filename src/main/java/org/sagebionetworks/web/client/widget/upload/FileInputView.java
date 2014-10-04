@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.upload;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.Input;
 
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
