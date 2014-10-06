@@ -48,7 +48,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
 	private WizardProgressWidget progressWidget;
-	private Callback iframeCallback;
+	
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
 		this.sageImageBundle = sageImageBundle;
