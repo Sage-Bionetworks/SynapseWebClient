@@ -162,6 +162,8 @@ public class GovernanceServiceHelperTest {
 				GovernanceServiceHelper.accessRequirementApprovalType(new TermsOfUseAccessRequirement()));
 		assertEquals(APPROVAL_TYPE.ACT_APPROVAL, 
 				GovernanceServiceHelper.accessRequirementApprovalType(new ACTAccessRequirement()));
+		assertEquals(APPROVAL_TYPE.POST_MESSAGE, 
+				GovernanceServiceHelper.accessRequirementApprovalType(new PostMessageContentAccessRequirement()));
 	}
 	
 	@Test 
