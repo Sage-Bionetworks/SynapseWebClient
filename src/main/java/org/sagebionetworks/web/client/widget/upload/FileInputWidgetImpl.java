@@ -39,10 +39,11 @@ public class FileInputWidgetImpl implements FileInputWidget,
 
 	private void doMultipartUpload() {
 		// The uploader does the real work
-		multipartUploader.uploadSelectedFile(view.getInputElement().getId(),
+		multipartUploader.uploadSelectedFile(view.getInputId(),
 				new ProgressingFileUploadHandler() {
 					@Override
 					public void uploadSuccess(String fileHandleId) {
+						// Set the view at 100%
 						view.updateProgress(100, "100%");
 						handler.uploadSuccess(fileHandleId);
 					}

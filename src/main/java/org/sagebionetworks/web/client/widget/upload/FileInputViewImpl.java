@@ -41,8 +41,8 @@ public class FileInputViewImpl implements FileInputView {
 	}
 
 	@Override
-	public Input getInputElement() {
-		return fileInput;
+	public String getInputId() {
+		return fileInput.getElement().getId();
 	}
 
 	@Override

@@ -29,10 +29,10 @@ public interface FileInputView extends IsWidget{
 	void setPresenter(Presenter presenter);
 	
 	/**
-	 * Get the input element.
+	 * Get the ID of the file input DOM.
 	 * @return
 	 */
-	Input getInputElement();
+	String getInputId();
 
 	/**
 	 * Update the progress.
