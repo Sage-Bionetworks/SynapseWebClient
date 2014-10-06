@@ -45,7 +45,8 @@ public class JoinTeamWidgetTest {
 	JSONObjectAdapter mockJSONObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
-	PaginatedResults<TermsOfUseAccessRequirement> requirements;
+	List<TermsOfUseAccessRequirement> ars;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -65,13 +66,9 @@ public class JoinTeamWidgetTest {
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
-        requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
-        requirements.setTotalNumberOfResults(0);
-        List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
-        requirements.setResults(ars);
-        when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+        ars = new ArrayList<TermsOfUseAccessRequirement>();
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-        AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+        AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
 		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, mockJSONObjectAdapter);
@@ -117,10 +114,7 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithRestriction() throws Exception {
-		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
 		ars.add(new TermsOfUseAccessRequirement());
-        requirements.setResults(ars);
-        requirements.setTotalNumberOfResults(1);
         
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
@@ -154,10 +148,7 @@ public class JoinTeamWidgetTest {
 		
 
         //Now test with an access requirement.  First as part of a challenge, then outside of challenge 
-        List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
-		ars.add(new TermsOfUseAccessRequirement());
-        requirements.setResults(ars);
-        requirements.setTotalNumberOfResults(1);
+        ars.add(new TermsOfUseAccessRequirement());
         
         isChallengeSignup = true;
         joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
