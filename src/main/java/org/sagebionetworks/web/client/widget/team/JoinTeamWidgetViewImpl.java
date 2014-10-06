@@ -30,6 +30,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
+	public static JoinTeamWidgetViewImpl frameListener = null;
+	static {
+		_initIFrameListenerCallback();
+	}
 	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
@@ -52,7 +56,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.progressWidget = progressWidget;
 		this.joinWizard = joinWizard;
 		joinWizard.setSize(ModalSize.LARGE);
-		_initIFrameListenerCallback(this);
 	}
 	
 	@Override
@@ -197,8 +200,9 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.presenter = presenter;
 	}
 	
-			@Override
+	@Override
 	public void showJoinWizard() {
+		frameListener = this;
 		FlowPanel body = new FlowPanel();
 		body.add(progressWidget.asWidget());
         body.add(currentWizardContent);
@@ -254,13 +258,18 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.getPrimaryButton().setEnabled(true);
 	}
 
-	private native void _initIFrameListenerCallback(JoinTeamWidgetViewImpl x) /*-{
+	public static void onSuccessMessage() {
+		if (frameListener != null) {
+			frameListener.enablePrimaryButton();
+		}
+	}
+	private static native void _initIFrameListenerCallback() /*-{
 		$wnd.addEventListener('message', 
 			function (event) {
 					console.log("Message received: "+event);
 					if(event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase()) {
 						//enable primary button if we received a success message from iframe
-						x.@org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl::enablePrimaryButton()();
+						@org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl::onSuccessMessage()();
 					}
 			}, false);
 	}-*/;
