@@ -124,7 +124,7 @@ public class JoinTeamWidgetTest {
         
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
-		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -133,7 +133,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		//no ARs shown...
-		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView, times(0)).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	

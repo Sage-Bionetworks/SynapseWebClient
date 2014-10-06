@@ -112,7 +112,7 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 				public void invoke() {
 					//agreed to terms of use.
 					currentAccessRequirement++;
-					setLicenseAccepted(accessRequirement.getId());
+					setLicenseAccepted(accessRequirement);
 				}
 			};
 			//pop up the requirement
@@ -126,7 +126,7 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 		mainCallback.invoke(false);
 	}
 	
-	public void setLicenseAccepted(Long arId) {	
+	public void setLicenseAccepted(AccessRequirement ar) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -145,7 +145,7 @@ public class EntityAccessRequirementsWidget implements EntityAccessRequirementsW
 		
 		GovernanceServiceHelper.signTermsOfUse(
 				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
+				ar, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 

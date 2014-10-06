@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -43,7 +44,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
 	private WizardProgressWidget progressWidget;
-	
+	private Callback iframeCallback;
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
 		this.sageImageBundle = sageImageBundle;
@@ -51,6 +52,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.progressWidget = progressWidget;
 		this.joinWizard = joinWizard;
 		joinWizard.setSize(ModalSize.LARGE);
+		_initIFrameListenerCallback(this);
 	}
 	
 	@Override
@@ -224,7 +226,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 		
 	@Override
-	public void showAccessRequirement(
+	public void showTermsOfUseAccessRequirement(
 			String arText,
 			final Callback touAcceptanceCallback) {
 		joinWizard.getPrimaryButton().setText(DisplayConstants.ACCEPT);
@@ -232,6 +234,36 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
         currentWizardContent.add(new HTML(arText));
         okButtonCallback = touAcceptanceCallback;
 	}
+	
+	@Override
+	public void showPostMessageContentAccessRequirement(String url, Callback touAcceptanceCallback) {
+		//add the iframe, and wait for the message event to re-enable the continue button
+		joinWizard.getPrimaryButton().setEnabled(false);
+		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
+		currentWizardContent.clear();
+		Frame frame = new Frame(url);
+		frame.getElement().setAttribute("seamless", "true");
+        currentWizardContent.add(frame);
+        okButtonCallback = touAcceptanceCallback;
+	}
+	
+	/**
+	 * Called when message is received from iframe (via postMessage)
+	 */
+	public void enablePrimaryButton() {
+		joinWizard.getPrimaryButton().setEnabled(true);
+	}
+
+	private native void _initIFrameListenerCallback(JoinTeamWidgetViewImpl x) /*-{
+		$wnd.addEventListener('message', 
+			function (event) {
+					console.log("Message received: "+event);
+					if(event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase()) {
+						//enable primary button if we received a success message from iframe
+						x.@org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl::enablePrimaryButton()();
+					}
+			}, false);
+	}-*/;
 	
 			@Override
 	public void updateWizardProgress(int currentPage, int totalPages) {
