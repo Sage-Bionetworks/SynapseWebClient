@@ -247,8 +247,8 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		currentWizardContent.clear();
 		Frame frame = new Frame(url);
 		frame.getElement().setAttribute("seamless", "true");
-        currentWizardContent.add(frame);
-        okButtonCallback = touAcceptanceCallback;
+		currentWizardContent.add(frame);
+		okButtonCallback = touAcceptanceCallback;
 	}
 	
 	/**
