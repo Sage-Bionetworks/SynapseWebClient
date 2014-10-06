@@ -139,7 +139,6 @@ public class MultipartUploaderTest {
 
 	@Test
 	public void testDirectUploadStep4Failure() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		String error = "failed";
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
 		uploader.uploadSelectedFile("123", mockHandler);
@@ -151,7 +150,6 @@ public class MultipartUploaderTest {
 	
 	@Test
 	public void testDirectUploadStep5Failure() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		String error = "failed";
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(synapseClient).combineChunkedFileUpload(any(List.class), any(AsyncCallback.class));
 		uploader.uploadSelectedFile("123", mockHandler);

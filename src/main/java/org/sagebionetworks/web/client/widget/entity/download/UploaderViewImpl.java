@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
-import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
@@ -18,7 +17,6 @@ import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
-import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
@@ -37,7 +35,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -237,28 +234,18 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void createUploadForm(boolean isEntity, String parentEntityId, boolean isDirectUploadSupported) {
+	public void createUploadForm(boolean isEntity, String parentEntityId) {
 		this.isEntity = isEntity;
 		this.parentEntityId = parentEntityId;
 		initializeControls();
 		
-		createUploadContents(isDirectUploadSupported);
+		createUploadContents();
 		
 		// reset
 		if (pathField != null)
 			pathField.clear();
 		if (nameField != null)
 			nameField.clear();
-	}
-	
-	@Override
-	public int getDisplayHeight() {
-		return isEntity ? 440 : 200;
-	}
-
-	@Override
-	public int getDisplayWidth() {
-		return 650;
 	}
 	
 	@Override
@@ -302,7 +289,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	/*
 	 * Private Methods
 	 */	
-	private void createUploadContents(boolean isDirectUploadSupported) {
+	private void createUploadContents() {
 		if (container == null)
 			this.container = new FlowPanel();
 		else
