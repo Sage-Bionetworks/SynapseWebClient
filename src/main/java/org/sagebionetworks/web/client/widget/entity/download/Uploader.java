@@ -62,6 +62,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private boolean isDirectUploadSupported;
 	private String[] fileNames;
 	private int currIndex;
+	private NumberFormat percentFormat;
 	private boolean fileHasBeenUploaded = false;
 	
 	@Inject
@@ -84,6 +85,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		view.setPresenter(this);
 		clearHandlers();
+		this.percentFormat = gwt.getNumberFormat("##");;
 		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
 		if (!isDirectUploadSupported)
 			disableMultipleFileUploads();
@@ -519,7 +521,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void updateProgress(double currentProgress, String progressText) {
 		view.showProgressBar();
-		view.updateProgress(currentProgress, progressText);
+		double percentOfAllFiles = calculatePercentOverAllFiles(this.fileNames.length, this.currIndex, currentProgress);
+		String textOfAllFiles = percentFormat.format(percentOfAllFiles*100.0) + "%";
+		view.updateProgress(percentOfAllFiles, textOfAllFiles);
 	}
 
 	@Override
@@ -530,5 +534,19 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void uploadFailed(String string) {
 		this.uploadError(string);
+	}
+	
+	/**
+	 * Calculate the upload progress over all file upload given the progress of the current file.
+	 * This method assumes each file contributes equally to the total upload times.
+	 * @param numberFiles Number of files to upload.
+	 * @param currentFileIndex Index of the current file with zero being the first file.
+	 * @param percentOfCurrentFile The percent complete for the current file.  This number should be between 0.0 and 1.0 (%/100).
+	 * @return
+	 */
+	public static double calculatePercentOverAllFiles(int numberFiles, int currentFileIndex, double percentOfCurrentFile){
+		double percentPerFile = 1.0/(double)numberFiles;
+		double percentOfAllFiles = percentPerFile*percentOfCurrentFile + (percentPerFile*currentFileIndex);
+		return percentOfAllFiles;
 	}
 }

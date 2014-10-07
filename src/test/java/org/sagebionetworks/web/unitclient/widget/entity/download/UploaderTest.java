@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -304,5 +305,17 @@ public class UploaderTest {
 		// triggers file3 to upload
 		verify(synapseClient).getFileEntityIdWithSameName(eq(file3), eq(parentEntityId), any(AsyncCallback.class));
 		
+	}
+	
+	@Test
+	public void testCalculatePercentOverAllFiles(){
+		double tollerance = 0.01;;
+		int numberOfFiles = 3;
+		int currentIndex = 0;
+		assertEquals(0.166, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
+		currentIndex = 1;
+		assertEquals(0.50, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
+		currentIndex = 2;
+		assertEquals(0.833, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
 	}
 }
