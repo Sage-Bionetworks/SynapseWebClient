@@ -2,12 +2,12 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
@@ -26,10 +26,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -48,6 +46,10 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	SimplePanel peopleListPanel;
 	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	Button searchButton;
+	@UiField
+	TextBox searchField;
 	
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -56,8 +58,8 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	private UserGroupListWidget userGroupListWidget;
 	
 	private Presenter presenter;
-	private TextBox searchField;
-	private Button searchButton;
+	//private TextBox searchField;
+	//private Button searchButton;
 	
 	
 	@Inject
@@ -76,13 +78,8 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		configureSearchBox();
 	}
-	
-//	@Override
-//	public Widget asWidget() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	@Override
 	public void showLoading() {
@@ -115,7 +112,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-		configureSearchBox();
 	}
 	
 	@Override
@@ -132,24 +128,13 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	}
 	
 	private void configureSearchBox() {
-		// setup search box
-		SimplePanel container;
-		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("row");
-		
-		// setup serachButton
-		searchButton = DisplayUtils.createIconButton(DisplayConstants.LABEL_SEARCH, ButtonType.DEFAULT, "glyphicon-search");
-		searchButton.addStyleName("btn-lg btn-block");
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
 				presenter.goTo(new PeopleSearch(searchField.getValue()));
 			}
 		});
-
-		// setup field
-		searchField = new TextBox();
-		searchField.setStyleName("form-control input-lg");
+		
 		searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -158,16 +143,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	            }					
 			}
 		});				
-
-		// add to table and page
-		container = new SimplePanel(searchField);
-		container.addStyleName("col-md-9 padding-right-5");
-		horizontalTable.add(container);
-		container = new SimplePanel(searchButton);
-		container.addStyleName("col-md-3 padding-left-5");
-		horizontalTable.add(container);
-		searchBoxPanel.clear();
-		searchBoxPanel.add(horizontalTable);
 	}
 
 	private void createPagination(String searchTerm) {

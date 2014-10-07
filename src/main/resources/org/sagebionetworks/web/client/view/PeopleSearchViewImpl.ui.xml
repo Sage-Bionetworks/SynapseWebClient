@@ -31,16 +31,24 @@
 		<!-- <div class="container margin-top-15"> -->
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
-			    <b:Row>
-					<b:Column size="MD_12">
-						<g:SimplePanel ui:field="searchBoxPanel" />
-					</b:Column>
-				</b:Row>
+				<b:InputGroup>
+				    <b:TextBox ui:field="searchField" addStyleNames="input-lg"/>
+				    <b:InputGroupButton>
+				        <b:Button ui:field="searchButton" icon="SEARCH" addStyleNames="btn-lg">Search</b:Button>
+				    </b:InputGroupButton>
+				</b:InputGroup>
+			</b:Row>
+			<b:Row>
 	       		<g:SimplePanel ui:field="peopleListPanel" />
+	       	</b:Row>
+	       	<b:Row>
 				<g:SimplePanel ui:field="paginationPanel"/>
+			</b:Row>
+			<b:Row>
 				<b:Container addStyleNames="clear"></b:Container>
-			</b:Row>	
+			</b:Row>
         </b:Container>
+        <g:SimplePanel ui:field="searchBoxPanel"></g:SimplePanel>
         <g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 
