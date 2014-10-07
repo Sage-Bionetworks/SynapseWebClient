@@ -9,14 +9,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
+import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -58,8 +57,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	private UserGroupListWidget userGroupListWidget;
 	
 	private Presenter presenter;
-	//private TextBox searchField;
-	//private Button searchButton;
 	
 	
 	@Inject
@@ -146,11 +143,10 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	}
 
 	private void createPagination(String searchTerm) {
-		LayoutContainer lc = new LayoutContainer();
 		UnorderedListPanel ul = new UnorderedListPanel();
 		ul.setStyleName("pagination pagination-lg");
 		
-		List<PaginationEntry> entries = presenter.getPaginationEntries(PeopleSearchPresenter.SEARCH_PEOPLE_LIMIT, MAX_PAGES_IN_PAGINATION);
+		List<PaginationEntry> entries = presenter.getPaginationEntries(TeamSearchPresenter.SEARCH_TEAM_LIMIT, MAX_PAGES_IN_PAGINATION);
 		if(entries != null) {
 			for(PaginationEntry pe : entries) {
 				if(pe.isCurrent())
@@ -160,10 +156,9 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 			}
 		}
 		
-		lc.add(ul);
 		paginationPanel.clear();
 		if (entries.size() > 1)
-			paginationPanel.add(lc);
+			paginationPanel.add(ul);
 	}
 	
 	private Anchor createPaginationAnchor(String anchorName, String searchTerm, final int newStart) {
