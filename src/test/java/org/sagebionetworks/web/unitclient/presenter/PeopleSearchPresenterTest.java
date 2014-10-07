@@ -52,29 +52,6 @@ public class PeopleSearchPresenterTest {
 		verify(mockView).setPresenter(presenter);
 	}	
 	
-	private static UserGroupHeaderResponsePage getTestPeople() {
-		UserGroupHeaderResponsePage people = new UserGroupHeaderResponsePage();
-		List<UserGroupHeader> peopleList = new ArrayList<UserGroupHeader>();
-		UserGroupHeader header = new UserGroupHeader();
-		header.setOwnerId("2112");
-		header.setFirstName("Geddy");
-		header.setLastName("Lee");
-		peopleList.add(header);
-		header = new UserGroupHeader();
-		header.setOwnerId("1221");
-		header.setFirstName("Alex");
-		header.setLastName("Lifeson");
-		peopleList.add(header);
-		header = new UserGroupHeader();
-		header.setOwnerId("1212");
-		header.setFirstName("Neil");
-		header.setLastName("Peart");
-		peopleList.add(header);
-		people.setChildren(peopleList);
-		people.setTotalNumberOfResults((long) peopleList.size());
-		return people;
-	}
-	
 	@Test
 	public void testSetPlace() {
 		PeopleSearch place = Mockito.mock(PeopleSearch.class);
@@ -106,6 +83,29 @@ public class PeopleSearchPresenterTest {
 
 		team.setCanPublicJoin(true);
 		assertTrue(TeamSearchPresenter.getCanPublicJoin(team));
+	}
+	
+	private static UserGroupHeaderResponsePage getTestPeople() {
+		UserGroupHeaderResponsePage people = new UserGroupHeaderResponsePage();
+		List<UserGroupHeader> peopleList = new ArrayList<UserGroupHeader>();
+		UserGroupHeader header = new UserGroupHeader();
+		header.setOwnerId("2112");
+		header.setFirstName("Geddy");
+		header.setLastName("Lee");
+		peopleList.add(header);
+		header = new UserGroupHeader();
+		header.setOwnerId("1221");
+		header.setFirstName("Alex");
+		header.setLastName("Lifeson");
+		peopleList.add(header);
+		header = new UserGroupHeader();
+		header.setOwnerId("1212");
+		header.setFirstName("Neil");
+		header.setLastName("Peart");
+		peopleList.add(header);
+		people.setChildren(peopleList);
+		people.setTotalNumberOfResults((long) peopleList.size());
+		return people;
 	}
 
 }
