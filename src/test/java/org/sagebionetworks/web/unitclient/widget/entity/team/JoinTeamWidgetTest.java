@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -45,7 +47,7 @@ public class JoinTeamWidgetTest {
 	JSONObjectAdapter mockJSONObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
-	List<TermsOfUseAccessRequirement> ars;
+	List<AccessRequirement> ars;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -66,7 +68,7 @@ public class JoinTeamWidgetTest {
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
-        ars = new ArrayList<TermsOfUseAccessRequirement>();
+        ars = new ArrayList<AccessRequirement>();
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
@@ -119,6 +121,16 @@ public class JoinTeamWidgetTest {
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testJoinRequestStep2WithACTRestriction() throws Exception {
+		ars.add(new ACTAccessRequirement());
+        
+        joinWidget.sendJoinRequestStep0();
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockView).showACTAccessRequirement(anyString(), any(Callback.class));
 	}
 	
 	@SuppressWarnings("unchecked")

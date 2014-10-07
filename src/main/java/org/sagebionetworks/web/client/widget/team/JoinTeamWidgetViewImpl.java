@@ -232,13 +232,20 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 		
 	@Override
-	public void showTermsOfUseAccessRequirement(
-			String arText,
-			final Callback touAcceptanceCallback) {
-		joinWizard.getPrimaryButton().setText(DisplayConstants.ACCEPT);
+	public void showTermsOfUseAccessRequirement(String arText, Callback touAcceptanceCallback) {
+		showAccessRequirement(arText, touAcceptanceCallback, DisplayConstants.ACCEPT);
+	}
+	
+	@Override
+	public void showACTAccessRequirement(String arText, Callback callback) {
+		showAccessRequirement(arText, callback, DisplayConstants.BUTTON_CONTINUE);
+	}
+	
+	private void showAccessRequirement(String arText, Callback callback, String primaryButtonText) {
+		joinWizard.getPrimaryButton().setText(primaryButtonText);
 		currentWizardContent.clear();
         currentWizardContent.add(new HTML(arText));
-        okButtonCallback = touAcceptanceCallback;
+        okButtonCallback = callback;
 	}
 	
 	@Override

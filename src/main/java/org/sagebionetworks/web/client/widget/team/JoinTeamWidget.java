@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -21,7 +23,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
-import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -242,15 +243,17 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			};
 			//pop up the requirement
 			view.updateWizardProgress(currentPage, getTotalPageCount());
-			APPROVAL_TYPE type = GovernanceServiceHelper.accessRequirementApprovalType(accessRequirement);
-			if (APPROVAL_TYPE.USER_AGREEMENT.equals(type) || APPROVAL_TYPE.ACT_APPROVAL.equals(type)) {
+			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);
-			} else if (APPROVAL_TYPE.POST_MESSAGE.equals(type)) {
+			} else if (accessRequirement instanceof ACTAccessRequirement) {
+				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+				view.showACTAccessRequirement(text, termsOfUseCallback);
+			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
 				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
 				view.showPostMessageContentAccessRequirement(url, termsOfUseCallback);
 			} else {
-				view.showErrorMessage("Unsupported access restriction type - " + type);
+				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}
 				
 				
@@ -272,14 +275,18 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				sendJoinRequestStep2();
 			}
 		};
-		
-		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getCurrentUserPrincipalId(), 
-				ar, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
+		if (ar instanceof ACTAccessRequirement) {
+			//no need to sign, just continue
+			onSuccess.invoke();
+		} else {
+			GovernanceServiceHelper.signTermsOfUse(
+					authenticationController.getCurrentUserPrincipalId(), 
+					ar, 
+					onSuccess, 
+					onFailure, 
+					synapseClient, 
+					jsonObjectAdapter);
+		}
 	}
 	
 	public void sendJoinRequestStep3() {
