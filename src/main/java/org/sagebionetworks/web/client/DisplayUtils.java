@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -906,6 +907,16 @@ public class DisplayUtils {
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
 	
+	public static String getPeopleSearchHistoryToken(String searchTerm) {
+		PeopleSearch place = new PeopleSearch(searchTerm);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
+	public static String getPeopleSearchHistoryToken(String searchTerm, Integer start) {
+		PeopleSearch place = new PeopleSearch(searchTerm, start);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
 	public static String getTrashHistoryToken(String token, Integer start) {
 		Trash place = new Trash(token, start);
 		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
@@ -1017,6 +1028,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPeopleSearchPlaceString(Class<PeopleSearch> place) {
 		return getPlaceString(place.getName());		
 	}
 	
