@@ -1,20 +1,12 @@
-package org.sagebionetworks.web.client.widget.entity.download;
+package org.sagebionetworks.web.client.widget.upload;
 
 /**
- * Abstraction for a multi-part files upload handler.
+ * Abstraction to handle file upload events.
  * 
- * @author John
+ * @author jhill
  *
  */
 public interface FileUploadHandler {
-
-	/**
-	 * Called as the file upload progresses.
-	 * 
-	 * @param currentProgress The percent complete.
-	 * @param progressText A progress message.
-	 */
-	void updateProgress(double currentProgress, String progressText);
 
 	/**
 	 * Called upon a successful file upload.
@@ -29,5 +21,4 @@ public interface FileUploadHandler {
 	 * @param error Description of the failure.
 	 */
 	void uploadFailed(String error);
-
 }

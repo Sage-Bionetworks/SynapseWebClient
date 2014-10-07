@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

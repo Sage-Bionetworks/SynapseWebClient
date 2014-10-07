@@ -21,6 +21,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentDialog;
+import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -39,7 +41,7 @@ import com.google.inject.Inject;
  * 
  * Case B will be the most common case.
  */
-public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, FileUploadHandler {
+public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, ProgressingFileUploadHandler {
 	
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB	
 	private UploaderView view;

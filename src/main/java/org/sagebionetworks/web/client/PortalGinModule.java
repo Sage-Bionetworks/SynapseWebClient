@@ -162,8 +162,6 @@ import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescrip
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.MultipartUploader;
-import org.sagebionetworks.web.client.widget.entity.download.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidgetView;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidgetView;
@@ -338,6 +336,12 @@ import org.sagebionetworks.web.client.widget.team.TeamListWidgetView;
 import org.sagebionetworks.web.client.widget.team.TeamListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetView;
 import org.sagebionetworks.web.client.widget.team.WizardProgressWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.upload.FileInputView;
+import org.sagebionetworks.web.client.widget.upload.FileInputViewImpl;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileInputWidgetImpl;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
+import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
@@ -640,6 +644,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(HomeSearchBoxView.class).to(HomeSearchBoxViewImpl.class);
 		
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
+		bind(FileInputWidget.class).to(FileInputWidgetImpl.class);
+		bind(FileInputView.class).to(FileInputViewImpl.class);
 
 		// LocationableUploader
 		bind(UploaderView.class).to(UploaderViewImpl.class);

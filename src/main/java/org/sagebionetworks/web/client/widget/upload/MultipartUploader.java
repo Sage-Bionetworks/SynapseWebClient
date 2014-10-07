@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.entity.download;
+package org.sagebionetworks.web.client.widget.upload;
 
 /**
  * Abstraction for a muti-part file uploader.
@@ -16,7 +16,7 @@ public interface MultipartUploader {
 	 * @param fileIndex
 	 * @param handler
 	 */
-	void uploadSelectedFile(String fileInputId, FileUploadHandler handler);
+	void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler);
 	
 	/**
 	 * Upload a single file using multi-part upload.
@@ -25,6 +25,6 @@ public interface MultipartUploader {
 	 * @param inputFile
 	 * @param handler
 	 */
-	void uploadFile(String fileName, String fileInputId, int fileIndex, FileUploadHandler handler);
+	void uploadFile(String fileName, String fileInputId, int fileIndex, ProgressingFileUploadHandler handler);
 
 }

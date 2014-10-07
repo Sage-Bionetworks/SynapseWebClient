@@ -41,4 +41,30 @@ public interface UploadTableModalView extends IsWidget{
 	 * @param body
 	 */
 	public void setBody(IsWidget body);
+
+	/**
+	 * Show/hide the error alert.
+	 * 
+	 * @param b
+	 */
+	public void showAlert(boolean visible);
+
+	/**
+	 * Show an error message.
+	 * @param error
+	 */
+	public void showErrorMessage(String error);
+
+	/**
+	 * Set the instructions message.
+	 * @param string
+	 */
+	public void setInstructionsMessage(String message);
+
+	/**
+	 * Enable/disable the primary button.
+	 * 
+	 * @param enabled
+	 */
+	public void setPrimaryEnabled(boolean enabled);
 }
