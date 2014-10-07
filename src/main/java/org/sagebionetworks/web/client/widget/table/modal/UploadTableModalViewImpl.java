@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table.modal;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,7 +21,7 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	@UiField
 	Button primaryButton;
 	@UiField
-	Alert instructions;
+	Text instructions;
 	@UiField
 	SimplePanel bodyPanel;
 	@UiField
@@ -62,12 +63,12 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	}
 
 	@Override
-	public void setErrorVisible(boolean visible) {
+	public void showAlert(boolean visible) {
 		this.alert.setVisible(visible);
 	}
 
 	@Override
-	public void showError(String error) {
+	public void showErrorMessage(String error) {
 		this.alert.setText(error);
 	}
 

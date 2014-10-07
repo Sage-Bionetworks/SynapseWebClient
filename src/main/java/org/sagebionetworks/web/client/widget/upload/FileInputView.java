@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import org.gwtbootstrap3.client.ui.Form;
-import org.gwtbootstrap3.client.ui.Input;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -58,12 +55,6 @@ public interface FileInputView extends IsWidget{
 	 * @param b
 	 */
 	void setInputEnabled(boolean b);
-
-	/**
-	 * Get the form
-	 * @return
-	 */
-	Form getForm();
 	
 
 }

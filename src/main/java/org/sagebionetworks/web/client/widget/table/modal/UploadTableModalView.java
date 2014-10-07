@@ -47,13 +47,13 @@ public interface UploadTableModalView extends IsWidget{
 	 * 
 	 * @param b
 	 */
-	public void setErrorVisible(boolean b);
+	public void showAlert(boolean visible);
 
 	/**
 	 * Show an error message.
 	 * @param error
 	 */
-	public void showError(String error);
+	public void showErrorMessage(String error);
 
 	/**
 	 * Show/hide the instructions.

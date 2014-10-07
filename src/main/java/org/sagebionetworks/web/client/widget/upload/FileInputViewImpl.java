@@ -66,9 +66,4 @@ public class FileInputViewImpl implements FileInputView {
 		this.fileInput.setEnabled(enabled);
 	}
 
-	@Override
-	public Form getForm() {
-		return form;
-	}
-
 }

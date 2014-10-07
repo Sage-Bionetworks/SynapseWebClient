@@ -15,7 +15,8 @@ import com.google.inject.Inject;
  */
 public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, FileUploadHandler {
 	
-	private static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
+	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
+	
 	String parentId;
 	TableCreatedHandler handler;
 	String fileHandleId;
@@ -36,7 +37,7 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void onPrimary() {
-		view.setErrorVisible(false);
+		view.showAlert(false);
 		view.setPrimaryEnabled(false);
 		// Upload the file
 		fileInputWidget.uploadSelectedFile();
@@ -53,7 +54,7 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 		view.setPrimaryEnabled(true);
 		view.setInstructionsVisible(true);
 		view.setInstructionsMessage(CHOOSE_A_CSV_OR_TSV_FILE);
-		view.setErrorVisible(false);
+		view.showAlert(false);
 		fileInputWidget.configure(this);
 		view.setBody(fileInputWidget);
 		view.showModal();
@@ -62,15 +63,15 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 	@Override
 	public void uploadSuccess(String fileHandleId) {
 		view.setPrimaryEnabled(true);
-		view.showError("Uploaded file handle: "+fileHandleId);
-		view.setErrorVisible(true);
+		view.showErrorMessage("Uploaded file handle: "+fileHandleId);
+		view.showAlert(true);
 	}
 
 	@Override
 	public void uploadFailed(String error) {
 		view.setPrimaryEnabled(true);
-		view.showError(error);
-		view.setErrorVisible(true);
+		view.showErrorMessage(error);
+		view.showAlert(true);
 	}
 
 
