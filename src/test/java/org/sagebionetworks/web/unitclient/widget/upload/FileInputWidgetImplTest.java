@@ -66,6 +66,7 @@ public class FileInputWidgetImplTest {
 		// update at the start but not the end plus the progress that was made
 		verify(mockView, times(progress.length+1)).updateProgress(anyDouble(), anyString());
 		verify(mockView).setInputEnabled(true);
+		verify(mockView).showProgress(false);
 		verify(mockHandler, never()).uploadSuccess(anyString());
 		verify(mockHandler).uploadFailed(error);
 	}

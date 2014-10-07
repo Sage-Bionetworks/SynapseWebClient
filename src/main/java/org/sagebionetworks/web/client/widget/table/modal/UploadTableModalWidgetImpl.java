@@ -52,7 +52,6 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 	@Override
 	public void showModal() {
 		view.setPrimaryEnabled(true);
-		view.setInstructionsVisible(true);
 		view.setInstructionsMessage(CHOOSE_A_CSV_OR_TSV_FILE);
 		view.showAlert(false);
 		fileInputWidget.configure(this);

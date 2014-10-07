@@ -50,6 +50,7 @@ public class FileInputWidgetImpl implements FileInputWidget,
 
 					@Override
 					public void uploadFailed(String error) {
+						view.showProgress(false);
 						view.setInputEnabled(true);
 						handler.uploadFailed(error);
 					}

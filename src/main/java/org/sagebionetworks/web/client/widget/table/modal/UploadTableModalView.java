@@ -56,13 +56,6 @@ public interface UploadTableModalView extends IsWidget{
 	public void showErrorMessage(String error);
 
 	/**
-	 * Show/hide the instructions.
-	 * 
-	 * @param b
-	 */
-	public void setInstructionsVisible(boolean b);
-
-	/**
 	 * Set the instructions message.
 	 * @param string
 	 */

@@ -41,7 +41,6 @@ public class UploadTableModalWidgetImplTest {
 	public void testShowModal(){
 		widget.showModal();
 		verify(mockView).setPrimaryEnabled(true);
-		verify(mockView).setInstructionsVisible(true);
 		verify(mockView).setInstructionsMessage(UploadTableModalWidgetImpl.CHOOSE_A_CSV_OR_TSV_FILE);
 		verify(mockView).showAlert(false);
 		verify(mockFileInputWidget).configure(widget);
