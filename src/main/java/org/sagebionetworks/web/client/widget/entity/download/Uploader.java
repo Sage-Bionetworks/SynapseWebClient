@@ -28,8 +28,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,10 +35,9 @@ import com.google.inject.Inject;
 /**
  * This Uploader class supports 3 use cases:
  * A. Legacy data types (like the Data Entity): Uploads to the FileUpload servlet, using the Form submit (POST).  @see org.sagebionetworks.web.server.servlet.FileUpload
- * B. File Entity, older client browser: Directs users to JavaWebStart the SynapseUploader (for direct S3 upload from Java)
- * C. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
+ * B. File Entity, newer client browser: Direct multipart upload to S3, using a PUT to presigned URLs.
  * 
- * Case C will be the most common case.
+ * Case B will be the most common case.
  */
 public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, FileUploadHandler {
 	
@@ -59,7 +56,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	MultipartUploader multiPartUploader;
 	AuthenticationController authenticationController;
 	
-	private boolean isDirectUploadSupported;
 	private String[] fileNames;
 	private int currIndex;
 	private boolean fileHasBeenUploaded = false;
@@ -84,9 +80,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		view.setPresenter(this);
 		clearHandlers();
-		isDirectUploadSupported = synapseJsniUtils.isDirectUploadSupported();
-		if (!isDirectUploadSupported)
-			disableMultipleFileUploads();
 	}		
 		
 	public Widget asWidget(Entity entity) {
@@ -102,7 +95,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.entity = entity;
 		this.parentEntityId = parentEntityId;
 		this.fileHandleIdCallback = fileHandleIdCallback;
-		this.view.createUploadForm(isEntity, parentEntityId, isDirectUploadSupported);
+		this.view.createUploadForm(isEntity, parentEntityId);
 		view.resetToInitialState();
 		resetUploadProgress();
 		view.showUploaderUI();
@@ -125,13 +118,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 
 	@Override
 	public String getDefaultUploadActionUrl() {
-		boolean isFileEntity = entity == null || entity instanceof FileEntity;
-		String uploadUrl = isFileEntity ? 
-				//new way				
-				getBaseFileHandleUrl(): 
-				//old way
-				getOldUploadUrl();
-		return uploadUrl;
+		return getOldUploadUrl();
 	}
 	
 	public void uploadFiles() {
@@ -158,11 +145,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 		
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
-		if (isFileEntity && isDirectUploadSupported) {
-			//use case C from above
+		if (isFileEntity) {
+			//use case B from above
 			directUploadStep1(fileNames[currIndex]);
 		} else {
-			//use case A and B from above
+			//use case A from above
 			//uses the default action url
 			//if using this method, block if file size is > MAX_SIZE
 			try {
@@ -418,15 +405,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void showCancelButton(boolean showCancel) {
 		view.setShowCancelButton(showCancel);
 	}
-
-	public int getDisplayHeight() {
-		return view.getDisplayHeight();
-	}
 	
-	public int getDisplayWidth() {
-		return view.getDisplayWidth();
-	}
-
 	@Override
 	public void cancelClicked() {		
 		fireCancelEvent();
@@ -477,10 +456,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
-	private String getBaseFileHandleUrl() {
-		return gwt.getModuleBaseURL() + WebConstants.FILE_HANDLE_UPLOAD_SERVLET;
-	}
-
 	private String getOldUploadUrl() {
 		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
@@ -508,14 +483,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileNames = fileNames;
 	}
 	
-	/**
-	 * for testing purposes only
-	 * @param isDirectUploadSupported
-	 */
-	public void setDirectUploadSupported(boolean isDirectUploadSupported) {
-		this.isDirectUploadSupported = isDirectUploadSupported;
-	}
-
 	@Override
 	public void updateProgress(double currentProgress, String progressText) {
 		view.showProgressBar();

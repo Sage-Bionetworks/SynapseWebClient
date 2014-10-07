@@ -15,11 +15,8 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean isEntity, String parentEntityId, boolean isDirectUploadSupported);
+	public void createUploadForm(boolean isEntity, String parentEntityId);
 	
-	public int getDisplayHeight();
-
-	public int getDisplayWidth();
 	public void submitForm();
 	public void hideLoading();
 	public void updateProgress(double value, String text);
