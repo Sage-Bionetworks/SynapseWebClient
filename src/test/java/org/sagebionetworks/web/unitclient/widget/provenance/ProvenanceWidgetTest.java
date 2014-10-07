@@ -421,10 +421,6 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void tablesorter(String id) {}
-			@Override
-			public boolean isDirectUploadSupported() {
-				return false;
-			}
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url) {

@@ -353,10 +353,6 @@ public class ProvUtilsTest {
 				// TODO Auto-generated method stub
 				
 			}
-			@Override
-			public boolean isDirectUploadSupported() {
-				return false;
-			}
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url) {

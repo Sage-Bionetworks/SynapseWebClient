@@ -103,9 +103,6 @@ public class UploaderTest {
 		when(authenticationController.isLoggedIn()).thenReturn(true);
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
-		//direct upload
-		//by default, do not support direct upload (direct upload tests will turn on)
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(false);
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
 		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
@@ -134,8 +131,6 @@ public class UploaderTest {
 				synapseClient,
 				synapseJsniUtils,
 				gwt, authenticationController, multipartUploader);
-		//direct upload is disabled in the test by default
-		verify(view).disableMultipleFileUploads();
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -214,7 +209,6 @@ public class UploaderTest {
 
 	@Test
 	public void testDirectUploadHappyCase() throws Exception {
-		uploader.setDirectUploadSupported(true);
 		uploader.addCancelHandler(cancelHandler);
 		
 		final String file1 = "file1.txt";
@@ -227,7 +221,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadTeamIconHappyCase() throws Exception {
-		uploader.setDirectUploadSupported(true);
 		CallbackP callback = mock(CallbackP.class);
 		uploader.asWidget(null,  null, callback, false);
 		uploader.handleUploads();
@@ -241,7 +234,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.directUploadStep1("newFile.txt");
 		verifyUploadError();
@@ -249,7 +241,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1SameNameFound() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		String duplicateNameEntityId = "syn007";
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.directUploadStep1("newFile.txt");
@@ -258,7 +249,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1NoParentEntityId() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		uploader.asWidget(null, null, null, false);
 		uploader.directUploadStep1("newFile.txt");
 		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
@@ -276,8 +266,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadFailure() throws Exception {
-		uploader.setDirectUploadSupported(true);
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
 		multipartUploader.setError("Something went wrong");
 		uploader.handleUploads();
 		verifyUploadError();
@@ -286,9 +274,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testMultipleFileUploads() throws Exception {
-		when(synapseJsniUtils.isDirectUploadSupported()).thenReturn(true);
-		uploader.setDirectUploadSupported(true);
-		
 		final String file1 = "file1.txt";
 		final String file2 = "file2.txt";
 		final String file3 = "file3.txt";

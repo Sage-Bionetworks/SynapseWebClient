@@ -175,20 +175,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public boolean isDirectUploadSupported() {
-		return _isDirectUploadSupported();
-	}
-	
-	private final static native boolean _isDirectUploadSupported() /*-{ 
-		var userAgentString = navigator.userAgent.toLowerCase();
-		if (userAgentString.indexOf('msie') != -1) //IE
-			return false;
-		var xhr = new XMLHttpRequest();
-		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
-		return ("withCredentials" in xhr);
-	}-*/;
-
-	@Override
 	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
 		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
