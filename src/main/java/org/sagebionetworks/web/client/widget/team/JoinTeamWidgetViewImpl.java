@@ -11,17 +11,24 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EventHandlerUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
@@ -30,11 +37,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
-	public static JoinTeamWidgetViewImpl frameListener = null;
-	static {
-		_initIFrameListenerCallback();
-	}
-	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
 	
@@ -48,6 +50,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
 	private WizardProgressWidget progressWidget;
+	private HandlerRegistration messageHandler;
 	
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
@@ -202,7 +205,6 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	public void showJoinWizard() {
-		frameListener = this;
 		FlowPanel body = new FlowPanel();
 		body.add(progressWidget.asWidget());
         body.add(currentWizardContent);
@@ -258,23 +260,35 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		joinWizard.getPrimaryButton().setEnabled(true);
 	}
 
-	public static void onSuccessMessage() {
-		if (frameListener != null) {
-			frameListener.enablePrimaryButton();
-		}
-	}
-	private static native void _initIFrameListenerCallback() /*-{
-		$wnd.addEventListener('message', 
-			function (event) {
-					console.log("Message received: "+event);
-					if(event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase()) {
-						//enable primary button if we received a success message from iframe
-						@org.sagebionetworks.web.client.widget.team.JoinTeamWidgetViewImpl::onSuccessMessage()();
+	@Override
+	protected void onAttach() {
+		//register to listen for the "message" events
+		if (messageHandler == null) {
+			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+				
+				@Override
+				public void invoke(JavaScriptObject event) {
+					if (_isSuccessMessage(event)) {
+						enablePrimaryButton();
 					}
-			}, false);
-	}-*/;
+				}
+			});
+		}
+		super.onAttach();
+	}
 	
-			@Override
+	private static native boolean _isSuccessMessage(JavaScriptObject event) /*-{
+		return (event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase());
+    }-*/;
+	
+	@Override
+	protected void onDetach() {
+		if (messageHandler != null)
+			messageHandler.removeHandler();
+		super.onDetach();
+	}
+	
+	@Override
 	public void updateWizardProgress(int currentPage, int totalPages) {
 		progressWidget.configure(currentPage, totalPages);
 	}

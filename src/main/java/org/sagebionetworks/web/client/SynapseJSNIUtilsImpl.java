@@ -17,6 +17,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
@@ -499,5 +500,4 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 		img.src = cssUrl;
 	}-*/;
-	
 }
