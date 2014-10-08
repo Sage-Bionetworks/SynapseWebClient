@@ -1,9 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.S3UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -120,11 +126,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return null;
 	}
 
-	@Override
-	public String getDefaultUploadActionUrl() {
-		return getOldUploadUrl();
-	}
-	
 	public void uploadFiles() {
 		view.triggerUpload();
 	}
@@ -148,6 +149,59 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			entityId = entity.getId();
 		}
 		
+		uploadBasedOnConfiguration();
+	}
+	
+	/**
+	 * Get the upload destination (based on the project settings), and continue the upload.
+	 */
+	public void uploadBasedOnConfiguration() {
+		if (parentEntityId == null) {
+			uploadToS3();
+		} else {
+			//we have a parent entity, check to see where we are suppose to upload the file(s)
+			synapseClient.getUploadDestinations(parentEntityId, new AsyncCallback<List<UploadDestination>>() {
+				public void onSuccess(List<UploadDestination> uploadDestinations) {
+					if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
+						uploadToS3();
+					} else {
+						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
+						uploadToExternal(d);
+					}
+				};
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					uploadError(caught.getMessage());
+				}
+			});
+		}
+	}
+	public void uploadToExternal(ExternalUploadDestination d) {
+		if (UploadType.SFTP.equals(d.getUploadType())){
+			//upload to the sftp proxy!
+			uploadToSftpProxy(d.getUrl());
+		} else {
+			//not yet supported
+			uploadError("External upload destination type not yet handled: " + d.getUploadType().name());
+		}
+	}
+	
+	public void uploadToSftpProxy(final String url) {
+		AsyncCallback<String> endpointCallback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sftpProxy) {
+				view.submitForm(sftpProxy + "?url="+url);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				uploadError("Unable to determine SFTP endpoint: " + caught.getMessage());
+			}
+		};
+		synapseClient.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT, endpointCallback);
+	}
+	
+	public void uploadToS3() {
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity) {
 			//use case B from above
@@ -163,7 +217,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				fireCancelEvent();
 				return;
 			}				
-			view.submitForm();
+			view.submitForm(getOldUploadUrl());
 		}
 	}
 	
