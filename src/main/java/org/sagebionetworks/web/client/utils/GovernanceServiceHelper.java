@@ -4,6 +4,9 @@ import java.util.Collection;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -14,25 +17,45 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelper {
+	
+	public static EntityWrapper getAccessApproval(
+			String principalId, 
+			AccessRequirement ar, 
+			JSONObjectAdapter jsonObjectAdapter) throws JSONObjectAdapterException {
+		SelfSignAccessApproval approval;
+		
+		if (ar instanceof TermsOfUseAccessRequirement) {
+			//Terms of Use
+			approval = new TermsOfUseAccessApproval();
+		} else if (ar instanceof PostMessageContentAccessRequirement) {
+			//Post Message
+			approval = new PostMessageContentAccessApproval();
+		} else {
+			throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
+		}
+
+		approval.setAccessorId(principalId);
+		approval.setRequirementId(ar.getId());
+		JSONObjectAdapter approvalJson = null;
+		approvalJson = approval.writeToJSONObject(jsonObjectAdapter.createNew());
+		return new EntityWrapper(approvalJson.toJSONString(), approval.getClass().getName());
+	}
+	
 	public static void signTermsOfUse(
 			final String principalId,
-			final Long accessRequirementId,
+			final AccessRequirement ar,
 			final Callback onSuccess,
 			final CallbackP<Throwable> onFailure,
 			final SynapseClientAsync synapseClient,
 			final JSONObjectAdapter jsonObjectAdapter
 			) {
-		TermsOfUseAccessApproval agreement = new TermsOfUseAccessApproval();
-		agreement.setAccessorId(principalId);
-		agreement.setRequirementId(accessRequirementId);
-		JSONObjectAdapter approvalJson = null;
+		EntityWrapper ew;
 		try {
-			approvalJson = agreement.writeToJSONObject(jsonObjectAdapter.createNew());
+			ew = getAccessApproval(principalId, ar, jsonObjectAdapter);
 		} catch (JSONObjectAdapterException e) {
 			onFailure.invoke(e);
 			return;
 		}
-		EntityWrapper ew = new EntityWrapper(approvalJson.toJSONString(), agreement.getClass().getName());
 		synapseClient.createAccessApproval(ew, new AsyncCallback<EntityWrapper>(){
 			@Override
 			public void onSuccess(EntityWrapper result) {
@@ -75,6 +98,7 @@ public class GovernanceServiceHelper {
 		if (ar==null) return APPROVAL_TYPE.NONE;
 		if (ar instanceof TermsOfUseAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
 		if (ar instanceof ACTAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
+		if (ar instanceof PostMessageContentAccessRequirement) return APPROVAL_TYPE.POST_MESSAGE;
 		throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
 	}
 	

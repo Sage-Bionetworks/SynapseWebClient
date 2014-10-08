@@ -275,7 +275,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		};
 		GovernanceServiceHelper.signTermsOfUse(
 				userProfile.getOwnerId(), 
-				accessRequirementToDisplay.getId(), 
+				accessRequirementToDisplay, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 
