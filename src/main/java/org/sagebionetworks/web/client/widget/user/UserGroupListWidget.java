@@ -63,10 +63,6 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 		return users;
 	}
 	
-	public void setTitle(String title) {
-		view.setTitle(title);
-	}
-	
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);

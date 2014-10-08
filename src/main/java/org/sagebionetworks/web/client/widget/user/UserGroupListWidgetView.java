@@ -16,7 +16,6 @@ public interface UserGroupListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	public void configure(List<UserGroupHeader> users, boolean isBig);
-	public void setTitle(String title);
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);

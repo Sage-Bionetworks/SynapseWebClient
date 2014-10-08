@@ -10,11 +10,14 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl.Binder;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -68,9 +71,13 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 
 	@Override
 	public void configure(List<UserGroupHeader> users, boolean isBig) {
+		
 		for (UserGroupHeader user : users) {
 			mainRow.add(getBadgeWidget(user.getOwnerId(), isBig));
 		}
+		
+		if (users.isEmpty())
+			mainRow.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
 	private Widget getBadgeWidget(String ownerId, boolean isBig) {
@@ -84,13 +91,10 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 		} else {
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 			userBadge.configure(ownerId);
-			return userBadge.asWidget();
+			Widget result = userBadge.asWidget();
+			result.addStyleName("col-sm-12 col-md-3 margin-top-5");
+			return result;
 		}
-	}
-	
-	@Override
-	public void setTitle(String title) {
-		getElement().setAttribute("highlight-box-title", title);
 	}
 
 	@Override

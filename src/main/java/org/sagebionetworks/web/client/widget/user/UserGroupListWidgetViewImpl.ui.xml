@@ -3,7 +3,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	
-   <b:Container ui:field="mainContainer" addStyleNames="highlight-box margin-bottom-10">
+   <b:Container ui:field="mainContainer" addStyleNames="margin-bottom-10">
         <b:Row ui:field="mainRow">
             <!-- Insert user badges here -->
     	</b:Row>
