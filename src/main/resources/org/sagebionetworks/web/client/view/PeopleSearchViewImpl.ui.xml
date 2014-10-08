@@ -3,26 +3,6 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
-	<!-- <g:HTMLPanel>
-	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
-		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
-		<div class="container margin-top-15">
-		    <div class="row">
-			    <div class="row">
-					<div class="col-md-12">
-						<g:SimplePanel ui:field="searchBoxPanel" />
-					</div>
-				</div>
-	       		<g:SimplePanel ui:field="peopleListPanel" />
-				<g:SimplePanel ui:field="paginationPanel"/>
-				<div class="clear"></div>
-			</div>	
-        </div>
-        <g:SimplePanel ui:field="footer" />
-	</g:HTMLPanel>
-</ui:UiBinder>  -->
 	<g:HTMLPanel>
 	    <div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
