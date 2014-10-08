@@ -19,7 +19,7 @@
 				</b:InputGroup>
 			</b:Row>
 			<b:Row>
-	       		<g:SimplePanel ui:field="peopleListPanel" />
+	       		<g:SimplePanel ui:field="peopleListPanel" addStyleNames="margin-top-15"/>
 	       	</b:Row>
 	       	<b:Row>
 				<g:SimplePanel ui:field="paginationPanel"/>

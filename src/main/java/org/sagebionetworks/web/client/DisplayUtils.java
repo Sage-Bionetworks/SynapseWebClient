@@ -2118,7 +2118,13 @@ public class DisplayUtils {
 		} else {
 			//display default picture
 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
-			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			HTML profilePicture;
+			if (clickHandler != null) {
+				profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
+			} else {
+				// Image should not act as a button
+				profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 userProfileImage lightGreyText margin-0-imp-before"));
+			}
 			profilePicture.addStyleName("pull-left media-object displayInline ");
 			if (clickHandler != null)
 				profilePicture.addClickHandler(clickHandler);

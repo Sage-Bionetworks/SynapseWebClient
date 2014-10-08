@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl.Binder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -73,28 +74,40 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	public void configure(List<UserGroupHeader> users, boolean isBig) {
 		
 		for (UserGroupHeader user : users) {
-			mainRow.add(getBadgeWidget(user.getOwnerId(), isBig));
+			mainRow.add(getBadgeWidget(user.getOwnerId(), user.getIsIndividual(), user.getUserName(), isBig));
 		}
 		
 		if (users.isEmpty())
 			mainRow.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
-	private Widget getBadgeWidget(String ownerId, boolean isBig) {
+	private Widget getBadgeWidget(String ownerId, boolean isIndividual, String displayName, boolean isBig) {
+		Widget result;
 		if (isBig) {
-			BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
-			userBadge.configure(ownerId);
-			Widget result = userBadge.asWidget();
+			if (isIndividual) {
+				BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
+				userBadge.configure(ownerId);
+				result = userBadge.asWidget();
+			} else {
+				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
+				teamBadge.configure(ownerId, displayName);
+				result = teamBadge.asWidget();
+			}
 			result.addStyleName("col-sm-12 col-md-6 margin-top-15");
 			result.setHeight("120px");
-			return userBadge.asWidget();
 		} else {
-			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-			userBadge.configure(ownerId);
-			Widget result = userBadge.asWidget();
+			if (isIndividual) {
+				UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
+				userBadge.configure(ownerId);
+				result = userBadge.asWidget();
+			} else {
+				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
+				teamBadge.configure(ownerId);
+				result = teamBadge.asWidget();
+			};
 			result.addStyleName("col-sm-12 col-md-3 margin-top-5");
-			return result;
 		}
+		return result;
 	}
 
 	@Override

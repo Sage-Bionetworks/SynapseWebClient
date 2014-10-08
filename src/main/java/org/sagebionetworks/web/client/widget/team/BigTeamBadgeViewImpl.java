@@ -61,6 +61,19 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		add(notificationsPanel);
 		add(mediaObjectPanel);
 	}
+	
+	@Override
+	public void setTeamWithoutLink(String name) {
+		clear();
+		notificationsPanel.clear();
+		if(name == null)  throw new IllegalArgumentException("Name is required");
+		
+		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, null, null,  null, false, 5);
+		// TODO: Refactor
+		mediaObjectPanel.addStyleName("displayInline");
+		add(notificationsPanel);
+		add(mediaObjectPanel);
+	}
 
 	@Override
 	public void showLoadError(String principalId) {

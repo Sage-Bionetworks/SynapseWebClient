@@ -75,7 +75,6 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 		else
 			this.offset = offset;
 		//execute search, and update view with the results
-		// TODO: this returns users and groups?
 		synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 
 			@Override
