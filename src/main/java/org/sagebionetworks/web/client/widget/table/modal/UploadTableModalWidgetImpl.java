@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
+import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
+import org.sagebionetworks.web.client.widget.table.modal.upload.PreviewUploadHandler;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
+import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -13,20 +17,31 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, FileUploadHandler {
+public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, FileUploadHandler, PreviewUploadHandler {
 	
+	private static final String PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD = "Please select a CSV or TSV file to upload";
+
+	private static final String PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE = "Please select a comma-separated or tab-separated file.  Unknown type: ";
+
 	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
 	
-	String parentId;
+	// injected fields
 	TableCreatedHandler handler;
-	String fileHandleId;
 	UploadTableModalView view;
 	FileInputWidget fileInputWidget;
+	UploadCSVConfigurationWidget uploadPreviewWidget;
+	
+	// data fields
+	String fileHandleId;
+	String parentId;
+	ContentTypeDelimiter type;
+	String fileName;
 
 	@Inject
-	public UploadTableModalWidgetImpl(UploadTableModalView view, FileInputWidget fileInputWidget) {
+	public UploadTableModalWidgetImpl(UploadTableModalView view, FileInputWidget fileInputWidget, UploadCSVConfigurationWidget uploadPreviewWidget) {
 		this.view = view;
 		this.fileInputWidget = fileInputWidget;
+		this.uploadPreviewWidget = uploadPreviewWidget;
 		this.view.setPresenter(this);
 	}
 
@@ -37,10 +52,13 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void onPrimary() {
-		view.showAlert(false);
-		view.setPrimaryEnabled(false);
-		// Upload the file
-		fileInputWidget.uploadSelectedFile();
+		// proceed if valid
+		if(validateSelecedFile()){
+			view.showAlert(false);
+			view.setPrimaryEnabled(false);
+			// Upload the file
+			fileInputWidget.uploadSelectedFile();
+		}
 	}
 
 	@Override
@@ -61,9 +79,9 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void uploadSuccess(String fileHandleId) {
-		view.setPrimaryEnabled(true);
-		view.showErrorMessage("Uploaded file handle: "+fileHandleId);
-		view.showAlert(true);
+		this.fileHandleId = fileHandleId;
+		view.setBody(uploadPreviewWidget);
+		uploadPreviewWidget.configure(this.type, this.fileName, this.parentId, fileHandleId, this);
 	}
 
 	@Override
@@ -71,6 +89,37 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 		view.setPrimaryEnabled(true);
 		view.showErrorMessage(error);
 		view.showAlert(true);
+	}
+
+	@Override
+	public void setLoading(boolean loading) {
+		view.setPrimaryEnabled(!loading);
+	}
+	/**
+	 * Validate the content type of the selected file.
+	 * @return
+	 */
+	private boolean validateSelecedFile(){
+		// Frist validate the input
+		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
+		if(meta == null || meta.length != 1){
+			this.uploadFailed(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
+			return false;
+		}
+		String contentType = meta[0].getContentType();
+		try{
+			this.type = ContentTypeDelimiter.findByContentType(contentType);
+			this.fileName =  meta[0].getFileName();
+			return true;
+		}catch(IllegalArgumentException e){
+			this.uploadFailed(PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE+contentType);
+			return false;
+		}
+	}
+
+	@Override
+	public void onCancel() {
+		this.view.hideModal();
 	}
 
 

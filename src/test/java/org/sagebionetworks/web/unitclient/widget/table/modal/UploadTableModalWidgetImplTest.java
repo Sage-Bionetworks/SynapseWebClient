@@ -6,12 +6,11 @@ import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationWidget;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.*;
 
 /**
@@ -22,6 +21,7 @@ import static org.mockito.Mockito.*;
 public class UploadTableModalWidgetImplTest {
 	
 	FileInputWidget mockFileInputWidget;
+	UploadCSVConfigurationWidget mockUploadPreviewWidget;
 	UploadTableModalView mockView;
 	UploadTableModalWidgetImpl widget;
 	String parentId;
@@ -31,9 +31,10 @@ public class UploadTableModalWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(UploadTableModalView.class);
 		mockFileInputWidget = Mockito.mock(FileInputWidget.class);
+		mockUploadPreviewWidget = Mockito.mock(UploadCSVConfigurationWidget.class);
 		mockHandler = Mockito.mock(TableCreatedHandler.class);
 		parentId = "syn123";
-		widget = new UploadTableModalWidgetImpl(mockView, mockFileInputWidget);
+		widget = new UploadTableModalWidgetImpl(mockView, mockFileInputWidget, mockUploadPreviewWidget);
 		widget.configure(parentId, mockHandler);
 	}
 

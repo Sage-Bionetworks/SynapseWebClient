@@ -20,5 +20,13 @@ public interface FileInputWidget extends IsWidget {
 	 * Upload the selected files.
 	 */
 	public void uploadSelectedFile();
+	
+	/**
+	 * Get the metadata about the selected files.
+	 * 
+	 * @return
+	 */
+	public FileMetadata[] getSelectedFileMetadata();
+	
 
 }

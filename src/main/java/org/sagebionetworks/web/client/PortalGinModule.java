@@ -290,6 +290,14 @@ import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -790,6 +798,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
 		bind(UploadTableModalView.class).to(UploadTableModalViewImpl.class);
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
+		bind(UploadCSVConfigurationWidget.class).to(UploadCSVConfigurationWidgetImpl.class);
+		bind(UploadCSVConfigurationView.class).to(UploadCSVConfigurationViewImpl.class);
+		bind(UploadPreviewView.class).to(UploadPreviewViewImpl.class);
+		bind(UploadPreviewWidget.class).to(UploadPreviewWidgetImpl.class);
 		
 		// Keyboard navigation
 		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);

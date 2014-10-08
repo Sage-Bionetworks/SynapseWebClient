@@ -3430,5 +3430,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 
+	@Override
+	public FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.getRawFileHandle(fileHandleId);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
 
 }

@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -371,5 +372,7 @@ public interface SynapseClientAsync {
 
 	void createTableEntity(TableEntity entity,
 			AsyncCallback<TableEntity> callback);
+
+	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
 
 }

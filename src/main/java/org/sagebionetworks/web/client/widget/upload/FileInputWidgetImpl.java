@@ -75,4 +75,9 @@ public class FileInputWidgetImpl implements FileInputWidget,
 		view.resetForm();
 	}
 
+	@Override
+	public FileMetadata[] getSelectedFileMetadata() {
+		return this.multipartUploader.getSelectedFileMetadata(view.getInputId());
+	}
+
 }

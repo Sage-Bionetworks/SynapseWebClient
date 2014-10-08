@@ -67,4 +67,9 @@ public interface UploadTableModalView extends IsWidget{
 	 * @param enabled
 	 */
 	public void setPrimaryEnabled(boolean enabled);
+
+	/**
+	 * Hide the modal dialog.
+	 */
+	public void hideModal();
 }
