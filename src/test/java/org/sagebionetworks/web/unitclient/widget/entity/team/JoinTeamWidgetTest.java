@@ -11,15 +11,18 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -28,6 +31,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -44,7 +48,7 @@ public class JoinTeamWidgetTest {
 	JoinTeamWidget joinWidget;
 	AuthenticationController mockAuthenticationController;
 	Callback mockTeamUpdatedCallback;
-	JSONObjectAdapter mockJSONObjectAdapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
@@ -57,7 +61,7 @@ public class JoinTeamWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		mockPlaceChanger = mock(PlaceChanger.class);
         when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -73,7 +77,7 @@ public class JoinTeamWidgetTest {
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, mockJSONObjectAdapter);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter);
 		TeamMembershipStatus status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -83,6 +87,8 @@ public class JoinTeamWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
 	}
 	
 //	@SuppressWarnings("unchecked")
@@ -244,5 +250,68 @@ public class JoinTeamWidgetTest {
 		Assert.assertFalse(joinWidget.isChallengeSignup());
 	}
 
+	@Test
+	public void testSetLicenseAccepted() throws Exception {
+		//single ToU
+		AccessRequirement ar = new TermsOfUseAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showTermsOfUseAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+		
+        //it should try to sign this type of ar
+        verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
+	
+	@Test
+	public void testSetLicenseAcceptedACT() throws Exception {
+		//single ToU
+		AccessRequirement ar = new ACTAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showACTAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+				
+        //verify it does not try to sign, we just continue
+        verify(mockSynapseClient, never()).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
 
+	
+	@Test
+	public void testSetLicenseAcceptedPostMessage() throws Exception {
+		//single ToU
+		AccessRequirement ar = new PostMessageContentAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showPostMessageContentAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+				
+        //verify it does not try to sign, we just continue
+        verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
+	
+	@Test
+	public void testSetLicenseAcceptedInvalidType() throws Exception {
+		//single ToU
+		AccessRequirement ar = mock(AccessRequirement.class);
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we show an error for an unrecognized ar
+		verify(mockView).showErrorMessage(anyString());
+	}
 }

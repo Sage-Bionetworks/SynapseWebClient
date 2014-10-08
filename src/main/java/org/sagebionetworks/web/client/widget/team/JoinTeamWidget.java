@@ -331,5 +331,4 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public boolean isChallengeSignup() {
 		return isChallengeSignup;
 	}
-
 }
