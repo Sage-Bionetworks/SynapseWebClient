@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UserGroupListWidgetViewImpl extends Composite implements UserGroupListWidgetView {	// TODO: Extend composite?
+public class UserGroupListWidgetViewImpl extends Composite implements UserGroupListWidgetView {
 	public interface UserGroupListWidgetViewImplUiBinder extends UiBinder<Widget, UserGroupListWidgetViewImpl> {};
 	
 	@UiField
