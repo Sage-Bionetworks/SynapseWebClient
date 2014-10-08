@@ -1285,14 +1285,24 @@ public class SynapseClientImplTest {
 	}
 	@Test
 	public void testGetOpenRequestCountUnauthorized() throws SynapseException, RestServiceException {
-		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenThrow(new SynapseForbiddenException());
+		//is not an admin
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(false);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
 		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		//should never ask for open request count
+		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
 		assertNull(count);
 	}
 
 	@Test
 	public void testGetOpenRequestCount() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//is admin
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(true);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
 		Long testCount = 42L;
 		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
 		testOpenRequests.setTotalNumberOfResults(testCount);
