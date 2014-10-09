@@ -156,6 +156,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
+//		//TESTING ONLY
+//		uploadToSftpProxy("sftp://localhost/dir/subdir/1234");
+		
 		if (parentEntityId == null) {
 			uploadToS3();
 		} else {
@@ -164,9 +167,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
 						uploadToS3();
-					} else {
+					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
 						uploadToExternal(d);
+					} else {
+						//unsupported upload destination type
+						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
 					}
 				};
 				
@@ -191,7 +197,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		AsyncCallback<String> endpointCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sftpProxy) {
-				view.submitForm(sftpProxy + "?url="+url);
+				//support gwt codeserver
+				String delimiter = sftpProxy.contains("?") ? "&" : "?";
+				view.submitForm(sftpProxy + delimiter + "url="+url);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
