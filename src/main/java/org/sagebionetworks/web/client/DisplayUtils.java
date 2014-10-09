@@ -2102,35 +2102,36 @@ public class DisplayUtils {
 	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
-		String linkStyle = "";
-		if (clickHandler != null)
-			linkStyle = "link";
-		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
-		if (clickHandler != null)
-			headingHtml.addClickHandler(clickHandler);
-		
-		if (pictureUri != null) {
-			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-			profilePicture.addStyleName("pull-left media-object imageButton");
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		} else {
-			//display default picture
-			String iconClass = defaultPictureSinglePerson ? "user" : "users";
-			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
-			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2" + clickableButtonCssClass + "userProfileImage lightGreyText margin-0-imp-before"));
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		}
-		FlowPanel mediaBodyPanel = new FlowPanel();
-		mediaBodyPanel.addStyleName("media-body");
-		mediaBodyPanel.add(headingHtml);
-		if (description != null)
-			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
-		panel.add(mediaBodyPanel);
-		return panel;
+ 		String linkStyle = "";
+ 		if (clickHandler != null)
+ 			linkStyle = "link";
+ 		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
+ 		if (clickHandler != null)
+ 			headingHtml.addClickHandler(clickHandler);
+ 
+ 		if (pictureUri != null) {
+ 			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+ 			profilePicture.addStyleName("pull-left media-object imageButton");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		} else {
+ 			//display default picture
+ 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+ 			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
+ 			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
+ 			profilePicture.addStyleName("pull-left media-object displayInline ");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		}
+ 		FlowPanel mediaBodyPanel = new FlowPanel();
+ 		mediaBodyPanel.addStyleName("media-body");
+ 		mediaBodyPanel.add(headingHtml);
+ 		if (description != null)
+ 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+ 		panel.add(mediaBodyPanel);
+ 		return panel;
 	}
 	
 	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
