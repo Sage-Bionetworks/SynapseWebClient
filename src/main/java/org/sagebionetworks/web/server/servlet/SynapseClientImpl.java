@@ -2397,7 +2397,12 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-
+	
+	private boolean isTeamAdmin(String currentUserId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		TeamMember member = synapseClient.getTeamMember(teamId, currentUserId);
+		return member.getIsAdmin();
+	}
+	
 	@Override
 	public Long getOpenRequestCount(String currentUserId, String teamId)
 			throws RestServiceException {
@@ -2405,13 +2410,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			// must be an admin to the team open requests. To get admin status,
 			// must be a member
-			try {
+			if (isTeamAdmin(currentUserId, teamId, synapseClient)) {
 				PaginatedResults<MembershipRequest> requests = synapseClient
 						.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
 				return requests.getTotalNumberOfResults();
-			} catch (SynapseForbiddenException forbiddenEx) {
+			} else {
 				return null;
 			}
+				
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
