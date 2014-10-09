@@ -8,7 +8,6 @@
 		<g:SimplePanel ui:field="header" />
 		<div class="separator separator-header-page"></div>
 		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
-		<!-- <div class="container margin-top-15"> -->
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
 				<b:InputGroup>

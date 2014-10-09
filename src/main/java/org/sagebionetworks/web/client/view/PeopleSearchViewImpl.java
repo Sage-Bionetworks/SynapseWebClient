@@ -75,7 +75,6 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		//userGroupListWidget.setTitle("Search Results");
 		configureSearchBox();
 	}
 

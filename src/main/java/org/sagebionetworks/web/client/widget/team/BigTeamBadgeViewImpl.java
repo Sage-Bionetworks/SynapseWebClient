@@ -56,10 +56,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
 		}
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5);
-		mediaObjectPanel.addStyleName("displayInline");
-		add(notificationsPanel);
-		add(mediaObjectPanel);
+		addBadgeMedia(DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));
 	}
 	
 	@Override
@@ -68,8 +65,10 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		notificationsPanel.clear();
 		if(name == null)  throw new IllegalArgumentException("Name is required");
 		
-		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(name, null, null,  null, false, 5);
-		// TODO: Refactor
+		addBadgeMedia(DisplayUtils.getMediaObject(name, null, null,  null, false, 5));
+	}
+	
+	private void addBadgeMedia(FlowPanel mediaObjectPanel) {
 		mediaObjectPanel.addStyleName("displayInline");
 		add(notificationsPanel);
 		add(mediaObjectPanel);
