@@ -80,6 +80,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.synapseClient = synapseClient;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
+		this.percentFormat = gwt.getNumberFormat("##");
 		this.authenticationController = authenticationController;
 		this.multiPartUploader = multiPartUploader;
 		view.setPresenter(this);
