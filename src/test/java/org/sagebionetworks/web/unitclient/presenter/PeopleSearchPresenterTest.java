@@ -61,7 +61,7 @@ public class PeopleSearchPresenterTest {
 	@Test
 	public void testSearch() throws RestServiceException {
 		presenter.search("test", null);
-		verify(mockView).configure(anyList(), anyString());
+		verify(mockView).configure(eq(peopleList.getChildren()), eq("test"));
 	}
 	
 	@Test
@@ -70,19 +70,6 @@ public class PeopleSearchPresenterTest {
 				anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
 		presenter.search("test", null);
 		verify(mockView).showErrorMessage(anyString());
-	}
-	
-	@Test
-	public void testCanPublicJoin() throws RestServiceException {
-		//can public join is interpretted as false if null
-		Team team = new Team();
-		team.setCanPublicJoin(null);
-		assertFalse(TeamSearchPresenter.getCanPublicJoin(team));
-		team.setCanPublicJoin(false);
-		assertFalse(TeamSearchPresenter.getCanPublicJoin(team));
-
-		team.setCanPublicJoin(true);
-		assertTrue(TeamSearchPresenter.getCanPublicJoin(team));
 	}
 	
 	private static UserGroupHeaderResponsePage getTestPeople() {

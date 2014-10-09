@@ -23,7 +23,6 @@
 			<g:SimplePanel ui:field="entityView" />
 		</div>
 		<g:FlexTable ui:field="flextTable1"></g:FlexTable>
-		<g:FlowPanel ui:field="treePanel" />
 		This page is coming soon.
 		<div class="clear"></div>
 		<g:SimplePanel ui:field="footer" />	    

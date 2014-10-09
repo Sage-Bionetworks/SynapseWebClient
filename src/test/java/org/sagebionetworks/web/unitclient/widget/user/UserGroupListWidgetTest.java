@@ -33,14 +33,14 @@ public class UserGroupListWidgetTest {
 	public void testConfigure() {
 		List<UserGroupHeader> testUsers = getTestUsers();
 		widget.configure(testUsers);
-		verify(mockView).configure(anyList(), anyBoolean());
+		verify(mockView).configure(eq(testUsers), eq(true));
 	}
 	
 	@Test
 	public void testGetUsers() {
 		List<UserGroupHeader> testUsers = getTestUsers();
 		widget.configure(testUsers);
-		assertTrue(widget.getUsers() == testUsers);
+		assertTrue(widget.getUsers().equals(testUsers));
 	}
 	
 	private static List<UserGroupHeader> getTestUsers() {

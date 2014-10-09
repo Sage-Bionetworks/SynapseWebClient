@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeViewImpl.Binder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
 import org.sagebionetworks.web.client.widget.team.MemberListWidgetView;
+import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -101,7 +102,7 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 				userBadge.configure(ownerId);
 				result = userBadge.asWidget();
 			} else {
-				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
+				TeamBadge teamBadge = portalGinInjector.getTeamBadgeWidget();
 				teamBadge.configure(ownerId);
 				result = teamBadge.asWidget();
 			};

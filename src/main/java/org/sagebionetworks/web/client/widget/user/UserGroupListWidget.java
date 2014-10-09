@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.user;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Team;
@@ -56,11 +58,11 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 	}
 	
 	public void configure(List<UserGroupHeader> users) {
-		configure(users, false);
+		configure(users, true);
 	}
 	
 	public List<UserGroupHeader> getUsers() {
-		return users;
+		return new LinkedList<UserGroupHeader>(users);
 	}
 	
 	@Override
