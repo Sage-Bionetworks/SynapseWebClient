@@ -32,17 +32,14 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	Row mainRow;
 
 	private SageImageBundle sageImageBundle;
-	private PortalGinInjector portalGinInjector;
 	
 	private Presenter presenter;
 	
 	@Inject
 	public UserGroupListWidgetViewImpl(UserGroupListWidgetViewImplUiBinder uiBinder,
-										SageImageBundle sageImageBundle,
-										PortalGinInjector portalGinInjector) {
+										SageImageBundle sageImageBundle) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.sageImageBundle = sageImageBundle;
-		this.portalGinInjector = portalGinInjector;
 	}
 	
 	@Override
@@ -72,45 +69,27 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	}
 
 	@Override
-	public void configure(List<UserGroupHeader> users, boolean isBig) {
+	public void configure(List<UserGroupHeader> users) {
 		
 		for (UserGroupHeader user : users) {
-			mainRow.add(getBadgeWidget(user.getOwnerId(), user.getIsIndividual(), user.getUserName(), isBig));
+			Widget badge = presenter.getBadgeWidget(user.getOwnerId(), user.getIsIndividual(), user.getUserName());
+			styleBadgeWidget(badge, presenter.getIsBig());
+			mainRow.add(badge);
 		}
 		
 		if (users.isEmpty())
 			mainRow.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
-	private Widget getBadgeWidget(String ownerId, boolean isIndividual, String displayName, boolean isBig) {
-		Widget result;
+	private void styleBadgeWidget(Widget badge, boolean isBig) {
 		if (isBig) {
-			if (isIndividual) {
-				BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
-				userBadge.configure(ownerId);
-				result = userBadge.asWidget();
-			} else {
-				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
-				teamBadge.configure(ownerId, displayName);
-				result = teamBadge.asWidget();
-			}
-			result.addStyleName("col-sm-12 col-md-6 margin-top-15");
-			result.setHeight("120px");
+			badge.addStyleName("col-sm-12 col-md-6 margin-top-15");
+			badge.setHeight("120px");
 		} else {
-			if (isIndividual) {
-				UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
-				userBadge.configure(ownerId);
-				result = userBadge.asWidget();
-			} else {
-				TeamBadge teamBadge = portalGinInjector.getTeamBadgeWidget();
-				teamBadge.configure(ownerId);
-				result = teamBadge.asWidget();
-			};
-			result.addStyleName("col-sm-12 col-md-3 margin-top-5");
+			badge.addStyleName("col-sm-12 col-md-3 margin-top-5");
 		}
-		return result;
 	}
-
+	
 	@Override
 	public void clear() {
 		mainRow.clear();

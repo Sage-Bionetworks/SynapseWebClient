@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 
 public interface UserGroupListWidgetView extends IsWidget, SynapseView {
 	/**
@@ -15,10 +16,12 @@ public interface UserGroupListWidgetView extends IsWidget, SynapseView {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void configure(List<UserGroupHeader> users, boolean isBig);
+	public void configure(List<UserGroupHeader> users);
 	
 	public interface Presenter extends SynapsePresenter {
 		void goTo(Place place);
 		void clear();
+		Widget getBadgeWidget(String ownerId, boolean isIndividual, String displayName);
+		boolean getIsBig();
 	}
 }
