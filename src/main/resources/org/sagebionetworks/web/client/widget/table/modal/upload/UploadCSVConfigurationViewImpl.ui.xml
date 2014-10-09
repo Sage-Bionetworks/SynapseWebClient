@@ -4,15 +4,21 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
+
 	<g:HTMLPanel>
-		<b:Form >
+		<b:Form>
 			<b:FormGroup>
 				<b:FormLabel for="formName">Table Name</b:FormLabel>
-				<b:TextBox ui:field="tableNameBox" text="" b:id="formName" enabled="false"/>
+				<b:TextBox ui:field="tableNameBox" text="" b:id="formName" />
 			</b:FormGroup>
 		</b:Form>
 		<g:SimplePanel ui:field="previewPanel" />
 		<g:SimplePanel ui:field="trackerPanel" />
+		<g:HTMLPanel ui:field="spinnerPanel" visible="false">
+			<g:Image resource='{sageImageBundle.loading31}' />
+			<bh:Text ui:field="spinnerText"></bh:Text>
+		</g:HTMLPanel>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

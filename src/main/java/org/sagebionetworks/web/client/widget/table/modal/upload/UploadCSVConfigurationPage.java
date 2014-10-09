@@ -1,13 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
-import com.google.gwt.user.client.ui.IsWidget;
 
 /**
- * Abstraction for a widget that creates and manages the configuration of a CSV upload.
+ * Abstraction for a page that manages the configuration of the table including, table name, columns, and CSV descriptors..
  * @author John
  *
  */
-public interface UploadCSVConfigurationWidget extends IsWidget{
+public interface UploadCSVConfigurationPage extends ModalPage {
 
 	/**
 	 * Call configure before using.
@@ -15,8 +14,7 @@ public interface UploadCSVConfigurationWidget extends IsWidget{
 	 * @param fileName The name of the file.
 	 * @param parentId The ID of the project that will be the parent of the table.
 	 * @param fileHandleId The ID of the FileHandle that the user already uploaded.
-	 * @param Handler for 
 	 */
-	void configure(ContentTypeDelimiter type, String fileName, String parentId, String fileHandleId, PreviewUploadHandler handler);
+	void configure(ContentTypeDelimiter type, String fileName, String parentId, String fileHandleId);
 
 }

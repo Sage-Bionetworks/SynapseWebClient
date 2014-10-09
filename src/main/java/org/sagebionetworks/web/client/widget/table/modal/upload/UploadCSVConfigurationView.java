@@ -55,4 +55,21 @@ public interface UploadCSVConfigurationView extends IsWidget {
 	 * @param uploadPreviewWidget
 	 */
 	public void setPreviewWidget(Widget uploadPreviewWidget);
+	
+	/**
+	 * Show the spinner with the following text
+	 * @param text
+	 */
+	public void showSpinner(String text);
+	
+	/**
+	 * Hide the spinner.
+	 */
+	public void hideSpinner();
+
+	/**
+	 * Get the name of the table from the box.
+	 * @return
+	 */
+	public String getTableName();
 }

@@ -68,6 +68,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public void configure(String projectOwnerId, final boolean canEdit) {
 		this.canEdit = canEdit;
 		this.createTableModalWidget.configure(projectOwnerId, this);
+		this.uploadTableModalWidget.configure(projectOwnerId, this);
 		this.query = createQuery(projectOwnerId);
 		queryForOnePage(OFFSET_ZERO);
 	}

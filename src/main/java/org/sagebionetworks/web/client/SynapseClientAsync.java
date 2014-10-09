@@ -375,4 +375,7 @@ public interface SynapseClientAsync {
 
 	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
 
+	void createTableColumns(List<ColumnModel> value,
+			AsyncCallback<List<ColumnModel>> asyncCallback);
+
 }

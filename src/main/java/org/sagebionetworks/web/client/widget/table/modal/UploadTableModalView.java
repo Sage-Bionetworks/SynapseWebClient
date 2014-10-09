@@ -62,14 +62,20 @@ public interface UploadTableModalView extends IsWidget{
 	public void setInstructionsMessage(String message);
 
 	/**
-	 * Enable/disable the primary button.
+	 * Change the state of the primary button.
 	 * 
 	 * @param enabled
 	 */
-	public void setPrimaryEnabled(boolean enabled);
+	public void setLoading(boolean enabled);
 
 	/**
 	 * Hide the modal dialog.
 	 */
 	public void hideModal();
+
+	/**
+	 * Set the text of the primary button.
+	 * @param text
+	 */
+	public void setPrimaryButtonText(String text);
 }

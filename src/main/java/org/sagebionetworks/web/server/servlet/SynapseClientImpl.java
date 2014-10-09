@@ -3440,5 +3440,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 
+	@Override
+	public List<ColumnModel> createTableColumns(List<ColumnModel> models) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.createColumnModels(models);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
 
 }

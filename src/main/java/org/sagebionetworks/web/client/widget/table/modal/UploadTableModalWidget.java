@@ -18,6 +18,7 @@ public interface UploadTableModalWidget extends IsWidget {
 	 * Configure this widget before using it.
 	 * 
 	 * @param parentId
+	 * @param handler Table creation notification.
 	 */
 	public void configure(String parentId, TableCreatedHandler handler);
 	

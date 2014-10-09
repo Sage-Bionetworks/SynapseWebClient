@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal;
 
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.PreviewUploadHandler;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
+import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,31 +14,19 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, FileUploadHandler, PreviewUploadHandler {
-	
-	private static final String PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD = "Please select a CSV or TSV file to upload";
-
-	private static final String PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE = "Please select a comma-separated or tab-separated file.  Unknown type: ";
-
-	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
+public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, ModalPage.ModalPresenter {
 	
 	// injected fields
-	TableCreatedHandler handler;
 	UploadTableModalView view;
-	FileInputWidget fileInputWidget;
-	UploadCSVConfigurationWidget uploadPreviewWidget;
-	
-	// data fields
-	String fileHandleId;
-	String parentId;
-	ContentTypeDelimiter type;
-	String fileName;
+	UploadCSVFilePage firstPage;
+	// dynamic data
+	ModalPage currentPage;
+	TableCreatedHandler tableCreatedHandler;
 
 	@Inject
-	public UploadTableModalWidgetImpl(UploadTableModalView view, FileInputWidget fileInputWidget, UploadCSVConfigurationWidget uploadPreviewWidget) {
+	public UploadTableModalWidgetImpl(UploadTableModalView view, UploadCSVFilePage uploadCSVFileWidget) {
 		this.view = view;
-		this.fileInputWidget = fileInputWidget;
-		this.uploadPreviewWidget = uploadPreviewWidget;
+		this.firstPage = uploadCSVFileWidget;
 		this.view.setPresenter(this);
 	}
 
@@ -52,69 +37,20 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 
 	@Override
 	public void onPrimary() {
-		// proceed if valid
-		if(validateSelecedFile()){
-			view.showAlert(false);
-			view.setPrimaryEnabled(false);
-			// Upload the file
-			fileInputWidget.uploadSelectedFile();
-		}
+		// pass this to the current page
+		this.currentPage.onPrimary();
 	}
 
 	@Override
 	public void configure(String parentId, TableCreatedHandler handler) {
-		this.parentId = parentId;
-		this.handler = handler;
+		this.firstPage.configure(parentId);
+		this.tableCreatedHandler = handler;
 	}
 
 	@Override
 	public void showModal() {
-		view.setPrimaryEnabled(true);
-		view.setInstructionsMessage(CHOOSE_A_CSV_OR_TSV_FILE);
-		view.showAlert(false);
-		fileInputWidget.configure(this);
-		view.setBody(fileInputWidget);
+		setNextActivePage(this.firstPage);
 		view.showModal();
-	}
-
-	@Override
-	public void uploadSuccess(String fileHandleId) {
-		this.fileHandleId = fileHandleId;
-		view.setBody(uploadPreviewWidget);
-		uploadPreviewWidget.configure(this.type, this.fileName, this.parentId, fileHandleId, this);
-	}
-
-	@Override
-	public void uploadFailed(String error) {
-		view.setPrimaryEnabled(true);
-		view.showErrorMessage(error);
-		view.showAlert(true);
-	}
-
-	@Override
-	public void setLoading(boolean loading) {
-		view.setPrimaryEnabled(!loading);
-	}
-	/**
-	 * Validate the content type of the selected file.
-	 * @return
-	 */
-	private boolean validateSelecedFile(){
-		// Frist validate the input
-		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
-		if(meta == null || meta.length != 1){
-			this.uploadFailed(PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD);
-			return false;
-		}
-		String contentType = meta[0].getContentType();
-		try{
-			this.type = ContentTypeDelimiter.findByContentType(contentType);
-			this.fileName =  meta[0].getFileName();
-			return true;
-		}catch(IllegalArgumentException e){
-			this.uploadFailed(PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE+contentType);
-			return false;
-		}
 	}
 
 	@Override
@@ -122,5 +58,42 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget, Uploa
 		this.view.hideModal();
 	}
 
+	@Override
+	public void setNextActivePage(ModalPage next) {
+		this.currentPage = next;
+		this.currentPage.setModalPresenter(this);
+		// add the page to the dialog.
+		this.view.setBody(this.currentPage);
+		this.setLoading(false);
+	}
+
+	@Override
+	public void setLoading(boolean loading) {
+		view.showAlert(false);
+		view.setLoading(loading);
+	}
+
+	@Override
+	public void setPrimaryButtonText(String text) {
+		view.setPrimaryButtonText(text);
+	}
+
+	@Override
+	public void setInstructionMessage(String message) {
+		view.setInstructionsMessage(message);
+	}
+
+	@Override
+	public void setErrorMessage(String message) {
+		view.showAlert(true);
+		view.showErrorMessage(message);
+		view.setLoading(false);
+	}
+
+	@Override
+	public void onTableCreated(TableEntity table) {
+		this.tableCreatedHandler.tableCreated(table);
+		this.view.hideModal();
+	}
 
 }

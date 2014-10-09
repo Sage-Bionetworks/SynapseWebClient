@@ -78,8 +78,8 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	}
 
 	@Override
-	public void setPrimaryEnabled(boolean enabled) {
-		if(enabled){
+	public void setLoading(boolean loading) {
+		if(!loading){
 			this.primaryButton.state().reset();
 		}else{
 			this.primaryButton.state().loading();
@@ -89,6 +89,11 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	@Override
 	public void hideModal() {
 		modal.hide();
+	}
+
+	@Override
+	public void setPrimaryButtonText(String text) {
+		this.primaryButton.setText(text);
 	}
 	
 }
