@@ -158,7 +158,7 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 		descriptor.setSeparator(type.getDelimiter());
 		previewRequest.setCsvTableDescriptor(descriptor);
 		previewRequest.setUploadFileHandleId(fileHandleId);
-		previewRequest.setDoFullFileScan(false);
+		previewRequest.setDoFullFileScan(true);
 		// Start the job
 		asynchronousProgressWidget.startAndTrackJob("Analyzing file...", false, AsynchType.TableCSVUploadPreview, previewRequest, new AsynchronousProgressHandler() {
 			
