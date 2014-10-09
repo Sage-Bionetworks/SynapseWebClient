@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
+import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -94,6 +95,7 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -157,6 +159,8 @@ public interface PortalGinInjector extends Ginjector {
 	public TrashPresenter getTrashPresenter();
 	
 	public TeamSearchPresenter getTeamSearchPresenter();
+	
+	public PeopleSearchPresenter getPeopleSearchPresenter();
 	
 	public EventBus getEventBus();
 	
@@ -246,6 +250,8 @@ public interface PortalGinInjector extends Ginjector {
 	public EntityBadge getEntityBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 
+	public UserGroupListWidget getUserGroupListWidget();
+	
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();

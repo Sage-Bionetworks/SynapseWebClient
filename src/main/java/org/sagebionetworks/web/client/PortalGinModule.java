@@ -55,6 +55,8 @@ import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.PeopleSearchView;
+import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -346,6 +348,8 @@ import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
@@ -811,6 +815,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// Team Search Page
 		bind(TeamSearchViewImpl.class).in(Singleton.class);
 		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
+		
+		// People Search Page
+		bind(PeopleSearchViewImpl.class).in(Singleton.class);
+		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class);
 
 		/*
 		 * Teams Widgets
@@ -826,6 +834,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Team List widget (link to search teams page, optionally can create team)
 		bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
+		
+		// User Group List widget
+		bind(UserGroupListWidgetView.class).to(UserGroupListWidgetViewImpl.class);
 
 		// Member List widget
 		bind(MemberListWidgetView.class).to(MemberListWidgetViewImpl.class);

@@ -7,7 +7,7 @@
 	    <div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
 		<div class="separator separator-header-page"></div>
-		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search Teams</h3></div>
+		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
 				<b:InputGroup>
@@ -18,7 +18,7 @@
 				</b:InputGroup>
 			</b:Row>
 			<b:Row>
-	       		<g:FlowPanel ui:field="mainContainer" />
+	       		<g:SimplePanel ui:field="peopleListPanel" addStyleNames="margin-top-15"/>
 	       	</b:Row>
 	       	<b:Row>
 				<g:SimplePanel ui:field="paginationPanel"/>
@@ -27,6 +27,7 @@
 				<b:Container addStyleNames="clear"></b:Container>
 			</b:Row>
         </b:Container>
+        <g:SimplePanel ui:field="searchBoxPanel"></g:SimplePanel>
         <g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 
