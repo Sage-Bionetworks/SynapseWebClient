@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
+import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 
@@ -53,6 +54,12 @@ public class MultipartUploaderStub implements MultipartUploader {
 
 	public void setProgressText(String...progressText) {
 		this.progressText = progressText;
+	}
+
+	@Override
+	public FileMetadata[] getSelectedFileMetadata(String inputId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

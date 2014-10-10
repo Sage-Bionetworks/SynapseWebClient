@@ -11,8 +11,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -38,8 +40,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	SimplePanel footer;
 	@UiField
 	SimplePanel entityView;
-	@UiField
-	FlowPanel treePanel;
 		
 	private Presenter presenter;
 	private IconsImageBundle icons;
@@ -47,27 +47,33 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
 	SynapseJSNIUtils synapseJSNIUtils;
+	NodeModelCreator nodeModelCreator;
 	JiraURLHelper jiraErrorHelper;
+	SynapseClientAsync synapseClient;
 	AuthenticationController authenticationController;
 	
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
+			SynapseClientAsync synapseClient, final NodeModelCreator nodeModelCreator,
 			SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils, ProvenanceWidget provenanceWidget,
 			PortalGinInjector ginInjector,
-			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController) {		
+			JiraURLHelper jiraErrorHelper, AuthenticationController authenticationController ) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.icons = icons;
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.synapseClient = synapseClient;
+		this.nodeModelCreator = nodeModelCreator;
 		this.jiraErrorHelper = jiraErrorHelper;
 		this.provenanceWidget = provenanceWidget;
 		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());		
+		footer.add(footerWidget.asWidget());	
+		
 	}
 
 	@Override

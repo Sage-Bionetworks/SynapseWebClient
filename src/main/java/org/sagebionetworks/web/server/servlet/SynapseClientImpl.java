@@ -245,7 +245,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
-	
+
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
 		this.wiki2Markdown = wikiToMarkdown;
 	}
@@ -3019,7 +3019,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	private static class PortalVersionHolder {
 		private static String versionInfo = "";
-		
+
 		static {
 			InputStream s = SynapseClientImpl.class
 					.getResourceAsStream("/version-info.properties");
@@ -3043,7 +3043,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
 	}
-	
+
 	@Override
 	public HashMap<String, String> getSynapseProperties(){
 		return PortalPropertiesHolder.getPropertiesMap();
@@ -3052,7 +3052,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public static class PortalPropertiesHolder {
 		private static Properties props;
 		private static HashMap<String, String> propsMap;
-		
+
 		static {
 			InputStream s = SynapseClientImpl.class
 					.getResourceAsStream("/portal.properties");
@@ -3074,7 +3074,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 				propsMap = new HashMap<String, String>();
 				for (Entry<Object, Object> entry : props.entrySet()) {
 					propsMap.put(entry.getKey().toString(), entry.getValue().toString());
-				}	
+	}
 			}
 			return propsMap;
 		}
@@ -3428,7 +3428,27 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-	
+
+	@Override
+	public FileHandle getFileHandle(String fileHandleId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.getRawFileHandle(fileHandleId);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
+	@Override
+	public List<ColumnModel> createTableColumns(List<ColumnModel> models) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.createColumnModels(models);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+
 	@Override
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -3438,4 +3458,5 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+
 }

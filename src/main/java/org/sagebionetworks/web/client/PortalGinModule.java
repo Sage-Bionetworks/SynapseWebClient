@@ -55,6 +55,8 @@ import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.view.LoginViewImpl;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.NewAccountViewImpl;
+import org.sagebionetworks.web.client.view.PeopleSearchView;
+import org.sagebionetworks.web.client.view.PeopleSearchViewImpl;
 import org.sagebionetworks.web.client.view.ProfileFormView;
 import org.sagebionetworks.web.client.view.ProfileFormViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
@@ -286,10 +288,20 @@ import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -346,6 +358,8 @@ import org.sagebionetworks.web.client.widget.user.BigUserBadgeView;
 import org.sagebionetworks.web.client.widget.user.BigUserBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.client.widget.user.UserBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetView;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl;
 
 import com.google.gwt.cell.client.widget.CustomWidgetImageBundle;
 import com.google.gwt.event.shared.EventBus;
@@ -790,6 +804,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
 		bind(UploadTableModalView.class).to(UploadTableModalViewImpl.class);
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
+		bind(UploadCSVConfigurationPage.class).to(UploadCSVConfigurationPageImpl.class);
+		bind(UploadCSVConfigurationView.class).to(UploadCSVConfigurationViewImpl.class);
+		bind(UploadPreviewView.class).to(UploadPreviewViewImpl.class);
+		bind(UploadPreviewWidget.class).to(UploadPreviewWidgetImpl.class);
+		bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
 		
 		// Keyboard navigation
 		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);
@@ -811,6 +830,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// Team Search Page
 		bind(TeamSearchViewImpl.class).in(Singleton.class);
 		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
+		
+		// People Search Page
+		bind(PeopleSearchViewImpl.class).in(Singleton.class);
+		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class);
 
 		/*
 		 * Teams Widgets
@@ -826,6 +849,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Team List widget (link to search teams page, optionally can create team)
 		bind(TeamListWidgetView.class).to(TeamListWidgetViewImpl.class);
+		
+		// User Group List widget
+		bind(UserGroupListWidgetView.class).to(UserGroupListWidgetViewImpl.class);
 
 		// Member List widget
 		bind(MemberListWidgetView.class).to(MemberListWidgetViewImpl.class);

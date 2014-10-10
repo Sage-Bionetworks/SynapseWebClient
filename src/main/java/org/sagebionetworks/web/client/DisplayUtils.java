@@ -76,6 +76,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -906,6 +907,16 @@ public class DisplayUtils {
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
 	
+	public static String getPeopleSearchHistoryToken(String searchTerm) {
+		PeopleSearch place = new PeopleSearch(searchTerm);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
+	public static String getPeopleSearchHistoryToken(String searchTerm, Integer start) {
+		PeopleSearch place = new PeopleSearch(searchTerm, start);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
 	public static String getTrashHistoryToken(String token, Integer start) {
 		Trash place = new Trash(token, start);
 		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
@@ -1017,6 +1028,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPeopleSearchPlaceString(Class<PeopleSearch> place) {
 		return getPlaceString(place.getName());		
 	}
 	
@@ -2087,35 +2102,36 @@ public class DisplayUtils {
 	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
-		String linkStyle = "";
-		if (clickHandler != null)
-			linkStyle = "link";
-		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
-		if (clickHandler != null)
-			headingHtml.addClickHandler(clickHandler);
-		
-		if (pictureUri != null) {
-			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-			profilePicture.addStyleName("pull-left media-object imageButton");
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		} else {
-			//display default picture
-			String iconClass = defaultPictureSinglePerson ? "user" : "users";
-			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
-			profilePicture.addStyleName("pull-left media-object displayInline ");
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		}
-		FlowPanel mediaBodyPanel = new FlowPanel();
-		mediaBodyPanel.addStyleName("media-body");
-		mediaBodyPanel.add(headingHtml);
-		if (description != null)
-			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
-		panel.add(mediaBodyPanel);
-		return panel;
+ 		String linkStyle = "";
+ 		if (clickHandler != null)
+ 			linkStyle = "link";
+ 		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
+ 		if (clickHandler != null)
+ 			headingHtml.addClickHandler(clickHandler);
+ 
+ 		if (pictureUri != null) {
+ 			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+ 			profilePicture.addStyleName("pull-left media-object imageButton");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		} else {
+ 			//display default picture
+ 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+ 			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
+ 			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
+ 			profilePicture.addStyleName("pull-left media-object displayInline ");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		}
+ 		FlowPanel mediaBodyPanel = new FlowPanel();
+ 		mediaBodyPanel.addStyleName("media-body");
+ 		mediaBodyPanel.add(headingHtml);
+ 		if (description != null)
+ 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+ 		panel.add(mediaBodyPanel);
+ 		return panel;
 	}
 	
 	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){

@@ -14,7 +14,7 @@
 			</t:Table>
 		</g:ScrollPanel>
 		<b:Row>
-			<b:Column size="XS_2" offset="XS_5">
+			<b:Column size="XS_4" offset="XS_5">
 				<g:SimplePanel ui:field="paginationPanel"/>
 			</b:Column>
 		</b:Row>

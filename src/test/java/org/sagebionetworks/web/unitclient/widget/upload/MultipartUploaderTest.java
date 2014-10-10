@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -267,12 +270,45 @@ public class MultipartUploaderTest {
 		
 		inputFilename = "file.tsv";
 		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		// should fix CSV files as well
+		inputFilename = "file.CSV";
+		assertEquals(WebConstants.TEXT_COMMA_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		
+		// should fix text files as well
+		inputFilename = "file.TXT";
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
 	}
 	
 	@Test
 	public void testChunkCount() {
 		//see SWC-1436
 		assertEquals(2L, uploader.getChunkCount(8404992L));
+	}
+	
+	@Test
+	public void testGetSelectedFileMetadataNull(){
+		String inputId = "123";
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		assertEquals(null, uploader.getSelectedFileMetadata(inputId));
+	}
+	
+	@Test
+	public void testGetSelectedFileMetadataEmpty(){
+		String inputId = "123";
+		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[0]);
+		assertNotNull(uploader.getSelectedFileMetadata(inputId));
+	}
+	
+	@Test
+	public void testGetSelectedFileMetadata(){
+		String inputId = "123";
+		when(synapseJsniUtils.getMultipleUploadFileNames(inputId)).thenReturn(new String[]{"a","b"});
+		when(synapseJsniUtils.getContentType(inputId, 0)).thenReturn("text/csv");
+		when(synapseJsniUtils.getContentType(inputId, 1)).thenReturn("text/tab-separated-values");
+		FileMetadata[] results = uploader.getSelectedFileMetadata(inputId);
+		FileMetadata[] expected = new FileMetadata[]{new FileMetadata("a", "text/csv"), new FileMetadata("b", "text/tab-separated-values")};
+		assertTrue(Arrays.equals(expected, results));
 	}
 	
 }

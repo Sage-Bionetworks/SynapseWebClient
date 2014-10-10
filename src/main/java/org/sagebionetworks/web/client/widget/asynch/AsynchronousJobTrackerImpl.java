@@ -90,8 +90,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		timerProvider.setHandler(new FireHandler() {
 			@Override
 			public void fire() {
-				// when the timer fires the status is checked.
-				checkAndWait();
+				// Only continue to fire if the handler is still attached to the UI,
+				if(handler.isAttached()){
+					// when the timer fires the status is checked.
+					checkAndWait();
+				}
 			}
 		});
 		// Do the first check and wait.

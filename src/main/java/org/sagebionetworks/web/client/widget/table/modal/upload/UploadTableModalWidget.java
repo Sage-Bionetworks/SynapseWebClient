@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.modal;
+package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
@@ -18,6 +18,7 @@ public interface UploadTableModalWidget extends IsWidget {
 	 * Configure this widget before using it.
 	 * 
 	 * @param parentId
+	 * @param handler Table creation notification.
 	 */
 	public void configure(String parentId, TableCreatedHandler handler);
 	

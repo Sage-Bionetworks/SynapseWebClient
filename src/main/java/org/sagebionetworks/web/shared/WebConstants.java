@@ -159,6 +159,7 @@ public class WebConstants {
 	
 	public static final String SFTP_PROXY_ENDPOINT = "org.sagebionetworks.portal.sftp_proxy_endpoint";
 	
+	public static final String TEXT_COMMA_SEPARATED_VALUES = "text/csv";
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
 	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";

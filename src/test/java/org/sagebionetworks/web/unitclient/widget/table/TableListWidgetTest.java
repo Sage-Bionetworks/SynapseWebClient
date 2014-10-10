@@ -22,7 +22,7 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

@@ -11,14 +11,24 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface FileInputWidget extends IsWidget {
 	
-	/**
-	 * Configure this widget before use.
-	 */
-	public void configure(FileUploadHandler handler);
 	
 	/**
 	 * Upload the selected files.
+	 * @param handler Will be notified of file upload success or failure.
 	 */
-	public void uploadSelectedFile();
+	public void uploadSelectedFile(FileUploadHandler handler);
+	
+	/**
+	 * Reset the widget to clear all state.
+	 */
+	public void reset();
+	
+	/**
+	 * Get the metadata about the selected files.
+	 * 
+	 * @return
+	 */
+	public FileMetadata[] getSelectedFileMetadata();
+	
 
 }
