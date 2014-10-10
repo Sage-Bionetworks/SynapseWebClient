@@ -5,10 +5,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.entity.query.Condition;
+import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
+import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
+import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
+import org.sagebionetworks.repo.model.entity.query.Operator;
+import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -39,9 +49,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, SynapseWidgetPresenter {
+	public static final long OFFSET_ZERO = 0;
 	
 	private EntityTreeBrowserView view;
-	private SearchServiceAsync searchService;
+	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private HandlerManager handlerManager = new HandlerManager(this);
@@ -56,14 +67,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Inject
 	public EntityTreeBrowser(EntityTreeBrowserView view,
-			SearchServiceAsync searchService,
+			SynapseClientAsync synapseClient,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle,
 			AdapterFactory adapterFactory) {
 		this.view = view;		
-		this.searchService = searchService;
+		this.synapseClient = synapseClient;
 		this.entityTypeProvider = entityTypeProvider;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -86,18 +97,17 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	}
 
 	/**
-	 * Configure tree view with given entityId's children as start set
+	 * Configure tree view with given entityId's children as start set.
+	 * Note: Root entities are sorted by default.
 	 * @param entityId
 	 */
-	public void configure(String entityId, final boolean sort) {
+	public void configure(String entityId) {
 		view.clear();
 		view.showLoading();
 		getFolderChildren(entityId, new AsyncCallback<List<EntityHeader>>() {
 			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				if (sort)
-					EntityBrowserUtils.sortEntityHeadersByName(result);
-				view.setRootEntities(result);
+			public void onSuccess(List<EntityHeader> results) {
+				view.setRootEntities(results);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -105,6 +115,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 			}
 		});
 	}
+
 	
 	/**
 	 * Configure tree view to be filled initially with the given headers.
@@ -124,36 +135,20 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	
 	@Override
 	public void getFolderChildren(String entityId, final AsyncCallback<List<EntityHeader>> asyncCallback) {
-		List<EntityHeader> headers = new ArrayList<EntityHeader>();		
+		EntityQuery childrenQuery = createGetChildrenQuery(entityId);
 		
-		// NOTE: this is fragile, but there doesn't seem to be a way around querying by nodeType. 
-		// a query on concreteType!=org...TableEntity eliminates nodes who do not have concreteType defined
-		final String TABLE_ENTITY_NODE_TYPE_ID = "17"; 
+		synapseClient.executeEntityQuery(childrenQuery, new AsyncCallback<EntityQueryResults>() {
+			@Override
+			public void onSuccess(EntityQueryResults results) {
+				asyncCallback.onSuccess(getHeadersFromQueryResults(results));
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
+				asyncCallback.onFailure(caught);
+			}
+		});
 		
-		searchService.searchEntities("entity", Arrays
-				.asList(new WhereCondition[] { 
-						new WhereCondition("parentId", WhereOperator.EQUALS, entityId),
-						new WhereCondition(WebConstants.NODE_TYPE_KEY, WhereOperator.NOT_EQUALS, TABLE_ENTITY_NODE_TYPE_ID)
-						}), 1, MAX_FOLDER_LIMIT, null,
-				false, new AsyncCallback<List<String>>() {
-				@Override
-				public void onSuccess(List<String> result) {
-					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for(String entityHeaderJson : result) {
-						try {
-							headers.add(new EntityHeader(adapterFactory.createNew(entityHeaderJson)));
-						} catch (JSONObjectAdapterException e) {
-							onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-						}
-					}
-					asyncCallback.onSuccess(headers);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);				
-					asyncCallback.onFailure(caught);
-				}
-			});					
 	}
 
 	@Override
@@ -252,6 +247,32 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter, Synap
 	 */
 	private void fireEntitySelectedEvent() {
 		handlerManager.fireEvent(new EntitySelectedEvent());
+	}
+	
+	private EntityQuery createGetChildrenQuery(String parentId) {
+		EntityQuery newQuery = new EntityQuery();
+		Sort sort = new Sort();
+		sort.setColumnName(EntityFieldName.name.name());
+		sort.setDirection(SortDirection.ASC);
+		newQuery.setSort(sort);
+		Condition condition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
+		newQuery.setConditions(Arrays.asList(condition));
+		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
+		newQuery.setOffset(OFFSET_ZERO);
+		return newQuery;
+	}
+	
+	private List<EntityHeader> getHeadersFromQueryResults(EntityQueryResults results) {
+		List<EntityHeader> headerList = new LinkedList<EntityHeader>();
+		for (EntityQueryResult result : results.getEntities()) {
+			EntityHeader header = new EntityHeader();
+			header.setId(result.getId());
+			header.setName(result.getName());
+			header.setType(result.getEntityType());
+			header.setVersionNumber(result.getVersionNumber());
+			headerList.add(header);
+		}
+		return headerList;
 	}
 
 	@Override

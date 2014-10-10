@@ -16,13 +16,14 @@ import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SearchServiceAsync;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 
 public class EntityTreeBrowserTest {	
 	EntityTreeBrowserView mockView;
-	SearchServiceAsync mockSearchService; 
+	SynapseClientAsync mockSynapseClient; 
 	AuthenticationController mockAuthenticationController;
 	EntityTypeProvider mockEntityTypeProvider;
 	GlobalApplicationState mockGlobalApplicationState;
@@ -34,14 +35,14 @@ public class EntityTreeBrowserTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockView = mock(EntityTreeBrowserView.class);
-		mockSearchService = mock(SearchServiceAsync.class);
+		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockEntityTypeProvider = mock(EntityTypeProvider.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
 		adapterFactory = new AdapterFactoryImpl();
 		
-		entityTreeBrowser = new EntityTreeBrowser(mockView, mockSearchService, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockIconsImageBundle, adapterFactory);
+		entityTreeBrowser = new EntityTreeBrowser(mockView, mockSynapseClient, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
 	}
