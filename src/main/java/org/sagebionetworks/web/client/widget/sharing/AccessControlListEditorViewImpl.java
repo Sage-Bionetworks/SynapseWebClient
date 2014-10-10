@@ -81,14 +81,11 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private UrlCache urlCache;
-	private Grid<PermissionsTableEntry> permissionsGrid;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
 	private SynapseClientAsync synapseClient;
-	private ListStore<PermissionsTableEntry> permissionsStore;
-	private ColumnModel columnModel;
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
@@ -97,10 +94,16 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
+//	private Grid<PermissionsTableEntry> permissionsGrid;
+//	private ListStore<PermissionsTableEntry> permissionsStore;
+//	private ColumnModel columnModel;
+	SharingPermissionsGrid permissionsGrid;
+	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
 			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
-			CookieProvider cookies, SynapseClientAsync synapseClient, UserGroupSuggestBox peopleCombo) {
+			CookieProvider cookies, SynapseClientAsync synapseClient, UserGroupSuggestBox peopleCombo,
+			SharingPermissionsGrid permissionsGrid) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
@@ -108,6 +111,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		this.cookies = cookies;
 		this.synapseClient = synapseClient;
 		this.peopleSuggestBox = peopleCombo;
+		this.permissionsGrid = permissionsGrid;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
@@ -128,22 +132,22 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	
 	@Override
 	public void addAclEntry(AclEntry aclEntry) {
-		if (permissionsStore == null || columnModel == null || permissionsGrid == null)
+		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual())
-			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), 0); // insert groups first
+			permissionsGrid.insert(aclEntry, 0); // insert groups first
 		else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
-			for (; insertIndex < permissionsStore.getCount(); insertIndex++) {
-				if (permissionsStore.getAt(insertIndex).getAclEntry().isIndividual())
+			for (; insertIndex < permissionsGrid.getCount(); insertIndex++) {
+				if (permissionsGrid.getAt(insertIndex).isIndividual())
 					break;
 			}
-			permissionsStore.insert(new PermissionsTableEntry(permissionDisplay, aclEntry), insertIndex); // insert owner
+			permissionsGrid.insert(aclEntry, insertIndex); // insert owner
 		}
 		else
-			permissionsStore.add(new PermissionsTableEntry(permissionDisplay, aclEntry));
-		permissionsGrid.reconfigure(permissionsStore, columnModel);
+			permissionsGrid.add(aclEntry);
+		//permissionsGrid.reconfigure(permissionsStore, columnModel);
 	}
 	
 	@Override
@@ -171,22 +175,22 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		this.setLayout(new FlowLayout(10));
 		
 		// show existing permissions
-		permissionsStore = new ListStore<PermissionsTableEntry>();
+		//permissionsStore = new ListStore<PermissionsTableEntry>();
 		showEditColumns = canChangePermission && !isInherited;
-		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
-				permissionsStore, 
-				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
-				createButtonRenderer(), 
-				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
-					@Override
-					public void invoke(Long principalId) {
-						presenter.removeAccess(principalId);
-					}
-				}),
-				showEditColumns);
+//		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
+//				permissionsStore, 
+//				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
+//				createButtonRenderer(), 
+//				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
+//					@Override
+//					public void invoke(Long principalId) {
+//						presenter.removeAccess(principalId);
+//					}
+//				}),
+//				showEditColumns);
 
-		add(permissionsGrid, new MarginData(5, 0, 0, 0));
-		columnModel = permissionsGrid.getColumnModel();
+		add(permissionsGrid.asWidget(), new MarginData(5, 0, 0, 0));
+		//columnModel = permissionsGrid.getColumnModel();
 		
 		// create panel to hold ACL management buttons
 		HorizontalPanel hPanel = new HorizontalPanel();
