@@ -88,4 +88,9 @@ public class AsynchronousProgressViewImpl implements AsynchronousProgressView {
 		this.message.setText(message);
 	}
 
+	@Override
+	public boolean isAttached() {
+		return progressBar.isAttached();
+	}
+
 }

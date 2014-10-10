@@ -74,6 +74,11 @@ public class AsynchronousProgressWidget implements
 					public void onComplete(AsynchronousResponseBody response) {
 						handler.onComplete(response);
 					}
+
+					@Override
+					public boolean isAttached() {
+						return view.isAttached();
+					}
 				});
 	}
 

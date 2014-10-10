@@ -4,8 +4,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
@@ -93,6 +92,7 @@ public class AsynchronousJobTrackerTest {
 		responseBody.setEtag("etag123");
 		responseBody.setTableId("syn123");
 		
+		when(mockHandler.isAttached()).thenReturn(true);
 	}
 	
 	@Test
@@ -158,5 +158,27 @@ public class AsynchronousJobTrackerTest {
 		verify(mockHandler).onComplete(any(AsynchronousResponseBody.class));
 		// The handler should not get the onCancle() because the onComplete() would have already been sent.
 		verify(mockHandler, never()).onCancel();
+	}
+	
+	/**
+	 * This is a test for SWC-1780.
+	 */
+	@Test
+	public void testDetached(){
+		// Setup a case were the handler starts attached but then becomes detached.
+		when(mockHandler.isAttached()).thenReturn(true, true, false);
+		// Simulate start
+		AsyncMockStubber.callSuccessWith(jobId).when(mockSynapseClient).startAsynchJob(any(AsynchType.class), any(AsynchronousRequestBody.class), any(AsyncCallback.class));
+		// simulate three calls
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockSynapseClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(AsyncCallback.class));
+		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
+		// Update should occur for all three phases
+		verify(mockHandler).onUpdate(start);
+		verify(mockHandler).onUpdate(middle);
+		verify(mockHandler).onUpdate(done);
+		// detachment should be slient.
+		verify(mockHandler, never()).onComplete(any(AsynchronousResponseBody.class));
+		verify(mockHandler, never()).onCancel();
+		verify(mockHandler, never()).onFailure(any(Throwable.class));
 	}
 }
