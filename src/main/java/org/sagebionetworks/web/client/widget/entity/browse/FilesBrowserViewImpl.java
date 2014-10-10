@@ -98,7 +98,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		
 		SimplePanel files = new SimplePanel();
 		files.addStyleName("highlight-box padding-top-0-imp");
-		entityTreeBrowser.configure(entityId, true);
+		entityTreeBrowser.configure(entityId);
 		Widget etbW = entityTreeBrowser.asWidget();
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
@@ -267,7 +267,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 
 	@Override
 	public void refreshTreeView(String entityId) {
-		entityTreeBrowser.configure(entityId, true);
+		entityTreeBrowser.configure(entityId);
 	}
 	
 	/**
