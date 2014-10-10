@@ -365,5 +365,13 @@ public interface SynapseClientAsync {
 
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);
+	
+	/**
+	 * Return the upload destinations associated with this parent entity (container)
+	 * @param parentEntityId
+	 * @return
+	 * @throws RestServiceException
+	 */
+	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 
 }
