@@ -157,6 +157,7 @@ public class WebConstants {
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
 	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
 	
+	public static final String TEXT_COMMA_SEPARATED_VALUES = "text/csv";
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
 	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";

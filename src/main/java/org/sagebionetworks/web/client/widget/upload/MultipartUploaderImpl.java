@@ -357,6 +357,12 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
 				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
 			}
+			else if (lowercaseFilename.endsWith(".csv")) {
+				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
+			}
+			else if (lowercaseFilename.endsWith(".txt")) {
+				contentType = ContentTypeUtils.PLAIN_TEXT;
+			}
 		}
 		return contentType;
 	}
@@ -374,5 +380,21 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		String fileName = names[0];
 		uploadFile(fileName, fileInputId, index, handler);
 	}
+
+	@Override
+	public FileMetadata[] getSelectedFileMetadata(String inputId) {
+		FileMetadata[] results = null;
+		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(inputId);
+		if(fileNames != null){
+			results = new FileMetadata[fileNames.length];
+			for(int i=0; i<fileNames.length; i++){
+				String name = fileNames[i];
+				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
+				results[i] = new FileMetadata(name, contentType);
+			}
+		}
+		return results;
+	}
+
 	
 }

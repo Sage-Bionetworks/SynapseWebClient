@@ -288,10 +288,20 @@ import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalView;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputView;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -794,6 +804,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateTableModalView.class).to(CreateTableModalViewImpl.class);
 		bind(UploadTableModalView.class).to(UploadTableModalViewImpl.class);
 		bind(UploadTableModalWidget.class).to(UploadTableModalWidgetImpl.class);
+		bind(UploadCSVConfigurationPage.class).to(UploadCSVConfigurationPageImpl.class);
+		bind(UploadCSVConfigurationView.class).to(UploadCSVConfigurationViewImpl.class);
+		bind(UploadPreviewView.class).to(UploadPreviewViewImpl.class);
+		bind(UploadPreviewWidget.class).to(UploadPreviewWidgetImpl.class);
+		bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
 		
 		// Keyboard navigation
 		bind(KeyboardNavigationHandler.class).to(KeyboardNavigationHandlerImpl.class);

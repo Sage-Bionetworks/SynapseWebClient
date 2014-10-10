@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
@@ -460,5 +461,24 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 */
 	public TableEntity createTableEntity(TableEntity entity) throws RestServiceException;
+
+	/**
+	 * Get the file Handle given its ID.
+	 * Note: Only the creator of the FileHandle can get the FileHandle with this method.
+	 * 
+	 * @param fileHandleId
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	FileHandle getFileHandle(String fileHandleId) throws RestServiceException;
+
+	/**
+	 * Create a list of columns.
+	 * 
+	 * @param value
+	 * @return
+	 * @throws RestServiceException 
+	 */
+	List<ColumnModel> createTableColumns(List<ColumnModel> value) throws RestServiceException;
 	
 }
