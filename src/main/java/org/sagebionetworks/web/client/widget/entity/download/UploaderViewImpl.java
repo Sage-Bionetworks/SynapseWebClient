@@ -136,8 +136,8 @@ public class UploaderViewImpl extends FlowPanel implements
 			public void onClick(ClickEvent event) {
 				if (isExternal) {
 					String url = pathField.getValue();
-					
-					if (!LoginPresenter.isValidUrl(url, false)) {
+					//let the service decide what is a valid url (now supporting sftp, and perhaps others)
+					if (url == null || url.isEmpty()) {
 						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
 						return;
 					}
