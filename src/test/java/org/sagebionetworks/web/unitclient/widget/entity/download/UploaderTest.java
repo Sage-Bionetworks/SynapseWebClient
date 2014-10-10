@@ -31,6 +31,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
@@ -63,7 +64,7 @@ public class UploaderTest {
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
 	ClientLogger mockLogger;
-	
+	GlobalApplicationState mockGlobalApplicationState;
 	// JSON utility components
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
@@ -87,6 +88,7 @@ public class UploaderTest {
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
 		autogenFactory=mock(AutoGenFactory.class);
 		gwt = mock(GWTWrapper.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
@@ -131,7 +133,7 @@ public class UploaderTest {
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				synapseJsniUtils,
-				gwt, authenticationController, multipartUploader);
+				gwt, authenticationController, multipartUploader, mockGlobalApplicationState);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);

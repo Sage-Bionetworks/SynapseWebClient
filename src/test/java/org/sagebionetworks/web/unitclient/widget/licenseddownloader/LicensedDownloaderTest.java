@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -90,7 +91,7 @@ public class LicensedDownloaderTest {
 	EntityWrapper layerEntityWrapper;
 	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
-	
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
@@ -103,23 +104,23 @@ public class LicensedDownloaderTest {
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
-
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 
 		// create entity type provider
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
 		AdapterFactory adapterFactory = new AdapterFactoryImpl();
 		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
-		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
 		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
 		JiraClientAsync mockJiraClient = mock(JiraClientAsync.class);
 		GWTWrapper mockGWTWrapper = mock(GWTWrapper.class);
 		AuthenticationController mockAuthController = mock(AuthenticationController.class);
 		jiraURLHelper  = new JiraURLHelperImpl(gc, mockJiraClient, mockGWTWrapper, mockAuthController);
+		
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator);
+				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, mockSynapseJSNIUtils);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -258,7 +259,7 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5(), null);
+		verify(mockView).setDownloadLocation(eq(fileHandle.getContentMd5()), anyString());
 		
 		// Success Test: External file
 		resetMocks();			
@@ -275,7 +276,7 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(externalFileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), null, externalFileHandle.getExternalURL());
+		verify(mockView).setDownloadLocation(null, externalFileHandle.getExternalURL());
 	}
 	
 

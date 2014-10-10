@@ -15,7 +15,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -23,7 +22,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -48,8 +46,7 @@ import com.google.inject.Inject;
 public class LicensedDownloader implements LicensedDownloaderView.Presenter, SynapseWidgetPresenter {
 	
 	private LicensedDownloaderView view;
-	private NodeModelCreator nodeModelCreator;
-
+	
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -60,7 +57,6 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	
 	private HandlerManager handlerManager;
 	
-	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
 	private boolean isDirectDownloadSupported;
 	private AuthenticationController authenticationController;
@@ -76,12 +72,10 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
-			NodeModelCreator nodeModelCreator,
 			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
 		this.authenticationController = authenticationController;
