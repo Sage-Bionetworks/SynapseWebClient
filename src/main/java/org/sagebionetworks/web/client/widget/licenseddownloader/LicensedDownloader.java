@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
@@ -30,7 +31,9 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.LicenseAgreement;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
@@ -60,7 +63,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
 	private boolean isDirectDownloadSupported;
-	AuthenticationController authenticationController;
+	private AuthenticationController authenticationController;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -72,7 +76,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
-			NodeModelCreator nodeModelCreator) {
+			NodeModelCreator nodeModelCreator,
+			SynapseJSNIUtils synapseJSNIUtils) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
@@ -80,6 +85,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
 		this.authenticationController = authenticationController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -170,11 +176,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 						if (fileHandle instanceof S3FileHandleInterface) {
 							md5 = ((S3FileHandleInterface)fileHandle).getContentMd5();
 						}
-						String externalUrl = null;
-						if (fileHandle instanceof ExternalFileHandle) {
-							externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
-						}
-						this.view.setDownloadLocation(fileHandle.getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5, externalUrl);
+						String directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle);
+						this.view.setDownloadLocation(md5, directDownloadURL);
 					}
 					else {
 						this.view.setNoDownloads();
@@ -299,4 +302,23 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			}};
 	}
 
+	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle) {
+		String externalUrl = null;
+		if (fileHandle instanceof ExternalFileHandle) {
+			externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
+		}
+		
+		String directDownloadURL = null;
+		if (externalUrl == null)
+			directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), fileEntity.getVersionNumber(), false);
+		else {
+			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+				//point to sftp proxy instead
+				directDownloadURL = Uploader.getSftpProxyLink(externalUrl, globalApplicationState);
+			} else {
+				directDownloadURL = externalUrl;	
+			}
+		}
+		return directDownloadURL;
+	}
 }

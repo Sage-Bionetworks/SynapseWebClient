@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GlobalApplicationStateImplTest {
 	
+	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookieProvider;
 	PlaceController mockPlaceController;
 	ActivityMapper mockMapper;
@@ -37,10 +38,13 @@ public class GlobalApplicationStateImplTest {
 		mockMapper = Mockito.mock(ActivityMapper.class);
 		mockEventBus = Mockito.mock(EventBus.class);
 		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+				globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setActivityMapper(mockMapper);
 	}
+	
 	/**
 	 * 
 	 */
@@ -77,18 +81,15 @@ public class GlobalApplicationStateImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
-		SynapseClientAsync mockSynapseClient = mock(SynapseClientAsync.class);
 		SynapseView mockView = mock(SynapseView.class);
-
-		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(mockSynapseClient, mockView);
+		globalApplicationState.checkVersionCompatibility(mockView);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showErrorMessage(anyString());
 		
 		// simulate change repo version
 		reset(mockSynapseClient);
 		AsyncMockStubber.callSuccessWith("v2").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(mockSynapseClient, mockView);
+		globalApplicationState.checkVersionCompatibility(mockView);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 		

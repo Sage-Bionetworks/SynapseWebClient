@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -210,7 +211,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
-	private TableModelUtils tableModelUtils = new TableModelUtils(adapterFactory);
 	
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
@@ -3032,7 +3032,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	private static class PortalVersionHolder {
 		private static String versionInfo = "";
-
+		
 		static {
 			InputStream s = SynapseClientImpl.class
 					.getResourceAsStream("/version-info.properties");
@@ -3053,14 +3053,19 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
-	@Override
-	public String getSynapseProperty(String key) {
+	private String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
+	}
+	
+	@Override
+	public HashMap<String, String> getSynapseProperties(){
+		return PortalPropertiesHolder.getPropertiesMap();
 	}
 
 	public static class PortalPropertiesHolder {
 		private static Properties props;
-
+		private static HashMap<String, String> propsMap;
+		
 		static {
 			InputStream s = SynapseClientImpl.class
 					.getResourceAsStream("/portal.properties");
@@ -3075,6 +3080,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 		public static String getProperty(String key) {
 			return props.getProperty(key);
+		}
+		
+		public static HashMap<String, String> getPropertiesMap() {
+			if (propsMap == null) {
+				propsMap = new HashMap<String, String>();
+				for (Entry<Object, Object> entry : props.entrySet()) {
+					propsMap.put(entry.getKey().toString(), entry.getValue().toString());
+				}	
+			}
+			return propsMap;
 		}
 	}
 
@@ -3436,5 +3451,4 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
 }

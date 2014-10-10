@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -24,6 +25,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
+	private SynapseClientAsync synapseClient;
 	private ActivityMapper directMapper;
 	private PlaceChanger placeChanger;
 	private JiraURLHelper jiraUrlHelper;
@@ -31,12 +33,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private List<EntityHeader> favorites;
 	private String synapseVersion;
 	private boolean isEditing;
+	private HashMap<String, String> synapseProperties;
 	
 	@Inject
-	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus) {
+	public GlobalApplicationStateImpl(CookieProvider cookieProvider, JiraURLHelper jiraUrlHelper, EventBus eventBus, SynapseClientAsync synapseClient) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
+		this.synapseClient = synapseClient;
 		isEditing = false;
 	}
 
@@ -129,7 +133,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 
 	@Override
-	public void checkVersionCompatibility(final SynapseClientAsync synapseClient, final SynapseView view) {
+	public void checkVersionCompatibility(final SynapseView view) {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
@@ -157,4 +161,27 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void setIsEditing(boolean isEditing) {
 		this.isEditing = isEditing;
 	}
+	
+	@Override
+	public void initSynapseProperties() {
+		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+			@Override
+			public void onSuccess(HashMap<String, String> properties) {
+				synapseProperties = properties;
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+	}
+	
+	@Override
+	public String getSynapseProperty(String key) {
+		if (synapseProperties != null)
+			return synapseProperties.get(key);
+		else 
+			return null;
+	}
+	
 }

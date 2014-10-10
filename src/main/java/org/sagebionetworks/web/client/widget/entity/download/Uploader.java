@@ -14,6 +14,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -61,6 +62,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
 	MultipartUploader multiPartUploader;
 	AuthenticationController authenticationController;
@@ -79,7 +81,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
 			AuthenticationController authenticationController,
-			MultipartUploader multiPartUploader
+			MultipartUploader multiPartUploader,
+			GlobalApplicationState globalAppState
 			) {
 	
 		this.view = view;		
@@ -88,6 +91,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
+		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
 		view.setPresenter(this);
 		clearHandlers();
@@ -159,9 +163,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Get the upload destination (based on the project settings), and continue the upload.
 	 */
 	public void uploadBasedOnConfiguration() {
-//		//TESTING ONLY
-//		uploadToSftpProxy("sftp://localhost/dir/subdir/1234");
-		
 		if (parentEntityId == null) {
 			uploadToS3();
 		} else {
@@ -196,22 +197,31 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			uploadError("External upload destination type not yet handled: " + d.getUploadType().name());
 		}
 	}
+
+	/**
+	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
+	 * @param realSftpUrl
+	 * @param globalAppState
+	 * @return
+	 */
+	public static String getSftpProxyLink(String realSftpUrl, GlobalApplicationState globalAppState) {
+		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+		if (sftpProxy != null) {
+			String delimiter = sftpProxy.contains("?") ? "&" : "?";
+			return sftpProxy + delimiter + "url="+realSftpUrl;
+		} else {
+			//unlikely state
+			throw new IllegalArgumentException("Unable to determine SFTP endpoint");
+		}
+	}
 	
 	public void uploadToSftpProxy(final String url) {
 		currentUploadType = UploadType.SFTP;
-		AsyncCallback<String> endpointCallback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String sftpProxy) {
-				//support gwt codeserver
-				String delimiter = sftpProxy.contains("?") ? "&" : "?";
-				view.submitForm(sftpProxy + delimiter + "url="+url);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				uploadError("Unable to determine SFTP endpoint: " + caught.getMessage());
-			}
-		};
-		synapseClient.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT, endpointCallback);
+		try {
+			view.submitForm(getSftpProxyLink(url, globalAppState));
+		} catch (Exception e) {
+			uploadError(e.getMessage());
+		}
 	}
 	
 	public void uploadToS3() {

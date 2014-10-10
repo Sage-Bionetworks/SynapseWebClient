@@ -78,8 +78,14 @@ public interface GlobalApplicationState {
 	
 	public void setFavorites(List<EntityHeader> favorites);
 	
-	public void checkVersionCompatibility(SynapseClientAsync synapseClient, SynapseView view);
+	public void checkVersionCompatibility(SynapseView view);
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	
+	/**
+	 * As app loads, initialize Synapse properties in the GlobalApplicationState so that they can be used client-side.
+	 */
+	void initSynapseProperties();
+	
+	String getSynapseProperty(String key);
 }

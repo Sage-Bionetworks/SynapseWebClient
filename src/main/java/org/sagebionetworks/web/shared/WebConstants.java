@@ -217,4 +217,6 @@ public class WebConstants {
 	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
 	public static final String AND_NAME_EQUALS = "' and name == '";
 	public static final String LIMIT_ONE = "' limit 1";
+	
+	public static final String SFTP_PREFIX = "sftp://";
 }
