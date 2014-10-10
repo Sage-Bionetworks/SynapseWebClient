@@ -7,8 +7,8 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
  */
 public enum ContentTypeDelimiter {
 
-	CSV("text/tab-separated-values", "\t"),
-	TSV("text/csv", ","),
+	TSV("text/tab-separated-values", "\t"),
+	CSV("text/csv", ","),
 	TEXT("text/plain", null);;
 	
 	String contentType;

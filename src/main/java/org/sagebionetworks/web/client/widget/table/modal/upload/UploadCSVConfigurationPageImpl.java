@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,12 +22,17 @@ import com.google.inject.Inject;
 
 public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPage, UploadCSVConfigurationView.Presenter{
 	
-	private static final String CREATE = "Create";
+	public static final String CREATING_TABLE_COLUMNS = "Creating table columns...";
+	public static final String CREATING_THE_TABLE = "Creating the table...";
+	public static final String ANALYZING_FILE = "Analyzing file...";
+	public static final String APPLYING_CSV_TO_THE_TABLE = "Applying CSV to the Table...";
+	public static final String PREPARING_A_PREVIEW = "Preparing a preview...";
+	public static final String CREATE = "Create";
 	// Injected dependencies.
 	UploadCSVConfigurationView view;
 	SynapseClientAsync synapseClient;
 	UploadPreviewWidget uploadPreviewWidget;
-	AsynchronousProgressWidget asynchronousProgressWidget;
+	JobTrackingWidget jobTrackingWidget;
 
 	// dynamic data fields
 	ContentTypeDelimiter type;
@@ -36,14 +42,14 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 	ModalPresenter presenter;
 	
 	@Inject
-	public UploadCSVConfigurationPageImpl(UploadCSVConfigurationView view, SynapseClientAsync synapseClient, UploadPreviewWidget uploadPreviewWidget, AsynchronousProgressWidget asynchronousProgressWidget){
+	public UploadCSVConfigurationPageImpl(UploadCSVConfigurationView view, SynapseClientAsync synapseClient, UploadPreviewWidget uploadPreviewWidget, JobTrackingWidget jobTrackingWidget){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.uploadPreviewWidget = uploadPreviewWidget;
-		this.asynchronousProgressWidget = asynchronousProgressWidget;
+		this.jobTrackingWidget = jobTrackingWidget;
 		view.setPresenter(this);
 		this.view.setPreviewWidget(this.uploadPreviewWidget.asWidget());
-		this.view.setTrackingWidget(this.asynchronousProgressWidget.asWidget());
+		this.view.setTrackingWidget(this.jobTrackingWidget.asWidget());
 	}
 
 	@Override
@@ -68,13 +74,14 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 	private void createColumns() {
 		try{
 			presenter.setLoading(true);
-			view.showSpinner("Creating table columns...");
+			view.showSpinner(CREATING_TABLE_COLUMNS);
 			List<ColumnModel> value = this.uploadPreviewWidget.getCurrentModel();
 			// Create the columns
 			synapseClient.createTableColumns(value, new AsyncCallback<List<ColumnModel>>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
+					view.hideSpinner();
 					presenter.setErrorMessage(caught.getMessage());
 				}
 
@@ -89,7 +96,7 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 	}
 	
 	public void createTable(List<ColumnModel> schema){
-		view.showSpinner("Creating the table...");
+		view.showSpinner(CREATING_THE_TABLE);
 		// Get the column model ids.
 		List<String> columnIds = new ArrayList<String>(schema.size());
 		for(ColumnModel cm: schema){
@@ -125,7 +132,7 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 		UploadToTableRequest request = uploadPreviewWidget.getUploadRequest();
 		request.setTableId(table.getId());
 		this.view.setTrackerVisible(true);
-		asynchronousProgressWidget.startAndTrackJob("Applying CSV to the Table...", false, AsynchType.TableCSVUpload, request, new AsynchronousProgressHandler(){
+		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false, AsynchType.TableCSVUpload, request, new AsynchronousProgressHandler(){
 
 			@Override
 			public void onCancel() {
@@ -151,7 +158,8 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 		this.view.setPreviewVisible(false);
 		this.view.setTrackerVisible(true);
 		this.presenter.setPrimaryButtonText(CREATE);
-		this.presenter.setInstructionMessage("Preparing a preview...");
+		this.presenter.setInstructionMessage(PREPARING_A_PREVIEW);
+		this.presenter.setLoading(true);
 		// Setup the preview request
 		final UploadToTablePreviewRequest previewRequest = new UploadToTablePreviewRequest();
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
@@ -160,7 +168,7 @@ public class UploadCSVConfigurationPageImpl implements UploadCSVConfigurationPag
 		previewRequest.setUploadFileHandleId(fileHandleId);
 		previewRequest.setDoFullFileScan(true);
 		// Start the job
-		asynchronousProgressWidget.startAndTrackJob("Analyzing file...", false, AsynchType.TableCSVUploadPreview, previewRequest, new AsynchronousProgressHandler() {
+		jobTrackingWidget.startAndTrackJob(ANALYZING_FILE, false, AsynchType.TableCSVUploadPreview, previewRequest, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {

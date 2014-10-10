@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;

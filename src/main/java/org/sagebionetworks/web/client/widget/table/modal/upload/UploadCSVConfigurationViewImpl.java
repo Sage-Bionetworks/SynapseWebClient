@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 
@@ -26,7 +27,7 @@ public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationVie
 	@UiField
 	SimplePanel trackerPanel;
 	@UiField
-	HTMLPanel spinnerPanel;
+	Column spinnerColumn;
 	@UiField
 	Text spinnerText;
 	
@@ -76,12 +77,12 @@ public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationVie
 	@Override
 	public void showSpinner(String text) {
 		spinnerText.setText(text);
-		spinnerPanel.setVisible(true);
+		spinnerColumn.setVisible(true);
 	}
 
 	@Override
 	public void hideSpinner() {
-		spinnerPanel.setVisible(false);
+		spinnerColumn.setVisible(false);
 	}
 
 	@Override

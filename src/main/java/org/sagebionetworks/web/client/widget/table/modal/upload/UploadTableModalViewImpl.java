@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.modal;
+package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;

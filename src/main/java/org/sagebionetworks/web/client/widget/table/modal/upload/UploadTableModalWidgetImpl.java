@@ -1,9 +1,7 @@
-package org.sagebionetworks.web.client.widget.table.modal;
+package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

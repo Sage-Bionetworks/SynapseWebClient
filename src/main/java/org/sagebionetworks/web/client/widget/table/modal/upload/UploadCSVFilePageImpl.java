@@ -9,8 +9,9 @@ import com.google.inject.Inject;
 
 public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 
-	private static final String PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD = "Please select a CSV or TSV file to upload";
-	private static final String PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE = "Please select a comma-separated or tab-separated file.  Unknown type: ";
+	public static final String NEXT = "Next";
+	public static final String PLEASE_SELECT_A_CSV_OR_TSV_FILE_TO_UPLOAD = "Please select a CSV or TSV file to upload";
+	public static final String UNKNOWN_TYPE_SLECTED = "The selected files is not of the expected type. Please select a comma-separated or tab-separated file.";
 	public static final String CHOOSE_A_CSV_OR_TSV_FILE = "Choose a CSV or TSV file and then click next.";
 	
 	// Injected dependencies.
@@ -35,9 +36,20 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	public void onPrimary() {
 		// proceed if valid
 		if(validateSelecedFile()){
-			presenter.setLoading(false);
+			presenter.setLoading(true);
 			// Upload the file
-			fileInputWidget.uploadSelectedFile();
+			fileInputWidget.uploadSelectedFile(new FileUploadHandler() {
+				
+				@Override
+				public void uploadSuccess(String fileHandleId) {
+					fileHandleCreated(fileHandleId);
+				}
+				
+				@Override
+				public void uploadFailed(String error) {
+					presenter.setErrorMessage(error);
+				}
+			});
 		}
 	}
 
@@ -50,25 +62,15 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	public void setModalPresenter(final ModalPresenter presenter) {
 		this.presenter = presenter;
 		this.presenter.setInstructionMessage(CHOOSE_A_CSV_OR_TSV_FILE);
-		this.fileInputWidget.configure(new FileUploadHandler() {
-			
-			@Override
-			public void uploadSuccess(String fileHandleId) {
-				fileHandleCreated(fileHandleId);
-			}
-			
-			@Override
-			public void uploadFailed(String error) {
-				presenter.setErrorMessage(error);
-			}
-		});
+		this.presenter.setPrimaryButtonText(NEXT);
+		this.fileInputWidget.reset();
 	}
 
 	/**
 	 * Validate the content type of the selected file.
 	 * @return
 	 */
-	private boolean validateSelecedFile(){
+	public boolean validateSelecedFile(){
 		// Frist validate the input
 		FileMetadata[] meta = fileInputWidget.getSelectedFileMetadata();
 		if(meta == null || meta.length != 1){
@@ -81,7 +83,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 			this.fileName =  meta[0].getFileName();
 			return true;
 		}catch(IllegalArgumentException e){
-			presenter.setErrorMessage(PLEASE_SELECT_A_COMMA_SEPARATED_OR_TAB_SEPARATED_FILE_UNKNOWN_TYPE+contentType);
+			presenter.setErrorMessage(UNKNOWN_TYPE_SLECTED);
 			return false;
 		}
 	}

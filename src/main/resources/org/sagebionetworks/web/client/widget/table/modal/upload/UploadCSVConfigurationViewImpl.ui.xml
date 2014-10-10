@@ -15,10 +15,14 @@
 		</b:Form>
 		<g:SimplePanel ui:field="previewPanel" />
 		<g:SimplePanel ui:field="trackerPanel" />
-		<g:HTMLPanel ui:field="spinnerPanel" visible="false">
-			<g:Image resource='{sageImageBundle.loading31}' />
-			<bh:Text ui:field="spinnerText"></bh:Text>
-		</g:HTMLPanel>
+
+		<b:Row>
+			<b:Column size="XS_3" offset="XS_5" ui:field="spinnerColumn" visible="false">
+					<g:Image resource='{sageImageBundle.loading31}' />
+					<bh:Text ui:field="spinnerText"></bh:Text>
+			</b:Column>
+		</b:Row>
+
 	</g:HTMLPanel>
 
 </ui:UiBinder>

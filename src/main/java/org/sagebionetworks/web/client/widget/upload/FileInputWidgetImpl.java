@@ -30,7 +30,8 @@ public class FileInputWidgetImpl implements FileInputWidget,
 	}
 
 	@Override
-	public void uploadSelectedFile() {
+	public void uploadSelectedFile(final FileUploadHandler handler) {
+		this.handler = handler;
 		view.updateProgress(1, "1%");
 		view.showProgress(true);
 		view.setInputEnabled(false);
@@ -64,12 +65,7 @@ public class FileInputWidgetImpl implements FileInputWidget,
 	}
 
 	@Override
-	public void configure(final FileUploadHandler handler) {
-		this.handler = handler;
-		resetView();
-	}
-
-	private void resetView() {
+	public void reset() {
 		view.showProgress(false);
 		view.setInputEnabled(true);
 		view.resetForm();

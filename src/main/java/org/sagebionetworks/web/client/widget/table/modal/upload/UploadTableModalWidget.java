@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.modal;
+package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 
