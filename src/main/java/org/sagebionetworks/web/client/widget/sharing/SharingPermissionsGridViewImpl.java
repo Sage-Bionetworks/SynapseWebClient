@@ -2,7 +2,11 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -22,6 +26,8 @@ import com.google.inject.Inject;
 public class SharingPermissionsGridViewImpl extends Composite implements SharingPermissionsGridView {
 	public interface SharingPermissionsGridViewImplUiBinder extends UiBinder<Widget, SharingPermissionsGridViewImpl> {};
 	
+	CallbackP<Long> deleteButtonCallback;
+	
 	@UiField 
 	TBody tableBody;
 	
@@ -36,12 +42,17 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
+	public void configure(CallbackP<Long> deleteButtonCallback) {
+		this.deleteButtonCallback = deleteButtonCallback;
+	}
+	
+	@Override
 	public void add(AclEntry aclEntry) {
 		tableBody.add(createAclEntryTableRow(aclEntry));
 	}
 	
-	private TableRow createAclEntryTableRow(AclEntry aclEntry) {
-		TableRow row = new TableRow();
+	private TableRow createAclEntryTableRow(final AclEntry aclEntry) {
+		final TableRow row = new TableRow();
 		
 		// Poeple label
 		TableData data = new TableData();
@@ -58,17 +69,19 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		
 		// Delete button
 		data = new TableData();
-		Button button = new Button("", IconType.SEARCH, new ClickHandler() {
+		Button button = new Button("", IconType.SEARCH, new ClickHandler() {	// TODO: IconType.REMOVE??
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Window.alert("THIS WILL DELETE!!");
+				tableBody.remove(row);
+				deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
 			}
 			
-		});	// TODO: IconType.REMOVE??
+		});
 		if (aclEntry.isOwner()) {
 			button.setEnabled(false);
 		}
+		button.setType(ButtonType.DANGER);
 		data.add(button);
 		row.add(data);;
 		

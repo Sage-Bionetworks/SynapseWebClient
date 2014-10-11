@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.users.AclEntry;
 
@@ -19,6 +20,15 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 	public SharingPermissionsGrid(SharingPermissionsGridView view) {
 		this.view = view;
 		aclEntries = new ArrayList<AclEntry>();
+	}
+	
+	public void clear() {
+		aclEntries.clear();
+		view.clear();
+	}
+	
+	public void configure(CallbackP<Long> deleteButtonCallback) {
+		view.configure(deleteButtonCallback);
 	}
 	
 	public AclEntry getAt(int index) {

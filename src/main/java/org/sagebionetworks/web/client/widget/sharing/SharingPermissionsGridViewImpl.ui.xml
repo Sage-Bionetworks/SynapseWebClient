@@ -4,7 +4,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	
-   <g:HTMLPanel ui:field="mainContainer" addStyleNames="highlight-box">
+   <g:HTMLPanel ui:field="mainContainer" addStyleNames="panel panel-default">
         <t:Table ui:field="sharingTable" styleName="table table-condensed" >
 		    <t:THead>
 		        <t:TableRow>
