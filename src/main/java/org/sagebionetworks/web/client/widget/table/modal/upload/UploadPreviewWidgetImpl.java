@@ -8,13 +8,15 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	
-	private static final int MAX_CHARS_PER_CELL = 10;
+	public static final double COLUMN_SIZE_BUFFER = 0.25;
+	public static final int MAX_CHARS_PER_CELL = 10;
 	UploadPreviewView view;
 	UploadToTablePreviewRequest previewRequest;
 	List<ColumnModel> columns;
@@ -33,7 +35,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	@Override
 	public void configure(UploadToTablePreviewRequest previewRequest, UploadToTablePreviewResult preview) {
 		this.previewRequest = previewRequest;
-		columns = preview.getSuggestedColumns();
+		columns = preProcessColumns(preview.getSuggestedColumns());
 		// Create a list of headers
 		List<String> headers = new ArrayList<String>();
 		for(ColumnModel cm: preview.getSuggestedColumns()){
@@ -46,13 +48,16 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 		}
 		view.setHeaders(headers);
 		// add each row
-		for(Row row: preview.getSampleRows()){
-			List<String> values = new ArrayList<String>(row.getValues().size());
-			for(String value: row.getValues()){
-				values.add(truncateValues(value));
+		if(preview.getSampleRows() != null){
+			for(Row row: preview.getSampleRows()){
+				List<String> values = new ArrayList<String>(row.getValues().size());
+				for(String value: row.getValues()){
+					values.add(truncateValues(value));
+				}
+				view.addRow(values);
 			}
-			view.addRow(values);
 		}
+
 	}
 	
 	private String truncateValues(String in){
@@ -79,5 +84,22 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 		return request;
 	}
 
+	/**
+	 * Pre-process the passed columns.  Returns a cloned list of ColumnModels, each modified as needed.
+	 * @param adapter
+	 * @param columns
+	 * @return
+	 * @throws JSONObjectAdapterException
+	 */
+	public List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
+		for(ColumnModel cm: columns){
+			if(cm.getMaximumSize() != null){
+				// Add a buffer to the max size
+				double startingMax = cm.getMaximumSize();
+				cm.setMaximumSize((long)(startingMax+(startingMax*COLUMN_SIZE_BUFFER)));
+			}
+		}
+		return columns;
+	}
 	
 }
