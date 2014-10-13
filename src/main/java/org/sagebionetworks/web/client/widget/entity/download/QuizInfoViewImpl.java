@@ -42,9 +42,9 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	}
 	
 	@Override
-	public void configure(boolean isCertifationRequired) {
+	public void configure(boolean isCertificationRequired) {
 		clear();
-		if (!isCertifationRequired) {
+		if (!isCertificationRequired) {
 			DisplayUtils.show(remindMeLaterButton);
 			remindMeLaterButton.addClickHandler(new ClickHandler() {
 				@Override

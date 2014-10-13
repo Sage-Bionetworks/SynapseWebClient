@@ -483,7 +483,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(filesTabContainer, bundle, wikiPageId,  null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanEdit(), bundle.getPermissions().getCanCertifiedUserEdit()));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanAddChild(), bundle.getPermissions().getCanCertifiedUserAddChild()));
 		filesTabContainer.add(row);		
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));

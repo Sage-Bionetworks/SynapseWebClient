@@ -191,8 +191,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		Entity entity = entityBundle.getEntity();
 		UserEntityPermissions permissions = entityBundle.getPermissions();
 		// upload
-		if(permissions.getCanCertifiedUserAddChild()) {
+		if (permissions.getCanCertifiedUserEdit()) {
 			addRenameItem(toolsButton);
+		}
+		
+		if(permissions.getCanCertifiedUserAddChild()) {
 			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
