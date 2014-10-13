@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -89,7 +88,6 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	 * @param adapter
 	 * @param columns
 	 * @return
-	 * @throws JSONObjectAdapterException
 	 */
 	public List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
 		for(ColumnModel cm: columns){
