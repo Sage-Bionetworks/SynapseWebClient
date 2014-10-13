@@ -484,7 +484,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		addWikiPageWidget(filesTabContainer, bundle, canEdit, wikiPageId,  null);
 		// Child Browser
 		row = DisplayUtils.createRowContainer();
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), canEdit));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanEdit(), bundle.getPermissions().getCanCertifiedUserEdit()));
 		filesTabContainer.add(row);		
 		// Created By/Modified By
 		filesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), true));
@@ -540,7 +540,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		
 		// File Tab: Files, Annotations & old
 		row = DisplayUtils.createRowContainer();		
-		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), canEdit));
+		row.add(createEntityFilesBrowserWidget(bundle.getEntity(), bundle.getPermissions().getCanAddChild(), bundle.getPermissions().getCanCertifiedUserAddChild()));
 		filesTabContainer.add(row);			
 		filesTabContainer.add(createAttachmentsWidget(bundle, canEdit, false)); // Attachments (TODO : this should eventually be removed)
 		// Created By/Modified By
@@ -801,9 +801,8 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return wrapper;
 	}
 
-	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canEdit) {
-		filesBrowser.setCanEdit(canEdit);
-		filesBrowser.configure(entity.getId());
+	private Widget createEntityFilesBrowserWidget(Entity entity, boolean canAddChild, boolean canCertifiedUserAddChild) {
+		filesBrowser.configure(entity.getId(), canAddChild, canCertifiedUserAddChild);
 		LayoutContainer lc = new LayoutContainer();
 		lc.addStyleName("col-md-12 margin-top-10");
 		lc.add(filesBrowser.asWidget());

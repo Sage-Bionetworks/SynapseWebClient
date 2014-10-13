@@ -132,7 +132,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	private FlowPanel openTeamInvitesPanel;
 	private MyEvaluationEntitiesList myEvaluationsList;
 	
-	private static final Date LOCKDOWN = new Date(114, 9, 20);
+	private static final Date LOCKDOWN = new Date(114, 10, 10);
 	public static final String LOCKDOWN_DATE_STRING = DateTimeFormat.getFormat("MMMM d").format(LOCKDOWN);
 	
 	@Inject

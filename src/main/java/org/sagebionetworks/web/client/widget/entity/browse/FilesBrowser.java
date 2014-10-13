@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +41,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
 	EntityAccessRequirementsWidget accessRequirementsWidget;
-	boolean canEdit = false;
+	boolean canAddChild, canCertifiedUserAddChild;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
@@ -69,18 +68,16 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId) {
-		this.configuredEntityId = entityId;		
-		view.configure(entityId, canEdit);
+	public void configure(String entityId, boolean canAddChild, boolean canCertifiedUserAddChild) {
+		this.configuredEntityId = entityId;
+		this.canAddChild = canAddChild;
+		this.canCertifiedUserAddChild = canCertifiedUserAddChild;
+		view.configure(entityId, canCertifiedUserAddChild);
 	}
 	
 	public void refresh() {
 		if (configuredEntityId != null)
-			view.configure(configuredEntityId, canEdit);
-	}
-	
-	public void setCanEdit(boolean canEdit) {
-		this.canEdit = canEdit;
+			view.configure(configuredEntityId, canCertifiedUserAddChild);
 	}
 	
 	public void clearState() {
@@ -108,7 +105,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, cookies, authenticationController);
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, cookies, authenticationController, isCertificationNeeded(canAddChild, canCertifiedUserAddChild));
+	}
+	
+	public static boolean isCertificationNeeded(boolean canAddChild, boolean canCertifiedUserAddChild) {
+		return !canAddChild && canCertifiedUserAddChild;
 	}
 	
 	//any access requirements to accept?
@@ -116,14 +117,14 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			EntityAccessRequirementsWidget accessRequirementsWidget, 
 			final String entityId, 
 			final UploadView view,
-			final SynapseClientAsync synapseClient,
 			final CookieProvider cookies,
-			final AuthenticationController authenticationController) {
+			final AuthenticationController authenticationController,
+			final boolean isCertificationNeeded) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, cookies, authenticationController);
+					uploadButtonClickedStep2(entityId, view, cookies, authenticationController, isCertificationNeeded);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
@@ -133,39 +134,31 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	public static void uploadButtonClickedStep2(
 			final String entityId, 
 			final UploadView view,
-			SynapseClientAsync synapseClient,
 			final CookieProvider cookies,
-			AuthenticationController authenticationController) {
-		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String passingRecord) {
-				view.showUploadDialog(entityId);
-			}
-			@Override
-			public void onFailure(Throwable t) {
-				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(new CallbackP<Boolean>() {
-						@Override
-						public void invoke(Boolean tutorialClicked) {
-							if (!tutorialClicked) {
-								//remind me later clicked
-								//do not pop this up for a day
-								Date date = new Date();
-								CalendarUtil.addDaysToDate(date, 1);
-								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
-								view.showUploadDialog(entityId);
-						}
-						}
-					});					
-				} else
-					view.showErrorMessage(t.getMessage());
-			}
-		};
+			AuthenticationController authenticationController,
+			boolean isCertificationNeeded) {
+
 		//only if cookie is not set
 		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
+			if(isCertificationNeeded) {
+				view.showQuizInfoDialog(new CallbackP<Boolean>() {
+					@Override
+					public void invoke(Boolean tutorialClicked) {
+						if (!tutorialClicked) {
+							//remind me later clicked
+							//do not pop this up for a day
+							Date date = new Date();
+							CalendarUtil.addDaysToDate(date, 1);
+							cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
+							view.showUploadDialog(entityId);
+						}
+					}
+				});	
+			} else {
+				view.showUploadDialog(entityId);
+			}
 		} else {
-			userCertifiedCallback.onSuccess("");
+			view.showUploadDialog(entityId);
 		}
 	}
 	

@@ -61,25 +61,14 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	}
 
 	@Override
-	public void configure(String entityId, boolean canEdit) {
-		configure(entityId, canEdit, null);
-	}		
-	
-	@Override
-	public void configure(String entityId, boolean canEdit, String title) {
+	public void configure(String entityId, boolean canCertifiedUserAddChild) {
 		this.clear();
 		this.add(uploader.asWidget());	//add the upload dialog
 		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
 		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
-		boolean isTitle = (title!=null);
-		if(isTitle) {
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant("<h3>" + title + "</h3>");
-			topbar.add(new HTML(shb.toSafeHtml()));
-		}
 		
-		if(canEdit) {
+		if(canCertifiedUserAddChild) {
 			Button upload = getUploadButton(entityId);
 			upload.addStyleName("margin-right-5");
 			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
@@ -103,7 +92,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
-		if (canEdit || isTitle) {
+		if (canCertifiedUserAddChild) {
 			fp.add(topbar);
 		}
 		fp.add(files);
