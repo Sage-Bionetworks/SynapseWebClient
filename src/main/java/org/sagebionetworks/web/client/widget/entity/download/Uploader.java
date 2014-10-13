@@ -219,10 +219,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void uploadToSftpProxy(final String url) {
 		currentUploadType = UploadType.SFTP;
 		try {
-			String destinationUrl = url;
-			if (!destinationUrl.endsWith("/"))
-				destinationUrl += "/";
-			view.submitForm(getSftpProxyLink(destinationUrl, globalAppState));
+			view.submitForm(getSftpProxyLink(url, globalAppState));
 		} catch (Exception e) {
 			uploadError(e.getMessage());
 		}
@@ -428,7 +425,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 				}			
 			});
-		} catch (RestServiceException e) {			
+		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
 	}
@@ -549,7 +546,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
-	private String getOldUploadUrl() {
+	public String getOldUploadUrl() {
 		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}

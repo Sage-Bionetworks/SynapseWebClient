@@ -144,7 +144,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testGetUploadActionUrlWithNull() {
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 		
 		//also check view reset
@@ -155,7 +155,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithFileEntity() {
 		FileEntity fileEntity = new FileEntity();
 		uploader.asWidget(fileEntity);
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
@@ -163,7 +163,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithData() {
 		Data data = new Data();
 		uploader.asWidget(data);
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
