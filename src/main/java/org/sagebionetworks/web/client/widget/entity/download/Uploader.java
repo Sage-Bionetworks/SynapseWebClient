@@ -219,7 +219,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void uploadToSftpProxy(final String url) {
 		currentUploadType = UploadType.SFTP;
 		try {
-			view.submitForm(getSftpProxyLink(url, globalAppState));
+			String destinationUrl = url;
+			if (!destinationUrl.endsWith("/"))
+				destinationUrl += "/";
+			view.submitForm(getSftpProxyLink(destinationUrl, globalAppState));
 		} catch (Exception e) {
 			uploadError(e.getMessage());
 		}
