@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.ListBox;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -35,14 +36,14 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 		return aclEntries.get(index);
 	}
 	
-	public void insert(AclEntry aclEntry, int beforeIndex) {
+	public void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox) {
 		aclEntries.add(beforeIndex, aclEntry);
-		view.insert(aclEntry, beforeIndex);
+		view.insert(aclEntry, beforeIndex, permListBox);
 	}
 	
-	public void add(AclEntry aclEntry) {
+	public void add(AclEntry aclEntry, ListBox permListBox) {
 		aclEntries.add(aclEntry);
-		view.add(aclEntry);
+		view.add(aclEntry, permListBox);
 	}
 	
 	public int getCount() {

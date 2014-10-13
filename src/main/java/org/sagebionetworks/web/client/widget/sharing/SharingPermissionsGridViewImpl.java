@@ -37,8 +37,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void insert(AclEntry aclEntry, int beforeIndex) {
-		tableBody.insert(createAclEntryTableRow(aclEntry), beforeIndex);
+	public void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox) {
+		tableBody.insert(createAclEntryTableRow(aclEntry, permListBox), beforeIndex);
 	}
 	
 	@Override
@@ -47,11 +47,11 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void add(AclEntry aclEntry) {
-		tableBody.add(createAclEntryTableRow(aclEntry));
+	public void add(AclEntry aclEntry, ListBox permListBox) {
+		tableBody.add(createAclEntryTableRow(aclEntry, permListBox));
 	}
 	
-	private TableRow createAclEntryTableRow(final AclEntry aclEntry) {
+	private TableRow createAclEntryTableRow(final AclEntry aclEntry, ListBox permListBox) {
 		final TableRow row = new TableRow();
 		
 		// Poeple label
@@ -59,12 +59,9 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		data.add(new Label(aclEntry.getTitle()));
 		row.add(data);
 		
-		// Access list
+		// Permissions List Box
 		data = new TableData();
-		ListBox listBox = getAccessListBox();
-		if (aclEntry.isOwner())
-			listBox.setEnabled(false);
-		data.add(listBox);
+		data.add(permListBox);
 		row.add(data);
 		
 		// Delete button
@@ -86,15 +83,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		row.add(data);;
 		
 		return row;
-	}
-	
-	private ListBox getAccessListBox() {
-		ListBox listBox = new ListBox();
-		listBox.addItem("TEST 1");	// TODO: Change
-		listBox.addItem("TEST 2");
-		listBox.addItem("TEST 3");
-		
-		return listBox;
 	}
 	
 	@Override
