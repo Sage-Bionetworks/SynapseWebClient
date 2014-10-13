@@ -24,7 +24,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 	
 	public void showUploadDialog(String entityId);
 	public void showFolderEditDialog(String folderEntityId);
-	public void showQuizInfoDialog(CallbackP<Boolean> callback);
+	public void showQuizInfoDialog(boolean isCertificationRequired, CallbackP<Boolean> callback);
 	
 	/**
 	 * Presenter interface

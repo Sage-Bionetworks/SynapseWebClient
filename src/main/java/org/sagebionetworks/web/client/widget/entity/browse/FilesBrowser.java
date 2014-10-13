@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,10 +106,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, cookies, authenticationController, isCertificationNeeded(canAddChild, canCertifiedUserAddChild));
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, cookies, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
 	}
 	
-	public static boolean isCertificationNeeded(boolean canAddChild, boolean canCertifiedUserAddChild) {
+	public static boolean isCertificationRequired(boolean canAddChild, boolean canCertifiedUserAddChild) {
 		return !canAddChild && canCertifiedUserAddChild;
 	}
 	
@@ -117,48 +118,60 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			EntityAccessRequirementsWidget accessRequirementsWidget, 
 			final String entityId, 
 			final UploadView view,
+			final SynapseClientAsync synapseClient,
 			final CookieProvider cookies,
 			final AuthenticationController authenticationController,
-			final boolean isCertificationNeeded) {
+			final boolean isCertificationRequired) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, cookies, authenticationController, isCertificationNeeded);
+					uploadButtonClickedStep2(entityId, view, synapseClient, cookies, authenticationController, isCertificationRequired);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-		//is this a certified user?
+	//is this a certified user?
 	public static void uploadButtonClickedStep2(
 			final String entityId, 
 			final UploadView view,
+			SynapseClientAsync synapseClient,
 			final CookieProvider cookies,
 			AuthenticationController authenticationController,
-			boolean isCertificationNeeded) {
+			final boolean isCertificationRequired) {
 
-		//only if cookie is not set
-		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
-			if(isCertificationNeeded) {
-				view.showQuizInfoDialog(new CallbackP<Boolean>() {
-					@Override
-					public void invoke(Boolean tutorialClicked) {
-						if (!tutorialClicked) {
-							//remind me later clicked
-							//do not pop this up for a day
-							Date date = new Date();
-							CalendarUtil.addDaysToDate(date, 1);
-							cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
-							view.showUploadDialog(entityId);
-						}
-					}
-				});	
-			} else {
+		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String passingRecord) {
 				view.showUploadDialog(entityId);
 			}
+
+			@Override
+			public void onFailure(Throwable t) {
+				if (t instanceof NotFoundException) {
+					view.showQuizInfoDialog(isCertificationRequired, new CallbackP<Boolean>() {
+						@Override
+						public void invoke(Boolean tutorialClicked) {
+							if (!tutorialClicked) {
+								// remind me later clicked
+								// do not pop this up for a day
+								Date date = new Date();
+								CalendarUtil.addDaysToDate(date, 1);
+								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
+								view.showUploadDialog(entityId);
+							}
+						}
+					});
+				} else
+					view.showErrorMessage(t.getMessage());
+			}
+		};
+		//only if cookie is not set
+		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
+			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 		} else {
-			view.showUploadDialog(entityId);
+			userCertifiedCallback.onSuccess("");
 		}
 	}
 	

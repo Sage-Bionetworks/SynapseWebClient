@@ -101,8 +101,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator,
-			boolean canEdit, 
 			Long versionNumber,
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
@@ -114,12 +112,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		shareButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_SHARE, ButtonType.DEFAULT, "glyphicon-lock");
 		shareButton.getElement().setId(DisplayConstants.ID_BTN_SHARE);
 		shareButton.addStyleName("pull-right margin-left-5");
-		configureShareButton(entity, isAdministrator);				
+		configureShareButton(entity, entityBundle.getPermissions().getCanChangePermissions());				
 		
 		// Tools
 		toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
 		toolsButton.addStyleName("pull-right margin-left-5");
-		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
+		configureToolsMenu(entityBundle, entityType);
 
 		this.add(toolsButton);	
 		this.add(shareButton);
@@ -188,18 +186,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle,
-			EntityType entityType, boolean isAdministrator, boolean canEdit) {
+			EntityType entityType) {
 		boolean authenticated = presenter.isUserLoggedIn();
 		Entity entity = entityBundle.getEntity();
-		
+		UserEntityPermissions permissions = entityBundle.getPermissions();
 		// upload
-		if(canEdit) {
+		if(permissions.getCanCertifiedUserAddChild()) {
 			addRenameItem(toolsButton);
 			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
-		if (canEdit && entity instanceof Versionable) {
+		if (permissions.getCanCertifiedUserAddChild() && entity instanceof Versionable) {
 			addSubmitToEvaluationItem(toolsButton, entity, entityType);
 		} 
 		
@@ -208,7 +206,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			addCreateShortcutItem(toolsButton, entity, entityType);
 		}
 		// move
-		if (canEdit && !(entityBundle.getEntity() instanceof Project)) {
+		if (permissions.getCanCertifiedUserAddChild() && !(entityBundle.getEntity() instanceof Project)) {
 			addMoveItem(toolsButton, entity, entityType);
 		}
 
@@ -217,7 +215,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		}
 		
 		// put delete last
-		if(canEdit) {
+		if(permissions.getCanDelete()) {
 			addDeleteItem(toolsButton, typeDisplay);
 		}
 		
@@ -272,8 +270,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 				@Override
 				public void onClick(ClickEvent event) {
 					UserEntityPermissions permissions = entityBundle.getPermissions();
-					boolean isCertificationNeeded = FilesBrowser.isCertificationNeeded(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
-					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, cookies, authenticationController, isCertificationNeeded);
+					boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
+					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController, isCertificationRequired);
 				}
 			});
 			menuBtn.addMenuItem(a);
@@ -293,8 +291,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	@Override
-	public void showQuizInfoDialog(CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
+	public void showQuizInfoDialog(boolean isCertificationRequired, CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(isCertificationRequired, callback, quizInfoWidget);
 	}
 		
 	/**
