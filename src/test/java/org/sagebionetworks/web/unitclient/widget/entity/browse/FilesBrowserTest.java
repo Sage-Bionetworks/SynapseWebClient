@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -233,6 +235,26 @@ public class FilesBrowserTest {
 	public void testAddFolderButtonClickedCertified(){
 		filesBrowser.addFolderClicked();
 		verify(mockView).showFolderEditDialog(anyString());
+	}
+	
+	@Test
+	public void testIsCertificationRequired() {
+		//note method signature:
+		//FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild);
+		
+		//BEFORE LOCKDOWN
+		//certification not required if can add child regardless of certification
+		assertFalse(FilesBrowser.isCertificationRequired(true, true));
+		
+		//the case when you can add a child before certification, but after certification you cannot.  This is an invalid state:
+		//assertNA(FilesBrowser.isCertificationRequired(true, false));
+		
+		//AFTER LOCKDOWN
+		//certification is required if you can't add a child without certification.
+		assertTrue(FilesBrowser.isCertificationRequired(false, true));
+		
+		//regardless of certification, this user cannot add children
+		assertFalse(FilesBrowser.isCertificationRequired(false, false));
 	}
 }
 
