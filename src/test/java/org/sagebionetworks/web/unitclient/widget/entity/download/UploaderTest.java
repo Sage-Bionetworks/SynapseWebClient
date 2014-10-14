@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -327,6 +328,16 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testInvalidUploadDestination() {
+		//add an invalid upload destination
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(mock(UploadDestination.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.handleUploads();
+		verifyUploadError();
+	}
+	
+	@Test
 	public void testUploadToExternal() {
 		String sftpProxy = "http://mytestproxy.com/sftp";
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
@@ -380,5 +391,4 @@ public class UploaderTest {
 		uploader.handleSubmitResult(r);
 		verifyUploadError();
 	}
-
 }
