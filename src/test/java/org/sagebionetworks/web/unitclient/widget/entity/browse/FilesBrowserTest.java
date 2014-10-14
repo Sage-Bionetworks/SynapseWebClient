@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import static junit.framework.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,6 +46,8 @@ public class FilesBrowserTest {
 	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
 	EntityAccessRequirementsWidget mockAccessRequirementsWidget;
+	boolean canAddChild = true;
+	boolean canCertifiedUserAddChild = false;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -60,7 +64,7 @@ public class FilesBrowserTest {
 				mockNodeModelCreator, adapterFactory, autoGenFactory,
 				mockGlobalApplicationState, mockAuthenticationController, mockCookies, mockAccessRequirementsWidget);
 		verify(mockView).setPresenter(filesBrowser);
-		filesBrowser.configure(configuredEntityId);
+		filesBrowser.configure(configuredEntityId, canAddChild, canCertifiedUserAddChild);
 		String newId = "syn456";
 		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(anyString(), anyString(), eq(true), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
@@ -71,9 +75,19 @@ public class FilesBrowserTest {
 	@Test
 	public void testConfigure() {		
 		String entityId = "syn123";
-		filesBrowser.configure(entityId);
-		verify(mockView).configure(entityId, false);
+		boolean canCertifiedUserAddChild = false;
+		filesBrowser.configure(entityId, canAddChild, canCertifiedUserAddChild);
+		verify(mockView).configure(entityId, canCertifiedUserAddChild);
 	}
+	
+	@Test
+	public void testConfigureCanAddChild() {		
+		String entityId = "syn123";
+		boolean canCertifiedUserAddChild = true;
+		filesBrowser.configure(entityId, canAddChild, canCertifiedUserAddChild);
+		verify(mockView).configure(entityId, canCertifiedUserAddChild);
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Test
@@ -147,7 +161,7 @@ public class FilesBrowserTest {
 
 	@Test
 	public void testUploadStep1ARsAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
 		CallbackP callback = arg.getValue();
@@ -158,7 +172,7 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadStep1ARsNotAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
 		CallbackP callback = arg.getValue();
@@ -169,17 +183,18 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadStep2Certified(){
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
 	@Test
 	public void testUploadStep2NotCertified(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		boolean isCertificationRequired = true;
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, isCertificationRequired);
 		
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockView).showQuizInfoDialog(arg.capture());
+		verify(mockView).showQuizInfoDialog(eq(isCertificationRequired), arg.capture());
 		CallbackP callback = arg.getValue();
 		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
 		callback.invoke(true);
@@ -190,21 +205,29 @@ public class FilesBrowserTest {
 	}
 	
 	@Test
+	public void testUploadStep2NotCertifiedNotRequired(){
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
+		boolean isCertificationRequired = false;
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, isCertificationRequired);
+		verify(mockView).showQuizInfoDialog(eq(isCertificationRequired), any(CallbackP.class));
+	}
+	
+	@Test
 	public void testUploadStep2NotCertifiedIgnore(){
 		//simulate that the dialog was previously ignored
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		when(mockCookies.getCookie(eq(CookieKeys.IGNORE_CERTIFICATION_REMINDER))).thenReturn("yes");
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
 		
 		//should not show the quiz info dialog, it should go directly to upload 
-		verify(mockView, Mockito.times(0)).showQuizInfoDialog(any(CallbackP.class));
+		verify(mockView, Mockito.times(0)).showQuizInfoDialog(anyBoolean(), any(CallbackP.class));
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
 	@Test
 	public void testUploadStep2Failure(){
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
@@ -212,6 +235,26 @@ public class FilesBrowserTest {
 	public void testAddFolderButtonClickedCertified(){
 		filesBrowser.addFolderClicked();
 		verify(mockView).showFolderEditDialog(anyString());
+	}
+	
+	@Test
+	public void testIsCertificationRequired() {
+		//note method signature:
+		//FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild);
+		
+		//BEFORE LOCKDOWN
+		//certification not required if can add child regardless of certification
+		assertFalse(FilesBrowser.isCertificationRequired(true, true));
+		
+		//the case when you can add a child before certification, but after certification you cannot.  This is an invalid state:
+		//assertNA(FilesBrowser.isCertificationRequired(true, false));
+		
+		//AFTER LOCKDOWN
+		//certification is required if you can't add a child without certification.
+		assertTrue(FilesBrowser.isCertificationRequired(false, true));
+		
+		//regardless of certification, this user cannot add children
+		assertFalse(FilesBrowser.isCertificationRequired(false, false));
 	}
 }
 

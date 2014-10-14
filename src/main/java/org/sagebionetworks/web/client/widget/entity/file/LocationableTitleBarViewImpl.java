@@ -143,8 +143,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator,
-			boolean canEdit) {
+			boolean canCertifiedUserAddChild) {
 		
 		Entity entity = entityBundle.getEntity();
 
@@ -200,7 +199,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 			}
 			else {
 				uploadButtonContainer.clear();
-				if (canEdit) {
+				if (canCertifiedUserAddChild) {
 					EntityUpdatedHandler handler = new EntityUpdatedHandler() {				
 						@Override
 						public void onPersistSuccess(EntityUpdatedEvent event) {

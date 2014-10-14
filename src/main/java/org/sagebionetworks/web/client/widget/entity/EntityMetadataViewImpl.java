@@ -130,7 +130,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		favoriteWidget.configure(bundle.getEntity().getId());
 		
 		//doi widget
-		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanEdit(), versionNumber);
+		doiWidget.configure(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit(), versionNumber);
 		
 		// annotations		
 		configureAnnotations(bundle, canEdit);

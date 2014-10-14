@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
-import java.util.List;
-
-import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,8 +30,6 @@ public interface ActionMenuView extends IsWidget, SynapseView {
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator, 
-			boolean canEdit, 
 			Long versionNumber, 
 			boolean isInTestMode);
 	
