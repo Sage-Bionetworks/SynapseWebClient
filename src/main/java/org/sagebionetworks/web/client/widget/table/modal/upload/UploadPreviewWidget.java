@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,6 +23,7 @@ public interface UploadPreviewWidget extends IsWidget{
 	 * @param previewRequest 
 	 * 
 	 * @param preview
+	 * @throws JSONObjectAdapterException 
 	 */
 	public void configure(UploadToTablePreviewRequest previewRequest, UploadToTablePreviewResult preview);
 	

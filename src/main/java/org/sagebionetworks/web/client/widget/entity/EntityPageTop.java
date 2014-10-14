@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityDeletedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -21,7 +20,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.handlers.AreaChangeHandler;
@@ -38,8 +36,6 @@ import com.google.inject.Inject;
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter  {
 
 	private EntityPageTopView view;
-	private SynapseClientAsync synapseClient;
-	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private EntitySchemaCache schemaCache;
 	private EntityTypeProvider entityTypeProvider;
@@ -65,8 +61,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
-			SynapseClientAsync synapseClient,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			EntitySchemaCache schemaCache,
 			EntityTypeProvider entityTypeProvider,
@@ -76,8 +70,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EventBus bus, JSONObjectAdapter jsonObjectAdapter,
 			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.schemaCache = schemaCache;
 		this.entityTypeProvider = entityTypeProvider;
@@ -169,7 +161,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	@Override
 	public void refresh() {
-		sendDetailsToView(bundle.getPermissions().getCanChangePermissions(), bundle.getPermissions().getCanEdit(), area, areaToken, projectHeader);
+		sendDetailsToView(area, areaToken, projectHeader);
 	}
 		
 	@Override
@@ -346,10 +338,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	/*
 	 * Private Methods
 	 */
-	private void sendDetailsToView(boolean isAdmin, boolean canEdit, Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
+	private void sendDetailsToView(Synapse.EntityArea area, String areaToken, EntityHeader projectHeader) {		
 		ObjectSchema schema = schemaCache.getSchemaEntity(bundle.getEntity());
 		entityTypeDisplay = DisplayUtils.getEntityTypeDisplay(schema);
-		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, isAdmin, canEdit, versionNumber, area, areaToken, projectHeader);
+		view.setEntityBundle(bundle, getUserProfile(), entityTypeDisplay, versionNumber, area, areaToken, projectHeader);
 	}
 	
 	private UserProfile getUserProfile() {

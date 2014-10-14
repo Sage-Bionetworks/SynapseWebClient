@@ -65,9 +65,7 @@ import com.google.gwt.event.shared.EventBus;
 public class EntityPageTopTest {
 
 	QueryTokenProvider queryTokenProvider;
-	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
-	NodeModelCreator mockNodeModelCreator;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	EntityPageTopView mockView;
@@ -105,9 +103,6 @@ public class EntityPageTopTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		mockNodeModelCreator = mock(NodeModelCreator.class);
-		
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityPageTopView.class);
 		mockSchemaCache = mock(EntitySchemaCache.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
@@ -118,8 +113,7 @@ public class EntityPageTopTest {
 		mockWidgetRegistrar = mock(WidgetRegistrar.class);
 		areaChangeHandler = mock(AreaChangeHandler.class);
 		
-		pageTop = new EntityPageTop(mockView, mockSynapseClient,
-				mockNodeModelCreator, mockAuthenticationController,
+		pageTop = new EntityPageTop(mockView, mockAuthenticationController,
 				mockSchemaCache,
 				mockEntityTypeProvider,
 				mockIconsImageBundle, 

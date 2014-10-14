@@ -35,17 +35,16 @@ public class QuizInfoViewImpl extends Composite implements QuizInfoWidgetView {
 	@Inject
 	public QuizInfoViewImpl(Binder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
-		initializeUI();
 	}
 	
 	@Override
 	public void clear() {
 	}
 	
-	private void initializeUI() {
+	@Override
+	public void configure(boolean isCertificationRequired) {
 		clear();
-		int daysRemaining = HomeViewImpl.getDaysRemaining();
-		if (daysRemaining > 0) {
+		if (!isCertificationRequired) {
 			DisplayUtils.show(remindMeLaterButton);
 			remindMeLaterButton.addClickHandler(new ClickHandler() {
 				@Override
