@@ -113,7 +113,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit, Long versionNumber) {		
+	public Widget asWidget(EntityBundle bundle, Long versionNumber) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
 		this.versionNumber = versionNumber;
@@ -121,7 +121,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createMenu(bundle, entityType, authenticationController, isAdministrator, canEdit, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
+		view.createMenu(bundle, entityType, authenticationController, versionNumber, DisplayUtils.isInTestWebsite(cookieProvider));
 		return view.asWidget();
 	}
 	
