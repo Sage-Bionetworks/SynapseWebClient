@@ -766,6 +766,13 @@ a.shortBtn {
 	margin-top: 3px;
 }
 
+.input-xs, select.input-xs {
+  height: 20px !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  border-radius: 3px !important;
+}
+
 .dropable {
 	border-color: #3a5bdc !important;
 }

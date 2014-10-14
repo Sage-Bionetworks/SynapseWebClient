@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -96,7 +97,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
-	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private UserGroupSuggestBox peopleSuggestBox;
 	private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
@@ -104,7 +104,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 //	private Grid<PermissionsTableEntry> permissionsGrid;
 //	private ListStore<PermissionsTableEntry> permissionsStore;
 //	private ColumnModel columnModel;
-	SharingPermissionsGrid permissionsGrid;
+	private SharingPermissionsGrid permissionsGrid;
+	
+//	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
+	private ListBox permissionLevelListBox;
+	
+	private PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};	// To enforce order.
 	
 	@Inject
 	public AccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
@@ -125,6 +130,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
 		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
+		
 	}
 	
 	@Override
@@ -257,8 +263,9 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
 				peopleSuggestBox.setPlaceholderText("Enter name...");
 				peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
+				peopleSuggestBox.asWidget().addStyleName("form-control input-xs");	// TODO: Move this elsewhere?
 				HorizontalPanel userGroupPanel = new HorizontalPanel();
-				userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
+				//userGroupPanel.addStyleName(" input-sm");	// TODO: Remove when moving away from gxt components.
 				
 				Label nameLbl = new Label("Name:");
 				nameLbl.addStyleName("width-80");
@@ -267,24 +274,32 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				fieldSet.add(userGroupPanel);
 				
 				// permission level combobox
-				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
-				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
-				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
-				permissionLevelCombo.setEmptyText("Select access level...");
-				permissionLevelCombo.setFieldLabel("Access Level");
-				permissionLevelCombo.setTypeAhead(false);
-				permissionLevelCombo.setEditable(false);
-				permissionLevelCombo.setForceSelection(true);
-				permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
-				permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
-					@Override
-					public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
-						presenter.setUnsavedViewChanges(true);
-					}
-				});
-				fieldSet.add(permissionLevelCombo);
+//				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
+//				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
+//				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
+//				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
+//				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
+//				permissionLevelCombo.setEmptyText("Select access level...");
+//				permissionLevelCombo.setFieldLabel("Access Level");
+//				permissionLevelCombo.setTypeAhead(false);
+//				permissionLevelCombo.setEditable(false);
+//				permissionLevelCombo.setForceSelection(true);
+//				permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
+//				permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
+//					@Override
+//					public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
+//						presenter.setUnsavedViewChanges(true);
+//					}
+//				});
+				permissionLevelListBox = new ListBox();
+				for (PermissionLevel permLevel : permList) {
+					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
+				}
+				permissionLevelListBox.addStyleName("input-xs");
+				fieldSet.add(permissionLevelListBox);
+				
+				Panel addPanel = new Panel();
+				
 				
 				// share button and listener
 				Button shareButton = new Button("Add");
@@ -476,22 +491,13 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			return listBox;
 		}
 		
-		final PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
 		for (int i = 0; i < permList.length; i++) {
 			listBox.addItem(permissionDisplay.get(permList[i]));
 			if (permList[i].equals(permLevel))
 				listBox.setSelectedIndex(i);
 		}
-//		listBox.addItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));
-//		listBox.addItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));
-//		listBox.addItem(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE));
-//		listBox.addItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));
 		
-		Map<String, PermissionLevel> reversePermissionDisplay = new HashMap<String, PermissionLevel>();
-		for (PermissionLevel level : permissionDisplay.keySet()) {
-			reversePermissionDisplay.put(permissionDisplay.get(level), level);
-		}
 		listBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
@@ -499,50 +505,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			}
 		});
 		
-		//PermissionLevel level = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
-		//listBox.setSelectedIndex(ArrayUtils.indexOf(permList, level));
-		
 		return listBox;
-		
-		
-//		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
-//		Menu menu = new Menu();
-//		menu.setEnableScrolling(false);
-//		MenuItem item;
-//		
-//		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_VIEW));			
-//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-//			public void componentSelected(MenuEvent menuEvent) {
-//				presenter.setAccess(principalId, PermissionLevel.CAN_VIEW);
-//			}
-//		});
-//		menu.add(item);
-//
-//		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT));			
-//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-//			public void componentSelected(MenuEvent menuEvent) {
-//				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT);
-//			}
-//		});
-//		menu.add(item);
-//
-//		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE));			
-//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-//			public void componentSelected(MenuEvent menuEvent) {
-//				presenter.setAccess(principalId, PermissionLevel.CAN_EDIT_DELETE);
-//			}
-//		});
-//		menu.add(item);
-//
-//		item = new MenuItem(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER));			
-//		item.addSelectionListener(new SelectionListener<MenuEvent>() {
-//			public void componentSelected(MenuEvent menuEvent) {
-//				presenter.setAccess(principalId, PermissionLevel.CAN_ADMINISTER);
-//			}
-//		});
-//		menu.add(item);
-//		
-//		return menu;
 	}
 
 	public static GridCellRenderer<PermissionsTableEntry> createPeopleRenderer(
@@ -687,17 +650,19 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
-			if(permissionLevelCombo.getValue() != null) {
-				PermissionLevel level = permissionLevelCombo.getValue().getValue().getLevel();
+			// TODO: Add "force selection" functionality.
+//			if(permissionLevelCombo.getValue() != null) {
+				PermissionLevel level = permList[permissionLevelListBox.getSelectedIndex()];
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
 				peopleSuggestBox.clear();
-				permissionLevelCombo.clearSelections();
+				//permissionLevelCombo.clearSelections();
+				permissionLevelListBox.setSelectedIndex(0);
 				presenter.setUnsavedViewChanges(false);
-			} else {
-				showAddMessage("Please select a permission level to grant.");
-			}
+//			} else {
+//				showAddMessage("Please select a permission level to grant.");
+//			}
 		} else {
 			showAddMessage("Please select a user or team to grant permission to.");
 		}
