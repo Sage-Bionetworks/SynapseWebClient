@@ -246,6 +246,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
+	/**
+	 * Return the current upload type.  Used for testing purposes only.
+	 * @return
+	 */
+	public UploadType getCurrentUploadType() {
+		return currentUploadType;
+	};
+	
+	/**
+	 * Set the current upload type.  Used for testing purposes only
+	 * @param currentUploadType
+	 */
+	public void setCurrentUploadType(UploadType currentUploadType) {
+		this.currentUploadType = currentUploadType;
+	}
+	
 	public void checkFileSize() throws IllegalArgumentException{
 		long fileSize = (long)synapseJsniUtils.getFileSize(UploaderViewImpl.FILE_FIELD_ID, currIndex);
 		//check
@@ -467,20 +483,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		String detailedErrorMessage = null;
 		try{
 			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
-			if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
-				if (currentUploadType == null || currentUploadType.equals(UploadType.S3)) {
-					//upload result has file handle id if successful
-					String fileHandleId = uploadResult.getMessage();
-					setFileEntityFileHandle(fileHandleId);
-				} else if (UploadType.SFTP.equals(currentUploadType)) {
-					//should respond with the new path
-					String path = uploadResult.getMessage();
-					String fileName = fileNames[currIndex];
-					setExternalFilePath(path, fileName);
-				}
-			}else {
-				uploadError("Upload result status indicated upload was unsuccessful.");
-			}
+			handleSubmitResult(uploadResult);
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
@@ -489,6 +492,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			} else {
 				uploadSuccess();
 			}
+		}
+	}
+	
+	public void handleSubmitResult(UploadResult uploadResult) {
+		if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
+			if (currentUploadType == null || currentUploadType.equals(UploadType.S3)) {
+				//upload result has file handle id if successful
+				String fileHandleId = uploadResult.getMessage();
+				setFileEntityFileHandle(fileHandleId);
+			} else if (UploadType.SFTP.equals(currentUploadType)) {
+				//should respond with the new path
+				String path = uploadResult.getMessage();
+				String fileName = fileNames[currIndex];
+				setExternalFilePath(path, fileName);
+			}
+		}else {
+			uploadError("Upload result status indicated upload was unsuccessful.");
 		}
 	}
 	

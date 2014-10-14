@@ -15,17 +15,22 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -49,7 +54,9 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
@@ -222,6 +229,7 @@ public class UploaderTest {
 		uploader.handleUploads();
 		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
+		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 	}
 	
 	@Test
@@ -308,4 +316,69 @@ public class UploaderTest {
 		currentIndex = 2;
 		assertEquals(0.833, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
 	}
+	
+	@Test
+	public void testUploadToExternalInvalid() {
+		//we don't know how to handle an external s3 upload yet
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		d.setUploadType(UploadType.S3);
+		uploader.uploadToExternal(d);
+		verifyUploadError();
+	}
+	
+	@Test
+	public void testUploadToExternal() {
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		String url = "sftp://ok.net";
+		d.setUploadType(UploadType.SFTP);
+		d.setUrl(url);
+		uploader.uploadToExternal(d);
+		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
+		//capture the value sent to the form to submit
+		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
+		verify(view).submitForm(c.capture());
+		String target = c.getValue();
+		//should point to the sftp proxy, and contain the original url
+		assertTrue(target.startsWith(sftpProxy));
+		assertTrue(target.contains(url));
+	}
+	
+	@Test
+	public void testHandleSftpSubmitResult() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.SFTP);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.SUCCESS);
+		String newUrl = "sftp://bar/test.txt";
+		r.setMessage(newUrl);
+		uploader.handleSubmitResult(r);
+		//should try to create a new external file
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testHandleS3SubmitResult() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.S3);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.SUCCESS);
+		String fileHandleId = "1234";
+		r.setMessage(fileHandleId);
+		uploader.handleSubmitResult(r);
+		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testHandleSubmitResultFailure() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.S3);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.FAILED);
+		r.setMessage("error occurred");
+		uploader.handleSubmitResult(r);
+		verifyUploadError();
+	}
+
 }

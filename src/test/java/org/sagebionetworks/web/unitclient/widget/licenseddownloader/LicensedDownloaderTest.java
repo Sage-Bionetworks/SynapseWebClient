@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
@@ -62,6 +61,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
@@ -92,6 +92,7 @@ public class LicensedDownloaderTest {
 	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	String baseFileHandleUrl="http://mytestbasefilehandleurl/filehandle";
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
@@ -186,6 +187,8 @@ public class LicensedDownloaderTest {
 		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
 		
 		when(mockView.getDirectDownloadURL()).thenReturn("http://synapse.sagebase.org/file.png");
+		
+		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -370,25 +373,40 @@ public class LicensedDownloaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 
-	private void configureTestLoadMocks() throws Exception {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
-		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+	@Test
+	public void testGetDirectDownloadUrlFileEntity() {
+		String entityId = "syn99999";
+		Long versionNumber = 8888L;
+		FileEntity f = new FileEntity();
+		FileHandle h = new S3FileHandle();
+		f.setId(entityId);
+		f.setVersionNumber(versionNumber);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(f, h);
+		assertTrue(downloadUrl.startsWith(baseFileHandleUrl));
+		assertTrue(downloadUrl.contains(entityId));
+		assertTrue(downloadUrl.contains(Long.toString(versionNumber)));
 	}
 	
-
-	private void configureTestFindEulaIdMocks() throws Exception {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
-		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-
+	@Test
+	public void testGetDirectDownloadUrlExternalFileEntity() {
+		ExternalFileHandle h = new ExternalFileHandle();
+		String url = "http://www.jhodgson.com/test.txt";
+		h.setExternalURL(url);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		assertEquals(url, downloadUrl);
 	}
 	
-	
-	
-	
+	@Test
+	public void testGetDirectDownloadUrlSftpExternalFileEntity() {
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
+		
+		ExternalFileHandle h = new ExternalFileHandle();
+		String url = "sftp://www.jhodgson.com/test.txt";
+		h.setExternalURL(url);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		
+		assertTrue(downloadUrl.startsWith(sftpProxy));
+		assertTrue(downloadUrl.contains(url));
+	}
 }

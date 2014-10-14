@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -93,6 +95,19 @@ public class GlobalApplicationStateImplTest {
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 		
+	}
+	
+	@Test
+	public void testInitSynapseProperties() {
+		HashMap<String, String> testProps = new HashMap<String, String>();
+		String key = "k1";
+		String value = "v1";
+		testProps.put(key, value);
+		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		globalApplicationState.initSynapseProperties();
+		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		assertEquals(value, globalApplicationState.getSynapseProperty(key));
+		assertNull(globalApplicationState.getSynapseProperty("foo"));
 	}
 	
 }
