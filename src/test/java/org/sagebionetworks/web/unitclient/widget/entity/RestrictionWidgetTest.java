@@ -94,7 +94,6 @@ public class RestrictionWidgetTest {
 		vb.setVersionLabel("");
 		vb.setVersionComment("");
 		bundle = mock(EntityBundle.class, RETURNS_DEEP_STUBS);
-		when(bundle.getPermissions().getCanEdit()).thenReturn(true);
 		when(bundle.getEntity()).thenReturn(vb);
 
 		List<AccessRequirement> accessRequirements = new ArrayList<AccessRequirement>();

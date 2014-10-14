@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
@@ -100,8 +101,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator,
-			boolean canEdit, 
 			Long versionNumber,
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
@@ -113,12 +112,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		shareButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_SHARE, ButtonType.DEFAULT, "glyphicon-lock");
 		shareButton.getElement().setId(DisplayConstants.ID_BTN_SHARE);
 		shareButton.addStyleName("pull-right margin-left-5");
-		configureShareButton(entity, isAdministrator);				
+		configureShareButton(entity, entityBundle.getPermissions().getCanChangePermissions());				
 		
 		// Tools
 		toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
 		toolsButton.addStyleName("pull-right margin-left-5");
-		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
+		configureToolsMenu(entityBundle, entityType);
 
 		this.add(toolsButton);	
 		this.add(shareButton);
@@ -187,18 +186,21 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle,
-			EntityType entityType, boolean isAdministrator, boolean canEdit) {
+			EntityType entityType) {
 		boolean authenticated = presenter.isUserLoggedIn();
 		Entity entity = entityBundle.getEntity();
-		
+		UserEntityPermissions permissions = entityBundle.getPermissions();
 		// upload
-		if(canEdit) {
+		if (permissions.getCanCertifiedUserEdit()) {
 			addRenameItem(toolsButton);
+		}
+		
+		if(permissions.getCanCertifiedUserAddChild()) {
 			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
-		if (canEdit && entity instanceof Versionable) {
+		if (permissions.getCanCertifiedUserAddChild() && entity instanceof Versionable) {
 			addSubmitToEvaluationItem(toolsButton, entity, entityType);
 		} 
 		
@@ -207,7 +209,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			addCreateShortcutItem(toolsButton, entity, entityType);
 		}
 		// move
-		if (canEdit && !(entityBundle.getEntity() instanceof Project)) {
+		if (permissions.getCanCertifiedUserAddChild() && !(entityBundle.getEntity() instanceof Project)) {
 			addMoveItem(toolsButton, entity, entityType);
 		}
 
@@ -216,7 +218,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		}
 		
 		// put delete last
-		if(canEdit) {
+		if(permissions.getCanDelete()) {
 			addDeleteItem(toolsButton, typeDisplay);
 		}
 		
@@ -264,14 +266,15 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	 */
 	private void addUploadItem(DropdownButton menuBtn, final EntityBundle entityBundle, EntityType entityType) {
 		this.entityBundle = entityBundle;
-		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_NEW_VERSION_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController);
+					UserEntityPermissions permissions = entityBundle.getPermissions();
+					boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
+					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController, isCertificationRequired);
 				}
 			});
 			menuBtn.addMenuItem(a);
@@ -291,8 +294,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	@Override
-	public void showQuizInfoDialog(CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
+	public void showQuizInfoDialog(boolean isCertificationRequired, CallbackP<Boolean> callback) {
+		FilesBrowserViewImpl.showQuizInfoDialog(isCertificationRequired, callback, quizInfoWidget);
 	}
 		
 	/**

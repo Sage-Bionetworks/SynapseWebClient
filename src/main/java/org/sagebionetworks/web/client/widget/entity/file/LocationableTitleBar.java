@@ -35,7 +35,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit) {		
+	public Widget asWidget(EntityBundle bundle) {		
 		//if this isn't locationable, then return an empty panel
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
@@ -43,7 +43,7 @@ public class LocationableTitleBar implements LocationableTitleBarView.Presenter,
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit);
+		view.createTitlebar(bundle, entityType, authenticationController, bundle.getPermissions().getCanCertifiedUserAddChild());
 		Widget widget =  view.asWidget();
 		widget.setVisible(bundle.getEntity() instanceof Locationable);
 		return widget;
