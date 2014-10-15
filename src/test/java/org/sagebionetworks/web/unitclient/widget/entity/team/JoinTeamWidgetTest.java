@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.team;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class JoinTeamWidgetTest {
 	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
+	UserProfile currentUserProfile;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -71,7 +73,7 @@ public class JoinTeamWidgetTest {
         mockAuthenticationController = mock(AuthenticationController.class);
         when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
         UserSessionData currentUser = new UserSessionData();                
-        UserProfile currentUserProfile = new UserProfile();
+        currentUserProfile = new UserProfile();
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
@@ -317,4 +319,62 @@ public class JoinTeamWidgetTest {
 		//verify we show an error for an unrecognized ar
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testIsRecognizedSite() {
+		//test the whitelist
+		//recognize project datasphere
+		assertTrue(JoinTeamWidget.isRecognizedSite("https://MPMdev.Ondemand.Sas.Com/projectdatasphere/html/registration/challenge"));
+		
+		//but not other sites
+		assertFalse(JoinTeamWidget.isRecognizedSite("http://mpmdev.ondemand.sas.com/projectdatasphere/html/registration/challenge")); //not https
+		assertFalse(JoinTeamWidget.isRecognizedSite("https://www.jayhodgson.com/projectdatasphere/"));
+	}
+	
+	@Test
+	public void testenhancePostMessageUrl() {
+		String firstName = "Luke";
+		String lastName = "Skywalker";
+		String ownerId = "628";
+		List<String> emails = new ArrayList<String>();
+		String email = "MidichloriansSaturation@bigfoot.com";
+		emails.add(email);
+		when(mockGwt.encodeQueryString(email)).thenReturn(email);
+		when(mockGwt.encodeQueryString(firstName)).thenReturn(firstName);
+		when(mockGwt.encodeQueryString(lastName)).thenReturn(lastName);
+		when(mockGwt.encodeQueryString(ownerId)).thenReturn(ownerId);
+		
+		currentUserProfile.setFirstName(firstName);
+		currentUserProfile.setLastName(lastName);
+		currentUserProfile.setOwnerId(ownerId);
+		currentUserProfile.setEmails(emails);
+		
+		//test setup configures us as logged in
+		String enhancedUrl = joinWidget.enhancePostMessageUrl("https://mpmdev.ondemand.sas.com/projectdatasphere/html/registration/challenge");
+		assertTrue(enhancedUrl.contains(firstName));
+		assertTrue(enhancedUrl.contains(lastName));
+		assertTrue(enhancedUrl.contains(ownerId));
+		assertTrue(enhancedUrl.contains(email));
+	}
+	
+	@Test
+	public void testEnhancePostMessageUrlNotLoggedIn() {
+		//test setup configures us as logged in
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		String url = "https://mpmdev.ondemand.sas.com/projectdatasphere/html/registration/challenge";
+		assertEquals(url, joinWidget.enhancePostMessageUrl(url));
+	}
+
+	@Test
+	public void testGetEncodedParamValueIfDefined() {
+		//return empty string if null value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, null, "&"));
+		//or empty string value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "", "&"));
+		
+		//if defined, return <paramkey>=<url-encoded-value><suffix>
+		when(mockGwt.encodeQueryString("bar")).thenReturn("encodedbar");
+		assertEquals(WebConstants.USER_ID_PARAM+"=encodedbar&", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "bar", "&"));
+	}
+	
 }

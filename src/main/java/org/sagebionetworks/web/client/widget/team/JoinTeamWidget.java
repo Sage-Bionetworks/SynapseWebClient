@@ -273,10 +273,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			//include other information from the profile
 			UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
 			return url + "?" + 
-					getEncodedParamValueIfDefined("firstName", profile.getFirstName(), "&") + 
-					getEncodedParamValueIfDefined("lastName", profile.getLastName(), "&") + 
-					getEncodedParamValueIfDefined("email", profile.getEmails().get(0), "&") + 
-					getEncodedParamValueIfDefined("userId", profile.getOwnerId(), ""); 
+					getEncodedParamValueIfDefined(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
 		} else
 			return url;
 	}
