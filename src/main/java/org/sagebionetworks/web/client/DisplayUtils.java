@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -1991,7 +1993,7 @@ public class DisplayUtils {
 		window.setModal(true);
 		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
 		window.setLayout(new FitLayout());
-		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
+		window.add(accessControlListEditor.asWidget(), new FitData(4));
 	    
 		// configure buttons
 		if (canChangePermission) {
@@ -2041,6 +2043,98 @@ public class DisplayUtils {
 	    });
 		
 		window.show();
+	}
+	
+	public static void showSharingDialog(final org.sagebionetworks.web.client.widget.modal.Dialog dialog, final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
+//		final Dialog window = new Dialog();
+//		// configure layout
+//		int windowHeight = canChangePermission ? 552 : 282;
+//		window.setSize(560, windowHeight);
+//		window.setPlain(true);
+//		window.setModal(true);
+//		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
+//		window.setLayout(new FitLayout());
+//		window.add(accessControlListEditor.asWidget(), new FitData(4));
+		dialog.setSize(ModalSize.LARGE);
+	    dialog.configure(DisplayConstants.TITLE_SHARING_PANEL, accessControlListEditor.asWidget(), "Save", "Cancel",
+	    		new org.sagebionetworks.web.client.widget.modal.Dialog.Callback() {
+	    	
+	    		// TODO: DON'T ADD PRIMARY BUTTON IF !CANCHANGEPERMISSION
+					@Override
+					public void onPrimary() {
+						// confirm close action if there are unsaved changes
+						if (accessControlListEditor.hasUnsavedChanges()) {
+							accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<AccessControlList>() {
+								@Override
+								public void onSuccess(AccessControlList result) {
+									callback.invoke();
+								}
+								@Override
+								public void onFailure(Throwable caught) {
+									//failure notification is handled by the acl editor view.
+								}
+							});
+						}
+						dialog.hide();
+					}
+
+					@Override
+					public void onDefault() {
+						// TODO SOMETHING ELSE?
+						dialog.hide();
+					}
+	    	
+	    		}, false);
+	    
+	    dialog.show();
+//		// configure buttons
+//		if (canChangePermission) {
+//			window.okText = "Save";
+//			window.cancelText = "Cancel";
+//			window.setButtons(Dialog.OKCANCEL);
+//		} else {
+//			window.cancelText = "Close";
+//			window.setButtons(Dialog.CANCEL);
+//		}
+//		window.setButtonAlign(HorizontalAlignment.RIGHT);
+//	    window.setHideOnButtonClick(false);
+//		window.setResizable(true);
+//		
+//		if (canChangePermission) {
+//			// "Apply" button
+//			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+//			Button applyButton = window.getButtonById(Dialog.OK);
+//			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//				@Override
+//				public void componentSelected(ButtonEvent ce) {
+//					// confirm close action if there are unsaved changes
+//					if (accessControlListEditor.hasUnsavedChanges()) {
+//						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<AccessControlList>() {
+//							@Override
+//							public void onSuccess(AccessControlList result) {
+//								callback.invoke();
+//							}
+//							@Override
+//							public void onFailure(Throwable caught) {
+//								//failure notification is handled by the acl editor view.
+//							}
+//						});
+//					}
+//					window.hide();
+//				}
+//		    });
+//		}
+//		
+//		// "Close" button				
+//		Button closeButton = window.getButtonById(Dialog.CANCEL);
+//	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+//			@Override
+//			public void componentSelected(ButtonEvent ce) {
+//				window.hide();
+//			}
+//	    });
+//		
+//		window.show();
 	}
 
 	public static LayoutContainer createRowContainer() {

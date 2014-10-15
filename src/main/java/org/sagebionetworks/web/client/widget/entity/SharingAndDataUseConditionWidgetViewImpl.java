@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
@@ -35,6 +36,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 	PublicPrivateBadge publicPrivateBadge;
 	AccessControlListEditor aclEditor;
 	RestrictionWidget restrictionWidget;
+	Dialog dialog;
 	
 	@Inject
 	public SharingAndDataUseConditionWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -43,7 +45,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			IconsImageBundle iconsImageBundle, 
 			PublicPrivateBadge publicPrivateBadge, 
 			AccessControlListEditor aclEditor,
-			RestrictionWidget restrictionWidget) {
+			RestrictionWidget restrictionWidget,
+			Dialog dialog) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
@@ -51,6 +54,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 		this.publicPrivateBadge = publicPrivateBadge;
 		this.aclEditor = aclEditor;
 		this.restrictionWidget = restrictionWidget;
+		this.dialog = dialog;
 		container = new FlowPanel();
 		container.addStyleName("margin-top-left-10");
 		this.add(container);
@@ -90,7 +94,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			change.addClickHandler(new ClickHandler(){
 				@Override
 				public void onClick(ClickEvent event) {
-					DisplayUtils.showSharingDialog(aclEditor, true, new Callback() {
+					DisplayUtils.showSharingDialog(dialog, aclEditor, true, new Callback() {
 						@Override
 						public void invoke() {
 							presenter.entityUpdated();
