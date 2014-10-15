@@ -10,6 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -343,6 +345,7 @@ public class UploaderTest {
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
 		ExternalUploadDestination d = new ExternalUploadDestination();
 		String url = "sftp://ok.net";
+		when(gwt.encodeQueryString(anyString())).thenReturn(url);
 		d.setUploadType(UploadType.SFTP);
 		d.setUrl(url);
 		uploader.uploadToExternal(d);
@@ -353,7 +356,24 @@ public class UploaderTest {
 		String target = c.getValue();
 		//should point to the sftp proxy, and contain the original url
 		assertTrue(target.startsWith(sftpProxy));
-		assertTrue(target.contains(url));
+		assertTrue(target.contains("?url=" + url));
+	}
+	
+	@Test
+	public void testGetSftpProxyLink() throws UnsupportedEncodingException {
+		
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		//test with existing query param
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy +"?gwt.codesvr=localhost:9999");
+		//and the sftp link contains characters that should be escaped
+		String sftpLink = "sftp://this/and/that.txt?foo=bar";
+		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
+		when(gwt.encodeQueryString(anyString())).thenReturn(encodedUrl);
+		String sftpProxyLink = Uploader.getSftpProxyLink(sftpLink, mockGlobalApplicationState, gwt);
+		//verify that the sftp link was encoded
+		assertTrue(sftpProxyLink.contains(encodedUrl));
+		//and that it did not add another '?' for the url param
+		assertTrue(sftpProxyLink.contains("&url="));
 	}
 	
 	@Test

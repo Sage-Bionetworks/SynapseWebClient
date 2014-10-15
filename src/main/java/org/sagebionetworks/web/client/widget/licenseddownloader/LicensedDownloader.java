@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -50,7 +51,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
-	
+	private GWTWrapper gwt;
 	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
 	private UserProfile userProfile;
@@ -72,7 +73,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
-			SynapseJSNIUtils synapseJSNIUtils) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			GWTWrapper gwt) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
@@ -80,6 +82,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		this.jiraUrlHelper=jiraUrlHelper;
 		this.authenticationController = authenticationController;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.gwt = gwt;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -308,7 +311,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		else {
 			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 				//point to sftp proxy instead
-				directDownloadURL = Uploader.getSftpProxyLink(externalUrl, globalApplicationState);
+				directDownloadURL = Uploader.getSftpProxyLink(externalUrl, globalApplicationState, gwt);
 			} else {
 				directDownloadURL = externalUrl;	
 			}

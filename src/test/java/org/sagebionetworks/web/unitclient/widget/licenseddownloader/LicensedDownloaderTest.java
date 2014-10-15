@@ -76,6 +76,7 @@ public class LicensedDownloaderTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
+	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
 	AsyncCallback<String> mockStringCallback;
 
@@ -101,6 +102,7 @@ public class LicensedDownloaderTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockGwt = mock(GWTWrapper.class);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -121,7 +123,7 @@ public class LicensedDownloaderTest {
 		
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, mockSynapseJSNIUtils);
+				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, mockSynapseJSNIUtils, mockGwt);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -403,6 +405,7 @@ public class LicensedDownloaderTest {
 		
 		ExternalFileHandle h = new ExternalFileHandle();
 		String url = "sftp://www.jhodgson.com/test.txt";
+		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
 		h.setExternalURL(url);
 		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
 		

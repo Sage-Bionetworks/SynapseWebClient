@@ -37,6 +37,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -205,11 +206,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param globalAppState
 	 * @return
 	 */
-	public static String getSftpProxyLink(String realSftpUrl, GlobalApplicationState globalAppState) {
+	public static String getSftpProxyLink(String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
 		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 		if (sftpProxy != null) {
 			String delimiter = sftpProxy.contains("?") ? "&" : "?";
-			return sftpProxy + delimiter + "url="+realSftpUrl;
+			
+			String escapedRealSftpUrl = gwt.encodeQueryString(realSftpUrl);
+			return sftpProxy + delimiter + "url="+escapedRealSftpUrl;
 		} else {
 			//unlikely state
 			throw new IllegalArgumentException("Unable to determine SFTP endpoint");
@@ -219,7 +222,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void uploadToSftpProxy(final String url) {
 		currentUploadType = UploadType.SFTP;
 		try {
-			view.submitForm(getSftpProxyLink(url, globalAppState));
+			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
 		} catch (Exception e) {
 			uploadError(e.getMessage());
 		}
