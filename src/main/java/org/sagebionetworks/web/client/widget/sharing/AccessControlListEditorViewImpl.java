@@ -239,7 +239,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				if (publicButton == null) {
 					//publicButton = DisplayUtils.createButton("Test");
 					publicButton = new com.google.gwt.user.client.ui.Button();
-					publicButton.addStyleName("btn-xs");
+					publicButton.addStyleName("btn btn-default btn-xs");
 					setIsPubliclyVisible(false);
 					
 					publicButton.addClickHandler(new ClickHandler() {
@@ -295,7 +295,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				deleteAclButton.setEnabled(canEnableInheritance);
 			}
 		}
-		
 		
 		this.add(hPanel);
 	}
