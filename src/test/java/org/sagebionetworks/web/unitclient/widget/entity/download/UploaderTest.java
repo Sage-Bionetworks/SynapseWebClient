@@ -10,27 +10,37 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.attachment.UploadResult;
+import org.sagebionetworks.repo.model.attachment.UploadStatus;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
@@ -47,7 +57,9 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
@@ -63,7 +75,7 @@ public class UploaderTest {
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
 	ClientLogger mockLogger;
-	
+	GlobalApplicationState mockGlobalApplicationState;
 	// JSON utility components
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
@@ -87,6 +99,7 @@ public class UploaderTest {
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
 		autogenFactory=mock(AutoGenFactory.class);
 		gwt = mock(GWTWrapper.class);
+		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
@@ -107,6 +120,7 @@ public class UploaderTest {
 		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
 		AsyncMockStubber.callSuccessWith(tokenJson).when(synapseClient).getChunkedFileToken(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("http://fakepresignedurl.uploader.test").when(synapseClient).getChunkedPresignedUrl(any(ChunkRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		status.setState(State.COMPLETED);
 		status.setFileHandleId("fake handle");
@@ -131,7 +145,7 @@ public class UploaderTest {
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				synapseJsniUtils,
-				gwt, authenticationController, multipartUploader);
+				gwt, authenticationController, multipartUploader, mockGlobalApplicationState);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -142,7 +156,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testGetUploadActionUrlWithNull() {
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 		
 		//also check view reset
@@ -153,7 +167,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithFileEntity() {
 		FileEntity fileEntity = new FileEntity();
 		uploader.asWidget(fileEntity);
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
@@ -161,7 +175,7 @@ public class UploaderTest {
 	public void testGetUploadActionUrlWithData() {
 		Data data = new Data();
 		uploader.asWidget(data);
-		uploader.getDefaultUploadActionUrl();
+		uploader.getOldUploadUrl();
 		verify(gwt).getModuleBaseURL();
 	}
 	
@@ -218,6 +232,7 @@ public class UploaderTest {
 		uploader.handleUploads();
 		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
+		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 	}
 	
 	@Test
@@ -303,5 +318,97 @@ public class UploaderTest {
 		assertEquals(0.50, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
 		currentIndex = 2;
 		assertEquals(0.833, Uploader.calculatePercentOverAllFiles(numberOfFiles, currentIndex, 0.50), tollerance);
+	}
+	
+	@Test
+	public void testUploadToExternalInvalid() {
+		//we don't know how to handle an external s3 upload yet
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		d.setUploadType(UploadType.S3);
+		uploader.uploadToExternal(d);
+		verifyUploadError();
+	}
+	
+	@Test
+	public void testInvalidUploadDestination() {
+		//add an invalid upload destination
+		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
+		destinations.add(mock(UploadDestination.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.handleUploads();
+		verifyUploadError();
+	}
+	
+	@Test
+	public void testUploadToExternal() {
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
+		ExternalUploadDestination d = new ExternalUploadDestination();
+		String url = "sftp://ok.net";
+		when(gwt.encodeQueryString(anyString())).thenReturn(url);
+		d.setUploadType(UploadType.SFTP);
+		d.setUrl(url);
+		uploader.uploadToExternal(d);
+		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
+		//capture the value sent to the form to submit
+		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
+		verify(view).submitForm(c.capture());
+		String target = c.getValue();
+		//should point to the sftp proxy, and contain the original url
+		assertTrue(target.startsWith(sftpProxy));
+		assertTrue(target.contains("?url=" + url));
+	}
+	
+	@Test
+	public void testGetSftpProxyLink() throws UnsupportedEncodingException {
+		
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		//test with existing query param
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy +"?gwt.codesvr=localhost:9999");
+		//and the sftp link contains characters that should be escaped
+		String sftpLink = "sftp://this/and/that.txt?foo=bar";
+		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
+		when(gwt.encodeQueryString(anyString())).thenReturn(encodedUrl);
+		String sftpProxyLink = Uploader.getSftpProxyLink(sftpLink, mockGlobalApplicationState, gwt);
+		//verify that the sftp link was encoded
+		assertTrue(sftpProxyLink.contains(encodedUrl));
+		//and that it did not add another '?' for the url param
+		assertTrue(sftpProxyLink.contains("&url="));
+	}
+	
+	@Test
+	public void testHandleSftpSubmitResult() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.SFTP);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.SUCCESS);
+		String newUrl = "sftp://bar/test.txt";
+		r.setMessage(newUrl);
+		uploader.handleSubmitResult(r);
+		//should try to create a new external file
+		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testHandleS3SubmitResult() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.S3);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.SUCCESS);
+		String fileHandleId = "1234";
+		r.setMessage(fileHandleId);
+		uploader.handleSubmitResult(r);
+		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testHandleSubmitResultFailure() throws RestServiceException {
+		uploader.setCurrentUploadType(UploadType.S3);
+		uploader.setFileNames(new String[] {"test.txt"});
+		UploadResult r = new UploadResult();
+		r.setUploadStatus(UploadStatus.FAILED);
+		r.setMessage("error occurred");
+		uploader.handleSubmitResult(r);
+		verifyUploadError();
 	}
 }

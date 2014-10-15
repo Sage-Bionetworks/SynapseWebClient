@@ -136,8 +136,8 @@ public class UploaderViewImpl extends FlowPanel implements
 			public void onClick(ClickEvent event) {
 				if (isExternal) {
 					String url = pathField.getValue();
-					
-					if (!LoginPresenter.isValidUrl(url, false)) {
+					//let the service decide what is a valid url (now supporting sftp, and perhaps others)
+					if (url == null || url.isEmpty()) {
 						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
 						return;
 					}
@@ -273,8 +273,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void submitForm() {
+	public void submitForm(String actionUrl) {
 		showSpinningProgress();
+		formPanel.setAction(actionUrl);
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();	
 	}
@@ -385,7 +386,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
-		formPanel.setAction(presenter.getDefaultUploadActionUrl());
 		if(formPanel.isVisible()) formPanel.reset(); // clear file choice from fileUploadField
 
 		configureUploadButton();

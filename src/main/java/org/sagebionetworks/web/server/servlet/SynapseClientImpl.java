@@ -10,13 +10,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +35,6 @@ import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
@@ -84,14 +83,8 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
 import org.sagebionetworks.repo.model.file.CompleteAllChunksRequest;
@@ -102,6 +95,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.file.State;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
@@ -210,7 +204,6 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	AutoGenFactory entityFactory = new AutoGenFactory();
 	private TableModelUtils tableModelUtils = new TableModelUtils(adapterFactory);
-	
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
 
@@ -253,11 +246,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
-
+	
 	public void setTableModelUtils(TableModelUtils tableModelUtils) {
 		this.tableModelUtils = tableModelUtils;
 	}
-	
+
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
 		this.wiki2Markdown = wikiToMarkdown;
 	}
@@ -3052,13 +3045,18 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 	}
 
-	@Override
-	public String getSynapseProperty(String key) {
+	private String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
+	}
+
+	@Override
+	public HashMap<String, String> getSynapseProperties(){
+		return PortalPropertiesHolder.getPropertiesMap();
 	}
 
 	public static class PortalPropertiesHolder {
 		private static Properties props;
+		private static HashMap<String, String> propsMap;
 
 		static {
 			InputStream s = SynapseClientImpl.class
@@ -3074,6 +3072,16 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 		public static String getProperty(String key) {
 			return props.getProperty(key);
+		}
+		
+		public static HashMap<String, String> getPropertiesMap() {
+			if (propsMap == null) {
+				propsMap = new HashMap<String, String>();
+				for (Entry<Object, Object> entry : props.entrySet()) {
+					propsMap.put(entry.getKey().toString(), entry.getValue().toString());
+	}
+			}
+			return propsMap;
 		}
 	}
 
@@ -3446,5 +3454,14 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		} 
 	}
 
+	@Override
+	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			return synapseClient.getUploadDestinations(parentEntityId);
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 }
