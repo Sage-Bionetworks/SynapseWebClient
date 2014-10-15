@@ -19,17 +19,28 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	Column permissionLevelPanel;
 	
 	private Presenter presenter;
+	UserGroupSuggestBox suggestBox;
 	
 	@Inject
 	public AddPeopleToAclPanelViewImpl(AddPeopleToAclPanelViewImplUiBinder uiBinder, UserGroupSuggestBox suggestBox) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.suggestBox = suggestBox;
 		suggestBox.asWidget().addStyleName("form-control input-xs");
-		ListBox listBox = new ListBox();
-		listBox.addStyleName("input-xs");
 		
 		suggestBoxPanel.add(suggestBox.asWidget());
-		permissionLevelPanel.add(listBox);
 	}
+	
+	@Override
+	public UserGroupSuggestBox getSuggestBox() {
+		return suggestBox;
+	}
+	
+	@Override
+	public void configure(ListBox permissionListBox) {
+		permissionListBox.addStyleName("input-xs");
+		permissionLevelPanel.add(permissionListBox);
+	}
+	
 	
 	@Override
 	public void setPresenter(Presenter presenter) {
