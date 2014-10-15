@@ -23,6 +23,11 @@
                     </b:Column>
                     <b:Column ui:field="permissionLevelPanel" size="MD_10" />
                 </b:Row>
+                <b:Row>
+                    <b:Column size = "MD_2">
+                        <b:Button ui:field="addPersonButton" size="EXTRA_SMALL">Add</b:Button>
+                    </b:Column>
+                </b:Row>
             </b:Container>
         </b:PanelBody>
     </g:HTMLPanel>

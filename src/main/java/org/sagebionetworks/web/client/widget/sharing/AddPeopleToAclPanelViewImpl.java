@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -17,6 +22,8 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	Column suggestBoxPanel;
 	@UiField
 	Column permissionLevelPanel;
+	@UiField
+	Button addPersonButton;
 	
 	private Presenter presenter;
 	UserGroupSuggestBox suggestBox;
@@ -35,10 +42,27 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 		return suggestBox;
 	}
 	
+	private HandlerRegistration buttonReg;	// TODO: Get rid of this logic when only build window once (if I do that)?
 	@Override
-	public void configure(ListBox permissionListBox) {
+	public void configure(ListBox permissionListBox, final CallbackP<Void> addPersonCallback) {
+		permissionLevelPanel.clear();
 		permissionListBox.addStyleName("input-xs");
 		permissionLevelPanel.add(permissionListBox);
+		
+		if (buttonReg != null) {
+			buttonReg.removeHandler();
+		}
+		
+		buttonReg = addPersonButton.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				addPersonCallback.invoke(null);
+			}
+			
+		});
+		
+		
 	}
 	
 	

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -28,39 +28,13 @@ import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.GridEvent;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
-import com.extjs.gxt.ui.client.event.SelectionChangedListener;
-import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
-import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.FieldSet;
-import com.extjs.gxt.ui.client.widget.form.FormPanel;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
-import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnData;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.extjs.gxt.ui.client.widget.layout.FormLayout;
-import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
-import com.extjs.gxt.ui.client.widget.menu.Menu;
-import com.extjs.gxt.ui.client.widget.menu.MenuItem;
-import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,11 +48,12 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AccessControlListEditorViewImpl extends LayoutContainer implements AccessControlListEditorView {
+public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
  
 	private static final int FIELD_WIDTH = 500;
 	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
@@ -137,10 +112,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		
 	}
 	
-	@Override
-	protected void onRender(Element parent, int pos) {
-		super.onRender(parent, pos);
-	}
+//	@Override
+//	protected void onRender(Element parent, int pos) {
+//		super.onRender(parent, pos);
+//	}
 		
 	@Override
 	public Widget asWidget() {
@@ -151,7 +126,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		
 		ListBox permissionsListBox = createEditAccessMenu(aclEntry);
 		if (!aclEntry.isIndividual())
 			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first
@@ -190,12 +164,12 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	
 	@Override
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
-		this.removeAll(true);
+		//this.removeAll(true);
+		clear();
 		permissionsGrid.clear();
-		this.setLayout(new FlowLayout(10));
+		//this.setLayout(new FlowLayout(10));
 		
 		// show existing permissions
-		//permissionsStore = new ListStore<PermissionsTableEntry>();
 		showEditColumns = canChangePermission && !isInherited;
 		permissionsGrid.configure(new CallbackP<Long>() {
 				@Override
@@ -204,20 +178,7 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 				}
 			});
 		
-//		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
-//				permissionsStore, 
-//				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
-//				createButtonRenderer(), 
-//				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
-//					@Override
-//					public void invoke(Long principalId) {
-//						presenter.removeAccess(principalId);
-//					}
-//				}),
-//				showEditColumns);
-
-		add(permissionsGrid.asWidget(), new MarginData(5, 0, 0, 0));
-		//columnModel = permissionsGrid.getColumnModel();
+		add(permissionsGrid.asWidget());
 		
 		// create panel to hold ACL management buttons
 		FlowPanel hPanel = new FlowPanel();
@@ -229,102 +190,31 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 		if (canChangePermission) {
 			if(isInherited) { 
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-				readOnly.setWidth(450);
-				add(readOnly, new MarginData(15, 0, 0, 0));			
+				readOnly.setWidth(450 + "px");
+				add(readOnly);			
 				
 				// 'Create ACL' button
-				Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, AbstractImagePrototype.create(iconsImageBundle.addSquare16()));
-				createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
-				createAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
+				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, new ClickHandler() {
+
 					@Override
-					public void componentSelected(ButtonEvent ce) {
+					public void onClick(ClickEvent event) {
 						presenter.createAcl();
 					}
+					
 				});
-				//hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-				//hPanel.add(createAclButton, tdLeft);
+				// TODO: Tooltip?
+				//createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
 				hPanel.add(createAclButton);
 			} else {
 //				// show add people view
 				FlowPanel form2 = new FlowPanel();  
-//				form2.setFrame(false);
-//				form2.setHeaderVisible(false);  
-//				form2.setAutoWidth(true);			
-//				form2.setLayout(new FlowLayout());
-//				
-//				FormLayout layout = new FormLayout();  
-//				layout.setLabelWidth(75);
-//				layout.setDefaultWidth(DEFAULT_WIDTH);
-//				  
-//				FieldSet fieldSet = new FieldSet();  
-//				fieldSet.setHeading(DisplayConstants.LABEL_PERMISSION_TEXT_ADD_PEOPLE);  
-//				fieldSet.setCheckboxToggle(false);
-//				fieldSet.setCollapsible(false);			
-//				fieldSet.setLayout(layout);
-//				fieldSet.setWidth(FIELD_WIDTH);
-//				
-//				
-//				// user/group Suggest Box
-//				peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
-//				peopleSuggestBox.setPlaceholderText("Enter name...");
-//				peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
-//				peopleSuggestBox.asWidget().addStyleName("form-control input-xs");	// TODO: Move this elsewhere?
-//				HorizontalPanel userGroupPanel = new HorizontalPanel();
-//				//userGroupPanel.addStyleName(" input-sm");	// TODO: Remove when moving away from gxt components.
-//				
-//				Label nameLbl = new Label("Name:");
-//				nameLbl.addStyleName("width-80");
-//				userGroupPanel.add(nameLbl);
-//				userGroupPanel.add(peopleSuggestBox.asWidget());
-//				fieldSet.add(userGroupPanel);
-//				
-//				// permission level combobox
-////				permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
-////				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_VIEW), PermissionLevel.CAN_VIEW));
-////				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT), PermissionLevel.CAN_EDIT));
-////				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_EDIT_DELETE), PermissionLevel.CAN_EDIT_DELETE));
-////				permissionLevelCombo.add(new PermissionLevelSelect(permissionDisplay.get(PermissionLevel.CAN_ADMINISTER), PermissionLevel.CAN_ADMINISTER));			
-////				permissionLevelCombo.setEmptyText("Select access level...");
-////				permissionLevelCombo.setFieldLabel("Access Level");
-////				permissionLevelCombo.setTypeAhead(false);
-////				permissionLevelCombo.setEditable(false);
-////				permissionLevelCombo.setForceSelection(true);
-////				permissionLevelCombo.setTriggerAction(TriggerAction.ALL);
-////				permissionLevelCombo.addSelectionChangedListener(new SelectionChangedListener<SimpleComboValue<PermissionLevelSelect>>() {				
-////					@Override
-////					public void selectionChanged(SelectionChangedEvent<SimpleComboValue<PermissionLevelSelect>> se) {
-////						presenter.setUnsavedViewChanges(true);
-////					}
-////				});
-//				permissionLevelListBox = new ListBox();
-//				for (PermissionLevel permLevel : permList) {
-//					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
-//				}
-//				permissionLevelListBox.addStyleName("input-xs");
-//				fieldSet.add(permissionLevelListBox);
-//				
-//				Panel addPanel = new Panel();
-//				
-//				
-//				// share button and listener
-//				Button shareButton = new Button("Add");
-//				shareButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//					@Override
-//					public void componentSelected(ButtonEvent ce) {
-//						addPersonToAcl();
-//					}
-//				});
-//	
-//				fieldSet.add(shareButton);
-//				
-//				form2.add(fieldSet);
 				
 				// configure permission level list box
-				ListBox listBox = new ListBox();
+				permissionLevelListBox = new ListBox();
 				for (PermissionLevel permLevel : permList) {
-					listBox.addItem(permissionDisplay.get(permLevel));
+					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
 				}
-				listBox.addChangeHandler(new ChangeHandler() {
+				permissionLevelListBox.addChangeHandler(new ChangeHandler() {
 
 					@Override
 					public void onChange(ChangeEvent event) {
@@ -332,7 +222,17 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 					}
 					
 				});
-				addPeoplePanel.configure(listBox);
+				
+				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
+
+					@Override
+					public void invoke(Void param) {
+						addPersonToAcl();
+					}
+					
+				};
+				
+				addPeoplePanel.configure(permissionLevelListBox, addPersonCallback);
 				
 				
 				//Make Public button
@@ -390,30 +290,14 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 						presenter.deleteAcl();					
 					}
 				});
-//				deleteAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT));
-//				deleteAclButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//					@Override
-//					public void componentSelected(ButtonEvent ce) {
-//						presenter.deleteAcl();					
-//					}
-//				});
-				
-				//hPanel.setHorizontalAlign(HorizontalAlignment.LEFT);
-				//delete button takes up the rest of the line space
-				//hPanel.add(deleteAclButton, tdLeft);
+				// TODO: Tooltip?
 				hPanel.add(deleteAclButton);
 				deleteAclButton.setEnabled(canEnableInheritance);
 			}
 		}
 		
-		// Unsaved changes label
-//		Label blank = new Label("");
-//		Label unsavedChangesLabel = new Label(DisplayUtils.getIconHtml(iconsImageBundle.warning16()) + " " + DisplayConstants.PERMISSIONS_UNSAVED_CHANGES);
-//	   	hPanel.setHorizontalAlign(HorizontalAlignment.RIGHT);
-//		hPanel.add(unsavedChanges ? unsavedChangesLabel : blank, tdRight);
 		
-		this.add(hPanel, new MarginData(10, 0, 0, 0));
-		this.layout(true);
+		this.add(hPanel);
 	}
 	
 	@Override
@@ -429,9 +313,10 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	
 	@Override
 	public void showLoading() {
-		this.removeAll(true);
-		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
-		this.layout(true);
+		// TODO
+//		this.removeAll(true);
+//		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
+//		this.layout(true);
 	}
 
 	@Override
@@ -442,11 +327,6 @@ public class AccessControlListEditorViewImpl extends LayoutContainer implements 
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void clear() {
-		this.removeAll();
 	}
 
 	@Override
