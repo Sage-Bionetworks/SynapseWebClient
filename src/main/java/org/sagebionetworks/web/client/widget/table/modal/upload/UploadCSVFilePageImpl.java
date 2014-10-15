@@ -17,7 +17,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	// Injected dependencies.
 	FileInputWidget fileInputWidget;
 	ModalPresenter presenter;
-	UploadCSVConfigurationPage nextPage;
+	UploadCSVPreviewPage nextPage;
 	
 	// data fields
 	String fileHandleId;
@@ -26,7 +26,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	String fileName;
 	
 	@Inject
-	public UploadCSVFilePageImpl(FileInputWidget fileInputWidget, UploadCSVConfigurationPage uploadCSVConfigurationWidget) {
+	public UploadCSVFilePageImpl(FileInputWidget fileInputWidget, UploadCSVPreviewPage uploadCSVConfigurationWidget) {
 		super();
 		this.fileInputWidget = fileInputWidget;
 		this.nextPage = uploadCSVConfigurationWidget;

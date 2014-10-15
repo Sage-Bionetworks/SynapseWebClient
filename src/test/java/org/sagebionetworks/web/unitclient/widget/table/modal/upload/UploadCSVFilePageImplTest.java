@@ -15,7 +15,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
@@ -24,7 +24,7 @@ public class UploadCSVFilePageImplTest {
 	
 	FileInputWidget mockFileInputWidget;
 	ModalPresenter mockPresenter;
-	UploadCSVConfigurationPage mockNextPage;
+	UploadCSVPreviewPage mockNextPage;
 	UploadCSVFilePageImpl page;
 	String parentId;
 	
@@ -32,7 +32,7 @@ public class UploadCSVFilePageImplTest {
 	public void before(){
 		mockFileInputWidget = Mockito.mock(FileInputWidget.class);
 		mockPresenter = Mockito.mock(ModalPresenter.class);
-		mockNextPage = Mockito.mock(UploadCSVConfigurationPage.class);
+		mockNextPage = Mockito.mock(UploadCSVPreviewPage.class);
 		page = new UploadCSVFilePageImpl(mockFileInputWidget, mockNextPage);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("testing.csv", ContentTypeDelimiter.CSV.getContentType())});
 		parentId = "syn456";

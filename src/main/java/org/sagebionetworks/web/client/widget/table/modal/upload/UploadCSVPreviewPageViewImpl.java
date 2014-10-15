@@ -16,12 +16,10 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationView {
+public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 
-	public interface Binder extends UiBinder<Widget, UploadCSVConfigurationViewImpl> {}
+	public interface Binder extends UiBinder<Widget, UploadCSVPreviewPageViewImpl> {}
 	
-	@UiField
-	TextBox tableNameBox;
 	@UiField
 	SimplePanel previewPanel;
 	@UiField
@@ -35,7 +33,7 @@ public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationVie
 	Presenter presenter;
 	
 	@Inject
-	public UploadCSVConfigurationViewImpl(Binder binder){
+	public UploadCSVPreviewPageViewImpl(Binder binder){
 		this.widget = binder.createAndBindUi(this);
 	}
 	
@@ -47,11 +45,6 @@ public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationVie
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-	}
-
-	@Override
-	public void setTableName(String fileName) {
-		tableNameBox.setText(fileName);
 	}
 
 	@Override
@@ -83,11 +76,6 @@ public class UploadCSVConfigurationViewImpl implements UploadCSVConfigurationVie
 	@Override
 	public void hideSpinner() {
 		spinnerColumn.setVisible(false);
-	}
-
-	@Override
-	public String getTableName() {
-		return this.tableNameBox.getValue();
 	}
 
 }

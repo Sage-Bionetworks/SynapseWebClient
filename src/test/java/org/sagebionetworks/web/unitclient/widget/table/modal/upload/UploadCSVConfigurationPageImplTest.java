@@ -21,8 +21,8 @@ import org.sagebionetworks.repo.model.table.UploadToTableResult;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationPageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVConfigurationView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
@@ -31,7 +31,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UploadCSVConfigurationPageImplTest {
 	
-	UploadCSVConfigurationView mockView;
+	UploadCSVPreviewPageView mockView;
 	SynapseClientAsync mockSynapseClient;
 	UploadPreviewWidget mockUploadPreviewWidget;
 	JobTrackingWidgetStub jobTrackingWidgetStub;
@@ -40,18 +40,18 @@ public class UploadCSVConfigurationPageImplTest {
 	String fileName;
 	String parentId;
 	String fileHandleId;
-	UploadCSVConfigurationPageImpl page;
+	UploadCSVPreviewPageImpl page;
 	
 
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(UploadCSVConfigurationView.class);
+		mockView = Mockito.mock(UploadCSVPreviewPageView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockUploadPreviewWidget = Mockito.mock(UploadPreviewWidget.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockPresenter = Mockito.mock(ModalPresenter.class);
-		page = new UploadCSVConfigurationPageImpl(mockView, mockSynapseClient, mockUploadPreviewWidget, jobTrackingWidgetStub);
+		page = new UploadCSVPreviewPageImpl(mockView, mockSynapseClient, mockUploadPreviewWidget, jobTrackingWidgetStub);
 		type = ContentTypeDelimiter.CSV;
 		fileName = "testing.csv";
 		parentId = "syn123";
@@ -67,8 +67,8 @@ public class UploadCSVConfigurationPageImplTest {
 		verify(mockView).setTableName(fileName);
 		verify(mockView).setPreviewVisible(false);
 		verify(mockView).setTrackerVisible(true);
-		verify(mockPresenter).setPrimaryButtonText(UploadCSVConfigurationPageImpl.CREATE);
-		verify(mockPresenter).setInstructionMessage(UploadCSVConfigurationPageImpl.PREPARING_A_PREVIEW);
+		verify(mockPresenter).setPrimaryButtonText(UploadCSVPreviewPageImpl.CREATE);
+		verify(mockPresenter).setInstructionMessage(UploadCSVPreviewPageImpl.PREPARING_A_PREVIEW);
 		verify(mockPresenter).setLoading(true);
 		// We expect this to be the first request.
 		UploadToTablePreviewRequest expectedRequst = new UploadToTablePreviewRequest();
@@ -112,7 +112,7 @@ public class UploadCSVConfigurationPageImplTest {
 		reset(mockPresenter);
 		// the test calls
 		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVConfigurationPageImpl.CREATING_TABLE_COLUMNS);
+		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
 		verify(mockPresenter).setLoading(true);
 		verify(mockView).hideSpinner();
 		verify(mockPresenter).setErrorMessage(error);
@@ -129,7 +129,7 @@ public class UploadCSVConfigurationPageImplTest {
 		reset(mockPresenter);
 		// the test call
 		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVConfigurationPageImpl.CREATING_TABLE_COLUMNS);
+		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
 		verify(mockPresenter).setLoading(true);
 		verify(mockView).hideSpinner();
 		verify(mockPresenter).setErrorMessage(error);
@@ -150,10 +150,10 @@ public class UploadCSVConfigurationPageImplTest {
 		jobTrackingWidgetStub.setResponse(new UploadToTableResult());
 		// the test call
 		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVConfigurationPageImpl.CREATING_TABLE_COLUMNS);
+		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
 		verify(mockPresenter).setLoading(true);
 		// should start the create column call
-		verify(mockView).showSpinner(UploadCSVConfigurationPageImpl.CREATING_THE_TABLE);
+		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_THE_TABLE);
 		verify(mockView).hideSpinner();
 		verify(mockPresenter).onTableCreated(table);
 	}

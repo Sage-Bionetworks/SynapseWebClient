@@ -23,7 +23,7 @@ public class ColumnModelUtils {
 	 * @param model
 	 * @param row
 	 */
-	public static void applyColumnModelToRow(ColumnModel model, ColumnModelTableRow row){
+	public static void applyColumnModelToRow(ColumnModel model, ColumnModelView row){
 		if(model == null){
 			throw new IllegalArgumentException("Model cannot be null");
 		}
@@ -79,7 +79,7 @@ public class ColumnModelUtils {
 	 * @param row
 	 * @return
 	 */
-	public static ColumnModel extractColumnModel(ColumnModelTableRow row) {
+	public static ColumnModel extractColumnModel(ColumnModelView row) {
 		if(row == null){
 			throw new IllegalArgumentException("Row cannot be null");
 		}

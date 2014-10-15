@@ -13,8 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
-	
-	public static final double COLUMN_SIZE_BUFFER = 0.25;
+
 	public static final int MAX_CHARS_PER_CELL = 10;
 	UploadPreviewView view;
 	UploadToTablePreviewRequest previewRequest;
@@ -34,7 +33,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	@Override
 	public void configure(UploadToTablePreviewRequest previewRequest, UploadToTablePreviewResult preview) {
 		this.previewRequest = previewRequest;
-		columns = preProcessColumns(preview.getSuggestedColumns());
+		columns = preview.getSuggestedColumns();
 		// Create a list of headers
 		List<String> headers = new ArrayList<String>();
 		for(ColumnModel cm: preview.getSuggestedColumns()){
@@ -82,22 +81,4 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 		request.setUploadFileHandleId(previewRequest.getUploadFileHandleId());
 		return request;
 	}
-
-	/**
-	 * Pre-process the passed columns.  Returns a cloned list of ColumnModels, each modified as needed.
-	 * @param adapter
-	 * @param columns
-	 * @return
-	 */
-	public List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
-		for(ColumnModel cm: columns){
-			if(cm.getMaximumSize() != null){
-				// Add a buffer to the max size
-				double startingMax = cm.getMaximumSize();
-				cm.setMaximumSize((long)(startingMax+(startingMax*COLUMN_SIZE_BUFFER)));
-			}
-		}
-		return columns;
-	}
-	
 }

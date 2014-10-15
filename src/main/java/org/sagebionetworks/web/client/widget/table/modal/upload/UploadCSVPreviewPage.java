@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 
 /**
- * Abstraction for a page that manages the configuration of the table including, table name, columns, and CSV descriptors..
+ * Abstraction for a page that shows a preview of what a table upload will look like with the option to change how the CSV is read.
  * @author John
  *
  */
-public interface UploadCSVConfigurationPage extends ModalPage {
+public interface UploadCSVPreviewPage extends ModalPage {
 
 	/**
 	 * Call configure before using.

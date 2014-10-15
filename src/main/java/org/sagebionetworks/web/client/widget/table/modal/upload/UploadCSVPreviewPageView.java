@@ -9,7 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author John
  *
  */
-public interface UploadCSVConfigurationView extends IsWidget {
+public interface UploadCSVPreviewPageView extends IsWidget {
 	
 	/**
 	 * Business logic goes here.
@@ -25,12 +25,6 @@ public interface UploadCSVConfigurationView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-
-	/**
-	 * Set the table name.
-	 * @param fileName
-	 */
-	public void setTableName(String fileName);
 
 	/**
 	 * Add the tracking widget to the view.
@@ -67,9 +61,4 @@ public interface UploadCSVConfigurationView extends IsWidget {
 	 */
 	public void hideSpinner();
 
-	/**
-	 * Get the name of the table from the box.
-	 * @return
-	 */
-	public String getTableName();
 }
