@@ -79,7 +79,12 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 				@Override
 				public void onClick(ClickEvent event) {
 					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
-					presenter.addFolderClicked();
+					presenter.callbackIfCertifiedIfEnabled(new Callback() {
+						@Override
+						public void invoke() {
+							presenter.addFolderClicked();
+						}
+					});
 				}
 			});
 		
@@ -246,12 +251,17 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	private Button getUploadButton(final String entityId) {
 		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
 		uploadButton.addStyleName("left display-inline");
-		
 		uploadButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.uploadButtonClicked();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						presenter.uploadButtonClicked();
+					}
+				});
+				
 			}
 		});
 		return uploadButton;

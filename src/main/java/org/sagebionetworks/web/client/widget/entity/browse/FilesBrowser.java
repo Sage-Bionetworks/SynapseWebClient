@@ -128,9 +128,19 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-	//TODO: on add folder or upload click, check isCertificationRequired.  If it is, then pop up the QuizInfoDialog (certification dialog)  
-	
-	
+	/**
+	 * Invokes the callback iff the user certification feature is enabled on the backend AND certification requirements have been met.
+	 * Otherwise, it will pop up the "get certified" dialog
+	 * @return
+	 */
+	@Override
+	public void callbackIfCertifiedIfEnabled(Callback callback) {
+		if (FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild)) {
+			view.showQuizInfoDialog(true, null);
+		} else
+			callback.invoke();
+	}
+  
 	/**
 	 * Check for user certification passing record.  NOTE: This should be removed after certification is required 
 	 * (we will check the permissions up front and block on click), 

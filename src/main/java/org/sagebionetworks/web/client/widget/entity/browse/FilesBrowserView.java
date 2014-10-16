@@ -33,7 +33,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 		void updateFolderName(String newFolderName, String folderEntityId);
 		void deleteFolder(String folderEntityId, boolean skipTrashCan);
 		void fireEntityUpdatedEvent();
-
+		void callbackIfCertifiedIfEnabled(Callback callback);
 	}
 
 }
