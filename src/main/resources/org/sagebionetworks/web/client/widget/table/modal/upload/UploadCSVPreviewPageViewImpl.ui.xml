@@ -9,13 +9,6 @@
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="previewPanel" />
 		<g:SimplePanel ui:field="trackerPanel" />
-		<b:Row>
-			<b:Column size="XS_3" offset="XS_5" ui:field="spinnerColumn"
-				visible="false">
-				<g:Image resource='{sageImageBundle.loading31}' />
-				<bh:Text ui:field="spinnerText"></bh:Text>
-			</b:Column>
-		</b:Row>
 		<b:Button dataToggle="COLLAPSE" dataTarget="#optionsCollapse" text="Options"/>
 		<b:Collapse b:id="optionsCollapse">
 			<g:SimplePanel ui:field="optionsPanel" />

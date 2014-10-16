@@ -50,15 +50,5 @@ public interface UploadCSVPreviewPageView extends IsWidget {
 	 */
 	public void setPreviewWidget(Widget uploadPreviewWidget);
 	
-	/**
-	 * Show the spinner with the following text
-	 * @param text
-	 */
-	public void showSpinner(String text);
-	
-	/**
-	 * Hide the spinner.
-	 */
-	public void hideSpinner();
 
 }

@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
-import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Text;
-
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,9 +20,7 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	@UiField
 	SimplePanel trackerPanel;
 	@UiField
-	Column spinnerColumn;
-	@UiField
-	Text spinnerText;
+	SimplePanel optionsPanel;
 	
 	Widget widget;
 	Presenter presenter;
@@ -65,17 +58,6 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	@Override
 	public void setPreviewWidget(Widget uploadPreviewWidget) {
 		this.previewPanel.add(uploadPreviewWidget);
-	}
-
-	@Override
-	public void showSpinner(String text) {
-		spinnerText.setText(text);
-		spinnerColumn.setVisible(true);
-	}
-
-	@Override
-	public void hideSpinner() {
-		spinnerColumn.setVisible(false);
 	}
 
 }
