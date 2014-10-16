@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -161,7 +162,7 @@ public class FilesBrowserTest {
 
 	@Test
 	public void testUploadStep1ARsAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
 		CallbackP callback = arg.getValue();
@@ -172,7 +173,7 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadStep1ARsNotAccepted(){
-		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
+		FilesBrowser.uploadButtonClickedStep1(mockAccessRequirementsWidget, configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
 		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockAccessRequirementsWidget).showUploadAccessRequirements(eq(configuredEntityId), arg.capture());
 		CallbackP callback = arg.getValue();
@@ -183,7 +184,7 @@ public class FilesBrowserTest {
 	
 	@Test
 	public void testUploadStep2Certified(){
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
@@ -191,16 +192,13 @@ public class FilesBrowserTest {
 	public void testUploadStep2NotCertified(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		boolean isCertificationRequired = true;
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, isCertificationRequired);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, isCertificationRequired);
 		
-		ArgumentCaptor<CallbackP> arg = ArgumentCaptor.forClass(CallbackP.class);
+		ArgumentCaptor<Callback> arg = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).showQuizInfoDialog(eq(isCertificationRequired), arg.capture());
-		CallbackP callback = arg.getValue();
-		//if the view calls back that the tutorial was clicked, then the upload dialog is not shown
-		callback.invoke(true);
-		verify(mockView, never()).showUploadDialog(anyString());
-		//but if the tutorial was not clicked, then it should show the upload dialog
-		callback.invoke(false);
+		Callback callback = arg.getValue();
+		//if the user clicks remind me later, then we should invoke
+		callback.invoke();
 		verify(mockView).showUploadDialog(anyString());
 	}
 	
@@ -208,26 +206,14 @@ public class FilesBrowserTest {
 	public void testUploadStep2NotCertifiedNotRequired(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
 		boolean isCertificationRequired = false;
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, isCertificationRequired);
-		verify(mockView).showQuizInfoDialog(eq(isCertificationRequired), any(CallbackP.class));
-	}
-	
-	@Test
-	public void testUploadStep2NotCertifiedIgnore(){
-		//simulate that the dialog was previously ignored
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		when(mockCookies.getCookie(eq(CookieKeys.IGNORE_CERTIFICATION_REMINDER))).thenReturn("yes");
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
-		
-		//should not show the quiz info dialog, it should go directly to upload 
-		verify(mockView, Mockito.times(0)).showQuizInfoDialog(anyBoolean(), any(CallbackP.class));
-		verify(mockView).showUploadDialog(anyString());
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, isCertificationRequired);
+		verify(mockView).showQuizInfoDialog(eq(isCertificationRequired), any(Callback.class));
 	}
 	
 	@Test
 	public void testUploadStep2Failure(){
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getCertifiedUserPassingRecord(anyString(), any(AsyncCallback.class));
-		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockCookies, mockAuthenticationController, true);
+		FilesBrowser.uploadButtonClickedStep2(configuredEntityId, mockView, mockSynapseClient, mockAuthenticationController, true);
 		verify(mockView).showErrorMessage(anyString());
 	}
 	
