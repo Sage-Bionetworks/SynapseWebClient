@@ -4,15 +4,12 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.repo.model.AutoGenFactory;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.LocationData;
 import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
@@ -36,12 +33,11 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityEditor;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
+import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -67,7 +63,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	private EntityDeletedHandler entityDeletedHandler;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookieProvider;
-	private  NodeModelCreator nodeModelCreator;
 	private EvaluationSubmitter evaluationSubmitter;
 	private Long versionNumber;
 	
@@ -85,10 +80,8 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		public void onSuccess(List<String> evaluations);		
 	}
 
-
-	
 	@Inject
-	public ActionMenu(ActionMenuView view, NodeModelCreator nodeModelCreator,
+	public ActionMenu(ActionMenuView view,
 			AuthenticationController authenticationController,
 			EntityTypeProvider entityTypeProvider,
 			GlobalApplicationState globalApplicationState,
@@ -108,7 +101,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityFactory = entityFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.cookieProvider = cookieProvider;
-		this.nodeModelCreator = nodeModelCreator;
 		this.evaluationSubmitter = evaluationSubmitter;
 		view.setPresenter(this);
 	}	
@@ -162,8 +154,23 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 		this.entityDeletedHandler = handler;
 	}
 	
+	/**
+	 * Returns true if certification requirements have been met (if user certification feature is enabled on the backend)
+	 * @return
+	 */
+	public boolean isCertifiedIfEnabled() {
+		if (FilesBrowser.isCertificationRequired(entityBundle.getPermissions().getCanEdit(), entityBundle.getPermissions().getCanCertifiedUserEdit())) {
+			view.showQuizInfoDialog(true, null);
+			return false;
+		} else
+			return true;
+	}
+	
 	@Override
 	public void moveEntity(String newParentId) {
+		if (!isCertifiedIfEnabled()) {
+			return;
+		}
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
 		
@@ -206,6 +213,9 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void deleteEntity() {
+		if (!isCertifiedIfEnabled()) {
+			return;
+		}
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
@@ -254,7 +264,11 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	}
 
 	@Override
-	public void createLink(String selectedEntityId) {			
+	public void createLink(String selectedEntityId) {		
+		if (!isCertifiedIfEnabled()) {
+			return;
+		}
+
 		Link link = (Link) entityFactory.newInstance(Link.class.getName());
 		link.setParentId(selectedEntityId); // user selects where to save
 		Reference ref = new Reference();

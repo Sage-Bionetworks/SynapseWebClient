@@ -44,7 +44,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, UploadView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;

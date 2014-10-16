@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu;
 
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -8,7 +9,7 @@ import org.sagebionetworks.web.shared.EntityType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface ActionMenuView extends IsWidget, SynapseView {
+public interface ActionMenuView extends IsWidget, SynapseView, UploadView {
 
 	/**
 	 * Set the presenter.
