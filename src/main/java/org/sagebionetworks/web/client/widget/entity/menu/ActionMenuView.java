@@ -65,6 +65,8 @@ public interface ActionMenuView extends IsWidget, SynapseView, UploadView {
 		void uploadToGenomespace();
 		
 		void showAvailableEvaluations();
+		
+		void callbackIfCertifiedIfEnabled(Callback callback);
 	}
 
 }
