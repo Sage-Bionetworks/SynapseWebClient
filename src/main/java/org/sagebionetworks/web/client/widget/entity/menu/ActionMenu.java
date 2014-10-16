@@ -155,22 +155,20 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	}
 	
 	/**
-	 * Returns true if certification requirements have been met (if user certification feature is enabled on the backend)
+	 * Invokes the callback iff the user certification feature is enabled on the backend AND certification requirements have been met.
+	 * Otherwise, it will pop up the "get certified" dialog
 	 * @return
 	 */
-	public boolean isCertifiedIfEnabled() {
+	@Override
+	public void callbackIfCertifiedIfEnabled(Callback callback) {
 		if (FilesBrowser.isCertificationRequired(entityBundle.getPermissions().getCanEdit(), entityBundle.getPermissions().getCanCertifiedUserEdit())) {
 			view.showQuizInfoDialog(true, null);
-			return false;
 		} else
-			return true;
+			callback.invoke();
 	}
 	
 	@Override
 	public void moveEntity(String newParentId) {
-		if (!isCertifiedIfEnabled()) {
-			return;
-		}
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
 		
@@ -213,9 +211,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void deleteEntity() {
-		if (!isCertifiedIfEnabled()) {
-			return;
-		}
 		final String parentId = entityBundle.getEntity().getParentId();
 		final EntityType entityType = entityTypeProvider.getEntityTypeForEntity(entityBundle.getEntity());
 		final String entityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityType);
@@ -265,10 +260,6 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 
 	@Override
 	public void createLink(String selectedEntityId) {		
-		if (!isCertifiedIfEnabled()) {
-			return;
-		}
-
 		Link link = (Link) entityFactory.newInstance(Link.class.getName());
 		link.setParentId(selectedEntityId); // user selects where to save
 		Reference ref = new Reference();

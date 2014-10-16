@@ -103,7 +103,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, cookies, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
 	}
 	
 	public static boolean isCertificationRequired(boolean canAddChild, boolean canCertifiedUserAddChild) {
@@ -116,25 +116,33 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final String entityId, 
 			final UploadView view,
 			final SynapseClientAsync synapseClient,
-			final CookieProvider cookies,
 			final AuthenticationController authenticationController,
 			final boolean isCertificationRequired) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, cookies, authenticationController, isCertificationRequired);
+					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertificationRequired);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-	//is this a certified user?
+	/**
+	 * Check for user certification passing record.  NOTE: This should be removed after certification is required 
+	 * (we will check the permissions up front and block on click), 
+	 * and calls to this method should be replaced with a direct call to "view.showUploadDialog(entityId);"
+	 * @param entityId
+	 * @param view
+	 * @param synapseClient
+	 * @param cookies
+	 * @param authenticationController
+	 * @param isCertificationRequired
+	 */
 	public static void uploadButtonClickedStep2(
 			final String entityId, 
 			final UploadView view,
 			SynapseClientAsync synapseClient,
-			final CookieProvider cookies,
 			AuthenticationController authenticationController,
 			final boolean isCertificationRequired) {
 

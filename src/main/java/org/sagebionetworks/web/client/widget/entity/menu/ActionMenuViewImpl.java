@@ -240,7 +240,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 					
 					@Override
 					public void invoke() {
-						presenter.deleteEntity();
+						presenter.callbackIfCertifiedIfEnabled(new Callback() {
+							@Override
+							public void invoke() {
+								presenter.deleteEntity();
+							}
+						});
 					}
 				});
 			}
@@ -273,9 +278,14 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					UserEntityPermissions permissions = entityBundle.getPermissions();
-					boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
-					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController, isCertificationRequired);
+					presenter.callbackIfCertifiedIfEnabled(new Callback() {
+						@Override
+						public void invoke() {
+							UserEntityPermissions permissions = entityBundle.getPermissions();
+							boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
+							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, isCertificationRequired);
+						}
+					});
 				}
 			});
 			menuBtn.addMenuItem(a);
@@ -312,22 +322,32 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
 					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.createLink(selected.getTargetId());
-							window.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+					public void invoke() {
+						createShortcut();
 					}
-				});					
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);		
+	}
+	
+	private void createShortcut() {
+		entityFinder.configure(false);				
+		final Window window = new Window();
+		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					presenter.createLink(selected.getTargetId());
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});					
+
 	}
 	
 	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
@@ -336,8 +356,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
-				presenter.showAvailableEvaluations();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
+						presenter.showAvailableEvaluations();
+					}
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);
@@ -355,24 +380,34 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				//only if certified
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
 					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.moveEntity(selected.getTargetId());
-							window.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+					public void invoke() {
+						moveItem();
 					}
-				});				
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);
 	}
 
+	private void moveItem() {
+		entityFinder.configure(false);				
+		final Window window = new Window();
+		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					presenter.moveEntity(selected.getTargetId());
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});	
+	}
+	
 	private void addUploadToGenomeSpace(final DropdownButton menuBtn, final EntityBundle bundle) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML()));
 		a.addClickHandler(new ClickHandler() {			
@@ -405,8 +440,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		addDescriptionCommand.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (addDescriptionCallback != null)
-					addDescriptionCallback.invoke();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						if (addDescriptionCallback != null)
+							addDescriptionCallback.invoke();
+					}
+				});
 			}
 		});
 		menuBtn.addMenuItem(addDescriptionCommand);
