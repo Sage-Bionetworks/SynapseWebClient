@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.Date;
-
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
@@ -12,12 +10,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UploadView;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
@@ -26,7 +24,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPresenter {
@@ -150,29 +147,18 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			@Override
 			public void onFailure(Throwable t) {
 				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(isCertificationRequired, new CallbackP<Boolean>() {
+					view.showQuizInfoDialog(isCertificationRequired, new Callback() {
 						@Override
-						public void invoke(Boolean tutorialClicked) {
-							if (!tutorialClicked) {
-								// remind me later clicked
-								// do not pop this up for a day
-								Date date = new Date();
-								CalendarUtil.addDaysToDate(date, 1);
-								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
-								view.showUploadDialog(entityId);
-							}
+						public void invoke() {
+							// remind me later clicked
+							view.showUploadDialog(entityId);
 						}
 					});
 				} else
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		//only if cookie is not set
-		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
-		} else {
-			userCertifiedCallback.onSuccess("");
-		}
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	@Override

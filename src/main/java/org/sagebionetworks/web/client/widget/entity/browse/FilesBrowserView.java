@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.UploadView;
-import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -22,9 +22,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView, UploadView {
 
 	public void refreshTreeView(String entityId);
 	
-	public void showUploadDialog(String entityId);
 	public void showFolderEditDialog(String folderEntityId);
-	public void showQuizInfoDialog(boolean isCertificationRequired, CallbackP<Boolean> callback);
 	
 	/**
 	 * Presenter interface

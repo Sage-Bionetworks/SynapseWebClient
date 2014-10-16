@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
@@ -42,7 +43,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
 	private UploadDialogWidget uploader;
-	private QuizInfoWidget quizInfoWidget;
+	private QuizInfoDialog quizInfoDialog;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private PortalGinInjector ginInjector;
 	
@@ -52,18 +53,19 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 			UploadDialogWidget uploader,
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoWidget quizInfoWidget,
+			QuizInfoDialog quizInfoDialog,
 			PortalGinInjector ginInjector) {
 		this.uploader = uploader;
 		this.ginInjector = ginInjector;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
-		this.quizInfoWidget = quizInfoWidget;
+		this.quizInfoDialog = quizInfoDialog;
 	}
 
 	@Override
 	public void configure(String entityId, boolean canCertifiedUserAddChild) {
 		this.clear();
 		this.add(uploader.asWidget());	//add the upload dialog
+		this.add(quizInfoDialog.asWidget()); //and the certification dialog
 		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
 		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
@@ -100,30 +102,8 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, final CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(isCertificationRequired, callback, quizInfoWidget);
-	}
-	
-	public static void showQuizInfoDialog(boolean isCertificationRequired, final CallbackP<Boolean> callback, QuizInfoWidget quizInfoWidget) {
-		final Window dialog = new Window();
-		dialog.setMaximizable(false);
-		dialog.setSize(420, 270);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setLayout(new FitLayout());
-		dialog.setBorders(false);
-		dialog.setHeading("Join the Synapse Certified User Community");
-
-		quizInfoWidget.configure(isCertificationRequired, new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean tutorialClicked) {
-				dialog.hide();
-				callback.invoke(tutorialClicked);
-			}
-		});
-		dialog.add(quizInfoWidget.asWidget());
-		dialog.show();
-		DisplayUtils.center(dialog);
+	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
+		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
 	}
 	
 	@Override

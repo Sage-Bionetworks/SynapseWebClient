@@ -220,4 +220,9 @@ public class WebConstants {
 	public static final String LIMIT_ONE = "' limit 1";
 	
 	public static final String SFTP_PREFIX = "sftp://";
+	
+	public static final String USER_ID_PARAM = "userId";
+	public static final String EMAIL_PARAM = "email";
+	public static final String LAST_NAME_PARAM = "lastName";
+	public static final String FIRST_NAME_PARAM = "firstName";
 }

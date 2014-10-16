@@ -218,6 +218,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		}, false);
 		
 		joinWizard.show();
+		enablePrimaryButton();
 	}
 			
 	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {

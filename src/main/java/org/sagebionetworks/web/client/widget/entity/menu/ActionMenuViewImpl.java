@@ -21,14 +21,12 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
@@ -46,7 +44,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, UploadView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
@@ -54,7 +52,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	private UploadDialogWidget uploader;
 	private EntityTypeProvider typeProvider;
 	private EntityFinder entityFinder;
-	private QuizInfoWidget quizInfoWidget;
+	private QuizInfoDialog quizInfoDialog;
 	private EntityAccessRequirementsWidget accessRequirementsWidget;
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -76,7 +74,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
 			PublicPrivateBadge publicPrivateBadge,
-			QuizInfoWidget quizInfoWidget,
+			QuizInfoDialog quizInfoDialog,
 			EntityAccessRequirementsWidget accessRequirementsWidget,
 			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
@@ -88,7 +86,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		this.typeProvider = typeProvider;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;
-		this.quizInfoWidget = quizInfoWidget;
+		this.quizInfoDialog = quizInfoDialog;
 		this.accessRequirementsWidget = accessRequirementsWidget;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
@@ -121,6 +119,9 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 
 		this.add(toolsButton);	
 		this.add(shareButton);
+		
+		//add quiz info dialog to the DOM
+		toolsButton.add(quizInfoDialog.asWidget());
 	}
 	
 	@Override
@@ -294,8 +295,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	@Override
-	public void showQuizInfoDialog(boolean isCertificationRequired, CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(isCertificationRequired, callback, quizInfoWidget);
+	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
+		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
 	}
 		
 	/**
