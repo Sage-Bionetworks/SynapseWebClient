@@ -9,8 +9,11 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -75,7 +78,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
 	//private UserGroupSuggestBox peopleSuggestBox;
-	private CheckBox notifyPeopleCheckbox;
+	//private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
 //	private Grid<PermissionsTableEntry> permissionsGrid;
@@ -153,13 +156,15 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.isPubliclyVisible = isPubliclyVisible;
 		if (publicButton != null) {
 			if(isPubliclyVisible) {
-				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, "glyphicon-lock");
+				
+//				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, "glyphicon-lock");
 //				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
 			} else {
-				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, "glyphicon-globe");
+//				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, "glyphicon-globe");
 //				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
 			}
 		}
+		addPeoplePanel.setMakePublicButtonDisplay(!isPubliclyVisible);
 	}
 	
 	@Override
@@ -183,18 +188,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		// create panel to hold ACL management buttons
 		FlowPanel hPanel = new FlowPanel();
 		hPanel.setWidth(FIELD_WIDTH + "px");
-		TableData tdLeft = new TableData("1%", "100%");
-		tdLeft.setPadding(BUTTON_PADDING);
-		TableData tdRight = new TableData();
-		tdRight.setPadding(BUTTON_PADDING);
 		if (canChangePermission) {
 			if(isInherited) { 
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-				readOnly.setWidth(450 + "px");
+				//readOnly.setWidth(450 + "px");
 				add(readOnly);			
 				
 				// 'Create ACL' button
-				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, new ClickHandler() {
+				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
 
 					@Override
 					public void onClick(ClickEvent event) {
@@ -202,14 +203,20 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 					
 				});
+				createAclButton.setType(ButtonType.SUCCESS);
+				createAclButton.addStyleName("margin-top-10");
 				// TODO: Tooltip?
+				Tooltip toolTipAndCreateAclButton = new Tooltip();
+				toolTipAndCreateAclButton.setWidget(createAclButton);
+				toolTipAndCreateAclButton.setText(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
+				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
 				//createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
-				hPanel.add(createAclButton);
+				hPanel.add(toolTipAndCreateAclButton);
 			} else {
-//				// show add people view
-				FlowPanel form2 = new FlowPanel();  
+				// show add people view
 				
 				// configure permission level list box
+				// TODO: Can't have listBox not have option selected initially, so onChange is all weird.
 				permissionLevelListBox = new ListBox();
 				for (PermissionLevel permLevel : permList) {
 					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
@@ -232,52 +239,24 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					
 				};
 				
-				addPeoplePanel.configure(permissionLevelListBox, addPersonCallback);
-				
-				
-				//Make Public button
-				if (publicButton == null) {
-					//publicButton = DisplayUtils.createButton("Test");
-					publicButton = new com.google.gwt.user.client.ui.Button();
-					publicButton.addStyleName("btn btn-default btn-xs");
-					setIsPubliclyVisible(false);
-					
-					publicButton.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent event) {
-							//add the ability for PUBLIC to see this entity
-							if (isPubliclyVisible) {
-								presenter.makePrivate();
-							}
-							else {
-								if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-									presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
-								}
+				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
+
+					@Override
+					public void invoke(Void param) {
+						// Add the ability for PUBLIC to see this entity.
+						if (isPubliclyVisible) {
+							presenter.makePrivate();
+						} else {
+							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
 							}
 						}
-					});
-				}
-				form2.add(addPeoplePanel.asWidget());
+					}
+					
+				};
 				
-				if (notifyPeopleCheckbox == null) {
-					notifyPeopleCheckbox = new CheckBox("Notify people via email");
-					setIsNotifyPeople(true);
-					DisplayUtils.addTooltip(notifyPeopleCheckbox, DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
-				}
-				
-				FlowPanel cbPanel = new FlowPanel();
-				cbPanel.addStyleName("margin-top-0 margin-right-10 checkbox right");
-				cbPanel.add(notifyPeopleCheckbox);
-				
-				FlowPanel publicButtonPanel = new FlowPanel();
-				publicButtonPanel.addStyleName("margin-top-0 margin-left-10 left");
-				publicButtonPanel.add(publicButton);
-				
-				FlowPanel publicButtonAndCheckbox = new FlowPanel();
-				publicButtonAndCheckbox.add(publicButtonPanel);
-				publicButtonAndCheckbox.add(cbPanel);
-				form2.add(publicButtonAndCheckbox);
-				add(form2);
+				addPeoplePanel.configure(permissionLevelListBox, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				add(addPeoplePanel.asWidget());
 				
 				// 'Delete ACL' button
 				//Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
@@ -290,8 +269,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 						presenter.deleteAcl();					
 					}
 				});
-				// TODO: Tooltip?
-				hPanel.add(deleteAclButton);
+				
+				Tooltip toolTipAndDeleteAclButton = new Tooltip();
+				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
+				toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
+				toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
+				hPanel.add(toolTipAndDeleteAclButton);
 				deleteAclButton.setEnabled(canEnableInheritance);
 			}
 		}
@@ -301,13 +284,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	@Override
 	public Boolean isNotifyPeople(){
-		return notifyPeopleCheckbox.getValue();
+		return addPeoplePanel.getNotifyPeopleCheckBox().getValue();
 	}
 	
 	@Override
 	public void setIsNotifyPeople(Boolean value) {
-		if (notifyPeopleCheckbox != null && value != null)
-			notifyPeopleCheckbox.setValue(value);
+		if (value != null)
+			addPeoplePanel.getNotifyPeopleCheckBox().setValue(value);
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -77,6 +78,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			}
 			
 		});
+		button.setSize(ButtonSize.SMALL);
 		if (aclEntry.isOwner()) {
 			button.setEnabled(false);
 		}
@@ -85,29 +87,6 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		row.add(data);;
 		
 		return row;
-	}
-	
-	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void clear() {
-		tableBody.clear();
 	}
 	
 	@Override

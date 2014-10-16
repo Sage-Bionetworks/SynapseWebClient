@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -23,13 +24,21 @@ public class AddPeopleToAclPanel implements AddPeopleToAclPanelView.Presenter, S
 		return view.getSuggestBox();
 	}
 	
-	public void configure(ListBox permissionListBox, CallbackP<Void> addPersonCallback) {
-		view.configure(permissionListBox, addPersonCallback);
+	public void configure(ListBox permissionListBox, CallbackP<Void> addPersonCallback, CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
+		view.configure(permissionListBox, addPersonCallback, makePublicCallback, isPubliclyVisible);
+	}
+	
+	public CheckBox getNotifyPeopleCheckBox() {
+		return view.getNotifyPeopleCheckBox();
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	void setMakePublicButtonDisplay(boolean makePublic) {
+		view.setMakePublicButtonDisplay(makePublic);
 	}
 
 }

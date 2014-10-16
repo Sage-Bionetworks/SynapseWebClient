@@ -7,7 +7,7 @@ import org.sagebionetworks.web.shared.users.AclEntry;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface SharingPermissionsGridView extends IsWidget, SynapseView {
+public interface SharingPermissionsGridView extends IsWidget {	// TODO: extend SynapseView?
 
 	void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox);
 	void add(AclEntry aclEntry, ListBox permListBox);

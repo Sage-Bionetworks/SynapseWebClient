@@ -34,10 +34,12 @@
 	        <b:PanelFooter>
 	            <b:Row>
 	                <b:Column size="MD_1">
-	                    <b:Button icon="GLOBE" size="EXTRA_SMALL">Make Public</b:Button>
+	                    <b:Button ui:field="makePublicButton" icon="GLOBE" size="EXTRA_SMALL">Make Public</b:Button>
 	                </b:Column>
 	                <b:Column size="MD_3" addStyleNames="pull-right">
-	                    <b:CheckBox addStyleNames="margin-0-imp" >Notify people via email</b:CheckBox>
+	                    <b:Tooltip placement="BOTTOM" ui:field="notifyTooltip">
+	                    	<b:CheckBox ui:field="notifyPeopleCheckBox" addStyleNames="margin-0-imp" >Notify people via email</b:CheckBox>
+	                    </b:Tooltip>
 	                </b:Column>
 	            </b:Row>
 	        </b:PanelFooter>
