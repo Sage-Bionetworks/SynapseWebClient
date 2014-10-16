@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,24 +12,20 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableResult;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinalPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UploadCSVConfigurationPageImplTest {
 	
+	UploadCSVFinalPage mockNextPage;
 	UploadCSVPreviewPageView mockView;
 	SynapseClientAsync mockSynapseClient;
 	UploadPreviewWidget mockUploadPreviewWidget;
@@ -41,7 +36,6 @@ public class UploadCSVConfigurationPageImplTest {
 	String parentId;
 	String fileHandleId;
 	UploadCSVPreviewPageImpl page;
-	
 
 	
 	@Before
@@ -49,9 +43,11 @@ public class UploadCSVConfigurationPageImplTest {
 		mockView = Mockito.mock(UploadCSVPreviewPageView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockUploadPreviewWidget = Mockito.mock(UploadPreviewWidget.class);
+		mockNextPage = Mockito.mock(UploadCSVFinalPage.class);
+		
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockPresenter = Mockito.mock(ModalPresenter.class);
-		page = new UploadCSVPreviewPageImpl(mockView, mockSynapseClient, mockUploadPreviewWidget, jobTrackingWidgetStub);
+		page = new UploadCSVPreviewPageImpl(mockView, mockUploadPreviewWidget, jobTrackingWidgetStub, mockNextPage);
 		type = ContentTypeDelimiter.CSV;
 		fileName = "testing.csv";
 		parentId = "syn123";
@@ -64,7 +60,6 @@ public class UploadCSVConfigurationPageImplTest {
 		UploadToTablePreviewResult results = new UploadToTablePreviewResult();
 		jobTrackingWidgetStub.setResponse(new UploadToTablePreviewResult());
 		page.setModalPresenter(mockPresenter);
-		verify(mockView).setTableName(fileName);
 		verify(mockView).setPreviewVisible(false);
 		verify(mockView).setTrackerVisible(true);
 		verify(mockPresenter).setPrimaryButtonText(UploadCSVPreviewPageImpl.CREATE);
@@ -112,49 +107,8 @@ public class UploadCSVConfigurationPageImplTest {
 		reset(mockPresenter);
 		// the test calls
 		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
 		verify(mockPresenter).setLoading(true);
-		verify(mockView).hideSpinner();
 		verify(mockPresenter).setErrorMessage(error);
 	}
 	
-	@Test
-	public void testOnPrimaryFailedColumnCreate(){
-		String error = "an error";
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockSynapseClient).createTableColumns(any(List.class), any(AsyncCallback.class));
-		List<ColumnModel> columns = new ArrayList<ColumnModel>();
-		when(mockUploadPreviewWidget.getCurrentModel()).thenReturn(columns);
-		page.setModalPresenter(mockPresenter);
-		reset(mockView);
-		reset(mockPresenter);
-		// the test call
-		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
-		verify(mockPresenter).setLoading(true);
-		verify(mockView).hideSpinner();
-		verify(mockPresenter).setErrorMessage(error);
-	}
-	
-	@Test
-	public void testOnPrimarySuccess(){
-		// This test does a full success train.
-		TableEntity table = new TableEntity();
-		List<ColumnModel> columns = new ArrayList<ColumnModel>();
-		AsyncMockStubber.callSuccessWith(columns).when(mockSynapseClient).createTableColumns(any(List.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
-		when(mockUploadPreviewWidget.getCurrentModel()).thenReturn(columns);
-		when(mockUploadPreviewWidget.getUploadRequest()).thenReturn(new UploadToTableRequest());
-		page.setModalPresenter(mockPresenter);
-		reset(mockView);
-		reset(mockPresenter);
-		jobTrackingWidgetStub.setResponse(new UploadToTableResult());
-		// the test call
-		page.onPrimary();
-		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_TABLE_COLUMNS);
-		verify(mockPresenter).setLoading(true);
-		// should start the create column call
-		verify(mockView).showSpinner(UploadCSVPreviewPageImpl.CREATING_THE_TABLE);
-		verify(mockView).hideSpinner();
-		verify(mockPresenter).onTableCreated(table);
-	}
 }

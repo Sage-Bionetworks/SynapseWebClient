@@ -31,7 +31,6 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget {
 		if(Delimiter.OTHER.equals(delimiter)){
 			view.setOtherSeparatorValue(descriptor.getSeparator());
 		}
-		
 	}
 
 	@Override
