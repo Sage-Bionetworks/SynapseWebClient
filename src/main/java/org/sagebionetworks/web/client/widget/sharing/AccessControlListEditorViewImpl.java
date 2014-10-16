@@ -77,16 +77,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
 	private com.google.gwt.user.client.ui.Button publicButton;
-	//private UserGroupSuggestBox peopleSuggestBox;
-	//private CheckBox notifyPeopleCheckbox;
 	private boolean showEditColumns;
 	
-//	private Grid<PermissionsTableEntry> permissionsGrid;
-//	private ListStore<PermissionsTableEntry> permissionsStore;
-//	private ColumnModel columnModel;
 	private SharingPermissionsGrid permissionsGrid;
 	
-//	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
 	private ListBox permissionLevelListBox;
 	
 	private AddPeopleToAclPanel addPeoplePanel;
@@ -115,11 +109,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		
 	}
 	
-//	@Override
-//	protected void onRender(Element parent, int pos) {
-//		super.onRender(parent, pos);
-//	}
-		
 	@Override
 	public Widget asWidget() {
 		return this;
@@ -129,7 +118,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		ListBox permissionsListBox = createEditAccessMenu(aclEntry);
+		ListBox permissionsListBox = createEditAccessListBox(aclEntry);
 		if (!aclEntry.isIndividual())
 			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first
 		else if (aclEntry.isOwner()) {
@@ -143,7 +132,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		}
 		else
 			permissionsGrid.add(aclEntry, permissionsListBox);
-		//permissionsGrid.reconfigure(permissionsStore, columnModel);
 	}
 	
 	@Override
@@ -155,24 +143,19 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;
 		if (publicButton != null) {
-			if(isPubliclyVisible) {
-				
-//				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL, "glyphicon-lock");
-//				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_REVOKE_PUBLIC_ACL_TOOLTIP);
-			} else {
-//				DisplayUtils.relabelIconButton(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL, "glyphicon-globe");
-//				DisplayUtils.addTooltip(publicButton, DisplayConstants.BUTTON_MAKE_PUBLIC_ACL_TOOLTIP);
-			}
+			addPeoplePanel.setMakePublicButtonDisplay(!isPubliclyVisible);
 		}
-		addPeoplePanel.setMakePublicButtonDisplay(!isPubliclyVisible);
+	}
+	
+	@Override
+	public void clear() {
+		super.clear();
+		permissionsGrid.clear();
 	}
 	
 	@Override
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
-		//this.removeAll(true);
 		clear();
-		permissionsGrid.clear();
-		//this.setLayout(new FlowLayout(10));
 		
 		// show existing permissions
 		showEditColumns = canChangePermission && !isInherited;
@@ -205,7 +188,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				});
 				createAclButton.setType(ButtonType.SUCCESS);
 				createAclButton.addStyleName("margin-top-10");
-				// TODO: Tooltip?
+				
 				Tooltip toolTipAndCreateAclButton = new Tooltip();
 				toolTipAndCreateAclButton.setWidget(createAclButton);
 				toolTipAndCreateAclButton.setText(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
@@ -216,7 +199,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				// show add people view
 				
 				// configure permission level list box
-				// TODO: Can't have listBox not have option selected initially, so onChange is all weird.
+				// TODO: Can't have listBox not have option selected initially, so onChange is all weird. Force selection.
 				permissionLevelListBox = new ListBox();
 				for (PermissionLevel permLevel : permList) {
 					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
@@ -295,10 +278,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	@Override
 	public void showLoading() {
-		// TODO
-//		this.removeAll(true);
-//		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
-//		this.layout(true);
+		this.clear();
+		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
 	}
 
 	@Override
@@ -375,7 +356,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		return permissionsGrid;
 	}
 	
-	private ListBox createEditAccessMenu(final AclEntry aclEntry) {
+	private ListBox createEditAccessListBox(final AclEntry aclEntry) {
 		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
 		
 		final ListBox listBox = new ListBox();
@@ -460,51 +441,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		};
 		return personRenderer;
 	}
-
-//	private GridCellRenderer<PermissionsTableEntry> createButtonRenderer() {
-//		GridCellRenderer<PermissionsTableEntry> buttonRenderer = new GridCellRenderer<PermissionsTableEntry>() {  
-//			   
-//			  private boolean init;  
-//			  @Override	   
-//			  public Object render(final PermissionsTableEntry model, String property, ColumnData config, final int rowIndex,  
-//			      final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {
-//				  PermissionsTableEntry entry = store.getAt(rowIndex);
-//			    if (!init) {  
-//			      init = true;  
-//			      grid.addListener(Events.ColumnResize, new Listener<GridEvent<PermissionsTableEntry>>() {  
-//					   
-//			        public void handleEvent(GridEvent<PermissionsTableEntry> be) {  
-//			          for (int i = 0; i < be.getGrid().getStore().getCount(); i++) {  
-//			            if (be.getGrid().getView().getWidget(i, be.getColIndex()) != null  
-//			                && be.getGrid().getView().getWidget(i, be.getColIndex()) instanceof BoxComponent) {  
-//			              ((BoxComponent) be.getGrid().getView().getWidget(i, be.getColIndex())).setWidth(be.getWidth() - 10);  
-//			            }  
-//			          }  
-//			        }  
-//			      });  
-//			    }
-//			    if(entry.getAclEntry().isOwner()) {
-//				    Button b = new Button(DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
-//				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 15);
-//				    b.disable();
-//					return b;		    	
-//			    } else {
-//				    Button b = new Button((String) model.get(property));  
-//				    b.setWidth(grid.getColumnModel().getColumnWidth(colIndex) - 25);  
-//				    if (showEditColumns) {
-//				    	b.setToolTip("Click to change");
-//				    } else {
-//				    	b.disable();
-//				    }
-//				    				  
-//				    b.setMenu(createEditAccessMenu(entry.getAclEntry()));
-//				    return b;
-//			    }
-//			  }
-//			};  
-//			
-//			return buttonRenderer;
-//	}
 
 	public static GridCellRenderer<PermissionsTableEntry> createRemoveRenderer(final IconsImageBundle iconsImageBundle, final CallbackP<Long> callback) {
 		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
