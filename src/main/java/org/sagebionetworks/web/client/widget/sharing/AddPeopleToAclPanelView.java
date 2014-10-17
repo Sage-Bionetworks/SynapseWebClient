@@ -16,7 +16,7 @@ public interface AddPeopleToAclPanelView extends IsWidget {	// TODO: extend Syna
 	
 	void setPresenter(Presenter presenter);
 	CheckBox getNotifyPeopleCheckBox();
-	void setMakePublicButtonDisplay(boolean makePublic);
+	void setMakePublicButtonDisplay(boolean isPubliclyVisible);
 	
 	public interface Presenter {}
 }

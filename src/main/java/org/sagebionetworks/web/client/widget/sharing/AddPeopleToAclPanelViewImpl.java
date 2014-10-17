@@ -100,8 +100,8 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	}
 	
 	@Override
-	public void setMakePublicButtonDisplay(boolean makePublic) {
-		if (makePublic) {
+	public void setMakePublicButtonDisplay(boolean isPubliclyVisible) {
+		if (!isPubliclyVisible) {
 			makePublicButton.setText("Make Public");
 			makePublicButton.setIcon(IconType.GLOBE);
 		} else {
