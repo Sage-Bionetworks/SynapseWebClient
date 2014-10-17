@@ -16,4 +16,12 @@ public interface UploadPreviewView extends IsWidget{
 	
 	void addRow(List<String> row);
 
+	void setPreviewMessage(String string);
+
+	void showEmptyPreviewMessage(String string);
+	
+	void setTableVisible(boolean visibile);
+	
+	void setEmptyMessageVisible(boolean visibile);
+
 }

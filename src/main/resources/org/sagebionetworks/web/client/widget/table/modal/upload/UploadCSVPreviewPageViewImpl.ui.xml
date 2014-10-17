@@ -7,22 +7,14 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
 
 	<g:HTMLPanel>
-		<b:Form>
-			<b:FormGroup>
-				<b:FormLabel for="formName">Table Name</b:FormLabel>
-				<b:TextBox ui:field="tableNameBox" text="" b:id="formName" />
-			</b:FormGroup>
-		</b:Form>
 		<g:SimplePanel ui:field="previewPanel" />
 		<g:SimplePanel ui:field="trackerPanel" />
-
-		<b:Row>
-			<b:Column size="XS_3" offset="XS_5" ui:field="spinnerColumn" visible="false">
-					<g:Image resource='{sageImageBundle.loading31}' />
-					<bh:Text ui:field="spinnerText"></bh:Text>
-			</b:Column>
-		</b:Row>
-
+		<bh:Div styleName="margin-top-15" />
+		<b:Button dataToggle="COLLAPSE" dataTarget="#optionsCollapse" text="Options"/>
+		<bh:Div styleName="margin-top-15" />
+		<b:Collapse b:id="optionsCollapse" toggle="false">
+			<g:SimplePanel ui:field="optionsPanel" />
+		</b:Collapse>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

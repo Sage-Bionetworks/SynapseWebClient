@@ -50,4 +50,9 @@ public abstract class AbstractColumnModelTableRow implements ColumnModelTableRow
 		row.removeFromParent();
 	}
 	
+	@Override
+	public void setSelectVisible(boolean visible){
+		select.setVisible(visible);
+	}
+	
 }

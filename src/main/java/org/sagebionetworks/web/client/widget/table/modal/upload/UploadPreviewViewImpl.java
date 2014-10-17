@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
@@ -21,9 +23,15 @@ public class UploadPreviewViewImpl implements UploadPreviewView {
 	public interface Binder extends UiBinder<Widget, UploadPreviewViewImpl> {}
 	
 	@UiField
+	Text previewMessage;
+	@UiField
+	Table table;
+	@UiField
 	TableRow header;
 	@UiField
 	TBody body;
+	@UiField
+	Alert emptyResults;
 	
 	Widget widget;
 	
@@ -58,6 +66,26 @@ public class UploadPreviewViewImpl implements UploadPreviewView {
 			tr.add(td);
 		}
 		body.add(tr);
+	}
+
+	@Override
+	public void setPreviewMessage(String message) {
+		previewMessage.setText(message);
+	}
+
+	@Override
+	public void showEmptyPreviewMessage(String message) {
+		emptyResults.setText(message);
+	}
+
+	@Override
+	public void setEmptyMessageVisible(boolean visibile) {
+		emptyResults.setVisible(visibile);
+	}
+
+	@Override
+	public void setTableVisible(boolean visibile) {
+		this.table.setVisible(visibile);
 	}
 	
 }

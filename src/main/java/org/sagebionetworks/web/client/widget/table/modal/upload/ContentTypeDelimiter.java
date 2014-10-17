@@ -9,7 +9,7 @@ public enum ContentTypeDelimiter {
 
 	TSV("text/tab-separated-values", "\t"),
 	CSV("text/csv", ","),
-	TEXT("text/plain", null);;
+	TEXT("text/plain", null);
 	
 	String contentType;
 	String delimiter;
