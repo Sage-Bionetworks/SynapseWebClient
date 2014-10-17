@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -41,7 +42,7 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	}
 
 	@Override
-	public void setTrackingWidget(Widget tracker) {
+	public void setTrackingWidget(IsWidget tracker) {
 		this.trackerPanel.add(tracker);
 	}
 
@@ -56,8 +57,13 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	}
 
 	@Override
-	public void setPreviewWidget(Widget uploadPreviewWidget) {
+	public void setPreviewWidget(IsWidget uploadPreviewWidget) {
 		this.previewPanel.add(uploadPreviewWidget);
+	}
+
+	@Override
+	public void setCSVOptionsWidget(IsWidget asWidget) {
+		this.optionsPanel.add(asWidget);
 	}
 
 }

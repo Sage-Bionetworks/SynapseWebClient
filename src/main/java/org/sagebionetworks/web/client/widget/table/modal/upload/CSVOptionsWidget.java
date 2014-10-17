@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
@@ -22,7 +21,7 @@ public interface CSVOptionsWidget extends IsWidget {
 	 * Get the current options for this widget.
 	 * @return
 	 */
-	public UploadToTableRequest getCurrentOptions();
+	public UploadToTablePreviewRequest getCurrentOptions();
 	
 	/**
 	 * Listener for option changes.

@@ -30,7 +30,7 @@ public interface UploadCSVPreviewPageView extends IsWidget {
 	 * Add the tracking widget to the view.
 	 * @param tracker
 	 */
-	public void setTrackingWidget(Widget tracker);
+	public void setTrackingWidget(IsWidget tracker);
 
 	/**
 	 * Show or hide the tracker widget
@@ -45,10 +45,17 @@ public interface UploadCSVPreviewPageView extends IsWidget {
 	public void setPreviewVisible(boolean visible);
 
 	/**
-	 * Add the preview widget.s
+	 * Add the preview widget to the view.
 	 * @param uploadPreviewWidget
 	 */
-	public void setPreviewWidget(Widget uploadPreviewWidget);
+	public void setPreviewWidget(IsWidget uploadPreviewWidget);
+
+	/**
+	 * Add the options widget to the view.
+	 * 
+	 * @param asWidget
+	 */
+	public void setCSVOptionsWidget(IsWidget asWidget);
 	
 
 }

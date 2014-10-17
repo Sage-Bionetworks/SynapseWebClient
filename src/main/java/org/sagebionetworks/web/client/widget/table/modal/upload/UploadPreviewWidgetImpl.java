@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -16,7 +14,6 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 
 	public static final int MAX_CHARS_PER_CELL = 10;
 	UploadPreviewView view;
-	UploadToTablePreviewRequest previewRequest;
 	List<ColumnModel> columns;
 
 	@Inject
@@ -31,8 +28,7 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 	}
 
 	@Override
-	public void configure(UploadToTablePreviewRequest previewRequest, UploadToTablePreviewResult preview) {
-		this.previewRequest = previewRequest;
+	public void configure(UploadToTablePreviewResult preview) {
 		columns = preview.getSuggestedColumns();
 		// Create a list of headers
 		List<String> headers = new ArrayList<String>();
@@ -66,19 +62,5 @@ public class UploadPreviewWidgetImpl implements UploadPreviewWidget {
 			return in.substring(0, MAX_CHARS_PER_CELL-1)+"...";
 		}
 		return in;
-	}
-
-	@Override
-	public List<ColumnModel> getCurrentModel() {
-		return columns;
-	}
-
-	@Override
-	public UploadToTableRequest getUploadRequest() {
-		UploadToTableRequest request = new UploadToTableRequest();
-		request.setCsvTableDescriptor(previewRequest.getCsvTableDescriptor());
-		request.setLinesToSkip(previewRequest.getLinesToSkip());
-		request.setUploadFileHandleId(previewRequest.getUploadFileHandleId());
-		return request;
 	}
 }

@@ -1,16 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidgetImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget.ChangeHandler;
+import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidgetImpl;
 
 public class CSVOptionsWidgetImplTest {
 	
@@ -18,10 +18,13 @@ public class CSVOptionsWidgetImplTest {
 	CSVOptionsView mockView;
 	CSVOptionsWidgetImpl widget;
 	
+	String fileHandleId;
+	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(CSVOptionsView.class);
 		mockHandler = Mockito.mock(ChangeHandler.class);
+		fileHandleId = "123456";
 		widget = new CSVOptionsWidgetImpl(mockView);
 	}
 
@@ -32,11 +35,13 @@ public class CSVOptionsWidgetImplTest {
 		UploadToTablePreviewRequest inRequest = new UploadToTablePreviewRequest();
 		CsvTableDescriptor csvTableDescriptor = new CsvTableDescriptor();
 		csvTableDescriptor.setSeparator("p");
+		csvTableDescriptor.setIsFirstLineHeader(true);
 		inRequest.setCsvTableDescriptor(csvTableDescriptor);
+		inRequest.setUploadFileHandleId(fileHandleId);
 		widget.configure(inRequest, mockHandler);
-		UploadToTableRequest outRequest = widget.getCurrentOptions();
+		UploadToTablePreviewRequest outRequest = widget.getCurrentOptions();
 		assertNotNull(outRequest);
-		assertEquals(inRequest.getCsvTableDescriptor(), outRequest.getCsvTableDescriptor());
+		assertEquals(inRequest, outRequest);
 	}
 	
 	@Test
@@ -45,11 +50,13 @@ public class CSVOptionsWidgetImplTest {
 		widget = new CSVOptionsWidgetImpl(stub);
 		UploadToTablePreviewRequest inRequest = new UploadToTablePreviewRequest();
 		CsvTableDescriptor csvTableDescriptor = new CsvTableDescriptor();
+		csvTableDescriptor.setIsFirstLineHeader(false);
 		csvTableDescriptor.setSeparator(",");
 		inRequest.setCsvTableDescriptor(csvTableDescriptor);
+		inRequest.setUploadFileHandleId(fileHandleId);
 		widget.configure(inRequest, mockHandler);
-		UploadToTableRequest outRequest = widget.getCurrentOptions();
+		UploadToTablePreviewRequest outRequest = widget.getCurrentOptions();
 		assertNotNull(outRequest);
-		assertEquals(inRequest.getCsvTableDescriptor(), outRequest.getCsvTableDescriptor());
+		assertEquals(inRequest, outRequest);
 	}
 }

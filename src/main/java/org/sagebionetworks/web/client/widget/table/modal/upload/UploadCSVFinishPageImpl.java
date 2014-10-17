@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -21,14 +22,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
+public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	
+	private static final String CREATE = "Create";
 	public static final double COLUMN_SIZE_BUFFER = 0.25;
 	public static final String APPLYING_CSV_TO_THE_TABLE = "Applying CSV to the Table...";
 	public static final String CREATING_TABLE_COLUMNS = "Creating table columns...";
 	public static final String CREATING_THE_TABLE = "Creating the table...";
 
-	UploadCSVFinalPageView view;
+	UploadCSVFinishPageView view;
 	SynapseClientAsync synapseClient;
 	PortalGinInjector portalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
@@ -40,7 +42,7 @@ public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
 	List<ColumnModelTableRow> editors;
 	
 	@Inject
-	public UploadCSVFinalPageImpl(UploadCSVFinalPageView view,
+	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view,
 			SynapseClientAsync synapseClient,
 			PortalGinInjector portalGinInjector,
 			JobTrackingWidget jobTrackingWidget,
@@ -61,6 +63,7 @@ public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
 	@Override
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
+		this.presenter.setPrimaryButtonText(CREATE);
 	}
 
 	@Override
@@ -83,6 +86,9 @@ public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
 			ColumnModelUtils.applyColumnModelToRow(cm, editor);
 			editors.add(editor);
 			this.keyboardNavigationHandler.bindRow(editor);
+			// Setup a presenter for this row
+			new ColumnModelTableRowEditorPresenter(editor);
+			editor.setSelectVisible(false);
 		}
 		view.setColumnEditor(editors);
 	}
@@ -90,9 +96,10 @@ public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
 	private void createColumns() {
 		try{
 			presenter.setLoading(true);
-			List<ColumnModel> value = ColumnModelUtils.extractColumnModels(editors);
+
+			List<ColumnModel> schema = getCurrentSchema();
 			// Create the columns
-			synapseClient.createTableColumns(value, new AsyncCallback<List<ColumnModel>>(){
+			synapseClient.createTableColumns(schema, new AsyncCallback<List<ColumnModel>>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -175,5 +182,9 @@ public class UploadCSVFinalPageImpl implements UploadCSVFinalPage {
 			}
 		}
 		return columns;
+	}
+
+	public List<ColumnModel> getCurrentSchema() {
+		return ColumnModelUtils.extractColumnModels(editors);
 	}
 }

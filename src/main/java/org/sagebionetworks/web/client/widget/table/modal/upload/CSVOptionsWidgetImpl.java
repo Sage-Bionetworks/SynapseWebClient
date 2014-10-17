@@ -2,19 +2,22 @@ package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class CSVOptionsWidgetImpl implements CSVOptionsWidget {
+public class CSVOptionsWidgetImpl implements CSVOptionsWidget, CSVOptionsView.Presenter{
 	
 	CSVOptionsView view;
 
+	String fileHandleId;
+	ChangeHandler handler;
+	
 	@Inject
 	public CSVOptionsWidgetImpl(CSVOptionsView view) {
 		super();
 		this.view = view;
+		this.view.setPresetner(this);
 	}
 
 	@Override
@@ -23,19 +26,26 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget {
 	}
 
 	@Override
-	public void configure(UploadToTablePreviewRequest options,
-			ChangeHandler handler) {
+	public void configure(UploadToTablePreviewRequest options, ChangeHandler handler) {
+		this.handler = handler;
 		CsvTableDescriptor descriptor = options.getCsvTableDescriptor();
 		Delimiter delimiter = Delimiter.findDelimiter(descriptor.getSeparator());
 		view.setSeparator(delimiter);
 		if(Delimiter.OTHER.equals(delimiter)){
 			view.setOtherSeparatorValue(descriptor.getSeparator());
 		}
+		if(descriptor.getIsFirstLineHeader() == null){
+			view.setFirsLineIsHeader(true);
+		}else{
+			view.setFirsLineIsHeader(descriptor.getIsFirstLineHeader());
+		}
+		fileHandleId = options.getUploadFileHandleId();
+		onSeparatorChanged();
 	}
 
 	@Override
-	public UploadToTableRequest getCurrentOptions() {
-		UploadToTableRequest request = new UploadToTableRequest();
+	public UploadToTablePreviewRequest getCurrentOptions() {
+		UploadToTablePreviewRequest request = new UploadToTablePreviewRequest();
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
 		request.setCsvTableDescriptor(descriptor);
 		Delimiter delimiter = view.getSeparator();
@@ -44,7 +54,24 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget {
 		}else{
 			descriptor.setSeparator(delimiter.getDelimiter());
 		}
+		request.setUploadFileHandleId(this.fileHandleId);
+		descriptor.setIsFirstLineHeader(view.getIsFristLineHeader());
 		return request;
+	}
+
+	@Override
+	public void onSeparatorChanged() {
+		if(Delimiter.OTHER.equals(view.getSeparator())){
+			view.setOtherSeparatorTextEnabled(true);
+		}else{
+			view.setOtherSeparatorTextEnabled(false);
+			view.clearOtherSeparatorText();
+		}
+	}
+
+	@Override
+	public void onRefreshPreview() {
+		handler.optionsChanged();
 	}
 
 }

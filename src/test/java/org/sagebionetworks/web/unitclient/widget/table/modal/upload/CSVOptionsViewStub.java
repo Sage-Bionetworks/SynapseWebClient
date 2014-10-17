@@ -9,6 +9,8 @@ public class CSVOptionsViewStub implements CSVOptionsView {
 
 	Delimiter separator;
 	String otherSeparatorValue;
+	boolean isFirstLineHeader;
+	
 	public Delimiter getSeparator() {
 		return separator;
 	}
@@ -25,6 +27,29 @@ public class CSVOptionsViewStub implements CSVOptionsView {
 	@Override
 	public Widget asWidget() {
 		return null;
+	}
+	@Override
+	public void setOtherSeparatorTextEnabled(boolean enabled) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void clearOtherSeparatorText() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setPresetner(Presenter presenter) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setFirsLineIsHeader(boolean isFirstLineHeader) {
+		this.isFirstLineHeader = isFirstLineHeader;
+	}
+	@Override
+	public boolean getIsFristLineHeader() {
+		return this.isFirstLineHeader;
 	}
 	
 	

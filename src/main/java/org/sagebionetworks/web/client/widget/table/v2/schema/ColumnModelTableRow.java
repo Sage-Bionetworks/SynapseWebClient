@@ -45,4 +45,10 @@ public interface ColumnModelTableRow extends ColumnModelView, IsWidget {
 	 */
 	public void setSelectionPresenter(SelectionPresenter selectionPresenter);
 	
+	/**
+	 * Show/hide the select check box.
+	 * @param visible
+	 */
+	public void setSelectVisible(boolean visible);
+	
 }
