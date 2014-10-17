@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -414,7 +415,9 @@ public class DisplayUtilsTest {
 	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, true, mockView));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
+		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showErrorMessage(c.capture());
+		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
 	}
 	
 	@Test
