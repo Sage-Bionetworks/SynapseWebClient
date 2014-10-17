@@ -13,12 +13,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewRequest;
-import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.table.UploadToTableResult;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -26,21 +26,20 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidgetImpl;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
+import org.sagebionetworks.web.unitclient.widget.table.v2.schema.ColumnModelTableRowEditorStub;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class UploadCSVFinalPageImplTest {
 
+	ColumnModelView mockEditor;
 	UploadCSVFinishPageView mockView;
 	PortalGinInjector mockPortalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
@@ -55,23 +54,28 @@ public class UploadCSVFinalPageImplTest {
 	UploadToTableRequest request;
 	List<ColumnModel> schema;
 	UploadCSVFinishPageImpl page;
-	
+
 	@Before
-	public void before(){
+	public void before() {
 		mockView = Mockito.mock(UploadCSVFinishPageView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockPortalGinInjector = Mockito.mock(PortalGinInjector.class);
-		mockKeyboardNavigationHandler = Mockito.mock(KeyboardNavigationHandler.class);
+		mockKeyboardNavigationHandler = Mockito
+				.mock(KeyboardNavigationHandler.class);
 		jobTrackingWidgetStub = new JobTrackingWidgetStub();
 		mockPresenter = Mockito.mock(ModalPresenter.class);
-		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient, mockPortalGinInjector, jobTrackingWidgetStub, mockKeyboardNavigationHandler);
+		page = new UploadCSVFinishPageImpl(mockView, mockSynapseClient,
+				mockPortalGinInjector, jobTrackingWidgetStub,
+				mockKeyboardNavigationHandler);
 
 		ColumnModel one = new ColumnModel();
 		one.setMaximumSize(100L);
 		one.setColumnType(ColumnType.STRING);
+		one.setName("a column name");
 		ColumnModel two = new ColumnModel();
 		two.setMaximumSize(null);
 		two.setColumnType(ColumnType.STRING);
+		two.setName(null);
 		schema = Arrays.asList(one, two);
 		request = new UploadToTableRequest();
 		request.setCsvTableDescriptor(new CsvTableDescriptor());
@@ -80,13 +84,22 @@ public class UploadCSVFinalPageImplTest {
 		fileName = "testing.csv";
 		parentId = "syn123";
 		fileHandleId = "456";
+		when(mockPortalGinInjector.createNewColumnModelTableRowEditor()).thenAnswer(new Answer<ColumnModelTableRowEditor>() {
+			@Override
+			public ColumnModelTableRowEditor answer(InvocationOnMock invocation)
+					throws Throwable {
+				return new ColumnModelTableRowEditorStub();
+			}
+		});
 		page.configure(fileName, parentId, request, schema);
 	}
-	
+
 	@Test
-	public void testOnPrimaryFailedColumnCreate(){
+	public void testOnPrimaryFailedColumnCreate() {
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockSynapseClient).createTableColumns(any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error))
+				.when(mockSynapseClient)
+				.createTableColumns(any(List.class), any(AsyncCallback.class));
 		List<ColumnModel> columns = new ArrayList<ColumnModel>();
 		page.setModalPresenter(mockPresenter);
 		reset(mockView);
@@ -96,37 +109,46 @@ public class UploadCSVFinalPageImplTest {
 		verify(mockPresenter).setLoading(true);
 		verify(mockPresenter).setErrorMessage(error);
 	}
-	
+
 	@Test
-	public void testOnPrimarySuccess(){
+	public void testOnPrimarySuccess() {
 		// This test does a full success train.
 		TableEntity table = new TableEntity();
 		List<ColumnModel> columns = new ArrayList<ColumnModel>();
-		AsyncMockStubber.callSuccessWith(columns).when(mockSynapseClient).createTableColumns(any(List.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createTableEntity(any(TableEntity.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(columns).when(mockSynapseClient)
+				.createTableColumns(any(List.class), any(AsyncCallback.class));
+		AsyncMockStubber
+				.callSuccessWith(table)
+				.when(mockSynapseClient)
+				.createTableEntity(any(TableEntity.class),
+						any(AsyncCallback.class));
 		page.setModalPresenter(mockPresenter);
 		reset(mockView);
 		reset(mockPresenter);
 		jobTrackingWidgetStub.setResponse(new UploadToTableResult());
 		// the test call
 		page.onPrimary();
-		verify(mockPresenter).setLoading(true);;
+		verify(mockPresenter).setLoading(true);
 		verify(mockPresenter).onTableCreated(table);
 	}
-	
+
 	@Test
-	public void testPreProcessColumns(){	
+	public void testPreProcessColumns() {
 		// the call under test
 		List<ColumnModel> results = page.getCurrentSchema();
 		// expected
 		ColumnModel oneExpected = new ColumnModel();
 		oneExpected.setColumnType(ColumnType.STRING);
 		// size should be increased by the buffer
-		oneExpected.setMaximumSize((long)(100+(100*UploadCSVFinishPageImpl.COLUMN_SIZE_BUFFER)));
+		oneExpected
+				.setMaximumSize((long) (100 + (100 * UploadCSVFinishPageImpl.COLUMN_SIZE_BUFFER)));
+		oneExpected.setName("a column name");
 		ColumnModel twoExpected = new ColumnModel();
 		twoExpected.setColumnType(ColumnType.STRING);
 		twoExpected.setMaximumSize(null);
+		twoExpected.setName("col2");
 		List<ColumnModel> expected = Arrays.asList(oneExpected, twoExpected);
 		assertEquals(expected, results);
 	}
+	
 }

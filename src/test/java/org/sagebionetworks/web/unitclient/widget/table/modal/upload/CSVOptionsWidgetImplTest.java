@@ -38,6 +38,7 @@ public class CSVOptionsWidgetImplTest {
 		csvTableDescriptor.setIsFirstLineHeader(true);
 		inRequest.setCsvTableDescriptor(csvTableDescriptor);
 		inRequest.setUploadFileHandleId(fileHandleId);
+		inRequest.setDoFullFileScan(true);
 		widget.configure(inRequest, mockHandler);
 		UploadToTablePreviewRequest outRequest = widget.getCurrentOptions();
 		assertNotNull(outRequest);

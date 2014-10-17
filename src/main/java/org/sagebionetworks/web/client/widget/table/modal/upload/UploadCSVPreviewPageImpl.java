@@ -88,6 +88,7 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		UploadToTableRequest results = new UploadToTableRequest();
 		results.setCsvTableDescriptor(currentOptions.getCsvTableDescriptor());
 		results.setLinesToSkip(currentOptions.getLinesToSkip());
+		results.setUploadFileHandleId(currentOptions.getUploadFileHandleId());
 		return results;
 	}
 

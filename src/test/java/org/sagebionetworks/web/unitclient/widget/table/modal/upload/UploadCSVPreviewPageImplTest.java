@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreview
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
-public class UploadCSVConfigurationPageImplTest {
+public class UploadCSVPreviewPageImplTest {
 	
 	UploadCSVFinishPage mockNextPage;
 	UploadCSVPreviewPageView mockView;

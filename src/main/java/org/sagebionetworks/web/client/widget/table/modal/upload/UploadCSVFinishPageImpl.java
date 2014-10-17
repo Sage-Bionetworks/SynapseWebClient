@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 
 public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	
+	private static final String COL = "col";
 	private static final String CREATE = "Create";
 	public static final double COLUMN_SIZE_BUFFER = 0.25;
 	public static final String APPLYING_CSV_TO_THE_TABLE = "Applying CSV to the Table...";
@@ -53,6 +54,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.portalGinInjector = portalGinInjector;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.keyboardNavigationHandler = keyboardNavigationHandler;
+		this.view.addTrackerWidget(jobTrackingWidget);
 	}
 
 	@Override
@@ -64,6 +66,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
 		this.presenter.setPrimaryButtonText(CREATE);
+		this.view.setTrackerVisible(false);
 	}
 
 	@Override
@@ -173,8 +176,13 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	 * @param columns
 	 * @return
 	 */
-	public List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
-		for(ColumnModel cm: columns){
+	public static List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
+		for(int i=0; i<columns.size(); i++){
+			ColumnModel cm = columns.get(i);
+			// Set a default name
+			if(cm.getName() == null){
+				cm.setName(COL+(i+1));
+			}
 			if(cm.getMaximumSize() != null){
 				// Add a buffer to the max size
 				double startingMax = cm.getMaximumSize();

@@ -11,6 +11,8 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget, CSVOptionsView.Pr
 	CSVOptionsView view;
 
 	String fileHandleId;
+	Boolean doFullScan;
+	
 	ChangeHandler handler;
 	
 	@Inject
@@ -39,7 +41,8 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget, CSVOptionsView.Pr
 		}else{
 			view.setFirsLineIsHeader(descriptor.getIsFirstLineHeader());
 		}
-		fileHandleId = options.getUploadFileHandleId();
+		this.fileHandleId = options.getUploadFileHandleId();
+		this.doFullScan = options.getDoFullFileScan();
 		onSeparatorChanged();
 	}
 
@@ -56,6 +59,7 @@ public class CSVOptionsWidgetImpl implements CSVOptionsWidget, CSVOptionsView.Pr
 		}
 		request.setUploadFileHandleId(this.fileHandleId);
 		descriptor.setIsFirstLineHeader(view.getIsFristLineHeader());
+		request.setDoFullFileScan(this.doFullScan);
 		return request;
 	}
 

@@ -16,4 +16,6 @@ public interface UploadCSVFinishPageView extends IsWidget{
 
 	void setColumnEditor(List<ColumnModelTableRow> editors);
 
+	void addTrackerWidget(IsWidget jobTrackingWidget);
+
 }

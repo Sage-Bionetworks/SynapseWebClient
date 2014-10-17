@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,6 +61,11 @@ public class UploadCSVFinishPageViewImpl implements UploadCSVFinishPageView{
 		for(ColumnModelTableRow row: editors){
 			tableBody.add(row);
 		}
+	}
+
+	@Override
+	public void addTrackerWidget(IsWidget jobTrackingWidget) {
+		this.trackerPanel.add(jobTrackingWidget);
 	}
 
 }
