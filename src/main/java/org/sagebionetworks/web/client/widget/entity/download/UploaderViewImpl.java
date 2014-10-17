@@ -20,6 +20,9 @@ import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -34,12 +37,16 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -68,6 +75,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private boolean isEntity;
 	private String parentEntityId;
 	private FormPanel formPanel;
+	private FlowPanel uploadDestinationContainer;
 	
 	private Form externalLinkFormPanel;
 	private FormGroup externalUrlFormGroup;
@@ -410,6 +418,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 		
 	private void initUploadPanel() {
+		uploadDestinationContainer = new FlowPanel();
+		uploadDestinationContainer.addStyleName("alert alert-info margin-5");
+		
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		fileUploadHTML = createFileUploadHTML();
@@ -417,6 +428,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		configureUploadButton(); // upload tab first by default
 		
 		uploadPanel = new FlowPanel();
+		uploadPanel.add(uploadDestinationContainer);
 		uploadPanel.add(DRAG_AND_DROP_HTML);
 		uploadPanel.add(formPanel);
 		
@@ -427,7 +439,32 @@ public class UploaderViewImpl extends FlowPanel implements
 		row.add(col);
 		uploadPanel.add(row);
 	}
-
+	
+	@Override
+	public void showUploadingToExternalStorage(String url, String banner) {
+		uploadDestinationContainer.clear();
+		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(url) + "</strong>"));
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+	}
+	
+	@Override
+	public void showUploadingToSynapseStorage(String banner) {
+		uploadDestinationContainer.clear();
+		uploadDestinationContainer.add(new InlineHTML(DisplayConstants.UPLOAD_DESTINATION));
+		Image icon = new Image(sageImageBundle.logoHeader().getURL());
+		icon.addStyleName("displayInline moveup-2");
+		icon.setPixelSize(25, 25);
+		uploadDestinationContainer.add(icon);
+		icon = new Image(sageImageBundle.synapseTextHeader().getURL());
+		icon.setPixelSize(88, 20);
+		icon.addStyleName("displayInline margin-right-5");
+		uploadDestinationContainer.add(icon);
+		uploadDestinationContainer.add(new InlineHTML(" storage"));
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+	}
+	
 	private void initExternalPanel() {
 		pathField = new TextBox();
 		nameField = new TextBox();

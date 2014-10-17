@@ -37,7 +37,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -73,6 +72,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private NumberFormat percentFormat;
 	private boolean fileHasBeenUploaded = false;
 	private UploadType currentUploadType;
+	private String currentExternalUploadUrl;
 	
 	@Inject
 	public Uploader(
@@ -116,6 +116,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.resetToInitialState();
 		resetUploadProgress();
 		view.showUploaderUI();
+		
+		//async load upload destinations (and update view)
+		queryForUploadDestination();
 		return this.view.asWidget();
 	}
 	
@@ -126,6 +129,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.entity = null;
 		this.parentEntityId = null;
 		this.currentUploadType = null;
+		this.currentExternalUploadUrl = null;
 		resetUploadProgress();
 	}
 
@@ -161,21 +165,29 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		uploadBasedOnConfiguration();
 	}
 	
-	/**
-	 * Get the upload destination (based on the project settings), and continue the upload.
-	 */
-	public void uploadBasedOnConfiguration() {
+	public void queryForUploadDestination() {
 		if (parentEntityId == null) {
-			uploadToS3();
+			currentUploadType = UploadType.S3;
+			view.showUploadingToSynapseStorage("");
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			synapseClient.getUploadDestinations(parentEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
-					if (uploadDestinations == null || uploadDestinations.isEmpty() || uploadDestinations.get(0) instanceof S3UploadDestination) {
-						uploadToS3();
+					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
+						currentUploadType = UploadType.S3;
+						view.showUploadingToSynapseStorage("");
+					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
+						currentUploadType = UploadType.S3;
+						view.showUploadingToSynapseStorage(uploadDestinations.get(0).getBanner());
 					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
 						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
-						uploadToExternal(d);
+						if (UploadType.SFTP == d.getUploadType()){
+							currentUploadType = UploadType.SFTP;
+							currentExternalUploadUrl = d.getUrl();
+							view.showUploadingToExternalStorage(getSftpDomain(currentExternalUploadUrl), d.getBanner());
+						} else {
+							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
+						}
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
@@ -190,16 +202,29 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public void uploadToExternal(ExternalUploadDestination d) {
-		if (UploadType.SFTP.equals(d.getUploadType())){
-			//upload to the sftp proxy!
-			uploadToSftpProxy(d.getUrl());
+	public String getSftpDomain(String url) {
+		if (url != null && url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			String domain = url.substring(WebConstants.SFTP_PREFIX.length());
+			int slashIndex = domain.indexOf("/");
+			if (slashIndex != -1) {
+				domain = domain.substring(0, slashIndex);
+			}
+			return domain;
+		} else
+			return url;
+	}
+	
+	/**
+	 * Get the upload destination (based on the project settings), and continue the upload.
+	 */
+	public void uploadBasedOnConfiguration() {
+		if (currentUploadType == UploadType.S3) {
+			uploadToS3();
 		} else {
-			//not yet supported
-			uploadError("External upload destination type not yet handled: " + d.getUploadType().name());
+			uploadToSftpProxy(currentExternalUploadUrl);
 		}
 	}
-
+	
 	/**
 	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
 	 * @param realSftpUrl
@@ -229,7 +254,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void uploadToS3() {
-		currentUploadType = UploadType.S3;
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity) {
 			//use case B from above
