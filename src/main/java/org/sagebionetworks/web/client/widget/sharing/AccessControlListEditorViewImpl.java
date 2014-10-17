@@ -157,24 +157,16 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
 		clear();
 		
-		// show existing permissions
-		showEditColumns = canChangePermission && !isInherited;
-		permissionsGrid.configure(new CallbackP<Long>() {
-				@Override
-				public void invoke(Long principalId) {
-					presenter.removeAccess(principalId);
-				}
-			});
-		
-		add(permissionsGrid.asWidget());
-		
 		// create panel to hold ACL management buttons
-		FlowPanel hPanel = new FlowPanel();
-		hPanel.setWidth(FIELD_WIDTH + "px");
 		if (canChangePermission) {
 			if(isInherited) { 
+				// show existing permissions
+				showEditColumns = canChangePermission && !isInherited;
+				permissionsGrid.configure(null);
+				add(permissionsGrid.asWidget());
+				
+				
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-				//readOnly.setWidth(450 + "px");
 				add(readOnly);			
 				
 				// 'Create ACL' button
@@ -193,11 +185,19 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				toolTipAndCreateAclButton.setWidget(createAclButton);
 				toolTipAndCreateAclButton.setText(DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT);
 				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
-				//createAclButton.setToolTip(new ToolTipConfig("Warning", DisplayConstants.PERMISSIONS_CREATE_NEW_ACL_TEXT));
-				hPanel.add(toolTipAndCreateAclButton);
+				add(toolTipAndCreateAclButton);
 			} else {
-				// show add people view
 				
+				// show existing permissions
+				showEditColumns = canChangePermission && !isInherited;
+				permissionsGrid.configure(new CallbackP<Long>() {
+						@Override
+						public void invoke(Long principalId) {
+							presenter.removeAccess(principalId);
+						}
+					});
+				
+				add(permissionsGrid.asWidget());
 				// configure permission level list box
 				// TODO: Can't have listBox not have option selected initially, so onChange is all weird. Force selection.
 				permissionLevelListBox = new ListBox();
@@ -257,12 +257,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
 				toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);
 				toolTipAndDeleteAclButton.setPlacement(Placement.BOTTOM);
-				hPanel.add(toolTipAndDeleteAclButton);
 				deleteAclButton.setEnabled(canEnableInheritance);
+				add(toolTipAndDeleteAclButton);
 			}
 		}
-		
-		this.add(hPanel);
 	}
 	
 	@Override

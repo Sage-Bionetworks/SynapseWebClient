@@ -12,7 +12,7 @@ public interface SharingPermissionsGridView extends IsWidget {	// TODO: extend S
 	void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox);
 	void add(AclEntry aclEntry, ListBox permListBox);
 	void configure(CallbackP<Long> deleteButtonCallback);
-	
+	void clear();
 	public interface Presenter{}
 	
 }

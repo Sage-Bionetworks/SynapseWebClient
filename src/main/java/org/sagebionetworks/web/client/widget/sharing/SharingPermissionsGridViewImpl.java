@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl.UserGroupListWidgetViewImplUiBinder;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -28,10 +29,17 @@ import com.google.inject.Inject;
 public class SharingPermissionsGridViewImpl extends Composite implements SharingPermissionsGridView {
 	public interface SharingPermissionsGridViewImplUiBinder extends UiBinder<Widget, SharingPermissionsGridViewImpl> {};
 	
+	private static final int PERMISSION_COLUMN_WIDTH_PERCENTAGE = 27;
+	private static final int DELETE_COLUMN_WIDTH_PERCENTAGE = 5;
+	
 	CallbackP<Long> deleteButtonCallback;
 	
 	@UiField 
 	TBody tableBody;
+	@UiField
+	TableHeader permissionColumnHeader;
+	@UiField
+	TableHeader deleteColumnHeader;
 	
 	@Inject
 	public SharingPermissionsGridViewImpl(SharingPermissionsGridViewImplUiBinder uiBinder) {
@@ -67,30 +75,44 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		data.add(permListBox);
 		row.add(data);
 		
-		// Delete button
-		data = new TableData();
-		Button button = new Button("", IconType.SEARCH, new ClickHandler() {	// TODO: IconType.REMOVE??
-
-			@Override
-			public void onClick(ClickEvent event) {
-				tableBody.remove(row);
-				deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
+		if (deleteButtonCallback == null) {
+			// Don't allow editing the permissions and don't add delete button.
+			permListBox.setEnabled(false);
+			permissionColumnHeader.setWidth(PERMISSION_COLUMN_WIDTH_PERCENTAGE + DELETE_COLUMN_WIDTH_PERCENTAGE + "%");
+			deleteColumnHeader.setWidth("0%");
+		} else {
+			// Add delete button and size columns.
+			data = new TableData();
+			Button button = new Button("", IconType.SEARCH, new ClickHandler() {	// TODO: IconType.REMOVE??
+	
+				@Override
+				public void onClick(ClickEvent event) {
+					tableBody.remove(row);
+					deleteButtonCallback.invoke(Long.parseLong(aclEntry.getOwnerId()));
+				}
+				
+			});
+			button.setSize(ButtonSize.SMALL);
+			if (aclEntry.isOwner()) {
+				button.setEnabled(false);
 			}
+			button.setType(ButtonType.DANGER);
+			data.add(button);
+			row.add(data);
 			
-		});
-		button.setSize(ButtonSize.SMALL);
-		if (aclEntry.isOwner()) {
-			button.setEnabled(false);
+			permissionColumnHeader.setWidth(PERMISSION_COLUMN_WIDTH_PERCENTAGE + "%");
+			deleteColumnHeader.setWidth(DELETE_COLUMN_WIDTH_PERCENTAGE + "%");
 		}
-		button.setType(ButtonType.DANGER);
-		data.add(button);
-		row.add(data);;
-		
 		return row;
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return this;
+	}
+
+	@Override
+	public void clear() {
+		tableBody.clear();
 	}
 }
