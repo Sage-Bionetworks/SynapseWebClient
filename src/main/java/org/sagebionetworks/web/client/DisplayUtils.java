@@ -405,7 +405,7 @@ public class DisplayUtils {
 				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
-				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
+				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
