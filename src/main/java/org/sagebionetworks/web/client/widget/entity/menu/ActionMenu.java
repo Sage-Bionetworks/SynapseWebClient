@@ -161,7 +161,7 @@ public class ActionMenu implements ActionMenuView.Presenter, SynapseWidgetPresen
 	 */
 	@Override
 	public void callbackIfCertifiedIfEnabled(Callback callback) {
-		if (FilesBrowser.isCertificationRequired(entityBundle.getPermissions().getCanEdit(), entityBundle.getPermissions().getCanCertifiedUserEdit())) {
+		if (FilesBrowser.isCertificationRequired(entityBundle.getPermissions().getCanAddChild(), entityBundle.getPermissions().getCanCertifiedUserAddChild())) {
 			view.showQuizInfoDialog(true, null);
 		} else
 			callback.invoke();

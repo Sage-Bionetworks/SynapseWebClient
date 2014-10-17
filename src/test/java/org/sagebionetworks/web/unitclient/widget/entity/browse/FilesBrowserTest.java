@@ -242,6 +242,33 @@ public class FilesBrowserTest {
 		//regardless of certification, this user cannot add children
 		assertFalse(FilesBrowser.isCertificationRequired(false, false));
 	}
+	
+	@Test
+	public void testCallbackIfCertifiedIfEnabled(){
+		//set up so that certification is required
+		filesBrowser.configure(configuredEntityId, false, true);
+		Callback callback = mock(Callback.class);
+		filesBrowser.callbackIfCertifiedIfEnabled(callback);
+		
+		//should pop up quiz info dialog 
+		verify(mockView).showQuizInfoDialog(true, null);
+		//and should not call back
+		verify(callback, never()).invoke();
+	}
+	
+	@Test
+	public void testCallbackIfCertified(){
+		//certified user
+		filesBrowser.configure(configuredEntityId, true, true);
+		
+		Callback callback = mock(Callback.class);
+		filesBrowser.callbackIfCertifiedIfEnabled(callback);
+		
+		//should not pop up quiz info dialog 
+		verify(mockView, never()).showQuizInfoDialog(true, null);
+		//and should invoke the callback immediately
+		verify(callback).invoke();
+	}
 }
 
 
