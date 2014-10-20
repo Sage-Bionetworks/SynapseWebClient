@@ -74,22 +74,9 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 	public void onPrimary() {
 		// Get the current options
 		UploadToTablePreviewRequest currentOptions = csvOptionsWidget.getCurrentOptions();
-		UploadToTableRequest uploadRequest = createUploadRequest(currentOptions);
+		UploadToTableRequest uploadRequest = UploadRequestUtils.createFromPreview(currentOptions);
 		this.nextPage.configure(fileName, parentId, uploadRequest, suggestedSchema);
 		this.presenter.setNextActivePage(this.nextPage);
-	}
-	
-	/**
-	 * Create an UploadToTableRequest from a UploadToTablePreviewRequest
-	 * @param currentOptions
-	 * @return
-	 */
-	public static UploadToTableRequest createUploadRequest(UploadToTablePreviewRequest currentOptions){
-		UploadToTableRequest results = new UploadToTableRequest();
-		results.setCsvTableDescriptor(currentOptions.getCsvTableDescriptor());
-		results.setLinesToSkip(currentOptions.getLinesToSkip());
-		results.setUploadFileHandleId(currentOptions.getUploadFileHandleId());
-		return results;
 	}
 
 	@Override
