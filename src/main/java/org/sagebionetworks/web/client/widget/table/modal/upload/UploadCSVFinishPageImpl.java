@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 
 public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 
-	private static final String INSTRUCTIONS = "Use the schema options button to make changes to the columns of the table.  Use the create button to to finish building the table.";
+	private static final String INSTRUCTIONS = "Use the schema options button to make changes to the columns of the table.  Use the create button to finish building the table.";
 	private static final String COL = "col";
 	private static final String CREATE = "Create";
 	public static final double COLUMN_SIZE_BUFFER = 0.25;
