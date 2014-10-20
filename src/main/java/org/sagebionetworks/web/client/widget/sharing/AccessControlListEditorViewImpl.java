@@ -156,21 +156,34 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
 		clear();
 		
-		// create panel to hold ACL management buttons
-		if (canChangePermission) {
-			if(isInherited) { 
-				// show existing permissions
-				showEditColumns = canChangePermission && !isInherited;
-				permissionsGrid.configure(null);
-				add(permissionsGrid.asWidget());
-				
-				
+		// Display Permissions grid.
+		showEditColumns = canChangePermission && !isInherited;
+		CallbackP<Long> removeUserCallback = null;
+		if (showEditColumns) {
+			removeUserCallback = new CallbackP<Long>() {
+					@Override
+					public void invoke(Long principalId) {
+						presenter.removeAccess(principalId);
+					}
+				};
+		}
+		permissionsGrid.configure(removeUserCallback);
+		add(permissionsGrid.asWidget());
+		
+		if (!canChangePermission) {
+			// Inform user of restricted privileges.
+			Label canNotModify = new Label();
+			canNotModify.setText("Some text telling the user they have insufficient privilages to modify sharing settings.");
+			add(canNotModify);
+		} else {
+			if(isInherited) {
+				// Notify user of inherited sharing settings.
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
 				add(readOnly);
 				
 				// 'Create ACL' button
 				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
-
+	
 					@Override
 					public void onClick(ClickEvent event) {
 						presenter.createAcl();
@@ -186,17 +199,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
 				add(toolTipAndCreateAclButton);
 			} else {
-				
-				// show existing permissions
-				showEditColumns = canChangePermission && !isInherited;
-				permissionsGrid.configure(new CallbackP<Long>() {
-						@Override
-						public void invoke(Long principalId) {
-							presenter.removeAccess(principalId);
-						}
-					});
-				
-				add(permissionsGrid.asWidget());
 				// configure permission level list box
 				// TODO: Can't have listBox not have option selected initially, so onChange is all weird. Force selection.
 				permissionLevelListBox = new ListBox();
@@ -204,7 +206,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
 				}
 				permissionLevelListBox.addChangeHandler(new ChangeHandler() {
-
+	
 					@Override
 					public void onChange(ChangeEvent event) {
 						presenter.setUnsavedViewChanges(true);
@@ -213,7 +215,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				});
 				
 				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
-
+	
 					@Override
 					public void invoke(Void param) {
 						addPersonToAcl();
@@ -222,21 +224,19 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				};
 				
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
-
-					@Override
-					public void invoke(Void param) {
-						// Add the ability for PUBLIC to see this entity.
-						if (isPubliclyVisible) {
-							presenter.makePrivate();
-						} else {
-							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+						@Override
+						public void invoke(Void param) {
+							// Add the ability for PUBLIC to see this entity.
+							if (isPubliclyVisible) {
+								presenter.makePrivate();
+							} else {
+								if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+									presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+								}
 							}
 						}
-					}
-					
-				};
-				
+					};
+			
 				addPeoplePanel.configure(permissionLevelListBox, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				
@@ -246,12 +246,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				deleteAclButton.setType(ButtonType.DANGER);
 				deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
 				deleteAclButton.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent ce) {
-						presenter.deleteAcl();					
-					}
-				});
-				
+						@Override
+						public void onClick(ClickEvent ce) {
+							presenter.deleteAcl();					
+							}
+						});
+					
 				Tooltip toolTipAndDeleteAclButton = new Tooltip();
 				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
 				toolTipAndDeleteAclButton.setText(DisplayConstants.PERMISSIONS_DELETE_ACL_TEXT);

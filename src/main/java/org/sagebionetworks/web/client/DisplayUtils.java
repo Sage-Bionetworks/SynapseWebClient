@@ -2046,20 +2046,16 @@ public class DisplayUtils {
 	}
 	
 	public static void showSharingDialog(final org.sagebionetworks.web.client.widget.modal.Dialog dialog, final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
-//		final Dialog window = new Dialog();
-//		// configure layout
-//		int windowHeight = canChangePermission ? 552 : 282;
-//		window.setSize(560, windowHeight);
-//		window.setPlain(true);
-//		window.setModal(true);
-//		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
-//		window.setLayout(new FitLayout());
-//		window.add(accessControlListEditor.asWidget(), new FitData(4));
 		dialog.setSize(ModalSize.LARGE);
-	    dialog.configure(DisplayConstants.TITLE_SHARING_PANEL, accessControlListEditor.asWidget(), "Save", "Cancel",
-	    		new org.sagebionetworks.web.client.widget.modal.Dialog.Callback() {
-	    	
-	    		// TODO: DON'T ADD PRIMARY BUTTON IF !CANCHANGEPERMISSION
+		
+		String primaryButtonText = null;
+		String defaultButtonText;
+		org.sagebionetworks.web.client.widget.modal.Dialog.Callback dialogCallback = null;
+		if (canChangePermission) {
+			primaryButtonText = "Save";
+			defaultButtonText = "Cancel";
+			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
+			dialogCallback = new org.sagebionetworks.web.client.widget.modal.Dialog.Callback() {
 					@Override
 					public void onPrimary() {
 						// confirm close action if there are unsaved changes
@@ -2077,15 +2073,18 @@ public class DisplayUtils {
 						}
 						dialog.hide();
 					}
-
+	
 					@Override
 					public void onDefault() {
 						// TODO SOMETHING ELSE?
 						dialog.hide();
 					}
-	    	
-	    		}, false);
-	    
+			};
+		} else {
+			defaultButtonText = "Close";
+		}
+		dialog.configure(DisplayConstants.TITLE_SHARING_PANEL, accessControlListEditor.asWidget(),
+						primaryButtonText, defaultButtonText, dialogCallback, false);
 	    dialog.show();
 //		// configure buttons
 //		if (canChangePermission) {

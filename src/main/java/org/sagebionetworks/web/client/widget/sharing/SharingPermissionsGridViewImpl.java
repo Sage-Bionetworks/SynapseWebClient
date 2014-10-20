@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -83,7 +84,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		} else {
 			// Add delete button and size columns.
 			data = new TableData();
-			Button button = new Button("", IconType.SEARCH, new ClickHandler() {	// TODO: IconType.REMOVE??
+			Button button = new Button("", new ClickHandler() {	// TODO: IconType.REMOVE??
 	
 				@Override
 				public void onClick(ClickEvent event) {
@@ -93,6 +94,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 				
 			});
 			button.setSize(ButtonSize.SMALL);
+			button.addStyleName("glyphicon glyphicon-remove");
+			Icon icon = new Icon();
 			if (aclEntry.isOwner()) {
 				button.setEnabled(false);
 			}
