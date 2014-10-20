@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelim
 import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadRequestUtils;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -91,11 +92,11 @@ public class UploadCSVFinalPageImplTest {
 				return new ColumnModelTableRowEditorStub();
 			}
 		});
-		page.configure(fileName, parentId, request, schema);
 	}
 
 	@Test
 	public void testOnPrimaryFailedColumnCreate() {
+		page.configure(fileName, parentId, request, schema);
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error))
 				.when(mockSynapseClient)
@@ -112,6 +113,7 @@ public class UploadCSVFinalPageImplTest {
 
 	@Test
 	public void testOnPrimarySuccess() {
+		page.configure(fileName, parentId, request, schema);
 		// This test does a full success train.
 		TableEntity table = new TableEntity();
 		List<ColumnModel> columns = new ArrayList<ColumnModel>();
@@ -134,6 +136,7 @@ public class UploadCSVFinalPageImplTest {
 
 	@Test
 	public void testPreProcessColumns() {
+		page.configure(fileName, parentId, request, schema);
 		// the call under test
 		List<ColumnModel> results = page.getCurrentSchema();
 		// expected
@@ -149,6 +152,56 @@ public class UploadCSVFinalPageImplTest {
 		twoExpected.setName("col2");
 		List<ColumnModel> expected = Arrays.asList(oneExpected, twoExpected);
 		assertEquals(expected, results);
+	}
+	
+	@Test
+	public void testPreProcessUploadRequestFirstLineHaderTrueLinesToSkipNull(){
+		request = new UploadToTableRequest();
+		request.setCsvTableDescriptor(new CsvTableDescriptor());
+		request.getCsvTableDescriptor().setSeparator(",");
+		request.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.TRUE);
+		request.setLinesToSkip(null);
+		page.configure(fileName, parentId, request, schema);
+		
+		UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(request);
+		expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
+		expected.setLinesToSkip(1L);
+		
+		UploadToTableRequest result = page.getUploadToTableRequest();
+		assertEquals(expected, result);
+	}
+	
+	@Test
+	public void testPreProcessUploadRequestFirstLineHaderTrueLinesToSkipExists(){
+		request = new UploadToTableRequest();
+		request.setCsvTableDescriptor(new CsvTableDescriptor());
+		request.getCsvTableDescriptor().setSeparator(",");
+		request.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.TRUE);
+		long startLinesToSkip = 3;
+		request.setLinesToSkip(startLinesToSkip);
+		page.configure(fileName, parentId, request, schema);
+		
+		UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(request);
+		expected.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
+		expected.setLinesToSkip(startLinesToSkip+1);
+		
+		UploadToTableRequest result = page.getUploadToTableRequest();
+		assertEquals(expected, result);
+	}
+	
+	@Test
+	public void testPreProcessUploadRequestFirstLineHaderFalsLinesToSkipNull(){
+		request = new UploadToTableRequest();
+		request.setCsvTableDescriptor(new CsvTableDescriptor());
+		request.getCsvTableDescriptor().setSeparator(",");
+		request.getCsvTableDescriptor().setIsFirstLineHeader(Boolean.FALSE);
+		request.setLinesToSkip(null);
+		page.configure(fileName, parentId, request, schema);
+		
+		UploadToTableRequest expected = UploadRequestUtils.cloneUploadToTableRequest(request);
+		
+		UploadToTableRequest result = page.getUploadToTableRequest();
+		assertEquals(expected, result);
 	}
 	
 }
