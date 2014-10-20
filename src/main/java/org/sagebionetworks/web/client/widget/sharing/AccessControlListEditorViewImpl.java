@@ -141,9 +141,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	@Override
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
-		// TODO: Verify this is correct?
 		this.isPubliclyVisible = isPubliclyVisible;
-		if (publicButton != null) {
+		if (isPubliclyVisible != null) {
 			addPeoplePanel.setMakePublicButtonDisplay(isPubliclyVisible);
 		}
 	}
