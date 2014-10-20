@@ -144,10 +144,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void handleUploads() {
-		currentUploadType = null;
 		if (fileNames == null) {
 			//setup upload process.
-			
 			fileHasBeenUploaded = false;
 			currIndex = 0;
 			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
@@ -203,15 +201,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public String getSftpDomain(String url) {
-		if (url != null && url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
-			String domain = url.substring(WebConstants.SFTP_PREFIX.length());
-			int slashIndex = domain.indexOf("/");
-			if (slashIndex != -1) {
-				domain = domain.substring(0, slashIndex);
-			}
-			return domain;
-		} else
-			return url;
+		if (url == null)
+			return null;
+		if (!url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			throw new IllegalArgumentException("Not a sftp url: " + url);
+		}
+		String domain = url.substring(WebConstants.SFTP_PREFIX.length());
+		int slashIndex = domain.indexOf("/");
+		if (slashIndex != -1) {
+			domain = domain.substring(0, slashIndex);
+		}
+		return domain;
 	}
 	
 	/**
@@ -220,8 +220,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void uploadBasedOnConfiguration() {
 		if (currentUploadType == UploadType.S3) {
 			uploadToS3();
-		} else {
+		} else if (currentUploadType == UploadType.SFTP){
 			uploadToSftpProxy(currentExternalUploadUrl);
+		} else {
+			uploadError("Unsupported external upload type specified: " + currentUploadType);
 		}
 	}
 	
@@ -245,7 +247,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void uploadToSftpProxy(final String url) {
-		currentUploadType = UploadType.SFTP;
 		try {
 			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
 		} catch (Exception e) {
@@ -287,6 +288,22 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 */
 	public void setCurrentUploadType(UploadType currentUploadType) {
 		this.currentUploadType = currentUploadType;
+	}
+	
+	/**
+	 * Get the current external upload url.  Used for testing purposes only.
+	 * @return
+	 */
+	public String getCurrentExternalUploadUrl() {
+		return currentExternalUploadUrl;
+	}
+	
+	/**
+	 * Set the current external upload url.  Used for testing purposes only.
+	 * @return
+	 */
+	public void setCurrentExternalUploadUrl(String currentExternalUploadUrl) {
+		this.currentExternalUploadUrl = currentExternalUploadUrl;
 	}
 	
 	public void checkFileSize() throws IllegalArgumentException{
@@ -367,7 +384,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			handleUploads();
 		}
 	}
-
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
 		if (entityId != null || parentEntityId != null) {
