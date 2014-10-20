@@ -23,7 +23,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
-	
+
+	private static final String INSTRUCTIONS = "Use the schema options button to make changes to the columns of the table.  Use the create button to finish building the table.";
 	private static final String COL = "col";
 	private static final String CREATE = "Create";
 	public static final double COLUMN_SIZE_BUFFER = 0.25;
@@ -36,12 +37,12 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 	PortalGinInjector portalGinInjector;
 	JobTrackingWidget jobTrackingWidget;
 	KeyboardNavigationHandler keyboardNavigationHandler;
-	
+
 	String parentId;
 	UploadToTableRequest uploadtoTableRequest;
 	ModalPresenter presenter;
 	List<ColumnModelTableRow> editors;
-	
+
 	@Inject
 	public UploadCSVFinishPageImpl(UploadCSVFinishPageView view,
 			SynapseClientAsync synapseClient,
@@ -67,6 +68,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		this.presenter = presenter;
 		this.presenter.setPrimaryButtonText(CREATE);
 		this.view.setTrackerVisible(false);
+		this.presenter.setInstructionMessage(INSTRUCTIONS);
 	}
 
 	@Override
@@ -79,13 +81,14 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 			UploadToTableRequest request, List<ColumnModel> suggestedSchema) {
 		view.setTableName(fileName);
 		this.parentId = parentId;
-		this.uploadtoTableRequest = request;
+		this.uploadtoTableRequest = preProcessUploadToTableRequest(request);
 		this.keyboardNavigationHandler.removeAllRows();
 		// prepare the columns
 		List<ColumnModel> columns = preProcessColumns(suggestedSchema);
 		editors = new ArrayList<ColumnModelTableRow>(columns.size());
-		for(ColumnModel cm: columns){
-			ColumnModelTableRowEditor editor = portalGinInjector.createNewColumnModelTableRowEditor();
+		for (ColumnModel cm : columns) {
+			ColumnModelTableRowEditor editor = portalGinInjector
+					.createNewColumnModelTableRowEditor();
 			ColumnModelUtils.applyColumnModelToRow(cm, editor);
 			editors.add(editor);
 			this.keyboardNavigationHandler.bindRow(editor);
@@ -95,33 +98,35 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		}
 		view.setColumnEditor(editors);
 	}
-	
+
 	private void createColumns() {
-		try{
+		try {
 			presenter.setLoading(true);
 
 			List<ColumnModel> schema = getCurrentSchema();
 			// Create the columns
-			synapseClient.createTableColumns(schema, new AsyncCallback<List<ColumnModel>>(){
+			synapseClient.createTableColumns(schema,
+					new AsyncCallback<List<ColumnModel>>() {
 
-				@Override
-				public void onFailure(Throwable caught) {
-					presenter.setErrorMessage(caught.getMessage());
-				}
+						@Override
+						public void onFailure(Throwable caught) {
+							presenter.setErrorMessage(caught.getMessage());
+						}
 
-				@Override
-				public void onSuccess(List<ColumnModel> schema) {
-					createTable(schema);
-				}} );
-		}catch(IllegalArgumentException e){
+						@Override
+						public void onSuccess(List<ColumnModel> schema) {
+							createTable(schema);
+						}
+					});
+		} catch (IllegalArgumentException e) {
 			presenter.setErrorMessage(e.getMessage());
 		}
 	}
-	
-	public void createTable(List<ColumnModel> schema){
+
+	public void createTable(List<ColumnModel> schema) {
 		// Get the column model ids.
 		List<String> columnIds = new ArrayList<String>(schema.size());
-		for(ColumnModel cm: schema){
+		for (ColumnModel cm : schema) {
 			columnIds.add(cm.getId());
 		}
 		TableEntity table = new TableEntity();
@@ -129,70 +134,121 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		table.setParentId(this.parentId);
 		table.setName(this.view.getTableName());
 		// Create the table
-		synapseClient.createTableEntity(table, new AsyncCallback<TableEntity>() {
-			
-			@Override
-			public void onSuccess(TableEntity result) {
-				applyCSVToTable(result);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				presenter.setErrorMessage(caught.getMessage());
-			}
-		});
+		synapseClient.createTableEntity(table,
+				new AsyncCallback<TableEntity>() {
+
+					@Override
+					public void onSuccess(TableEntity result) {
+						applyCSVToTable(result);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						presenter.setErrorMessage(caught.getMessage());
+					}
+				});
 	}
-	
+
 	/**
 	 * Apply the CSV to the table.
+	 * 
 	 * @param table
 	 */
-	public void applyCSVToTable(final TableEntity table){
+	public void applyCSVToTable(final TableEntity table) {
 		// Get the preview request.
 		this.uploadtoTableRequest.setTableId(table.getId());
 		this.view.setTrackerVisible(true);
-		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false, AsynchType.TableCSVUpload, this.uploadtoTableRequest, new AsynchronousProgressHandler(){
+		jobTrackingWidget.startAndTrackJob(APPLYING_CSV_TO_THE_TABLE, false,
+				AsynchType.TableCSVUpload, this.uploadtoTableRequest,
+				new AsynchronousProgressHandler() {
 
-			@Override
-			public void onCancel() {
-				presenter.onCancel();
-			}
+					@Override
+					public void onCancel() {
+						presenter.onCancel();
+					}
 
-			@Override
-			public void onComplete(AsynchronousResponseBody response) {
-				// At this point the table should be created with CSV applied.
-				presenter.onTableCreated(table);
-			}
+					@Override
+					public void onComplete(AsynchronousResponseBody response) {
+						// At this point the table should be created with CSV
+						// applied.
+						presenter.onTableCreated(table);
+					}
 
-			@Override
-			public void onFailure(Throwable failure) {
-				presenter.setErrorMessage(failure.getMessage());
-			}});
+					@Override
+					public void onFailure(Throwable failure) {
+						presenter.setErrorMessage(failure.getMessage());
+					}
+				});
 	}
 
 	/**
-	 * Pre-process the passed columns.  Returns a cloned list of ColumnModels, each modified as needed.
+	 * Pre-process the passed columns. Returns a cloned list of ColumnModels,
+	 * each modified as needed.
+	 * 
 	 * @param adapter
 	 * @param columns
 	 * @return
 	 */
 	public static List<ColumnModel> preProcessColumns(List<ColumnModel> columns) {
-		for(int i=0; i<columns.size(); i++){
+		for (int i = 0; i < columns.size(); i++) {
 			ColumnModel cm = columns.get(i);
 			// Set a default name
-			if(cm.getName() == null){
-				cm.setName(COL+(i+1));
+			if (cm.getName() == null) {
+				cm.setName(COL + (i + 1));
 			}
-			if(cm.getMaximumSize() != null){
+			if (cm.getMaximumSize() != null) {
 				// Add a buffer to the max size
 				double startingMax = cm.getMaximumSize();
-				cm.setMaximumSize((long)(startingMax+(startingMax*COLUMN_SIZE_BUFFER)));
+				cm.setMaximumSize((long) (startingMax + (startingMax * COLUMN_SIZE_BUFFER)));
 			}
 		}
 		return columns;
 	}
 
+	/**
+	 * This method will create a clone of the input object and change some of
+	 * the values if needed.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public static UploadToTableRequest preProcessUploadToTableRequest(
+			UploadToTableRequest request) {
+		UploadToTableRequest clone = UploadRequestUtils
+				.cloneUploadToTableRequest(request);
+		/*
+		 * If the first line is a header, then we want to skip it. This allows
+		 * the table's schema to have different names than the headers in the
+		 * original CSV file.
+		 */
+		if (clone.getCsvTableDescriptor() != null
+				&& clone.getCsvTableDescriptor().getIsFirstLineHeader() != null) {
+			if (clone.getCsvTableDescriptor().getIsFirstLineHeader()) {
+				if (clone.getLinesToSkip() == null) {
+					clone.setLinesToSkip(Long.valueOf(1L));
+				} else {
+					clone.setLinesToSkip(Long.valueOf(clone.getLinesToSkip() + 1L));
+				}
+				clone.getCsvTableDescriptor().setIsFirstLineHeader(
+						Boolean.FALSE);
+			}
+		}
+		return clone;
+	}
+
+	/**
+	 * Extract the current schema.
+	 */
 	public List<ColumnModel> getCurrentSchema() {
 		return ColumnModelUtils.extractColumnModels(editors);
+	}
+
+	/**
+	 * Extract the current upload request.
+	 * 
+	 * @return
+	 */
+	public UploadToTableRequest getUploadToTableRequest() {
+		return this.uploadtoTableRequest;
 	}
 }
