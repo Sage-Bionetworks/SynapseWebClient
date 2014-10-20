@@ -76,7 +76,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private SynapseClientAsync synapseClient;
 	private PublicPrincipalIds publicPrincipalIds;
 	private Boolean isPubliclyVisible;
-	private com.google.gwt.user.client.ui.Button publicButton;
 	private boolean showEditColumns;
 	
 	private SharingPermissionsGrid permissionsGrid;
@@ -167,7 +166,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				
 				
 				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
-				add(readOnly);			
+				add(readOnly);
 				
 				// 'Create ACL' button
 				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
