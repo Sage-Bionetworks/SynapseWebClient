@@ -1,6 +1,4 @@
-package org.sagebionetworks.web.client.widget.table.modal.upload;
-
-import org.sagebionetworks.repo.model.table.TableEntity;
+package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -51,10 +49,10 @@ public interface ModalPage extends IsWidget {
 		 */
 		public void onCancel();
 		/**
-		 * Called when the table is created.
+		 * Called when the process is finished.
 		 * @param table
 		 */
-		public void onTableCreated(TableEntity table);
+		public void onFinished();
 	}
 	
 	/**

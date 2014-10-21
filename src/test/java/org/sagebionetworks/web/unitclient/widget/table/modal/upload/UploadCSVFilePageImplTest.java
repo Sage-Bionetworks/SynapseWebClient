@@ -13,10 +13,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 

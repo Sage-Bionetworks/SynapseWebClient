@@ -1,40 +1,39 @@
-package org.sagebionetworks.web.unitclient.widget.table.modal.upload;
+package org.sagebionetworks.web.unitclient.widget.table.modal.wizard;
+
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalView;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 /**
  * 
  * @author jhill
  *
  */
-public class UploadTableModalWidgetImplTest {
+public class AbstractModalWizardTest {
 	
 	UploadCSVFilePage mockUploadCSVFileWidget;
-	UploadTableModalView mockView;
-	UploadTableModalWidgetImpl widget;
+	ModalWizardView mockView;
+	WizardCallback mockWizardCallback;
+	TestModalWizardWidget widget;
 	String parentId;
 	TableCreatedHandler mockHandler; 
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(UploadTableModalView.class);
+		mockView = Mockito.mock(ModalWizardView.class);
 		mockHandler = Mockito.mock(TableCreatedHandler.class);
 		mockUploadCSVFileWidget = Mockito.mock(UploadCSVFilePage.class);
+		mockWizardCallback = Mockito.mock(WizardCallback.class);
 		parentId = "syn123";
-		widget = new UploadTableModalWidgetImpl(mockView, mockUploadCSVFileWidget);
-		widget.configure(parentId, mockHandler);
+		widget = new TestModalWizardWidget(mockView, mockUploadCSVFileWidget);
 	}
 
 	@Test
@@ -44,7 +43,7 @@ public class UploadTableModalWidgetImplTest {
 	
 	@Test
 	public void testShowModal(){
-		widget.showModal();
+		widget.showModal(mockWizardCallback);
 		verify(mockUploadCSVFileWidget).setModalPresenter(widget);
 		verify(mockView).showModal();
 	}
@@ -68,7 +67,7 @@ public class UploadTableModalWidgetImplTest {
 	
 	@Test
 	public void testOnPrimary(){
-		widget.showModal();
+		widget.showModal(mockWizardCallback);
 		widget.onPrimary();
 		verify(mockUploadCSVFileWidget).onPrimary();
 		// change active page
@@ -90,8 +89,8 @@ public class UploadTableModalWidgetImplTest {
 	@Test
 	public void testTableCreated(){
 		TableEntity mockEntity = Mockito.mock(TableEntity.class);
-		widget.onTableCreated(mockEntity);
-		verify(mockHandler).tableCreated(mockEntity);
+		widget.onFinished();
+		verify(mockHandler).tableCreated();
 		verify(mockView).hideModal();
 	}
 }
