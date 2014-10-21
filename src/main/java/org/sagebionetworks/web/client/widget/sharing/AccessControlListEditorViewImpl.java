@@ -14,6 +14,8 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.extras.select.client.ui.Option;
+import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -45,6 +47,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -81,6 +84,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private SharingPermissionsGrid permissionsGrid;
 	
 	private ListBox permissionLevelListBox;
+	private Select permissionLevelSelectBox;
 	
 	private AddPeopleToAclPanel addPeoplePanel;
 	
@@ -173,7 +177,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		if (!canChangePermission) {
 			// Inform user of restricted privileges.
 			Label canNotModify = new Label();
-			canNotModify.setText("Some text telling the user they have insufficient privilages to modify sharing settings.");
+			canNotModify.setText("Some text telling the user they have insufficient privilages to modify sharing settings.");	// TODO: Some text...
 			add(canNotModify);
 		} else {
 			if(isInherited) {
@@ -261,6 +265,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		}
 	}
+	String selectedPermissionLevel;
 	
 	@Override
 	public Boolean isNotifyPeople(){
