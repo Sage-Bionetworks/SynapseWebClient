@@ -21,7 +21,15 @@
 		                    <b:Column size="MD_2">
 		                        <b:FormLabel>Access Level:</b:FormLabel>
 		                    </b:Column>
-		                    <b:Column ui:field="permissionLevelPanel" size="MD_10" />
+		                    <b:Column size="MD_10">
+		                       <b:ButtonGroup ui:field="permButtonGroup" >
+		                    	<b:Button ui:field="permDropDownButton" dataToggle="DROPDOWN">Dropdown</b:Button>
+		                    	<b:DropDownMenu ui:field="permDropDownMenu" />
+		                    </b:ButtonGroup>
+		                    </b:Column>
+		                </b:Row>
+		                <b:Row>
+		                    
 		                </b:Row>
 		                <b:Row>
 		                    <b:Column size = "MD_2">

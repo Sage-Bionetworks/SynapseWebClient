@@ -1,14 +1,20 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.Map;
+
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
+import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,8 +31,8 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	
 	@UiField
 	Column suggestBoxPanel;
-	@UiField
-	Column permissionLevelPanel;
+//	@UiField
+//	Column permissionLevelPanel;
 	@UiField
 	Button addPersonButton;
 	@UiField
@@ -35,6 +41,12 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	CheckBox notifyPeopleCheckBox;
 	@UiField
 	Tooltip notifyTooltip;
+	@UiField
+	ButtonGroup permButtonGroup;
+	@UiField
+	Button permDropDownButton;
+	@UiField
+	DropDownMenu permDropDownMenu;
 	
 	
 	private Presenter presenter;
@@ -51,6 +63,7 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 		
 		suggestBoxPanel.add(suggestBox.asWidget());
 		notifyTooltip.setText(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
+		permButtonGroup.addStyleName("input-xs");
 	}
 	
 	@Override
@@ -64,10 +77,14 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	}
 	
 	@Override
-	public void configure(ListBox permissionListBox, final CallbackP<Void> addPersonCallback, final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
-		permissionLevelPanel.clear();
-		permissionListBox.addStyleName("input-xs");
-		permissionLevelPanel.add(permissionListBox);
+	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback,  final CallbackP<Void> addPersonCallback,
+						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
+		permDropDownMenu.clear();
+		
+		//permissionLevelPanel.clear();
+		//permissionListBox.addStyleName("input-xs");
+		//permissionLevelPanel.add(permissionListBox);
+		configureDropdownButton(permLevels, permDisplay, selectPermissionCallback);
 		
 		if (publicButtonReg != null) {
 			publicButtonReg.removeHandler();
@@ -122,4 +139,18 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 		return this;
 	}
 
+	private void configureDropdownButton(PermissionLevel[] permLevels, final Map<PermissionLevel, String> permDisplay, final CallbackP<Void> selectPermissionCallback) {
+		for (final PermissionLevel permLevel : permLevels) {
+			AnchorListItem item = new AnchorListItem(permDisplay.get(permLevel));
+			item.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					permDropDownButton.setText(permDisplay.get(permLevel));
+					presenter.setSelectedPermissionLevel(permLevel);
+					selectPermissionCallback.invoke(null);
+				}
+			});
+			permDropDownMenu.add(item);
+		}
+	}
 }

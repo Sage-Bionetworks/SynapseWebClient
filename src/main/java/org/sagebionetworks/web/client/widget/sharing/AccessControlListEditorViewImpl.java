@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.extras.select.client.ui.Option;
 import org.gwtbootstrap3.extras.select.client.ui.Select;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -44,6 +48,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
@@ -83,7 +88,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private SharingPermissionsGrid permissionsGrid;
 	
-	private ListBox permissionLevelListBox;
+	//private ListBox permissionLevelListBox;
 	private Select permissionLevelSelectBox;
 	
 	private AddPeopleToAclPanel addPeoplePanel;
@@ -205,18 +210,25 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			} else {
 				// configure permission level list box
 				// TODO: Can't have listBox not have option selected initially, so onChange is all weird. Force selection.
-				permissionLevelListBox = new ListBox();
-				for (PermissionLevel permLevel : permList) {
-					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
-				}
-				permissionLevelListBox.addChangeHandler(new ChangeHandler() {
-	
+//				permissionLevelListBox = new ListBox();
+//				for (PermissionLevel permLevel : permList) {
+//					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
+//				}
+//				permissionLevelListBox.addChangeHandler(new ChangeHandler() {
+//	
+//					@Override
+//					public void onChange(ChangeEvent event) {
+//						presenter.setUnsavedViewChanges(true);
+//					}
+//					
+//				});
+				
+				CallbackP<Void> selectPermissionCallback = new CallbackP<Void>() {
 					@Override
-					public void onChange(ChangeEvent event) {
+					public void invoke(Void param) {
 						presenter.setUnsavedViewChanges(true);
 					}
-					
-				});
+				};
 				
 				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
 	
@@ -240,8 +252,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 							}
 						}
 					};
-			
-				addPeoplePanel.configure(permissionLevelListBox, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				
+				addPeoplePanel.configure(permList, permissionDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				
 				// 'Delete ACL' button
@@ -264,8 +276,35 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(toolTipAndDeleteAclButton);
 			}
 		}
+		// test
+		//add(buildDropDownPermissionButton());
 	}
+	
 	String selectedPermissionLevel;
+	
+	public ButtonGroup buildDropDownPermissionButton() {
+		ButtonGroup group = new ButtonGroup();
+		final Button button = new Button("Select something.");
+		//button.toggle();	// TODO: DropDown?? I don't think so.
+		button.setDataToggle(Toggle.DROPDOWN);
+		DropDownMenu menu = new DropDownMenu();
+		
+		ListItem item1 = new ListItem("Yeah yeah");
+		item1.addHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				ListItem item = (ListItem) event.getSource();
+				button.setText(item.getText());
+				Window.alert(item.getText());
+			}
+			
+		}, ClickEvent.getType());
+		menu.add(item1);
+		group.add(button);
+		group.add(menu);
+		return group;
+	}
 	
 	@Override
 	public Boolean isNotifyPeople(){
@@ -485,18 +524,18 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			// TODO: Add "force selection" functionality.
-//			if(permissionLevelCombo.getValue() != null) {
-				PermissionLevel level = permList[permissionLevelListBox.getSelectedIndex()];
+			if(addPeoplePanel.getSelectedPermissionLevel() != null) {
+				PermissionLevel level = addPeoplePanel.getSelectedPermissionLevel();
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
 				peopleSuggestBox.clear();
 				//permissionLevelCombo.clearSelections();
-				permissionLevelListBox.setSelectedIndex(0);
+				//permissionLevelListBox.setSelectedIndex(0);
 				presenter.setUnsavedViewChanges(false);
-//			} else {
-//				showAddMessage("Please select a permission level to grant.");
-//			}
+			} else {
+				showAddMessage("Please select a permission level to grant.");
+			}
 		} else {
 			showAddMessage("Please select a user or team to grant permission to.");
 		}
