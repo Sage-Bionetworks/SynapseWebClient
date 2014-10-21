@@ -4,7 +4,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * This widget is a modal dialog used to download the results of a table query.
- * Thsi widget should be added to the page to work correctly.
  * 
  * @author jhill
  *
@@ -18,8 +17,10 @@ public interface DownloadTableQueryModalWidget extends IsWidget {
 	public void configure(String sql);
 	
 	/**
-	 * Show the dialog
+	 * After configuring the widget call this method to show the wizard.
+	 * 
+	 * @param wizardCallback
 	 */
-	public void showDialog();
+	public void showModal();
 
 }

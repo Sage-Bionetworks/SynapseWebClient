@@ -3443,6 +3443,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
+	
+	@Override
+	public String createFileHandleURL(String fileHandleId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			URL url = synapseClient.getFileHandleTemporaryUrl(fileHandleId);
+			return url.toString();
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (IOException e) {
+			throw new UnknownErrorException(e.getMessage());
+		} 
+	}
 
 	@Override
 	public List<ColumnModel> createTableColumns(List<ColumnModel> models) throws RestServiceException {

@@ -17,11 +17,12 @@
 		</b:Collapse>
 
 		<b:Alert ui:field="tableMessage" type="INFO" />
-		
+
 		<g:SimplePanel ui:field="queryInputPanel" />
 		
 		<bh:Div styleName="margin-top-15" />
 		<g:SimplePanel ui:field="queryResultsPanel" />
-
+		
+		<g:SimplePanel ui:field="downloadResultsPanel" />
 	</g:HTMLPanel>
 </ui:UiBinder>

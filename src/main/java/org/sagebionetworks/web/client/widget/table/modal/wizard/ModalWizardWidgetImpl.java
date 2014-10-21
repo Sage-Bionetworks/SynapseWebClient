@@ -4,23 +4,24 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 /**
- * This is the main modal of the wizard.
+ * The main modal dialog of a wizard.
  * 
  * @author jhill
  *
  */
-public abstract class AbstractModalWizard implements ModalWizardWidget,  ModalWizardView.Presenter, ModalPage.ModalPresenter, IsWidget {
+public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardView.Presenter, ModalPage.ModalPresenter, IsWidget {
 
 	WizardCallback callback;
 	ModalPage currentPage;
 	ModalPage firstPage;
 	ModalWizardView view;
 	
-	public AbstractModalWizard(ModalWizardView view, ModalPage firstPage){
+	@Inject
+	public ModalWizardWidgetImpl(ModalWizardView view){
 		this.view = view;
-		this.firstPage = firstPage;
 		this.view.setPresenter(this);
 	}
 	
@@ -37,6 +38,9 @@ public abstract class AbstractModalWizard implements ModalWizardWidget,  ModalWi
 
 	@Override
 	public void onCancel() {
+		if(this.callback != null){
+			this.callback.onCanceled();
+		}
 		this.view.hideModal();
 	}
 
@@ -74,7 +78,9 @@ public abstract class AbstractModalWizard implements ModalWizardWidget,  ModalWi
 
 	@Override
 	public void onFinished() {
-		this.callback.onFinished();
+		if(callback != null){
+			this.callback.onFinished();
+		}
 		this.view.hideModal();
 	}
 
@@ -93,6 +99,11 @@ public abstract class AbstractModalWizard implements ModalWizardWidget,  ModalWi
 		setNextActivePage(this.firstPage);
 		this.callback = callback;
 		this.view.showModal();
+	}
+
+	@Override
+	public void configure(ModalPage firstPage) {
+		this.firstPage = firstPage;
 	}
 
 }

@@ -12,6 +12,12 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface ModalWizardWidget extends IsWidget {
 	
 	/**
+	 * Configure this widget before using it.
+	 * @param firstPage The first page of the wizard.
+	 */
+	public void configure(ModalPage firstPage);
+	
+	/**
 	 * Set the title of the main dialog.
 	 * @param title
 	 */

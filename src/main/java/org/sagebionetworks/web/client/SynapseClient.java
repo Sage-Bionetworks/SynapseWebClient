@@ -462,6 +462,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 */
 	FileHandle getFileHandle(String fileHandleId) throws RestServiceException;
+	
+	
+	String createFileHandleURL(String fileHandleId) throws RestServiceException;
 
 	/**
 	 * Create a list of columns.

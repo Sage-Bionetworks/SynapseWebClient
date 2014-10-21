@@ -98,4 +98,14 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		view.setQueryInputLoading(false);
 	}
 
+	@Override
+	public void onEditResults() {
+		queryInputListener.onEditResults();
+	}
+
+	@Override
+	public void onDownloadResults() {
+		queryInputListener.onDownloadResults(view.getInputQueryString());
+	}
+
 }

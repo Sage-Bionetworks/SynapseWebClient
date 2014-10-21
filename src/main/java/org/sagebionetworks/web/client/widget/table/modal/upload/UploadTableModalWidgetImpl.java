@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.AbstractModalWizard;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
@@ -12,20 +13,32 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadTableModalWidgetImpl extends AbstractModalWizard implements UploadTableModalWidget {
+public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
 	
+	ModalWizardWidget modalWizarWidget;
 	UploadCSVFilePage uploadCSVFileWidget;
 
 	@Inject
-	public UploadTableModalWidgetImpl(ModalWizardView view, UploadCSVFilePage uploadCSVFileWidget) {
-		super(view, uploadCSVFileWidget);
-		this.setTitle("Upload Table");
-		this.setModalSize(ModalSize.LARGE);
+	public UploadTableModalWidgetImpl(ModalWizardWidget modalWizarWidget, UploadCSVFilePage uploadCSVFileWidget) {
+		this.modalWizarWidget = modalWizarWidget;
+		this.modalWizarWidget.setTitle("Upload Table");
+		this.modalWizarWidget.setModalSize(ModalSize.LARGE);
 		this.uploadCSVFileWidget = uploadCSVFileWidget;
+		this.modalWizarWidget.configure(this.uploadCSVFileWidget);
 	}
 
 	@Override
 	public void configure(String parentId) {
 		this.uploadCSVFileWidget.configure(parentId);
+	}
+
+	@Override
+	public Widget asWidget() {
+		return modalWizarWidget.asWidget();
+	}
+
+	@Override
+	public void showModal(WizardCallback wizardCallback) {
+		this.modalWizarWidget.showModal(wizardCallback);
 	}
 }

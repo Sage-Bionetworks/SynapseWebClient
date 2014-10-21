@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,6 +39,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	SimplePanel queryInputPanel;
 	@UiField
 	SimplePanel queryResultsPanel;
+	@UiField
+	SimplePanel downloadResultsPanel;
 
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
@@ -85,13 +88,13 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget) {
+	public void setQueryResultsWidget(IsWidget queryResultsWidget) {
 		this.queryResultsPanel.add(queryResultsWidget);
 		
 	}
 
 	@Override
-	public void setQueryInputWidget(QueryInputWidget queryInputWidget) {
+	public void setQueryInputWidget(IsWidget queryInputWidget) {
 		this.queryInputPanel.add(queryInputWidget);
 		
 	}
@@ -99,6 +102,12 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setQueryInputVisible(boolean visible) {
 		this.queryInputPanel.setVisible(visible);
+	}
+
+	@Override
+	public void setDownloadTableQueryModalWidget(
+			IsWidget downloadTableQueryModalWidget) {
+		downloadResultsPanel.add(downloadTableQueryModalWidget);
 	}
 
 

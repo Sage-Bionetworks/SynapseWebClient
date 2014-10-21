@@ -362,6 +362,8 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableEntity> callback);
 
 	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
+	
+	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
 
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);
@@ -373,5 +375,6 @@ public interface SynapseClientAsync {
 	 * @throws RestServiceException
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
+
 
 }

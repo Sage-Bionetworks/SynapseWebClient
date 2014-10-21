@@ -5,40 +5,31 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardView;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidgetImpl;
 
 /**
  * 
  * @author jhill
  *
  */
-public class AbstractModalWizardTest {
+public class ModalWizardWidgetImplTest {
 	
 	UploadCSVFilePage mockUploadCSVFileWidget;
 	ModalWizardView mockView;
 	WizardCallback mockWizardCallback;
-	TestModalWizardWidget widget;
-	String parentId;
-	TableCreatedHandler mockHandler; 
-	
+	ModalWizardWidgetImpl widget;
+
 	@Before
 	public void before(){
 		mockView = Mockito.mock(ModalWizardView.class);
-		mockHandler = Mockito.mock(TableCreatedHandler.class);
 		mockUploadCSVFileWidget = Mockito.mock(UploadCSVFilePage.class);
 		mockWizardCallback = Mockito.mock(WizardCallback.class);
-		parentId = "syn123";
-		widget = new TestModalWizardWidget(mockView, mockUploadCSVFileWidget);
-	}
-
-	@Test
-	public void testConfigure(){
-		verify(mockUploadCSVFileWidget).configure(parentId);
+		widget = new ModalWizardWidgetImpl(mockView);
+		widget.configure(mockUploadCSVFileWidget);
 	}
 	
 	@Test
@@ -46,12 +37,6 @@ public class AbstractModalWizardTest {
 		widget.showModal(mockWizardCallback);
 		verify(mockUploadCSVFileWidget).setModalPresenter(widget);
 		verify(mockView).showModal();
-	}
-	
-	@Test
-	public void testCancel(){
-		widget.onCancel();
-		verify(mockView).hideModal();
 	}
 	
 	@Test
@@ -87,10 +72,18 @@ public class AbstractModalWizardTest {
 	}
 	
 	@Test
-	public void testTableCreated(){
-		TableEntity mockEntity = Mockito.mock(TableEntity.class);
+	public void testFinished(){
+		widget.showModal(mockWizardCallback);
 		widget.onFinished();
-		verify(mockHandler).tableCreated();
+		verify(mockWizardCallback).onFinished();
+		verify(mockView).hideModal();
+	}
+	
+	@Test
+	public void testCancled(){
+		widget.showModal(mockWizardCallback);
+		widget.onCancel();
+		verify(mockWizardCallback).onCanceled();
 		verify(mockView).hideModal();
 	}
 }

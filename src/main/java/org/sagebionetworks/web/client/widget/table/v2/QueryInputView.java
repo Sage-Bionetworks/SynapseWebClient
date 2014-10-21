@@ -24,6 +24,10 @@ public interface QueryInputView extends IsWidget {
 		 * Called to rest the query.
 		 */
 		void onReset();
+
+		void onEditResults();
+
+		void onDownloadResults();
 		
 	}
 	

@@ -1,24 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
 import com.google.gwt.user.client.ui.IsWidget;
+
 /**
- * Abstraction for the view of the options for table CSV file download.
- * @author jhill
+ * This view shows the options that for a table query download.
+ * 
+ * @author John
  *
  */
-public interface DownloadTableQueryModalView  extends IsWidget{
-	
-	/**
-	 * Methods the view can call on the widget.
-	 *
-	 */
-	public interface Presenter{
-		
-		/**
-		 * Called when the user selects the primary button.
-		 */
-		void onPrimary();
-	}
+public interface CreateDownloadPageView extends IsWidget {
 
 	/**
 	 * The type of file to create.
@@ -65,37 +55,4 @@ public interface DownloadTableQueryModalView  extends IsWidget{
 	 */
 	public void setTrackerVisible(boolean visible);
 	
-	/**
-	 * Set the error message
-	 * @param message
-	 */
-	public void setErrorMessage(String message);
-	
-	/**
-	 * Show/hide the error message;
-	 * @param visibile
-	 */
-	public void setErrorMessageVisible(boolean visibile);
-	
-	/**
-	 * Show the modal.
-	 */
-	void show();
-
-	/**
-	 * Called to enable or disable the primary button
-	 * @param loading
-	 */
-	void setLoading(boolean loading);
-	
-	/**
-	 * Bind this view to its presenter.
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
-	
-	/**
-	 * Hide the dialog.
-	 */
-	void hide();
 }
