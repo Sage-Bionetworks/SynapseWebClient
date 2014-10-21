@@ -84,7 +84,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		} else {
 			// Add delete button and size columns.
 			data = new TableData();
-			Button button = new Button("", new ClickHandler() {	// TODO: IconType.REMOVE??
+			Button button = new Button("", new ClickHandler() {
 	
 				@Override
 				public void onClick(ClickEvent event) {

@@ -2076,7 +2076,6 @@ public class DisplayUtils {
 	
 					@Override
 					public void onDefault() {
-						// TODO SOMETHING ELSE?
 						dialog.hide();
 					}
 			};
@@ -2086,54 +2085,6 @@ public class DisplayUtils {
 		dialog.configure(DisplayConstants.TITLE_SHARING_PANEL, accessControlListEditor.asWidget(),
 						primaryButtonText, defaultButtonText, dialogCallback, false);
 	    dialog.show();
-//		// configure buttons
-//		if (canChangePermission) {
-//			window.okText = "Save";
-//			window.cancelText = "Cancel";
-//			window.setButtons(Dialog.OKCANCEL);
-//		} else {
-//			window.cancelText = "Close";
-//			window.setButtons(Dialog.CANCEL);
-//		}
-//		window.setButtonAlign(HorizontalAlignment.RIGHT);
-//	    window.setHideOnButtonClick(false);
-//		window.setResizable(true);
-//		
-//		if (canChangePermission) {
-//			// "Apply" button
-//			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-//			Button applyButton = window.getButtonById(Dialog.OK);
-//			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//				@Override
-//				public void componentSelected(ButtonEvent ce) {
-//					// confirm close action if there are unsaved changes
-//					if (accessControlListEditor.hasUnsavedChanges()) {
-//						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<AccessControlList>() {
-//							@Override
-//							public void onSuccess(AccessControlList result) {
-//								callback.invoke();
-//							}
-//							@Override
-//							public void onFailure(Throwable caught) {
-//								//failure notification is handled by the acl editor view.
-//							}
-//						});
-//					}
-//					window.hide();
-//				}
-//		    });
-//		}
-//		
-//		// "Close" button				
-//		Button closeButton = window.getButtonById(Dialog.CANCEL);
-//	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-//			@Override
-//			public void componentSelected(ButtonEvent ce) {
-//				window.hide();
-//			}
-//	    });
-//		
-//		window.show();
 	}
 
 	public static LayoutContainer createRowContainer() {

@@ -40,6 +40,9 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	private Presenter presenter;
 	private UserGroupSuggestBox suggestBox;
 	
+	private HandlerRegistration publicButtonReg;	// TODO: Get rid of this logic when only build window once (if I do that)?
+	private HandlerRegistration makePublicReg;
+	
 	@Inject
 	public AddPeopleToAclPanelViewImpl(AddPeopleToAclPanelViewImplUiBinder uiBinder, UserGroupSuggestBox suggestBox) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -60,8 +63,6 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 		return notifyPeopleCheckBox;
 	}
 	
-	private HandlerRegistration publicButtonReg;	// TODO: Get rid of this logic when only build window once (if I do that)?
-	private HandlerRegistration makePublicReg;
 	@Override
 	public void configure(ListBox permissionListBox, final CallbackP<Void> addPersonCallback, final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		permissionLevelPanel.clear();
