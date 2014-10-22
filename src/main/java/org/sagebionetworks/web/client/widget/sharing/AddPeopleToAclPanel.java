@@ -28,8 +28,8 @@ public class AddPeopleToAclPanel implements AddPeopleToAclPanelView.Presenter, S
 		return view.getSuggestBox();
 	}
 	
-	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback, CallbackP<Void> addPersonCallback,
-						CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
+	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback,
+							CallbackP<Void> addPersonCallback, CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		view.configure(permLevels, permDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
 	}
 	

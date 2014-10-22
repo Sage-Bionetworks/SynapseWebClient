@@ -15,6 +15,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface AddPeopleToAclPanelView extends IsWidget {	// TODO: extend SynapseView?
 
 	UserGroupSuggestBox getSuggestBox();
+	
+	/**
+	 * Configures the panel. If called multiple times, old callbacks are
+	 * deregistered from their associated components.
+	 */
 	void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback, CallbackP<Void> addPersonCallback,
 					CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible);
 	
