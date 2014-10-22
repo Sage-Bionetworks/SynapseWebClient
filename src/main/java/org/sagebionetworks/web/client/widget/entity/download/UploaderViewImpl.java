@@ -325,35 +325,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void submitForm(String actionUrl) {
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
-//		_submitForm(formPanel.getElement());
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();
 	}
-	
-	private native void _submitForm(Element form) /*-{
-//		form.ajaxForm({
-//		    dataType : 'json',
-//		    success : function (response) {
-//		        alert("server says (success): " + response);
-//		    },
-//		    failure : function (response) {
-//		        alert("server says (failure): " + response);
-//		    }
-//		});
-//		
-		form.submit({
-	        success: function(form, action) {
-	            //handle success
-				alert("server says (success): " + response);
-				this.@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::handleSubmitResult(Ljava/lang/String;)(action.response.responseText);
-	        },
-	        failure: function(form, action) {
-	        	//handle failure
-	        	alert("server says (failure): " + response);
-				this.@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::handleSubmitResult(Ljava/lang/String;)(action.response.responseText);
-	        }                        
-	    });
-	}-*/;
 	
 	@Override
 	public void disableMultipleFileUploads() {
