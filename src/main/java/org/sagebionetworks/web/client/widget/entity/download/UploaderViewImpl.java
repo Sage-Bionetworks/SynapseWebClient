@@ -22,32 +22,42 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.NamedFrame;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-
+/**
+ * Note on the form submission.  This supports two form submission use cases.
+ * 1.  Submit to Portal servlet.  These will return the response html in the SubmitCompleteHandler.
+ * 2.  Submit to SFTP proxy servlet.  This will not return the response html in the SubmitCompleteHandler (due to CORS).  But the sftp proxy will return a page that sends a message (via postMessage)
+ * 	to the parent window.  So we set up a listener (onAttach) for this cross-window message.
+ * @author jayhodgson
+ *
+ */
 public class UploaderViewImpl extends FlowPanel implements
 		UploaderView {
 	
@@ -91,9 +101,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HTML fileUploadHTML;
 	private static final HTML DRAG_AND_DROP_HTML = new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>");
 	FlowPanel container;
-	NamedFrame targetFrame;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
+	private HandlerRegistration messageHandler;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
@@ -114,21 +124,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		progressBar.setType(ProgressBarType.INFO);
 		progressContainer.add(progressBar);
 		
-		//set the form target frame, and add a load listener to that
-		targetFrame = new NamedFrame("formtarget");
-		targetFrame.setWidth("1px");
-		targetFrame.setHeight("1px");
-	    targetFrame.setVisible(false);
-		
-		targetFrame.addLoadHandler(new LoadHandler() {
-			@Override
-			public void onLoad(LoadEvent event) {
-				String results = getMessage(targetFrame.getElement());
-				presenter.handleSubmitResult(results);
-                hideLoading();
-			}
-		});
-		this.formPanel = new FormPanel(targetFrame);
+		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
 		
 		spinningProgressContainer = new HTML();
@@ -173,31 +169,56 @@ public class UploaderViewImpl extends FlowPanel implements
 		});
 		
 		cancelBtn.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.cancelClicked();
 			}
 		});
 		
-//		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
-//			@Override
-//               public void onSubmitComplete(SubmitCompleteEvent event) {
-//                       presenter.handleSubmitResult(event.getResults());
-//                       hideLoading();
-//               }
-//       };
-//       formPanel.addSubmitCompleteHandler(submitHandler);
+		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
+			@Override
+               public void onSubmitComplete(SubmitCompleteEvent event) {
+					handleSubmitResult(event.getResults());
+               }
+       };
+       formPanel.addSubmitCompleteHandler(submitHandler);
 	}
 	
-	private native String getMessage(Element el)/*-{
-		var html = el.contentWindow.document.body.innerHTML;
-		return html 
-	}-*/;
+	private void handleSubmitResult(String result) {
+		if (result != null) {
+			presenter.handleSubmitResult(result);
+            hideLoading();
+		}
+	}
 	
-	public void handleSubmitResult(String results) {
-		presenter.handleSubmitResult(results);
-		hideLoading();
+	private static native String _getMessage(JavaScriptObject event) /*-{
+		console.log("event received: "+event);
+		console.log("event.data received: "+event.data);
+		if (event !== undefined && event.data !== undefined)
+			return event.data;
+		else return null;
+    }-*/;
+	
+	
+	@Override
+	protected void onAttach() {
+		//register to listen for the "message" events
+		if (messageHandler == null) {
+			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+				@Override
+				public void invoke(JavaScriptObject event) {
+					handleSubmitResult(_getMessage(event));
+				}
+			});
+		}
+		super.onAttach();
+	}
+
+	@Override
+	protected void onDetach() {
+		if (messageHandler != null)
+			messageHandler.removeHandler();
+		super.onDetach();
 	}
 	
 	@Override
@@ -351,8 +372,7 @@ public class UploaderViewImpl extends FlowPanel implements
 			container.clear();
 		
 		container.add(dialog);	// Put modal on uploader layer.
-		container.add(targetFrame);
-
+		
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		uploadPanel.removeFromParent();
 		if (isEntity) {
