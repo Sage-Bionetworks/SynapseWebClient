@@ -45,6 +45,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshTeamInvites();
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
+	void showProjectsLoading(boolean isLoading);
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);

@@ -338,30 +338,36 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getMyProjects(String userId, int offset) {
+		view.showProjectsLoading(true);
 		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
+				view.showProjectsLoading(false);
 				List<ProjectHeader> headers = projectHeaders.getResults();
 				view.addProjects(headers);
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.showProjectsLoading(false);
 				view.setProjectsError("Could not load my projects:" + caught.getMessage());
 			}
 		});
 	}
 	
 	public void getUserProjects(String userId, int offset) {
+		view.showProjectsLoading(true);
 		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
+				view.showProjectsLoading(false);
 				List<ProjectHeader> headers = projectHeaders.getResults();
 				view.addProjects(headers);
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.showProjectsLoading(false);
 				view.setProjectsError("Could not load user projects:" + caught.getMessage());
 			}
 		});

@@ -156,7 +156,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement teamsHighlightBox;
 
-
+	@UiField 
+	DivElement projectsLoadingUI;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -229,6 +230,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 				presenter.getMoreProjects();
 			}
 		});
+		showProjectsLoading(false);
 	}
 	
 	private void initCertificationBadge() {
@@ -380,7 +382,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			EntityBadge badge = ginInjector.getEntityBadgeWidget();
 			badge.configure(entityHeaderWrapper);
 			Widget widget = badge.asWidget();
-			widget.addStyleName("margin-top-5");
+			widget.addStyleName("margin-bottom-10 col-xs-12 col-lg-6");
 			targetPanel.add(widget);
 		}
 		if (projectHeaders.isEmpty())
@@ -519,6 +521,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.showInfo(title, message);
 	}
 
+	@Override
+	public void showProjectsLoading(boolean isLoading) {
+		UIObject.setVisible(projectsLoadingUI, isLoading);
+	}
+	
 	@Override
 	public void clear() {
 		updateUserInfoPanel.clear();
