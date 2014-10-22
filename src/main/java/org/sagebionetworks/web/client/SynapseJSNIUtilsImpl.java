@@ -42,7 +42,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _recordPageVisit(String token) /*-{
 		$wnd._gaq.push(['_trackPageview', token]);
 	}-*/;
-
+	
 	@Override
 	public String getCurrentHistoryToken() {
 		return History.getToken();

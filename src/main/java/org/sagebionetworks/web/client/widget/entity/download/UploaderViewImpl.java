@@ -20,9 +20,6 @@ import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -36,17 +33,18 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.NamedFrame;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -93,6 +91,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HTML fileUploadHTML;
 	private static final HTML DRAG_AND_DROP_HTML = new HTML("<p class=\"" + FILE_UPLOAD_LABEL_STYLENAME + "\">" + "or<br>Drag & Drop" + "</p>");
 	FlowPanel container;
+	NamedFrame targetFrame;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
 	
@@ -115,7 +114,21 @@ public class UploaderViewImpl extends FlowPanel implements
 		progressBar.setType(ProgressBarType.INFO);
 		progressContainer.add(progressBar);
 		
-		this.formPanel = new FormPanel();
+		//set the form target frame, and add a load listener to that
+		targetFrame = new NamedFrame("formtarget");
+		targetFrame.setWidth("1px");
+		targetFrame.setHeight("1px");
+	    targetFrame.setVisible(false);
+		
+		targetFrame.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				String results = getMessage(targetFrame.getElement());
+				presenter.handleSubmitResult(results);
+                hideLoading();
+			}
+		});
+		this.formPanel = new FormPanel(targetFrame);
 		this.externalLinkFormPanel = new Form();
 		
 		spinningProgressContainer = new HTML();
@@ -132,8 +145,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		pathField = new TextBox();
 		initUploadPanel();
 		initExternalPanel();
-		
-		this.add(dialog);	// Put modal on uploader layer.
 		initHandlers();
 	}
 	
@@ -169,14 +180,24 @@ public class UploaderViewImpl extends FlowPanel implements
 			}
 		});
 		
-		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
-			@Override
-			public void onSubmitComplete(SubmitCompleteEvent event) {
-				presenter.handleSubmitResult(event.getResults());
-				hideLoading();
-			}
-		};
-		formPanel.addSubmitCompleteHandler(submitHandler);
+//		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
+//			@Override
+//               public void onSubmitComplete(SubmitCompleteEvent event) {
+//                       presenter.handleSubmitResult(event.getResults());
+//                       hideLoading();
+//               }
+//       };
+//       formPanel.addSubmitCompleteHandler(submitHandler);
+	}
+	
+	private native String getMessage(Element el)/*-{
+		var html = el.contentWindow.document.body.innerHTML;
+		return html 
+	}-*/;
+	
+	public void handleSubmitResult(String results) {
+		presenter.handleSubmitResult(results);
+		hideLoading();
 	}
 	
 	@Override
@@ -283,9 +304,35 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void submitForm(String actionUrl) {
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
+//		_submitForm(formPanel.getElement());
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
-		formPanel.submit();	
+		formPanel.submit();
 	}
+	
+	private native void _submitForm(Element form) /*-{
+//		form.ajaxForm({
+//		    dataType : 'json',
+//		    success : function (response) {
+//		        alert("server says (success): " + response);
+//		    },
+//		    failure : function (response) {
+//		        alert("server says (failure): " + response);
+//		    }
+//		});
+//		
+		form.submit({
+	        success: function(form, action) {
+	            //handle success
+				alert("server says (success): " + response);
+				this.@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::handleSubmitResult(Ljava/lang/String;)(action.response.responseText);
+	        },
+	        failure: function(form, action) {
+	        	//handle failure
+	        	alert("server says (failure): " + response);
+				this.@org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl::handleSubmitResult(Ljava/lang/String;)(action.response.responseText);
+	        }                        
+	    });
+	}-*/;
 	
 	@Override
 	public void disableMultipleFileUploads() {
@@ -303,6 +350,9 @@ public class UploaderViewImpl extends FlowPanel implements
 		else
 			container.clear();
 		
+		container.add(dialog);	// Put modal on uploader layer.
+		container.add(targetFrame);
+
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		uploadPanel.removeFromParent();
 		if (isEntity) {
