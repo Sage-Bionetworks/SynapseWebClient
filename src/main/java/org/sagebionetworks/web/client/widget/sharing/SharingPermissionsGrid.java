@@ -13,9 +13,9 @@ import com.google.inject.Inject;
 
 public class SharingPermissionsGrid implements SharingPermissionsGridView.Presenter, SynapseWidgetPresenter {
 
-	SharingPermissionsGridView view;
+	private SharingPermissionsGridView view;
 	
-	List<AclEntry> aclEntries;
+	private List<AclEntry> aclEntries;
 	
 	@Inject
 	public SharingPermissionsGrid(SharingPermissionsGridView view) {

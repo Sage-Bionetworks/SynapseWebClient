@@ -66,13 +66,10 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
  
-	private static final int FIELD_WIDTH = 500;
 	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
 	private static final String PRINCIPAL_COLUMN_ID = "principalData";
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
-	private static final int DEFAULT_WIDTH = 380;
-	private static final int BUTTON_PADDING = 3;
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -208,21 +205,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				toolTipAndCreateAclButton.setPlacement(Placement.BOTTOM);
 				add(toolTipAndCreateAclButton);
 			} else {
-				// configure permission level list box
-				// TODO: Can't have listBox not have option selected initially, so onChange is all weird. Force selection.
-//				permissionLevelListBox = new ListBox();
-//				for (PermissionLevel permLevel : permList) {
-//					permissionLevelListBox.addItem(permissionDisplay.get(permLevel));
-//				}
-//				permissionLevelListBox.addChangeHandler(new ChangeHandler() {
-//	
-//					@Override
-//					public void onChange(ChangeEvent event) {
-//						presenter.setUnsavedViewChanges(true);
-//					}
-//					
-//				});
-				
+				// Configure AddPeopleToAclPanel.
 				CallbackP<Void> selectPermissionCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
@@ -231,42 +214,39 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				};
 				
 				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
-	
 					@Override
 					public void invoke(Void param) {
 						addPersonToAcl();
 					}
-					
 				};
 				
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
-						@Override
-						public void invoke(Void param) {
-							// Add the ability for PUBLIC to see this entity.
-							if (isPubliclyVisible) {
-								presenter.makePrivate();
-							} else {
-								if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-									presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
-								}
+					@Override
+					public void invoke(Void param) {
+						// Add the ability for PUBLIC to see this entity.
+						if (isPubliclyVisible) {
+							presenter.makePrivate();
+						} else {
+							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
+								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
 							}
 						}
-					};
+					}
+				};
 				
 				addPeoplePanel.configure(permList, permissionDisplay, selectPermissionCallback, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(addPeoplePanel.asWidget());
 				
 				// 'Delete ACL' button
-				//Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL, AbstractImagePrototype.create(iconsImageBundle.deleteButton16()));
 				org.gwtbootstrap3.client.ui.Button deleteAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
 				deleteAclButton.setType(ButtonType.DANGER);
 				deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
 				deleteAclButton.addClickHandler(new ClickHandler() {
-						@Override
-						public void onClick(ClickEvent ce) {
-							presenter.deleteAcl();					
-							}
-						});
+					@Override
+					public void onClick(ClickEvent ce) {
+						presenter.deleteAcl();					
+						}
+				});
 					
 				Tooltip toolTipAndDeleteAclButton = new Tooltip();
 				toolTipAndDeleteAclButton.setWidget(deleteAclButton);
@@ -276,34 +256,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(toolTipAndDeleteAclButton);
 			}
 		}
-		// test
-		//add(buildDropDownPermissionButton());
-	}
-	
-	String selectedPermissionLevel;
-	
-	public ButtonGroup buildDropDownPermissionButton() {
-		ButtonGroup group = new ButtonGroup();
-		final Button button = new Button("Select something.");
-		//button.toggle();	// TODO: DropDown?? I don't think so.
-		button.setDataToggle(Toggle.DROPDOWN);
-		DropDownMenu menu = new DropDownMenu();
-		
-		ListItem item1 = new ListItem("Yeah yeah");
-		item1.addHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				ListItem item = (ListItem) event.getSource();
-				button.setText(item.getText());
-				Window.alert(item.getText());
-			}
-			
-		}, ClickEvent.getType());
-		menu.add(item1);
-		group.add(button);
-		group.add(menu);
-		return group;
 	}
 	
 	@Override
@@ -523,15 +475,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
-			// TODO: Add "force selection" functionality.
-			if(addPeoplePanel.getSelectedPermissionLevel() != null) {
+			if (addPeoplePanel.getSelectedPermissionLevel() != null) {
 				PermissionLevel level = addPeoplePanel.getSelectedPermissionLevel();
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
 				peopleSuggestBox.clear();
-				//permissionLevelCombo.clearSelections();
-				//permissionLevelListBox.setSelectedIndex(0);
 				presenter.setUnsavedViewChanges(false);
 			} else {
 				showAddMessage("Please select a permission level to grant.");
