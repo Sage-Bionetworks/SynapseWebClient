@@ -29,10 +29,10 @@ import com.google.inject.Inject;
 public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeopleToAclPanelView {
 	public interface AddPeopleToAclPanelViewImplUiBinder extends UiBinder<Widget, AddPeopleToAclPanelViewImpl> {};
 	
+	public static final String ACCESS_LEVEL_PLACEHOLDER_TEXT = "Select access level...";
+	
 	@UiField
 	Column suggestBoxPanel;
-//	@UiField
-//	Column permissionLevelPanel;
 	@UiField
 	Button addPersonButton;
 	@UiField
@@ -41,8 +41,6 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	CheckBox notifyPeopleCheckBox;
 	@UiField
 	Tooltip notifyTooltip;
-	@UiField
-	ButtonGroup permButtonGroup;
 	@UiField
 	Button permDropDownButton;
 	@UiField
@@ -59,11 +57,10 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	public AddPeopleToAclPanelViewImpl(AddPeopleToAclPanelViewImplUiBinder uiBinder, UserGroupSuggestBox suggestBox) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.suggestBox = suggestBox;
-		suggestBox.asWidget().addStyleName("form-control input-xs");
+		suggestBox.asWidget().addStyleName("form-control input-sm");
 		
 		suggestBoxPanel.add(suggestBox.asWidget());
 		notifyTooltip.setText(DisplayConstants.NOTIFY_PEOPLE_TOOLTIP);
-		permButtonGroup.addStyleName("input-xs");
 	}
 	
 	@Override
@@ -79,11 +76,10 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	@Override
 	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback,  final CallbackP<Void> addPersonCallback,
 						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
+		suggestBox.clear();
 		permDropDownMenu.clear();
+		permDropDownButton.setText(ACCESS_LEVEL_PLACEHOLDER_TEXT);
 		
-		//permissionLevelPanel.clear();
-		//permissionListBox.addStyleName("input-xs");
-		//permissionLevelPanel.add(permissionListBox);
 		configureDropdownButton(permLevels, permDisplay, selectPermissionCallback);
 		
 		if (publicButtonReg != null) {

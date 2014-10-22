@@ -17,14 +17,14 @@
 		                    </b:Column>
 		                    <b:Column ui:field="suggestBoxPanel" size="MD_10" />
 		                </b:Row>
-		                <b:Row>
+		                <b:Row addStyleNames="margin-top-10">
 		                    <b:Column size="MD_2">
 		                        <b:FormLabel>Access Level:</b:FormLabel>
 		                    </b:Column>
 		                    <b:Column size="MD_10">
-		                       <b:ButtonGroup ui:field="permButtonGroup" >
-		                    	<b:Button ui:field="permDropDownButton" dataToggle="DROPDOWN">Dropdown</b:Button>
-		                    	<b:DropDownMenu ui:field="permDropDownMenu" />
+		                       <b:ButtonGroup addStyleNames="btn-block">
+		                    	<b:Button ui:field="permDropDownButton" size="SMALL" dataToggle="DROPDOWN" addStyleNames="btn-block"/>
+		                    	<b:DropDownMenu ui:field="permDropDownMenu" addStyleNames="btn-block"/>
 		                    </b:ButtonGroup>
 		                    </b:Column>
 		                </b:Row>
