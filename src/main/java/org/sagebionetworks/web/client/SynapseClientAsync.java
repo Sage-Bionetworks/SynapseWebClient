@@ -34,6 +34,7 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -68,7 +69,7 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-	
+
 	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
@@ -328,14 +329,14 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
-	
+
 	/**
 	 * Validate a table query.
 	 * @param sql
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-
+	
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
 	void purgeTrashForUser(AsyncCallback<Void> callback);
@@ -374,4 +375,6 @@ public interface SynapseClientAsync {
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 
+	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 }
