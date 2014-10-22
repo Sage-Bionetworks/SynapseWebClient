@@ -177,17 +177,17 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
 			@Override
-               public void onSubmitComplete(SubmitCompleteEvent event) {
+			public void onSubmitComplete(SubmitCompleteEvent event) {
 					handleSubmitResult(event.getResults());
-               }
-       };
-       formPanel.addSubmitCompleteHandler(submitHandler);
+			}
+		};
+		formPanel.addSubmitCompleteHandler(submitHandler);
 	}
 	
 	private void handleSubmitResult(String result) {
 		if (result != null) {
 			presenter.handleSubmitResult(result);
-            hideLoading();
+			hideLoading();
 		}
 	}
 	
