@@ -24,6 +24,10 @@ public interface QueryInputView extends IsWidget {
 		 * Called to rest the query.
 		 */
 		void onReset();
+
+		void onEditResults();
+
+		void onDownloadResults();
 		
 	}
 	
@@ -64,5 +68,25 @@ public interface QueryInputView extends IsWidget {
 	 * @param string
 	 */
 	public void setInputErrorMessage(String string);
+
+	/**
+	 * Enable/disable the edit query results button.
+	 * 
+	 * @param wasSuccessful
+	 */
+	public void setEditEnabled(boolean enabled);
+
+	/**
+	 * Enable/disable the download query results button.
+	 * 
+	 * @param enabled
+	 */
+	public void setDownloadEnabled(boolean enabled);
+
+	/**
+	 * Show/hide the edit results button.
+	 * @param isEditable
+	 */
+	public void setEditVisible(boolean visibile);
 
 }

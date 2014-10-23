@@ -1,4 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
+
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+
 /**
  * Abstraction for page that handles the upload of a CSV file.
  *  

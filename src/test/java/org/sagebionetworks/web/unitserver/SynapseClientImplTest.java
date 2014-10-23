@@ -1156,11 +1156,10 @@ public class SynapseClientImplTest {
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();
 		inputSubmission.setId("my submission id");
-		String submissionJson = EntityFactory.createJSONStringForEntity(inputSubmission);
 		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
-		String returnSubmissionJson = synapseClient.createSubmission(submissionJson, "fakeEtag");
+		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
 		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
-		assertEquals(submissionJson, returnSubmissionJson);
+		assertEquals(inputSubmission, returnSubmission);
 	}
 	
 	private void setupTestSubmitterAliases() throws SynapseException{

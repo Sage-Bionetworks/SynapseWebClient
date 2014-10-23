@@ -171,7 +171,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 					public void onComplete(AsynchronousResponseBody response) {
 						// At this point the table should be created with CSV
 						// applied.
-						presenter.onTableCreated(table);
+						presenter.onFinished();
 					}
 
 					@Override

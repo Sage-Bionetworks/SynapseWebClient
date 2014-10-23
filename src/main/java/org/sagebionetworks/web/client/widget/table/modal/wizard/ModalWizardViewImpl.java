@@ -1,8 +1,9 @@
-package org.sagebionetworks.web.client.widget.table.modal.upload;
+package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,9 +15,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class UploadTableModalViewImpl implements UploadTableModalView {
-	
-	public interface Binder extends UiBinder<Modal, UploadTableModalViewImpl> {}
+public class ModalWizardViewImpl implements ModalWizardView {
+
+	public interface Binder extends UiBinder<Modal, ModalWizardViewImpl> {}
 	
 	@UiField
 	Button primaryButton;
@@ -30,7 +31,7 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	Modal modal;
 	
 	@Inject
-	public UploadTableModalViewImpl(Binder binder){
+	public ModalWizardViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
 	}
 
@@ -94,6 +95,16 @@ public class UploadTableModalViewImpl implements UploadTableModalView {
 	@Override
 	public void setPrimaryButtonText(String text) {
 		this.primaryButton.setText(text);
+	}
+
+	@Override
+	public void setTile(String title) {
+		modal.setTitle(title);
+	}
+
+	@Override
+	public void setSize(ModalSize size) {
+		modal.setSize(size);
 	}
 	
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -69,7 +70,7 @@ public interface SynapseClientAsync {
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
-
+	
 	void logErrorToRepositoryServices(String message, AsyncCallback<Void> callback);
 	
 	void logInfo(String message, AsyncCallback<Void> callback);
@@ -264,7 +265,7 @@ public interface SynapseClientAsync {
 	 * @param etag
 	 * @param callback
 	 */
-	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	void createSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
 	
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
@@ -329,14 +330,14 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void applyTableDelta(PartialRowSet delta, AsyncCallback<Void> callback);
-
+	
 	/**
 	 * Validate a table query.
 	 * @param sql
 	 * @param callback
 	 */
 	void validateTableQuery(String sql, AsyncCallback<Void> callback);
-	
+
 	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
 	
 	void purgeTrashForUser(AsyncCallback<Void> callback);
@@ -363,6 +364,8 @@ public interface SynapseClientAsync {
 			AsyncCallback<TableEntity> callback);
 
 	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
+	
+	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
 
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);

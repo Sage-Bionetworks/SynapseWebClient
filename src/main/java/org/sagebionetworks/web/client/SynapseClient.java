@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -355,7 +356,7 @@ public interface SynapseClient extends RemoteService {
 	
 	public ArrayList<String> getSharableEvaluations(String entityId) throws RestServiceException;
 	
-	public String createSubmission(String submissionJson, String etag) throws RestServiceException;
+	public Submission createSubmission(Submission submission, String etag) throws RestServiceException;
 	
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
@@ -464,6 +465,9 @@ public interface SynapseClient extends RemoteService {
 	 * @throws RestServiceException 
 	 */
 	FileHandle getFileHandle(String fileHandleId) throws RestServiceException;
+	
+	
+	String createFileHandleURL(String fileHandleId) throws RestServiceException;
 
 	/**
 	 * Create a list of columns.

@@ -2877,19 +2877,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public String createSubmission(String submissionJson, String etag)
+	public Submission createSubmission(Submission submission, String etag)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			Submission sub = jsonEntityFactory.createEntity(submissionJson,
-					Submission.class);
-			Submission updatedSubmission = synapseClient.createSubmission(sub,
-					etag);
-			JSONObjectAdapter updatedSubmissionJson = updatedSubmission
-					.writeToJSONObject(adapterFactory.createNew());
-			return updatedSubmissionJson.toJSONString();
+			return synapseClient.createSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
@@ -3444,6 +3436,20 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return synapseClient.getRawFileHandle(fileHandleId);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
+	public String createFileHandleURL(String fileHandleId)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try{
+			URL url = synapseClient.getFileHandleTemporaryUrl(fileHandleId);
+			return url.toString();
+		}catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} catch (IOException e) {
+			throw new UnknownErrorException(e.getMessage());
 		} 
 	}
 

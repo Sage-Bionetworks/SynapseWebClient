@@ -26,10 +26,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadRequestUtils;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditor;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -131,7 +131,7 @@ public class UploadCSVFinalPageImplTest {
 		// the test call
 		page.onPrimary();
 		verify(mockPresenter).setLoading(true);
-		verify(mockPresenter).onTableCreated(table);
+		verify(mockPresenter).onFinished();
 	}
 
 	@Test

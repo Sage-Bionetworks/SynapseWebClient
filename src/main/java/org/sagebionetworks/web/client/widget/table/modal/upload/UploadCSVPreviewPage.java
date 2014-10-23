@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+
 
 /**
  * Abstraction for a page that shows a preview of what a table upload will look like with the option to change how the CSV is read.

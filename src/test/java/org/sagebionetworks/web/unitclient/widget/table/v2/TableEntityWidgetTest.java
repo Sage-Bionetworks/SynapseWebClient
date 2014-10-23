@@ -2,8 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
 
 import java.util.LinkedList;
@@ -23,6 +21,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -39,6 +38,7 @@ public class TableEntityWidgetTest {
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
+	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
 	TableEntityWidgetView mockView;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
@@ -51,6 +51,7 @@ public class TableEntityWidgetTest {
 	public void before(){
 		// mocks
 		mockView = Mockito.mock(TableEntityWidgetView.class);
+		mockDownloadTableQueryModalWidget = Mockito.mock(DownloadTableQueryModalWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
@@ -64,7 +65,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 		
