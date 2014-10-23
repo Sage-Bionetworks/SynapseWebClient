@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.UploadToTableRequest;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
 public interface UploadCSVFinishPage extends ModalPage {
 	/**

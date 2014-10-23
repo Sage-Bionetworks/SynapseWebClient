@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
-import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 import com.google.gwt.user.client.ui.IsWidget;
+
 
 /**
  * Abstraction for a widget used to upload CSV files to a table.
@@ -12,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface UploadTableModalWidget extends IsWidget {
+public interface UploadTableModalWidget extends IsWidget{
 
 	/**
 	 * Configure this widget before using it.
@@ -20,10 +21,13 @@ public interface UploadTableModalWidget extends IsWidget {
 	 * @param parentId
 	 * @param handler Table creation notification.
 	 */
-	public void configure(String parentId, TableCreatedHandler handler);
-	
+	public void configure(String parentId);
+
 	/**
-	 * Call this method to show the modal dialog.
+	 * After configuring the widget call this method to show the wizard.
+	 * 
+	 * @param wizardCallback
 	 */
-	public void showModal();
+	public void showModal(WizardCallback wizardCallback);
+	
 }

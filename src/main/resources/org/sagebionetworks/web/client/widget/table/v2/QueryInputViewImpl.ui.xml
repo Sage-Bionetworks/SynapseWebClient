@@ -12,10 +12,13 @@
 			<b:InputGroupButton>
 				<b:Button ui:field="queryButton" icon="SEARCH" type="INFO"
 					dataLoadingText="Executing...">Query</b:Button>
+				<b:Button ui:field="editResultsButton" icon="GEAR" height="34px" />
+				<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" />
 			</b:InputGroupButton>
 		</b:InputGroup>
 		<b:Alert ui:field="queryResultsMessage" type="DANGER" visible="false">
-			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="LINK" title="Reset query"></b:Button>
+			<b:Button ui:field="resetButton" icon="ROTATE_LEFT" type="LINK"
+				title="Reset query"></b:Button>
 		</b:Alert>
 	</g:HTMLPanel>
 </ui:UiBinder>

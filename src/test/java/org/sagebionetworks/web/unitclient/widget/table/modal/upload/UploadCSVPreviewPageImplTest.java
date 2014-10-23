@@ -11,11 +11,11 @@ import org.sagebionetworks.repo.model.table.UploadToTablePreviewResult;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.ContentTypeDelimiter;
-import org.sagebionetworks.web.client.widget.table.modal.upload.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVPreviewPageView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadPreviewWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.unitclient.widget.asynch.JobTrackingWidgetStub;
 
 public class UploadCSVPreviewPageImplTest {

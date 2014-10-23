@@ -41,6 +41,10 @@ public class QueryInputViewImpl implements QueryInputView{
 	Alert queryResultsMessage;
 	@UiField
 	Button resetButton;
+	@UiField
+	Button editResultsButton;
+	@UiField
+	Button downloadResultsButton;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -74,6 +78,18 @@ public class QueryInputViewImpl implements QueryInputView{
 				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
 					presenter.onExecuteQuery();
 				}
+			}
+		});
+		editResultsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onEditResults();
+			}
+		});
+		downloadResultsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onDownloadResults();
 			}
 		});
 	}
@@ -118,5 +134,22 @@ public class QueryInputViewImpl implements QueryInputView{
 	public void setInputErrorMessage(String string) {
 		this.queryResultsMessage.setText(string);
 	}
+
+	@Override
+	public void setEditEnabled(boolean enabled) {
+		this.editResultsButton.setEnabled(enabled);
+	}
+	
+	@Override
+	public void setEditVisible(boolean visibile) {
+		this.editResultsButton.setVisible(visibile);
+	}
+
+	@Override
+	public void setDownloadEnabled(boolean enabled) {
+		this.downloadResultsButton.setEnabled(enabled);
+	}
+
+
 
 }

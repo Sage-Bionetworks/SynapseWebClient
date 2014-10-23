@@ -65,7 +65,7 @@ public class CreateTableModalWidgetTest {
 		widget.onCreateTable();
 		verify(mockView, never()).showError(anyString());
 		verify(mockView).hide();
-		verify(mockHandler).tableCreated(table);
+		verify(mockHandler).tableCreated();
 	}
 	
 	@Test
@@ -83,7 +83,7 @@ public class CreateTableModalWidgetTest {
 		verify(mockView).setLoading(false);
 		// Should not hide with error.
 		verify(mockView, never()).hide();
-		verify(mockHandler, never()).tableCreated(any(TableEntity.class));
+		verify(mockHandler, never()).tableCreated();
 	}
 	
 }

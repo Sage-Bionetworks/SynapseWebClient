@@ -59,7 +59,7 @@ public class CreateTableModalWidgetImpl implements CreateTableModalView.Presente
 			@Override
 			public void onSuccess(TableEntity table) {
 				view.hide();
-				handler.tableCreated(table);
+				handler.tableCreated();
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
@@ -31,7 +32,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the Table Schema to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 10L;
-
+	
+	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	private TableEntityWidgetView view;
 	
 	String tableId;
@@ -43,13 +45,15 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	Query currentQuery;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget){
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, DownloadTableQueryModalWidget downloadTableQueryModalWidget){
 		this.view = view;
+		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
+		this.view.setDownloadTableQueryModalWidget(this.downloadTableQueryModalWidget);
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 */
 	private void setQuery(Query query){
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), this);
+		this.queryInputWidget.configure(query.getSql(), this, this.canEdit);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		this.queryResultsWidget.configure(query, this.canEdit, this);
@@ -190,6 +194,17 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public void onPageChange(Long newOffset) {
 		this.currentQuery.setOffset(newOffset);
 		setQuery(this.currentQuery);
+	}
+
+	@Override
+	public void onEditResults() {
+		queryResultsWidget.onEditRows();
+	}
+
+	@Override
+	public void onDownloadResults(String sql) {
+		this.downloadTableQueryModalWidget.configure(sql);
+		downloadTableQueryModalWidget.showModal();
 	}
 	
 }

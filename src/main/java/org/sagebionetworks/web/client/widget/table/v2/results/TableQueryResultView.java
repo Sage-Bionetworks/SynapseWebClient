@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -75,18 +73,6 @@ public interface TableQueryResultView extends IsWidget {
 	 * Hide the editor.
 	 */
 	void hideEditor();
-
-	/**
-	 * Show or hide the tool bar.
-	 * @param b
-	 */
-	void setToolbarVisible(boolean visible);
-
-	/**
-	 * Enable the edit button.
-	 * @param isEditable
-	 */
-	void setEditEnabled(boolean isEditable);
 
 	/**
 	 * The progress widget shows query progress.s

@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.widget.table.TableCreatedHandler;
+import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,86 +13,32 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class UploadTableModalWidgetImpl implements UploadTableModalWidget, UploadTableModalView.Presenter, ModalPage.ModalPresenter {
+public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
 	
-	// injected fields
-	UploadTableModalView view;
-	UploadCSVFilePage firstPage;
-	// dynamic data
-	ModalPage currentPage;
-	TableCreatedHandler tableCreatedHandler;
+	ModalWizardWidget modalWizarWidget;
+	UploadCSVFilePage uploadCSVFileWidget;
 
 	@Inject
-	public UploadTableModalWidgetImpl(UploadTableModalView view, UploadCSVFilePage uploadCSVFileWidget) {
-		this.view = view;
-		this.firstPage = uploadCSVFileWidget;
-		this.view.setPresenter(this);
+	public UploadTableModalWidgetImpl(ModalWizardWidget modalWizarWidget, UploadCSVFilePage uploadCSVFileWidget) {
+		this.modalWizarWidget = modalWizarWidget;
+		this.modalWizarWidget.setTitle("Upload Table");
+		this.modalWizarWidget.setModalSize(ModalSize.LARGE);
+		this.uploadCSVFileWidget = uploadCSVFileWidget;
+		this.modalWizarWidget.configure(this.uploadCSVFileWidget);
+	}
+
+	@Override
+	public void configure(String parentId) {
+		this.uploadCSVFileWidget.configure(parentId);
 	}
 
 	@Override
 	public Widget asWidget() {
-		return view.asWidget();
+		return modalWizarWidget.asWidget();
 	}
 
 	@Override
-	public void onPrimary() {
-		// pass this to the current page
-		this.currentPage.onPrimary();
+	public void showModal(WizardCallback wizardCallback) {
+		this.modalWizarWidget.showModal(wizardCallback);
 	}
-
-	@Override
-	public void configure(String parentId, TableCreatedHandler handler) {
-		this.firstPage.configure(parentId);
-		this.tableCreatedHandler = handler;
-	}
-
-	@Override
-	public void showModal() {
-		setNextActivePage(this.firstPage);
-		view.showModal();
-	}
-
-	@Override
-	public void onCancel() {
-		this.view.hideModal();
-	}
-
-	@Override
-	public void setNextActivePage(ModalPage next) {
-		this.currentPage = next;
-		this.currentPage.setModalPresenter(this);
-		// add the page to the dialog.
-		this.view.setBody(this.currentPage);
-		this.setLoading(false);
-	}
-
-	@Override
-	public void setLoading(boolean loading) {
-		view.showAlert(false);
-		view.setLoading(loading);
-	}
-
-	@Override
-	public void setPrimaryButtonText(String text) {
-		view.setPrimaryButtonText(text);
-	}
-
-	@Override
-	public void setInstructionMessage(String message) {
-		view.setInstructionsMessage(message);
-	}
-
-	@Override
-	public void setErrorMessage(String message) {
-		view.showAlert(true);
-		view.showErrorMessage(message);
-		view.setLoading(false);
-	}
-
-	@Override
-	public void onTableCreated(TableEntity table) {
-		this.tableCreatedHandler.tableCreated(table);
-		this.view.hideModal();
-	}
-
 }
