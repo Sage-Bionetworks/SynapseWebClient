@@ -50,14 +50,15 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+
 /**
- * Note on the form submission.  This supports two form submission use cases.
- * 1.  Submit to Portal servlet.  These will return the response html in the SubmitCompleteHandler.
- * 2.  Submit to SFTP proxy servlet.  This will not return the response html in the SubmitCompleteHandler (due to CORS).  But the sftp proxy will return a page that sends a message (via postMessage)
- * 	to the parent window.  So we set up a listener (onAttach) for this cross-window message.
- * @author jayhodgson
- *
- */
+* Note on the form submission. This supports two form submission use cases.
+* 1. Submit to Portal servlet. These will return the response html in the SubmitCompleteHandler.
+* 2. Submit to SFTP proxy servlet. This will not return the response html in the SubmitCompleteHandler (due to CORS). But the sftp proxy will return a page that sends a message (via postMessage)
+* to the parent window. So we set up a listener (onAttach) for this cross-window message.
+* @author jayhodgson
+*
+*/
 public class UploaderViewImpl extends FlowPanel implements
 		UploaderView {
 	
@@ -141,6 +142,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		pathField = new TextBox();
 		initUploadPanel();
 		initExternalPanel();
+		
 		initHandlers();
 	}
 	
@@ -178,12 +180,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
-					handleSubmitResult(event.getResults());
+				handleSubmitResult(event.getResults());
 			}
 		};
 		formPanel.addSubmitCompleteHandler(submitHandler);
 	}
 	
+
 	private void handleSubmitResult(String result) {
 		if (result != null) {
 			presenter.handleSubmitResult(result);
@@ -197,8 +200,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		if (event !== undefined && event.data !== undefined)
 			return event.data;
 		else return null;
-    }-*/;
-	
+	}-*/;
 	
 	@Override
 	protected void onAttach() {
@@ -213,7 +215,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		}
 		super.onAttach();
 	}
-
+	
 	@Override
 	protected void onDetach() {
 		if (messageHandler != null)
@@ -326,7 +328,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
-		formPanel.submit();
+		formPanel.submit();	
 	}
 	
 	@Override
@@ -345,8 +347,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		else
 			container.clear();
 		
-		container.add(dialog);	// Put modal on uploader layer.
-		
+		container.add(dialog); // Put modal on uploader layer.
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		uploadPanel.removeFromParent();
 		if (isEntity) {
@@ -483,7 +484,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		row.add(col);
 		uploadPanel.add(row);
 	}
-	
+
 	@Override
 	public void showUploadingToExternalStorage(String url, String banner) {
 		uploadDestinationContainer.clear();

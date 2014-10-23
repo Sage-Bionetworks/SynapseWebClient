@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -263,7 +264,7 @@ public interface SynapseClientAsync {
 	 * @param etag
 	 * @param callback
 	 */
-	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	void createSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
 	
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
