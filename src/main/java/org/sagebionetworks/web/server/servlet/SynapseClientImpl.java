@@ -2874,19 +2874,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public String createSubmission(String submissionJson, String etag)
+	public Submission createSubmission(Submission submission, String etag)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(
-					adapterFactory);
-			Submission sub = jsonEntityFactory.createEntity(submissionJson,
-					Submission.class);
-			Submission updatedSubmission = synapseClient.createSubmission(sub,
-					etag);
-			JSONObjectAdapter updatedSubmissionJson = updatedSubmission
-					.writeToJSONObject(adapterFactory.createNew());
-			return updatedSubmissionJson.toJSONString();
+			return synapseClient.createSubmission(submission, etag);
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
