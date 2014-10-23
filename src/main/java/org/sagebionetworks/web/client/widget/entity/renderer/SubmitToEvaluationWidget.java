@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -17,6 +16,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -69,6 +70,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 			evaluationIds = subchallengeIdList.split(WidgetConstants.JOIN_WIDGET_SUBCHALLENGE_ID_LIST_DELIMETER);
 		}
 		final String evaluationUnavailableMessage = descriptor.get(WidgetConstants.UNAVAILABLE_MESSAGE);
+		final String buttonText = descriptor.get(WidgetConstants.BUTTON_TEXT_KEY);
 		
 		//figure out if we should show anything
 		try {
@@ -81,7 +83,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 				public void onSuccess(String jsonString) {
 					try {
 						PaginatedResults<Evaluation> results = nodeModelCreator.createPaginatedResults(jsonString, Evaluation.class);
-						view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage);	
+						view.configure(wikiKey, results.getTotalNumberOfResults() > 0, evaluationUnavailableMessage, buttonText);	
 					} catch (JSONObjectAdapterException e) {
 						onFailure(e);
 					}
