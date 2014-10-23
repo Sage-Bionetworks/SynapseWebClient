@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -21,7 +22,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -38,9 +38,9 @@ import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -64,7 +64,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileFormWidget profileForm;
 	private GWTWrapper gwt;
 	private AdapterFactory adapterFactory;
-	private SearchServiceAsync searchService;
 	private ProfileUpdatedCallback profileUpdatedCallback;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private CookieProvider cookies;
@@ -72,6 +71,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private int teamNotificationCount;
 	private String currentUserId;
 	private boolean isOwner;
+	private int currentOffset;
+	public final static int PROJECT_PAGE_SIZE=20;
 	
 	@Inject
 	public ProfilePresenter(ProfileView view,
@@ -82,7 +83,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			GWTWrapper gwt, JSONObjectAdapter jsonObjectAdapter,
 			ProfileFormWidget profileForm,
 			AdapterFactory adapterFactory,
-			SearchServiceAsync searchService,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			RequestBuilderWrapper requestBuilder) {
 		this.view = view;
@@ -92,7 +92,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.gwt = gwt;
 		this.adapterFactory = adapterFactory;
 		this.profileForm = profileForm;
-		this.searchService = searchService;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.requestBuilder = requestBuilder;
 		this.cookies = cookieProvider;
@@ -159,13 +158,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProfile(currentUserId, new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile profile) {
-					if (isOwner) {
-						//only configure the profile form (editor) if owner of this profile
-						profileForm.configure(profile, profileUpdatedCallback);
+						if (isOwner) {
+							//only configure the profile form (editor) if owner of this profile
+							profileForm.configure(profile, profileUpdatedCallback);
+						}
+						
+						getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
 					}
-					
-					getIsCertifiedAndUpdateView(profile, isOwner, initialTab);
-				}
 				@Override
 				public void onFailure(Throwable caught) {
 					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);    					    				
@@ -199,13 +198,26 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			
 			private void proceed() {
-				getUserProjects(profile.getOwnerId());
+				refreshProjects();
 				refreshTeams();
 				if (isOwner) {
 					getFavorites();
 				}
 			}
 		});
+	}
+	
+	public void refreshProjects() {
+		currentOffset = 0;
+		view.clearProjects();
+		getMoreProjects();
+	}
+
+	public void getMoreProjects() {
+		if (isOwner)
+			getMyProjects(currentUserId, currentOffset);
+		else
+			getUserProjects(currentUserId, currentOffset);
 	}
 	
 	@Override
@@ -305,18 +317,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onSuccess(ArrayList<EntityHeader> headers) {
-				//finally, we can tell the view to update the user challenges based on these entity headers
-				
-				//sort by name
-				Collections.sort(headers, new Comparator<EntityHeader>() {
-			        @Override
-			        public int compare(EntityHeader o1, EntityHeader o2) {
-			        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
-			        }
-				});
-				
-				view.setChallenges(headers);
-			}
+					//finally, we can tell the view to update the user challenges based on these entity headers
+					
+					//sort by name
+					Collections.sort(headers, new Comparator<EntityHeader>() {
+				        @Override
+				        public int compare(EntityHeader o1, EntityHeader o2) {
+				        	return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+				        }
+					});
+					
+					view.setChallenges(headers);
+				}	
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -325,17 +337,45 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void getUserProjects(String userId) {
-		EntityBrowserUtils.loadUserUpdateable(userId, searchService, adapterFactory, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+	public void getMyProjects(String userId, int offset) {
+		view.showProjectsLoading(true);
+		synapseClient.getMyProjects(PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
 			@Override
-			public void onSuccess(List<EntityHeader> result) {
-				view.setProjects(result);
+			public void onSuccess(ProjectPagedResults projectHeaders) {
+				view.showProjectsLoading(false);
+				List<ProjectHeader> headers = projectHeaders.getResults();
+				view.addProjects(headers);
+				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setProjectsError("Could not load Projects: " + caught.getMessage());
+				view.showProjectsLoading(false);
+				view.setProjectsError("Could not load my projects:" + caught.getMessage());
 			}
 		});
+	}
+	
+	public void getUserProjects(String userId, int offset) {
+		view.showProjectsLoading(true);
+		synapseClient.getUserProjects(userId, PROJECT_PAGE_SIZE, offset, new AsyncCallback<ProjectPagedResults>() {
+			@Override
+			public void onSuccess(ProjectPagedResults projectHeaders) {
+				view.showProjectsLoading(false);
+				List<ProjectHeader> headers = projectHeaders.getResults();
+				view.addProjects(headers);
+				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showProjectsLoading(false);
+				view.setProjectsError("Could not load user projects:" + caught.getMessage());
+			}
+		});
+	}
+	
+	public void projectPageAdded(int totalNumberOfResults) {
+		currentOffset += PROJECT_PAGE_SIZE;
+		view.setIsMoreProjectsVisible(currentOffset < totalNumberOfResults);
 	}
 	
 	public void getFavorites() {
@@ -522,13 +562,29 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	/**
-	 * Exposed for testing purposes only
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public int getCurrentOffset() {
+		return currentOffset;
+	}
+
+	/**
+	 * Exposed for unit testing purposes only
+	 * @return
+	 */
+	public void setCurrentOffset(int currentOffset) {
+		this.currentOffset = currentOffset;
+	}
+	
+	/**
+	 * Exposed for unit testing purposes only
 	 * @return
 	 */
 	public boolean isOwner() {
 		return isOwner;
 	}
-
+	
 	@Override
 	public void tabClicked(ProfileArea tab) {
 		//Project tab is default
@@ -548,7 +604,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	/**
-	 * Exposed for testing purposes only
+	 * Exposed for unit testing purposes only
 	 * @return
 	 */
 	public void setIsOwner(boolean isOwner) {
@@ -558,6 +614,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void certificationBadgeClicked() {
 		goTo(new Certificate(currentUserId));
-	}
+}
 }
 

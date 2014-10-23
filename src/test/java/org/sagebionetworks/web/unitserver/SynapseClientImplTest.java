@@ -73,6 +73,8 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -111,6 +113,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -130,6 +133,7 @@ import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -371,6 +375,15 @@ public class SynapseClientImplTest {
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
 		when(mockSynapse.sendStringMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
+		
+		//getMyProjects getUserProjects
+		PaginatedResults<ProjectHeader> headers = new PaginatedResults<ProjectHeader>();
+		headers.setTotalNumberOfResults(1100);
+		List<ProjectHeader> projectHeaders = new ArrayList();
+		projectHeaders.add(new ProjectHeader());
+		headers.setResults(projectHeaders);
+		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
@@ -676,7 +689,7 @@ public class SynapseClientImplTest {
 		synapseClient.getWikiHeaderTree("testId", ObjectType.ENTITY.toString());
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
 	}
-
+	
 	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
@@ -963,7 +976,7 @@ public class SynapseClientImplTest {
 		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 	}
-	
+		
 	@Test(expected = ConflictException.class)
 	public void testGetFileEntityIdWithSameNameConflict() throws JSONObjectAdapterException, SynapseException, RestServiceException, JSONException {
 		Folder folder = new Folder();
@@ -987,7 +1000,7 @@ public class SynapseClientImplTest {
 		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 	}
-	
+		
 	@Test
 	public void testGetFileEntityIdWithSameNameFound() throws JSONException, JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity file = getTestFileEntity();
@@ -1529,9 +1542,43 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
-		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage);
-		verify(mockSynapse).logError(any(LogEntry.class));
+	public void testGetMyProjects() throws Exception {
+		int limit = 11;
+		int offset = 20;
+		synapseClient.getMyProjects(limit, offset);
+		verify(mockSynapse).getMyProjects(eq(limit), eq(offset));
 	}
+	
+	@Test
+	public void testGetUserProjects() throws Exception {
+		int limit = 11;
+		int offset = 20;
+		Long userId = 133l;
+		String userIdString = userId.toString();
+		synapseClient.getUserProjects(userIdString, limit, offset);
+		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
+	}
+	
+	@Test
+	public void testSafeLongToInt() {
+		int inRangeInt = 500;
+		int after = SynapseClientImpl.safeLongToInt(inRangeInt);
+		assertEquals(inRangeInt, after);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSafeLongToIntPositive() {
+		long testValue = Integer.MAX_VALUE;
+		testValue++;
+		SynapseClientImpl.safeLongToInt(testValue);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSafeLongToIntNegative() {
+		long testValue = Integer.MIN_VALUE;
+		testValue--;
+		SynapseClientImpl.safeLongToInt(testValue);
+	}
+
+	
 }
