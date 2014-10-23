@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.repo.model.table.CsvTableDescriptor;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
+import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.download.CreateDownloadPageView;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadFilePage;
@@ -49,7 +50,6 @@ public class CreateDownloadPageImplTest {
 	
 	@Test
 	public void testgetDownloadFromTableRequest(){
-		// This is the main entry to the page
 		page.setModalPresenter(mockModalPresenter);
 		DownloadFromTableRequest expected = new DownloadFromTableRequest();
 		CsvTableDescriptor descriptor = new CsvTableDescriptor();
@@ -64,5 +64,62 @@ public class CreateDownloadPageImplTest {
 		
 		DownloadFromTableRequest request = page.getDownloadFromTableRequest();
 		assertEquals(expected, request);
+	}
+	
+	@Test
+	public void testOnPrimarySuccess(){
+		page.setModalPresenter(mockModalPresenter);
+		when(mockView.getFileType()).thenReturn(FileType.TSV);
+		when(mockView.getIncludeHeaders()).thenReturn(true);
+		when(mockView.getIncludeRowMetadata()).thenReturn(false);
+	
+		String fileHandle = "45678";
+		DownloadFromTableResult results = new DownloadFromTableResult();
+		results.setResultsFileHandleId(fileHandle);
+	
+		jobTrackingWidgetStub.setResponse(results);
+		page.onPrimary();
+		verify(mockModalPresenter).setLoading(true);
+		verify(mockView).setTrackerVisible(true);
+		verify(mockNextPage).configure(fileHandle);
+		verify(mockModalPresenter).setNextActivePage(mockNextPage);
+	}
+	
+	@Test
+	public void testOnPrimaryCancel(){
+		page.setModalPresenter(mockModalPresenter);
+		when(mockView.getFileType()).thenReturn(FileType.TSV);
+		when(mockView.getIncludeHeaders()).thenReturn(true);
+		when(mockView.getIncludeRowMetadata()).thenReturn(false);
+	
+		String fileHandle = "45678";
+		DownloadFromTableResult results = new DownloadFromTableResult();
+		results.setResultsFileHandleId(fileHandle);
+	
+		jobTrackingWidgetStub.setOnCancel(true);
+		page.onPrimary();
+		verify(mockModalPresenter).setLoading(true);
+		verify(mockView).setTrackerVisible(true);
+		verify(mockNextPage, never()).configure(fileHandle);
+		verify(mockModalPresenter).onCancel();
+	}
+	
+	@Test
+	public void testOnPrimaryFailure(){
+		page.setModalPresenter(mockModalPresenter);
+		when(mockView.getFileType()).thenReturn(FileType.TSV);
+		when(mockView.getIncludeHeaders()).thenReturn(true);
+		when(mockView.getIncludeRowMetadata()).thenReturn(false);
+	
+		String fileHandle = "45678";
+		DownloadFromTableResult results = new DownloadFromTableResult();
+		results.setResultsFileHandleId(fileHandle);
+		String error = "failure";
+		jobTrackingWidgetStub.setError(new Throwable(error));
+		page.onPrimary();
+		verify(mockModalPresenter).setLoading(true);
+		verify(mockView).setTrackerVisible(true);
+		verify(mockNextPage, never()).configure(fileHandle);
+		verify(mockModalPresenter).setErrorMessage(error);
 	}
 }

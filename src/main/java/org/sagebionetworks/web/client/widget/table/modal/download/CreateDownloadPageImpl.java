@@ -66,7 +66,6 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 	 * @param results
 	 */
 	private void setResults(DownloadFromTableResult results){
-		this.view.setTrackerVisible(false);
 		this.nextPage.configure(results.getResultsFileHandleId());
 		this.presenter.setNextActivePage(this.nextPage);
 	}

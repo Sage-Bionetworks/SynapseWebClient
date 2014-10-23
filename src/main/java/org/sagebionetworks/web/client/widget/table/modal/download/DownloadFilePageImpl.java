@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 
 public class DownloadFilePageImpl implements DownloadFilePage {
 	
-	private static final String DOWNLOAD = "Download";
+	public static final String DOWNLOAD = "Download";
 	// Injected dependencies
 	DownloadFilePageView view;
 	SynapseClientAsync synapseClient;
