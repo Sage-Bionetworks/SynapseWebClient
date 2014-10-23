@@ -8,16 +8,6 @@
 	<g:HTMLPanel>
 		<b:Panel>
 			<b:PanelBody>
-				<!-- ToolBar for the table results -->
-				<b:ButtonToolBar ui:field="resultsToolBar">
-					<b:ButtonGroup>
-						<b:Button ui:field="editRowsButton" icon="GEAR" type="INFO">Edit
-							Rows</b:Button>
-					</b:ButtonGroup>
-					<b:ButtonGroup>
-						<b:Button ui:field="downloadCSVButton" icon="DOWNLOAD">Download</b:Button>
-					</b:ButtonGroup>
-				</b:ButtonToolBar>
 				<bh:Div styleName="margin-top-15" />
 				<b:Alert ui:field="errorAlert" type="DANGER"></b:Alert>
 

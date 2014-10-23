@@ -102,7 +102,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 */
 	private void setQuery(Query query){
 		this.currentQuery = query;
-		this.queryInputWidget.configure(query.getSql(), this);
+		this.queryInputWidget.configure(query.getSql(), this, this.canEdit);
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		this.queryResultsWidget.configure(query, this.canEdit, this);

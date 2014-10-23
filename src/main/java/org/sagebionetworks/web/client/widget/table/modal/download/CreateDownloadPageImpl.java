@@ -13,7 +13,8 @@ import com.google.inject.Inject;
 
 public class CreateDownloadPageImpl implements CreateDownloadPage {
 	
-	private static final String NEXT = "Next";
+	public static final String CREATING_THE_FILE = "Creating the file...";
+	public static final String NEXT = "Next";
 	// Injected dependencies.
 	CreateDownloadPageView view;
 	JobTrackingWidget jobTrackingWidget;
@@ -39,7 +40,7 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 		
 		DownloadFromTableRequest request = getDownloadFromTableRequest();
 		
-		this.jobTrackingWidget.startAndTrackJob("Preparing the file...", false, AsynchType.TableCSVDownload, request, new AsynchronousProgressHandler() {
+		this.jobTrackingWidget.startAndTrackJob(CREATING_THE_FILE, false, AsynchType.TableCSVDownload, request, new AsynchronousProgressHandler() {
 			
 			@Override
 			public void onFailure(Throwable failure) {
@@ -60,11 +61,14 @@ public class CreateDownloadPageImpl implements CreateDownloadPage {
 		
 	}
 	
+	/**
+	 * Called when the file is created and ready for download.
+	 * @param results
+	 */
 	private void setResults(DownloadFromTableResult results){
 		this.view.setTrackerVisible(false);
 		this.nextPage.configure(results.getResultsFileHandleId());
 		this.presenter.setNextActivePage(this.nextPage);
-		
 	}
 
 	@Override

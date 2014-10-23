@@ -107,8 +107,6 @@ public class QueryInputViewImpl implements QueryInputView{
 		} else {
 			this.queryButton.state().reset();
 		}
-		editResultsButton.setEnabled(!loading);
-		downloadResultsButton.setEnabled(!loading);
 	}
 
 	@Override
@@ -136,5 +134,22 @@ public class QueryInputViewImpl implements QueryInputView{
 	public void setInputErrorMessage(String string) {
 		this.queryResultsMessage.setText(string);
 	}
+
+	@Override
+	public void setEditEnabled(boolean enabled) {
+		this.editResultsButton.setEnabled(enabled);
+	}
+	
+	@Override
+	public void setEditVisible(boolean visibile) {
+		this.editResultsButton.setVisible(visibile);
+	}
+
+	@Override
+	public void setDownloadEnabled(boolean enabled) {
+		this.downloadResultsButton.setEnabled(enabled);
+	}
+
+
 
 }

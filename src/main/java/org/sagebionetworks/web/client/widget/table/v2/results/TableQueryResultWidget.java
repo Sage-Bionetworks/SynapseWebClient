@@ -70,7 +70,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void runQuery() {
 		this.view.hideEditor();
 		this.view.setErrorVisible(false);
-		this.view.setToolbarVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
@@ -109,8 +108,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
 		this.view.setTableVisible(true);
-		this.view.setToolbarVisible(true);
-		this.view.setEditEnabled(this.isEditable);
 		fireFinishEvent(true);
 	}
 
@@ -148,7 +145,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void showError(String message){
 		this.view.setTableVisible(false);
 		this.view.showError(message);
-		this.view.setToolbarVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false);
 		this.view.setErrorVisible(true);

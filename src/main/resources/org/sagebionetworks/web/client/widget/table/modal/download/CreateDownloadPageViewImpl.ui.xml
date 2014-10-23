@@ -10,11 +10,13 @@
 		<b:Form>
 			<b:FormGroup>
 				<b:FormLabel for="fileType">File type</b:FormLabel>
-				<b:Radio name="fileType" ui:field="commaRadio">Comma Separated Values (CSV)</b:Radio>
+				<b:Radio name="fileType" ui:field="commaRadio">Comma Separated Values
+					(CSV)</b:Radio>
 				<b:Radio name="fileType" ui:field="tabRadio">Tab Separated Values (TSV)</b:Radio>
 			</b:FormGroup>
 			<b:FormGroup>
-				<b:CheckBox ui:field="writeHeader">First line is the columns names.</b:CheckBox>
+				<b:FormLabel for="headers">Contents</b:FormLabel>
+				<b:CheckBox name="headers" ui:field="writeHeader">First line is the columns names.</b:CheckBox>
 			</b:FormGroup>
 			<b:FormGroup>
 				<b:CheckBox ui:field="includeMetadata">Include row metadata (Row Id and Row

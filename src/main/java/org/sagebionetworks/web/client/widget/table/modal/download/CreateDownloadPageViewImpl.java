@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.modal.download;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Radio;
-import org.gwtbootstrap3.extras.select.client.ui.Select;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

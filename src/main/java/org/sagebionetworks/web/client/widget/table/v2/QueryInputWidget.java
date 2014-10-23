@@ -35,9 +35,10 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	 * @param startQuery
 	 * @param queryInputListener
 	 */
-	public void configure(String startQuery, QueryInputListener queryInputListener){
+	public void configure(String startQuery, QueryInputListener queryInputListener, boolean isEditable){
 		this.startQuery = startQuery;
 		this.queryInputListener = queryInputListener;
+		this.view.setEditVisible(isEditable);
 		onReset();
 	}
 
@@ -84,11 +85,15 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	@Override
 	public void queryExecutionStarted() {
 		view.setQueryInputLoading(true);
+		view.setEditEnabled(false);
+		view.setDownloadEnabled(false);
 	}
 
 	@Override
 	public void queryExecutionFinished(boolean wasSuccessful) {
 		view.setQueryInputLoading(false);
+		view.setEditEnabled(wasSuccessful);
+		view.setDownloadEnabled(wasSuccessful);
 	}
 
 	@Override
@@ -96,6 +101,8 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 		view.setInputQueryString(startQuery);
 		view.showInputError(false);
 		view.setQueryInputLoading(false);
+		view.setEditEnabled(false);
+		view.setDownloadEnabled(false);
 	}
 
 	@Override
