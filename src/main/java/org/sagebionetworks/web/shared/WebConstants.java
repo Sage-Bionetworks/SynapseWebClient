@@ -149,6 +149,21 @@ public class WebConstants {
 	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
 	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
 	
+	
+	//Workshop
+	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
+	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
+	public static final String STAGE_II_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageII_synapse_id";
+	public static final String STAGE_III_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIII_synapse_id";
+	public static final String STAGE_IV_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIV_synapse_id";
+	public static final String STAGE_V_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageV_synapse_id";
+	public static final String STAGE_VI_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVI_synapse_id";
+	public static final String STAGE_VII_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVII_synapse_id";
+	public static final String STAGE_VIII_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVIII_synapse_id";
+	public static final String STAGE_IX_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIX_synapse_id";
+	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
+	
+	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	
 	public static final String LEGACY_DATA_UPLOAD_SERVLET = "upload";
@@ -177,6 +192,18 @@ public class WebConstants {
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	public static final String GOVERNANCE = "Governance";
+	
+	public static final String COLLABORATORIUM = "Collaboratorium";
+	public static final String STAGE_I = "StageI";
+	public static final String STAGE_II = "StageII";
+	public static final String STAGE_III = "StageIII";
+	public static final String STAGE_IV = "StageIV";
+	public static final String STAGE_V = "StageV";
+	public static final String STAGE_VI = "StageVI";
+	public static final String STAGE_VII = "StageVII";
+	public static final String STAGE_VIII = "StageVIII";
+	public static final String STAGE_IX = "StageIX";
+	public static final String STAGE_X = "StageX";
 	
 	public static final String CERTIFICATION = "Certification";
 	

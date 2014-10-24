@@ -22,7 +22,7 @@
 		<div class="separator margin-top-10-imp "></div>
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 	        <div class="row">
-		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12 margin-left-10"/>
+		    	<g:FlowPanel ui:field="mainContainer" styleName="margin-left-35 margin-right-40"/>
 		   	</div>
 	    	
 		    <div class="clear"></div>

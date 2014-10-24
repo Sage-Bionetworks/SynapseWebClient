@@ -291,8 +291,10 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	
 	@Override
 	protected void onDetach() {
-		if (messageHandler != null)
+		if (messageHandler != null) {
 			messageHandler.removeHandler();
+			messageHandler = null;
+		}
 		super.onDetach();
 	}
 	
