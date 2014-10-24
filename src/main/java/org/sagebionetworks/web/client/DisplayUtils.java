@@ -33,7 +33,6 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
@@ -100,6 +99,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -2192,7 +2192,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getPreviewSuffix(Boolean isPreview) {
-		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		return isPreview ? org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
 	
 	public static void hide(UIObject uiObject) {

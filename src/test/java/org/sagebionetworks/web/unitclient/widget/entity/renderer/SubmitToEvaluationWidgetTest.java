@@ -18,7 +18,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -33,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -106,7 +106,7 @@ public class SubmitToEvaluationWidgetTest {
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockSynapseClient).getAvailableEvaluations(eq(targetEvaluations), any(AsyncCallback.class));
-		verify(mockView).configure(any(WikiPageKey.class), eq(true), eq(TEST_UNAVAILABLE_MESSAGE));
+		verify(mockView).configure(any(WikiPageKey.class), eq(true), eq(TEST_UNAVAILABLE_MESSAGE), anyString());
 	}
 
 	@Test

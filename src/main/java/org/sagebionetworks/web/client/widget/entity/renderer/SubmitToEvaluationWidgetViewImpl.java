@@ -8,10 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -29,11 +26,12 @@ public class SubmitToEvaluationWidgetViewImpl extends LayoutContainer implements
 	}
 	
 	@Override
-	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage) {
+	public void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText) {
 		this.removeAll();
 		
 		if (isAvailableEvaluation) {
-			Button button = DisplayUtils.createButton("Submit To Challenge", ButtonType.PRIMARY);
+			String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
+			Button button = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
 			button.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
