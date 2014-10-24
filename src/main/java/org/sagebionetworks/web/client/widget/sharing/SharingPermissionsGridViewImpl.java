@@ -8,11 +8,13 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl.UserGroupListWidgetViewImplUiBinder;
 import org.sagebionetworks.web.shared.users.AclEntry;
 
@@ -42,9 +44,12 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	@UiField
 	TableHeader deleteColumnHeader;
 	
+	private PortalGinInjector ginInjector;
+	
 	@Inject
-	public SharingPermissionsGridViewImpl(SharingPermissionsGridViewImplUiBinder uiBinder) {
+	public SharingPermissionsGridViewImpl(SharingPermissionsGridViewImplUiBinder uiBinder, PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
+		this.ginInjector = ginInjector;
 	}
 	
 	@Override
@@ -67,7 +72,10 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		
 		// Poeple label
 		TableData data = new TableData();
-		data.add(new Label(aclEntry.getTitle()));
+		//data.add(new Label(aclEntry.getTitle()));
+		UserBadge badge = ginInjector.getUserBadgeWidget();
+		badge.configure(aclEntry.getOwnerId());
+		data.add(badge.asWidget());
 		row.add(data);
 		
 		// Permissions List Box

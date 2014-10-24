@@ -2047,6 +2047,7 @@ public class DisplayUtils {
 	
 	public static void showSharingDialog(final org.sagebionetworks.web.client.widget.modal.Dialog dialog, final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
 		dialog.setSize(ModalSize.LARGE);
+		accessControlListEditor.setDialog(dialog);
 		
 		String primaryButtonText = null;
 		String defaultButtonText;
@@ -2054,7 +2055,6 @@ public class DisplayUtils {
 		if (canChangePermission) {
 			primaryButtonText = "Save";
 			defaultButtonText = "Cancel";
-			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
 			dialogCallback = new org.sagebionetworks.web.client.widget.modal.Dialog.Callback() {
 					@Override
 					public void onPrimary() {

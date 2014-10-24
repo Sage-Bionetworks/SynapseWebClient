@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -94,7 +96,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);		
-	}	
+	}
+	
+	
+	private Dialog dialog;
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+		view.setDialogSaveButtonEnabled(dialog, unsavedViewChanges);
+	}
 	
 	/**
 	 * Set the entity with which this ACLEditor is associated.
@@ -121,6 +130,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
 		this.unsavedViewChanges = unsavedViewChanges;
+		view.setDialogSaveButtonEnabled(dialog, unsavedViewChanges);
 	}
 	
 	/**

@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -270,6 +271,16 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
+	public void setDialogSaveButtonEnabled(Dialog dialog, boolean enable) {
+		if (dialog != null) {
+			Button saveButton = dialog.getPrimaryButton();
+			if (saveButton != null) {
+				saveButton.setEnabled(enable);
+			}
+		}
+	}
+	
+	@Override
 	public void showLoading() {
 		this.clear();
 		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
@@ -489,6 +500,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			showAddMessage("Please select a user or team to grant permission to.");
 		}
 	}
+
 }
 
 

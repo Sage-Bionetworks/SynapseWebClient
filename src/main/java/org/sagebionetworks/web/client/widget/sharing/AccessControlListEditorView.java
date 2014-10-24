@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -36,6 +37,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
+	
+	void setDialogSaveButtonEnabled(Dialog dialog, boolean enable);
 	
 	
 	/**
