@@ -16,7 +16,8 @@ public interface UploadCSVPreviewPage extends ModalPage {
 	 * @param fileName The name of the file.
 	 * @param parentId The ID of the project that will be the parent of the table.
 	 * @param fileHandleId The ID of the FileHandle that the user already uploaded.
+	 * @param tableId When provided, the uploaded file will be used to update this table.  Can be null.
 	 */
-	void configure(ContentTypeDelimiter type, String fileName, String parentId, String fileHandleId);
+	void configure(ContentTypeDelimiter type, String fileName, String parentId, String fileHandleId, String tableId);
 
 }

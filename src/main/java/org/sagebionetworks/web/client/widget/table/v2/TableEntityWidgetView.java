@@ -75,8 +75,19 @@ public interface TableEntityWidgetView extends IsWidget {
 	 */
 	public void setQueryInputVisible(boolean visible);
 
+	/**
+	 * Add the download modal to the page.
+	 * @param downloadTableQueryModalWidget
+	 */
 	public void setDownloadTableQueryModalWidget(
 			IsWidget downloadTableQueryModalWidget);
+
+	/**
+	 * Add the upload modal to the page.
+	 * @param uploadTableModalWidget
+	 */
+	public void setUploadTableModalWidget(
+			IsWidget uploadTableModalWidget);
 
 
 }

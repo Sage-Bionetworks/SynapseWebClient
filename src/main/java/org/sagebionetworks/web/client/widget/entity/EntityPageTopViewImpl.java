@@ -746,10 +746,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
-		// TODO (maybe):
-//		// Programmatic Clients
-//		tablesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
-
 		// Created By/Modified By
 		tablesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
 		// Padding Bottom

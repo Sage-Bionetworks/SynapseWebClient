@@ -302,6 +302,10 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
@@ -838,6 +842,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
 		bind(UploadCSVFinishPage.class).to(UploadCSVFinishPageImpl.class);
 		bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
+		bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
+		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
 		
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);

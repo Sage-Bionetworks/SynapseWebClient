@@ -22,6 +22,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	// data fields
 	String fileHandleId;
 	String parentId;
+	String tableId;
 	ContentTypeDelimiter type;
 	String fileName;
 	
@@ -89,8 +90,9 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	}
 
 	@Override
-	public void configure(String parentId) {
+	public void configure(String parentId, String tableId) {
 		this.parentId = parentId;
+		this.tableId = tableId;
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class UploadCSVFilePageImpl implements UploadCSVFilePage {
 	 * @param fileHandleId
 	 */
 	private void fileHandleCreated(String fileHandleId) {
-		this.nextPage.configure(this.type, this.fileName, this.parentId, fileHandleId);
+		this.nextPage.configure(this.type, this.fileName, this.parentId, fileHandleId, this.tableId);
 		this.presenter.setNextActivePage(this.nextPage);
 	}
 

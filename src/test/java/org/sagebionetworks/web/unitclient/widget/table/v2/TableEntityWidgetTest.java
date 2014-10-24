@@ -2,7 +2,10 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,9 +22,9 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -39,6 +42,7 @@ public class TableEntityWidgetTest {
 	TableBundle tableBundle;
 	TableEntity tableEntity;
 	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
+	UploadTableModalWidget mockUploadTableModalWidget;
 	TableEntityWidgetView mockView;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
@@ -56,6 +60,7 @@ public class TableEntityWidgetTest {
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
 		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
+		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		columns = TableModelTestUtils.createOneOfEachType();
@@ -65,7 +70,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 		

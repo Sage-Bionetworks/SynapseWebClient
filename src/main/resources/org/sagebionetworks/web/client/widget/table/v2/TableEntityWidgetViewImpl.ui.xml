@@ -24,5 +24,6 @@
 		<g:SimplePanel ui:field="queryResultsPanel" />
 		
 		<g:SimplePanel ui:field="downloadResultsPanel" />
+		<g:SimplePanel ui:field="uploadResultsPanel" />
 	</g:HTMLPanel>
 </ui:UiBinder>

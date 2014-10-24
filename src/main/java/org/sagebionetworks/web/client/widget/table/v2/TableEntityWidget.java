@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
@@ -34,6 +35,7 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public static final long DEFAULT_LIMIT = 10L;
 	
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
+	UploadTableModalWidget uploadTableModalWidget;
 	private TableEntityWidgetView view;
 	
 	String tableId;
@@ -45,15 +47,18 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	Query currentQuery;
 	
 	@Inject
-	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, DownloadTableQueryModalWidget downloadTableQueryModalWidget){
+	public TableEntityWidget(TableEntityWidgetView view, TableQueryResultWidget queryResultsWidget, QueryInputWidget queryInputWidget, DownloadTableQueryModalWidget downloadTableQueryModalWidget,
+			UploadTableModalWidget uploadTableModalWidget){
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
+		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
 		this.view.setDownloadTableQueryModalWidget(this.downloadTableQueryModalWidget);
+		this.view.setUploadTableModalWidget(this.uploadTableModalWidget);
 	}
 
 	@Override

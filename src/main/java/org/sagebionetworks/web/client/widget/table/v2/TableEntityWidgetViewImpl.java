@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -41,7 +40,9 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	SimplePanel queryResultsPanel;
 	@UiField
 	SimplePanel downloadResultsPanel;
-
+	@UiField
+	SimplePanel uploadResultsPanel;
+	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	Presenter presenter;
@@ -108,6 +109,11 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	public void setDownloadTableQueryModalWidget(
 			IsWidget downloadTableQueryModalWidget) {
 		downloadResultsPanel.add(downloadTableQueryModalWidget);
+	}
+
+	@Override
+	public void setUploadTableModalWidget(IsWidget uploadTableModalWidget) {
+		this.uploadResultsPanel.add(uploadTableModalWidget);
 	}
 
 
