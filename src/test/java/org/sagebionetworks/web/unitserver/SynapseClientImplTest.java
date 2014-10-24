@@ -1531,7 +1531,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage);
+		synapseClient.logErrorToRepositoryServices(errorMessage, null);
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
 }

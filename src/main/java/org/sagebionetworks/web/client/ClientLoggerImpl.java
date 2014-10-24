@@ -83,8 +83,10 @@ public class ClientLoggerImpl implements ClientLogger{
 	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
 	 * @param message
 	 */
-	public void errorToRepositoryServices(String message){
-		this.synapseClient.logErrorToRepositoryServices(message, new AsyncCallback<Void>() {
+	public void errorToRepositoryServices(String message, Throwable e){
+		//get the stack trace out of the throwable
+		String stackTrace = DisplayUtils.getStackTrace(e);
+		this.synapseClient.logErrorToRepositoryServices(message, stackTrace, new AsyncCallback<Void>() {
 			
 			@Override
 			public void onSuccess(Void result) {

@@ -255,7 +255,7 @@ public class UploaderTest {
 	private void verifyUploadError() {
 		verify(view).showErrorMessage(anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
-		verify(mockLogger).errorToRepositoryServices(anyString());
+		verify(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
 	}
 	
 	@Test

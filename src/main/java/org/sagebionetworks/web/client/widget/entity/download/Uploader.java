@@ -198,7 +198,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					uploadError(caught.getMessage());
+					uploadError(caught.getMessage(), caught);
 				}
 			});
 		}
@@ -227,7 +227,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else if (currentUploadType == UploadType.SFTP){
 			uploadToSftpProxy(currentExternalUploadUrl);
 		} else {
-			uploadError("Unsupported external upload type specified: " + currentUploadType);
+			String message = "Unsupported external upload type specified: " + currentUploadType;
+			uploadError(message, new Exception(message));
 		}
 	}
 	
@@ -254,7 +255,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try {
 			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
 		} catch (Exception e) {
-			uploadError(e.getMessage());
+			uploadError(e.getMessage(), e);
 		}
 	}
 	
@@ -359,7 +360,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
 						handleCancelledFileUpload();
 					} else {
-						uploadError(caught.getMessage());
+						uploadError(caught.getMessage(), caught);
 					}
 				}
 			});
@@ -408,11 +409,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					}
 					@Override
 					public void onFailure(Throwable t) {
-						uploadError(t.getMessage());		
+						uploadError(t.getMessage(), t);		
 					}
 				});
 			} catch (RestServiceException e) {
-				uploadError(e.getMessage());
+				uploadError(e.getMessage(), e);
 			}
 		}
 		if (fileHandleIdCallback != null) {
@@ -535,7 +536,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 		if (uploadResult == null) {
 			if(!resultHtml.contains(DisplayConstants.UPLOAD_SUCCESS)) {
-				uploadError(detailedErrorMessage);
+				uploadError(detailedErrorMessage, new Exception());
 			} else {
 				uploadSuccess();
 			}
@@ -555,7 +556,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful.");
+			uploadError("Upload result status indicated upload was unsuccessful.", new Exception());
 		}
 	}
 	
@@ -588,12 +589,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		});
 	}
-	private void uploadError(String message) {
+	private void uploadError(String message, Throwable t) {
 		String details = "";
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
-		logger.errorToRepositoryServices(message);
+		logger.errorToRepositoryServices(message, t);
 		fireCancelEvent();
 	}
 	
@@ -656,7 +657,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 
 	@Override
 	public void uploadFailed(String string) {
-		this.uploadError(string);
+		this.uploadError(string, new Exception(string));
 	}
 	
 	/**
