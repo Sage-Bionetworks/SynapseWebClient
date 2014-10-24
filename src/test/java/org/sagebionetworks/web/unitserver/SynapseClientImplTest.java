@@ -40,6 +40,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
@@ -1534,4 +1535,21 @@ public class SynapseClientImplTest {
 		synapseClient.logErrorToRepositoryServices(errorMessage, null);
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
+	
+	@Test
+	public void testLogErrorToRepositoryServicesTruncation() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		StringBuilder stackTrace = new StringBuilder();
+		for (int i = 0; i < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100; i++) {
+			stackTrace.append('a');
+		}
+		
+		String errorMessage = "error has occurred";
+		synapseClient.logErrorToRepositoryServices(errorMessage, stackTrace.toString());
+		ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
+		verify(mockSynapse).logError(captor.capture());
+		LogEntry logEntry = captor.getValue();
+		assertTrue(logEntry.getLabel().length() - "SWC: ".length() <= SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE);
+		assertEquals(errorMessage, logEntry.getMessage());
+	}
+
 }
