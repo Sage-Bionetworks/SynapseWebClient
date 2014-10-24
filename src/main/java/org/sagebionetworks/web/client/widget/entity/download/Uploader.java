@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -73,6 +74,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private boolean fileHasBeenUploaded = false;
 	private UploadType currentUploadType;
 	private String currentExternalUploadUrl;
+	private ClientLogger logger;
 	
 	@Inject
 	public Uploader(
@@ -83,7 +85,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			GWTWrapper gwt,
 			AuthenticationController authenticationController,
 			MultipartUploader multiPartUploader,
-			GlobalApplicationState globalAppState
+			GlobalApplicationState globalAppState,
+			ClientLogger logger
 			) {
 	
 		this.view = view;		
@@ -95,6 +98,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.authenticationController = authenticationController;
 		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
+		this.logger = logger;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
@@ -589,6 +593,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		logger.errorToRepositoryServices(message);
 		fireCancelEvent();
 	}
 	

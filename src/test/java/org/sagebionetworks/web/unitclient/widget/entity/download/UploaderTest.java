@@ -152,7 +152,7 @@ public class UploaderTest {
 		uploader = new Uploader(view, nodeModelCreator,
 				synapseClient,
 				synapseJsniUtils,
-				gwt, authenticationController, multipartUploader, mockGlobalApplicationState);
+				gwt, authenticationController, multipartUploader, mockGlobalApplicationState, mockLogger);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -255,6 +255,7 @@ public class UploaderTest {
 	private void verifyUploadError() {
 		verify(view).showErrorMessage(anyString());
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		verify(mockLogger).errorToRepositoryServices(anyString());
 	}
 	
 	@Test

@@ -567,7 +567,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			LogEntry entry = new LogEntry();
-			entry.setLabel("Synapse web client error");
+			entry.setLabel("SWC: " + message);
 			entry.setMessage(message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
