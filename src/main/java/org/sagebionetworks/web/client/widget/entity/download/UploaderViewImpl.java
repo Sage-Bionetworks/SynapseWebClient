@@ -39,7 +39,6 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -218,8 +217,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	protected void onDetach() {
-		if (messageHandler != null)
+		if (messageHandler != null) {
 			messageHandler.removeHandler();
+			messageHandler = null;
+		}
 		super.onDetach();
 	}
 	

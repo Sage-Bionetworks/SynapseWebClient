@@ -63,6 +63,7 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -144,6 +145,8 @@ import org.sagebionetworks.web.shared.EntityConstants;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.PagedResults;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -249,11 +252,11 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	public void setTokenProvider(TokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
-	
+
 	public void setTableModelUtils(TableModelUtils tableModelUtils) {
 		this.tableModelUtils = tableModelUtils;
 	}
-
+	
 	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
 		this.wiki2Markdown = wikiToMarkdown;
 	}
@@ -892,7 +895,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public UserGroupHeaderResponsePage getUserGroupHeadersByPrefix(String prefix, long limit, long offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -2396,7 +2399,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw new UnknownErrorException(e.getMessage());
 		}
 	}
-	
+
 	private boolean isTeamAdmin(String currentUserId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		TeamMember member = synapseClient.getTeamMember(teamId, currentUserId);
 		return member.getIsAdmin();
@@ -2635,7 +2638,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
@@ -2671,7 +2674,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return synapseClient.startUploadDeamon(cacr);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
@@ -3254,9 +3257,32 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 							getSynapseProperty(WebConstants.GOVERNANCE_ENTITY_ID_PROPERTY),
 							ObjectType.ENTITY.toString(),
 							getSynapseProperty(WebConstants.GOVERNANCE_WIKI_ID_PROPERTY)));
-
+			
+			//Workshop
+			addHelpPageMapping(tempMap, WebConstants.COLLABORATORIUM, WebConstants.COLLABORATORIUM_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_I, WebConstants.STAGE_I_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_II, WebConstants.STAGE_II_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_III, WebConstants.STAGE_III_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_IV, WebConstants.STAGE_IV_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_V, WebConstants.STAGE_V_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_VI, WebConstants.STAGE_VI_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_VII, WebConstants.STAGE_VII_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_VIII, WebConstants.STAGE_VIII_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_IX, WebConstants.STAGE_IX_ENTITY_ID_PROPERTY, null);
+			addHelpPageMapping(tempMap, WebConstants.STAGE_X, WebConstants.STAGE_X_ENTITY_ID_PROPERTY, null);
+			
 			pageName2WikiKeyMap = tempMap;
 		}
+	}
+	
+	private void addHelpPageMapping(HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> mapping, String token, String entityIdPropertyKey, String wikiIdPropertyKey) {
+		String wikiIdProperty = wikiIdPropertyKey != null ? getSynapseProperty(wikiIdPropertyKey) : "";
+		mapping.put(
+				token,
+				new org.sagebionetworks.web.shared.WikiPageKey(
+						getSynapseProperty(entityIdPropertyKey),
+						ObjectType.ENTITY.toString(),
+						wikiIdProperty));
 	}
 
 	public Set<String> getWikiBasedEntities() throws RestServiceException {
@@ -3420,7 +3446,7 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			return synapseClient.entityQuery(query);
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		} 
+		}
 	}
 
 	@Override
@@ -3476,5 +3502,36 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+
+	@Override
+	public ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			PaginatedResults<ProjectHeader> headers = synapseClient.getMyProjects(limit, offset);
+			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	@Override
+	public ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			Long userIdLong = Long.parseLong(userId);
+			PaginatedResults<ProjectHeader> headers = synapseClient.getProjectsFromUser(userIdLong, limit, offset);
+			return new ProjectPagedResults((List<ProjectHeader>)headers.getResults(), safeLongToInt(headers.getTotalNumberOfResults()));
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	
+	public static int safeLongToInt(long l) {
+       if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+           throw new IllegalArgumentException
+               ("Cannot safely cast "+l+" to int without changing the value.");
+       }
+       return (int) l;
+   }
 
 }
