@@ -125,9 +125,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		ListBox permissionsListBox = createEditAccessListBox(aclEntry);
-		if (!aclEntry.isIndividual())
+		if (!aclEntry.isIndividual()) {
 			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first
-		else if (aclEntry.isOwner()) {
+		} else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
 			for (; insertIndex < permissionsGrid.getCount(); insertIndex++) {
@@ -170,6 +170,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			removeUserCallback = new CallbackP<Long>() {
 					@Override
 					public void invoke(Long principalId) {
+						presenter.setUnsavedViewChanges(true);	// TODO:?
 						presenter.removeAccess(principalId);
 					}
 				};
@@ -224,6 +225,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
+						presenter.setUnsavedViewChanges(true);	// TODO:?
 						// Add the ability for PUBLIC to see this entity.
 						if (isPubliclyVisible) {
 							presenter.makePrivate();

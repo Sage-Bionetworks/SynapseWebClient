@@ -15,6 +15,8 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	SynapseClientAsync synapseClient;
 	private Integer maxNameLength;
 	
+	private String teamName;
+	
 	@Inject
 	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient) {
 		this.view = view;
@@ -36,7 +38,11 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showLoadError(teamId);
+					if (teamName != null) {
+						view.setTeamWithoutLink(teamName);
+					} else {
+						view.showLoadError(teamId);
+					}
 				}
 			});
 		}
@@ -44,6 +50,15 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void configure(Team team) {
 		view.setTeam(team, maxNameLength);
+	}
+	
+	/**
+	 * If the teamId is not valid, a badge will be created
+	 * from the given teamName.
+	 */
+	public void configure(String teamId, String teamName) {
+		this.teamName = teamName;
+		configure(teamId);
 	}
 	
 	@SuppressWarnings("unchecked")

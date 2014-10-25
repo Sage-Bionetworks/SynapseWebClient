@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl.UserGroupListWidgetViewImplUiBinder;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -70,12 +71,20 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	private TableRow createAclEntryTableRow(final AclEntry aclEntry, ListBox permListBox) {
 		final TableRow row = new TableRow();
 		
-		// Poeple label
+		// People label
 		TableData data = new TableData();
 		//data.add(new Label(aclEntry.getTitle()));
-		UserBadge badge = ginInjector.getUserBadgeWidget();
-		badge.configure(aclEntry.getOwnerId());
-		data.add(badge.asWidget());
+		Widget badgeWidget;
+		if (aclEntry.isIndividual()) {
+			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.configure(aclEntry.getOwnerId());
+			badgeWidget = badge.asWidget();
+		} else {
+			TeamBadge badge = ginInjector.getTeamBadgeWidget();
+			badge.configure(aclEntry.getOwnerId(), aclEntry.getTitle());
+			badgeWidget = badge.asWidget();
+		}
+		data.add(badgeWidget);
 		row.add(data);
 		
 		// Permissions List Box

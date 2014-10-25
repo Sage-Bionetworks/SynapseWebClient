@@ -11,10 +11,12 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
@@ -84,7 +86,23 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		} 		
 		
 	}
-
+	
+	@Override
+	public void setTeamWithoutLink(String name) {
+		clear();
+		notificationsPanel.clear();
+		
+		Label nameLabel = new Label(name);
+		nameLabel.addStyleName("font-size-13 boldText");
+		
+		HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+		add(profilePicture);
+		setCellWidth(profilePicture, "20px");
+			
+		add(nameLabel);
+		add(notificationsPanel);
+	}
+	
 	@Override
 	public void showLoadError(String principalId) {
 		clear();

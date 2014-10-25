@@ -87,7 +87,6 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 	}
 	
 	public Widget getBadgeWidget(String ownerId, boolean isIndividual, String userName) {
-		Widget result;
 		if (isBig) {
 			if (isIndividual) {
 				BigUserBadge userBadge = portalGinInjector.getBigUserBadgeWidget();
@@ -104,8 +103,6 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 				userBadge.configure(ownerId);
 				return userBadge.asWidget();
 			} else {
-				// TODO: If this case is ever reached, add non-team group support
-				// to regular team badge (as was added to BigTeamBadge).
 				TeamBadge teamBadge = portalGinInjector.getTeamBadgeWidget();
 				teamBadge.configure(ownerId);
 				return teamBadge.asWidget();
