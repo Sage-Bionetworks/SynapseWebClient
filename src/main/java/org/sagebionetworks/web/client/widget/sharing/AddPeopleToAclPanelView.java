@@ -12,7 +12,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface AddPeopleToAclPanelView extends IsWidget {	// TODO: extend SynapseView?
+public interface AddPeopleToAclPanelView extends IsWidget, SynapseView{
 
 	UserGroupSuggestBox getSuggestBox();
 	

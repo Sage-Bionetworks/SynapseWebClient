@@ -7,12 +7,11 @@ import org.sagebionetworks.web.shared.users.AclEntry;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface SharingPermissionsGridView extends IsWidget {	// TODO: extend SynapseView?
+public interface SharingPermissionsGridView extends IsWidget, SynapseView {
 
 	void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox);
 	void add(AclEntry aclEntry, ListBox permListBox);
 	void configure(CallbackP<Long> deleteButtonCallback);
-	void clear();
 	public interface Presenter{}
 	
 }

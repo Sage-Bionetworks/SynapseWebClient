@@ -76,8 +76,7 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	@Override
 	public void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback,  final CallbackP<Void> addPersonCallback,
 						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
-		suggestBox.clear();
-		permDropDownMenu.clear();
+		clear();
 		permDropDownButton.setText(ACCESS_LEVEL_PLACEHOLDER_TEXT);
 		
 		configureDropdownButton(permLevels, permDisplay, selectPermissionCallback);
@@ -149,4 +148,23 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 			permDropDownMenu.add(item);
 		}
 	}
+	
+	@Override
+	public void clear() {
+		suggestBox.clear();
+		permDropDownMenu.clear();
+	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+	}
+
 }

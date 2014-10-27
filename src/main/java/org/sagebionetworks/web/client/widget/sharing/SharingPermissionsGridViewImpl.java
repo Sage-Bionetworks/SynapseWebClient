@@ -135,4 +135,16 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	public void clear() {
 		tableBody.clear();
 	}
+
+	@Override
+	public void showLoading() {
+	}
+
+	@Override
+	public void showInfo(String title, String message) {
+	}
+
+	@Override
+	public void showErrorMessage(String message) {
+	}
 }
