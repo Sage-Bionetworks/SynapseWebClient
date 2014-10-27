@@ -2076,6 +2076,7 @@ public class DisplayUtils {
 	
 					@Override
 					public void onDefault() {
+						accessControlListEditor.setUnsavedViewChanges(false);
 						dialog.hide();
 					}
 			};
