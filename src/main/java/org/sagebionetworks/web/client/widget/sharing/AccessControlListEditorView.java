@@ -37,9 +37,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
-	
-	void setDialogSaveButtonEnabled(Dialog dialog, boolean enable);
-	
+	void setDialog(Dialog dialog);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -49,7 +47,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	void showInfoError(String title, String message);
 
 	void showInfoSuccess(String title, String message);
-
+	
 	/**
 	 * Prompt about unsaved view changes
 	 * @param saveCallback 

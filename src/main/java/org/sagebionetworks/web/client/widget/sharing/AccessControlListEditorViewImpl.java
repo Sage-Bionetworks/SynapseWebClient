@@ -92,6 +92,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private AddPeopleToAclPanel addPeoplePanel;
 	
+	private Dialog dialog;	// For access to the save button.
+	
 	private PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};	// To enforce order.
 	
 	@Inject
@@ -127,7 +129,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			throw new IllegalStateException("Permissions window has not been built yet");
 		ListBox permissionsListBox = createEditAccessListBox(aclEntry);
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first
+			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first // TODO: PUBLIC is just a group? No team?
 		} else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
@@ -171,7 +173,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			removeUserCallback = new CallbackP<Long>() {
 					@Override
 					public void invoke(Long principalId) {
-						presenter.setUnsavedViewChanges(true);
+						if (dialog != null)
+							dialog.getPrimaryButton().setEnabled(true);
 						presenter.removeAccess(principalId);
 					}
 				};
@@ -226,7 +229,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
-						presenter.setUnsavedViewChanges(true);
+						if (dialog != null)
+							dialog.getPrimaryButton().setEnabled(true);
 						// Add the ability for PUBLIC to see this entity.
 						if (isPubliclyVisible) {
 							presenter.makePrivate();
@@ -274,13 +278,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void setDialogSaveButtonEnabled(Dialog dialog, boolean enable) {
-		if (dialog != null) {
-			Button saveButton = dialog.getPrimaryButton();
-			if (saveButton != null) {
-				saveButton.setEnabled(enable);
-			}
-		}
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+		if (dialog != null)
+			dialog.getPrimaryButton().setEnabled(false);
 	}
 	
 	@Override
@@ -477,7 +478,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					@Override
 					public void invoke() {
 						addPersonToAcl();
-						presenter.setUnsavedViewChanges(false);
 						saveCallback.invoke();
 					}
 				});

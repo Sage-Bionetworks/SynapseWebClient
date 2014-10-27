@@ -99,10 +99,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	
-	private Dialog dialog;
 	public void setDialog(Dialog dialog) {
-		this.dialog = dialog;
-		view.setDialogSaveButtonEnabled(dialog, unsavedViewChanges);
+		view.setDialog(dialog);
 	}
 	
 	/**
@@ -130,7 +128,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
 		this.unsavedViewChanges = unsavedViewChanges;
-		view.setDialogSaveButtonEnabled(dialog, unsavedViewChanges);
 	}
 	
 	/**
