@@ -50,7 +50,7 @@ public class AddPeopleToAclPanelViewImpl  extends Composite implements AddPeople
 	private Presenter presenter;
 	private UserGroupSuggestBox suggestBox;
 	
-	private HandlerRegistration publicButtonReg;	// TODO: Get rid of this logic when only build window once (if I do that)?
+	private HandlerRegistration publicButtonReg;
 	private HandlerRegistration makePublicReg;
 	
 	@Inject

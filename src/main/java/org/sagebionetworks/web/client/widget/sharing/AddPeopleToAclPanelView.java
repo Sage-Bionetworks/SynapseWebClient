@@ -18,7 +18,7 @@ public interface AddPeopleToAclPanelView extends IsWidget, SynapseView {
 	
 	/**
 	 * Configures the panel. If called multiple times, old callbacks are
-	 * deregistered from their associated components.
+	 * deregistered from their associated components and replaced.
 	 */
 	void configure(PermissionLevel[] permLevels, Map<PermissionLevel, String> permDisplay, CallbackP<Void> selectPermissionCallback, CallbackP<Void> addPersonCallback,
 					CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible);
