@@ -72,6 +72,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
 	
+	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the ACL.";	// TODO: Check if this text is ok.
+	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private UrlCache urlCache;
@@ -86,7 +88,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private SharingPermissionsGrid permissionsGrid;
 	
-	//private ListBox permissionLevelListBox;
 	private Select permissionLevelSelectBox;
 	
 	private AddPeopleToAclPanel addPeoplePanel;
@@ -170,7 +171,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			removeUserCallback = new CallbackP<Long>() {
 					@Override
 					public void invoke(Long principalId) {
-						presenter.setUnsavedViewChanges(true);	// TODO:?
+						presenter.setUnsavedViewChanges(true);
 						presenter.removeAccess(principalId);
 					}
 				};
@@ -181,7 +182,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		if (!canChangePermission) {
 			// Inform user of restricted privileges.
 			Label canNotModify = new Label();
-			canNotModify.setText("Some text telling the user they have insufficient privilages to modify sharing settings.");	// TODO: Some text...
+			canNotModify.setText(CANNOT_MODIFY_ACL_TEXT);
 			add(canNotModify);
 		} else {
 			if(isInherited) {
@@ -225,7 +226,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
-						presenter.setUnsavedViewChanges(true);	// TODO:?
+						presenter.setUnsavedViewChanges(true);
 						// Add the ability for PUBLIC to see this entity.
 						if (isPubliclyVisible) {
 							presenter.makePrivate();
