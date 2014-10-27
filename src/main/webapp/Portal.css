@@ -746,6 +746,11 @@ a.shortBtn {
 	background-color: #F0F4F9;
 }
 
+.userGroupSuggestBoxPopup .suggestPopupContent tr:hover {
+	cursor: pointer;
+	cursor: hand;
+}
+
 .item-selected > .userGroupSuggestion {
 	background-color: #2C5ECE;
 	color: white;
