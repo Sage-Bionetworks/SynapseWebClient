@@ -8,9 +8,9 @@
         <t:Table ui:field="sharingTable" styleName="table table-condensed" >
 		    <t:THead>
 		        <t:TableRow>
-		            <t:TableHeader width="68%"		text="People" />
-		            <t:TableHeader ui:field="permissionColumnHeader" width="27%"		text="Access" />
-		            <t:TableHeader ui:field="deleteColumnHeader" width="5%" />
+		            <t:TableHeader text="People" addStyleNames="col-md-9"/>
+		            <t:TableHeader ui:field="permissionColumnHeader" text="Access"/>
+		            <t:TableHeader ui:field="deleteColumnHeader" width="5%"/>
 		        </t:TableRow>
 		    </t:THead>
 		    <t:TBody ui:field="tableBody" />

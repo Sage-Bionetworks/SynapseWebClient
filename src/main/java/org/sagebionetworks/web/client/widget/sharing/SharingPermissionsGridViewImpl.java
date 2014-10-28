@@ -108,8 +108,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		if (deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
 			permListBox.setEnabled(false);
-			permissionColumnHeader.setWidth(PERMISSION_COLUMN_WIDTH_PERCENTAGE + DELETE_COLUMN_WIDTH_PERCENTAGE + "%");
-			deleteColumnHeader.setWidth("0%");
+			permissionColumnHeader.setStyleName("col-md-3");
 		} else {
 			// Add delete button and size columns.
 			data = new TableData();
@@ -132,8 +131,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			data.add(button);
 			row.add(data);
 			
-			permissionColumnHeader.setWidth(PERMISSION_COLUMN_WIDTH_PERCENTAGE + "%");
-			deleteColumnHeader.setWidth(DELETE_COLUMN_WIDTH_PERCENTAGE + "%");
+			permissionColumnHeader.addStyleName("col-md-2");
+			deleteColumnHeader.addStyleName("col-md-1");
 		}
 		return row;
 	}

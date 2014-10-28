@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
@@ -12,9 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
@@ -25,9 +21,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -38,7 +32,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
  
 	
 	
-	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";	// TODO: Check if this text is ok.
+	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
@@ -78,7 +72,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		//ListBox permissionsListBox = createEditAccessListBox(aclEntry);	// TODO: build listbox in SharingPermissionsGrid.
 		if (!aclEntry.isIndividual()) {
 			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay); // insert groups first // TODO: PUBLIC is just a group? No team?
 		} else if (aclEntry.isOwner()) {
