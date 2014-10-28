@@ -12,12 +12,15 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 
+import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
 import org.sagebionetworks.web.shared.users.AclEntry;
+import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 public class SharingPermissionsGridTest {
 
@@ -44,10 +47,10 @@ public class SharingPermissionsGridTest {
 		AclEntry[] entries = { entry1, entry2, entry3 };
 		
 		for (AclEntry entry : entries) {
-			grid.add(entry, null);
+			grid.add(entry, null, null);
 		}
 		
-		verify(mockView, times(3)).add(any(AclEntry.class), eq((ListBox) null));
+		verify(mockView, times(3)).add(any(AclEntry.class), eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null));
 	}
 	
 	@Test
@@ -64,7 +67,7 @@ public class SharingPermissionsGridTest {
 		AclEntry[] entries = { entry1, entry2, entry3 };
 		
 		for (AclEntry entry : entries) {
-			grid.add(entry, null);
+			grid.add(entry, null, null);
 		}
 		
 		assertTrue(grid.getAt(1) == entry2);
@@ -81,12 +84,12 @@ public class SharingPermissionsGridTest {
 		AclEntry entry3 = new AclEntry();
 		entry1.setTitle("Entry 3");
 		
-		grid.add(entry1, null);
-		grid.add(entry3, null);
+		grid.add(entry1, null, null);
+		grid.add(entry3, null, null);
 		
-		grid.insert(entry2, 1, null);
+		grid.insert(entry2, 1, null, null);
 		
-		verify(mockView).insert(eq(entry2), eq(1), eq((ListBox) null));
+		verify(mockView).insert(eq(entry2), eq(1),eq((PermissionLevel[]) null), eq((Map<PermissionLevel,String>) null));
 		
 		assertTrue(grid.getAt(1) == entry2);
 	}

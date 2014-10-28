@@ -117,6 +117,7 @@ public class AccessControlListEditorTest {
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(TEST_PUBLIC_PRINCIPAL_ID + "").when(mockSynapseClient).getSynapseProperty(anyString(), any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
@@ -274,7 +275,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(),anyBoolean());
-		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -321,7 +322,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
-		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
 		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), any(AsyncCallback.class));
