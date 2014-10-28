@@ -23,21 +23,6 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		this.view = view;
 		this.synapseClient = synapseClient;
 		view.setPresenter(this);
-		
-		// TODO: This in configure??
-		// Public Acl
-		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				view.setGlobeId(Long.parseLong(result));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -55,7 +40,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 				@Override
 				public void onFailure(Throwable caught) {
 					if (teamName != null) {
-						view.setTeamWithoutLink(teamName, teamId);
+						setTeamWithoutLink(teamName, teamId);
 					} else {
 						view.showLoadError(teamId);
 					}
@@ -65,21 +50,24 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		
 	}
 	
+	private void setTeamWithoutLink(final String teamName, final String teamId) {
+		// Public Acl
+		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.setGlobeId(Long.parseLong(result));
+				view.setTeamWithoutLink(teamName, teamId);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// No globe!
+				view.setTeamWithoutLink(teamName, teamId);
+			}
+		});
+	}
+	
 	public void configure(Team team) {
-//		// Public Acl
-//		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
-//			@Override
-//			public void onSuccess(String result) {
-//				view.setGlobeId(Long.parseLong(result));
-//			}
-//			
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//		});
-		
 		view.setTeam(team, maxNameLength);
 	}
 	

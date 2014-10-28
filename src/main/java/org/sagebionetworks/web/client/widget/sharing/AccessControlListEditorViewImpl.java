@@ -127,6 +127,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		SetAccessCallback setAccessCallback = new SetAccessCallback() {
 			@Override
 			public void invoke(Long principalId, PermissionLevel permissionLevel) {
+				if (dialog != null)
+					dialog.getPrimaryButton().setEnabled(true);
 				presenter.setAccess(principalId, permissionLevel);
 			}
 		};
@@ -174,6 +176,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
+						if (dialog != null)
+							dialog.getPrimaryButton().setEnabled(true);
 						addPersonToAcl();
 					}
 				};
@@ -204,8 +208,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				deleteAclButton.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent ce) {
+						if (dialog != null)
+							dialog.getPrimaryButton().setEnabled(true);
 						presenter.deleteAcl();					
-						}
+					}
 				});
 					
 				Tooltip toolTipAndDeleteAclButton = new Tooltip();
@@ -232,7 +238,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void setDialog(Dialog dialog) {
 		this.dialog = dialog;
-		
+		if (dialog != null)
+			dialog.getPrimaryButton().setEnabled(false);
 	}
 	
 	@Override
