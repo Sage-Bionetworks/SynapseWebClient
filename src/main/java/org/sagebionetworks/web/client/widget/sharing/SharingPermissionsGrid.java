@@ -32,7 +32,6 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 	}
 	
 	/**
-	 * 
 	 * @param deleteButtonCallback Callback for removing a user from
 	 * the ACL. If null, the table will not be editable.
 	 */

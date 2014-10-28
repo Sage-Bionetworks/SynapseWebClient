@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,10 +19,25 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	private String teamName;
 	
 	@Inject
-	public TeamBadge(TeamBadgeView view, SynapseClientAsync synapseClient) {
+	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		view.setPresenter(this);
+		
+		// TODO: This in configure??
+		// Public Acl
+		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String result) {
+				view.setGlobeId(Long.parseLong(result));
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -39,16 +55,31 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 				@Override
 				public void onFailure(Throwable caught) {
 					if (teamName != null) {
-						view.setTeamWithoutLink(teamName);
+						view.setTeamWithoutLink(teamName, teamId);
 					} else {
 						view.showLoadError(teamId);
 					}
 				}
 			});
 		}
+		
 	}
 	
 	public void configure(Team team) {
+//		// Public Acl
+//		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
+//			@Override
+//			public void onSuccess(String result) {
+//				view.setGlobeId(Long.parseLong(result));
+//			}
+//			
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
+		
 		view.setTeam(team, maxNameLength);
 	}
 	

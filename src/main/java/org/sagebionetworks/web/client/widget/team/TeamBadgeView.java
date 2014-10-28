@@ -19,7 +19,14 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 	
 	public void setRequestCount(String count);
 	
-	void setTeamWithoutLink(String name);
+	void setTeamWithoutLink(String name, String teamId);
+	
+	/**
+	 * If a badge is made with the id, then a globe
+	 * will be displayed as the profile picture.
+	 * @param globeId
+	 */
+	void setGlobeId(Long globeId);
 	
 	/**
 	 * Presenter interface

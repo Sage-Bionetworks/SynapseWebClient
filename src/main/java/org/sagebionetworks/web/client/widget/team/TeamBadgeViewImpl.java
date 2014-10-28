@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -28,6 +29,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
+	Long globeId;
 	
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -88,14 +90,22 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 	}
 	
 	@Override
-	public void setTeamWithoutLink(String name) {
+	public void setTeamWithoutLink(String name, String teamId) {
 		clear();
 		notificationsPanel.clear();
 		
 		Label nameLabel = new Label(name);
 		nameLabel.addStyleName("font-size-13 boldText");
 		
-		HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+		HTML profilePicture;
+		if (globeId != null && Long.parseLong(teamId) == globeId) {
+			//profilePicture = new HTML(DisplayUtils.getFontelloIcon("globe font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
+			profilePicture = new HTML(html);
+		} else {
+			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+		}
+		
 		add(profilePicture);
 		setCellWidth(profilePicture, "20px");
 			
@@ -133,6 +143,11 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
 		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
 		notificationsPanel.setWidget(widget);
+	}
+
+	@Override
+	public void setGlobeId(Long globeId) {
+		this.globeId = globeId;
 	}
 
 	/*
