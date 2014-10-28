@@ -22,6 +22,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -29,21 +30,20 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
- 
-	
 	
 	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
-	private PublicPrincipalIds publicPrincipalIds;
+	//private PublicPrincipalIds publicPrincipalIds;
+	private Long publicAclPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
 	
 	private SharingPermissionsGrid permissionsGrid;
 	
-	private AddPeopleToAclPanel addPeoplePanel;
+	private AclAddPeoplePanel addPeoplePanel;
 	
 	private Dialog dialog;	// For access to the save button.
 	
@@ -51,7 +51,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
-					SharingPermissionsGrid permissionsGrid, AddPeopleToAclPanel addPeoplePanel) {
+					SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
 		this.sageImageBundle = sageImageBundle;
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
@@ -88,8 +88,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds) {
-		this.publicPrincipalIds = publicPrincipalIds;
+	public void setPublicAclPrincipalId(Long publicAclPrincipalId) {
+		this.publicAclPrincipalId = publicAclPrincipalId;
 	}
 	
 	@Override
@@ -187,8 +187,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 						if (isPubliclyVisible) {
 							presenter.makePrivate();
 						} else {
-							if (publicPrincipalIds.getPublicAclPrincipalId() != null) {
-								presenter.setAccess(publicPrincipalIds.getPublicAclPrincipalId(), PermissionLevel.CAN_VIEW);
+							if (publicAclPrincipalId != null) {
+								presenter.setAccess(publicAclPrincipalId, PermissionLevel.CAN_VIEW);
 							}
 						}
 					}

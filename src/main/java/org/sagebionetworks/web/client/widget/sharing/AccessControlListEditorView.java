@@ -36,7 +36,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void addAclEntry(AclEntry entry);
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
-	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
+	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
 	void setDialog(Dialog dialog);
 	
 	/**
