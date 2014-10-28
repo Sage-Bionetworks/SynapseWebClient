@@ -569,15 +569,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void logErrorToRepositoryServices(String message, String stacktrace) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String label) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			LogEntry entry = new LogEntry();
-			String label = "";
-			if (stacktrace != null) {
-				label = stacktrace.substring(0, Math.min(stacktrace.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+			String outputLabel = "";
+			if (label != null) {
+				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 			}
-			entry.setLabel("SWC: " + label);
+			entry.setLabel("SWC: " + outputLabel);
 			entry.setMessage(message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
