@@ -333,11 +333,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void disableMultipleFileUploads() {
-		this.multipleFileUploads = false;
+	public void enableMultipleFileUploads(boolean isEnabled) {
+		this.multipleFileUploads = isEnabled;
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
-	
 
 	/*
 	 * Private Methods

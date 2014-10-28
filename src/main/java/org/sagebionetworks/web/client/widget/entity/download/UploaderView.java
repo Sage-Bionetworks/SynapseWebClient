@@ -22,7 +22,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	public void showConfirmDialog(String message, Callback yesCallback, Callback noCallback);
 	void resetToInitialState();
 	void showNoFilesSelectedForUpload();
-	void disableMultipleFileUploads();
+	void enableMultipleFileUploads(boolean isEnabled);
 	void setShowCancelButton(boolean showCancel);
 	void showUploaderUI();
 	void triggerUpload();
