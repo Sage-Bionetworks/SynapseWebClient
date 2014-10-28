@@ -75,7 +75,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
-	private Dialog dialog;
 	
 	TextBox pathField, nameField;
 	
@@ -109,14 +108,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
 			SharingAndDataUseConditionWidget sharingDataUseWidget,
-			PortalGinInjector ginInjector,
-			Dialog dialog) {
+			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
-		this.dialog = dialog;
-		dialog.setSize(ModalSize.MEDIUM);
 		
 		this.progressContainer = new Progress();
 		progressContainer.setMarginTop(10);
@@ -344,8 +340,6 @@ public class UploaderViewImpl extends FlowPanel implements
 			this.container = new FlowPanel();
 		else
 			container.clear();
-		
-		container.add(dialog); // Put modal on uploader layer.
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		uploadPanel.removeFromParent();
 		if (isEntity) {
@@ -417,21 +411,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void showConfirmDialog(String message, final Callback yesCallback, final Callback noCallback) {
-		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.QUESTION);
-		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.YES, DisplayConstants.NO, new Dialog.Callback() {
-
-			@Override
-			public void onPrimary() {
-				yesCallback.invoke();
-			}
-
-			@Override
-			public void onDefault() {
-				noCallback.invoke();
-			}
-			
-		}, true);
-		dialog.show();
+		DisplayUtils.showConfirmDialog(DisplayConstants.UPLOAD_DIALOG_TITLE, message, yesCallback, noCallback);
 	}
 	
 	// set the initial state of the controls when widget is made visible
