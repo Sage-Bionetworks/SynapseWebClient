@@ -53,7 +53,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private static final String ACCESS_COLUMN_ID = "accessData";
 	private static final String REMOVE_COLUMN_ID = "removeData";
 	
-	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the ACL.";	// TODO: Check if this text is ok.
+	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";	// TODO: Check if this text is ok.
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
@@ -93,7 +93,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		ListBox permissionsListBox = createEditAccessListBox(aclEntry);
+		ListBox permissionsListBox = createEditAccessListBox(aclEntry);	// TODO: build listbox in SharingPermissionsGrid.
 		if (!aclEntry.isIndividual()) {
 			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first // TODO: PUBLIC is just a group? No team?
 		} else if (aclEntry.isOwner()) {
@@ -288,6 +288,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		showErrorMessage(message);
 	}
 
+	// TODO: Move this (and other static methods) to EvaluationAccessControlList.
+	// Completely ungxtify ACLEditorViewImpl.
 	public static Grid<PermissionsTableEntry> createPermissionsGrid(
 			ListStore<PermissionsTableEntry> permissionsStore,
 			GridCellRenderer<PermissionsTableEntry> peopleRenderer,

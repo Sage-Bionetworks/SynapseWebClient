@@ -149,6 +149,8 @@ public class WebConstants {
 	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
 	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
 	
+	// TODO: Add public principal stuff here!!
+	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	
 	public static final String LEGACY_DATA_UPLOAD_SERVLET = "upload";
