@@ -36,7 +36,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private SageImageBundle sageImageBundle;
-	//private PublicPrincipalIds publicPrincipalIds;
 	private Long publicAclPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
@@ -73,7 +72,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay); // insert groups first // TODO: PUBLIC is just a group? No team?
+			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay); // insert groups first
 		} else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
