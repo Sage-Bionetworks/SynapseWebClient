@@ -259,9 +259,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	@Override
 	public void showErrorMessage(String message) {
-		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.WARNING);
-		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.OK, null, null, true);
-		dialog.show();
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
