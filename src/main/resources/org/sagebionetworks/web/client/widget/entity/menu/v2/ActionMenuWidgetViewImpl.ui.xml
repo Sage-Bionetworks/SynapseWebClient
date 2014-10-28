@@ -4,7 +4,14 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<g:HTMLPanel>
-
-	</g:HTMLPanel>
+	<b:ButtonToolBar addStyleNames="pull-right">
+		<b:ButtonGroup ui:field="buttonGroup"></b:ButtonGroup>
+		<b:ButtonGroup>
+			<b:DropDown >
+				<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
+				<b:DropDownMenu ui:field="toolsDropDown" addStyleNames="dropdown-menu-right">
+				</b:DropDownMenu>
+			</b:DropDown>
+		</b:ButtonGroup>
+	</b:ButtonToolBar>
 </ui:UiBinder>

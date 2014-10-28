@@ -22,6 +22,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -41,6 +42,7 @@ public class TableEntityWidgetTest {
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
+	ActionMenuWidget mockActionMenu;
 	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
 	UploadTableModalWidget mockUploadTableModalWidget;
 	TableEntityWidgetView mockView;
@@ -54,6 +56,7 @@ public class TableEntityWidgetTest {
 	@Before
 	public void before(){
 		// mocks
+		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockView = Mockito.mock(TableEntityWidgetView.class);
 		mockDownloadTableQueryModalWidget = Mockito.mock(DownloadTableQueryModalWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
@@ -84,7 +87,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeMaxUnder(){
 		tableBundle.setMaxRowsPerPage(4L);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is less than the default,
 		// the value used should be 3/4ths of the max allowed for the schema.
 		assertEquals(3l, widget.getDefaultPageSize());
@@ -94,7 +97,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeMaxOver(){
 		tableBundle.setMaxRowsPerPage(TableEntityWidget.DEFAULT_LIMIT *2L);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is greater than the default
 		// the default should be used.
 		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
@@ -104,7 +107,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeNull(){
 		tableBundle.setMaxRowsPerPage(null);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// when null the default should be used.
 		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
@@ -112,7 +115,7 @@ public class TableEntityWidgetTest {
 	@Test 
 	public void testDefaultQueryString(){
 		tableBundle.setMaxRowsPerPage(4L);
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		String expected = "SELECT * FROM "+tableEntity.getId();
 		Query query = new Query();
 		query.setSql(expected);
@@ -130,7 +133,7 @@ public class TableEntityWidgetTest {
 		Query query = new Query();
 		query.setSql(sql);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// The widget must not change the query when it is passed in.
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
 	}
@@ -139,7 +142,7 @@ public class TableEntityWidgetTest {
 	public void testNoColumnsWithEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = true;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
@@ -152,7 +155,7 @@ public class TableEntityWidgetTest {
 	public void testNoColumnsWithWihtouEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = false;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
@@ -164,7 +167,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testQueryExecutionStarted(){
 		boolean canEdit = true;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionStarted();
 		verify(mockQueryInputWidget).queryExecutionStarted();
 	}
@@ -176,7 +179,7 @@ public class TableEntityWidgetTest {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
@@ -189,7 +192,7 @@ public class TableEntityWidgetTest {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
@@ -204,7 +207,7 @@ public class TableEntityWidgetTest {
 		startQuery.setLimit(100L);
 		startQuery.setOffset(101L);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
 		verify(mockQueryResultsWidget).configure(startQuery, canEdit, widget);
 		reset(mockQueryResultsWidget);

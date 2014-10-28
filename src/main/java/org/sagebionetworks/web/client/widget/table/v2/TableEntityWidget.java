@@ -5,12 +5,12 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -27,7 +27,10 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryResultsListner, QueryInputListener {
+public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presenter, QueryResultsListner, QueryInputListener, ActionListener {
+	
+	private static final Action[] ACTIONS = new Action[]{Action.TABLE_SCHEMA, Action.UPLOAD_TABLE_DATA, Action.EDIT_TABLE_DATA, Action.DOWNLOAD_TABLE_QUERY_RESULTS};
+	
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the Table Schema to add columns to the this table.";
@@ -36,7 +39,8 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
-	private TableEntityWidgetView view;
+	TableEntityWidgetView view;
+	ActionMenuWidget actionMenu;
 	
 	String tableId;
 	TableBundle  tableBundle;
@@ -74,13 +78,22 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	 * @param queryString
 	 * @param qch
 	 */
-	public void configure(EntityBundle bundle, boolean canEdit, QueryChangeHandler qch) {
+	public void configure(EntityBundle bundle, boolean canEdit, QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
+		this.actionMenu = actionMenu;
+		configureActions();
 		checkState();
+	}
+
+	private void configureActions(){
+		for(Action action: ACTIONS){
+			this.actionMenu.addActionListener(action, this);
+			this.actionMenu.setActionVisible(action, true);
+		}
 	}
 
 	/**
@@ -210,6 +223,12 @@ public class TableEntityWidget implements IsWidget, TableEntityWidgetView.Presen
 	public void onDownloadResults(String sql) {
 		this.downloadTableQueryModalWidget.configure(sql);
 		downloadTableQueryModalWidget.showModal();
+	}
+
+	@Override
+	public void onAction(Action action) {
+		view.setTableMessageVisible(true);
+		view.showTableMessage(AlertType.DANGER, "Action clicked: "+action);
 	}
 	
 }

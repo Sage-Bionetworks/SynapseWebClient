@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
-import java.util.List;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface ActionMenuWidget extends IsWidget{
 
 	/**
-	 * Configure this widget before using.
-	 * @param actions The list of actions that should be shown
-	 * @param listener Listener for action events.
+	 * Reset this action menu.
 	 */
-	public void configure(List<Action> actions, ActionListener listener);
+	public void reset();
 	
 	/**
 	 * Enable/disable an action in the menu.
@@ -28,6 +26,29 @@ public interface ActionMenuWidget extends IsWidget{
 	public void setActionVisible(Action action, boolean visible);
 	
 	/**
+	 * The text shown for this action.
+	 * @param action
+	 * @param text
+	 */
+	public void setActionText(Action action, String text);
+	
+	/**
+	 * Set the icon for this action.
+	 * @param action
+	 * @param icon
+	 */
+	public void setActionIcon(Action action, IconType icon);
+	
+	/**
+	 * Add a new listener to an action.
+	 * 
+	 * All listeners are cleared each time the widget is configured.
+	 * @param action
+	 * @param listner
+	 */
+	public void addActionListener(Action action, ActionListener listner);
+	
+	/**
 	 * Listen to action events.
 	 */
 	public interface ActionListener{
@@ -35,6 +56,7 @@ public interface ActionMenuWidget extends IsWidget{
 		 * Called when the users selects an action.
 		 * @param action The selected action.
 		 */
-		public void onAction(Action action);
+		void onAction(Action action);
+
 	}
 }

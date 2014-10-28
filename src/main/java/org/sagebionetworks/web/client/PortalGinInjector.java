@@ -54,6 +54,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButton;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItem;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -238,6 +240,10 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	public StringRendererCell createStringRendererCell();
 	public StringEditorCell createStringEditorCell();
+	
+	// Actions V2
+	public ActionButton createActionButton();
+	public ActionMenuItem createActionMenuItem();
 
 	
 	// Asynchronous

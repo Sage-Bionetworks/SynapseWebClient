@@ -12,8 +12,15 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
  */
 public enum Action {
 
+	TABLE_SCHEMA(IconType.LIST,"Show Schema", BUTTON),
+	UPLOAD_TABLE_DATA(IconType.UPLOAD,"Upload Data", BUTTON),
 	SHARE(IconType.LOCK,"Share", BUTTON),
-	DELETE(IconType.TRASH_O,"Delete", TOOL_MENU);
+	EDIT_TABLE_DATA(null,"Edit Table Data", TOOL_MENU),
+	DOWNLOAD_TABLE_QUERY_RESULTS(IconType.DOWNLOAD,"Download Query Results", TOOL_MENU),
+	CHANGE_ENTITY_NAME(null,"Change name", TOOL_MENU),
+	SUBMIT_TO_CHALLENGE(null,"Submit to Challenge", TOOL_MENU),
+	MOVE_ENTITY(null,"Move", TOOL_MENU),
+	DELETE_ENTITY(IconType.TRASH_O,"Delete", TOOL_MENU);
 	
 	IconType icon;
 	String text;
