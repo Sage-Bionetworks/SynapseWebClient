@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -59,7 +58,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private NodeModelCreator nodeModelCreator;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;	
-	private LayoutServiceAsync layoutService;
 	private SynapseClientAsync synapseClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 	private AdapterFactory adapterFactory;
@@ -91,7 +89,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			GlobalApplicationState globalApplicationState,
 			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController, 
-			LayoutServiceAsync layoutService, 
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
@@ -101,7 +98,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.nodeModelCreator = nodeModelCreator;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.layoutService = layoutService;
 		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
@@ -542,7 +538,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
+					if (caught instanceof NotFoundException) {
+						//SWC-1843: do not redirect home.  log full exception to the console
+						synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
+					} else {
+						DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);	
+					}
+					
 				}
 			});
 		} catch (JSONObjectAdapterException e) {
