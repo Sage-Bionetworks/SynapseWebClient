@@ -2,17 +2,14 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -24,17 +21,8 @@ import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
-import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
-import com.extjs.gxt.ui.client.widget.grid.ColumnData;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
-import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -48,10 +36,7 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
  
-	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
-	private static final String PRINCIPAL_COLUMN_ID = "principalData";
-	private static final String ACCESS_COLUMN_ID = "accessData";
-	private static final String REMOVE_COLUMN_ID = "removeData";
+	
 	
 	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";	// TODO: Check if this text is ok.
 	
@@ -81,7 +66,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		permissionDisplay.put(PermissionLevel.CAN_EDIT, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT);
 		permissionDisplay.put(PermissionLevel.CAN_EDIT_DELETE, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE);
 		permissionDisplay.put(PermissionLevel.CAN_ADMINISTER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);		
-		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_ADMINISTER);
+		permissionDisplay.put(PermissionLevel.OWNER, DisplayConstants.MENU_PERMISSION_LEVEL_IS_OWNER);
 	}
 	
 	@Override
@@ -93,9 +78,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void addAclEntry(AclEntry aclEntry) {
 		if (permissionsGrid == null)
 			throw new IllegalStateException("Permissions window has not been built yet");
-		ListBox permissionsListBox = createEditAccessListBox(aclEntry);	// TODO: build listbox in SharingPermissionsGrid.
+		//ListBox permissionsListBox = createEditAccessListBox(aclEntry);	// TODO: build listbox in SharingPermissionsGrid.
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permissionsListBox); // insert groups first // TODO: PUBLIC is just a group? No team?
+			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay); // insert groups first // TODO: PUBLIC is just a group? No team?
 		} else if (aclEntry.isOwner()) {
 			//owner should be the first (after groups, if present)
 			int insertIndex = 0;
@@ -103,10 +88,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				if (permissionsGrid.getAt(insertIndex).isIndividual())
 					break;
 			}
-			permissionsGrid.insert(aclEntry, insertIndex, permissionsListBox); // insert owner
+			permissionsGrid.insert(aclEntry, insertIndex, permList, permissionDisplay); // insert owner
 		}
 		else
-			permissionsGrid.add(aclEntry, permissionsListBox);
+			permissionsGrid.add(aclEntry, permList, permissionDisplay);
 	}
 	
 	@Override
@@ -145,7 +130,15 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				};
 		}
-		permissionsGrid.configure(removeUserCallback);
+		
+		SetAccessCallback setAccessCallback = new SetAccessCallback() {
+			@Override
+			public void invoke(Long principalId, PermissionLevel permissionLevel) {
+				presenter.setAccess(principalId, permissionLevel);
+			}
+		};
+		
+		permissionsGrid.configure(removeUserCallback, setAccessCallback);
 		add(permissionsGrid.asWidget());
 		
 		if (!canChangePermission) {
@@ -280,164 +273,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		DisplayUtils.showErrorMessage(message);
 	}
 	
-	/*
-	 * Private Methods
-	 */	
-	private void showAddMessage(String message) {
-		// TODO : put this on the form somewhere
-		showErrorMessage(message);
-	}
 
-	// TODO: Move this (and other static methods) to EvaluationAccessControlList.
-	// Completely ungxtify ACLEditorViewImpl.
-	public static Grid<PermissionsTableEntry> createPermissionsGrid(
-			ListStore<PermissionsTableEntry> permissionsStore,
-			GridCellRenderer<PermissionsTableEntry> peopleRenderer,
-			GridCellRenderer<PermissionsTableEntry> buttonRenderer,
-			GridCellRenderer<PermissionsTableEntry> removeRenderer,
-			boolean isEditable) {
-		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
-
-		ColumnConfig column = new ColumnConfig();
-		column.setId(PRINCIPAL_COLUMN_ID);
-		column.setHeader("People");
-		column.setWidth(200);
-		column.setRenderer(peopleRenderer);
-		configs.add(column);
-
-		column = new ColumnConfig();
-		column.setId(ACCESS_COLUMN_ID);
-		column.setHeader("Access");
-		column.setWidth(110);
-		column.setRenderer(buttonRenderer);
-		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
-		configs.add(column);
-
-		column = new ColumnConfig();
-		column.setId(REMOVE_COLUMN_ID);
-		column.setHeader("");
-		column.setWidth(25);
-		column.setRenderer(removeRenderer);
-		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
-		column.setHidden(!isEditable);
-		configs.add(column);
-
-		Grid<PermissionsTableEntry> permissionsGrid = new Grid<PermissionsTableEntry>(
-				permissionsStore, new ColumnModel(configs));
-		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);
-		permissionsGrid.setBorders(true);
-		permissionsGrid.setWidth(520);
-		permissionsGrid.setHeight(180);
-		return permissionsGrid;
-	}
-	
-	private ListBox createEditAccessListBox(final AclEntry aclEntry) {
-		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
-		
-		final ListBox listBox = new ListBox();
-		
-		if (aclEntry.isOwner()) {
-			listBox.addItem("Owner");
-			listBox.setEnabled(false);
-			return listBox;
-		}
-		
-		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
-		for (int i = 0; i < permList.length; i++) {
-			listBox.addItem(permissionDisplay.get(permList[i]));
-			if (permList[i].equals(permLevel))
-				listBox.setSelectedIndex(i);
-		}
-		
-		listBox.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.setAccess(principalId, permList[listBox.getSelectedIndex()]);
-			}
-		});
-		
-		return listBox;
-	}
-
-	public static GridCellRenderer<PermissionsTableEntry> createPeopleRenderer(
-			final PublicPrincipalIds publicPrincipalIds, 
-			final SynapseJSNIUtils synapseJSNIUtils,
-			final IconsImageBundle iconsImageBundle) {
-		GridCellRenderer<PermissionsTableEntry> personRenderer = new GridCellRenderer<PermissionsTableEntry>() {
-			@Override
-			public Object render(PermissionsTableEntry model, String property,
-					ColumnData config, int rowIndex, int colIndex,
-					ListStore<PermissionsTableEntry> store,
-					Grid<PermissionsTableEntry> grid) {
-				PermissionsTableEntry entry = store.getAt(rowIndex);
-				AclEntry aclEntry = entry.getAclEntry();
-				String principalHtml = "";
-				Long publicPrincipalId = publicPrincipalIds.getPublicAclPrincipalId();
-				Long authenticatedPrincipalId = publicPrincipalIds.getAuthenticatedAclPrincipalId();
-				Long anonymousUserPrincipalId = publicPrincipalIds.getAnonymousUserPrincipalId();
-				
-				if (aclEntry != null & aclEntry.getOwnerId() != null) {
-					if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())) {
-						//is public group
-						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
-					} else if (authenticatedPrincipalId != null && aclEntry.getOwnerId().equals(authenticatedPrincipalId.toString())) {
-						//is authenticated group
-						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);	
-					} else if (anonymousUserPrincipalId != null && aclEntry.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
-						//is anonymous user
-						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
-					} else {
-						principalHtml = DisplayUtils.getUserNameDescriptionHtml(aclEntry.getTitle(), aclEntry.getSubtitle());
-					}
-				}
-				
-				String iconHtml = "";
-				if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())){
-					ImageResource icon = iconsImageBundle.globe32();
-					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
-				} else if (!aclEntry.isIndividual()) {
-					//if a group, then try to fill in the icon from the team
-					String url = DisplayUtils.createTeamIconUrl(
-							synapseJSNIUtils.getBaseFileHandleUrl(), 
-							aclEntry.getOwnerId()
-					);
-					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				} else {
-					// try to get the userprofile picture
-					String url = DisplayUtils.createUserProfilePicUrl(
-							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
-							aclEntry.getOwnerId() 
-					);
-					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
-				}
-				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
-			}
-			
-		};
-		return personRenderer;
-	}
-
-	public static GridCellRenderer<PermissionsTableEntry> createRemoveRenderer(final IconsImageBundle iconsImageBundle, final CallbackP<Long> callback) {
-		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
-			@Override  
-			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
-				  final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
-				  final PermissionsTableEntry entry = store.getAt(rowIndex);
-					Anchor removeAnchor = new Anchor();
-					removeAnchor.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.deleteButton16()));
-					removeAnchor.addClickHandler(new ClickHandler() {			
-						@Override
-						public void onClick(ClickEvent event) {
-							Long principalId = (Long.parseLong(entry.getAclEntry().getOwnerId()));
-							callback.invoke(principalId);
-						}
-					});
-					return removeAnchor;
-			  }
-			};  
-		return removeButton;
-	}
-	
 	@Override
 	public void alertUnsavedViewChanges(final Callback saveCallback) {
 		DisplayUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.ADD_ACL_UNSAVED_CHANGES, 
@@ -449,7 +285,15 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				});
 	}
-
+	
+	/*
+	 * Private Methods
+	 */	
+	private void showAddMessage(String message) {
+		// TODO : put this on the form somewhere
+		showErrorMessage(message);
+	}
+	
 	private void addPersonToAcl() {
 		UserGroupSuggestBox peopleSuggestBox = addPeoplePanel.getSuggestBox();
 		if(peopleSuggestBox.getSelectedSuggestion() != null) {
@@ -469,6 +313,14 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		} else {
 			showAddMessage("Please select a user or team to grant permission to.");
 		}
+	}
+	
+	
+	/*
+	 * Set Access Callback
+	 */
+	public interface SetAccessCallback {
+		public void invoke(Long principalId, PermissionLevel permissionLevel);
 	}
 
 }

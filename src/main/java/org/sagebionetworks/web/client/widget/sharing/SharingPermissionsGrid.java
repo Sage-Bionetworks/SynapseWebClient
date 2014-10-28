@@ -2,11 +2,14 @@ package org.sagebionetworks.web.client.widget.sharing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl.SetAccessCallback;
 import org.sagebionetworks.web.shared.users.AclEntry;
+import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,22 +36,22 @@ public class SharingPermissionsGrid implements SharingPermissionsGridView.Presen
 	 * @param deleteButtonCallback Callback for removing a user from
 	 * the ACL. If null, the table will not be editable.
 	 */
-	public void configure(CallbackP<Long> deleteButtonCallback) {
-		view.configure(deleteButtonCallback);
+	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback) {
+		view.configure(deleteButtonCallback, setAccessCallback);
 	}
 	
 	public AclEntry getAt(int index) {
 		return aclEntries.get(index);
 	}
 	
-	public void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox) {
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
 		aclEntries.add(beforeIndex, aclEntry);
-		view.insert(aclEntry, beforeIndex, permListBox);
+		view.insert(aclEntry, beforeIndex, permissionLevels, permissionDisplay);
 	}
 	
-	public void add(AclEntry aclEntry, ListBox permListBox) {
+	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
 		aclEntries.add(aclEntry);
-		view.add(aclEntry, permListBox);
+		view.add(aclEntry, permissionLevels, permissionDisplay);
 	}
 	
 	public int getCount() {

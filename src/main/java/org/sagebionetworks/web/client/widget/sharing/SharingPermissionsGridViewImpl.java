@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.HashSet;
+import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -14,11 +18,16 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl.SetAccessCallback;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidgetViewImpl.UserGroupListWidgetViewImplUiBinder;
 import org.sagebionetworks.web.shared.users.AclEntry;
+import org.sagebionetworks.web.shared.users.AclUtils;
+import org.sagebionetworks.web.shared.users.PermissionLevel;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -36,7 +45,8 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	private static final int PERMISSION_COLUMN_WIDTH_PERCENTAGE = 27;
 	private static final int DELETE_COLUMN_WIDTH_PERCENTAGE = 5;
 	
-	CallbackP<Long> deleteButtonCallback;
+	private CallbackP<Long> deleteButtonCallback;
+	private SetAccessCallback setAccessCallback;
 	
 	@UiField 
 	TBody tableBody;
@@ -54,21 +64,22 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 	}
 	
 	@Override
-	public void insert(AclEntry aclEntry, int beforeIndex, ListBox permListBox) {
-		tableBody.insert(createAclEntryTableRow(aclEntry, permListBox), beforeIndex);
+	public void insert(AclEntry aclEntry, int beforeIndex, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplays) {
+		tableBody.insert(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplays), beforeIndex);
 	}
 	
 	@Override
-	public void configure(CallbackP<Long> deleteButtonCallback) {
+	public void configure(CallbackP<Long> deleteButtonCallback, SetAccessCallback setAccessCallback) {
 		this.deleteButtonCallback = deleteButtonCallback;
+		this.setAccessCallback = setAccessCallback;
 	}
 	
 	@Override
-	public void add(AclEntry aclEntry, ListBox permListBox) {
-		tableBody.add(createAclEntryTableRow(aclEntry, permListBox));
+	public void add(AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
+		tableBody.add(createAclEntryTableRow(aclEntry, permissionLevels, permissionDisplay));
 	}
 	
-	private TableRow createAclEntryTableRow(final AclEntry aclEntry, ListBox permListBox) {
+	private TableRow createAclEntryTableRow(final AclEntry aclEntry, PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
 		final TableRow row = new TableRow();
 		
 		// People label
@@ -89,6 +100,7 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		
 		// Permissions List Box
 		data = new TableData();
+		ListBox permListBox = createEditAccessListBox(aclEntry, permissionLevels, permissionDisplay);
 		permListBox.addStyleName("input-xs");
 		data.add(permListBox);
 		row.add(data);
@@ -124,6 +136,35 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 			deleteColumnHeader.setWidth(DELETE_COLUMN_WIDTH_PERCENTAGE + "%");
 		}
 		return row;
+	}
+	
+	private ListBox createEditAccessListBox(final AclEntry aclEntry, final PermissionLevel[] permissionLevels, Map<PermissionLevel, String> permissionDisplay) {
+		final Long principalId = Long.parseLong(aclEntry.getOwnerId());
+		
+		final ListBox listBox = new ListBox();
+		
+		if (aclEntry.isOwner()) {
+			listBox.addItem(permissionDisplay.get(PermissionLevel.OWNER));
+			listBox.setEnabled(false);
+			return listBox;
+		}
+		
+		PermissionLevel permLevel = AclUtils.getPermissionLevel(new HashSet<ACCESS_TYPE>(aclEntry.getAccessTypes()));
+		for (int i = 0; i < permissionLevels.length; i++) {
+			listBox.addItem(permissionDisplay.get(permissionLevels[i]));
+			if (permissionLevels[i].equals(permLevel))
+				listBox.setSelectedIndex(i);
+		}
+		
+		listBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				if (setAccessCallback != null)
+					setAccessCallback.invoke(principalId, permissionLevels[listBox.getSelectedIndex()]);
+			}
+		});
+		
+		return listBox;
 	}
 	
 	@Override
