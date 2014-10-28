@@ -86,7 +86,7 @@ public class ClientLoggerImpl implements ClientLogger{
 	public void errorToRepositoryServices(String message, Throwable e){
 		//get the stack trace out of the throwable
 		String label = DisplayUtils.getStackTrace(e);
-		String exceptionMessage = e != null ? e.getMessage() : "";
+		String exceptionMessage = e != null && e.getMessage() != null ? e.getMessage() : "";
 		this.synapseClient.logErrorToRepositoryServices(message + " - " + exceptionMessage, label, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
