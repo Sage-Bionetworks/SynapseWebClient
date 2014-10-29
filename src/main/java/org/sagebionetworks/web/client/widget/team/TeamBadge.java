@@ -15,16 +15,14 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	
 	private TeamBadgeView view;
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalAppState;
 	private Integer maxNameLength;
 	
 	private String teamName;
 	
 	@Inject
-	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
+	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}
 	
@@ -43,7 +41,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 				@Override
 				public void onFailure(Throwable caught) {
 					if (teamName != null) {
-						setTeamWithoutLink(teamName, teamId);
+						view.setTeamWithoutLink(teamName, teamId);
 					} else {
 						view.showLoadError(teamId);
 					}
@@ -51,11 +49,6 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 			});
 		}
 		
-	}
-	
-	private void setTeamWithoutLink(final String teamName, final String teamId) {
-		view.setGlobeId(Long.parseLong(globalAppState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
-		view.setTeamWithoutLink(teamName, teamId);
 	}
 	
 	public void configure(Team team) {

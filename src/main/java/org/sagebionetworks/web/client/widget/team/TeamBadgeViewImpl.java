@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,7 +30,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
-	Long globeId;
+	Long publicAclPrincipalId;
 	
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -41,6 +42,8 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		this.iconsImageBundle = iconsImageBundle;
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("displayInline");
+		
+		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
 	}
 	
 	@Override
@@ -98,7 +101,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		nameLabel.addStyleName("font-size-13 boldText");
 		
 		HTML profilePicture;
-		if (globeId != null && Long.parseLong(teamId) == globeId) {
+		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
 			//profilePicture = new HTML(DisplayUtils.getFontelloIcon("globe font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
 			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
 			profilePicture = new HTML(html);
@@ -143,11 +146,6 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
 		DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP);
 		notificationsPanel.setWidget(widget);
-	}
-
-	@Override
-	public void setGlobeId(Long globeId) {
-		this.globeId = globeId;
 	}
 
 	/*
