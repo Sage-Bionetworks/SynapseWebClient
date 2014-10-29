@@ -18,6 +18,7 @@ public class DisplayConstants {
 	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	public static final String NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE = "No files were selected for upload.";
+	public static final String CREDENTIALS_REQUIRED_MESSAGE = "Credentials are required to upload to this external site.";
 	
 	public static final String FOLLOW_DATASET_HTML = "Following a dataset allows you to be notified when the dataset has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this dataset. You can adjust your notifications settings through your Profile.";  
 	public static final String FOLLOW_PROJECT_HTML = "Following a project allows you to be notified when the project has new comments, additional layers or data, is used in a project, or referenced by a new publication.<br/><br/>Click Confirm to Follow this project. You can adjust your notifications settings through your Profile.";

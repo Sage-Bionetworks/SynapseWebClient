@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -144,6 +145,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void handleUploads() {
+		//field validation
 		if (fileNames == null) {
 			//setup upload process.
 			fileHasBeenUploaded = false;
@@ -151,6 +153,16 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
 				//no files selected.
 				view.showNoFilesSelectedForUpload();
+				return;
+			}
+		}
+		
+		if (currentUploadType == UploadType.SFTP) {
+			//must also have credentials
+			String username = view.getExternalUsername();
+			String password = view.getExternalPassword();
+			if (!DisplayUtils.isDefined(username) || !DisplayUtils.isDefined(password)) {
+				view.showExternalCredentialsRequiredMessage();
 				return;
 			}
 		}

@@ -31,6 +31,19 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void showUploadingToExternalStorage(String url, String banner);
 	
 	/**
+	 * SFTP requires username and password, so prompt for it in the upload form.
+	 * @return
+	 */
+	String getExternalUsername();
+	/**
+	 * SFTP requires username and password, so prompt for it in the upload form.
+	 * @return
+	 */
+	String getExternalPassword();
+	
+	void showExternalCredentialsRequiredMessage();
+	
+	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
