@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -19,6 +18,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.uibinder.client.UiBinder;

@@ -10,10 +10,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class ProvenanceConfigEditorTest {

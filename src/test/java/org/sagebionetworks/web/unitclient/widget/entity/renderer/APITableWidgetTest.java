@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -43,6 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitialized
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;

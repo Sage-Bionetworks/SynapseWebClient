@@ -15,4 +15,14 @@ public interface QueryInputListener {
 	 */
 	public void onExecuteQuery(String sql);
 
+	/**
+	 * Called when the user selects the edit button.
+	 */
+	public void onEditResults();
+
+	/**
+	 * Called when the user clicks the download button
+	 */
+	public void onDownloadResults(String sql);
+
 }

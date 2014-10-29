@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.Code;
 import org.sagebionetworks.repo.model.ExampleEntity;
 import org.sagebionetworks.repo.model.Project;
@@ -37,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityPropertyForm;
 import org.sagebionetworks.web.client.widget.entity.EntityPropertyFormView;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;

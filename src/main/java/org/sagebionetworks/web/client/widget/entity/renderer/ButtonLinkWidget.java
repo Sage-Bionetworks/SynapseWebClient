@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;

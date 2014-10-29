@@ -1,7 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
@@ -23,6 +32,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,8 +42,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
 import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -50,8 +60,10 @@ public class JoinTeamWidgetTest {
 	Callback mockTeamUpdatedCallback;
 	JSONObjectAdapter jsonObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
+	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
 	List<AccessRequirement> ars;
+	UserProfile currentUserProfile;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -61,6 +73,7 @@ public class JoinTeamWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
+		mockGwt = mock(GWTWrapper.class);
 		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		mockPlaceChanger = mock(PlaceChanger.class);
@@ -68,7 +81,7 @@ public class JoinTeamWidgetTest {
         mockAuthenticationController = mock(AuthenticationController.class);
         when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
         UserSessionData currentUser = new UserSessionData();                
-        UserProfile currentUserProfile = new UserProfile();
+        currentUserProfile = new UserProfile();
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
@@ -77,7 +90,7 @@ public class JoinTeamWidgetTest {
         AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter, mockGwt);
 		TeamMembershipStatus status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -314,4 +327,72 @@ public class JoinTeamWidgetTest {
 		//verify we show an error for an unrecognized ar
 		verify(mockView).showErrorMessage(anyString());
 	}
+	
+	@Test
+	public void testIsRecognizedSite() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			//test the whitelist
+			//recognize project datasphere
+			//verify case insensitive
+			assertTrue(JoinTeamWidget.isRecognizedSite(url.toUpperCase()));
+			assertTrue(JoinTeamWidget.isRecognizedSite(url.toLowerCase()));
+			
+			//but not other sites
+			assertFalse(JoinTeamWidget.isRecognizedSite("http://mpmdev.ondemand.sas.com/projectdatasphere/html/registration/challenge")); //not https
+			assertFalse(JoinTeamWidget.isRecognizedSite("https://www.jayhodgson.com/projectdatasphere/"));
+		}
+	}
+	
+	@Test
+	public void testenhancePostMessageUrl() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			String firstName = "Luke";
+			String lastName = "Skywalker";
+			String ownerId = "628";
+			List<String> emails = new ArrayList<String>();
+			String email = "MidichloriansSaturation@bigfoot.com";
+			emails.add(email);
+			when(mockGwt.encodeQueryString(email)).thenReturn(email);
+			when(mockGwt.encodeQueryString(firstName)).thenReturn(firstName);
+			when(mockGwt.encodeQueryString(lastName)).thenReturn(lastName);
+			when(mockGwt.encodeQueryString(ownerId)).thenReturn(ownerId);
+			
+			currentUserProfile.setFirstName(firstName);
+			currentUserProfile.setLastName(lastName);
+			currentUserProfile.setOwnerId(ownerId);
+			currentUserProfile.setEmails(emails);
+			
+			//test setup configures us as logged in
+			String enhancedUrl = joinWidget.enhancePostMessageUrl(url);
+			assertTrue(enhancedUrl.contains(firstName));
+			assertTrue(enhancedUrl.contains(lastName));
+			assertTrue(enhancedUrl.contains(ownerId));
+			assertTrue(enhancedUrl.contains(email));
+		}
+	}
+	
+	@Test
+	public void testEnhancePostMessageUrlNotLoggedIn() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) { 
+			//test setup configures us as logged in
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+			assertEquals(url, joinWidget.enhancePostMessageUrl(url));
+		}
+	}
+
+	@Test
+	public void testGetEncodedParamValueIfDefined() {
+		//return empty string if null value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, null, "&"));
+		//or empty string value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "", "&"));
+		
+		//if defined, return <paramkey>=<url-encoded-value><suffix>
+		when(mockGwt.encodeQueryString("bar")).thenReturn("encodedbar");
+		assertEquals(WebConstants.USER_ID_PARAM+"=encodedbar&", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "bar", "&"));
+	}
+	
 }

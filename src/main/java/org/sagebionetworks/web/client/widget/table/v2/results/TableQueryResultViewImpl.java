@@ -2,10 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -34,10 +32,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	Alert errorAlert;
 	@UiField
-	ButtonToolBar resultsToolBar;
-	@UiField
-	Button editRowsButton;
-	@UiField
 	Button saveRowsButton;
 	@UiField
 	Modal editRowsModal;
@@ -54,12 +48,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
-		editRowsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditRows();
-			}
-		});
 		saveRowsButton.addClickHandler(new ClickHandler() {	
 			@Override
 			public void onClick(ClickEvent event) {
@@ -115,16 +103,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void hideEditor() {
 		editRowsModal.hide();
-	}
-
-	@Override
-	public void setToolbarVisible(boolean visible) {
-		this.resultsToolBar.setVisible(visible);
-	}
-
-	@Override
-	public void setEditEnabled(boolean isEditable) {
-		this.editRowsButton.setVisible(isEditable);
 	}
 
 	@Override

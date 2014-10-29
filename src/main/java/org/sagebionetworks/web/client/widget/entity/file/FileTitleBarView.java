@@ -28,9 +28,7 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	public void createTitlebar(
 			EntityBundle entityBundle, 
 			EntityType entityType, 
-			AuthenticationController authenticationController,
-			boolean isAdministrator, 
-			boolean canEdit);
+			AuthenticationController authenticationController);
 		
 	/**
 	 * Presenter interface

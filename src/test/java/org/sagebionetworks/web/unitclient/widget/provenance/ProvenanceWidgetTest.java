@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
@@ -62,6 +61,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;

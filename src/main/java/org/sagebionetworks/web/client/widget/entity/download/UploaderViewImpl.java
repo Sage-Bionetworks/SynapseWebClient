@@ -22,28 +22,42 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
+/**
+* Note on the form submission. This supports two form submission use cases.
+* 1. Submit to Portal servlet. These will return the response html in the SubmitCompleteHandler.
+* 2. Submit to SFTP proxy servlet. This will not return the response html in the SubmitCompleteHandler (due to CORS). But the sftp proxy will return a page that sends a message (via postMessage)
+* to the parent window. So we set up a listener (onAttach) for this cross-window message.
+* @author jayhodgson
+*
+*/
 public class UploaderViewImpl extends FlowPanel implements
 		UploaderView {
 	
@@ -61,7 +75,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	private SageImageBundle sageImageBundle;
-	private Dialog dialog;
 	
 	TextBox pathField, nameField;
 	
@@ -69,6 +82,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private boolean isEntity;
 	private String parentEntityId;
 	private FormPanel formPanel;
+	private FlowPanel uploadDestinationContainer;
 	
 	private Form externalLinkFormPanel;
 	private FormGroup externalUrlFormGroup;
@@ -88,19 +102,17 @@ public class UploaderViewImpl extends FlowPanel implements
 	FlowPanel container;
 	SharingAndDataUseConditionWidget sharingDataUseWidget;
 	PortalGinInjector ginInjector;
+	private HandlerRegistration messageHandler;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
 			SharingAndDataUseConditionWidget sharingDataUseWidget,
-			PortalGinInjector ginInjector,
-			Dialog dialog) {
+			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
-		this.dialog = dialog;
-		dialog.setSize(ModalSize.MEDIUM);
 		
 		this.progressContainer = new Progress();
 		progressContainer.setMarginTop(10);
@@ -126,7 +138,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		initUploadPanel();
 		initExternalPanel();
 		
-		this.add(dialog);	// Put modal on uploader layer.
 		initHandlers();
 	}
 	
@@ -136,8 +147,8 @@ public class UploaderViewImpl extends FlowPanel implements
 			public void onClick(ClickEvent event) {
 				if (isExternal) {
 					String url = pathField.getValue();
-					
-					if (!LoginPresenter.isValidUrl(url, false)) {
+					//let the service decide what is a valid url (now supporting sftp, and perhaps others)
+					if (url == null || url.isEmpty()) {
 						externalUrlFormGroup.setValidationState(ValidationState.ERROR);
 						return;
 					}
@@ -155,7 +166,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		});
 		
 		cancelBtn.addClickHandler(new ClickHandler() {
-			
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.cancelClicked();
@@ -165,11 +175,49 @@ public class UploaderViewImpl extends FlowPanel implements
 		SubmitCompleteHandler submitHandler = new SubmitCompleteHandler() {
 			@Override
 			public void onSubmitComplete(SubmitCompleteEvent event) {
-				presenter.handleSubmitResult(event.getResults());
-				hideLoading();
+				handleSubmitResult(event.getResults());
 			}
 		};
 		formPanel.addSubmitCompleteHandler(submitHandler);
+	}
+	
+
+	private void handleSubmitResult(String result) {
+		if (result != null) {
+			presenter.handleSubmitResult(result);
+			hideLoading();
+		}
+	}
+	
+	private static native String _getMessage(JavaScriptObject event) /*-{
+		console.log("event received: "+event);
+		console.log("event.data received: "+event.data);
+		if (event !== undefined && event.data !== undefined)
+			return event.data;
+		else return null;
+	}-*/;
+	
+	@Override
+	protected void onAttach() {
+		//register to listen for the "message" events
+		if (messageHandler == null) {
+			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+				@Override
+				public void invoke(JavaScriptObject event) {
+					handleSubmitResult(_getMessage(event));
+				}
+			});
+		}
+		super.onAttach();
+	}
+	
+	@Override
+	protected void onDetach() {
+		if (messageHandler != null) {
+			messageHandler.removeHandler();
+			messageHandler = null;
+		}
+		super.onDetach();
 	}
 	
 	@Override
@@ -207,9 +255,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	@Override
 	public void showErrorMessage(String message) {
-		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.WARNING);
-		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.OK, null, null, true);
-		dialog.show();
+		DisplayUtils.showErrorMessage(message);
 	}
 
 	@Override
@@ -273,18 +319,18 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 	
 	@Override
-	public void submitForm() {
+	public void submitForm(String actionUrl) {
 		showSpinningProgress();
+		formPanel.setAction(actionUrl);
 		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();	
 	}
 	
 	@Override
-	public void disableMultipleFileUploads() {
-		this.multipleFileUploads = false;
+	public void enableMultipleFileUploads(boolean isEnabled) {
+		this.multipleFileUploads = isEnabled;
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
 	}
-	
 
 	/*
 	 * Private Methods
@@ -294,7 +340,6 @@ public class UploaderViewImpl extends FlowPanel implements
 			this.container = new FlowPanel();
 		else
 			container.clear();
-		
 		container.add(new HTML("<div style=\"padding: 5px 10px 0px 15px;\"></div>"));
 		uploadPanel.removeFromParent();
 		if (isEntity) {
@@ -366,26 +411,11 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void showConfirmDialog(String message, final Callback yesCallback, final Callback noCallback) {
-		SafeHtml html = DisplayUtils.getPopupSafeHtml("", message, DisplayUtils.MessagePopup.QUESTION);
-		dialog.configure(DisplayConstants.UPLOAD_DIALOG_TITLE, new HTMLPanel(html.asString()), DisplayConstants.YES, DisplayConstants.NO, new Dialog.Callback() {
-
-			@Override
-			public void onPrimary() {
-				yesCallback.invoke();
-			}
-
-			@Override
-			public void onDefault() {
-				noCallback.invoke();
-			}
-			
-		}, true);
-		dialog.show();
+		DisplayUtils.showConfirmDialog(DisplayConstants.UPLOAD_DIALOG_TITLE, message, yesCallback, noCallback);
 	}
 	
 	// set the initial state of the controls when widget is made visible
 	private void initializeControls() {
-		formPanel.setAction(presenter.getDefaultUploadActionUrl());
 		if(formPanel.isVisible()) formPanel.reset(); // clear file choice from fileUploadField
 
 		configureUploadButton();
@@ -411,6 +441,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	}
 		
 	private void initUploadPanel() {
+		uploadDestinationContainer = new FlowPanel();
+		uploadDestinationContainer.addStyleName("alert alert-info margin-5");
+		
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		fileUploadHTML = createFileUploadHTML();
@@ -418,6 +451,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		configureUploadButton(); // upload tab first by default
 		
 		uploadPanel = new FlowPanel();
+		uploadPanel.add(uploadDestinationContainer);
 		uploadPanel.add(DRAG_AND_DROP_HTML);
 		uploadPanel.add(formPanel);
 		
@@ -429,6 +463,31 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(row);
 	}
 
+	@Override
+	public void showUploadingToExternalStorage(String url, String banner) {
+		uploadDestinationContainer.clear();
+		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(url) + "</strong>"));
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+	}
+	
+	@Override
+	public void showUploadingToSynapseStorage(String banner) {
+		uploadDestinationContainer.clear();
+		uploadDestinationContainer.add(new InlineHTML(DisplayConstants.UPLOAD_DESTINATION));
+		Image icon = new Image(sageImageBundle.logoHeader().getURL());
+		icon.addStyleName("displayInline moveup-2");
+		icon.setPixelSize(25, 25);
+		uploadDestinationContainer.add(icon);
+		icon = new Image(sageImageBundle.synapseTextHeader().getURL());
+		icon.setPixelSize(88, 20);
+		icon.addStyleName("displayInline margin-right-5");
+		uploadDestinationContainer.add(icon);
+		uploadDestinationContainer.add(new InlineHTML(" storage"));
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+	}
+	
 	private void initExternalPanel() {
 		pathField = new TextBox();
 		nameField = new TextBox();

@@ -62,6 +62,7 @@ public class EvaluationSubmitterTest {
 	List<Evaluation> evaluationList;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
 	AccessRequirementsTransport art;
+	Submission returnSubmission;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
@@ -79,8 +80,9 @@ public class EvaluationSubmitterTest {
 		
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		
-		AsyncMockStubber.callSuccessWith("fake submission result json").when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		returnSubmission = new Submission();
+		returnSubmission.setId("363636");
+		AsyncMockStubber.callSuccessWith(returnSubmission).when(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("fake evaluation results json").when(mockSynapseClient).getAvailableEvaluations(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUnmetEvaluationAccessRequirements(anyString(), any(AsyncCallback.class));
 		
@@ -123,7 +125,7 @@ public class EvaluationSubmitterTest {
 		submitter.submitToEvaluations((Reference)null, null, null, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
-		verify(mockSynapseClient, times(2)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, times(2)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 
 		ArgumentCaptor<HashSet> captor = ArgumentCaptor.forClass(HashSet.class);
 		//submitted status shown
@@ -143,10 +145,9 @@ public class EvaluationSubmitterTest {
 		submitter.submitToEvaluations(null, submissionName, teamName, evaluationList);
 		//should invoke submission twice (once per evaluation), directly without terms of use
 		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
-		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
 		verify(mockSynapseClient, times(2)).createSubmission(captor.capture(), anyString(), any(AsyncCallback.class));
-		String submissionJson = captor.getValue();
-		Submission submission = EntityFactory.createEntityFromJSONString(submissionJson, Submission.class);
+		Submission submission = captor.getValue();
 		assertEquals(submissionName, submission.getName());
 		assertEquals(teamName, submission.getSubmitterAlias());
 	}
@@ -157,14 +158,14 @@ public class EvaluationSubmitterTest {
 		reset(mockView);
 		when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
 		
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(AsyncCallback.class));
 
 		List<Evaluation> evals = new ArrayList<Evaluation>();
 		evals.add(new Evaluation());
 		submitter.submitToEvaluations((Reference)null, null, null, evals);
 		//Should invoke once directly without terms of use
-		verify(mockSynapseClient).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 		
 		//submitted status shown
 		verify(mockView).showErrorMessage(anyString());
@@ -185,7 +186,7 @@ public class EvaluationSubmitterTest {
 		
 		//should show terms of use for the requirement, view does not call back so submission should not be created
 		verify(mockView, times(1)).showAccessRequirement(anyString(), any(Callback.class));
-		verify(mockSynapseClient, times(0)).createSubmission(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient, times(0)).createSubmission(any(Submission.class), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test

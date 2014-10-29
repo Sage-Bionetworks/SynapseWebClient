@@ -15,11 +15,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManager;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnManagerView;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 public class APITableColumnManagerTest {
 		

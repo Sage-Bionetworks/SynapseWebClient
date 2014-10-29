@@ -1,13 +1,20 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import java.util.List;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
+import org.sagebionetworks.repo.model.file.S3UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.CancelEvent;
@@ -55,6 +62,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private CallbackP<String> fileHandleIdCallback;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils synapseJsniUtils;
+	private GlobalApplicationState globalAppState;
 	private GWTWrapper gwt;
 	MultipartUploader multiPartUploader;
 	AuthenticationController authenticationController;
@@ -63,6 +71,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private int currIndex;
 	private NumberFormat percentFormat;
 	private boolean fileHasBeenUploaded = false;
+	private UploadType currentUploadType;
+	private String currentExternalUploadUrl;
 	
 	@Inject
 	public Uploader(
@@ -72,7 +82,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			SynapseJSNIUtils synapseJsniUtils,
 			GWTWrapper gwt,
 			AuthenticationController authenticationController,
-			MultipartUploader multiPartUploader
+			MultipartUploader multiPartUploader,
+			GlobalApplicationState globalAppState
 			) {
 	
 		this.view = view;		
@@ -82,6 +93,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.gwt = gwt;
 		this.percentFormat = gwt.getNumberFormat("##");
 		this.authenticationController = authenticationController;
+		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
 		view.setPresenter(this);
 		clearHandlers();
@@ -104,6 +116,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.resetToInitialState();
 		resetUploadProgress();
 		view.showUploaderUI();
+		
+		//async load upload destinations (and update view)
+		queryForUploadDestination();
 		return this.view.asWidget();
 	}
 	
@@ -113,6 +128,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);		
 		this.entity = null;
 		this.parentEntityId = null;
+		this.currentUploadType = null;
+		this.currentExternalUploadUrl = null;
 		resetUploadProgress();
 	}
 
@@ -121,11 +138,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		return null;
 	}
 
-	@Override
-	public String getDefaultUploadActionUrl() {
-		return getOldUploadUrl();
-	}
-	
 	public void uploadFiles() {
 		view.triggerUpload();
 	}
@@ -134,7 +146,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void handleUploads() {
 		if (fileNames == null) {
 			//setup upload process.
-			
 			fileHasBeenUploaded = false;
 			currIndex = 0;
 			if ((fileNames = synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID)) == null) {
@@ -149,6 +160,103 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			entityId = entity.getId();
 		}
 		
+		uploadBasedOnConfiguration();
+	}
+	
+	public void queryForUploadDestination() {
+		enableMultipleFileUploads();
+		if (parentEntityId == null) {
+			currentUploadType = UploadType.S3;
+			view.showUploadingToSynapseStorage("");
+		} else {
+			//we have a parent entity, check to see where we are suppose to upload the file(s)
+			synapseClient.getUploadDestinations(parentEntityId, new AsyncCallback<List<UploadDestination>>() {
+				public void onSuccess(List<UploadDestination> uploadDestinations) {
+					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
+						currentUploadType = UploadType.S3;
+						view.showUploadingToSynapseStorage("");
+					} else if (uploadDestinations.get(0) instanceof S3UploadDestination) {
+						currentUploadType = UploadType.S3;
+						view.showUploadingToSynapseStorage(uploadDestinations.get(0).getBanner());
+					} else if (uploadDestinations.get(0) instanceof ExternalUploadDestination){
+						ExternalUploadDestination d = (ExternalUploadDestination) uploadDestinations.get(0);
+						if (UploadType.SFTP == d.getUploadType()){
+							currentUploadType = UploadType.SFTP;
+							currentExternalUploadUrl = d.getUrl();
+							view.showUploadingToExternalStorage(getSftpDomain(currentExternalUploadUrl), d.getBanner());
+							disableMultipleFileUploads();
+						} else {
+							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
+						}
+					} else {
+						//unsupported upload destination type
+						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
+					}
+				};
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					uploadError(caught.getMessage());
+				}
+			});
+		}
+	}
+	
+	public String getSftpDomain(String url) {
+		if (url == null)
+			return null;
+		if (!url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+			throw new IllegalArgumentException("Not a sftp url: " + url);
+		}
+		String domain = url.substring(WebConstants.SFTP_PREFIX.length());
+		int slashIndex = domain.indexOf("/");
+		if (slashIndex != -1) {
+			domain = domain.substring(0, slashIndex);
+		}
+		return domain;
+	}
+	
+	/**
+	 * Get the upload destination (based on the project settings), and continue the upload.
+	 */
+	public void uploadBasedOnConfiguration() {
+		if (currentUploadType == UploadType.S3) {
+			uploadToS3();
+		} else if (currentUploadType == UploadType.SFTP){
+			uploadToSftpProxy(currentExternalUploadUrl);
+		} else {
+			uploadError("Unsupported external upload type specified: " + currentUploadType);
+		}
+	}
+	
+	/**
+	 * Given a sftp link, return a link that goes through the sftp proxy to do the action (GET file or POST upload form)
+	 * @param realSftpUrl
+	 * @param globalAppState
+	 * @return
+	 */
+	public static String getSftpProxyLink(String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
+		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+		if (sftpProxy != null) {
+			String delimiter = sftpProxy.contains("?") ? "&" : "?";
+			
+			String escapedRealSftpUrl = gwt.encodeQueryString(realSftpUrl);
+			return sftpProxy + delimiter + "url="+escapedRealSftpUrl;
+		} else {
+			//unlikely state
+			throw new IllegalArgumentException("Unable to determine SFTP endpoint");
+		}
+	}
+	
+	public void uploadToSftpProxy(final String url) {
+		try {
+			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
+		} catch (Exception e) {
+			uploadError(e.getMessage());
+		}
+	}
+	
+	public void uploadToS3() {
 		boolean isFileEntity = entity == null || entity instanceof FileEntity;				 
 		if (isFileEntity) {
 			//use case B from above
@@ -164,8 +272,40 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				fireCancelEvent();
 				return;
 			}				
-			view.submitForm();
+			view.submitForm(getOldUploadUrl());
 		}
+	}
+	
+	/**
+	 * Return the current upload type.  Used for testing purposes only.
+	 * @return
+	 */
+	public UploadType getCurrentUploadType() {
+		return currentUploadType;
+	};
+	
+	/**
+	 * Set the current upload type.  Used for testing purposes only
+	 * @param currentUploadType
+	 */
+	public void setCurrentUploadType(UploadType currentUploadType) {
+		this.currentUploadType = currentUploadType;
+	}
+	
+	/**
+	 * Get the current external upload url.  Used for testing purposes only.
+	 * @return
+	 */
+	public String getCurrentExternalUploadUrl() {
+		return currentExternalUploadUrl;
+	}
+	
+	/**
+	 * Set the current external upload url.  Used for testing purposes only.
+	 * @return
+	 */
+	public void setCurrentExternalUploadUrl(String currentExternalUploadUrl) {
+		this.currentExternalUploadUrl = currentExternalUploadUrl;
 	}
 	
 	public void checkFileSize() throws IllegalArgumentException{
@@ -246,7 +386,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			handleUploads();
 		}
 	}
-
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
 		if (entityId != null || parentEntityId != null) {
@@ -347,15 +486,20 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);
 				}			
 			});
-		} catch (RestServiceException e) {			
+		} catch (RestServiceException e) {
 			view.showErrorMessage(DisplayConstants.TEXT_LINK_FAILED);	
 		}
 	}
 	
 	@Override
 	public void disableMultipleFileUploads() {
-		view.disableMultipleFileUploads();
+		view.enableMultipleFileUploads(false);
 	}
+	
+	public void enableMultipleFileUploads() {
+		view.enableMultipleFileUploads(true);
+	}
+
 	
 	@Override
 	@SuppressWarnings("unchecked")
@@ -389,13 +533,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		String detailedErrorMessage = null;
 		try{
 			uploadResult = AddAttachmentDialog.getUploadResult(resultHtml);
-			if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
-				//upload result has file handle id if successful
-				String fileHandleId = uploadResult.getMessage();
-				setFileEntityFileHandle(fileHandleId);
-			}else {
-				uploadError("Upload result status indicated upload was unsuccessful.");
-			}
+			handleSubmitResult(uploadResult);
 		} catch (Throwable th) {detailedErrorMessage = th.getMessage();};//wasn't an UplaodResult
 		
 		if (uploadResult == null) {
@@ -404,6 +542,23 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			} else {
 				uploadSuccess();
 			}
+		}
+	}
+	
+	public void handleSubmitResult(UploadResult uploadResult) {
+		if (uploadResult.getUploadStatus() == UploadStatus.SUCCESS) {
+			if (currentUploadType == null || currentUploadType.equals(UploadType.S3)) {
+				//upload result has file handle id if successful
+				String fileHandleId = uploadResult.getMessage();
+				setFileEntityFileHandle(fileHandleId);
+			} else if (UploadType.SFTP.equals(currentUploadType)) {
+				//should respond with the new path
+				String path = uploadResult.getMessage();
+				String fileName = fileNames[currIndex];
+				setExternalFilePath(path, fileName);
+			}
+		}else {
+			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage());
 		}
 	}
 	
@@ -461,7 +616,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager.fireEvent(new EntityUpdatedEvent());
 	}
 
-	private String getOldUploadUrl() {
+	public String getOldUploadUrl() {
 		 String entityIdString = entity != null ? WebConstants.ENTITY_PARAM_KEY + "=" + entity.getId() : "";
 		return gwt.getModuleBaseURL() + WebConstants.LEGACY_DATA_UPLOAD_SERVLET + "?" + entityIdString;
 	}

@@ -27,23 +27,14 @@ public class FileInputWidgetImplTest {
 		widget = new FileInputWidgetImpl(mockView, multipartUploaderStub);
 	}
 	
-	@Test 
-	public void testConfigure(){
-		widget.configure(mockHandler);
-		verify(mockView).resetForm();
-		verify(mockView).showProgress(false);
-		verify(mockView).setInputEnabled(true);
-	}
-	
 	@Test
 	public void testUploadSelectedFile(){
-		widget.configure(mockHandler);
 		reset(mockView);
 		String fileHandleId = "123";
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
-		widget.uploadSelectedFile();
+		widget.uploadSelectedFile(mockHandler);
 		verify(mockView).setInputEnabled(false);
 		// update at the start and end, plus each actual update
 		verify(mockView, times(progress.length+2)).updateProgress(anyDouble(), anyString());
@@ -53,15 +44,13 @@ public class FileInputWidgetImplTest {
 	
 	@Test
 	public void testUploadSelectedFailure(){
-		widget.configure(mockHandler);
-		reset(mockView);
 		String fileHandleId = "123";
 		multipartUploaderStub.setFileHandle(fileHandleId);
 		String[] progress = new String[]{"one","two", "three"};
 		multipartUploaderStub.setProgressText(progress);
 		String error = "an error";
 		multipartUploaderStub.setError(error);
-		widget.uploadSelectedFile();
+		widget.uploadSelectedFile(mockHandler);
 		verify(mockView).setInputEnabled(false);
 		// update at the start but not the end plus the progress that was made
 		verify(mockView, times(progress.length+1)).updateProgress(anyDouble(), anyString());
@@ -69,5 +58,13 @@ public class FileInputWidgetImplTest {
 		verify(mockView).showProgress(false);
 		verify(mockHandler, never()).uploadSuccess(anyString());
 		verify(mockHandler).uploadFailed(error);
+	}
+	
+	@Test
+	public void testRest(){
+		widget.reset();
+		verify(mockView).resetForm();
+		verify(mockView).setInputEnabled(true);
+		verify(mockView).showProgress(false);
 	}
 }

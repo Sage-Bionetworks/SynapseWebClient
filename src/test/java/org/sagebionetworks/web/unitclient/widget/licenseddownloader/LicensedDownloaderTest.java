@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.licenseddownloader;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
@@ -47,6 +46,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JSONEntityFactory;
@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelperImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.RegisterConstantsStub;
@@ -75,6 +76,7 @@ public class LicensedDownloaderTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseClientAsync mockSynapseClient;
+	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
 	AsyncCallback<String> mockStringCallback;
 
@@ -90,7 +92,8 @@ public class LicensedDownloaderTest {
 	EntityWrapper layerEntityWrapper;
 	EntityWrapper pathEntityWrapper;
 	JiraURLHelper jiraURLHelper;
-	
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	String baseFileHandleUrl="http://mytestbasefilehandleurl/filehandle";
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws UnsupportedEncodingException, JSONObjectAdapterException{		
@@ -99,27 +102,28 @@ public class LicensedDownloaderTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
+		mockGwt = mock(GWTWrapper.class);
 		jsonObjectAdapterProvider = new JSONObjectAdapterImpl();
 		mockStringCallback = mock(AsyncCallback.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
-
+		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 
 		// create entity type provider
 		entityTypeProvider = new EntityTypeProvider(new RegisterConstantsStub(), new AdapterFactoryImpl(), new EntitySchemaCacheImpl(new AdapterFactoryImpl()));		
 
 		AdapterFactory adapterFactory = new AdapterFactoryImpl();
 		JSONEntityFactory factory = new JSONEntityFactoryImpl(adapterFactory);
-		NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(factory, adapterFactory.createNew());
 		
 		JiraGovernanceConstants gc = mock(JiraGovernanceConstants.class);
 		JiraClientAsync mockJiraClient = mock(JiraClientAsync.class);
 		GWTWrapper mockGWTWrapper = mock(GWTWrapper.class);
 		AuthenticationController mockAuthController = mock(AuthenticationController.class);
 		jiraURLHelper  = new JiraURLHelperImpl(gc, mockJiraClient, mockGWTWrapper, mockAuthController);
+		
 
 		licensedDownloader = new LicensedDownloader(mockView, mockAuthenticationController, mockGlobalApplicationState,
-				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, nodeModelCreator);
+				jsonObjectAdapterProvider, mockSynapseClient, jiraURLHelper, mockSynapseJSNIUtils, mockGwt);
 		
 		verify(mockView).setPresenter(licensedDownloader);
 		
@@ -185,6 +189,8 @@ public class LicensedDownloaderTest {
 		pathEntityWrapper = new EntityWrapper("pathEntityWrapper", EntityPath.class.getName());
 		
 		when(mockView.getDirectDownloadURL()).thenReturn("http://synapse.sagebase.org/file.png");
+		
+		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -258,7 +264,7 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(fileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), fileHandle.getContentMd5(), null);
+		verify(mockView).setDownloadLocation(eq(fileHandle.getContentMd5()), anyString());
 		
 		// Success Test: External file
 		resetMocks();			
@@ -275,7 +281,7 @@ public class LicensedDownloaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		licensedDownloader.loadDownloadUrl(entityBundle);
 		verify(mockView).showDownloadsLoading();		
-		verify(mockView).setDownloadLocation(externalFileHandle.getFileName(), entity.getId(), entity.getVersionNumber(), null, externalFileHandle.getExternalURL());
+		verify(mockView).setDownloadLocation(null, externalFileHandle.getExternalURL());
 	}
 	
 
@@ -369,25 +375,41 @@ public class LicensedDownloaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 
-	private void configureTestLoadMocks() throws Exception {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
-		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+	@Test
+	public void testGetDirectDownloadUrlFileEntity() {
+		String entityId = "syn99999";
+		Long versionNumber = 8888L;
+		FileEntity f = new FileEntity();
+		FileHandle h = new S3FileHandle();
+		f.setId(entityId);
+		f.setVersionNumber(versionNumber);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(f, h);
+		assertTrue(downloadUrl.startsWith(baseFileHandleUrl));
+		assertTrue(downloadUrl.contains(entityId));
+		assertTrue(downloadUrl.contains(Long.toString(versionNumber)));
 	}
 	
-
-	private void configureTestFindEulaIdMocks() throws Exception {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(StudyEntityWrapper).when(mockSynapseClient).getEntity(eq(parentEntity.getId()), any(AsyncCallback.class)); 
-		AsyncMockStubber.callSuccessWith(layerEntityWrapper).when(mockSynapseClient).getEntity(eq(entity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(pathEntityWrapper).when(mockSynapseClient).getEntityPath(eq(entity.getId()), any(AsyncCallback.class));
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-
+	@Test
+	public void testGetDirectDownloadUrlExternalFileEntity() {
+		ExternalFileHandle h = new ExternalFileHandle();
+		String url = "http://www.jhodgson.com/test.txt";
+		h.setExternalURL(url);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		assertEquals(url, downloadUrl);
 	}
 	
-	
-	
-	
+	@Test
+	public void testGetDirectDownloadUrlSftpExternalFileEntity() {
+		String sftpProxy = "http://mytestproxy.com/sftp";
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
+		
+		ExternalFileHandle h = new ExternalFileHandle();
+		String url = "sftp://www.jhodgson.com/test.txt";
+		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
+		h.setExternalURL(url);
+		String downloadUrl = licensedDownloader.getDirectDownloadURL(new FileEntity(), h);
+		
+		assertTrue(downloadUrl.startsWith(sftpProxy));
+		assertTrue(downloadUrl.contains(url));
+	}
 }

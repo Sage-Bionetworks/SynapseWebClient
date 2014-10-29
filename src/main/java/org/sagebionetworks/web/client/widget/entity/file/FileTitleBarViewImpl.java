@@ -109,9 +109,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void createTitlebar(
 			EntityBundle entityBundle, 
 			EntityType entityType, 
-			AuthenticationController authenticationController,
-			boolean isAdministrator,
-			boolean canEdit) {
+			AuthenticationController authenticationController) {
 		
 		Entity entity = entityBundle.getEntity();
 

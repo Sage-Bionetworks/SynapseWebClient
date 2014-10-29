@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Dialog;

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -8,6 +7,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.dom.client.Style.Visibility;

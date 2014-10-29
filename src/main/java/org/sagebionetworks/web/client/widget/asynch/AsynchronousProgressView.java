@@ -48,4 +48,10 @@ public interface AsynchronousProgressView extends IsWidget{
 	 * @param message
 	 */
 	public void setIndetermianteProgress(String message);
+
+	/**
+	 * Is this view still attached to the UI.
+	 * @return
+	 */
+	public boolean isAttached();
 }

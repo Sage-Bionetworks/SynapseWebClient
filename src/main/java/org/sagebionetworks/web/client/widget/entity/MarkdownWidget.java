@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -24,6 +23,7 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -179,7 +179,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 		final String suffix = DisplayUtils.getPreviewSuffix(isPreview);
 		//look for every element that has the right format
 		int i = 0;
-		String currentWidgetDiv = WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+		String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 		Element el = panel.getElementById(currentWidgetDiv);
 		while (el != null) {
 				//based on the contents of the element, create the correct widget descriptor and renderer
@@ -204,7 +204,7 @@ public class MarkdownWidget extends FlowPanel implements SynapseView {
 				}
 			
 			i++;
-			currentWidgetDiv = WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
+			currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + suffix;
 			el = panel.getElementById(currentWidgetDiv);
 		}
 		return contentTypes;

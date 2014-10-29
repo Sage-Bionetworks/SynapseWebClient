@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal;
 
-import java.util.List;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -65,7 +65,7 @@ public class CreateTableModalWidgetTest {
 		widget.onCreateTable();
 		verify(mockView, never()).showError(anyString());
 		verify(mockView).hide();
-		verify(mockHandler).tableCreated(table);
+		verify(mockHandler).tableCreated();
 	}
 	
 	@Test
@@ -83,6 +83,7 @@ public class CreateTableModalWidgetTest {
 		verify(mockView).setLoading(false);
 		// Should not hide with error.
 		verify(mockView, never()).hide();
-		verify(mockHandler, never()).tableCreated(any(TableEntity.class));
+		verify(mockHandler, never()).tableCreated();
 	}
+	
 }

@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.attachment.AttachmentData;
@@ -115,6 +116,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement createProjectUI;
 	@UiField
 	FlowPanel projectsTabContent;
+	@UiField
+	Button moreProjectsButton;
 	
 	//Teams tab
 	@UiField
@@ -153,7 +156,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement teamsHighlightBox;
 
-
+	@UiField 
+	DivElement projectsLoadingUI;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -193,7 +197,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-		
 		picturePanel.clear();
 		initTabs();
 		
@@ -220,6 +223,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 			}
 		});
 		initCertificationBadge();
+
+		moreProjectsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.getMoreProjects();
+			}
+		});
+		showProjectsLoading(false);
 	}
 	
 	private void initCertificationBadge() {
@@ -232,7 +243,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
 		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
-			@Override
+	@Override
 			public void onClick(ClickEvent event) {
 				clear();
 				tooltip.hide();
@@ -265,8 +276,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(settingsListItem);
 		if (passingRecord != null) {
 			viewProfilePanel.add(certifiedUserBadgePanel);
-		 }
-		
+				}
+			
 		fillInProfileView(profile, viewProfilePanel);
 		picturePanel.add(getProfilePicture(profile, profile.getPic(), synapseJSNIUtils));
 		
@@ -340,13 +351,42 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void setProjects(List<EntityHeader> projectHeaders) {
-		addEntityBadges(projectHeaders, projectsTabContent);
+	public void addProjects(List<ProjectHeader> projectHeaders) {
+		addProjectBadges(projectHeaders, projectsTabContent);
 	}
 
 	@Override
 	public void setProjectsError(String error) {
 		DisplayUtils.showErrorMessage(error);
+	}
+	
+	@Override
+	public void clearProjects() {
+		projectsTabContent.clear();
+		setIsMoreProjectsVisible(false);
+	}
+	
+	@Override
+	public void setIsMoreProjectsVisible(boolean isVisible) {
+		moreProjectsButton.setVisible(isVisible);
+	}
+	
+	private void addProjectBadges(List<ProjectHeader> projectHeaders, FlowPanel targetPanel) {
+		//TODO: replace with ProjectBadges that will show more information (once additional information is available in the ProjectHeader)
+		for (ProjectHeader projectHeader : projectHeaders) {
+			EntityHeader entityHeaderWrapper = new EntityHeader();
+			entityHeaderWrapper.setId(projectHeader.getId());
+			entityHeaderWrapper.setName(projectHeader.getName());
+			entityHeaderWrapper.setType("project");
+			
+			EntityBadge badge = ginInjector.getEntityBadgeWidget();
+			badge.configure(entityHeaderWrapper);
+			Widget widget = badge.asWidget();
+			widget.addStyleName("margin-bottom-10 col-xs-12 col-lg-6");
+			targetPanel.add(widget);
+		}
+		if (projectHeaders.isEmpty())
+			targetPanel.add(new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText padding-15\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString()));
 	}
 	
 	private void addEntityBadges(List<EntityHeader> projectHeaders, FlowPanel targetPanel) {
@@ -482,12 +522,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 
 	@Override
+	public void showProjectsLoading(boolean isLoading) {
+		UIObject.setVisible(projectsLoadingUI, isLoading);
+	}
+	
+	@Override
 	public void clear() {
 		updateUserInfoPanel.clear();
 		viewProfilePanel.clear();
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
-		projectsTabContent.clear();
+		clearProjects();
 		//init with loading widget
 		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 		

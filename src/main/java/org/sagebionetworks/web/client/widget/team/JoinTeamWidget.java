@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
@@ -17,6 +16,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -41,6 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JoinTeamWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
@@ -54,13 +57,19 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private int currentPage;
 	private int currentAccessRequirement;
 	
+	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
+		"https://mpmdev.ondemand.sas.com/projectdatasphere/"
+	};
+
+	
 	@Inject
 	public JoinTeamWidget(JoinTeamWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController, 
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter
+			JSONObjectAdapter jsonObjectAdapter,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -69,6 +78,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.authenticationController = authenticationController;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.gwt = gwt;
 	}
 
 	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
@@ -251,14 +261,49 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				view.showACTAccessRequirement(text, termsOfUseCallback);
 			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
 				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
-				view.showPostMessageContentAccessRequirement(url, termsOfUseCallback);
+				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url), termsOfUseCallback);
 			} else {
 				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}
-				
-				
-		}		
+		}
 	}
+	
+	public String enhancePostMessageUrl(String url) {
+		if (authenticationController.isLoggedIn() && isRecognizedSite(url)) {
+			//include other information from the profile
+			UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+			return url + "?" + 
+					getEncodedParamValueIfDefined(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
+		} else
+			return url;
+	}
+	
+	public String getEncodedParamValueIfDefined(String paramKey, String value, String suffix) {
+		String param = "";
+		if (DisplayUtils.isDefined(value)) {
+			param = paramKey+"="+gwt.encodeQueryString(value) + suffix;
+		}
+		return param;
+	}
+	
+	/**
+	 * return true if it is on a whitelist that allows Synapse to send additional information in the query params
+	 * @param siteUrl
+	 * @return
+	 */
+	public static boolean isRecognizedSite(String siteUrl) {
+		if(siteUrl != null) {
+			for(String base : EXTRA_INFO_URL_WHITELIST) {
+				// starts with one of the valid url bases?				
+				if(siteUrl.toLowerCase().startsWith(base)) return true;
+			}
+		}
+		return false;
+	}
+
 	
 	public void setLicenseAccepted(AccessRequirement ar) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {

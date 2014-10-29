@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -29,7 +30,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	 */
 	void updateView(UserProfile profile, boolean isOwner, PassingRecord passingRecord, Widget profileFormView);
 	void refreshHeader();
-	void setProjects(List<EntityHeader> myProjects);
+	void addProjects(List<ProjectHeader> myProjects);
 	void setProjectsError(String string);
 	void setFavorites(List<EntityHeader> headers);
 	void setFavoritesError(String string);
@@ -38,10 +39,13 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setTeams(List<Team> teams, boolean showNotifications);
 	void setTeamsError(String error);
 	void setTeamNotificationCount(String count);
+	void clearProjects();
+	void setIsMoreProjectsVisible(boolean isVisible);
 	void clearTeamNotificationCount();
 	void refreshTeamInvites();
 	void setTabSelected(ProfileArea areaTab);
 	void showConfirmDialog(String title, String message, Callback yesCallback);
+	void showProjectsLoading(boolean isLoading);
 	
 	public interface Presenter extends SynapsePresenter {
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
@@ -54,5 +58,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
 		void certificationBadgeClicked();
+		void getMoreProjects();
 	}
 }

@@ -6,31 +6,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.PaginatedResults;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityType;
-import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.file.ChunkRequest;
 import org.sagebionetworks.repo.model.file.ChunkedFileToken;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.UploadDaemonStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
-import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.shared.AccessRequirementsTransport;
@@ -38,13 +35,12 @@ import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.table.QueryDetails;
-import org.sagebionetworks.web.shared.table.QueryResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
@@ -269,7 +265,7 @@ public interface SynapseClientAsync {
 	 * @param etag
 	 * @param callback
 	 */
-	void createSubmission(String submissionJson, String etag, AsyncCallback<String> callback) throws RestServiceException;
+	void createSubmission(Submission submission, String etag, AsyncCallback<Submission> callback) throws RestServiceException;
 	
 	
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
@@ -295,11 +291,7 @@ public interface SynapseClientAsync {
 	
 	void getSynapseVersions(AsyncCallback<String> callback);
 
-	/**
-	 * Return a property from portal.properties.  Returns null if the property key is not defined
-	 * @param callback
-	 */
-	void getSynapseProperty(String key, AsyncCallback<String> callback);
+	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 
 	void getAPIKey(AsyncCallback<String> callback);
 
@@ -371,4 +363,21 @@ public interface SynapseClientAsync {
 	void createTableEntity(TableEntity entity,
 			AsyncCallback<TableEntity> callback);
 
+	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
+	
+	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
+
+	void createTableColumns(List<ColumnModel> value,
+			AsyncCallback<List<ColumnModel>> asyncCallback);
+	
+	/**
+	 * Return the upload destinations associated with this parent entity (container)
+	 * @param parentEntityId
+	 * @return
+	 * @throws RestServiceException
+	 */
+	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
+
+	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 }

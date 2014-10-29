@@ -778,6 +778,8 @@ public class DisplayConstants {
 	public static final String UPDATE_FILE = "Update File";
 	public static final String SESSION_TIMEOUT = "Session Timeout";
 	public static final String SESSION_HAS_TIMED_OUT = "Your session has timed out. Please login again.";
+	
+	public static final String UPLOAD_DESTINATION = "All uploaded files will be stored in ";
 
 }
 
