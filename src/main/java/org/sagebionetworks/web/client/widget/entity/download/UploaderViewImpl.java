@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
-import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
@@ -29,7 +28,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -37,16 +35,15 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -65,6 +62,9 @@ public class UploaderViewImpl extends FlowPanel implements
 	private boolean multipleFileUploads = true;
 	private boolean isExternal;
 	
+	private TextBox externalUsername;
+	private PasswordTextBox externalPassword;
+	
 	public static final String FILE_FIELD_ID = "fileToUpload";
 	public static final String FILE_FIELD_STYLENAME = "dragAndDropUploadBox";
 	public static final String FILE_FIELD_DROP_STYLE_NAME = "dropable";
@@ -81,6 +81,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	// initialized in constructor
 	private boolean isEntity;
 	private String parentEntityId;
+	private FlowPanel formFieldsPanel;
 	private FormPanel formPanel;
 	private FlowPanel uploadDestinationContainer;
 	
@@ -155,7 +156,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 					presenter.setExternalFilePath(pathField.getValue(), nameField.getValue());
 				} else {
-					fileUploadHTML.setVisible(false);
+					formFieldsPanel.setVisible(false);
 					DRAG_AND_DROP_HTML.setVisible(false);
 					uploadBtn.setEnabled(false);
 					initializeProgress();
@@ -224,7 +225,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	public void resetToInitialState() {
 		hideLoading();
 		uploadBtn.setEnabled(true);
-		fileUploadHTML.setVisible(true);
+		formFieldsPanel.setVisible(true);
 		DRAG_AND_DROP_HTML.setVisible(true);
 		// Clear previously selected files.
 		fileUploadHTML.setHTML(createFileUploadHTML().toString());
@@ -235,6 +236,23 @@ public class UploaderViewImpl extends FlowPanel implements
 		showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
 		hideLoading();
 		resetToInitialState();
+	}
+	
+	@Override
+	public void showExternalCredentialsRequiredMessage() {
+		showErrorMessage(DisplayConstants.CREDENTIALS_REQUIRED_MESSAGE);
+		hideLoading();
+		resetToInitialState();
+	}
+	
+	@Override
+	public String getExternalUsername() {
+		return externalUsername.getValue();
+	}
+	
+	@Override
+	public String getExternalPassword() {
+		return externalPassword.getValue();
 	}
 
 	@Override
@@ -277,6 +295,14 @@ public class UploaderViewImpl extends FlowPanel implements
 			pathField.clear();
 		if (nameField != null)
 			nameField.clear();
+		if(externalUsername != null) {
+			externalUsername.clear();
+			externalUsername.setVisible(false);
+		}
+		if(externalPassword != null) {
+			externalPassword.setValue("");
+			externalPassword.setVisible(false);
+		}
 	}
 	
 	@Override
@@ -447,13 +473,29 @@ public class UploaderViewImpl extends FlowPanel implements
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		fileUploadHTML = createFileUploadHTML();
-		formPanel.add(fileUploadHTML);
+		formFieldsPanel = new FlowPanel();
+		
+		externalUsername = new TextBox();
+		externalUsername.addStyleName("margin-bottom-5");
+		externalUsername.setName("username");
+		externalUsername.setPlaceholder("Username");
+		externalPassword = new PasswordTextBox();
+		externalPassword.setName("password");
+		externalPassword.setStyleName("form-control margin-bottom-5");
+		externalPassword.getElement().setAttribute("placeholder", "Password");
+		externalUsername.setVisible(false);
+		externalPassword.setVisible(false);
+		
+		formFieldsPanel.add(externalUsername);
+		formFieldsPanel.add(externalPassword);
+		formFieldsPanel.add(fileUploadHTML);
 		configureUploadButton(); // upload tab first by default
 		
+		formPanel.setWidget(formFieldsPanel);
 		uploadPanel = new FlowPanel();
 		uploadPanel.add(uploadDestinationContainer);
-		uploadPanel.add(DRAG_AND_DROP_HTML);
 		uploadPanel.add(formPanel);
+		uploadPanel.add(DRAG_AND_DROP_HTML);
 		
 		Row row = new Row();
 		Column col = new Column(ColumnSize.XS_12);
@@ -469,6 +511,8 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadDestinationContainer.add(new HTML(DisplayConstants.UPLOAD_DESTINATION + "<strong>" + SafeHtmlUtils.htmlEscape(url) + "</strong>"));
 		if (banner != null)
 			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+		externalUsername.setVisible(true);
+		externalPassword.setVisible(true);
 	}
 	
 	@Override
