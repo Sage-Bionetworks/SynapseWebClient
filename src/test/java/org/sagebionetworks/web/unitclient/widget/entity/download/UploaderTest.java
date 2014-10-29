@@ -371,6 +371,29 @@ public class UploaderTest {
 		assertTrue(target.contains("?url=" + url));
 	}
 	
+
+	@Test
+	public void testUploadNoCredentials() {
+		uploader.setCurrentUploadType(UploadType.S3);
+		uploader.handleUploads();
+		
+		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
+		
+		uploader.setCurrentUploadType(UploadType.SFTP);
+		uploader.handleUploads();
+		verify(view).showExternalCredentialsRequiredMessage();
+	}
+	
+	@Test
+	public void testUploadCredentials() {
+		when(view.getExternalUsername()).thenReturn("alfred");
+		when(view.getExternalPassword()).thenReturn("12345");
+		
+		uploader.setCurrentUploadType(UploadType.SFTP);
+		uploader.handleUploads();
+		verify(view, Mockito.never()).showExternalCredentialsRequiredMessage();
+	}
+	
 	@Test
 	public void testGetSftpProxyLink() throws UnsupportedEncodingException {
 		
