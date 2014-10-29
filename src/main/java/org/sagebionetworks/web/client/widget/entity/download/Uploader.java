@@ -563,7 +563,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage());
+			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));
 		}
 	}
 	
