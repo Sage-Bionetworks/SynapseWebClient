@@ -729,6 +729,8 @@ a.shortBtn {
 	font-weight: bold;
 	color:  #3a5bdc;
 	text-align: center;
+	position: relative;
+	top: -160px;
 }
 
 .dragAndDropUploadBox {
