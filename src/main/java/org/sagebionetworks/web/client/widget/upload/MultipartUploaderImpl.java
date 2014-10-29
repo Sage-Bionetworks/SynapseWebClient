@@ -117,11 +117,11 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				}
 				@Override
 				public void onFailure(Throwable t) {
-					uploadError(t.getMessage());
+					uploadError(t.getMessage(), t);
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError(e.getMessage());
+			uploadError(e.getMessage(), e);
 		}
 	}
 	
@@ -219,7 +219,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				}
 			});
 		} catch (RestServiceException e) {
-			uploadError(e.getMessage());
+			uploadError(e.getMessage(), e);
 		}
 	}
 	
@@ -234,7 +234,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 */
 	public void chunkUploadFailure(final int currentChunkNumber, final int currentAttempt, final long totalChunkCount, final long fileSize, final List<ChunkRequest> requestList, String detailedMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage);
+			uploadError(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK + detailedMessage, new Exception(EXCEEDED_THE_MAXIMUM_UPLOAD_A_SINGLE_FILE_CHUNK));
 		else { //retry
 			//sleep for a second on the client, then try again.
 			gwt.scheduleExecution(new Callback() {
@@ -266,7 +266,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	private void combineChunksUploadFailure(List<ChunkRequest> requestList, int currentAttempt, String errorMessage) {
 		if (currentAttempt >= MAX_RETRY)
-			uploadError(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS + errorMessage);
+			uploadError(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS + errorMessage, new Exception(EXCEEDED_THE_MAXIMUM_COMBINE_ALL_OF_THE_PARTS));
 		else //retry
 			attemptCombineChunks(requestList, currentAttempt+1);
 	}
@@ -326,22 +326,22 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						}
 						@Override
 						public void onFailure(Throwable caught) {
-							uploadError(caught.getMessage());
+							uploadError(caught.getMessage(), caught);
 						}
 					});
 				} catch (RestServiceException e) {
-					uploadError(e.getMessage());
+					uploadError(e.getMessage(), e);
 				}       
 		      }
 		    };
 	    t.schedule(1000);
 	}
 	
-	private void uploadError(String message) {
+	private void uploadError(String message, Throwable t) {
 		uploadLog.append(message+"\n");
 		handler.uploadFailed(message);
 		//send full log to server logs
-		logger.errorToRepositoryServices(uploadLog.toString());
+		logger.errorToRepositoryServices(uploadLog.toString(), t);
 		//and to the console
 		synapseJsniUtils.consoleError(uploadLog.toString());
 		uploadLog = new StringBuilder();

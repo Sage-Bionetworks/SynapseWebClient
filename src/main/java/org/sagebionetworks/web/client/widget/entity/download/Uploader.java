@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -73,6 +74,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private boolean fileHasBeenUploaded = false;
 	private UploadType currentUploadType;
 	private String currentExternalUploadUrl;
+	private ClientLogger logger;
 	
 	@Inject
 	public Uploader(
@@ -83,7 +85,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			GWTWrapper gwt,
 			AuthenticationController authenticationController,
 			MultipartUploader multiPartUploader,
-			GlobalApplicationState globalAppState
+			GlobalApplicationState globalAppState,
+			ClientLogger logger
 			) {
 	
 		this.view = view;		
@@ -95,6 +98,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.authenticationController = authenticationController;
 		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
+		this.logger = logger;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
@@ -196,7 +200,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					uploadError(caught.getMessage());
+					uploadError(caught.getMessage(), caught);
 				}
 			});
 		}
@@ -225,7 +229,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else if (currentUploadType == UploadType.SFTP){
 			uploadToSftpProxy(currentExternalUploadUrl);
 		} else {
-			uploadError("Unsupported external upload type specified: " + currentUploadType);
+			String message = "Unsupported external upload type specified: " + currentUploadType;
+			uploadError(message, new Exception(message));
 		}
 	}
 	
@@ -252,7 +257,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		try {
 			view.submitForm(getSftpProxyLink(url, globalAppState, gwt));
 		} catch (Exception e) {
-			uploadError(e.getMessage());
+			uploadError(e.getMessage(), e);
 		}
 	}
 	
@@ -357,7 +362,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						view.showErrorMessage("An item named \""+fileName+"\" already exists in this location. File could not be uploaded.");
 						handleCancelledFileUpload();
 					} else {
-						uploadError(caught.getMessage());
+						uploadError(caught.getMessage(), caught);
 					}
 				}
 			});
@@ -406,11 +411,11 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 					}
 					@Override
 					public void onFailure(Throwable t) {
-						uploadError(t.getMessage());		
+						uploadError(t.getMessage(), t);		
 					}
 				});
 			} catch (RestServiceException e) {
-				uploadError(e.getMessage());
+				uploadError(e.getMessage(), e);
 			}
 		}
 		if (fileHandleIdCallback != null) {
@@ -538,7 +543,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		
 		if (uploadResult == null) {
 			if(!resultHtml.contains(DisplayConstants.UPLOAD_SUCCESS)) {
-				uploadError(detailedErrorMessage);
+				uploadError(detailedErrorMessage, new Exception());
 			} else {
 				uploadSuccess();
 			}
@@ -558,7 +563,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage());
+			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage(), new Exception(uploadResult.getMessage()));
 		}
 	}
 	
@@ -591,11 +596,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		});
 	}
-	private void uploadError(String message) {
+	private void uploadError(String message, Throwable t) {
 		String details = "";
 		if (message != null && message.length() > 0)
 			details = "  \n" + message;
 		view.showErrorMessage(DisplayConstants.ERROR_UPLOAD + details);
+		logger.errorToRepositoryServices(message, t);
 		fireCancelEvent();
 	}
 	
@@ -658,7 +664,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 
 	@Override
 	public void uploadFailed(String string) {
-		this.uploadError(string);
+		this.uploadError(string, new Exception(string));
 	}
 	
 	/**

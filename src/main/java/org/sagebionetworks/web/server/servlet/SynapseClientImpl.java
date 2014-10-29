@@ -170,6 +170,9 @@ import com.google.inject.Inject;
 @SuppressWarnings("serial")
 public class SynapseClientImpl extends RemoteServiceServlet implements
 		SynapseClient, TokenProvider {
+	
+	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
+	
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
 	// This will be appended to the User-Agent header.
 	private static final String PORTAL_USER_AGENT = "Synapse-Web-Client/"
@@ -566,11 +569,15 @@ public class SynapseClientImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void logErrorToRepositoryServices(String message) throws RestServiceException {
+	public void logErrorToRepositoryServices(String message, String label) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 			LogEntry entry = new LogEntry();
-			entry.setLabel("Synapse web client error");
+			String outputLabel = "";
+			if (label != null) {
+				outputLabel = label.substring(0, Math.min(label.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+			}
+			entry.setLabel("SWC: " + outputLabel);
 			entry.setMessage(message);
 			synapseClient.logError(entry);
 		} catch (SynapseException e) {
