@@ -118,6 +118,7 @@ public class AccessControlListEditorTest {
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
@@ -274,7 +275,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(),anyBoolean());
-		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -321,7 +322,7 @@ public class AccessControlListEditorTest {
 		assertEquals("Updated ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
 		verify(mockACLEView, times(6)).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
-		verify(mockACLEView).setPublicPrincipalIds(any(PublicPrincipalIds.class));
+		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		ArgumentCaptor<Set> recipientSetCaptor = ArgumentCaptor.forClass(Set.class);
 		verify(mockSynapseClient).sendMessage(recipientSetCaptor.capture(), anyString(), anyString(), any(AsyncCallback.class));

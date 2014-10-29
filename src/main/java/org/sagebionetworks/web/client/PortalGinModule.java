@@ -276,6 +276,8 @@ import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlList
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridView;
+import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGridViewImpl;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableView;
 import org.sagebionetworks.web.client.widget.statictable.StaticTableViewImpl;
 import org.sagebionetworks.web.client.widget.table.FocusSetter;
@@ -638,6 +640,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
+		
+		// Sharing Permissions Grid
+		bind(SharingPermissionsGridView.class).to(SharingPermissionsGridViewImpl.class);
 		
 		// Evaluation ACL Editor
 		bind(EvaluationAccessControlListEditorView.class).to(EvaluationAccessControlListEditorViewImpl.class);

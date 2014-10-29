@@ -7,14 +7,18 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.inject.Inject;
 
@@ -26,6 +30,7 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
+	Long publicAclPrincipalId;
 	
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -37,6 +42,8 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		this.iconsImageBundle = iconsImageBundle;
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("displayInline");
+		
+		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
 	}
 	
 	@Override
@@ -84,7 +91,31 @@ public class TeamBadgeViewImpl extends HorizontalPanel implements TeamBadgeView 
 		} 		
 		
 	}
-
+	
+	@Override
+	public void setTeamWithoutLink(String name, String teamId) {
+		clear();
+		notificationsPanel.clear();
+		
+		Label nameLabel = new Label(name);
+		nameLabel.addStyleName("font-size-13 boldText");
+		
+		HTML profilePicture;
+		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
+			//profilePicture = new HTML(DisplayUtils.getFontelloIcon("globe font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+			String html = AbstractImagePrototype.create(iconsImageBundle.globe16()).getHTML();
+			profilePicture = new HTML(html);
+		} else {
+			profilePicture = new HTML(DisplayUtils.getFontelloIcon("users font-size-13 userProfileImage lightGreyText margin-0-imp-before displayInline movedown-4"));
+		}
+		
+		add(profilePicture);
+		setCellWidth(profilePicture, "20px");
+			
+		add(nameLabel);
+		add(notificationsPanel);
+	}
+	
 	@Override
 	public void showLoadError(String principalId) {
 		clear();

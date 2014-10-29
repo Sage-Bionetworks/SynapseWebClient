@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
@@ -65,6 +66,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Anchor addDescriptionCommand;
 	private Callback addDescriptionCallback;
 	private EntityBundle entityBundle;
+	private Dialog dialog;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
@@ -78,7 +80,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			EntityAccessRequirementsWidget accessRequirementsWidget,
 			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			Dialog dialog) {
 		this.sageImageBundle = sageImageBundle;
 		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
@@ -91,6 +94,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.authenticationController = authenticationController;
+		this.dialog = dialog;
 		add(uploader.asWidget()); //add uploader dialog to page
 	}
 
@@ -176,7 +180,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(accessControlListEditor, isAdministrator, new Callback() {
+				DisplayUtils.showSharingDialog(dialog, accessControlListEditor, isAdministrator, new Callback() {
 					@Override
 					public void invoke() {
 						presenter.fireEntityUpdatedEvent();

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
@@ -25,8 +26,10 @@ import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -60,6 +63,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
+	private Long publicAclPrincipalId;
 	GWTWrapper gwt;
 	
 	private AdapterFactory adapterFactory;
@@ -93,8 +97,19 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.adapterFactory = adapterFactory;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
-		view.setPresenter(this);		
-	}	
+		view.setPresenter(this);
+		
+		publicPrincipalIds = new PublicPrincipalIds();
+		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+		publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));
+		initViewPrincipalIds();
+	}
+	
+	
+	public void setDialog(Dialog dialog) {
+		view.setDialog(dialog);
+	}
 	
 	/**
 	 * Set the entity with which this ACLEditor is associated.
@@ -141,7 +156,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	private void initViewPrincipalIds(){
 		if (publicPrincipalIds != null) {
-			view.setPublicPrincipalIds(publicPrincipalIds);
+			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 		}
 	}
 	
@@ -151,19 +166,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
-		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
-			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
-				initViewPrincipalIds();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
-			}
-		});
-			
+		
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
 			@Override

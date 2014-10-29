@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -35,8 +36,8 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void addAclEntry(AclEntry entry);
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
-	public void setPublicPrincipalIds(PublicPrincipalIds publicPrincipalIds);
-	
+	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
+	void setDialog(Dialog dialog);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -46,7 +47,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	void showInfoError(String title, String message);
 
 	void showInfoSuccess(String title, String message);
-
+	
 	/**
 	 * Prompt about unsaved view changes
 	 * @param saveCallback 

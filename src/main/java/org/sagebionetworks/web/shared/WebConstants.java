@@ -148,6 +148,9 @@ public class WebConstants {
 	public static final String CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_wiki_id";
 	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
 	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
+	public static final String AUTHENTICATED_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.authenticated_acl_principal_id";
+	public static final String PUBLIC_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.public_acl_principal_id";
+	public static final String ANONYMOUS_USER_PRINCIPAL_ID = "org.sagebionetworks.portal.anonymous_user_principal_id";
 	
 	
 	//Workshop
