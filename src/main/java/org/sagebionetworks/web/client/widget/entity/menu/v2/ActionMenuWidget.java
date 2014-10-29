@@ -3,11 +3,17 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.user.client.ui.IsWidget;
-
+/**
+ * Abstraction for an ActionMenu widget that knows nothing about the actions it maintains.
+ * This widget can be used to listen to action events and maintain action state.
+ * 
+ * @author John
+ *
+ */
 public interface ActionMenuWidget extends IsWidget{
 
 	/**
-	 * Reset this action menu.
+	 * Reset this action menu.  This will clear all listeners and hide all action.
 	 */
 	public void reset();
 	

@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.base.HasIcon;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 
+import com.google.gwt.user.client.ui.HasEnabled;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -10,28 +14,24 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
-public interface ActionView extends IsWidget {
-	
-	interface Presenter {
-		/**
-		 * The action was selected.
-		 * @param action
-		 */
-		void onClicked(Action action);
-	}
-
-	void setText(String text);
-
-	void setIcon(IconType icon);
-
-	void setEnabled(boolean enabled);
-
-	void setVisible(boolean visible);
+public interface ActionView extends IsWidget, HasText, HasIcon, HasEnabled, HasVisibility {
 	
 	/**
-	 * Bind this view to its presenter and its action.
-	 * @param presenter
+	 * Bind an action to this view.
 	 * @param action
 	 */
-	void setPresenter(Presenter presenter, Action action);
+	void setAction(Action action);
+	
+	/**
+	 * Get the action bound to this view.
+	 * @return
+	 */
+	Action getAction();
+	
+	/**
+	 * Add an action listener to this view.
+	 * @param listner
+	 */
+	void addActionListener(ActionListener listener);
+	
 }

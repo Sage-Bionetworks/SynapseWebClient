@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 /**
  * This widget view is composed of a toolbar that contains buttons and a "tools"
- * drop-down menu. ActionViews can either be added as buttons or tools.
+ * drop-down menu. Each button or menu is an ActionViews.
  * 
  * @author jhill
  *
@@ -12,21 +12,8 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface ActionMenuWidgetView extends IsWidget {
 
 	/**
-	 * Clear all actions from the view.
+	 * Iterate over the ActionViews found in this view.	
+	 * @return
 	 */
-	public void clear();
-
-	/**
-	 * Add a button to the toolbar
-	 * 
-	 * @param actionView
-	 */
-	public void addButton(ActionView actionView);
-
-	/**
-	 * Add a menu item to the tools menu
-	 * 
-	 * @param actionView
-	 */
-	public void addMenuItem(ActionView actionView);
+	Iterable<ActionView> listActionViews();
 }

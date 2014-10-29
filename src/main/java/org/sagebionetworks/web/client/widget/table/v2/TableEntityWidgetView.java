@@ -14,7 +14,10 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface TableEntityWidgetView extends IsWidget {
 	
 	public interface Presenter extends EntityUpdatedHandler {
-		
+		/**
+		 * Called when the schema is shown or hidden.
+		 */
+		void onSchemaToggle(boolean shown);
 	}
 	
 	/**
@@ -88,6 +91,11 @@ public interface TableEntityWidgetView extends IsWidget {
 	 */
 	public void setUploadTableModalWidget(
 			IsWidget uploadTableModalWidget);
+
+	/**
+	 * Show or hide the table schema.
+	 */
+	public void toggleSchema();
 
 
 }

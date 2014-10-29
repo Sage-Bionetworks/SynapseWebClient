@@ -213,9 +213,9 @@ import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarVie
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButton;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButtonImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButton;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItem;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItemImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItem;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -676,8 +676,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// ActionMenu V2
 		bind(ActionMenuWidget.class).to(ActionMenuWidgetImpl.class);
 		bind(ActionMenuWidgetView.class).to(ActionMenuWidgetViewImpl.class);
-		bind(ActionButton.class).to(ActionButtonImpl.class);
-		bind(ActionMenuItem.class).to(ActionMenuItemImpl.class);
 		
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);

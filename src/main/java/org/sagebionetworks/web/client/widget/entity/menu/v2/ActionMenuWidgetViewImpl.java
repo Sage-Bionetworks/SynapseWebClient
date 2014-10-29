@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
-import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.ButtonToolBar;
 
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 /**
@@ -15,41 +18,46 @@ import com.google.inject.Inject;
  */
 public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	
-	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
+	public interface Binder extends UiBinder<ButtonToolBar, ActionMenuWidgetViewImpl> {}
 
-	@UiField
-	ButtonGroup buttonGroup;
-	
-	@UiField
-	DropDownMenu toolsDropDown;
-	
-	Widget widget;
+	ButtonToolBar buttonToolBar;
+
 	
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
-		widget = binder.createAndBindUi(this);
+		buttonToolBar = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public Widget asWidget() {
-		return widget;
-	}
-
-
-	@Override
-	public void clear() {
-		buttonGroup.clear();
-		toolsDropDown.clear();
+		return buttonToolBar;
 	}
 
 	@Override
-	public void addButton(ActionView actionView) {
-		buttonGroup.add(actionView);
+	public Iterable<ActionView> listActionViews() {
+		List<ActionView> list = new LinkedList<ActionView>();
+		recursiveSearch(list, buttonToolBar);
+		return list;
 	}
-
-	@Override
-	public void addMenuItem(ActionView actionView) {
-		toolsDropDown.add(actionView);
+	/**
+	 * Recursive function to find all ActionView within this widget.
+	 * 
+	 * @param results
+	 * @param toSearch
+	 */
+	private static void recursiveSearch(List<ActionView> results, ComplexPanel toSearch){
+		Iterator<Widget> childIterator = toSearch.iterator();
+		if(childIterator != null){
+			while(childIterator.hasNext()){
+				Widget child = childIterator.next();
+				if(child instanceof ActionView){
+					results.add((ActionView) child);
+				}else if(child instanceof ComplexPanel){
+					ComplexPanel container = (ComplexPanel) child;
+					recursiveSearch(results, container);
+				}
+			}
+		}
 	}
 
 }
