@@ -235,6 +235,7 @@ public class UploaderTest {
 	public void testDirectUploadHappyCase() throws Exception {
 		uploader.addCancelHandler(cancelHandler);
 		verify(view).showUploadingToSynapseStorage(anyString());
+		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
@@ -359,6 +360,7 @@ public class UploaderTest {
 		uploader.queryForUploadDestination();
 		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
+		verify(view).enableMultipleFileUploads(false);
 		
 		uploader.uploadToSftpProxy(url);
 		//capture the value sent to the form to submit

@@ -168,6 +168,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void queryForUploadDestination() {
+		enableMultipleFileUploads();
 		if (parentEntityId == null) {
 			currentUploadType = UploadType.S3;
 			view.showUploadingToSynapseStorage("");
@@ -187,6 +188,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 							currentUploadType = UploadType.SFTP;
 							currentExternalUploadUrl = d.getUrl();
 							view.showUploadingToExternalStorage(getSftpDomain(currentExternalUploadUrl), d.getBanner());
+							disableMultipleFileUploads();
 						} else {
 							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
 						}
@@ -496,8 +498,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void disableMultipleFileUploads() {
-		view.disableMultipleFileUploads();
+		view.enableMultipleFileUploads(false);
 	}
+	
+	public void enableMultipleFileUploads() {
+		view.enableMultipleFileUploads(true);
+	}
+
 	
 	@Override
 	@SuppressWarnings("unchecked")
@@ -556,7 +563,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				setExternalFilePath(path, fileName);
 			}
 		}else {
-			uploadError("Upload result status indicated upload was unsuccessful.", new Exception());
+			uploadError("Upload result status indicated upload was unsuccessful. " + uploadResult.getMessage());
 		}
 	}
 	
