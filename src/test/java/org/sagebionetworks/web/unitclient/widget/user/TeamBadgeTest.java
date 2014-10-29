@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
@@ -27,6 +28,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class TeamBadgeTest {
 
 	SynapseClientAsync mockSynapseClient;
+	GlobalApplicationState mockGlobalAppState;
 	TeamBadgeView mockView;
 	TeamBadge badge;
 	Team team;
@@ -39,8 +41,9 @@ public class TeamBadgeTest {
 		team.setName("name");
 		team.setId(principalId);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		mockGlobalAppState = Mockito.mock(GlobalApplicationState.class);
 		mockView = mock(TeamBadgeView.class);
-		badge = new TeamBadge(mockView, mockSynapseClient);
+		badge = new TeamBadge(mockView, mockSynapseClient, mockGlobalAppState);
 	}
 	
 	@Test

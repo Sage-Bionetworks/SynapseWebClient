@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -13,15 +14,17 @@ import com.google.inject.Inject;
 public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
 	
 	private TeamBadgeView view;
-	SynapseClientAsync synapseClient;
+	private SynapseClientAsync synapseClient;
+	private GlobalApplicationState globalAppState;
 	private Integer maxNameLength;
 	
 	private String teamName;
 	
 	@Inject
-	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient) {
+	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}
 	
@@ -51,20 +54,8 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	private void setTeamWithoutLink(final String teamName, final String teamId) {
-		// Public Acl
-		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				view.setGlobeId(Long.parseLong(result));
-				view.setTeamWithoutLink(teamName, teamId);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				// No globe!
-				view.setTeamWithoutLink(teamName, teamId);
-			}
-		});
+		view.setGlobeId(Long.parseLong(globalAppState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+		view.setTeamWithoutLink(teamName, teamId);
 	}
 	
 	public void configure(Team team) {

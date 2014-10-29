@@ -160,63 +160,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
-//		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
-//			@Override
-//			public void onSuccess(PublicPrincipalIds result) {
-//				publicPrincipalIds = result;
-//				initViewPrincipalIds();
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-//					showErrorMessage("Could not find the public group: " + caught.getMessage());
-//			}
-//		});
 		
 		publicPrincipalIds = new PublicPrincipalIds();
-		// Public ACL Principal ID
-		synapseClient.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(result));
-				initViewPrincipalIds();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
-			}
-		});
+		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+		publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));
+		initViewPrincipalIds();
 		
-		// Anonymous User Principal ID
-		synapseClient.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				publicPrincipalIds.setAnonymousUserId(Long.parseLong(result));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
-			}
-		});
-		
-		// Authenticated ACL Principal ID
-		synapseClient.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID, new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String result) {
-				publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(result));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
-			}
-		});
-			
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
