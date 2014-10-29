@@ -86,7 +86,6 @@ public class ProvenanceWidgetTest {
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
-	LayoutServiceAsync mockLayoutService;
 	ClientCache mockClientCache;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	GlobalApplicationState mockGlobalAppState;
@@ -111,12 +110,11 @@ public class ProvenanceWidgetTest {
 		mockAuthController = mock(AuthenticationController.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockLayoutService = mock(LayoutServiceAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
@@ -285,6 +283,24 @@ public class ProvenanceWidgetTest {
 
 		verifySuccessGraphStructure(graph);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testFindOldVersionsNotFoundException() throws Exception {
+		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
+		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, mockJsniUtils, jsoProvider, mockClientCache);
+		
+		String message = "entity syn999 was not found";
+		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		// create graph
+		provenanceWidget.configure(null, descriptor, null, null);	
+		
+		provenanceWidget.findOldVersions();
+		
+		//send error to the console - silent error
+		verify(mockJsniUtils).consoleError(anyString());
+	}
 		
 	@Test
 	public void testFindOldVersions() throws Exception {
@@ -318,7 +334,7 @@ public class ProvenanceWidgetTest {
 		@SuppressWarnings("unchecked")
 		List<String> oldVersions = (List<String>)argument.getValue();
 		
-		assertEquals(1, oldVersions.size());		
+		assertEquals(1, oldVersions.size());	
 	}
 
 	private ProvGraph verifyBuildGraphCalls() throws Exception {
