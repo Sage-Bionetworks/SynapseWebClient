@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 /**
  * This is currently a stub.
@@ -25,7 +26,7 @@ public class PreflightControllerImpl implements PreflightController {
 	}
 
 	@Override
-	public void preflightDeleteEntity(String entityIdToDelete, Callback callback) {
+	public void preflightDeleteEntity(EntityBundle toDelete, Callback callback) {
 		// TODO Add a real check
 		callback.invoke();
 	}

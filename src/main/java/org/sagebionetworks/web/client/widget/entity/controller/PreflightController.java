@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 
 /**
@@ -31,9 +32,9 @@ public interface PreflightController {
 	/**
 	 * This preflight should be used before the users deletes an entity.
 	 * 
-	 * @param entityIdToDelete
+	 * @param toDelete
 	 * @param callback
 	 */
-	public void preflightDeleteEntity(String entityIdToDelete, Callback callback);
+	public void preflightDeleteEntity(EntityBundle toDelete, Callback callback);
 
 }

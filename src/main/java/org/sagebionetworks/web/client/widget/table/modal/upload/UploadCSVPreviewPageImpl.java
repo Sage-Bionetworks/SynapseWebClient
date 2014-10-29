@@ -84,6 +84,8 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 			uploadRequest.setTableId(this.tableId);
 			this.appendNextPage.configure(uploadRequest, suggestedSchema);
 			this.presenter.setNextActivePage(this.appendNextPage);
+			// For now just execute the next page.  This may change in the future.
+			this.appendNextPage.onPrimary();
 		}else{
 			// This is a create
 			this.createNextPage.configure(fileName, parentId, uploadRequest, suggestedSchema);
