@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
@@ -69,7 +68,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 	public void configure(String projectOwnerId, final boolean canEdit) {
 		this.canEdit = canEdit;
 		this.createTableModalWidget.configure(projectOwnerId, this);
-		this.uploadTableModalWidget.configure(projectOwnerId);
+		this.uploadTableModalWidget.configure(projectOwnerId, null);
 		this.query = createQuery(projectOwnerId);
 		queryForOnePage(OFFSET_ZERO);
 	}

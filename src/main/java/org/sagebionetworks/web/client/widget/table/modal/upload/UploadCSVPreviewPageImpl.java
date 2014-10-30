@@ -30,13 +30,15 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 	UploadPreviewWidget uploadPreviewWidget;
 	CSVOptionsWidget csvOptionsWidget;
 	JobTrackingWidget jobTrackingWidget;
-	UploadCSVFinishPage nextPage;
+	UploadCSVFinishPage createNextPage;
+	UploadCSVAppendPage appendNextPage;
 
 	// dynamic data fields
 	ContentTypeDelimiter type;
 	String fileName;
 	String parentId;
 	String fileHandleId;
+	String tableId;
 	ModalPresenter presenter;
 	List<ColumnModel> suggestedSchema;
 
@@ -44,12 +46,13 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 	public UploadCSVPreviewPageImpl(UploadCSVPreviewPageView view,
 			UploadPreviewWidget uploadPreviewWidget,
 			CSVOptionsWidget csvOptionsWidget,
-			JobTrackingWidget jobTrackingWidget, UploadCSVFinishPage nextPage) {
+			JobTrackingWidget jobTrackingWidget, UploadCSVFinishPage createNextPage, UploadCSVAppendPage appendNextPage) {
 		this.view = view;
 		this.uploadPreviewWidget = uploadPreviewWidget;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.csvOptionsWidget = csvOptionsWidget;
-		this.nextPage = nextPage;
+		this.createNextPage = createNextPage;
+		this.appendNextPage = appendNextPage;
 		view.setPresenter(this);
 		this.view.setPreviewWidget(this.uploadPreviewWidget);
 		this.view.setTrackingWidget(this.jobTrackingWidget);
@@ -63,11 +66,12 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 
 	@Override
 	public void configure(ContentTypeDelimiter type, String fileName,
-			String parentId, String fileHandleId) {
+			String parentId, String fileHandleId, String tableId) {
 		this.type = type;
 		this.fileName = fileName;
 		this.parentId = parentId;
 		this.fileHandleId = fileHandleId;
+		this.tableId = tableId;
 	}
 
 	@Override
@@ -75,8 +79,18 @@ public class UploadCSVPreviewPageImpl implements UploadCSVPreviewPage,
 		// Get the current options
 		UploadToTablePreviewRequest currentOptions = csvOptionsWidget.getCurrentOptions();
 		UploadToTableRequest uploadRequest = UploadRequestUtils.createFromPreview(currentOptions);
-		this.nextPage.configure(fileName, parentId, uploadRequest, suggestedSchema);
-		this.presenter.setNextActivePage(this.nextPage);
+		if(this.tableId != null){
+			// This is an append.
+			uploadRequest.setTableId(this.tableId);
+			this.appendNextPage.configure(uploadRequest, suggestedSchema);
+			this.presenter.setNextActivePage(this.appendNextPage);
+			// For now just execute the next page.  This may change in the future.
+			this.appendNextPage.onPrimary();
+		}else{
+			// This is a create
+			this.createNextPage.configure(fileName, parentId, uploadRequest, suggestedSchema);
+			this.presenter.setNextActivePage(this.createNextPage);
+		}
 	}
 
 	@Override

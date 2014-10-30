@@ -28,8 +28,8 @@ public class UploadTableModalWidgetImpl implements UploadTableModalWidget {
 	}
 
 	@Override
-	public void configure(String parentId) {
-		this.uploadCSVFileWidget.configure(parentId);
+	public void configure(String parentId, String tableId) {
+		this.uploadCSVFileWidget.configure(parentId, tableId);
 	}
 
 	@Override

@@ -23,6 +23,6 @@ public interface QueryInputListener {
 	/**
 	 * Called when the user clicks the download button
 	 */
-	public void onDownloadResults(String sql);
+	public void onDownloadResults();
 
 }

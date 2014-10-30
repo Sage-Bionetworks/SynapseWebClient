@@ -27,6 +27,7 @@ public class UploadCSVFilePageImplTest {
 	UploadCSVPreviewPage mockNextPage;
 	UploadCSVFilePageImpl page;
 	String parentId;
+	String tableId;
 	
 	@Before
 	public void before(){
@@ -36,7 +37,8 @@ public class UploadCSVFilePageImplTest {
 		page = new UploadCSVFilePageImpl(mockFileInputWidget, mockNextPage);
 		when(mockFileInputWidget.getSelectedFileMetadata()).thenReturn(new FileMetadata[]{new FileMetadata("testing.csv", ContentTypeDelimiter.CSV.getContentType())});
 		parentId = "syn456";
-		page.configure(parentId);
+		tableId = "syn987";
+		page.configure(parentId, tableId);
 	}
 
 	@Test
@@ -118,11 +120,11 @@ public class UploadCSVFilePageImplTest {
 		stub.setFileHandle(fileHandleId);
 		stub.setMetadata(new FileMetadata[]{new FileMetadata(fileName, ContentTypeDelimiter.CSV.getContentType())});
 		page = new UploadCSVFilePageImpl(stub, mockNextPage);
-		page.configure(parentId);
+		page.configure(parentId, tableId);
 		page.setModalPresenter(mockPresenter);
 		page.onPrimary();
 		verify(mockPresenter, never()).setErrorMessage(anyString());
-		verify(mockNextPage).configure(ContentTypeDelimiter.CSV, fileName, parentId, fileHandleId);
+		verify(mockNextPage).configure(ContentTypeDelimiter.CSV, fileName, parentId, fileHandleId, tableId);
 		verify(mockPresenter).setNextActivePage(mockNextPage);
 	}
 }
