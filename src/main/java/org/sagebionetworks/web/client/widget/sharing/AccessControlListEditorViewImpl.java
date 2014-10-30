@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
@@ -13,16 +14,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
@@ -104,7 +102,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission) {		
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission) {		
 		clear();
 		
 		// Display Permissions grid.
@@ -141,7 +139,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(readOnly);
 				
 				// 'Create ACL' button
-				org.gwtbootstrap3.client.ui.Button createAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
+				Button createAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_CREATE_NEW_ACL, IconType.PLUS, new ClickHandler() {
 	
 					@Override
 					public void onClick(ClickEvent event) {
@@ -191,7 +189,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(addPeoplePanel.asWidget());
 				
 				// 'Delete ACL' button
-				org.gwtbootstrap3.client.ui.Button deleteAclButton = new org.gwtbootstrap3.client.ui.Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
+				Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
 				deleteAclButton.setType(ButtonType.DANGER);
 				deleteAclButton.setSize(ButtonSize.EXTRA_SMALL);
 				deleteAclButton.addClickHandler(new ClickHandler() {

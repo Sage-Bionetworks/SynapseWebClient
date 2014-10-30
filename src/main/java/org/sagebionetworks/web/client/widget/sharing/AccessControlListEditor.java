@@ -8,25 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -54,18 +48,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	// Editor components
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
-//	private UserAccountServiceAsync userAccountService;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private AuthenticationController authenticationController;
-	private boolean unsavedChanges;
+//	private boolean unsavedChanges;
 	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
-	private Long publicAclPrincipalId;
 	GWTWrapper gwt;
-	
-	private AdapterFactory adapterFactory;
 	
 	// Entity components
 	private Entity entity;
@@ -74,22 +63,19 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlList acl;	
 	private Map<String, UserGroupHeader> userGroupHeaders;
 	private Set<String> originalPrincipalIdSet;
+	HasChangesHandler hasChangesHandler;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
 			SynapseClientAsync synapseClientAsync,
 			AuthenticationController authenticationController,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt,
-			AdapterFactory adapterFactory) {
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
-		this.adapterFactory = adapterFactory;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
@@ -103,13 +89,15 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 
 	
 	/**
+	 * Configure this widget before using it.
 	 * Set the entity with which this ACLEditor is associated.
 	 */
-	public void setResource(Entity entity, boolean canChangePermission) {
+	public void configure(Entity entity, boolean canChangePermission, HasChangesHandler hasChangesHandler) {
 		if (!entity.equals(this.entity)) {
 			acl = null;
 			uep = null;
 		}
+		this.hasChangesHandler = hasChangesHandler;
 		this.entity = entity;
 		this.canChangePermission = canChangePermission;
 	}
@@ -121,10 +109,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return entity == null ? null : entity.getId();
 	}
 	
-	public boolean hasUnsavedChanges() {		
-		return unsavedChanges || unsavedViewChanges;
-	}
-	
 	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
 		this.unsavedViewChanges = unsavedViewChanges;
 	}
@@ -133,16 +117,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
-//		refresh(new AsyncCallback<Void>() {
-//			@Override
-//			public void onSuccess(Void result) {
-//			}
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				caught.printStackTrace();					
-//				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
-//			}
-//		});
 		return view.asWidget();
 	}
 	private void initViewPrincipalIds(){
@@ -157,6 +131,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
+		hasChangesHandler.hasChanges(false);
 		
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
@@ -178,7 +153,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						public void onSuccess(Void result) {
 							// update the view
 							setViewDetails();
-							unsavedChanges = false;
+							hasChangesHandler.hasChanges(false);
 							hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
 							callback.onSuccess(null);
 						};
@@ -205,7 +180,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges, canChangePermission);
+		view.buildWindow(isInherited, canEnableInheritance, canChangePermission);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}
@@ -294,10 +269,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		} else {
 			// Existing entry in the ACL
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-			unsavedChanges = true;
 			setViewDetails();
 		}
-		unsavedChanges = true;
+		hasChangesHandler.hasChanges(true);
 	}
 
 	private AsyncCallback<Void> updateViewDetailsCallback() {
@@ -336,7 +310,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 		if (foundUser) {
 			acl.setResourceAccess(newRAs);
-			unsavedChanges = true;
+			hasChangesHandler.hasChanges(true);
 			setViewDetails();
 		} else {
 			// not found
@@ -353,7 +327,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}		
 		acl.setId(entity.getId());
 		acl.setCreationDate(new Date());		
-		unsavedChanges = true;
+		hasChangesHandler.hasChanges(true);
 		setViewDetails();
 	}
 	
@@ -374,7 +348,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			public void onSuccess(AccessControlList result) {
 				try {
 					acl = result;
-					unsavedChanges = hasLocalACL_inRepo;
+					hasChangesHandler.hasChanges(hasLocalACL_inRepo);
 					fetchUserGroupHeaders(updateViewDetailsCallback());					
 				} catch (Throwable e) {
 					onFailure(e);
@@ -388,8 +362,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		});
 	}
 	
-	@Override
-	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<AccessControlList> changesPushedCallback) {
+	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
 		if(unsavedViewChanges) {
 			view.alertUnsavedViewChanges(new Callback() {
 				
@@ -401,10 +374,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}
 		
-		// TODO: Make recursive option for "Create"
-		if (!unsavedChanges) {			
-			return;
-		} 
 		validateEditorState();
 		
 		// Create an async callback to receive the updated ACL from Synapse
@@ -412,17 +381,15 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onSuccess(AccessControlList result) {
 				acl = result;
-				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
-				unsavedChanges = false;					
+				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));				
 				setViewDetails();
 				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
-				changesPushedCallback.onSuccess(result);
+				changesPushedCallback.invoke();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
 				view.showInfoError("Error", "Permissions were not saved to Synapse");				
-				changesPushedCallback.onFailure(caught);
 			}
 		};
 		
@@ -531,6 +498,17 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
+	}
+	/**
+	 * This handler is notified when there are changes made to the editor.
+	 */
+	public interface HasChangesHandler{
+		/**
+		 * Called with true then the user has changes in the editor.  Called with false when there are no changes in this editor.
+		 * @param hasChanges True when there are changes.  False when there are no changes.
+		 */
+		void hasChanges(boolean hasChanges);
+		
 	}
 	
 }

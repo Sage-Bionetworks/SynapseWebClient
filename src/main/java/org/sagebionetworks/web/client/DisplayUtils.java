@@ -1984,49 +1984,6 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final org.sagebionetworks.web.client.widget.modal.Dialog dialog, final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
-		dialog.setSize(ModalSize.LARGE);
-//		accessControlListEditor.setDialog(dialog);
-		
-		String primaryButtonText = null;
-		String defaultButtonText;
-		org.sagebionetworks.web.client.widget.modal.Dialog.Callback dialogCallback = null;
-		if (canChangePermission) {
-			primaryButtonText = "Save";
-			defaultButtonText = "Cancel";
-			dialogCallback = new org.sagebionetworks.web.client.widget.modal.Dialog.Callback() {
-					@Override
-					public void onPrimary() {
-						// confirm close action if there are unsaved changes
-						if (accessControlListEditor.hasUnsavedChanges()) {
-							accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<AccessControlList>() {
-								@Override
-								public void onSuccess(AccessControlList result) {
-									callback.invoke();
-								}
-								@Override
-								public void onFailure(Throwable caught) {
-									//failure notification is handled by the acl editor view.
-								}
-							});
-						}
-						dialog.hide();
-					}
-	
-					@Override
-					public void onDefault() {
-						accessControlListEditor.setUnsavedViewChanges(false);
-						dialog.hide();
-					}
-			};
-		} else {
-			defaultButtonText = "Close";
-		}
-		dialog.configure(DisplayConstants.TITLE_SHARING_PANEL, accessControlListEditor.asWidget(),
-						primaryButtonText, defaultButtonText, dialogCallback, false);
-	    dialog.show();
-	}
-
 	public static LayoutContainer createRowContainer() {
 		LayoutContainer row;
 		row = new LayoutContainer();
