@@ -53,9 +53,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	// Editor components
 	private AccessControlListEditorView view;
-	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
-	private UserAccountServiceAsync userAccountService;
+//	private UserAccountServiceAsync userAccountService;
 	private JSONObjectAdapter jsonObjectAdapter;
 	private AuthenticationController authenticationController;
 	private boolean unsavedChanges;
@@ -79,17 +78,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
 			SynapseClientAsync synapseClientAsync,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
 			JSONObjectAdapter jsonObjectAdapter,
-			UserAccountServiceAsync userAccountService,
 			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt,
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
-		this.userAccountService = userAccountService;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -105,11 +100,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));
 		initViewPrincipalIds();
 	}
-	
-	
-	public void setDialog(Dialog dialog) {
-		view.setDialog(dialog);
-	}
+
 	
 	/**
 	 * Set the entity with which this ACLEditor is associated.
@@ -142,16 +133,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
-		refresh(new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				caught.printStackTrace();					
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
-			}
-		});
+//		refresh(new AsyncCallback<Void>() {
+//			@Override
+//			public void onSuccess(Void result) {
+//			}
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				caught.printStackTrace();					
+//				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+//			}
+//		});
 		return view.asWidget();
 	}
 	private void initViewPrincipalIds(){
@@ -527,6 +518,19 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	private void showErrorMessage(String s) {
 		view.showErrorMessage(s);
+	}
+
+	public void refresh() {
+		refresh(new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+			}
+		});
 	}
 	
 }

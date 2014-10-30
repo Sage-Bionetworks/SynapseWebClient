@@ -67,14 +67,12 @@ public class AccessControlListEditorTest {
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	private static JSONEntityFactory jsonEntityFactory = new JSONEntityFactoryImpl(adapterFactory);
-	private static NodeModelCreator nodeModelCreator = new NodeModelCreatorImpl(jsonEntityFactory, jsonObjectAdapter);
 
 	// Mock components
 	private SynapseClientAsync mockSynapseClient;
 	private GWTWrapper mockGwt;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
-	private UserAccountServiceAsync mockUserAccountService;
 	private AsyncCallback<AccessControlList> mockPushToSynapseCallback;
 	
 	// Test Synapse objects
@@ -115,8 +113,7 @@ public class AccessControlListEditorTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
-		mockUserAccountService = mock(UserAccountServiceAsync.class);
-		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
+//		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID,TEST_ANONYMOUS_USER_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
 		mockGwt = mock(GWTWrapper.class);
@@ -130,10 +127,8 @@ public class AccessControlListEditorTest {
 		// instantiate the ACLEditor
 		acle = new AccessControlListEditor(mockACLEView,
 				mockSynapseClient,
-				nodeModelCreator,
 				mockAuthenticationController,
 				new JSONObjectAdapterImpl(),
-				mockUserAccountService,
 				mockGlobalApplicationState, 
 				mockGwt,
 				adapterFactory

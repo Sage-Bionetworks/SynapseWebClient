@@ -37,7 +37,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
-	void setDialog(Dialog dialog);
 	
 	/**
 	 * Set the view to a loading state while async loads

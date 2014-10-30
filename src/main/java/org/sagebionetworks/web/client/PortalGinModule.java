@@ -282,6 +282,10 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
@@ -653,6 +657,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
+		bind(AccessControlListModalWidget.class).to(AccessControlListModalWidgetImpl.class);
+		bind(AccessControlListModalWidgetView.class).to(AccessControlListModalWidgetViewImpl.class);
 		
 		// Sharing Permissions Grid
 		bind(SharingPermissionsGridView.class).to(SharingPermissionsGridViewImpl.class);

@@ -44,8 +44,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private AclAddPeoplePanel addPeoplePanel;
 	
-	private Dialog dialog;	// For access to the save button.
-	
 	private PermissionLevel[] permList = {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};	// To enforce order.
 	
 	@Inject
@@ -116,8 +114,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			removeUserCallback = new CallbackP<Long>() {
 					@Override
 					public void invoke(Long principalId) {
-						if (dialog != null)
-							dialog.getPrimaryButton().setEnabled(true);
 						presenter.removeAccess(principalId);
 					}
 				};
@@ -126,8 +122,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		SetAccessCallback setAccessCallback = new SetAccessCallback() {
 			@Override
 			public void invoke(Long principalId, PermissionLevel permissionLevel) {
-				if (dialog != null)
-					dialog.getPrimaryButton().setEnabled(true);
 				presenter.setAccess(principalId, permissionLevel);
 			}
 		};
@@ -175,8 +169,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> addPersonCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
-						if (dialog != null)
-							dialog.getPrimaryButton().setEnabled(true);
 						addPersonToAcl();
 					}
 				};
@@ -184,8 +176,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				CallbackP<Void> makePublicCallback = new CallbackP<Void>() {
 					@Override
 					public void invoke(Void param) {
-						if (dialog != null)
-							dialog.getPrimaryButton().setEnabled(true);
 						// Add the ability for PUBLIC to see this entity.
 						if (isPubliclyVisible) {
 							presenter.makePrivate();
@@ -207,8 +197,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				deleteAclButton.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent ce) {
-						if (dialog != null)
-							dialog.getPrimaryButton().setEnabled(true);
 						presenter.deleteAcl();					
 					}
 				});
@@ -232,13 +220,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public void setIsNotifyPeople(Boolean value) {
 		if (value != null)
 			addPeoplePanel.getNotifyPeopleCheckBox().setValue(value);
-	}
-	
-	@Override
-	public void setDialog(Dialog dialog) {
-		this.dialog = dialog;
-		if (dialog != null)
-			dialog.getPrimaryButton().setEnabled(false);
 	}
 	
 	@Override

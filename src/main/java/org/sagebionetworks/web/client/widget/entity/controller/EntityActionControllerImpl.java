@@ -23,22 +23,24 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
 	public static final String DELETE_PREFIX = "Delete ";
 	
-	AccessControlListEditor accessControlListEditor;
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
+	AccessControlListModalWidget accessControlListModalWidget;
 	
 	EntityBundle entityBundle;
 	Entity entity;
@@ -56,15 +58,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			AccessControlListEditor accessControlListEditor) {
+			AccessControlListModalWidget accessControlListModalWidget) {
 		super();
 		this.view = view;
+		this.accessControlListModalWidget = accessControlListModalWidget;
+		this.view.addAccessControlListModalWidget(accessControlListModalWidget);
 		this.preflightController = preflightController;
 		this.entityTypeProvider = entityTypeProvider;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.accessControlListEditor = accessControlListEditor;
 	}
 
 	@Override
@@ -76,7 +79,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.entity = entityBundle.getEntity();
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
-		this.accessControlListEditor.setResource(entity, permissions.getCanChangePermissions());  
+		this.accessControlListModalWidget.configure(entity, permissions.getCanChangePermissions());  
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
@@ -170,11 +173,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	@Override
 	public void onShare() {
-		DisplayUtils.showSharingDialog(accessControlListEditor, this.permissions.getCanChangePermissions(), new Callback() {
+		this.accessControlListModalWidget.showSharing(new Callback() {
 			@Override
 			public void invoke() {
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 		});
+	}
+
+	@Override
+	public Widget asWidget() {
+		return view.asWidget();
 	}
 }

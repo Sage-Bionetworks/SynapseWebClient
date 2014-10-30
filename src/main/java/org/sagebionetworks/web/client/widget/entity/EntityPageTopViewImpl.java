@@ -724,7 +724,13 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 				
 		// Action controller
 		EntityActionController controller = ginInjector.createEntityActionController();
-		controller.configure(actionMenu, bundle);
+		tablesTabContainer.add(controller.asWidget());
+		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 		// Wiki
 		String wikiPageId = null; // TODO : pull from entity
 		addWikiPageWidget(tablesTabContainer, bundle, wikiPageId, null);
