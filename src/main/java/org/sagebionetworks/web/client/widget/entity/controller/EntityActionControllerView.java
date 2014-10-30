@@ -1,38 +1,22 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-
-import com.google.gwt.user.client.ui.IsWidget;
+import org.sagebionetworks.web.client.ShowsErrors;
+import org.sagebionetworks.web.client.utils.Callback;
 /**
  * Abstraction for the view 
  * @author John
  *
  */
-public interface EntityActionControllerView extends SynapseView, IsWidget {
+public interface EntityActionControllerView extends ShowsErrors {
 	
-	interface Presenter{
-		
-		/**
-		 * Called if the user confirms an action.
-		 * 
-		 * @param action The action the user confirmed.
-		 */
-		public void onConfirmAction(Action action);
-	}
 
 	/**
 	 * Show the user a confirm dialog.
 	 * @param string
 	 * @param action
 	 */
-	void showConfirmDialog(String string, Action action);
+	void showConfirmDialog(String title, String string, Callback callback);
 	
-	/**
-	 * Bind this view to its presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
 
 	/**
 	 * Show info to the user.

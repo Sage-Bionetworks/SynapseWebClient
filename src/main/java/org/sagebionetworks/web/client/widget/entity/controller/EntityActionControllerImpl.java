@@ -1,58 +1,101 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityDeletedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.inject.Inject;
 
-public class EntityActionControllerImpl implements EntityActionController, EntityActionControllerView.Presenter, ActionListener {
+public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
 	public static final String DELETE_PREFIX = "Delete ";
-	public static final String ENTITY = "Entity";
-	public static final String TABLE = "Table";
-	public static final String FOLDER = "Folder";
-	public static final String FILE = "File";
-	public static final String PROJECT = "Project";
 	
+	AccessControlListEditor accessControlListEditor;
 	EntityActionControllerView view;
 	PreflightController preflightController;
+	EntityTypeProvider entityTypeProvider;
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
+	AuthenticationController authenticationController;
 	
-	String displayType;
 	EntityBundle entityBundle;
+	Entity entity;
+	UserEntityPermissions permissions;
+	String enityTypeDisplay;
 	boolean isUserAuthenticated;
+	ActionMenuWidget actionMenu;
+	EntityUpdatedHandler entityUpdateHandler;
+
+	
+	@Inject
+	public EntityActionControllerImpl(EntityActionControllerView view,
+			PreflightController preflightController,
+			EntityTypeProvider entityTypeProvider,
+			SynapseClientAsync synapseClient,
+			GlobalApplicationState globalApplicationState,
+			AuthenticationController authenticationController,
+			AccessControlListEditor accessControlListEditor) {
+		super();
+		this.view = view;
+		this.preflightController = preflightController;
+		this.entityTypeProvider = entityTypeProvider;
+		this.synapseClient = synapseClient;
+		this.globalApplicationState = globalApplicationState;
+		this.authenticationController = authenticationController;
+		this.accessControlListEditor = accessControlListEditor;
+	}
 
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, boolean isUserAuthenticated) {
-		UserEntityPermissions permissions = entityBundle.getPermissions();
-		this.entityBundle = entityBundle;
-		this.isUserAuthenticated = isUserAuthenticated;
-		displayType = getTypeName(entityBundle.getEntity());
-		// If the user can delete then enable the delete button
+			EntityBundle entityBundle, EntityUpdatedHandler handler) {
+		this.entityUpdateHandler = handler;
+		this.permissions = entityBundle.getPermissions();
+		this.actionMenu = actionMenu;
+		this.entity = entityBundle.getEntity();
+		this.isUserAuthenticated = authenticationController.isLoggedIn();
+		this.enityTypeDisplay = entityTypeProvider.getEntityDispalyName(entityBundle.getEntity());
+		this.accessControlListEditor.setResource(entity, permissions.getCanChangePermissions());  
+		// Setup the actions
+		configureDeleteAction();
+		configureShareAction();
+	}
+	
+	private void configureDeleteAction(){
 		actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
-		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+displayType);
+		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
 		actionMenu.addActionListener(Action.DELETE_ENTITY, this);
+	}
+	
+	private void configureShareAction(){
+		actionMenu.setActionVisible(Action.SHARE, true);
+		actionMenu.addActionListener(Action.SHARE, this);
+		if(permissions.getCanPublicRead()){
+			actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
+		}else{
+			actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
+		}
 	}
 
 	@Override
@@ -61,6 +104,9 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 		case DELETE_ENTITY:
 			onDeleteEntity();
 			break;
+		case SHARE:
+			onShare();
+			break;	
 		default:
 			break;
 		}
@@ -69,70 +115,46 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 	@Override
 	public void onDeleteEntity() {
 		// Confirm the delete with the user.
-		view.showConfirmDialog("Are you sure you want to delete "+this.displayType+" "+this.entityBundle.getEntity().getName(), Action.DELETE_ENTITY);
+		view.showConfirmDialog("Confirm Delete","Are you sure you want to delete "+this.enityTypeDisplay+" "+this.entity.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postConfirmedDeleteEntity();
+			}
+		});
 	}
 
-	@Override
-	public void onConfirmAction(Action action) {
-		switch(action){
-		case DELETE_ENTITY:
-			onConfirmedDeleteEntity();
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	public void onConfirmedDeleteEntity() {
-		// The user has confirmed the delete so do the pre-flight test
+	/**
+	 * Called after the user has confirmed the delete of the entity.
+	 */
+	public void postConfirmedDeleteEntity() {
+		// The user has confirmed the delete, the next step is the preflight check.
 		preflightController.preflightDeleteEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
-				// TODO Auto-generated method stub
-				
+				postCheckDeleteEntity();
 			}
 		});
 		
 	}
 
 	/**
-	 * Get a display type for this entity.
-	 * @param entity
-	 * @return
+	 * After all checks have been made we can do the actual entity delete.
 	 */
-	public static String getTypeName(Entity entity){
-		if(entity instanceof Project){
-			return PROJECT;
-		}else if(entity instanceof FileEntity){
-			return FILE;
-		}else if(entity instanceof Folder){
-			return FOLDER;
-		}else if(entity instanceof TableEntity){
-			return TABLE;
-		}else{
-			return ENTITY;
-		}
-	}
-
-	@Override
-	public void onPreflightCheckedDeleteEntity() {
+	public void postCheckDeleteEntity() {
 		final String entityId = this.entityBundle.getEntity().getId();
 		final String parentId = this.entityBundle.getEntity().getParentId();
 		synapseClient.deleteEntityById(entityId, new AsyncCallback<Void>() {
-			
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(" Deleted", "The " + displayType + " was successfully deleted."); 
+				view.showInfo("Deleted", "The " + enityTypeDisplay + " was successfully deleted."); 
 				// Go to entity's parent
 				Place gotoPlace = null;
-				if(parentId != null && !Project.class.getName().equals(entityBundle.getEntity().getEntityType())) {					
+				if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 					if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 					else gotoPlace = new Synapse(parentId);
 				} else {
 					gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
 				}
-					
 				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
 			}
 			
@@ -144,5 +166,15 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 			}
 		});
 		
+	}
+
+	@Override
+	public void onShare() {
+		DisplayUtils.showSharingDialog(accessControlListEditor, this.permissions.getCanChangePermissions(), new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
 	}
 }

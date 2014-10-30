@@ -160,6 +160,10 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
@@ -212,10 +216,6 @@ import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarVie
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButton;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionButton;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItem;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuItem;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -585,8 +585,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Trash
 		bind(TrashViewImpl.class).in(Singleton.class);
 		bind(TrashView.class).to(TrashViewImpl.class);
-		
-		bind(PreflightController.class).to(PreflightControllerImpl.class);
 
 		/*
 		 * Factories
@@ -676,6 +674,10 @@ public class PortalGinModule extends AbstractGinModule {
 		// ActionMenu V2
 		bind(ActionMenuWidget.class).to(ActionMenuWidgetImpl.class);
 		bind(ActionMenuWidgetView.class).to(ActionMenuWidgetViewImpl.class);
+		
+		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
+		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
+		bind(PreflightController.class).to(PreflightControllerImpl.class);
 		
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);

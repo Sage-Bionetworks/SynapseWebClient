@@ -385,7 +385,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, SynapseView view) {
+	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, ShowsErrors view) {
 		//send exception to the javascript console
 		if (displayUtilsLogger != null && ex != null)
 			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());

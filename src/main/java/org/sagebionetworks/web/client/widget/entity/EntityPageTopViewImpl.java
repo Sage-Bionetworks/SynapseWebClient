@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
@@ -115,7 +116,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	private SageImageBundle sageImageBundle;
 	private IconsImageBundle iconsImageBundle;
 	private ActionMenu actionMenu;
-	private ActionMenuWidget actionMenuV2;
 	private LocationableTitleBar locationableTitleBar;
 	private FileTitleBar fileTitleBar;
 	private PortalGinInjector ginInjector;
@@ -145,7 +145,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public EntityPageTopViewImpl(Binder uiBinder,
 			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle,
 			ActionMenu actionMenu,
-			ActionMenuWidget actionMenuV2,
 			LocationableTitleBar locationableTitleBar,
 			FileTitleBar fileTitleBar,
 			EntityTreeBrowser entityTreeBrowser, Breadcrumb breadcrumb,
@@ -160,7 +159,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		this.iconsImageBundle = iconsImageBundle;
 		this.sageImageBundle = sageImageBundle;
 		this.actionMenu = actionMenu;
-		this.actionMenuV2 = actionMenuV2;
 		this.entityTreeBrowser = entityTreeBrowser;
 		this.breadcrumb = breadcrumb;
 		this.attachmentsPanel = attachmentsPanel;
@@ -721,9 +719,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		left.add(entityMetadata.asWidget());
 		// ActionMenu
-		this.actionMenuV2.reset();
-		right.add(this.actionMenuV2.asWidget());
+		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		right.add(actionMenu.asWidget());
 				
+		// Action controller
+		EntityActionController controller = ginInjector.createEntityActionController();
+		controller.configure(actionMenu, bundle);
 		// Wiki
 		String wikiPageId = null; // TODO : pull from entity
 		addWikiPageWidget(tablesTabContainer, bundle, wikiPageId, null);
@@ -748,7 +749,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		IsWidget tableWidget = null;
 		// V2
 		TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
-		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, this.actionMenuV2);
+		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		tableWidget = v2TableWidget;
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
