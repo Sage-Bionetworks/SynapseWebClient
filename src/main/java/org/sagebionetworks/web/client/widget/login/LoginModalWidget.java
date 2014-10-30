@@ -13,7 +13,7 @@ import com.google.inject.Inject;
 public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 
 	LoginModalView view;
-	String action, method;
+	String action, method, encodingType;
 	
 	@Inject
 	public LoginModalWidget(LoginModalView view){
@@ -28,7 +28,7 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 
 	@Override
 	public void onPrimary() {
-		view.submitForm(action, method);
+		view.submitForm(action, method, encodingType);
 	}
 
 	
@@ -65,8 +65,9 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 		this.view.showModal();
 	}
 	
-	public void configure(String action, String method) {
+	public void configure(String action, String method, String encodingType) {
 		this.action = action;
 		this.method = method;
+		this.encodingType = encodingType;
 	}
 }

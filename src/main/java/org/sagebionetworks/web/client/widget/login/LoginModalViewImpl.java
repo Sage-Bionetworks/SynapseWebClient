@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 
+import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -112,7 +113,9 @@ public class LoginModalViewImpl implements LoginModalView {
 	}
 	
 	@Override
-	public void submitForm(String actionUrl, String method) {
+	public void submitForm(String actionUrl, String method, String encodingType) {
+		if (encodingType != null)
+			FormElement.as(formPanel.getElement()).setEnctype(encodingType);
 		formPanel.setAction(actionUrl);
 		formPanel.setMethod(method);
 		formPanel.submit();

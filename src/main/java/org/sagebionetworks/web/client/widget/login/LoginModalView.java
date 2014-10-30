@@ -84,5 +84,5 @@ public interface LoginModalView extends IsWidget {
 	 * Set the form action url, method, and submit
 	 * @param action
 	 */
-	public void submitForm(String actionUrl, String method);
+	public void submitForm(String actionUrl, String method, String encodingType);
 }

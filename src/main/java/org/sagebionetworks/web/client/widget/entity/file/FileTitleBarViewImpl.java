@@ -33,6 +33,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -213,7 +214,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				authorizedDirectDownloadLink.setVisible(true);
 				authorizedDirectDownloadImage.setVisible(true);
 				authorizedDirectDownloadLink.setText(entity.getName());
-				loginModalWidget.configure(directDownloadUrl, "get");
+				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadImage.setVisible(true);
