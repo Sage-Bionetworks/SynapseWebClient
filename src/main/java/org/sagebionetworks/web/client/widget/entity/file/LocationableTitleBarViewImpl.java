@@ -151,8 +151,8 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-		
-		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
+		licensedDownloader.configure(entityBundle, userProfile);
+		downloadButton = licensedDownloader.asWidget();
 		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
 		downloadButtonContainer.clear();
 		downloadButtonContainer.add(downloadButton);
@@ -214,7 +214,7 @@ public class LocationableTitleBarViewImpl extends Composite implements Locationa
 		}
 		
 		// Configure the button
-		licensedDownloader.configureHeadless(entityBundle, userProfile);
+		licensedDownloader.configure(entityBundle, userProfile);
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
 		licensedDownloader.clearHandlers();
 		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			

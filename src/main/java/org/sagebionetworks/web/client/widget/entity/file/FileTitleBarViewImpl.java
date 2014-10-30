@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
@@ -11,25 +10,24 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeProvider;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
+import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.EntityType;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -46,11 +44,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
 	private LicensedDownloader licensedDownloader;
-	private Widget downloadButton = null;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
-	NodeModelCreator nodeModelCreator;
+	private GlobalApplicationState globalAppState;
+	private LoginModalWidget loginModalWidget;
 	
 	@UiField
 	HTMLPanel panel;
@@ -59,7 +56,18 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	HTMLPanel fileNameContainer;
 	@UiField
-	Anchor entityLink;
+	Anchor licensedDownloadLink;
+	@UiField
+	Anchor directDownloadLink;
+	@UiField
+	Image directDownloadImage;
+	
+	@UiField
+	Anchor authorizedDirectDownloadLink;
+	@UiField
+	Image authorizedDirectDownloadImage;
+	
+	
 	@UiField
 	SimplePanel md5LinkContainer;
 	@UiField
@@ -72,7 +80,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	SpanElement fileSize;
 	@UiField
 	SimplePanel favoritePanel;
-	private HandlerRegistration entityLinkHandlerRegistration;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -86,23 +93,63 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			MyEntitiesBrowser myEntitiesBrowser, 
 			LicensedDownloader licensedDownloader, 
 			EntityTypeProvider typeProvider,
-			SynapseJSNIUtils synapseJSNIUtils,
 			FavoriteWidget favoriteWidget,
-			NodeModelCreator nodeModelCreator, Md5Link md5Link) {
+			GlobalApplicationState globalAppState,
+			Md5Link md5Link,
+			LoginModalWidget loginRequiredModalWidget) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.licensedDownloader = licensedDownloader;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.favoriteWidget = favoriteWidget;
-		this.nodeModelCreator = nodeModelCreator;
 		this.md5Link = md5Link;
-		
+		this.globalAppState = globalAppState;
+		this.loginModalWidget = loginRequiredModalWidget;
 		initWidget(uiBinder.createAndBindUi(this));
 		downloadButtonContainer.addStyleName("inline-block margin-left-5");
 		md5LinkContainer.addStyleName("inline-block margin-left-5");
-		entityLink.addStyleName("downloadLink link");
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
+		loginRequiredModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
+		final Widget downloadButton = licensedDownloader.asWidget();
+		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
+		downloadButtonContainer.add(downloadButton);
+		licensedDownloadLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				//if there is an href, ignore it
+				event.preventDefault();
+				downloadButton.fireEvent(event);
+			}
+		});
+		directDownloadImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				directDownloadLink.fireEvent(event);
+			}
+		});
+		
+		authorizedDirectDownloadImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				authorizedDirectDownloadLink.fireEvent(event);
+			}
+		});
+		
+		authorizedDirectDownloadLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loginModalWidget.showModal();
+			}
+		});
+	}
+	
+	private void hideAll() {
+		licensedDownloadLink.setVisible(false);
+		downloadButtonContainer.setVisible(false);
+		directDownloadLink.setVisible(false);
+		directDownloadImage.setVisible(false);
+		authorizedDirectDownloadLink.setVisible(false);
+		authorizedDirectDownloadImage.setVisible(false);
 	}
 	
 	@Override
@@ -111,24 +158,19 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			EntityType entityType, 
 			AuthenticationController authenticationController) {
 		
+		hideAll();
 		Entity entity = entityBundle.getEntity();
 
 		favoriteWidget.configure(entity.getId());
 		
 		UserSessionData sessionData = authenticationController.getCurrentUserSessionData();
 		UserProfile userProfile = (sessionData==null ? null : sessionData.getProfile());
-		
-		downloadButton = licensedDownloader.asWidget(entityBundle, userProfile);
-		DisplayUtils.addTooltip(downloadButton, DisplayConstants.BUTTON_DOWNLOAD, Placement.BOTTOM);
-		downloadButtonContainer.clear();
-		downloadButtonContainer.add(downloadButton);
+		licensedDownloader.configure(entityBundle, userProfile);
 		
 		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		
-		//add an anchor with the file name, that redirects to the download button for functionality
-		entityLink.setText(entity.getName());
 		AbstractImagePrototype synapseIconForEntity = AbstractImagePrototype.create(DisplayUtils.getSynapseIconForEntity(entity, DisplayUtils.IconSize.PX24, iconsImageBundle));
 		synapseIconForEntity.applyTo(entityIcon);
 		//fileHandle is null if user can't access the filehandle associated with this fileentity
@@ -155,8 +197,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			}
 		}
 		
-		// Configure the button
-		licensedDownloader.configureHeadless(entityBundle, userProfile);
 		// this allows the menu to respond to the user signing a Terms of Use agreement in the licensed downloader
 		licensedDownloader.clearHandlers();
 		licensedDownloader.addEntityUpdatedHandler(new EntityUpdatedHandler() {			
@@ -167,24 +207,23 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		});
 		String directDownloadUrl = licensedDownloader.getDirectDownloadURL();
 		if (directDownloadUrl != null) {
-			//clear old handler, if there is one
-			if (entityLinkHandlerRegistration != null) {
-				entityLinkHandlerRegistration.removeHandler();
-				entityLinkHandlerRegistration = null;
+			//special case, if this starts with sftp proxy, then handle
+			String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+			if (directDownloadUrl.startsWith(sftpProxy)) {
+				authorizedDirectDownloadLink.setVisible(true);
+				authorizedDirectDownloadImage.setVisible(true);
+				authorizedDirectDownloadLink.setText(entity.getName());
+				loginModalWidget.configure(directDownloadUrl, "get");
+			} else {
+				directDownloadLink.setVisible(true);
+				directDownloadImage.setVisible(true);
+				directDownloadLink.setHref(directDownloadUrl);
+				directDownloadLink.setText(entity.getName());
 			}
-			entityLink.setHref(directDownloadUrl);	
 		}
 		else {
-			//clear href, if there is one
-			entityLink.setHref((String)null);
-			entityLinkHandlerRegistration = entityLink.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					//if there is an href, ignore it
-					event.preventDefault();
-					downloadButton.fireEvent(event);
-				}
-			});
+			licensedDownloadLink.setVisible(true);
+			downloadButtonContainer.setVisible(true);
 		}
 	}
 	

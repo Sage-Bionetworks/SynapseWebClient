@@ -111,7 +111,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configureHeadless(EntityBundle entityBundle, UserProfile userProfile) {
+	public void configure(EntityBundle entityBundle, UserProfile userProfile) {
 		view.setPresenter(this);
 		this.entityId = entityBundle.getEntity().getId();
 		extractBundle(entityBundle, userProfile);
@@ -137,27 +137,15 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	/**
-	 * Returns a standard download button
+	 * Returns a standard download button.  User must configure this widget
 	 * @param entity
 	 * @param showDownloadLocations
 	 * @return
 	 */
-	public Widget asWidget(EntityBundle entityBundle, UserProfile userProfile) {
-		configureHeadless(entityBundle, userProfile);
-		
+	public Widget asWidget() {
 		return view.asWidget();
 	}	
-	
-	/**
-	 * does nothing use asWidget(Entity entity) 
-	 */
-	@Override
-	public Widget asWidget() { 
-		return null;
-	}	
-
-		
-	
+			
 	/**
 	 * Loads the download url 
 	 */
