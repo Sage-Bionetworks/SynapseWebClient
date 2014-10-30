@@ -13,7 +13,7 @@
 			<h2 style="margin-bottom: 0px;">
 			 	<span class="liftLargeIcon"><g:Image ui:field="entityIcon"/></span>
 			 	<g:Anchor ui:field="directDownloadLink" styleName="downloadLink link displayInline" />
-			 	<g:Image ui:field="directDownloadImage" styleName="displayInline imageButton" resource='{icons.NavigateDown16}' />
+			 	<b:ImageAnchor ui:field="directDownloadImage" styleName="displayInline imageButton" url='{icons.NavigateDown16.getSafeUri.asString}' />
 			 	
 			 	<g:Anchor ui:field="authorizedDirectDownloadLink" styleName="downloadLink link displayInline" />
 			 	<g:Image ui:field="authorizedDirectDownloadImage" styleName="displayInline imageButton" resource='{icons.NavigateDown16}' />

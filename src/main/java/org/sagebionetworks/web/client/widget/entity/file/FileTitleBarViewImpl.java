@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.ImageAnchor;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -61,7 +62,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Anchor directDownloadLink;
 	@UiField
-	Image directDownloadImage;
+	ImageAnchor directDownloadImage;
 	
 	@UiField
 	Anchor authorizedDirectDownloadLink;
@@ -122,26 +123,15 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				downloadButton.fireEvent(event);
 			}
 		});
-		directDownloadImage.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				directDownloadLink.fireEvent(event);
-			}
-		});
 		
-		authorizedDirectDownloadImage.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				authorizedDirectDownloadLink.fireEvent(event);
-			}
-		});
-		
-		authorizedDirectDownloadLink.addClickHandler(new ClickHandler() {
+		ClickHandler authorizedDirectDownloadClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				loginModalWidget.showModal();
 			}
-		});
+		};
+		authorizedDirectDownloadImage.addClickHandler(authorizedDirectDownloadClickHandler);
+		authorizedDirectDownloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
 	}
 	
 	private void hideAll() {
@@ -219,6 +209,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				directDownloadLink.setVisible(true);
 				directDownloadImage.setVisible(true);
 				directDownloadLink.setHref(directDownloadUrl);
+				directDownloadImage.setHref(directDownloadUrl);
 				directDownloadLink.setText(entity.getName());
 			}
 		}
