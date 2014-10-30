@@ -54,7 +54,6 @@ public interface SynapseJSNIUtils {
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
 	public double getFileSize(String fileFieldId, int index);
 	String[] getMultipleUploadFileNames(String fileFieldId);
-	//void addDropZoneStyleEventHandling(String fileFieldId, Uploader uploader);
 	public void consoleLog(String message);
 	public void consoleError(String message);
 	public void uploadUrlToGenomeSpace(String url);	

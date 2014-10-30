@@ -281,7 +281,6 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		//synapseJSNIUtils.addDropZoneStyleEventHandling(FILE_FIELD_ID, (Uploader) presenter);
 	}
 	
 	private void removeDragAndDropHandlers() {
