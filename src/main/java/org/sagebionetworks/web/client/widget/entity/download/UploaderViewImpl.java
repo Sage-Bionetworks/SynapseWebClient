@@ -283,13 +283,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		this.presenter = presenter;
 	}
 	
-	private void removeDragAndDropHandlers() {
-		if (onDragOverDocHandler != null) {
-			onDragOverDocHandler.removeHandler();
-			onDragOverDocHandler = null;
-		}
-	}
-	
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -595,6 +588,29 @@ public class UploaderViewImpl extends FlowPanel implements
 			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" multiple></input>");
 		else
 			return new HTML("<input id=\"" + FILE_FIELD_ID + "\" name=\"uploads[]\" type=\"file\" class=\"" + FILE_FIELD_STYLENAME + "\" /></input>");
+	}
+	
+	private void removeDragAndDropHandlers() {
+		if (onDragOverDocHandler != null) {
+			onDragOverDocHandler.removeHandler();
+			onDragOverDocHandler = null;
+		}
+		if (onDragEnterDocHandler != null) {
+			onDragEnterDocHandler.removeHandler();
+			onDragEnterDocHandler = null;
+		}
+		if (onDropDocHandler != null) {
+			onDropDocHandler.removeHandler();
+			onDropDocHandler = null;
+		}
+		if (onDropDocHandler != null) {
+			onDropDocHandler.removeHandler();
+			onDropDocHandler = null;
+		}
+		if (onDragEndDocHandler != null) {
+			onDragEndDocHandler.removeHandler();
+			onDragEndDocHandler = null;
+		}
 	}
 	
 	private void addDragAndDropHandlers() {
