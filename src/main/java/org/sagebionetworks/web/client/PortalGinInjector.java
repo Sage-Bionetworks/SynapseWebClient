@@ -58,6 +58,7 @@ import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
@@ -221,6 +222,7 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
 	public APITableColumnRendererUserId getAPITableColumnRendererUserId();
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
+	public APITableColumnRendererLink getAPITableColumnRendererLink();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
 	
