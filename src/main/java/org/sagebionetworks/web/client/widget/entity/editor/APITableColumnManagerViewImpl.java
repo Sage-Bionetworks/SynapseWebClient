@@ -176,6 +176,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_LINK);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
 		//rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose

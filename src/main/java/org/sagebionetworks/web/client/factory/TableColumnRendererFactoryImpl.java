@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.factory;
 
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
@@ -24,6 +25,8 @@ public class TableColumnRendererFactoryImpl implements TableColumnRendererFactor
 	@Inject
 	private Provider<APITableColumnRendererDate> apiTableColumnRendererDateProvider;
 	@Inject
+	private Provider<APITableColumnRendererLink> apiTableColumnRendererLinkProvider;
+	@Inject
 	private Provider<APITableColumnRendererSynapseID> apiTableColumnRendererSynapseIDProvider;
 	@Inject
 	private Provider<APITableColumnRendererEntityIdAnnotations> apiTableColumnRendererEntityIdAnnotationsProvider;
@@ -42,7 +45,12 @@ public class TableColumnRendererFactoryImpl implements TableColumnRendererFactor
 	public APITableColumnRendererDate getAPITableColumnRendererDate() {
 		return apiTableColumnRendererDateProvider.get();
 	}
-
+	
+	@Override
+	public APITableColumnRendererLink getAPITableColumnRendererLink() {
+		return apiTableColumnRendererLinkProvider.get();
+	}
+	
 	@Override
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID() {
 		return apiTableColumnRendererSynapseIDProvider.get();

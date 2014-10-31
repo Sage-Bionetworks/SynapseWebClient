@@ -150,6 +150,7 @@ public class WidgetConstants {
 	public static final String API_TABLE_COLUMN_RENDERER_NONE = "none";
 	public static final String API_TABLE_COLUMN_RENDERER_USER_ID = "userid";
 	public static final String API_TABLE_COLUMN_RENDERER_DATE = "date";
+	public static final String API_TABLE_COLUMN_RENDERER_LINK = "markdown link";
 	public static final String API_TABLE_COLUMN_RENDERER_EPOCH_DATE = "epochdate";
 	public static final String API_TABLE_COLUMN_RENDERER_SYNAPSE_ID = "synapseid";
 	public static final String API_TABLE_COLUMN_RENDERER_ANNOTATIONS = "annotations";
