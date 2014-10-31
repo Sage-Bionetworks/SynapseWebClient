@@ -214,6 +214,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			}
 		}
 		else {
+			licensedDownloadLink.setText(entity.getName());
 			licensedDownloadLink.setVisible(true);
 			downloadButtonContainer.setVisible(true);
 		}
