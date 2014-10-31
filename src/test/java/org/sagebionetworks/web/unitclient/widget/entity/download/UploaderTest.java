@@ -372,6 +372,24 @@ public class UploaderTest {
 		assertTrue(target.contains("?url=" + url));
 	}
 	
+	
+
+	@Test
+	public void testQueryForUploadDestinationsWithoutParentEntityId() {
+		//Configure the uploader without a parent entity id, but with an existing file entity.
+		//This is the case when updating a file entity (create a new version).
+		String entityId = "syn123";
+		FileEntity fileEntity = new FileEntity();
+		fileEntity.setId(entityId);
+		
+		Mockito.reset(synapseClient);
+		uploader.asWidget(fileEntity);
+		
+		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
+		verify(synapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
+		assertEquals(entityId, stringCaptor.getValue());
+	}
+	
 
 	@Test
 	public void testUploadNoCredentials() {

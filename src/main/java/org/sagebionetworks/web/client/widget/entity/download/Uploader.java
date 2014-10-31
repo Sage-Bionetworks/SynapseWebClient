@@ -181,12 +181,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void queryForUploadDestination() {
 		enableMultipleFileUploads();
-		if (parentEntityId == null) {
+		if (parentEntityId == null && entity == null) {
 			currentUploadType = UploadType.S3;
 			view.showUploadingToSynapseStorage("");
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
-			synapseClient.getUploadDestinations(parentEntityId, new AsyncCallback<List<UploadDestination>>() {
+			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
+			synapseClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {
 						currentUploadType = UploadType.S3;
