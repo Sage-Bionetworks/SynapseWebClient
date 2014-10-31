@@ -9,6 +9,8 @@ import com.google.inject.Inject;
 
 public class AccessControlListModalWidgetImpl implements AccessControlListModalWidget, AccessControlListModalWidgetView.Presenter, HasChangesHandler {
 
+	public static final String OK = "OK";
+	public static final String CANCEL = "Cancel";
 	AccessControlListModalWidgetView view;
 	AccessControlListEditor editor;
 	Callback changeCallback;
@@ -37,10 +39,10 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 		editor.configure(entity, canChangePermission, this);
 		if(canChangePermission){
 			view.setPrimaryButtonVisible(true);
-			view.setDefaultButtonText("Cancel");
+			view.setDefaultButtonText(CANCEL);
 		}else{
 			view.setPrimaryButtonVisible(false);
-			view.setDefaultButtonText("OK");
+			view.setDefaultButtonText(OK);
 		}
 	}
 
@@ -52,12 +54,19 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 	@Override
 	public void onPrimary() {
 		view.setLoading(true);
-		editor.pushChangesToSynapse(false, this.changeCallback);
-		view.hideDialog();
+		editor.pushChangesToSynapse(false, new Callback() {
+			@Override
+			public void invoke() {
+				view.hideDialog();
+				changeCallback.invoke();
+			}
+		});
+
 	}
 
 	@Override
 	public void hasChanges(boolean hasChanges) {
+		view.setLoading(false);
 		view.setPrimaryButtonEnabled(hasChanges);
 	}
 

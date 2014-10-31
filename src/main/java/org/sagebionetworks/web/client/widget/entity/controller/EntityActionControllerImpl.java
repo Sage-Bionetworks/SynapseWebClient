@@ -31,6 +31,16 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener {
 	
+	public static final String THE = "The ";
+
+	public static final String WAS_SUCCESSFULLY_DELETED = " was successfully deleted.";
+
+	public static final String DELETED = "Deleted";
+
+	public static final String ARE_YOU_SURE_YOU_WANT_TO_DELETE = "Are you sure you want to delete ";
+
+	public static final String CONFIRM_DELETE_TITLE = "Confirm Delete";
+
 	public static final String DELETE_PREFIX = "Delete ";
 	
 	EntityActionControllerView view;
@@ -72,6 +82,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
 			EntityBundle entityBundle, EntityUpdatedHandler handler) {
+		this.entityBundle = entityBundle;
 		this.entityUpdateHandler = handler;
 		this.permissions = entityBundle.getPermissions();
 		this.actionMenu = actionMenu;
@@ -86,11 +97,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureDeleteAction(){
 		actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
+		actionMenu.setActionEnabled(Action.DELETE_ENTITY, permissions.getCanDelete());
 		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
 		actionMenu.addActionListener(Action.DELETE_ENTITY, this);
 	}
 	
 	private void configureShareAction(){
+		actionMenu.setActionEnabled(Action.SHARE, true);
 		actionMenu.setActionVisible(Action.SHARE, true);
 		actionMenu.addActionListener(Action.SHARE, this);
 		if(permissions.getCanPublicRead()){
@@ -117,7 +130,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void onDeleteEntity() {
 		// Confirm the delete with the user.
-		view.showConfirmDialog("Confirm Delete","Are you sure you want to delete "+this.enityTypeDisplay+" "+this.entity.getName(), new Callback() {
+		view.showConfirmDialog(CONFIRM_DELETE_TITLE,ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName(), new Callback() {
 			@Override
 			public void invoke() {
 				postConfirmedDeleteEntity();
@@ -144,19 +157,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	public void postCheckDeleteEntity() {
 		final String entityId = this.entityBundle.getEntity().getId();
-		final String parentId = this.entityBundle.getEntity().getParentId();
 		synapseClient.deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Deleted", "The " + enityTypeDisplay + " was successfully deleted."); 
+				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
-				Place gotoPlace = null;
-				if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
-					if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
-					else gotoPlace = new Synapse(parentId);
-				} else {
-					gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
-				}
+				Place gotoPlace = createDeletePlace();
 				globalApplicationState.getPlaceChanger().goTo(gotoPlace);
 			}
 			
@@ -167,9 +173,24 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				}
 			}
 		});
-		
 	}
 
+	/**
+	 * Create the delete place
+	 * @return
+	 */
+	public Place createDeletePlace(){
+		String parentId = entityBundle.getEntity().getParentId();
+		Place gotoPlace = null;
+		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
+			if(entityBundle.getEntity() instanceof TableEntity) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
+			else gotoPlace = new Synapse(parentId);
+		} else {
+			gotoPlace = new Home(ClientProperties.DEFAULT_PLACE_TOKEN);
+		}
+		return gotoPlace;
+	}
+	
 	@Override
 	public void onShare() {
 		this.accessControlListModalWidget.showSharing(new Callback() {

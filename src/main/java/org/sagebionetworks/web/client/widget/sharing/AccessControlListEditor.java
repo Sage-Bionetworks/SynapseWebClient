@@ -49,7 +49,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlListEditorView view;
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
-//	private boolean unsavedChanges;
 	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
@@ -389,7 +388,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
-				view.showInfoError("Error", "Permissions were not saved to Synapse");				
+				view.showInfoError("Error", "Permissions were not saved to Synapse");
+				hasChangesHandler.hasChanges(true);
 			}
 		};
 		

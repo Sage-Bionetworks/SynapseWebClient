@@ -90,15 +90,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * pushed to Synapse.		 * 
 		 */
 		void deleteAcl();
-
-//		/**
-//		 * Push ACL changes to Synapse.
-//		 * 
-//		 * If 'recursive' is true, then all ACLs for all descendant entities
-//		 * will be deleted in Synapse. These descendant entities will 
-//		 * consequently inherit access permissions from this entity's ACL.
-//		 */
-//		void pushChangesToSynapse(boolean recursive, final AsyncCallback<AccessControlList> changesPushedCallback);
 		
 		/**
 		 * The view tells the presenter that there are unsaved changes in the view
