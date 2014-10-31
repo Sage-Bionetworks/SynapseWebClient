@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -34,9 +35,8 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 	IconsImageBundle iconsImageBundle;
 	FlowPanel container;
 	PublicPrivateBadge publicPrivateBadge;
-	AccessControlListEditor aclEditor;
 	RestrictionWidget restrictionWidget;
-	Dialog dialog;
+	AccessControlListModalWidget accessControlListModalWidget;
 	
 	@Inject
 	public SharingAndDataUseConditionWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils,
@@ -44,17 +44,15 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			SageImageBundle sageImageBundle, 
 			IconsImageBundle iconsImageBundle, 
 			PublicPrivateBadge publicPrivateBadge, 
-			AccessControlListEditor aclEditor,
 			RestrictionWidget restrictionWidget,
-			Dialog dialog) {
+			AccessControlListModalWidget accessControlListModalWidget) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.publicPrivateBadge = publicPrivateBadge;
-		this.aclEditor = aclEditor;
 		this.restrictionWidget = restrictionWidget;
-		this.dialog = dialog;
+		this.accessControlListModalWidget = accessControlListModalWidget;
 		container = new FlowPanel();
 		container.addStyleName("margin-top-left-10");
 		this.add(container);
@@ -90,11 +88,11 @@ public class SharingAndDataUseConditionWidgetViewImpl extends LayoutContainer im
 			Anchor change = new Anchor();
 			change.setText(DisplayConstants.CHANGE);
 			change.addStyleName("link");
-			aclEditor.setResource(bundle.getEntity(), true);
+			accessControlListModalWidget.configure(bundle.getEntity(), true);
 			change.addClickHandler(new ClickHandler(){
 				@Override
 				public void onClick(ClickEvent event) {
-					DisplayUtils.showSharingDialog(dialog, aclEditor, true, new Callback() {
+					accessControlListModalWidget.showSharing(new Callback() {
 						@Override
 						public void invoke() {
 							presenter.entityUpdated();

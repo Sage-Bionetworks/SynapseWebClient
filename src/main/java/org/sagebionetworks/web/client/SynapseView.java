@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client;
 
-public interface SynapseView {
+public interface SynapseView extends ShowsErrors {
 
 	/**
 	 * Shows a loading view
@@ -14,11 +14,7 @@ public interface SynapseView {
 	 */
 	public void showInfo(String title, String message);
 	
-	/**
-	 * Show error message
-	 * @param string
-	 */
-	public void showErrorMessage(String message);
+
 	
 	/**
 	 * Clears out old elements

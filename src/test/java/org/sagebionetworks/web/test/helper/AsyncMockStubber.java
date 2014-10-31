@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -22,6 +23,21 @@ public class AsyncMockStubber {
             public T answer(InvocationOnMock invocationOnMock) throws Throwable {
                 final Object[] args = invocationOnMock.getArguments();
                 ((AsyncCallback<T>) args[args.length - 1]).onSuccess(data);
+                return null;
+            }
+        };
+    }
+    /**
+     * The answer will call Callback.invoke();
+     * @return
+     */
+    public static Answer<Void> createInvokeAnswer(){
+    	return new Answer<Void>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+                final Object[] args = invocationOnMock.getArguments();
+                ((Callback) args[args.length - 1]).invoke();
                 return null;
             }
         };
@@ -129,5 +145,29 @@ public class AsyncMockStubber {
     		}
     	}
     	return last;
+    }
+   
+    /**
+     * Create a stubber that will call invoke() on the last callback of any method.
+     * @param data
+     * @return
+     */
+    public static Stubber callWithInvoke(){
+    	return Mockito.doAnswer(createInvokeAnswer());
+    }
+    
+    /**
+     * Creates a stubber that will not call invoke on the last callback of any method.
+     * This is not strictly necessary but it allows for symmetry for test that do invoke.
+     * @return
+     */
+    public static Stubber callNoInvovke(){
+    	return Mockito.doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				// nothing to do here
+				return null;
+			}
+		});
     }
 }

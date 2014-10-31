@@ -112,7 +112,11 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 
 	@Override
 	public void onDownloadResults() {
-		queryInputListener.onDownloadResults(view.getInputQueryString());
+		queryInputListener.onDownloadResults();
+	}
+
+	public String getInputSQL() {
+		return view.getInputQueryString();
 	}
 
 }

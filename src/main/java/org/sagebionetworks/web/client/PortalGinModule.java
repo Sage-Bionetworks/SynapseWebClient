@@ -160,6 +160,12 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerView;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -210,6 +216,10 @@ import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarVie
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuView;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenuViewImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
@@ -274,6 +284,10 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetView;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
@@ -306,6 +320,10 @@ import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidgetImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPage;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageImpl;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageView;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVAppendPageViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePage;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFilePageImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadCSVFinishPage;
@@ -575,7 +593,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Trash
 		bind(TrashViewImpl.class).in(Singleton.class);
 		bind(TrashView.class).to(TrashViewImpl.class);
-		
 
 		/*
 		 * Factories
@@ -642,6 +659,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);
+		bind(AccessControlListModalWidget.class).to(AccessControlListModalWidgetImpl.class);
+		bind(AccessControlListModalWidgetView.class).to(AccessControlListModalWidgetViewImpl.class);
 		
 		// Sharing Permissions Grid
 		bind(SharingPermissionsGridView.class).to(SharingPermissionsGridViewImpl.class);
@@ -664,6 +683,14 @@ public class PortalGinModule extends AbstractGinModule {
 		// ActionMenu
 		bind(ActionMenuViewImpl.class).in(Singleton.class);
 		bind(ActionMenuView.class).to(ActionMenuViewImpl.class);
+		
+		// ActionMenu V2
+		bind(ActionMenuWidget.class).to(ActionMenuWidgetImpl.class);
+		bind(ActionMenuWidgetView.class).to(ActionMenuWidgetViewImpl.class);
+		
+		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
+		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
+		bind(PreflightController.class).to(PreflightControllerImpl.class);
 		
 		// FileBox
 		bind(LocationableTitleBarViewImpl.class).in(Singleton.class);
@@ -845,6 +872,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UploadCSVFilePage.class).to(UploadCSVFilePageImpl.class);
 		bind(UploadCSVFinishPage.class).to(UploadCSVFinishPageImpl.class);
 		bind(UploadCSVFinishPageView.class).to(UploadCSVFinishPageViewImpl.class);
+		bind(UploadCSVAppendPage.class).to(UploadCSVAppendPageImpl.class);
+		bind(UploadCSVAppendPageView.class).to(UploadCSVAppendPageViewImpl.class);
 		
 		bind(CreateDownloadPage.class).to(CreateDownloadPageImpl.class);
 		bind(CreateDownloadPageView.class).to(CreateDownloadPageViewImpl.class);

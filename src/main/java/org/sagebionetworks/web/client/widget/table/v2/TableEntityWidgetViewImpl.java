@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import org.gwtbootstrap3.client.shared.event.HiddenEvent;
+import org.gwtbootstrap3.client.shared.event.HiddenHandler;
+import org.gwtbootstrap3.client.shared.event.ShownEvent;
+import org.gwtbootstrap3.client.shared.event.ShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,7 +33,7 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@UiField
-	Button columnDetailsToggleButton;
+	Collapse schemaCollapse;
 	@UiField
 	PanelBody columnDetailsPanel;
 	@UiField
@@ -41,7 +44,9 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	SimplePanel queryResultsPanel;
 	@UiField
 	SimplePanel downloadResultsPanel;
-
+	@UiField
+	SimplePanel uploadResultsPanel;
+	
 	PortalGinInjector ginInjector;
 	ColumnModelsWidget columnModelsWidget;
 	Presenter presenter;
@@ -56,8 +61,21 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
+	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		this.schemaCollapse.addShownHandler(new ShownHandler() {
+			@Override
+			public void onShown(ShownEvent event) {
+				presenter.onSchemaToggle(true);
+				
+			}
+		});
+		this.schemaCollapse.addHiddenHandler(new HiddenHandler() {
+			@Override
+			public void onHidden(HiddenEvent event) {
+				presenter.onSchemaToggle(false);
+			}
+		});
 	}
 
 	@Override
@@ -110,5 +128,14 @@ public class TableEntityWidgetViewImpl extends Composite implements
 		downloadResultsPanel.add(downloadTableQueryModalWidget);
 	}
 
+	@Override
+	public void setUploadTableModalWidget(IsWidget uploadTableModalWidget) {
+		this.uploadResultsPanel.add(uploadTableModalWidget);
+	}
+
+	@Override
+	public void toggleSchema() {
+		this.schemaCollapse.toggle();
+	}
 
 }

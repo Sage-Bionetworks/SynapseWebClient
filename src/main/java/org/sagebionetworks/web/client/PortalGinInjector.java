@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
+import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
@@ -22,7 +23,6 @@ import org.sagebionetworks.web.client.presenter.SearchPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
-import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -54,6 +55,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
@@ -168,6 +170,9 @@ public interface PortalGinInjector extends Ginjector {
 		
 	public MarkdownWidget getMarkdownWidget();
 	
+	public ActionMenuWidget createActionMenuWidget();
+	
+	public EntityActionController createEntityActionController();
 	/*
 	 *  Markdown Widgets
 	 */
@@ -238,8 +243,7 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	public StringRendererCell createStringRendererCell();
 	public StringEditorCell createStringEditorCell();
-
-	
+		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
 	

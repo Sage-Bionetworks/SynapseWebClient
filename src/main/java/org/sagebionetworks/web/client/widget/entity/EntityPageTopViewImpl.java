@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,9 +39,12 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.LocationableTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.ActionMenu;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -715,8 +719,18 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		entityMetadata.setEntityBundle(bundle, versionNumber);
 		left.add(entityMetadata.asWidget());
 		// ActionMenu
-		right.add(actionMenu.asWidget(bundle, null));
+		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
+		right.add(actionMenu.asWidget());
 				
+		// Action controller
+		EntityActionController controller = ginInjector.createEntityActionController();
+		tablesTabContainer.add(controller.asWidget());
+		controller.configure(actionMenu, bundle, new EntityUpdatedHandler() {
+			@Override
+			public void onPersistSuccess(EntityUpdatedEvent event) {
+				presenter.fireEntityUpdatedEvent();
+			}
+		});
 		// Wiki
 		String wikiPageId = null; // TODO : pull from entity
 		addWikiPageWidget(tablesTabContainer, bundle, wikiPageId, null);
@@ -741,15 +755,11 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		IsWidget tableWidget = null;
 		// V2
 		TableEntityWidget v2TableWidget = ginInjector.createNewTableEntityWidget();
-		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch);
+		v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), qch, actionMenu);
 		tableWidget = v2TableWidget;
 		Widget tableW = tableWidget.asWidget();
 		tableW.addStyleName("margin-top-15");
 		tablesTabContainer.add(tableW);
-		// TODO (maybe):
-//		// Programmatic Clients
-//		tablesTabContainer.add(createProgrammaticClientsWidget(bundle, versionNumber));
-
 		// Created By/Modified By
 		tablesTabContainer.add(createModifiedAndCreatedWidget(bundle.getEntity(), false));
 		// Padding Bottom

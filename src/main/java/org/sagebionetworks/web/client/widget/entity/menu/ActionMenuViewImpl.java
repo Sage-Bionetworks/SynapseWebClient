@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -49,7 +50,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private AccessControlListEditor accessControlListEditor;
 	private UploadDialogWidget uploader;
 	private EntityTypeProvider typeProvider;
 	private EntityFinder entityFinder;
@@ -66,11 +66,10 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 	private Anchor addDescriptionCommand;
 	private Callback addDescriptionCallback;
 	private EntityBundle entityBundle;
-	private Dialog dialog;
+	private AccessControlListModalWidget accessControlListModalWidget;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
-			AccessControlListEditor accessControlListEditor,
 			UploadDialogWidget locationableUploader, 
 			EntityTypeProvider typeProvider,
 			EntityFinder entityFinder,
@@ -81,9 +80,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
 			AuthenticationController authenticationController,
-			Dialog dialog) {
+			AccessControlListModalWidget accessControlListModalWidget) {
 		this.sageImageBundle = sageImageBundle;
-		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
 		locationableUploader.disableMultipleFileUploads();
 		this.typeProvider = typeProvider;
@@ -94,7 +92,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.authenticationController = authenticationController;
-		this.dialog = dialog;
+		this.accessControlListModalWidget = accessControlListModalWidget;
 		add(uploader.asWidget()); //add uploader dialog to page
 	}
 
@@ -176,11 +174,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 			}
 		});
 		
-		accessControlListEditor.setResource(entity, isAdministrator);  
+		accessControlListModalWidget.configure(entity, isAdministrator);
 		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(dialog, accessControlListEditor, isAdministrator, new Callback() {
+				accessControlListModalWidget.showSharing(new Callback() {
 					@Override
 					public void invoke() {
 						presenter.fireEntityUpdatedEvent();

@@ -13,7 +13,8 @@ public interface UploadCSVFilePage extends ModalPage {
 	/**
 	 * Configure this page before using it.
 	 * @param parentId The ID of the parent project of the new table.
+	 * @param tableId When provided, the uploaded file will be used to update this table.  Can be null.
 	 */
-	void configure(String parentId);
+	void configure(String parentId, String tableId);
 
 }

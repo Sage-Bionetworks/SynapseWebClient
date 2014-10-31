@@ -1,15 +1,10 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
-import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
-import org.sagebionetworks.web.shared.EntityWrapper;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AccessControlListEditorView extends IsWidget, SynapseView {
@@ -26,7 +21,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean unsavedChanges, boolean canChangePermission);
+	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission);
 	
 	/**
 	 * Add an ACL Entry to the permissions dialog
@@ -37,7 +32,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
-	void setDialog(Dialog dialog);
 	
 	/**
 	 * Set the view to a loading state while async loads
@@ -96,15 +90,6 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 		 * pushed to Synapse.		 * 
 		 */
 		void deleteAcl();
-
-		/**
-		 * Push ACL changes to Synapse.
-		 * 
-		 * If 'recursive' is true, then all ACLs for all descendant entities
-		 * will be deleted in Synapse. These descendant entities will 
-		 * consequently inherit access permissions from this entity's ACL.
-		 */
-		void pushChangesToSynapse(boolean recursive, final AsyncCallback<AccessControlList> changesPushedCallback);
 		
 		/**
 		 * The view tells the presenter that there are unsaved changes in the view
