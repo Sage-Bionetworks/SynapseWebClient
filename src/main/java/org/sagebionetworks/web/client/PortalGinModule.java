@@ -252,6 +252,8 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderViewImpl;
+import org.sagebionetworks.web.client.widget.login.LoginModalView;
+import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.modal.ModalWindowView;
@@ -918,6 +920,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 		bind(EntityAccessRequirementsWidgetView.class).to(EntityAccessRequirementsWidgetViewImpl.class);
 		bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
+		
+		bind(LoginModalView.class).to(LoginModalViewImpl.class);
 		
 	}
 
