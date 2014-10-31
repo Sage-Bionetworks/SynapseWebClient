@@ -15,9 +15,9 @@
 			<b:DropDown>
 				<b:Button icon="GEAR" dataToggle="DROPDOWN">Tools</b:Button>
 				<b:DropDownMenu ui:field="toolsDropDown" addStyleNames="dropdown-menu-right">
-					<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA"	>Upload data to Table</a:ActionMenuItem>
+					<a:ActionMenuItem icon="UPLOAD" action="UPLOAD_TABLE_DATA"	>Upload Data To Table</a:ActionMenuItem>
 					<a:ActionMenuItem action="EDIT_TABLE_DATA" >Edit Query Results</a:ActionMenuItem>
-					<a:ActionMenuItem icon="DOWNLOAD" action="DOWNLOAD_TABLE_QUERY_RESULTS"	>Dowload Query Results</a:ActionMenuItem>
+					<a:ActionMenuItem icon="DOWNLOAD" action="DOWNLOAD_TABLE_QUERY_RESULTS"	>Download Query Results</a:ActionMenuItem>
 					<b:Divider/>
 					<a:ActionMenuItem action="CHANGE_ENTITY_NAME">Change Name</a:ActionMenuItem>
 					<a:ActionMenuItem icon="PLUS" action="ADD_WIKI_PAGE">Add Wiki</a:ActionMenuItem>
