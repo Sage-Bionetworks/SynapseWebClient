@@ -8,13 +8,11 @@ public class VersionTimer implements SynapseView {
 	private static final int CHECK_VERSIONS_INTERVAL_MS = 1000*60*10; //10 minutes
 	Timer timer;
 	GlobalApplicationState globalApplicationState;
-	SynapseClientAsync synapseClient;
 	
 	@Inject
-	public VersionTimer(final GlobalApplicationState globalApplicationState, final SynapseClientAsync synapseClient) {
+	public VersionTimer(final GlobalApplicationState globalApplicationState) {
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		globalApplicationState.checkVersionCompatibility(synapseClient, this);
+		globalApplicationState.checkVersionCompatibility(this);
 	}
 	
 	public void start() {
@@ -22,7 +20,7 @@ public class VersionTimer implements SynapseView {
 		timer  = new Timer() {			
 			@Override
 			public void run() {
-				globalApplicationState.checkVersionCompatibility(synapseClient, view);
+				globalApplicationState.checkVersionCompatibility(view);
 			}
 		};
 		timer.scheduleRepeating(CHECK_VERSIONS_INTERVAL_MS);		

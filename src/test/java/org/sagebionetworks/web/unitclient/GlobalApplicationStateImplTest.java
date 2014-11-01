@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -23,6 +25,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GlobalApplicationStateImplTest {
 	
+	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookieProvider;
 	PlaceController mockPlaceController;
 	ActivityMapper mockMapper;
@@ -37,10 +40,13 @@ public class GlobalApplicationStateImplTest {
 		mockMapper = Mockito.mock(ActivityMapper.class);
 		mockEventBus = Mockito.mock(EventBus.class);
 		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
-		globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+				globalApplicationState = new GlobalApplicationStateImpl(mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setActivityMapper(mockMapper);
 	}
+	
 	/**
 	 * 
 	 */
@@ -77,21 +83,31 @@ public class GlobalApplicationStateImplTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
-		SynapseClientAsync mockSynapseClient = mock(SynapseClientAsync.class);
 		SynapseView mockView = mock(SynapseView.class);
-
-		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(mockSynapseClient, mockView);
+		globalApplicationState.checkVersionCompatibility(mockView);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showErrorMessage(anyString());
 		
 		// simulate change repo version
 		reset(mockSynapseClient);
 		AsyncMockStubber.callSuccessWith("v2").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
-		globalApplicationState.checkVersionCompatibility(mockSynapseClient, mockView);
+		globalApplicationState.checkVersionCompatibility(mockView);
 		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(anyString());
 		
+	}
+	
+	@Test
+	public void testInitSynapseProperties() {
+		HashMap<String, String> testProps = new HashMap<String, String>();
+		String key = "k1";
+		String value = "v1";
+		testProps.put(key, value);
+		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		globalApplicationState.initSynapseProperties();
+		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		assertEquals(value, globalApplicationState.getSynapseProperty(key));
+		assertNull(globalApplicationState.getSynapseProperty("foo"));
 	}
 	
 }

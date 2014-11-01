@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
-import java.util.Date;
-
 import org.sagebionetworks.repo.model.AutoGenFactory;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
@@ -12,12 +10,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UploadView;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
@@ -26,7 +24,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPresenter {
@@ -42,7 +39,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	AuthenticationController authenticationController;
 	CookieProvider cookies;
 	EntityAccessRequirementsWidget accessRequirementsWidget;
-	boolean canEdit = false;
+	boolean canAddChild, canCertifiedUserAddChild;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
@@ -69,18 +66,16 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	 * Configure tree view with given entityId's children as start set
 	 * @param entityId
 	 */
-	public void configure(String entityId) {
-		this.configuredEntityId = entityId;		
-		view.configure(entityId, canEdit);
+	public void configure(String entityId, boolean canAddChild, boolean canCertifiedUserAddChild) {
+		this.configuredEntityId = entityId;
+		this.canAddChild = canAddChild;
+		this.canCertifiedUserAddChild = canCertifiedUserAddChild;
+		view.configure(entityId, canCertifiedUserAddChild);
 	}
 	
 	public void refresh() {
 		if (configuredEntityId != null)
-			view.configure(configuredEntityId, canEdit);
-	}
-	
-	public void setCanEdit(boolean canEdit) {
-		this.canEdit = canEdit;
+			view.configure(configuredEntityId, canCertifiedUserAddChild);
 	}
 	
 	public void clearState() {
@@ -108,7 +103,11 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 
 	@Override
 	public void uploadButtonClicked() {
-		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, cookies, authenticationController);
+		uploadButtonClickedStep1(accessRequirementsWidget, configuredEntityId, view, synapseClient, authenticationController, isCertificationRequired(canAddChild, canCertifiedUserAddChild));
+	}
+	
+	public static boolean isCertificationRequired(boolean canAddChild, boolean canCertifiedUserAddChild) {
+		return !canAddChild && canCertifiedUserAddChild;
 	}
 	
 	//any access requirements to accept?
@@ -117,56 +116,70 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 			final String entityId, 
 			final UploadView view,
 			final SynapseClientAsync synapseClient,
-			final CookieProvider cookies,
-			final AuthenticationController authenticationController) {
+			final AuthenticationController authenticationController,
+			final boolean isCertificationRequired) {
 		CallbackP<Boolean> callback = new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean accepted) {
 				if (accepted)
-					uploadButtonClickedStep2(entityId, view, synapseClient, cookies, authenticationController);
+					uploadButtonClickedStep2(entityId, view, synapseClient, authenticationController, isCertificationRequired);
 			}
 		};
 		accessRequirementsWidget.showUploadAccessRequirements(entityId, callback);
 	}
 
-		//is this a certified user?
+	/**
+	 * Invokes the callback iff the user certification feature is enabled on the backend AND certification requirements have been met.
+	 * Otherwise, it will pop up the "get certified" dialog
+	 * @return
+	 */
+	@Override
+	public void callbackIfCertifiedIfEnabled(Callback callback) {
+		if (FilesBrowser.isCertificationRequired(canAddChild, canCertifiedUserAddChild)) {
+			view.showQuizInfoDialog(true, null);
+		} else
+			callback.invoke();
+	}
+  
+	/**
+	 * Check for user certification passing record.  NOTE: This should be removed after certification is required 
+	 * (we will check the permissions up front and block on click), 
+	 * and calls to this method should be replaced with a direct call to "view.showUploadDialog(entityId);"
+	 * @param entityId
+	 * @param view
+	 * @param synapseClient
+	 * @param cookies
+	 * @param authenticationController
+	 * @param isCertificationRequired
+	 */
 	public static void uploadButtonClickedStep2(
 			final String entityId, 
 			final UploadView view,
 			SynapseClientAsync synapseClient,
-			final CookieProvider cookies,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			final boolean isCertificationRequired) {
+
 		AsyncCallback<String> userCertifiedCallback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String passingRecord) {
 				view.showUploadDialog(entityId);
 			}
+
 			@Override
 			public void onFailure(Throwable t) {
 				if (t instanceof NotFoundException) {
-					view.showQuizInfoDialog(new CallbackP<Boolean>() {
+					view.showQuizInfoDialog(isCertificationRequired, new Callback() {
 						@Override
-						public void invoke(Boolean tutorialClicked) {
-							if (!tutorialClicked) {
-								//remind me later clicked
-								//do not pop this up for a day
-								Date date = new Date();
-								CalendarUtil.addDaysToDate(date, 1);
-								cookies.setCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER, Boolean.TRUE.toString(), date);
-								view.showUploadDialog(entityId);
+						public void invoke() {
+							// remind me later clicked
+							view.showUploadDialog(entityId);
 						}
-						}
-					});					
+					});
 				} else
 					view.showErrorMessage(t.getMessage());
 			}
 		};
-		//only if cookie is not set
-		if (cookies.getCookie(CookieKeys.IGNORE_CERTIFICATION_REMINDER) == null) {
-			synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
-		} else {
-			userCertifiedCallback.onSuccess("");
-		}
+		synapseClient.getCertifiedUserPassingRecord(authenticationController.getCurrentUserPrincipalId(), userCertifiedCallback);
 	}
 	
 	@Override

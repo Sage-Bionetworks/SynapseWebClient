@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -143,6 +144,11 @@ public class BulkPresenterProxy extends AbstractActivity {
 					// Team Search page
 					TeamSearchPresenter presenter = ginjector.getTeamSearchPresenter();
 					presenter.setPlace((TeamSearch) place);
+					presenter.start(panel, eventBus);
+				} else if (place instanceof PeopleSearch) {
+					// People Search Page
+					PeopleSearchPresenter presenter = ginjector.getPeopleSearchPresenter();
+					presenter.setPlace((PeopleSearch) place);
 					presenter.start(panel, eventBus);
 				} else if (place instanceof Quiz) {
 					// Test page

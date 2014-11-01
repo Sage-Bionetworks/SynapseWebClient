@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -11,46 +13,48 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
+import com.extjs.gxt.ui.client.widget.grid.ColumnData;
+import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
+import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.GridEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.BoxComponent;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.FieldSet;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboBox;
 import com.extjs.gxt.ui.client.widget.form.SimpleComboValue;
-import com.extjs.gxt.ui.client.widget.grid.ColumnData;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
-import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
 import com.extjs.gxt.ui.client.widget.layout.TableData;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -63,6 +67,8 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	static final String REMOVE_COLUMN_ID = "removeData";
 	private static final int DEFAULT_WIDTH = 380;
 	private static final int BUTTON_PADDING = 3;
+	
+	private static final String STYLE_VERTICAL_ALIGN_MIDDLE = "vertical-align:middle !important;";
 	
 	private Presenter presenter;
 	private IconsImageBundle iconsImageBundle;
@@ -77,15 +83,17 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	private Boolean isOpenParticipation;
 	private Button openParticipationButton;
 	private SimpleComboBox<PermissionLevelSelect> permissionLevelCombo;
-	private ComboBox<ModelData> peopleCombo;
+	private UserGroupSuggestBox peopleSuggestBox;
 	
 	@Inject
 	public EvaluationAccessControlListEditorViewImpl(IconsImageBundle iconsImageBundle, 
-			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+			SageImageBundle sageImageBundle, UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
+			UserGroupSuggestBox peopleSuggestBox) {
 		this.iconsImageBundle = iconsImageBundle;		
 		this.sageImageBundle = sageImageBundle;
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.peopleSuggestBox = peopleSuggestBox;
 		permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
 		permissionDisplay.put(PermissionLevel.CAN_SCORE_EVALUATION, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_SCORE);
@@ -154,11 +162,11 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 
 		// show existing permissions
 		permissionsStore = new ListStore<PermissionsTableEntry>();
-		permissionsGrid = AccessControlListEditorViewImpl.createPermissionsGrid(
+		permissionsGrid = createPermissionsGrid(
 				permissionsStore, 
-				AccessControlListEditorViewImpl.createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
+				createPeopleRenderer(publicPrincipalIds, synapseJSNIUtils, iconsImageBundle), 
 				createButtonRenderer(),
-				AccessControlListEditorViewImpl.createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
+				createRemoveRenderer(iconsImageBundle, new CallbackP<Long>() {
 					@Override
 					public void invoke(Long principalId) {
 						presenter.removeAccess(principalId);
@@ -195,20 +203,20 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 		fieldSet.setCollapsible(false);			
 		fieldSet.setLayout(layout);
 		fieldSet.setWidth(FIELD_WIDTH);
+
+		// user/group Suggest Box
+		peopleSuggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+		peopleSuggestBox.setPlaceholderText("Enter a user or group name...");
+		peopleSuggestBox.setWidth(DEFAULT_WIDTH + "px");
+		HorizontalPanel userGroupPanel = new HorizontalPanel();
+		userGroupPanel.addStyleName("x-form-item");	// TODO: Remove when moving away from gxt components.
 		
-		// user/group combobox
-		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), publicPrincipalIds);
-		peopleCombo.setEmptyText("Enter a user or group name...");
-		peopleCombo.setFieldLabel("User/Group");
-		peopleCombo.setForceSelection(true);
-		peopleCombo.setTriggerAction(TriggerAction.ALL);
-		peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-			@Override
-			public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-				presenter.setUnsavedViewChanges(true);
-			}
-		});
-		fieldSet.add(peopleCombo);			
+		Label boxLbl = new Label("User/Group:");
+		boxLbl.addStyleName("width-80");
+		
+		userGroupPanel.add(boxLbl);
+		userGroupPanel.add(peopleSuggestBox.asWidget());
+		fieldSet.add(userGroupPanel);	
 
 		// permission level combobox
 		permissionLevelCombo = new SimpleComboBox<PermissionLevelSelect>();
@@ -410,9 +418,8 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 	}
 
 	private void addPersonToAcl() {
-		if(peopleCombo.getValue() != null) {
-			ModelData selectedModel = peopleCombo.getValue();
-			String principalIdStr = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
+		if(peopleSuggestBox.getSelectedSuggestion() != null) {
+			String principalIdStr = peopleSuggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			if(permissionLevelCombo.getValue() != null) {
@@ -420,7 +427,7 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 				presenter.setAccess(principalId, level);
 				
 				// clear selections
-				peopleCombo.clearSelections();
+				peopleSuggestBox.clear();
 				permissionLevelCombo.clearSelections();
 				presenter.setUnsavedViewChanges(false);
 			} else {
@@ -430,5 +437,125 @@ public class EvaluationAccessControlListEditorViewImpl extends LayoutContainer i
 			showAddMessage("Please select a user or group to grant permission to.");
 		}
 	}
+	
+	public Grid<PermissionsTableEntry> createPermissionsGrid(
+			ListStore<PermissionsTableEntry> permissionsStore,
+			GridCellRenderer<PermissionsTableEntry> peopleRenderer,
+			GridCellRenderer<PermissionsTableEntry> buttonRenderer,
+			GridCellRenderer<PermissionsTableEntry> removeRenderer,
+			boolean isEditable) {
+		List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
 
+		ColumnConfig column = new ColumnConfig();
+		column.setId(PRINCIPAL_COLUMN_ID);
+		column.setHeader("People");
+		column.setWidth(200);
+		column.setRenderer(peopleRenderer);
+		configs.add(column);
+
+		column = new ColumnConfig();
+		column.setId(ACCESS_COLUMN_ID);
+		column.setHeader("Access");
+		column.setWidth(110);
+		column.setRenderer(buttonRenderer);
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
+		configs.add(column);
+
+		column = new ColumnConfig();
+		column.setId(REMOVE_COLUMN_ID);
+		column.setHeader("");
+		column.setWidth(25);
+		column.setRenderer(removeRenderer);
+		column.setStyle(STYLE_VERTICAL_ALIGN_MIDDLE);
+		column.setHidden(!isEditable);
+		configs.add(column);
+
+		Grid<PermissionsTableEntry> permissionsGrid = new Grid<PermissionsTableEntry>(
+				permissionsStore, new ColumnModel(configs));
+		permissionsGrid.setAutoExpandColumn(PRINCIPAL_COLUMN_ID);
+		permissionsGrid.setBorders(true);
+		permissionsGrid.setWidth(520);
+		permissionsGrid.setHeight(180);
+		return permissionsGrid;
+	}
+	
+	public GridCellRenderer<PermissionsTableEntry> createPeopleRenderer(
+			final PublicPrincipalIds publicPrincipalIds, 
+			final SynapseJSNIUtils synapseJSNIUtils,
+			final IconsImageBundle iconsImageBundle) {
+		GridCellRenderer<PermissionsTableEntry> personRenderer = new GridCellRenderer<PermissionsTableEntry>() {
+			@Override
+			public Object render(PermissionsTableEntry model, String property,
+					ColumnData config, int rowIndex, int colIndex,
+					ListStore<PermissionsTableEntry> store,
+					Grid<PermissionsTableEntry> grid) {
+				PermissionsTableEntry entry = store.getAt(rowIndex);
+				AclEntry aclEntry = entry.getAclEntry();
+				String principalHtml = "";
+				Long publicPrincipalId = publicPrincipalIds.getPublicAclPrincipalId();
+				Long authenticatedPrincipalId = publicPrincipalIds.getAuthenticatedAclPrincipalId();
+				Long anonymousUserPrincipalId = publicPrincipalIds.getAnonymousUserPrincipalId();
+				
+				if (aclEntry != null & aclEntry.getOwnerId() != null) {
+					if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())) {
+						//is public group
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_ACL_TITLE, DisplayConstants.PUBLIC_ACL_DESCRIPTION);
+					} else if (authenticatedPrincipalId != null && aclEntry.getOwnerId().equals(authenticatedPrincipalId.toString())) {
+						//is authenticated group
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.AUTHENTICATED_USERS_ACL_TITLE, DisplayConstants.AUTHENTICATED_USERS_ACL_DESCRIPTION);	
+					} else if (anonymousUserPrincipalId != null && aclEntry.getOwnerId().equals(anonymousUserPrincipalId.toString())) {
+						//is anonymous user
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(DisplayConstants.PUBLIC_USER_ACL_TITLE, DisplayConstants.PUBLIC_USER_ACL_DESCRIPTION);
+					} else {
+						principalHtml = DisplayUtils.getUserNameDescriptionHtml(aclEntry.getTitle(), aclEntry.getSubtitle());
+					}
+				}
+				
+				String iconHtml = "";
+				if (publicPrincipalId != null && aclEntry.getOwnerId().equals(publicPrincipalId.toString())){
+					ImageResource icon = iconsImageBundle.globe32();
+					iconHtml = DisplayUtils.getIconThumbnailHtml(icon);	
+				} else if (!aclEntry.isIndividual()) {
+					//if a group, then try to fill in the icon from the team
+					String url = DisplayUtils.createTeamIconUrl(
+							synapseJSNIUtils.getBaseFileHandleUrl(), 
+							aclEntry.getOwnerId()
+					);
+					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
+				} else {
+					// try to get the userprofile picture
+					String url = DisplayUtils.createUserProfilePicUrl(
+							synapseJSNIUtils.getBaseProfileAttachmentUrl(), 
+							aclEntry.getOwnerId() 
+					);
+					iconHtml = DisplayUtils.getThumbnailPicHtml(url);
+				}
+				return iconHtml + "&nbsp;&nbsp;" + principalHtml;
+			}
+			
+		};
+		return personRenderer;
+	}
+
+	public GridCellRenderer<PermissionsTableEntry> createRemoveRenderer(final IconsImageBundle iconsImageBundle, final CallbackP<Long> callback) {
+		GridCellRenderer<PermissionsTableEntry> removeButton = new GridCellRenderer<PermissionsTableEntry>() {  			   
+			@Override  
+			public Object render(final PermissionsTableEntry model, String property, ColumnData config, int rowIndex,  
+				  final int colIndex, ListStore<PermissionsTableEntry> store, Grid<PermissionsTableEntry> grid) {				 
+				  final PermissionsTableEntry entry = store.getAt(rowIndex);
+					Anchor removeAnchor = new Anchor();
+					removeAnchor.setHTML(DisplayUtils.getIconHtml(iconsImageBundle.deleteButton16()));
+					removeAnchor.addClickHandler(new ClickHandler() {			
+						@Override
+						public void onClick(ClickEvent event) {
+							Long principalId = (Long.parseLong(entry.getAclEntry().getOwnerId()));
+							callback.invoke(principalId);
+						}
+					});
+					return removeAnchor;
+			  }
+			};  
+		return removeButton;
+	}
 }
+

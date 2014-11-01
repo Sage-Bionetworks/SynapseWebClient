@@ -36,7 +36,7 @@ public class AuthenticationControllerImplTest {
 	CookieProvider mockCookieProvider;
 	UserAccountServiceAsync mockUserAccountService;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	String sessionDataJson;
+	UserSessionData sessionData;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -44,24 +44,23 @@ public class AuthenticationControllerImplTest {
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		
 		//by default, return a valid user session data if asked
-		UserSessionData sessionData = new UserSessionData();
+		sessionData = new UserSessionData();
 		sessionData.setIsSSO(false);
 		sessionData.setProfile(new UserProfile());
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1234");
-		sessionDataJson = sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		AsyncMockStubber.callSuccessWith(sessionDataJson).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		
 		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, adapterFactory);
 	}
 	
 	@Test
 	public void testReloadUserSessionData() {
-		AsyncCallback<String> mockCallback = mock(AsyncCallback.class);
+		AsyncCallback<UserSessionData> mockCallback = mock(AsyncCallback.class);
 		authenticationController.reloadUserSessionData(mockCallback);
 		
-		verify(mockCallback).onSuccess(eq(sessionDataJson));
+		verify(mockCallback).onSuccess(eq(sessionData));
 		//should have set the token when successful
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.USER_LOGIN_TOKEN), anyString(), any(Date.class));
 		
@@ -90,7 +89,7 @@ public class AuthenticationControllerImplTest {
 	public void testReloadUserSessionDataFailure() {
 		Exception testException = new UnauthorizedException("Test failure");
 		AsyncMockStubber.callFailureWith(testException).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		AsyncCallback<String> mockCallback = mock(AsyncCallback.class);
+		AsyncCallback<UserSessionData> mockCallback = mock(AsyncCallback.class);
 		authenticationController.reloadUserSessionData(mockCallback);
 		//should remove cookie
 		verify(mockCookieProvider).removeCookie(eq(CookieKeys.USER_LOGIN_TOKEN));
@@ -101,7 +100,7 @@ public class AuthenticationControllerImplTest {
 	@Test
 	public void testReloadUserSessionDataNullToken() {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn(null);
-		AsyncCallback<String> mockCallback = mock(AsyncCallback.class);
+		AsyncCallback<UserSessionData> mockCallback = mock(AsyncCallback.class);
 		authenticationController.reloadUserSessionData(mockCallback);
 		//notify the callback
 		verify(mockCallback).onFailure(any(Exception.class));
@@ -122,8 +121,8 @@ public class AuthenticationControllerImplTest {
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1234");
 		
-		AsyncCallback<String> callback = mock(AsyncCallback.class);
-		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
+		AsyncCallback<UserSessionData> callback = mock(AsyncCallback.class);
+		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		
 		// not logged in
 		assertNull(authenticationController.getCurrentUserPrincipalId());
@@ -134,7 +133,7 @@ public class AuthenticationControllerImplTest {
 		
 		// empty user profile
 		sessionData.setProfile(null);
-		AsyncMockStubber.callSuccessWith(sessionData.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
+		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));	
 		authenticationController.revalidateSession("token", callback);
 		assertNull(authenticationController.getCurrentUserPrincipalId());
 	}

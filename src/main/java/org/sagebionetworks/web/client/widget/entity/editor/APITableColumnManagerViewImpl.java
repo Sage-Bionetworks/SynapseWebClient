@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.VerticalAlignment;
@@ -176,6 +176,7 @@ public class APITableColumnManagerViewImpl extends LayoutContainer implements AP
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_NONE);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_USER_ID);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE);
+		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_LINK);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE);
 		rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID);
 		//rendererValues.add(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS);	//don't want to expose

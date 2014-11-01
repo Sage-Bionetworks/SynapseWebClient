@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 
@@ -42,7 +43,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
 	private UploadDialogWidget uploader;
-	private QuizInfoWidget quizInfoWidget;
+	private QuizInfoDialog quizInfoDialog;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private PortalGinInjector ginInjector;
 	
@@ -52,34 +53,24 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 			UploadDialogWidget uploader,
 			CookieProvider cookies,
 			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoWidget quizInfoWidget,
+			QuizInfoDialog quizInfoDialog,
 			PortalGinInjector ginInjector) {
 		this.uploader = uploader;
 		this.ginInjector = ginInjector;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
-		this.quizInfoWidget = quizInfoWidget;
+		this.quizInfoDialog = quizInfoDialog;
 	}
 
 	@Override
-	public void configure(String entityId, boolean canEdit) {
-		configure(entityId, canEdit, null);
-	}		
-	
-	@Override
-	public void configure(String entityId, boolean canEdit, String title) {
+	public void configure(String entityId, boolean canCertifiedUserAddChild) {
 		this.clear();
 		this.add(uploader.asWidget());	//add the upload dialog
+		this.add(quizInfoDialog.asWidget()); //and the certification dialog
 		entityTreeBrowser = ginInjector.getEntityTreeBrowser();
 		FlowPanel fp = new FlowPanel();
 		FlowPanel topbar = new FlowPanel();
-		boolean isTitle = (title!=null);
-		if(isTitle) {
-			SafeHtmlBuilder shb = new SafeHtmlBuilder();
-			shb.appendHtmlConstant("<h3>" + title + "</h3>");
-			topbar.add(new HTML(shb.toSafeHtml()));
-		}
 		
-		if(canEdit) {
+		if(canCertifiedUserAddChild) {
 			Button upload = getUploadButton(entityId);
 			upload.addStyleName("margin-right-5");
 			// AbstractImagePrototype.create(iconsImageBundle.synapseFolderAdd16())
@@ -88,7 +79,12 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 				@Override
 				public void onClick(ClickEvent event) {
 					//for additional functionality, it now creates the folder up front, and the dialog will rename (and change share and data use)
-					presenter.addFolderClicked();
+					presenter.callbackIfCertifiedIfEnabled(new Callback() {
+						@Override
+						public void invoke() {
+							presenter.addFolderClicked();
+						}
+					});
 				}
 			});
 		
@@ -103,7 +99,7 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
 		//If we are showing the buttons or a title, then add the topbar.  Otherwise don't
-		if (canEdit || isTitle) {
+		if (canCertifiedUserAddChild) {
 			fp.add(topbar);
 		}
 		fp.add(files);
@@ -111,30 +107,8 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	}
 	
 	@Override
-	public void showQuizInfoDialog(final CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
-	}
-	
-	public static void showQuizInfoDialog(final CallbackP<Boolean> callback, QuizInfoWidget quizInfoWidget) {
-		final Window dialog = new Window();
-		dialog.setMaximizable(false);
-		dialog.setSize(420, 270);
-		dialog.setPlain(true);
-		dialog.setModal(true);
-		dialog.setLayout(new FitLayout());
-		dialog.setBorders(false);
-		dialog.setHeading("Join the Synapse Certified User Community");
-
-		quizInfoWidget.configure(new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean tutorialClicked) {
-				dialog.hide();
-				callback.invoke(tutorialClicked);
-			}
-		});
-		dialog.add(quizInfoWidget.asWidget());
-		dialog.show();
-		DisplayUtils.center(dialog);
+	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
+		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
 	}
 	
 	@Override
@@ -277,12 +251,17 @@ public class FilesBrowserViewImpl extends FlowPanel implements FilesBrowserView 
 	private Button getUploadButton(final String entityId) {
 		Button uploadButton = DisplayUtils.createIconButton(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayUtils.ButtonType.DEFAULT, "glyphicon-arrow-up");
 		uploadButton.addStyleName("left display-inline");
-		
 		uploadButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.uploadButtonClicked();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						presenter.uploadButtonClicked();
+					}
+				});
+				
 			}
 		});
 		return uploadButton;

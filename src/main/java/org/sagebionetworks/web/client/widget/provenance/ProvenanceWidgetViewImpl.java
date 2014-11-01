@@ -8,7 +8,6 @@ import java.util.Set;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -17,6 +16,7 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
@@ -40,6 +40,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.LayoutData;
 import com.extjs.gxt.ui.client.widget.layout.MarginData;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -243,12 +244,19 @@ public class ProvenanceWidgetViewImpl extends LayoutContainer implements Provena
 						renderPopover(DisplayConstants.DETAILS_UNAVAILABLE);						
 					}
 					
-					private void renderPopover(String rendered) {
+					private void renderPopover(final String rendered) {
 						filledPopoverIds.put(container.getId(), rendered);
-						tooltip.setText(rendered);
-						tooltip.reconfigure();
-						if (node.isShowingTooltip())
-							tooltip.show();
+						Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+							@Override
+							public void execute() {
+								if (nodeContainer.isAttached()) {
+									tooltip.setText(rendered);
+									tooltip.reconfigure();
+									if (node.isShowingTooltip())
+										tooltip.show();
+								}
+							}
+						});
 					}
 				});
 			}

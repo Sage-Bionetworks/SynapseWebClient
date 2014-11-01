@@ -2,10 +2,10 @@ package org.sagebionetworks.web.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.TeamSearch;
@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -26,11 +25,9 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -44,11 +41,13 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	@UiField
 	SimplePanel footer;
 	@UiField
-	SimplePanel searchBoxPanel;
-	@UiField
 	FlowPanel mainContainer;
 	@UiField
 	SimplePanel paginationPanel;
+	@UiField
+	TextBox searchField;
+	@UiField
+	Button searchButton;
 	
 	private Header headerWidget;
 	private Footer footerWidget;
@@ -56,9 +55,6 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private TeamListWidget teamListWidget;
-	private TextBox searchField;
-	private Button searchButton;
-	private LayoutContainer searchButtonContainer;
 	
 	@Inject
 	public TeamSearchViewImpl(TeamSearchViewImplUiBinder binder,
@@ -76,6 +72,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
+		configureSearchBox();
 	}
 	
 	@Override
@@ -109,7 +106,6 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
-		configureSearchBox();
 	}
 	
 	@Override
@@ -126,24 +122,13 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	}
 	
 	private void configureSearchBox() {
-		// setup search box
-		SimplePanel container;
-		LayoutContainer horizontalTable = new LayoutContainer();
-		horizontalTable.addStyleName("row");
-		
-		// setup serachButton
-		searchButton = DisplayUtils.createIconButton(DisplayConstants.LABEL_SEARCH, ButtonType.DEFAULT, "glyphicon-search");
-		searchButton.addStyleName("btn-lg btn-block");
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
 				presenter.goTo(new TeamSearch(searchField.getValue()));
 			}
 		});
-
-		// setup field
-		searchField = new TextBox();
-		searchField.setStyleName("form-control input-lg");
+		
 		searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
@@ -152,20 +137,9 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	            }					
 			}
 		});				
-
-		// add to table and page
-		container = new SimplePanel(searchField);
-		container.addStyleName("col-md-9 padding-right-5");
-		horizontalTable.add(container);
-		container = new SimplePanel(searchButton);
-		container.addStyleName("col-md-3 padding-left-5");
-		horizontalTable.add(container);
-		searchBoxPanel.clear();
-		searchBoxPanel.add(horizontalTable);
 	}
 	
 	private void createPagination(String searchTerm) {
-		LayoutContainer lc = new LayoutContainer();
 		UnorderedListPanel ul = new UnorderedListPanel();
 		ul.setStyleName("pagination pagination-lg");
 		
@@ -179,10 +153,9 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 			}
 		}
 		
-		lc.add(ul);
 		paginationPanel.clear();
 		if (entries.size() > 1)
-			paginationPanel.add(lc);
+			paginationPanel.add(ul);
 	}
 	
 	private Anchor createPaginationAnchor(String anchorName, String searchTerm, final int newStart) {

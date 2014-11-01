@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -149,7 +148,7 @@ public class EvaluationSubmitter implements Presenter {
 							@Override
 							public void invoke() {
 								//agreed to terms of use.
-								setLicenseAccepted(firstUnmetAccessRequirement.getId(), evalIndex, evaluations);
+								setLicenseAccepted(firstUnmetAccessRequirement, evalIndex, evaluations);
 							}
 						};
 						//pop up the requirement
@@ -174,7 +173,7 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void setLicenseAccepted(Long	arId, final int evalIndex, final List<Evaluation> evaluations) {	
+	public void setLicenseAccepted(AccessRequirement ar, final int evalIndex, final List<Evaluation> evaluations) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -196,7 +195,7 @@ public class EvaluationSubmitter implements Presenter {
 		
 		GovernanceServiceHelper.signTermsOfUse(
 				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
+				ar, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 
@@ -215,11 +214,12 @@ public class EvaluationSubmitter implements Presenter {
 						v = ver;
 					else if (entity instanceof Versionable)
 						v = ((Versionable)entity).getVersionNumber();
-					else {
-						//not versionable, the service will not accept
-						onFailure(new IllegalArgumentException(DisplayConstants.SUBMIT_VERSIONABLE_ENTITY_MESSAGE));
-						return;
-					}
+					 else {
+						 //entity is not versionable, the service will not accept null, but will accept a version of 1
+						v = 1L;
+					 }
+						 
+					
 					view.hideWindow();
 					submitToEvaluations(id, v, entity.getEtag(), evaluations);
 				} catch (JSONObjectAdapterException e) {
@@ -254,27 +254,10 @@ public class EvaluationSubmitter implements Presenter {
 		//and create a new submission for each evaluation
 		Evaluation evaluation = evaluations.get(index);
 		newSubmission.setEvaluationId(evaluation.getId());
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		try {
-			newSubmission.writeToJSONObject(adapter);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC_NOTIFY);
-		}
-		try {
-//			//TODO: add the content source as a fav instead of My Challenges area
-//			synapseClient.addFavorite(evaluation.getContentSource(), new AsyncCallback<String>() {			
-//				@Override
-//				public void onSuccess(String result) {
-//				}
-//				@Override
-//				public void onFailure(Throwable caught) {
-//					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-//						view.showErrorMessage(caught.getMessage());
-//				}
-//			});
-			synapseClient.createSubmission(adapter.toJSONString(), etag, new AsyncCallback<String>() {			
+			synapseClient.createSubmission(newSubmission, etag, new AsyncCallback<Submission>() {			
 				@Override
-				public void onSuccess(String result) {
+				public void onSuccess(Submission result) {
 					//result is the updated submission
 					if (index == evaluations.size()-1) {
 						HashSet<String> replyMessages = new HashSet<String>();

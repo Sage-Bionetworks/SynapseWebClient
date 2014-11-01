@@ -62,7 +62,7 @@ public class ActionMenuTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockEntityEditor = mock(EntityEditor.class);
 		mockEvaluationSubmitter = mock(EvaluationSubmitter.class);
-		actionMenu = new ActionMenu(mockView, mockNodeModelCreator, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider, mockEvaluationSubmitter);
+		actionMenu = new ActionMenu(mockView, mockAuthenticationController, mockEntityTypeProvider, mockGlobalApplicationState, mockSynapseClient, jSONObjectAdapter, mockEntityEditor, mockAutoGenFactory, mockSynapseJSNIUtils, mockCookieProvider, mockEvaluationSubmitter);
 		UserSessionData usd = new UserSessionData();
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("test owner ID");
@@ -76,7 +76,7 @@ public class ActionMenuTest {
 		entity.setId("file entity test id");
 		bundle = new EntityBundle(entity, null, null, null, null, null, null, null);
 		
-		actionMenu.asWidget(bundle, true, true, null);
+		actionMenu.asWidget(bundle, null);
 	}
 	
 	@Test

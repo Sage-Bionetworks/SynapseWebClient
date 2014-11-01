@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.storage.StorageUsageSummaryList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -89,17 +90,17 @@ public class SettingsPresenter implements SettingsView.Presenter {
 					&& authenticationController.getCurrentUserSessionData().getProfile() != null
 					&& authenticationController.getCurrentUserSessionData().getProfile().getUserName() != null) {
 				final String username = authenticationController.getCurrentUserSessionData().getProfile().getUserName();
-				authenticationController.loginUser(username, existingPassword, new AsyncCallback<String>() {				
+				authenticationController.loginUser(username, existingPassword, new AsyncCallback<UserSessionData>() {				
 					@Override
-					public void onSuccess(String userSessionJson) {
+					public void onSuccess(UserSessionData userSessionData) {
 						userService.changePassword(authenticationController.getCurrentUserSessionToken(), newPassword, new AsyncCallback<Void>() {
 							@Override
 							public void onSuccess(Void result) {
 								view.showPasswordChangeSuccess();								
 								// login user as session token has changed
-								authenticationController.loginUser(username, newPassword, new AsyncCallback<String>() {
+								authenticationController.loginUser(username, newPassword, new AsyncCallback<UserSessionData>() {
 									@Override
-									public void onSuccess(String result) {
+									public void onSuccess(UserSessionData result) {
 									}
 									@Override
 									public void onFailure(Throwable caught) {

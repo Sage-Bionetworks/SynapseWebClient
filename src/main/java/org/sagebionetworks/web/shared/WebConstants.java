@@ -148,6 +148,24 @@ public class WebConstants {
 	public static final String CHALLENGE_PARTICIPATION_INFO_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.challenge_participation_info_wiki_id";
 	public static final String GOVERNANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.governance_synapse_id";
 	public static final String GOVERNANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.governance_wiki_id";
+	public static final String AUTHENTICATED_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.authenticated_acl_principal_id";
+	public static final String PUBLIC_ACL_PRINCIPAL_ID = "org.sagebionetworks.portal.public_acl_principal_id";
+	public static final String ANONYMOUS_USER_PRINCIPAL_ID = "org.sagebionetworks.portal.anonymous_user_principal_id";
+	
+	
+	//Workshop
+	public static final String COLLABORATORIUM_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.collaboratorium_synapse_id";
+	public static final String STAGE_I_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageI_synapse_id";
+	public static final String STAGE_II_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageII_synapse_id";
+	public static final String STAGE_III_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIII_synapse_id";
+	public static final String STAGE_IV_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIV_synapse_id";
+	public static final String STAGE_V_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageV_synapse_id";
+	public static final String STAGE_VI_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVI_synapse_id";
+	public static final String STAGE_VII_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVII_synapse_id";
+	public static final String STAGE_VIII_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageVIII_synapse_id";
+	public static final String STAGE_IX_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageIX_synapse_id";
+	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
+	
 	
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	
@@ -157,6 +175,9 @@ public class WebConstants {
 	public static final String JIRA_PROJECT_KEY ="org.sagebionetworks.portal.jira_project_key";
 	public static final String CONFLUENCE_ENDPOINT = "org.sagebionetworks.portal.confluence_endpoint";
 	
+	public static final String SFTP_PROXY_ENDPOINT = "org.sagebionetworks.portal.sftp_proxy_endpoint";
+	
+	public static final String TEXT_COMMA_SEPARATED_VALUES = "text/csv";
 	public static final String TEXT_TAB_SEPARATED_VALUES = "text/tab-separated-values";
 
 	public static final String FILE_UPLOADER_IS_UPDATE_PARAM = "isUpdate";
@@ -174,6 +195,18 @@ public class WebConstants {
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	public static final String GOVERNANCE = "Governance";
+	
+	public static final String COLLABORATORIUM = "Collaboratorium";
+	public static final String STAGE_I = "StageI";
+	public static final String STAGE_II = "StageII";
+	public static final String STAGE_III = "StageIII";
+	public static final String STAGE_IV = "StageIV";
+	public static final String STAGE_V = "StageV";
+	public static final String STAGE_VI = "StageVI";
+	public static final String STAGE_VII = "StageVII";
+	public static final String STAGE_VIII = "StageVIII";
+	public static final String STAGE_IX = "StageIX";
+	public static final String STAGE_X = "StageX";
 	
 	public static final String CERTIFICATION = "Certification";
 	
@@ -215,4 +248,11 @@ public class WebConstants {
 	public static final String SELECT_ID_FROM_ENTITY_WHERE_PARENT_ID = "select id from entity where parentId == '";
 	public static final String AND_NAME_EQUALS = "' and name == '";
 	public static final String LIMIT_ONE = "' limit 1";
+	
+	public static final String SFTP_PREFIX = "sftp://";
+	
+	public static final String USER_ID_PARAM = "userId";
+	public static final String EMAIL_PARAM = "email";
+	public static final String LAST_NAME_PARAM = "lastName";
+	public static final String FIRST_NAME_PARAM = "firstName";
 }

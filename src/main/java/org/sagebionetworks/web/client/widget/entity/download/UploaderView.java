@@ -13,26 +13,40 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 
-	public void createUploadForm(boolean isEntity, String parentEntityId, boolean isDirectUploadSupported);
+	public void createUploadForm(boolean isEntity, String parentEntityId);
 	
-	public int getDisplayHeight();
-
-	public int getDisplayWidth();
-	public void submitForm();
+	public void submitForm(String actionUrl);
 	public void hideLoading();
 	public void updateProgress(double value, String text);
 	public void showProgressBar();
 	public void showConfirmDialog(String message, Callback yesCallback, Callback noCallback);
 	void resetToInitialState();
 	void showNoFilesSelectedForUpload();
-	void disableMultipleFileUploads();
+	void enableMultipleFileUploads(boolean isEnabled);
+	void setShowCancelButton(boolean showCancel);
+	void showUploaderUI();
+	void triggerUpload();
+	
+	void showUploadingToSynapseStorage(String banner);
+	void showUploadingToExternalStorage(String url, String banner);
+	
+	/**
+	 * SFTP requires username and password, so prompt for it in the upload form.
+	 * @return
+	 */
+	String getExternalUsername();
+	/**
+	 * SFTP requires username and password, so prompt for it in the upload form.
+	 * @return
+	 */
+	String getExternalPassword();
+	
+	void showExternalCredentialsRequiredMessage();
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		String getDefaultUploadActionUrl();
-
 		void setExternalFilePath(String path, String name);
 		
 		void handleUploads();
@@ -52,7 +66,4 @@ public interface UploaderView extends IsWidget, SynapseView {
 		
 		void disableMultipleFileUploads();
 	}
-
-	public void setShowCancelButton(boolean showCancel);
-	public void showUploaderUI();
 }

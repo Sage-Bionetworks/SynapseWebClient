@@ -14,22 +14,16 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
-import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -53,19 +47,13 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	// Editor components
 	private AccessControlListEditorView view;
-	private NodeModelCreator nodeModelCreator;
 	private SynapseClientAsync synapseClient;
-	private UserAccountServiceAsync userAccountService;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private AuthenticationController authenticationController;
-	private boolean unsavedChanges;
 	private boolean unsavedViewChanges;
 	private boolean hasLocalACL_inRepo;
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	GWTWrapper gwt;
-	
-	private AdapterFactory adapterFactory;
 	
 	// Entity components
 	private Entity entity;
@@ -74,39 +62,41 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private AccessControlList acl;	
 	private Map<String, UserGroupHeader> userGroupHeaders;
 	private Set<String> originalPrincipalIdSet;
+	HasChangesHandler hasChangesHandler;
 	
 	@Inject
 	public AccessControlListEditor(AccessControlListEditorView view,
 			SynapseClientAsync synapseClientAsync,
-			NodeModelCreator nodeModelCreator,
 			AuthenticationController authenticationController,
-			JSONObjectAdapter jsonObjectAdapter,
-			UserAccountServiceAsync userAccountService,
 			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt,
-			AdapterFactory adapterFactory) {
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
-		this.userAccountService = userAccountService;
-		this.nodeModelCreator = nodeModelCreator;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
-		this.adapterFactory = adapterFactory;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
-		view.setPresenter(this);		
-	}	
+		view.setPresenter(this);
+		
+		publicPrincipalIds = new PublicPrincipalIds();
+		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+		publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));
+		initViewPrincipalIds();
+	}
+
 	
 	/**
+	 * Configure this widget before using it.
 	 * Set the entity with which this ACLEditor is associated.
 	 */
-	public void setResource(Entity entity, boolean canChangePermission) {
+	public void configure(Entity entity, boolean canChangePermission, HasChangesHandler hasChangesHandler) {
 		if (!entity.equals(this.entity)) {
 			acl = null;
 			uep = null;
 		}
+		this.hasChangesHandler = hasChangesHandler;
 		this.entity = entity;
 		this.canChangePermission = canChangePermission;
 	}
@@ -118,10 +108,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		return entity == null ? null : entity.getId();
 	}
 	
-	public boolean hasUnsavedChanges() {		
-		return unsavedChanges || unsavedViewChanges;
-	}
-	
 	public void setUnsavedViewChanges(boolean unsavedViewChanges) {
 		this.unsavedViewChanges = unsavedViewChanges;
 	}
@@ -130,21 +116,11 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	 * Generate the ACLEditor Widget
 	 */
 	public Widget asWidget() {
-		refresh(new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				caught.printStackTrace();					
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
-			}
-		});
 		return view.asWidget();
 	}
 	private void initViewPrincipalIds(){
 		if (publicPrincipalIds != null) {
-			view.setPublicPrincipalIds(publicPrincipalIds);
+			view.setPublicAclPrincipalId(publicPrincipalIds.getPublicAclPrincipalId());
 		}
 	}
 	
@@ -154,19 +130,8 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private void refresh(final AsyncCallback<Void> callback) {
 		if (this.entity.getId() == null) throw new IllegalStateException(NULL_ENTITY_MESSAGE);
 		view.showLoading();
-		DisplayUtils.getPublicPrincipalIds(userAccountService, new AsyncCallback<PublicPrincipalIds>() {
-			@Override
-			public void onSuccess(PublicPrincipalIds result) {
-				publicPrincipalIds = result;
-				initViewPrincipalIds();
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					showErrorMessage("Could not find the public group: " + caught.getMessage());
-			}
-		});
-			
+		hasChangesHandler.hasChanges(false);
+		
 		int partsMask = EntityBundleTransport.ACL | EntityBundleTransport.PERMISSIONS;
 		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundleTransport>() {
 			@Override
@@ -187,7 +152,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 						public void onSuccess(Void result) {
 							// update the view
 							setViewDetails();
-							unsavedChanges = false;
+							hasChangesHandler.hasChanges(false);
 							hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
 							callback.onSuccess(null);
 						};
@@ -214,7 +179,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(isInherited, canEnableInheritance, unsavedChanges, canChangePermission);
+		view.buildWindow(isInherited, canEnableInheritance, canChangePermission);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}
@@ -258,21 +223,16 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	}
 	
 	private void fetchUserGroupHeaders(final AsyncCallback<Void> callback) {
-		List<String> ids = new ArrayList<String>();
+		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
-		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<EntityWrapper>(){
+		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
 			@Override
-			public void onSuccess(EntityWrapper wrapper) {
-				try {	
-					UserGroupHeaderResponsePage response = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), UserGroupHeaderResponsePage.class);
-					for (UserGroupHeader ugh : response.getChildren())
-						userGroupHeaders.put(ugh.getOwnerId(), ugh);
-					if (callback != null)
-						callback.onSuccess(null);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
-				}
+			public void onSuccess(UserGroupHeaderResponsePage response) {
+				for (UserGroupHeader ugh : response.getChildren())
+					userGroupHeaders.put(ugh.getOwnerId(), ugh);
+				if (callback != null)
+					callback.onSuccess(null);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -308,10 +268,9 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		} else {
 			// Existing entry in the ACL
 			toSet.setAccessType(AclUtils.getACCESS_TYPEs(permissionLevel));
-			unsavedChanges = true;
 			setViewDetails();
 		}
-		unsavedChanges = true;
+		hasChangesHandler.hasChanges(true);
 	}
 
 	private AsyncCallback<Void> updateViewDetailsCallback() {
@@ -350,7 +309,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 		if (foundUser) {
 			acl.setResourceAccess(newRAs);
-			unsavedChanges = true;
+			hasChangesHandler.hasChanges(true);
 			setViewDetails();
 		} else {
 			// not found
@@ -367,7 +326,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}		
 		acl.setId(entity.getId());
 		acl.setCreationDate(new Date());		
-		unsavedChanges = true;
+		hasChangesHandler.hasChanges(true);
 		setViewDetails();
 	}
 	
@@ -383,12 +342,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}		
 		// Fetch parent's benefactor's ACL (candidate benefactor for this entity)
-		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<EntityWrapper>() {
+		synapseClient.getNodeAcl(entity.getParentId(), new AsyncCallback<AccessControlList>() {
 			@Override
-			public void onSuccess(EntityWrapper wrapper) {
+			public void onSuccess(AccessControlList result) {
 				try {
-					acl = nodeModelCreator.createJSONEntity(wrapper.getEntityJson(), AccessControlList.class);
-					unsavedChanges = hasLocalACL_inRepo;
+					acl = result;
+					hasChangesHandler.hasChanges(hasLocalACL_inRepo);
 					fetchUserGroupHeaders(updateViewDetailsCallback());					
 				} catch (Throwable e) {
 					onFailure(e);
@@ -402,8 +361,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		});
 	}
 	
-	@Override
-	public void pushChangesToSynapse(final boolean recursive, final AsyncCallback<EntityWrapper> changesPushedCallback) {
+	public void pushChangesToSynapse(final boolean recursive, final Callback changesPushedCallback) {
 		if(unsavedViewChanges) {
 			view.alertUnsavedViewChanges(new Callback() {
 				
@@ -415,42 +373,23 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			return;
 		}
 		
-		// TODO: Make recursive option for "Create"
-		if (!unsavedChanges) {			
-			return;
-		} 
 		validateEditorState();
 		
-		// Wrap the current ACL
-		EntityWrapper aclEW = null;
-		try {
-			JSONObjectAdapter aclJson = acl.writeToJSONObject(jsonObjectAdapter.createNew());
-			aclEW = new EntityWrapper(aclJson.toJSONString(), AccessControlList.class.getName());
-		} catch (JSONObjectAdapterException e) {
-			showErrorMessage(DisplayConstants.ERROR_LOCAL_ACL_CREATION_FAILED);
-			return;
-		}
-		
 		// Create an async callback to receive the updated ACL from Synapse
-		AsyncCallback<EntityWrapper> callback = new AsyncCallback<EntityWrapper>(){
+		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>(){
 			@Override
-			public void onSuccess(EntityWrapper result) {
-				try {
-					acl = nodeModelCreator.createJSONEntity(result.getEntityJson(), AccessControlList.class);
-					hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));
-					unsavedChanges = false;					
-					setViewDetails();
-					view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
-					changesPushedCallback.onSuccess(result);
-				} catch (JSONObjectAdapterException e) {
-					view.showErrorMessage(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION);
-				}
+			public void onSuccess(AccessControlList result) {
+				acl = result;
+				hasLocalACL_inRepo = (acl.getId().equals(entity.getId()));				
+				setViewDetails();
+				view.showInfoSuccess("Success", "Permissions were successfully saved to Synapse");
+				changesPushedCallback.invoke();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
-				view.showInfoError("Error", "Permissions were not saved to Synapse");				
-				changesPushedCallback.onFailure(caught);
+				view.showInfoError("Error", "Permissions were not saved to Synapse");
+				hasChangesHandler.hasChanges(true);
 			}
 		};
 		
@@ -460,12 +399,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		if (hasLocalACL_inPortal && !hasLocalACL_inRepo) {
 			// Local ACL exists in Portal, but does not exist in Repo
 			// Create local ACL in Repo
-			synapseClient.createAcl(aclEW, callback);
+			synapseClient.createAcl(acl, callback);
 			notifyNewUsers();
 		} else if (hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL exists in both Portal and Repo
 			// Apply updates to local ACL in Repo
-			synapseClient.updateAcl(aclEW, recursive, callback);
+			synapseClient.updateAcl(acl, recursive, callback);
 			notifyNewUsers();
 		} else if (!hasLocalACL_inPortal && hasLocalACL_inRepo) {
 			// Local ACL does not exist in Portal but does exist in Repo
@@ -546,6 +485,30 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	
 	private void showErrorMessage(String s) {
 		view.showErrorMessage(s);
+	}
+
+	public void refresh() {
+		refresh(new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+			}
+		});
+	}
+	/**
+	 * This handler is notified when there are changes made to the editor.
+	 */
+	public interface HasChangesHandler{
+		/**
+		 * Called with true then the user has changes in the editor.  Called with false when there are no changes in this editor.
+		 * @param hasChanges True when there are changes.  False when there are no changes.
+		 */
+		void hasChanges(boolean hasChanges);
+		
 	}
 	
 }

@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.Locationable;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
@@ -20,16 +21,16 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.DropdownButton;
 import org.sagebionetworks.web.client.widget.entity.EntityAccessRequirementsWidget;
 import org.sagebionetworks.web.client.widget.entity.EvaluationList;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.download.QuizInfoWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
+import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.EntityType;
 
@@ -45,15 +46,14 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, UploadView {
+public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView {
 
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
-	private AccessControlListEditor accessControlListEditor;
 	private UploadDialogWidget uploader;
 	private EntityTypeProvider typeProvider;
 	private EntityFinder entityFinder;
-	private QuizInfoWidget quizInfoWidget;
+	private QuizInfoDialog quizInfoDialog;
 	private EntityAccessRequirementsWidget accessRequirementsWidget;
 	private SynapseClientAsync synapseClient;
 	private CookieProvider cookies;
@@ -66,32 +66,33 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	private Anchor addDescriptionCommand;
 	private Callback addDescriptionCallback;
 	private EntityBundle entityBundle;
+	private AccessControlListModalWidget accessControlListModalWidget;
 	
 	@Inject
 	public ActionMenuViewImpl(SageImageBundle sageImageBundle,
-			AccessControlListEditor accessControlListEditor,
 			UploadDialogWidget locationableUploader, 
 			EntityTypeProvider typeProvider,
 			EntityFinder entityFinder,
 			EvaluationList evaluationList,
 			PublicPrivateBadge publicPrivateBadge,
-			QuizInfoWidget quizInfoWidget,
+			QuizInfoDialog quizInfoDialog,
 			EntityAccessRequirementsWidget accessRequirementsWidget,
 			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			AccessControlListModalWidget accessControlListModalWidget) {
 		this.sageImageBundle = sageImageBundle;
-		this.accessControlListEditor = accessControlListEditor;
 		this.uploader = locationableUploader;
 		locationableUploader.disableMultipleFileUploads();
 		this.typeProvider = typeProvider;
 		this.entityFinder = entityFinder;
 		this.publicPrivateBadge = publicPrivateBadge;
-		this.quizInfoWidget = quizInfoWidget;
+		this.quizInfoDialog = quizInfoDialog;
 		this.accessRequirementsWidget = accessRequirementsWidget;
 		this.synapseClient = synapseClient;
 		this.cookies = cookies;
 		this.authenticationController = authenticationController;
+		this.accessControlListModalWidget = accessControlListModalWidget;
 		add(uploader.asWidget()); //add uploader dialog to page
 	}
 
@@ -100,8 +101,6 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator,
-			boolean canEdit, 
 			Long versionNumber,
 			boolean isInTestMode) {
 		if(toolsButton != null) this.remove(toolsButton);
@@ -113,15 +112,18 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		shareButton = DisplayUtils.createIconButton(DisplayConstants.BUTTON_SHARE, ButtonType.DEFAULT, "glyphicon-lock");
 		shareButton.getElement().setId(DisplayConstants.ID_BTN_SHARE);
 		shareButton.addStyleName("pull-right margin-left-5");
-		configureShareButton(entity, isAdministrator);				
+		configureShareButton(entity, entityBundle.getPermissions().getCanChangePermissions());				
 		
 		// Tools
 		toolsButton = new DropdownButton(DisplayConstants.BUTTON_TOOLS_MENU, ButtonType.DEFAULT, "glyphicon-cog");
 		toolsButton.addStyleName("pull-right margin-left-5");
-		configureToolsMenu(entityBundle, entityType, isAdministrator, canEdit);
+		configureToolsMenu(entityBundle, entityType);
 
 		this.add(toolsButton);	
 		this.add(shareButton);
+		
+		//add quiz info dialog to the DOM
+		toolsButton.add(quizInfoDialog.asWidget());
 	}
 	
 	@Override
@@ -172,11 +174,11 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			}
 		});
 		
-		accessControlListEditor.setResource(entity, isAdministrator);  
+		accessControlListModalWidget.configure(entity, isAdministrator);
 		shareButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.showSharingDialog(accessControlListEditor, isAdministrator, new Callback() {
+				accessControlListModalWidget.showSharing(new Callback() {
 					@Override
 					public void invoke() {
 						presenter.fireEntityUpdatedEvent();
@@ -187,18 +189,21 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	private void configureToolsMenu(EntityBundle entityBundle,
-			EntityType entityType, boolean isAdministrator, boolean canEdit) {
+			EntityType entityType) {
 		boolean authenticated = presenter.isUserLoggedIn();
 		Entity entity = entityBundle.getEntity();
-		
+		UserEntityPermissions permissions = entityBundle.getPermissions();
 		// upload
-		if(canEdit) {
+		if (permissions.getCanCertifiedUserEdit()) {
 			addRenameItem(toolsButton);
+		}
+		
+		if(permissions.getCanCertifiedUserAddChild()) {
 			initAddDescriptionItem(toolsButton);
 			addUploadItem(toolsButton, entityBundle, entityType);
 		}
 		
-		if (canEdit && entity instanceof Versionable) {
+		if (permissions.getCanCertifiedUserAddChild() && entity instanceof Versionable) {
 			addSubmitToEvaluationItem(toolsButton, entity, entityType);
 		} 
 		
@@ -207,7 +212,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 			addCreateShortcutItem(toolsButton, entity, entityType);
 		}
 		// move
-		if (canEdit && !(entityBundle.getEntity() instanceof Project)) {
+		if (permissions.getCanCertifiedUserAddChild() && !(entityBundle.getEntity() instanceof Project)) {
 			addMoveItem(toolsButton, entity, entityType);
 		}
 
@@ -216,7 +221,7 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		}
 		
 		// put delete last
-		if(canEdit) {
+		if(permissions.getCanDelete()) {
 			addDeleteItem(toolsButton, typeDisplay);
 		}
 		
@@ -237,7 +242,12 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 					
 					@Override
 					public void invoke() {
-						presenter.deleteEntity();
+						presenter.callbackIfCertifiedIfEnabled(new Callback() {
+							@Override
+							public void invoke() {
+								presenter.deleteEntity();
+							}
+						});
 					}
 				});
 			}
@@ -264,14 +274,20 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	 */
 	private void addUploadItem(DropdownButton menuBtn, final EntityBundle entityBundle, EntityType entityType) {
 		this.entityBundle = entityBundle;
-		//if this is a FileEntity, then only show the upload item if we're in the test website
 		boolean isFileEntity = entityBundle.getEntity() instanceof FileEntity;
 		if(isFileEntity || entityBundle.getEntity() instanceof Locationable) {
 			Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIcon("glyphicon-arrow-up") + " " + DisplayConstants.TEXT_UPLOAD_NEW_VERSION_FILE_OR_LINK));
 			a.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, cookies, authenticationController);
+					presenter.callbackIfCertifiedIfEnabled(new Callback() {
+						@Override
+						public void invoke() {
+							UserEntityPermissions permissions = entityBundle.getPermissions();
+							boolean isCertificationRequired = FilesBrowser.isCertificationRequired(permissions.getCanAddChild(), permissions.getCanCertifiedUserAddChild());
+							FilesBrowser.uploadButtonClickedStep1(accessRequirementsWidget, entityBundle.getEntity().getId(), ActionMenuViewImpl.this, synapseClient, authenticationController, isCertificationRequired);
+						}
+					});
 				}
 			});
 			menuBtn.addMenuItem(a);
@@ -291,8 +307,8 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 	}
 	
 	@Override
-	public void showQuizInfoDialog(CallbackP<Boolean> callback) {
-		FilesBrowserViewImpl.showQuizInfoDialog(callback, quizInfoWidget);
+	public void showQuizInfoDialog(boolean isCertificationRequired, Callback remindMeLaterCallback) {
+		quizInfoDialog.show(isCertificationRequired, remindMeLaterCallback);
 	}
 		
 	/**
@@ -308,22 +324,32 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
 					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.createLink(selected.getTargetId());
-							window.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+					public void invoke() {
+						createShortcut();
 					}
-				});					
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);		
+	}
+	
+	private void createShortcut() {
+		entityFinder.configure(false);				
+		final Window window = new Window();
+		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					presenter.createLink(selected.getTargetId());
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});					
+
 	}
 	
 	private void addSubmitToEvaluationItem(DropdownButton menuBtn, Entity entity,EntityType entityType) {
@@ -332,8 +358,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
-				presenter.showAvailableEvaluations();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						//ask the presenter to query for all available evaluations, and it may call the view back for the user to select evaluation(s) to submit to
+						presenter.showAvailableEvaluations();
+					}
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);
@@ -351,24 +382,34 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(false);				
-				final Window window = new Window();
-				DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+				//only if certified
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
 					@Override
-					public void onSelected(Reference selected) {
-						if(selected.getTargetId() != null) {
-							presenter.moveEntity(selected.getTargetId());
-							window.hide();
-						} else {
-							showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
-						}
+					public void invoke() {
+						moveItem();
 					}
-				});				
+				});
 			}
 		});
 		menuBtn.addMenuItem(a);
 	}
 
+	private void moveItem() {
+		entityFinder.configure(false);				
+		final Window window = new Window();
+		DisplayUtils.configureAndShowEntityFinderWindow(entityFinder, window, new SelectedHandler<Reference>() {					
+			@Override
+			public void onSelected(Reference selected) {
+				if(selected.getTargetId() != null) {
+					presenter.moveEntity(selected.getTargetId());
+					window.hide();
+				} else {
+					showErrorMessage(DisplayConstants.PLEASE_MAKE_SELECTION);
+				}
+			}
+		});	
+	}
+	
 	private void addUploadToGenomeSpace(final DropdownButton menuBtn, final EntityBundle bundle) {
 		Anchor a = new Anchor(SafeHtmlUtils.fromSafeConstant("Upload to " + AbstractImagePrototype.create(sageImageBundle.genomeSpaceLogoTitle16()).getHTML()));
 		a.addClickHandler(new ClickHandler() {			
@@ -401,8 +442,13 @@ public class ActionMenuViewImpl extends FlowPanel implements ActionMenuView, Upl
 		addDescriptionCommand.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (addDescriptionCallback != null)
-					addDescriptionCallback.invoke();
+				presenter.callbackIfCertifiedIfEnabled(new Callback() {
+					@Override
+					public void invoke() {
+						if (addDescriptionCallback != null)
+							addDescriptionCallback.invoke();
+					}
+				});
 			}
 		});
 		menuBtn.addMenuItem(addDescriptionCommand);

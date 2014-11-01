@@ -50,7 +50,8 @@
 		        .js("js/jquery.tablesorter.js")
 		        .js("js/jquery.tablesorter.scinot.js")
 		        .js("js/highlight.pack.js")
-		        .js("jsPlumb/jquery.jsPlumb-1.6.2-min.js");
+		        .js("jsPlumb/jquery.jsPlumb-1.6.2-min.js")
+		        .js("js/init-nchart.js");
 	   	</script>    
 	
 		<title>Sage Synapse : Contribute to the Cure</title>
@@ -99,10 +100,11 @@
 			</noscript>
             
             <div style="display:none;">
-              <form id="login_form" method="post" action="login">
+              <form id="login_form" method="post" target='hiddeniframe'>
                 <input id="synapse_username" name="username"/>
                 <input id="synapse_password" name="password" type="password"/>
                 <input id="synapse_signin_btn" name="signInBtn" type="submit" />
+                <iframe name='hiddeniframe'></iframe>
               </form>
             </div>
             

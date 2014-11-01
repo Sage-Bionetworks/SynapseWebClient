@@ -13,10 +13,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -31,11 +41,22 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.shared.EntityWrapper;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 public class GovernanceServiceHelperTest {
+	SynapseClientAsync mockSynapseClient;
+	@Captor ArgumentCaptor<EntityWrapper> captor;
+	
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		mockSynapseClient = mock(SynapseClientAsync.class);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(captor.capture(), any(AsyncCallback.class));
+	}
+	
 	
 	@Test
 	public void testSignTermsOfUse() throws Exception {
@@ -77,9 +98,10 @@ public class GovernanceServiceHelperTest {
 		);
 		
 		final JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
-		
+		TermsOfUseAccessRequirement touAr = new TermsOfUseAccessRequirement();
+		touAr.setId(accessRequirementId);
 		GovernanceServiceHelper.signTermsOfUse(principalId,
-				accessRequirementId,
+				touAr,
 				onSuccess,
 				onFailure,
 				synapseClient,
@@ -87,6 +109,34 @@ public class GovernanceServiceHelperTest {
 				);
 		
 		assertFalse(callbackInvoked.isEmpty());
+	}
+	
+
+	@Test
+	public void testSignPostMessageTermsOfUse() throws Exception {
+		final String principalId = "101";
+		final Long accessRequirementId = 102L;
+		Callback onSuccess = mock(Callback.class);
+		CallbackP<Throwable> onFailure = mock(CallbackP.class);
+		
+		PostMessageContentAccessRequirement ar = new PostMessageContentAccessRequirement();
+		ar.setId(accessRequirementId);
+		JSONObjectAdapterImpl adapter = new JSONObjectAdapterImpl();
+		GovernanceServiceHelper.signTermsOfUse(principalId,
+				ar,
+				onSuccess,
+				onFailure,
+				mockSynapseClient,
+				adapter.createNew()
+				);
+		verify(onSuccess).invoke();
+		//also check the captured entity wrapper to verify the approval object
+		EntityWrapper capturedWrapper = captor.getValue();
+		//verify that this is the right type of approval
+		assertEquals(PostMessageContentAccessApproval.class.getName(), capturedWrapper.getEntityClassName());
+		//reconstruct the access approval
+		PostMessageContentAccessApproval approval = new PostMessageContentAccessApproval(adapter.createNew(capturedWrapper.getEntityJson()));
+		assertEquals(accessRequirementId, approval.getRequirementId());
 	}
 	
 	@Test
@@ -112,6 +162,8 @@ public class GovernanceServiceHelperTest {
 				GovernanceServiceHelper.accessRequirementApprovalType(new TermsOfUseAccessRequirement()));
 		assertEquals(APPROVAL_TYPE.ACT_APPROVAL, 
 				GovernanceServiceHelper.accessRequirementApprovalType(new ACTAccessRequirement()));
+		assertEquals(APPROVAL_TYPE.POST_MESSAGE, 
+				GovernanceServiceHelper.accessRequirementApprovalType(new PostMessageContentAccessRequirement()));
 	}
 	
 	@Test 

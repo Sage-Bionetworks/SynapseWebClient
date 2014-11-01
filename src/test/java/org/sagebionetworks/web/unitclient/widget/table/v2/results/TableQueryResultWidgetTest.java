@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.xerces.impl.dv.xs.AnyURIDV;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,10 +18,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListner;
-import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultView;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
@@ -82,16 +79,13 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setToolbarVisible(true);
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true);
 		verify(mockView).setProgressWidgetVisible(false);
-		verify(mockView).setEditEnabled(isEditable);		
 	}
 	
 	@Test
@@ -105,16 +99,13 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setToolbarVisible(true);
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true);
-		verify(mockView).setProgressWidgetVisible(false);
-		verify(mockView).setEditEnabled(isEditable);		
+		verify(mockView).setProgressWidgetVisible(false);	
 	}
 	
 	@Test
@@ -128,7 +119,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView, times(2)).setToolbarVisible(false);
 		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
@@ -151,7 +141,6 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView, times(2)).setTableVisible(false);
-		verify(mockView, times(2)).setToolbarVisible(false);
 		verify(mockView).hideEditor();
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
@@ -176,7 +165,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).showEditor();
 		// Setup success
 		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
 		// reset mocks
 		reset(mockView);
 		reset(mockPageWidget);
@@ -188,16 +177,13 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockView).setToolbarVisible(false);
 		verify(mockView).hideEditor();
 		verify(mockPageWidget).configure(bundle, widget.getStartingQuery(), false, null, widget);
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setToolbarVisible(true);
 		verify(mockView).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true);
 		verify(mockView).setProgressWidgetVisible(false);
-		verify(mockView).setEditEnabled(isEditable);
 	}
 	
 	@Test
@@ -215,7 +201,7 @@ public class TableQueryResultWidgetTest {
 		// Setup success
 		when(mockQueryResultEditor.extractDelta()).thenReturn(delta);
 		Throwable error = new Throwable("Things went bad!");
-		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).applyTableDelta(anyString(),  any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).applyTableDelta(any(PartialRowSet.class),  any(AsyncCallback.class));
 		// reset mocks
 		reset(mockView);
 		reset(mockPageWidget);

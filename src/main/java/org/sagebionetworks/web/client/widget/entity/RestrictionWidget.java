@@ -184,7 +184,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				};
 				GovernanceServiceHelper.signTermsOfUse(
 						principalId, 
-						ar.getId(), 
+						ar, 
 						onSuccess, 
 						onFailure, 
 						synapseClient, 

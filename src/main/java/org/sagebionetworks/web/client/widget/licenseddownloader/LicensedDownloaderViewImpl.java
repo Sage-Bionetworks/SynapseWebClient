@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
@@ -50,17 +49,15 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	private SageImageBundle sageImageBundle;
 	private int downloadWindowWidth;
 	private List<LocationData> locations;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private String directDownloadURL;
 	
 	/*
 	 * Constructors
 	 */
 	@Inject
-	public LicensedDownloaderViewImpl(IconsImageBundle icons, SageImageBundle sageImageBundle, SynapseJSNIUtils synapseJSNIUtils) {
+	public LicensedDownloaderViewImpl(IconsImageBundle icons, SageImageBundle sageImageBundle) {
 		this.icons = icons;
 		this.sageImageBundle = sageImageBundle;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		clear();
 	}
 
@@ -147,15 +144,11 @@ public class LicensedDownloaderViewImpl extends LayoutContainer implements Licen
 	}
 	
 	@Override
-	public void setDownloadLocation(String fileName, String entityId,
-			Long versionNumber, String md5, String externalUrl) {
+	public void setDownloadLocation(String md5, String directDownloadUrl) {
+		this.directDownloadURL = directDownloadUrl;
 		// build a list of links in HTML
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		String displayString = "Download";
-		if (externalUrl == null)
-			directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), entityId, versionNumber, false);
-		else
-			directDownloadURL = externalUrl;
 		sb.appendHtmlConstant("<a href=\"" + directDownloadURL + "\" target=\"_blank\">") 
 		.appendEscaped(displayString)
 		.appendHtmlConstant("</a> " + AbstractImagePrototype.create(icons.external16()).getHTML());

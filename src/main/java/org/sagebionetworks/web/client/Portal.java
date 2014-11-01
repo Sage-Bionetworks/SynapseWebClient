@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 
@@ -75,6 +76,7 @@ public class Portal implements EntryPoint {
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
 						globalApplicationState.setActivityMapper(activityMapper);
+						globalApplicationState.initSynapseProperties();
 						
 						//listen for window close (or navigating away)
 						registerWindowClosingHandler(globalApplicationState);
@@ -82,9 +84,9 @@ public class Portal implements EntryPoint {
 						// start version timer
 						ginjector.getVersionTimer().start();
 						
-						AsyncCallback<String> sessionLoadedCallback = new AsyncCallback<String>() {
+						AsyncCallback<UserSessionData> sessionLoadedCallback = new AsyncCallback<UserSessionData>() {
 							@Override
-							public void onSuccess(String result) {
+							public void onSuccess(UserSessionData result) {
 								proceed();
 							}
 							@Override

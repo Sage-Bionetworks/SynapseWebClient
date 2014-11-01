@@ -14,12 +14,12 @@ import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
+import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
-import org.sagebionetworks.web.client.presenter.SettingsPresenter;
 import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.presenter.WikiPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
@@ -37,6 +36,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
@@ -55,8 +55,10 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
+import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererLink;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
@@ -78,11 +80,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.table.SimpleTableWidget;
+import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.RowView;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.StringEditorCell;
@@ -97,6 +98,7 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.BigUserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
 
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
@@ -161,12 +163,17 @@ public interface PortalGinInjector extends Ginjector {
 	
 	public TeamSearchPresenter getTeamSearchPresenter();
 	
+	public PeopleSearchPresenter getPeopleSearchPresenter();
+	
 	public EventBus getEventBus();
 	
 	public JiraURLHelper getJiraURLHelper();
 		
 	public MarkdownWidget getMarkdownWidget();
 	
+	public ActionMenuWidget createActionMenuWidget();
+	
+	public EntityActionController createEntityActionController();
 	/*
 	 *  Markdown Widgets
 	 */
@@ -215,6 +222,7 @@ public interface PortalGinInjector extends Ginjector {
 	public APITableColumnRendererNone getAPITableColumnRendererNone();
 	public APITableColumnRendererUserId getAPITableColumnRendererUserId();
 	public APITableColumnRendererDate getAPITableColumnRendererDate();
+	public APITableColumnRendererLink getAPITableColumnRendererLink();
 	public APITableColumnRendererSynapseID getAPITableColumnRendererSynapseID();
 	public APITableColumnRendererEntityIdAnnotations getAPITableColumnRendererEntityAnnotations();
 	
@@ -237,22 +245,24 @@ public interface PortalGinInjector extends Ginjector {
 	// TableEntity V2 cells
 	public StringRendererCell createStringRendererCell();
 	public StringEditorCell createStringEditorCell();
-
-	
+		
 	// Asynchronous
 	public JobTrackingWidget creatNewAsynchronousProgressWidget();
 	
 	public UserTeamBadge getUserTeamBadgeWidget();
 	public TeamBadge getTeamBadgeWidget();
 	public BigTeamBadge getBigTeamBadgeWidget();
-	public SimpleTableWidget getSimpleTableWidget();
 	
 	public EntityBadge getEntityBadgeWidget();
 	public EntityTreeItem getEntityTreeItemWidget();
 
+	public UserGroupListWidget getUserGroupListWidget();
+	
 	public TableListWidget getTableListWidget();
 	public Uploader getUploaderWidget();
 	public CookieProvider getCookieProvider();
 
 	public BasicPaginationWidget createBasicPaginationWidget();
+
+	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 }

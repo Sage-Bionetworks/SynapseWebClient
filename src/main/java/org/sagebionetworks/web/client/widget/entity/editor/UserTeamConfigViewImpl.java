@@ -3,13 +3,16 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.widget.sharing.UserGroupSearchBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestBox;
 
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
+import com.extjs.gxt.ui.client.widget.HorizontalPanel;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -17,43 +20,36 @@ import com.google.inject.Inject;
 public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfigView {
 
 	private Presenter presenter;
-	ComboBox<ModelData> peopleCombo;
 	UrlCache urlCache;
 	SynapseJSNIUtils synapseJSNIUtils;
+	UserGroupSuggestBox suggestBox;
 	
 	@Inject
-	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils) {
+	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils, UserGroupSuggestBox suggestBox) {
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.suggestBox = suggestBox;
 	}
 	
 	@Override
 	public void initView() {
 		clear();
-		peopleCombo = UserGroupSearchBox.createUserGroupSearchSuggestBox(urlCache.getRepositoryServiceUrl(), synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl(), null);
-		peopleCombo.setWidth(330);
-		peopleCombo.setEmptyText("Enter name...");
-		peopleCombo.setFieldLabel("Name");
-		peopleCombo.setForceSelection(true);
-		peopleCombo.setTriggerAction(TriggerAction.ALL);
-		peopleCombo.addSelectionChangedListener(new SelectionChangedListener<ModelData>() {				
-			@Override
-			public void selectionChanged(SelectionChangedEvent<ModelData> se) {
-			}
-		});
-		peopleCombo.addStyleName("margin-10");
-		setWidget(peopleCombo);
+		suggestBox.configureURLs(synapseJSNIUtils.getBaseFileHandleUrl(), synapseJSNIUtils.getBaseProfileAttachmentUrl());
+		suggestBox.setPlaceholderText("Enter name...");
+		suggestBox.setWidth(330 + "px");
+		SimplePanel panel = new SimplePanel();
+		panel.setWidget(suggestBox.asWidget());
+		panel.addStyleName("margin-10");
+		setWidget(panel);
 	}
 	@Override
 	public void checkParams() throws IllegalArgumentException {
-		if (!peopleCombo.isValid())
-			throw new IllegalArgumentException(peopleCombo.getErrorMessage());
+		if (suggestBox.getSelectedSuggestion() == null)
+			throw new IllegalArgumentException("No user or team was selected.");
 	}
 	@Override
 	public String getId() {
-		ModelData selectedModel = peopleCombo.getValue();
-		String principalId = (String) selectedModel.get(UserGroupSearchBox.KEY_PRINCIPAL_ID);
-		return principalId;
+		return suggestBox.getSelectedSuggestion().getHeader().getOwnerId();
 	}
 	
 	@Override
@@ -63,9 +59,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	
 	@Override
 	public String isIndividual() {
-		ModelData selectedModel = peopleCombo.getValue();
-		Boolean isIndividual = (Boolean) selectedModel.get(UserGroupSearchBox.KEY_IS_INDIVIDUAL);
-		return isIndividual.toString();
+		return suggestBox.getSelectedSuggestion().getHeader().getIsIndividual().toString();
 	}
 	@Override
 	public Widget asWidget() {
@@ -99,9 +93,4 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	public int getAdditionalWidth() {
 		return 0;
 	}
-	
-	/*
-	 * Private Methods
-	 */
-
 }

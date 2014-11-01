@@ -11,8 +11,8 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -414,7 +415,9 @@ public class DisplayUtilsTest {
 	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, true, mockView));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
+		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
+		verify(mockView).showErrorMessage(c.capture());
+		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
 	}
 	
 	@Test

@@ -1,7 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,13 +21,18 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.mockito.ArgumentCaptor;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -26,8 +41,9 @@ import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidgetView;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -42,10 +58,13 @@ public class JoinTeamWidgetTest {
 	JoinTeamWidget joinWidget;
 	AuthenticationController mockAuthenticationController;
 	Callback mockTeamUpdatedCallback;
-	JSONObjectAdapter mockJSONObjectAdapter;
+	JSONObjectAdapter jsonObjectAdapter;
 	NodeModelCreator mockNodeModelCreator;
+	GWTWrapper mockGwt;
 	PlaceChanger mockPlaceChanger;
-	PaginatedResults<TermsOfUseAccessRequirement> requirements;
+	List<AccessRequirement> ars;
+	UserProfile currentUserProfile;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
@@ -54,27 +73,24 @@ public class JoinTeamWidgetTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
-		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
+		mockGwt = mock(GWTWrapper.class);
+		jsonObjectAdapter = new JSONObjectAdapterImpl();
 		
 		mockPlaceChanger = mock(PlaceChanger.class);
         when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
         mockAuthenticationController = mock(AuthenticationController.class);
         when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
         UserSessionData currentUser = new UserSessionData();                
-        UserProfile currentUserProfile = new UserProfile();
+        currentUserProfile = new UserProfile();
         currentUserProfile.setOwnerId("1");
         currentUser.setProfile(currentUserProfile);
         when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(currentUser);
-        requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
-        requirements.setTotalNumberOfResults(0);
-        List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
-        requirements.setResults(ars);
-        when(mockNodeModelCreator.createPaginatedResults(anyString(), any(Class.class))).thenReturn(requirements);
+        ars = new ArrayList<AccessRequirement>();
         AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).hasAccess(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-        AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+        AsyncMockStubber.callSuccessWith(ars).when(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
         
 		
-		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, mockJSONObjectAdapter);
+		joinWidget = new JoinTeamWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockNodeModelCreator, jsonObjectAdapter, mockGwt);
 		TeamMembershipStatus status = new TeamMembershipStatus();
 		status.setHasOpenInvitation(false);
 		status.setCanJoin(false);
@@ -84,6 +100,8 @@ public class JoinTeamWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteOpenMembershipRequests(anyString(), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
 	}
 	
 //	@SuppressWarnings("unchecked")
@@ -117,14 +135,21 @@ public class JoinTeamWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testJoinRequestStep2WithRestriction() throws Exception {
-		List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
 		ars.add(new TermsOfUseAccessRequirement());
-        requirements.setResults(ars);
-        requirements.setTotalNumberOfResults(1);
         
         joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
-		verify(mockView).showAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testJoinRequestStep2WithACTRestriction() throws Exception {
+		ars.add(new ACTAccessRequirement());
+        
+        joinWidget.sendJoinRequestStep0();
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
+		verify(mockView).showACTAccessRequirement(anyString(), any(Callback.class));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -133,7 +158,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep0();
 		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));
 		//no ARs shown...
-		verify(mockView, times(0)).showAccessRequirement(anyString(), any(Callback.class));
+		verify(mockView, times(0)).showTermsOfUseAccessRequirement(anyString(), any(Callback.class));
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
@@ -154,10 +179,7 @@ public class JoinTeamWidgetTest {
 		
 
         //Now test with an access requirement.  First as part of a challenge, then outside of challenge 
-        List<TermsOfUseAccessRequirement> ars = new ArrayList<TermsOfUseAccessRequirement>();
-		ars.add(new TermsOfUseAccessRequirement());
-        requirements.setResults(ars);
-        requirements.setTotalNumberOfResults(1);
+        ars.add(new TermsOfUseAccessRequirement());
         
         isChallengeSignup = true;
         joinWidget.configure(teamId, false, isChallengeSignup, null, mockTeamUpdatedCallback, null, null, null);
@@ -241,5 +263,136 @@ public class JoinTeamWidgetTest {
 		Assert.assertFalse(joinWidget.isChallengeSignup());
 	}
 
+	@Test
+	public void testSetLicenseAccepted() throws Exception {
+		//single ToU
+		AccessRequirement ar = new TermsOfUseAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showTermsOfUseAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+		
+        //it should try to sign this type of ar
+        verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
+	
+	@Test
+	public void testSetLicenseAcceptedACT() throws Exception {
+		//single ToU
+		AccessRequirement ar = new ACTAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showACTAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+				
+        //verify it does not try to sign, we just continue
+        verify(mockSynapseClient, never()).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
 
+	
+	@Test
+	public void testSetLicenseAcceptedPostMessage() throws Exception {
+		//single ToU
+		AccessRequirement ar = new PostMessageContentAccessRequirement();
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we showTermsOfUseAccessRequirement
+		ArgumentCaptor<Callback> callbackArg = ArgumentCaptor.forClass(Callback.class);
+		verify(mockView).showPostMessageContentAccessRequirement(anyString(), callbackArg.capture());
+		
+		//manually invoke the okbutton callback
+		callbackArg.getValue().invoke();
+				
+        //verify it does not try to sign, we just continue
+        verify(mockSynapseClient).createAccessApproval(any(EntityWrapper.class), any(AsyncCallback.class));
+        verify(mockView).hideJoinWizard();
+	}
+	
+	@Test
+	public void testSetLicenseAcceptedInvalidType() throws Exception {
+		//single ToU
+		AccessRequirement ar = mock(AccessRequirement.class);
+		ars.add(ar);
+		joinWidget.sendJoinRequestStep0();
+		//verify we show an error for an unrecognized ar
+		verify(mockView).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testIsRecognizedSite() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			//test the whitelist
+			//recognize project datasphere
+			//verify case insensitive
+			assertTrue(JoinTeamWidget.isRecognizedSite(url.toUpperCase()));
+			assertTrue(JoinTeamWidget.isRecognizedSite(url.toLowerCase()));
+			
+			//but not other sites
+			assertFalse(JoinTeamWidget.isRecognizedSite("http://mpmdev.ondemand.sas.com/projectdatasphere/html/registration/challenge")); //not https
+			assertFalse(JoinTeamWidget.isRecognizedSite("https://www.jayhodgson.com/projectdatasphere/"));
+		}
+	}
+	
+	@Test
+	public void testenhancePostMessageUrl() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) {
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			String firstName = "Luke";
+			String lastName = "Skywalker";
+			String ownerId = "628";
+			List<String> emails = new ArrayList<String>();
+			String email = "MidichloriansSaturation@bigfoot.com";
+			emails.add(email);
+			when(mockGwt.encodeQueryString(email)).thenReturn(email);
+			when(mockGwt.encodeQueryString(firstName)).thenReturn(firstName);
+			when(mockGwt.encodeQueryString(lastName)).thenReturn(lastName);
+			when(mockGwt.encodeQueryString(ownerId)).thenReturn(ownerId);
+			
+			currentUserProfile.setFirstName(firstName);
+			currentUserProfile.setLastName(lastName);
+			currentUserProfile.setOwnerId(ownerId);
+			currentUserProfile.setEmails(emails);
+			
+			//test setup configures us as logged in
+			String enhancedUrl = joinWidget.enhancePostMessageUrl(url);
+			assertTrue(enhancedUrl.contains(firstName));
+			assertTrue(enhancedUrl.contains(lastName));
+			assertTrue(enhancedUrl.contains(ownerId));
+			assertTrue(enhancedUrl.contains(email));
+		}
+	}
+	
+	@Test
+	public void testEnhancePostMessageUrlNotLoggedIn() {
+		if (JoinTeamWidget.EXTRA_INFO_URL_WHITELIST.length > 0) { 
+			//test setup configures us as logged in
+			String url = JoinTeamWidget.EXTRA_INFO_URL_WHITELIST[0];
+			when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+			assertEquals(url, joinWidget.enhancePostMessageUrl(url));
+		}
+	}
+
+	@Test
+	public void testGetEncodedParamValueIfDefined() {
+		//return empty string if null value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, null, "&"));
+		//or empty string value
+		assertEquals("", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "", "&"));
+		
+		//if defined, return <paramkey>=<url-encoded-value><suffix>
+		when(mockGwt.encodeQueryString("bar")).thenReturn("encodedbar");
+		assertEquals(WebConstants.USER_ID_PARAM+"=encodedbar&", joinWidget.getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, "bar", "&"));
+	}
+	
 }

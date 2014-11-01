@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -70,7 +69,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void runQuery() {
 		this.view.hideEditor();
 		this.view.setErrorVisible(false);
-		this.view.setToolbarVisible(false);
 		fireStartEvent();
 		this.view.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
@@ -109,8 +107,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, this.startingQuery, false, null, this);
 		this.view.setTableVisible(true);
-		this.view.setToolbarVisible(true);
-		this.view.setEditEnabled(this.isEditable);
 		fireFinishEvent(true);
 	}
 
@@ -148,7 +144,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	private void showError(String message){
 		this.view.setTableVisible(false);
 		this.view.showError(message);
-		this.view.setToolbarVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false);
 		this.view.setErrorVisible(true);
@@ -173,26 +168,21 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	@Override
 	public void onSave() {
 		view.setSaveButtonLoading(true);
-		try {
-			// Extract the delta
-			PartialRowSet prs = this.queryResultEditor.extractDelta();
-			String json = prs.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-			synapseClient.applyTableDelta(json, new AsyncCallback<Void>() {
-				
-				@Override
-				public void onSuccess(Void result) {
-					// If the save was success full then re-run the query.
-					runQuery();
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					showEditError(caught.getMessage());
-				}
-			});
-		} catch (JSONObjectAdapterException e) {
-			showEditError(e.getMessage());
-		}
+		// Extract the delta
+		PartialRowSet prs = this.queryResultEditor.extractDelta();
+		synapseClient.applyTableDelta(prs, new AsyncCallback<Void>() {
+			
+			@Override
+			public void onSuccess(Void result) {
+				// If the save was success full then re-run the query.
+				runQuery();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				showEditError(caught.getMessage());
+			}
+		});
 	}
 	
 	private void showEditError(String message){

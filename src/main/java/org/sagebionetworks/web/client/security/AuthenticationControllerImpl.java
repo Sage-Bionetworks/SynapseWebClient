@@ -40,7 +40,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	@Override
-	public void loginUser(final String username, String password, final AsyncCallback<String> callback) {
+	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));		
 		userAccountService.initiateSession(username, password, new AsyncCallback<String>() {		
 			@Override
@@ -65,7 +65,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void revalidateSession(final String token, final AsyncCallback<String> callback) {
+	public void revalidateSession(final String token, final AsyncCallback<UserSessionData> callback) {
 		setUser(token, callback);
 	}
 
@@ -76,26 +76,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		currentUser = null;
 	}
 
-	private void setUser(String token, final AsyncCallback<String> callback) {
+	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-		userAccountService.getUserSessionData(token, new AsyncCallback<String>() {
+		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
 			@Override
-			public void onSuccess(String userSessionJson) {
-				if (userSessionJson != null) {					
-					UserSessionData userSessionData = null;
-					try {
-						JSONObjectAdapter usdAdapter = adapterFactory.createNew(userSessionJson);
-						userSessionData = new UserSessionData(usdAdapter);
-						Date tomorrow = getDayFromNow();
-						cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
-						currentUser = userSessionData;
-						callback.onSuccess(usdAdapter.toJSONString());
-					} catch (JSONObjectAdapterException e){
-						callback.onFailure(e);
-					}
+			public void onSuccess(UserSessionData userSessionData) {
+				if (userSessionData != null) {					
+					Date tomorrow = getDayFromNow();
+					cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
+					currentUser = userSessionData;
+					callback.onSuccess(userSessionData);
 				} else {
 					onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 				}
@@ -139,7 +132,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	@Override
-	public void reloadUserSessionData(AsyncCallback<String> callback) {
+	public void reloadUserSessionData(AsyncCallback<UserSessionData> callback) {
 		String sessionToken = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
 		setUser(sessionToken, callback);
 	}

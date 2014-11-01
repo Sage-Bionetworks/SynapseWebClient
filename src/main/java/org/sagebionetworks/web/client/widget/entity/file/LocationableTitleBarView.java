@@ -21,16 +21,12 @@ public interface LocationableTitleBarView extends IsWidget, SynapseView {
 	 * Build menus for this entity
 	 * @param entity
 	 * @param entityType 
-	 * @param canEdit 
-	 * @param isAdministrator 
-	 * @param readOnly 
 	 */
 	public void createTitlebar(
 			EntityBundle entityBundle, 
 			EntityType entityType, 
 			AuthenticationController authenticationController,
-			boolean isAdministrator, 
-			boolean canEdit);
+			boolean canCertifiedUserAddChild);
 		
 	/**
 	 * Presenter interface

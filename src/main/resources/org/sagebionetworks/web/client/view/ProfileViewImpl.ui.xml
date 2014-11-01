@@ -4,6 +4,8 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	
+    <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+    
 	<g:HTMLPanel>
 		<div class="color-line"></div>
 		<g:SimplePanel ui:field="header" />
@@ -11,9 +13,10 @@
 		<div class="margin-10">
 			<div class="row margin-top-5">
 			    <div class="col-md-3 col-xs-12">
-		            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
-		        	<g:SimplePanel ui:field="certifiedUserBadgePanel" styleName="displayInline" />
-			        <g:FlowPanel ui:field="viewProfilePanel" />
+			        <div class="padding-15 light-border">
+			            <g:SimplePanel ui:field="picturePanel" styleName="margin-left-10 displayInlineBlock" height="180px" width="180px"/>
+			        	<g:FlowPanel ui:field="viewProfilePanel" />
+			        </div>
 			    </div>
 			    <div class="col-md-9 col-xs-12">
 				    <div class="row" ui:field="navtabContainer">
@@ -28,7 +31,14 @@
 					<div class="row">
 						<div class="tab-background padding-top-bottom-15-left-right-25" ui:field="projectsTabContainer">
 							<div class="highlight-box" ui:field="projectsHighlightBox" highlight-box-title="Projects">
-								<g:FlowPanel ui:field="projectsTabContent" styleName="margin-10" />
+								<g:FlowPanel ui:field="projectsTabContent" />
+								<div ui:field="projectsLoadingUI" >
+									<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+									&nbsp;Loading...
+								</div>
+								<div class="clearfix">
+								    <b:Button ui:field="moreProjectsButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>
+								</div>
 							</div>
 							<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 							    <div class="col-xs-12 col-sm-6">

@@ -107,9 +107,9 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPassword() throws RestServiceException {
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith("success login with new pw").when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
 		
@@ -129,7 +129,7 @@ public class SettingsPresenterTest {
 
 	@Test
 	public void testResetPasswordFailChangePw() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		
 		profilePresenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockCookieProvider, mockNodeModelCreator, mockSynapseClient, adapterFactory, mockGWT);
@@ -140,7 +140,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testResetPasswordFailFinalLogin() throws RestServiceException {		
-		AsyncMockStubber.callSuccessWith("success initial login").when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testUser).when(mockAuthenticationController).loginUser(eq(username), eq(password), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserService).changePassword(anyString(), eq(newPassword), any(AsyncCallback.class));
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockAuthenticationController).loginUser(eq(username), eq(newPassword), any(AsyncCallback.class));
 		

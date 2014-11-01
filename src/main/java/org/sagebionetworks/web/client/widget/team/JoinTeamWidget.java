@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -15,6 +16,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -25,9 +28,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -40,6 +43,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private JoinTeamWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private GWTWrapper gwt;
 	private String teamId;
 	private boolean isChallengeSignup;
 	private AuthenticationController authenticationController;
@@ -49,9 +53,14 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private String message, isMemberMessage, successMessage, buttonText;
 	private boolean isAcceptingInvite, canPublicJoin;
 	private Callback widgetRefreshRequired;
-	private List<TermsOfUseAccessRequirement> accessRequirements;
+	private List<AccessRequirement> accessRequirements;
 	private int currentPage;
 	private int currentAccessRequirement;
+	
+	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
+		"https://mpmdev.ondemand.sas.com/projectdatasphere/"
+	};
+
 	
 	@Inject
 	public JoinTeamWidget(JoinTeamWidgetView view, 
@@ -59,7 +68,8 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController, 
 			NodeModelCreator nodeModelCreator,
-			JSONObjectAdapter jsonObjectAdapter
+			JSONObjectAdapter jsonObjectAdapter,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		view.setPresenter(this);
@@ -68,6 +78,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.authenticationController = authenticationController;
 		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.gwt = gwt;
 	}
 
 	public void configure(String teamId, boolean canPublicJoin, boolean isChallengeSignup, TeamMembershipStatus teamMembershipStatus, Callback teamUpdatedCallback, String isMemberMessage, String successMessage, String buttonText) {
@@ -145,17 +156,12 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		currentPage = 0;
 		currentAccessRequirement = 0;
 		//initialize the access requirements
-		accessRequirements = new ArrayList<TermsOfUseAccessRequirement>();
-		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<String>() {
+		accessRequirements = new ArrayList<AccessRequirement>();
+		synapseClient.getTeamAccessRequirements(teamId, new AsyncCallback<List<AccessRequirement>>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(List<AccessRequirement> results) {
 				//are there access restrictions?
-				try{
-					PaginatedResults<TermsOfUseAccessRequirement> ar = nodeModelCreator.createPaginatedResults(result, TermsOfUseAccessRequirement.class);
-					accessRequirements = ar.getResults();
-				} catch (Throwable e) {
-					onFailure(e);
-				}
+				accessRequirements = results;
 				view.setButtonsEnabled(true);
 				//access requirements initialized, show the join wizard if challenge signup, or if there are AR to show
 				if (isChallengeSignup) {
@@ -236,23 +242,70 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			sendJoinRequestStep3();
 		} else {
 			final AccessRequirement accessRequirement = accessRequirements.get(currentAccessRequirement);
-			String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 			Callback termsOfUseCallback = new Callback() {
 				@Override
 				public void invoke() {
 					//agreed to terms of use.
 					currentAccessRequirement++;
 					currentPage++;
-					setLicenseAccepted(accessRequirement.getId());
+					setLicenseAccepted(accessRequirement);
 				}
 			};
 			//pop up the requirement
 			view.updateWizardProgress(currentPage, getTotalPageCount());
-			view.showAccessRequirement(text, termsOfUseCallback);
-		}		
+			if (accessRequirement instanceof TermsOfUseAccessRequirement) {
+				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+				view.showTermsOfUseAccessRequirement(text, termsOfUseCallback);
+			} else if (accessRequirement instanceof ACTAccessRequirement) {
+				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+				view.showACTAccessRequirement(text, termsOfUseCallback);
+			} else if (accessRequirement instanceof PostMessageContentAccessRequirement) {
+				String url = ((PostMessageContentAccessRequirement) accessRequirement).getUrl();
+				view.showPostMessageContentAccessRequirement(enhancePostMessageUrl(url), termsOfUseCallback);
+			} else {
+				view.showErrorMessage("Unsupported access restriction type - " + accessRequirement.getClass().getName());
+			}
+		}
 	}
 	
-	public void setLicenseAccepted(Long arId) {	
+	public String enhancePostMessageUrl(String url) {
+		if (authenticationController.isLoggedIn() && isRecognizedSite(url)) {
+			//include other information from the profile
+			UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();
+			return url + "?" + 
+					getEncodedParamValueIfDefined(WebConstants.FIRST_NAME_PARAM, profile.getFirstName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.LAST_NAME_PARAM, profile.getLastName(), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.EMAIL_PARAM, profile.getEmails().get(0), "&") + 
+					getEncodedParamValueIfDefined(WebConstants.USER_ID_PARAM, profile.getOwnerId(), ""); 
+		} else
+			return url;
+	}
+	
+	public String getEncodedParamValueIfDefined(String paramKey, String value, String suffix) {
+		String param = "";
+		if (DisplayUtils.isDefined(value)) {
+			param = paramKey+"="+gwt.encodeQueryString(value) + suffix;
+		}
+		return param;
+	}
+	
+	/**
+	 * return true if it is on a whitelist that allows Synapse to send additional information in the query params
+	 * @param siteUrl
+	 * @return
+	 */
+	public static boolean isRecognizedSite(String siteUrl) {
+		if(siteUrl != null) {
+			for(String base : EXTRA_INFO_URL_WHITELIST) {
+				// starts with one of the valid url bases?				
+				if(siteUrl.toLowerCase().startsWith(base)) return true;
+			}
+		}
+		return false;
+	}
+
+	
+	public void setLicenseAccepted(AccessRequirement ar) {	
 		final CallbackP<Throwable> onFailure = new CallbackP<Throwable>() {
 			@Override
 			public void invoke(Throwable t) {
@@ -267,14 +320,18 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				sendJoinRequestStep2();
 			}
 		};
-		
-		GovernanceServiceHelper.signTermsOfUse(
-				authenticationController.getCurrentUserPrincipalId(), 
-				arId, 
-				onSuccess, 
-				onFailure, 
-				synapseClient, 
-				jsonObjectAdapter);
+		if (ar instanceof ACTAccessRequirement) {
+			//no need to sign, just continue
+			onSuccess.invoke();
+		} else {
+			GovernanceServiceHelper.signTermsOfUse(
+					authenticationController.getCurrentUserPrincipalId(), 
+					ar, 
+					onSuccess, 
+					onFailure, 
+					synapseClient, 
+					jsonObjectAdapter);
+		}
 	}
 	
 	public void sendJoinRequestStep3() {
@@ -319,5 +376,4 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	public boolean isChallengeSignup() {
 		return isChallengeSignup;
 	}
-
 }

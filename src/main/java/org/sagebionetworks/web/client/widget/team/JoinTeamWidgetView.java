@@ -24,9 +24,15 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	
 	void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback callback);
 	
-	void showAccessRequirement(
+	void showTermsOfUseAccessRequirement(
 			String arText,
 			final Callback touAcceptanceCallback);
+	
+	void showACTAccessRequirement(
+			String arText,
+			final Callback callback);
+	
+	void showPostMessageContentAccessRequirement(String url, final Callback touAcceptanceCallback);
 	void showInfo(String title, String message);
 	
 	void setButtonsEnabled(boolean enable);

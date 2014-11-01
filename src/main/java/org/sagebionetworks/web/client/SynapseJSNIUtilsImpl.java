@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResultJso;
@@ -16,6 +17,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
@@ -27,8 +29,6 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
-	public static String FILE_FIELD_ID;
-	
 	private static ProgressCallback progressCallback;
 	
 	@Override
@@ -39,7 +39,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private static native void _recordPageVisit(String token) /*-{
 		$wnd._gaq.push(['_trackPageview', token]);
 	}-*/;
-
+	
 	@Override
 	public String getCurrentHistoryToken() {
 		return History.getToken();
@@ -173,20 +173,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public boolean isDirectUploadSupported() {
-		return _isDirectUploadSupported();
-	}
-	
-	private final static native boolean _isDirectUploadSupported() /*-{ 
-		var userAgentString = navigator.userAgent.toLowerCase();
-		if (userAgentString.indexOf('msie') != -1) //IE
-			return false;
-		var xhr = new XMLHttpRequest();
-		// This test is from http://blogs.msdn.com/b/ie/archive/2012/02/09/cors-for-xhr-in-ie10.aspx
-		return ("withCredentials" in xhr);
-	}-*/;
-
-	@Override
 	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
 		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
@@ -268,58 +254,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	        out += file.name + ';';
 	    }
 	    return out;
-	}-*/;
-	
-	@Override
-	public void addDropZoneStyleEventHandling(String fileFieldId) {
-		if (FILE_FIELD_ID == null) {
-			_addDropZoneStyleEventHandling(UploaderViewImpl.FILE_FIELD_DROP_STYLE_NAME);
-		}
-		FILE_FIELD_ID = fileFieldId;
-	}
-	
-	private static native void _addDropZoneStyleEventHandling(String dropStyleName) /*-{
-		$doc.addEventListener("dragover", function( event ) {
-				// Prevent default to allow drop.
-				if (event.target.id != @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
-					event.preventDefault();
-				}
-			}, false);
-	
-		$doc.addEventListener("dragenter", function( event ) {
-				// highlight potential drop target when the draggable element enters it
-				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID
-					&& event.target.className.indexOf(dropStyleName) == -1) {
-					event.target.className += " " + dropStyleName;
-				}
-			}, false);
-		
-		$doc.addEventListener("drop", function( event ) {
-				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
-					event.target.className = event.target.className.replace(dropStyleName, '');
-				}
-			}, false);
-		
-		$doc.addEventListener("dragleave", function( event ) {
-				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
-					var epsilon_divisor = 30;	// For dragleave events called "inside" box due to border radius.
-					var epsilonX = event.target.offsetWidth / epsilon_divisor;
-					var epsilonY = event.target.offsetHeight / epsilon_divisor;
-					
-					var rect = event.target.getBoundingClientRect();
-					if (	event.clientX <= rect.left + epsilonX || event.clientX >= rect.right - epsilonX ||
-							event.clientY <= rect.top + epsilonY || event.clientY >= rect.bottom - epsilonY	) {
-						// Out of bounds of the box (not just hovering over contained "choose files" button).
-						event.target.className = event.target.className.replace(dropStyleName, '');
-					}
-				}
-			}, false);
-		
-		$doc.addEventListener("dragend", function( event ) {
-				if (event.target.id == @org.sagebionetworks.web.client.SynapseJSNIUtilsImpl::FILE_FIELD_ID) {
-						event.target.className = event.target.className.replace(dropStyleName, '');
-				}
-			}, false);
 	}-*/;
 	
 	/**
@@ -488,5 +422,4 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 		img.src = cssUrl;
 	}-*/;
-	
 }

@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -27,30 +22,27 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 
 	private SynapseClientAsync synapseClient;
 	private TimerProvider timerProvider;
-	private AdapterFactory adapterFactory;
 	private int waitTimeMS;
 	private AsynchType type;
 	private String jobId;
 	private UpdatingAsynchProgressHandler handler;
 	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
-	private AsynchronousResponseBodyInstanceFactory bodyFactory;
 
 	@Inject
 	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
-			TimerProvider timerProvider, AdapterFactory adapterFactory) {
+			TimerProvider timerProvider) {
 		super();
 		this.synapseClient = synapseClient;
 		this.timerProvider = timerProvider;
-		this.adapterFactory = adapterFactory;
-		this.bodyFactory = new AsynchronousResponseBodyInstanceFactory();
 	}
 
 	/**
 	 * Start the job then start tracking the job
 	 */
-	public void startAndTrack(AsynchType type, AsynchronousRequestBody requestBody,
-			final int waitTimeMS, final UpdatingAsynchProgressHandler handler) {
+	public void startAndTrack(AsynchType type,
+			AsynchronousRequestBody requestBody, final int waitTimeMS,
+			final UpdatingAsynchProgressHandler handler) {
 		this.isCanceled = false;
 		this.handler = handler;
 		this.type = type;
@@ -63,33 +55,25 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
 		// Start the job.
-		JSONObjectAdapter adapter = adapterFactory.createNew();
-		try {
-			requestBody.writeToJSONObject(adapter);
-			String jobBodyJSON = adapter.toJSONString();
-			synapseClient.startAsynchJob(type, jobBodyJSON,
-					new AsyncCallback<String>() {
-						@Override
-						public void onSuccess(String jobId) {
-							// nothing to do if canceled.
-							if (!isCanceled) {
-								// Track the job.
-								trackJob(jobId, waitTimeMS);
-							}
+		synapseClient.startAsynchJob(type, requestBody,
+				new AsyncCallback<String>() {
+					@Override
+					public void onSuccess(String jobId) {
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							// Track the job.
+							trackJob(jobId, waitTimeMS);
 						}
+					}
 
-						@Override
-						public void onFailure(Throwable caught) {
-							if (!isCanceled) {
-								oneTimeOnFailure(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						if (!isCanceled) {
+							oneTimeOnFailure(caught);
 						}
-					});
-		} catch (JSONObjectAdapterException e) {
-			if (!isCanceled) {
-				oneTimeOnFailure(e);
-			}
-		}
+					}
+				});
+
 	}
 
 	/**
@@ -106,8 +90,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		timerProvider.setHandler(new FireHandler() {
 			@Override
 			public void fire() {
-				// when the timer fires the status is checked.
-				checkAndWait();
+				// Only continue to fire if the handler is still attached to the UI,
+				if(handler.isAttached()){
+					// when the timer fires the status is checked.
+					checkAndWait();
+				}
 			}
 		});
 		// Do the first check and wait.
@@ -121,19 +108,12 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private void checkAndWait() {
 		// Get the current status
 		synapseClient.getAsynchJobResults(this.type, this.jobId,
-				new AsyncCallback<String>() {
+				new AsyncCallback<AsynchronousResponseBody>() {
 					@Override
-					public void onSuccess(String resultJSON) {
+					public void onSuccess(AsynchronousResponseBody response) {
 						// nothing to do if canceled.
 						if (!isCanceled) {
-							try {
-								// Parse the results
-								AsynchronousResponseBody response = bodyFactory.newInstance(type.getResponseClass().getName());
-								response.initializeFromJSONObject(adapterFactory.createNew(resultJSON));
-								oneTimeOnComplete(response);
-							} catch (JSONObjectAdapterException e) {
-								oneTimeOnFailure(e);
-							}
+							oneTimeOnComplete(response);
 						}
 					}
 
@@ -145,15 +125,10 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 							if(caught instanceof ResultNotReadyException){
 								ResultNotReadyException rnre = (ResultNotReadyException) caught;
 								// Extract the status
-								try {
-									AsynchronousJobStatus status = new AsynchronousJobStatus(adapterFactory.createNew(rnre.getStatusJson()));
-									handler.onUpdate(status);
-									// start the timer and wait for another push
-									timerProvider.schedule(waitTimeMS);
-								} catch (JSONObjectAdapterException e) {
-									// Failed.
-									oneTimeOnFailure(caught);
-								}
+								AsynchronousJobStatus status = rnre.getStatus();
+								handler.onUpdate(status);
+								// start the timer and wait for another push
+								timerProvider.schedule(waitTimeMS);
 							}else{
 								// Failed.
 								oneTimeOnFailure(caught);

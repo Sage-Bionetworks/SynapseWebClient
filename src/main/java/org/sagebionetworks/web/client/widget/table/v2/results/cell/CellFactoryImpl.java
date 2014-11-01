@@ -26,7 +26,7 @@ public class CellFactoryImpl implements CellFactory {
 	}
 
 	@Override
-	public Cell createEditor(ColumnModel model) {
+	public CellEditor createEditor(ColumnModel model) {
 		return ginInjector.createStringEditorCell();
 	}
 

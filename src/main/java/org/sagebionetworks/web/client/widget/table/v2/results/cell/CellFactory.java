@@ -24,5 +24,5 @@ public interface CellFactory {
 	 * @param value
 	 * @return
 	 */
-	public Cell createEditor(ColumnModel model);
+	public CellEditor createEditor(ColumnModel model);
 }

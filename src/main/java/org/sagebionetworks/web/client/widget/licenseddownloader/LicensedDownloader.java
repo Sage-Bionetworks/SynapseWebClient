@@ -14,15 +14,15 @@ import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.transform.NodeModelCreator;
 import org.sagebionetworks.web.client.utils.APPROVAL_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -30,7 +30,9 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.shared.LicenseAgreement;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
@@ -45,22 +47,21 @@ import com.google.inject.Inject;
 public class LicensedDownloader implements LicensedDownloaderView.Presenter, SynapseWidgetPresenter {
 	
 	private LicensedDownloaderView view;
-	private NodeModelCreator nodeModelCreator;
-
+	
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
 	private JSONObjectAdapter jsonObjectAdapter;
-	
+	private GWTWrapper gwt;
 	private AccessRequirement accessRequirementToDisplay;
 	private String entityId;
 	private UserProfile userProfile;
 	
 	private HandlerManager handlerManager;
 	
-	private StackConfigServiceAsync stackConfigService;
 	private JiraURLHelper jiraUrlHelper;
 	private boolean isDirectDownloadSupported;
-	AuthenticationController authenticationController;
+	private AuthenticationController authenticationController;
+	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	// for testing
 	public void setUserProfile(UserProfile userProfile) {this.userProfile=userProfile;}
@@ -72,14 +73,16 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseClientAsync synapseClient,
 			JiraURLHelper jiraUrlHelper,
-			NodeModelCreator nodeModelCreator) {
+			SynapseJSNIUtils synapseJSNIUtils,
+			GWTWrapper gwt) {
 		this.view = view;		
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		this.nodeModelCreator = nodeModelCreator;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.jiraUrlHelper=jiraUrlHelper;
 		this.authenticationController = authenticationController;
+		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.gwt = gwt;
 		view.setPresenter(this);		
 		clearHandlers();
 	}
@@ -108,7 +111,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	 * @param entity
 	 * @param showDownloadLocations
 	 */
-	public void configureHeadless(EntityBundle entityBundle, UserProfile userProfile) {
+	public void configure(EntityBundle entityBundle, UserProfile userProfile) {
 		view.setPresenter(this);
 		this.entityId = entityBundle.getEntity().getId();
 		extractBundle(entityBundle, userProfile);
@@ -134,27 +137,15 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 	}
 	
 	/**
-	 * Returns a standard download button
+	 * Returns a standard download button.  User must configure this widget
 	 * @param entity
 	 * @param showDownloadLocations
 	 * @return
 	 */
-	public Widget asWidget(EntityBundle entityBundle, UserProfile userProfile) {
-		configureHeadless(entityBundle, userProfile);
-		
+	public Widget asWidget() {
 		return view.asWidget();
 	}	
-	
-	/**
-	 * does nothing use asWidget(Entity entity) 
-	 */
-	@Override
-	public Widget asWidget() { 
-		return null;
-	}	
-
-		
-	
+			
 	/**
 	 * Loads the download url 
 	 */
@@ -170,11 +161,8 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 						if (fileHandle instanceof S3FileHandleInterface) {
 							md5 = ((S3FileHandleInterface)fileHandle).getContentMd5();
 						}
-						String externalUrl = null;
-						if (fileHandle instanceof ExternalFileHandle) {
-							externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
-						}
-						this.view.setDownloadLocation(fileHandle.getFileName(), fileEntity.getId(), fileEntity.getVersionNumber(), md5, externalUrl);
+						String directDownloadURL = getDirectDownloadURL(fileEntity, fileHandle);
+						this.view.setDownloadLocation(md5, directDownloadURL);
 					}
 					else {
 						this.view.setNoDownloads();
@@ -275,7 +263,7 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 		};
 		GovernanceServiceHelper.signTermsOfUse(
 				userProfile.getOwnerId(), 
-				accessRequirementToDisplay.getId(), 
+				accessRequirementToDisplay, 
 				onSuccess, 
 				onFailure, 
 				synapseClient, 
@@ -299,4 +287,23 @@ public class LicensedDownloader implements LicensedDownloaderView.Presenter, Syn
 			}};
 	}
 
+	public String getDirectDownloadURL(FileEntity fileEntity, FileHandle fileHandle) {
+		String externalUrl = null;
+		if (fileHandle instanceof ExternalFileHandle) {
+			externalUrl = ((ExternalFileHandle) fileHandle).getExternalURL();
+		}
+		
+		String directDownloadURL = null;
+		if (externalUrl == null)
+			directDownloadURL = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), fileEntity.getVersionNumber(), false);
+		else {
+			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
+				//point to sftp proxy instead
+				directDownloadURL = Uploader.getSftpProxyLink(externalUrl, globalApplicationState, gwt);
+			} else {
+				directDownloadURL = externalUrl;	
+			}
+		}
+		return directDownloadURL;
+	}
 }

@@ -13,7 +13,7 @@ public interface SubmitToEvaluationWidgetView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	
-	void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage);
+	void configure(WikiPageKey wikiKey, boolean isAvailableEvaluation, String unavailableMessage, String buttonText);
 	
 	void showAnonymousRegistrationMessage();
 	

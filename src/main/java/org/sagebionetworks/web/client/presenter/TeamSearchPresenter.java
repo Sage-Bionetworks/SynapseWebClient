@@ -129,4 +129,3 @@ public class TeamSearchPresenter extends AbstractActivity implements TeamSearchV
 	}
 
 }
-

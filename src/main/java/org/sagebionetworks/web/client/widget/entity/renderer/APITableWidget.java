@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.ServiceConstants;
 import org.sagebionetworks.repo.model.query.QueryTableResults;
 import org.sagebionetworks.repo.model.query.Row;
@@ -29,6 +28,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
@@ -462,6 +462,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			renderer = ginInjector.getAPITableColumnRendererUserId();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_DATE) || friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_EPOCH_DATE))
 			renderer = ginInjector.getAPITableColumnRendererDate();
+		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_LINK))
+			renderer = ginInjector.getAPITableColumnRendererLink();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_SYNAPSE_ID))
 			renderer = ginInjector.getAPITableColumnRendererSynapseID();
 		else if (friendlyName.equals(WidgetConstants.API_TABLE_COLUMN_RENDERER_ANNOTATIONS))

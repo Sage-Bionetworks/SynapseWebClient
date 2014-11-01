@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
@@ -53,6 +52,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.NodeModelCreator;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
@@ -61,6 +61,7 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
@@ -85,7 +86,6 @@ public class ProvenanceWidgetTest {
 	NodeModelCreator mockNodeModelCreator;
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
-	LayoutServiceAsync mockLayoutService;
 	ClientCache mockClientCache;
 	SynapseJSNIUtils synapseJsniUtils = implJSNIUtils();	
 	GlobalApplicationState mockGlobalAppState;
@@ -93,7 +93,7 @@ public class ProvenanceWidgetTest {
 	Data outputEntity;
 	String entity456Id = "syn456";
 	BatchResults<EntityHeader> referenceHeaders;
-	String activityJSON;
+	
 	String referenceListJSON;
 	String referenceHeadersJSON;
 	Exception someException = new Exception();
@@ -110,12 +110,11 @@ public class ProvenanceWidgetTest {
 		mockAuthController = mock(AuthenticationController.class);
 		mockNodeModelCreator = mock(NodeModelCreator.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockLayoutService = mock(LayoutServiceAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, mockLayoutService, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, synapseJsniUtils, jsoProvider, mockClientCache);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new Data();
@@ -150,13 +149,12 @@ public class ProvenanceWidgetTest {
 		generatedBy.setResults(Arrays.asList(new Reference[] { ref123 }));		
 						
 		EntityWrapper ew = new EntityWrapper(outputEntity.writeToJSONObject(adapterFactory.createNew()).toJSONString(), Data.class.getName());		
-		activityJSON = act.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceListJSON = referenceList.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		referenceHeadersJSON = referenceHeaders.writeToJSONObject(adapterFactory.createNew()).toJSONString();
 		
 		AsyncMockStubber.callSuccessWith(ew).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
 		when(mockNodeModelCreator.createEntity(ew)).thenReturn(outputEntity);
-		AsyncMockStubber.callSuccessWith(activityJSON).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(referenceHeadersJSON).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));		
 		Mockito.<BatchResults<?>>when(mockNodeModelCreator.createBatchResults(anyString(), eq(EntityHeader.class))).thenReturn((BatchResults<EntityHeader>)referenceHeaders);
 		AsyncMockStubber.callSuccessWith(generatedResult).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
@@ -285,6 +283,24 @@ public class ProvenanceWidgetTest {
 
 		verifySuccessGraphStructure(graph);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testFindOldVersionsNotFoundException() throws Exception {
+		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
+		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
+		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockNodeModelCreator, mockAuthController, adapterFactory, mockJsniUtils, jsoProvider, mockClientCache);
+		
+		String message = "entity syn999 was not found";
+		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseClient).getEntityHeaderBatch(anyString(), any(AsyncCallback.class));
+		// create graph
+		provenanceWidget.configure(null, descriptor, null, null);	
+		
+		provenanceWidget.findOldVersions();
+		
+		//send error to the console - silent error
+		verify(mockJsniUtils).consoleError(anyString());
+	}
 		
 	@Test
 	public void testFindOldVersions() throws Exception {
@@ -318,7 +334,7 @@ public class ProvenanceWidgetTest {
 		@SuppressWarnings("unchecked")
 		List<String> oldVersions = (List<String>)argument.getValue();
 		
-		assertEquals(1, oldVersions.size());		
+		assertEquals(1, oldVersions.size());	
 	}
 
 	private ProvGraph verifyBuildGraphCalls() throws Exception {
@@ -421,10 +437,6 @@ public class ProvenanceWidgetTest {
 			
 			@Override
 			public void tablesorter(String id) {}
-			@Override
-			public boolean isDirectUploadSupported() {
-				return false;
-			}
 
 			@Override
 			public void uploadUrlToGenomeSpace(String url) {
@@ -492,12 +504,6 @@ public class ProvenanceWidgetTest {
 			public String[] getMultipleUploadFileNames(String fileFieldId) {
 				// TODO Auto-generated method stub
 				return null;
-			}
-
-			@Override
-			public void addDropZoneStyleEventHandling(String fileFieldId) {
-				// TODO Auto-generated method stub
-				
 			}
 		};
 	}

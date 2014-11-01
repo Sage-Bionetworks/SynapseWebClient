@@ -9,12 +9,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
 
-import org.sagebionetworks.markdown.constants.WidgetConstants;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetEncodingUtil;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.shared.WidgetConstants;
 
 public class APITableConfigTest {
 		

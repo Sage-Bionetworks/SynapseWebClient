@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -16,7 +14,10 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface TableEntityWidgetView extends IsWidget {
 	
 	public interface Presenter extends EntityUpdatedHandler {
-		
+		/**
+		 * Called when the schema is shown or hidden.
+		 */
+		void onSchemaToggle(boolean shown);
 	}
 	
 	/**
@@ -54,12 +55,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	public void setQueryResultsVisible(boolean visible);
 
 	/**
-	 * Set the AsynchronousProgressWidget to be shown when queries are run.
-	 * @param asynchProgressWidget
-	 */
-	public void setProgressWidget(AsynchronousProgressWidget asynchProgressWidget);
-
-	/**
 	 * Show or hide the Query Progress widget.
 	 * @param b
 	 */
@@ -69,19 +64,38 @@ public interface TableEntityWidgetView extends IsWidget {
 	 * Set the query results widget.
 	 * @param queryResultsWidget
 	 */
-	public void setQueryResultsWidget(TableQueryResultWidget queryResultsWidget);
+	public void setQueryResultsWidget(IsWidget queryResultsWidget);
 	
 	/**
 	 * Set the query input widget.
 	 * @param queryInputWidget
 	 */
-	public void setQueryInputWidget(QueryInputWidget queryInputWidget);
+	public void setQueryInputWidget(IsWidget queryInputWidget);
 
 	/**
 	 * Show or hide the query input.
 	 * @param b
 	 */
 	public void setQueryInputVisible(boolean visible);
+
+	/**
+	 * Add the download modal to the page.
+	 * @param downloadTableQueryModalWidget
+	 */
+	public void setDownloadTableQueryModalWidget(
+			IsWidget downloadTableQueryModalWidget);
+
+	/**
+	 * Add the upload modal to the page.
+	 * @param uploadTableModalWidget
+	 */
+	public void setUploadTableModalWidget(
+			IsWidget uploadTableModalWidget);
+
+	/**
+	 * Show or hide the table schema.
+	 */
+	public void toggleSchema();
 
 
 }

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.Date;
 
 import org.sagebionetworks.web.client.callback.MD5Callback;
+import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
@@ -45,8 +46,6 @@ public interface SynapseJSNIUtils {
 	
 	public void setPageDescription(String newDescription);
 
-	public boolean isDirectUploadSupported();
-	
 	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
 	
 	public String getContentType(String fileFieldId, int index);
@@ -55,7 +54,6 @@ public interface SynapseJSNIUtils {
 	public void getFileMd5(String fileFieldId, int index, MD5Callback callback);
 	public double getFileSize(String fileFieldId, int index);
 	String[] getMultipleUploadFileNames(String fileFieldId);
-	void addDropZoneStyleEventHandling(String fileFieldId);
 	public void consoleLog(String message);
 	public void consoleError(String message);
 	public void uploadUrlToGenomeSpace(String url);	

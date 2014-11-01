@@ -6,11 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -38,14 +38,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
@@ -60,7 +59,6 @@ import org.sagebionetworks.repo.model.BatchResults;
 import org.sagebionetworks.repo.model.Data;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
@@ -76,6 +74,8 @@ import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedResults;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestResourceList;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -114,6 +114,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -133,6 +134,7 @@ import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundleTransport;
 import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.MembershipInvitationBundle;
+import org.sagebionetworks.web.shared.PagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -374,11 +376,20 @@ public class SynapseClientImplTest {
 		sentMessage = new MessageToUser();
 		sentMessage.setId("987");
 		when(mockSynapse.sendStringMessage(any(MessageToUser.class), anyString())).thenReturn(sentMessage);
+		
+		//getMyProjects getUserProjects
+		PaginatedResults<ProjectHeader> headers = new PaginatedResults<ProjectHeader>();
+		headers.setTotalNumberOfResults(1100);
+		List<ProjectHeader> projectHeaders = new ArrayList();
+		projectHeaders.add(new ProjectHeader());
+		headers.setResults(projectHeaders);
+		when(mockSynapse.getMyProjects(anyInt(), anyInt())).thenReturn(headers);
+		when(mockSynapse.getProjectsFromUser(anyLong(), anyInt(), anyInt())).thenReturn(headers);
 	}
 	
 	private AccessRequirement createAccessRequirement(ACCESS_TYPE type) {
 		TermsOfUseAccessRequirement accessRequirement = new TermsOfUseAccessRequirement();
-		accessRequirement.setEntityType(TermsOfUseAccessRequirement.class.getName());
+		accessRequirement.setConcreteType(TermsOfUseAccessRequirement.class.getName());
 		RestrictableObjectDescriptor descriptor = new RestrictableObjectDescriptor();
 		descriptor.setId("101");
 		descriptor.setType(RestrictableObjectType.ENTITY);
@@ -532,43 +543,32 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetNodeAcl() throws Exception {
-		EntityWrapper ew = synapseClient.getNodeAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.getNodeAcl("syn101");
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testCreateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.createAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.createAcl(acl);
 		assertEquals(acl, clone);
 	}
 
 	@Test
 	public void testUpdateAcl() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl);
 		assertEquals(acl, clone);
 	}
 	
 	@Test
 	public void testUpdateAclRecursive() throws Exception {
-		EntityWrapper in = new EntityWrapper();
-		in.setEntityJson(EntityFactory.createJSONObjectForEntity(acl).toString());
-		EntityWrapper ew = synapseClient.updateAcl(in, true);
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.updateAcl(acl, true);
 		assertEquals(acl, clone);
 		verify(mockSynapse).updateACL(any(AccessControlList.class), eq(true));
 	}
 
 	@Test
 	public void testDeleteAcl() throws Exception {
-		EntityWrapper ew = synapseClient.deleteAcl("syn101");
-		AccessControlList clone = EntityFactory.createEntityFromJSONString(ew.getEntityJson(), AccessControlList.class);
+		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
 	}
 
@@ -684,20 +684,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testCreateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.createWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-	    verify(mockSynapse).createWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
-	}
-	
-	@Test
-	public void testDeleteWikiPage() throws Exception {
-		synapseClient.deleteWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-		verify(mockSynapse).deleteWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
 	public void testGetWikiHeaderTree() throws Exception {
 		PaginatedResults<WikiHeader> headerTreeResults = new PaginatedResults<WikiHeader>();
 		when(mockSynapse.getWikiHeaderTree(anyString(), any(ObjectType.class))).thenReturn(headerTreeResults);
@@ -705,22 +691,6 @@ public class SynapseClientImplTest {
 	    verify(mockSynapse).getWikiHeaderTree(anyString(), any(ObjectType.class));
 	}
 	
-	@Test
-	public void testGetWikiPage() throws Exception {
-		Mockito.when(mockSynapse.getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class))).thenReturn(page);
-		synapseClient.getWikiPage(new WikiPageKey("syn123", ObjectType.ENTITY.toString(), "20"));
-	    verify(mockSynapse).getWikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-	}
-	
-	@Test
-	public void testUpdateWikiPage() throws Exception {
-		String wikiPageJson = EntityFactory.createJSONStringForEntity(page);
-		Mockito.when(mockSynapse.updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class))).thenReturn(page);
-		synapseClient.updateWikiPage("testId", ObjectType.ENTITY.toString(), wikiPageJson);
-		
-		verify(mockSynapse).updateWikiPage(anyString(), any(ObjectType.class), any(WikiPage.class));
-	}
-
 	@Test
 	public void testGetWikiAttachmentHandles() throws Exception {
 		FileHandleResults testResults = new FileHandleResults();
@@ -951,21 +921,20 @@ public class SynapseClientImplTest {
 	}
 
 	
-	private List<String> getTestChunkRequestJson() throws JSONObjectAdapterException {
+	private List<ChunkRequest> getTestChunkRequestJson() throws JSONObjectAdapterException {
 		ChunkRequest chunkRequest = new ChunkRequest();
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setKey("test key");
 		chunkRequest.setChunkedFileToken(token);
 		chunkRequest.setChunkNumber(1l);
-		String chunkRequestJson = EntityFactory.createJSONStringForEntity(chunkRequest);
-		List<String> chunkRequests = new ArrayList<String>();
-		chunkRequests.add(chunkRequestJson);
+		List<ChunkRequest> chunkRequests = new ArrayList<ChunkRequest>();
+		chunkRequests.add(chunkRequest);
 		return chunkRequests;
 	}
 	
 	@Test
 	public void testCombineChunkedFileUpload() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		List<String> chunkRequests = getTestChunkRequestJson();
+		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
 		synapseClient.combineChunkedFileUpload(chunkRequests);
 		verify(mockSynapse).startUploadDeamon(any(CompleteAllChunksRequest.class));
 	}
@@ -1008,7 +977,7 @@ public class SynapseClientImplTest {
 		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 	}
-	
+		
 	@Test(expected = ConflictException.class)
 	public void testGetFileEntityIdWithSameNameConflict() throws JSONObjectAdapterException, SynapseException, RestServiceException, JSONException {
 		Folder folder = new Folder();
@@ -1032,7 +1001,7 @@ public class SynapseClientImplTest {
 		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(testFileName,"parentEntityId");
 	}
-	
+		
 	@Test
 	public void testGetFileEntityIdWithSameNameFound() throws JSONException, JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity file = getTestFileEntity();
@@ -1058,7 +1027,7 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testCompleteChunkedFileUploadExistingEntity() throws JSONObjectAdapterException, SynapseException, RestServiceException {
-		List<String> chunkRequests = getTestChunkRequestJson();
+		List<ChunkRequest> chunkRequests = getTestChunkRequestJson();
 		FileEntity testFileEntity = getTestFileEntity();
 		when(mockSynapse.getEntityById(anyString())).thenReturn(testFileEntity);
 		when(mockSynapse.createEntity(any(FileEntity.class))).thenThrow(new AssertionError("No need to create a new entity!"));
@@ -1083,8 +1052,7 @@ public class SynapseClientImplTest {
 		testToken.setContentMD5(md5);
 		when(mockSynapse.createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class))).thenReturn(testToken);
 		
-		String chunkTokenJson = synapseClient.getChunkedFileToken(fileName, contentType, md5);
-		ChunkedFileToken token = EntityFactory.createEntityFromJSONString(chunkTokenJson, ChunkedFileToken.class);
+		ChunkedFileToken token = synapseClient.getChunkedFileToken(fileName, contentType, md5);
 		verify(mockSynapse).createChunkedFileUploadToken(any(CreateChunkedFileTokenRequest.class));
 		assertEquals(testToken, token);
 	}
@@ -1189,11 +1157,10 @@ public class SynapseClientImplTest {
 	public void testCreateSubmission() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
 		Submission inputSubmission = new Submission();
 		inputSubmission.setId("my submission id");
-		String submissionJson = EntityFactory.createJSONStringForEntity(inputSubmission);
 		when(mockSynapse.createSubmission(any(Submission.class), anyString())).thenReturn(inputSubmission);
-		String returnSubmissionJson = synapseClient.createSubmission(submissionJson, "fakeEtag");
+		Submission returnSubmission = synapseClient.createSubmission(inputSubmission, "fakeEtag");
 		verify(mockSynapse).createSubmission(any(Submission.class), anyString());
-		assertEquals(submissionJson, returnSubmissionJson);
+		assertEquals(inputSubmission, returnSubmission);
 	}
 	
 	private void setupTestSubmitterAliases() throws SynapseException{
@@ -1328,14 +1295,24 @@ public class SynapseClientImplTest {
 	}
 	@Test
 	public void testGetOpenRequestCountUnauthorized() throws SynapseException, RestServiceException {
-		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenThrow(new SynapseForbiddenException());
+		//is not an admin
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(false);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
 		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
+		//should never ask for open request count
+		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong());
 		assertNull(count);
 	}
 
 	@Test
 	public void testGetOpenRequestCount() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
+		//is admin
+		TeamMember testTeamMember = new TeamMember();
+		testTeamMember.setIsAdmin(true);
+		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(testTeamMember);
+		
 		Long testCount = 42L;
 		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
 		testOpenRequests.setTotalNumberOfResults(testCount);
@@ -1402,11 +1379,10 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testGetEntityHeaderBatch() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		List<String> headers = synapseClient.getEntityHeaderBatch(new ArrayList());
-		//in the setup, we told the mockSynapse.getEntityHeaderBatch to return batchHeaderResults, so verify that this is batchHeaderResults (json string versions)
+		List<EntityHeader> headers = synapseClient.getEntityHeaderBatch(new ArrayList());
+		//in the setup, we told the mockSynapse.getEntityHeaderBatch to return batchHeaderResults
 		for (int i = 0; i < batchHeaderResults.size(); i++) {
-			EntityHeader returnedHeader = new EntityHeader(adapterFactory.createNew(headers.get(i)));
-			assertEquals(batchHeaderResults.get(i), returnedHeader);
+			assertEquals(batchHeaderResults.get(i), headers.get(i));
 		}
 	}
 	
@@ -1569,7 +1545,64 @@ public class SynapseClientImplTest {
 	@Test
 	public void testLogErrorToRepositoryServices() throws SynapseException, RestServiceException, JSONObjectAdapterException {
 		String errorMessage = "error has occurred";
-		synapseClient.logErrorToRepositoryServices(errorMessage);
+		synapseClient.logErrorToRepositoryServices(errorMessage, null);
 		verify(mockSynapse).logError(any(LogEntry.class));
 	}
+	
+	@Test
+	public void testLogErrorToRepositoryServicesTruncation() throws SynapseException, RestServiceException, JSONObjectAdapterException {
+		StringBuilder stackTrace = new StringBuilder();
+		for (int i = 0; i < SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE + 100; i++) {
+			stackTrace.append('a');
+		}
+		
+		String errorMessage = "error has occurred";
+		synapseClient.logErrorToRepositoryServices(errorMessage, stackTrace.toString());
+		ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
+		verify(mockSynapse).logError(captor.capture());
+		LogEntry logEntry = captor.getValue();
+		assertTrue(logEntry.getLabel().length() - "SWC: ".length() <= SynapseClientImpl.MAX_LOG_ENTRY_LABEL_SIZE);
+		assertEquals(errorMessage, logEntry.getMessage());
+	}
+
+@Test
+	public void testGetMyProjects() throws Exception {
+		int limit = 11;
+		int offset = 20;
+		synapseClient.getMyProjects(limit, offset);
+		verify(mockSynapse).getMyProjects(eq(limit), eq(offset));
+	}
+	
+	@Test
+	public void testGetUserProjects() throws Exception {
+		int limit = 11;
+		int offset = 20;
+		Long userId = 133l;
+		String userIdString = userId.toString();
+		synapseClient.getUserProjects(userIdString, limit, offset);
+		verify(mockSynapse).getProjectsFromUser(eq(userId), eq(limit), eq(offset));
+	}
+	
+	@Test
+	public void testSafeLongToInt() {
+		int inRangeInt = 500;
+		int after = SynapseClientImpl.safeLongToInt(inRangeInt);
+		assertEquals(inRangeInt, after);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSafeLongToIntPositive() {
+		long testValue = Integer.MAX_VALUE;
+		testValue++;
+		SynapseClientImpl.safeLongToInt(testValue);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testSafeLongToIntNegative() {
+		long testValue = Integer.MIN_VALUE;
+		testValue--;
+		SynapseClientImpl.safeLongToInt(testValue);
+	}
+
+
 }

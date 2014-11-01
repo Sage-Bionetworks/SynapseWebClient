@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import java.util.List;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -9,7 +7,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author John
  *
  */
-public interface ColumnModelTableRow extends IsWidget {
+public interface ColumnModelTableRow extends ColumnModelView, IsWidget {
 	
 	/**
 	 * Control for this view.
@@ -24,61 +22,7 @@ public interface ColumnModelTableRow extends IsWidget {
 		public void selectionChanged(boolean isSelected);
 	}
 	
-	/**
-	 * ColumnModel.id
-	 * @return
-	 */
-	public String getId();
-	
-	/**
-	 * ColumnModel.id
-	 */
-	public void setId(String id);
 
-	/**
-	 * ColumnModel.name
-	 * @return
-	 */
-	public String getColumnName();
-	
-	/**
-	 * ColumnModel.name
-	 */
-	public void setColumnName(String name);
-	
-	/**
-	 * ColumnModel.columnType
-	 * @return
-	 */
-	public ColumnTypeViewEnum getColumnType();
-	
-	/**
-	 * ColumnModel.columnType
-	 */
-	public void setColumnType(ColumnTypeViewEnum type);
-	
-	/**
-	 * ColumnModel.maximumSize
-	 * @return
-	 */
-	public String getMaxSize();
-	
-	/**
-	 * ColumnModel.maximumSize
-	 */
-	public void setMaxSize(String maxSize);
-	
-	/**
-	 * ColumnModel.defaultValue
-	 * @return
-	 */
-	public String getDefaultValue();
-	
-	/**
-	 * ColumnModel.defaultValue
-	 */
-	public void setDefaultValue(String defaultValue);
-	
 	/**
 	 * Set the selection selection state of this row
 	 * @param select
@@ -102,15 +46,9 @@ public interface ColumnModelTableRow extends IsWidget {
 	public void setSelectionPresenter(SelectionPresenter selectionPresenter);
 	
 	/**
-	 * Restrict values to an enumeration.
-	 * 
-	 * @param enums
+	 * Show/hide the select check box.
+	 * @param visible
 	 */
-	public void setEnumValues(List<String> enums);
+	public void setSelectVisible(boolean visible);
 	
-	/**
-	 * Restrict values to an enumeration.
-	 * @return
-	 */
-	public List<String> getEnumValues();
 }

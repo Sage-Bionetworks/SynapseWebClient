@@ -132,9 +132,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	}
 		
 	public void validateToken() {
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
+		AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {
 			@Override
-			public void onSuccess(String result) {
+			public void onSuccess(UserSessionData result) {
 				//do nothing
 			}
 			@Override
@@ -281,9 +281,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			callback.onSuccess(false);
 			return;
 		}
-		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<List<MembershipInvitationBundle>>() {
+		synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<MembershipInvitationBundle>>() {
 			@Override
-			public void onSuccess(List<MembershipInvitationBundle> result) {
+			public void onSuccess(ArrayList<MembershipInvitationBundle> result) {
 				callback.onSuccess(result.size() > 0);
 			}
 			
@@ -316,25 +316,13 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public void getChallengeProjectHeaders(final Set<String> challengeProjectIdsSet) {
 		List<String> challengeProjectIds = new ArrayList<String>();
 		challengeProjectIds.addAll(challengeProjectIdsSet);
-		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<List<String>>() {
+		synapseClient.getEntityHeaderBatch(challengeProjectIds, new AsyncCallback<ArrayList<EntityHeader>>() {
 			
 			@Override
-			public void onSuccess(List<String> entityHeaderStrings) {
-				try {
-					//finally, we can tell the view to update the user challenges based on these entity headers
-					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					
-					for (String headerString : entityHeaderStrings) {
-						EntityHeader header = new EntityHeader(adapterFactory.createNew(headerString));
-						headers.add(header);
-					}
-					
-					EntityBrowserUtils.sortEntityHeadersByName(headers);
-					
-					view.setMyChallenges(headers);
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}	
+			public void onSuccess(ArrayList<EntityHeader> headers) {
+				//finally, we can tell the view to update the user challenges based on these entity headers
+				EntityBrowserUtils.sortEntityHeadersByName(headers);
+				view.setMyChallenges(headers);
 			}
 			
 			@Override

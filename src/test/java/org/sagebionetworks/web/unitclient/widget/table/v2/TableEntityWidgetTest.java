@@ -3,13 +3,15 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,8 +23,11 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
+import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidgetView;
@@ -39,8 +44,10 @@ public class TableEntityWidgetTest {
 	List<ColumnModel> columns;
 	TableBundle tableBundle;
 	TableEntity tableEntity;
+	ActionMenuWidget mockActionMenu;
+	DownloadTableQueryModalWidget mockDownloadTableQueryModalWidget;
+	UploadTableModalWidget mockUploadTableModalWidget;
 	TableEntityWidgetView mockView;
-	AsynchronousProgressWidget mockAsynchronousProgressWidget;
 	QueryChangeHandler mockQueryChangeHandler;
 	TableQueryResultWidget mockQueryResultsWidget;
 	QueryInputWidget mockQueryInputWidget;
@@ -51,12 +58,14 @@ public class TableEntityWidgetTest {
 	@Before
 	public void before(){
 		// mocks
+		mockActionMenu = Mockito.mock(ActionMenuWidget.class);
 		mockView = Mockito.mock(TableEntityWidgetView.class);
-		mockAsynchronousProgressWidget = Mockito.mock(AsynchronousProgressWidget.class);
+		mockDownloadTableQueryModalWidget = Mockito.mock(DownloadTableQueryModalWidget.class);
 		mockQueryChangeHandler = Mockito.mock(QueryChangeHandler.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockQueryResultsWidget = Mockito.mock(TableQueryResultWidget.class);
 		mockQueryInputWidget = Mockito.mock(QueryInputWidget.class);
+		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		// stubs
 		adapterFactory = new AdapterFactoryImpl();
 		columns = TableModelTestUtils.createOneOfEachType();
@@ -66,7 +75,7 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockAsynchronousProgressWidget, mockQueryResultsWidget, mockQueryInputWidget);
+		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget);
 		// The test bundle
 		entityBundle = new EntityBundle(tableEntity, null, null, null, null, null, null, tableBundle);
 		
@@ -80,7 +89,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeMaxUnder(){
 		tableBundle.setMaxRowsPerPage(4L);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is less than the default,
 		// the value used should be 3/4ths of the max allowed for the schema.
 		assertEquals(3l, widget.getDefaultPageSize());
@@ -90,7 +99,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeMaxOver(){
 		tableBundle.setMaxRowsPerPage(TableEntityWidget.DEFAULT_LIMIT *2L);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// since the size from the bundle is greater than the default
 		// the default should be used.
 		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
@@ -100,7 +109,7 @@ public class TableEntityWidgetTest {
 	public void testGetDefaultPageSizeNull(){
 		tableBundle.setMaxRowsPerPage(null);
 		// Configure with the default values
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// when null the default should be used.
 		assertEquals(TableEntityWidget.DEFAULT_LIMIT, widget.getDefaultPageSize());
 	}
@@ -108,7 +117,7 @@ public class TableEntityWidgetTest {
 	@Test 
 	public void testDefaultQueryString(){
 		tableBundle.setMaxRowsPerPage(4L);
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		String expected = "SELECT * FROM "+tableEntity.getId();
 		Query query = new Query();
 		query.setSql(expected);
@@ -126,16 +135,38 @@ public class TableEntityWidgetTest {
 		Query query = new Query();
 		query.setSql(sql);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
-		widget.configure(entityBundle, true, mockQueryChangeHandler);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		// The widget must not change the query when it is passed in.
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
+	}
+	
+	@Test
+	public void testConfigureEdit(){
+		boolean canEdit = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+	}
+	
+	@Test
+	public void testConfigureNoEdit(){
+		boolean canEdit = false;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 	}
 	
 	@Test
 	public void testNoColumnsWithEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = true;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
@@ -148,7 +179,7 @@ public class TableEntityWidgetTest {
 	public void testNoColumnsWithWihtouEdit(){
 		entityBundle.getTableBundle().setColumnModels(new LinkedList<ColumnModel>());
 		boolean canEdit = false;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		verify(mockView).setQueryInputVisible(false);
 		verify(mockView).setQueryResultsVisible(false);
 		verify(mockView).setTableMessageVisible(true);
@@ -160,9 +191,11 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testQueryExecutionStarted(){
 		boolean canEdit = true;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.queryExecutionStarted();
 		verify(mockQueryInputWidget).queryExecutionStarted();
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 	}
 	
 	@Test
@@ -172,10 +205,29 @@ public class TableEntityWidgetTest {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryChangeHandler).onQueryChange(startQuery);
+		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+	}
+	
+	@Test
+	public void testQueryExecutionFinishedSuccessNoEdit(){
+		boolean canEdit = false;
+		boolean wasExecutionSuccess = true;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockActionMenu);
+		widget.queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
+		verify(mockQueryChangeHandler).onQueryChange(startQuery);
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu, never()).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 	
 	@Test
@@ -185,10 +237,13 @@ public class TableEntityWidgetTest {
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		reset(mockActionMenu);
 		widget.queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryInputWidget).queryExecutionFinished(wasExecutionSuccess);
 		verify(mockQueryChangeHandler, never()).onQueryChange(any(Query.class));
+		verify(mockActionMenu, never()).setActionVisible(Action.EDIT_TABLE_DATA, true);
+		verify(mockActionMenu, never()).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 	}
 	
 	@Test
@@ -200,7 +255,7 @@ public class TableEntityWidgetTest {
 		startQuery.setLimit(100L);
 		startQuery.setOffset(101L);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
 		verify(mockQueryResultsWidget).configure(startQuery, canEdit, widget);
 		reset(mockQueryResultsWidget);
@@ -213,5 +268,25 @@ public class TableEntityWidgetTest {
 		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
 		verify(mockQueryResultsWidget).configure(expected, canEdit, widget);
+	}
+	
+	@Test
+	public void testOnSchemaToggleShown(){
+		boolean canEdit = true;
+		boolean schemaShown = true;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onSchemaToggle(schemaShown);
+		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.HIDE_SCHEMA);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
+	}
+	
+	@Test
+	public void testOnSchemaToggleHide(){
+		boolean canEdit = true;
+		boolean schemaShown = false;
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		widget.onSchemaToggle(schemaShown);
+		verify(mockActionMenu).setActionText(Action.TOGGLE_TABLE_SCHEMA, TableEntityWidget.SHOW_SCHEMA);
+		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
 	}
 }

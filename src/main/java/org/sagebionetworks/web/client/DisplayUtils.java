@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -33,7 +35,7 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.AlertCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Analysis;
 import org.sagebionetworks.repo.model.Annotations;
@@ -75,6 +77,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Team;
@@ -98,6 +101,7 @@ import org.sagebionetworks.web.shared.EntityWrapper;
 import org.sagebionetworks.web.shared.NodeType;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -206,6 +210,38 @@ public class DisplayUtils {
 	 */
 	public static String getUserNameDescriptionHtml(String name, String description) {
 		return DisplayUtilsGWT.TEMPLATES.nameAndUsername(name, description).asString();
+	}
+	
+	/**
+	 * Returns an HTML String of the suggestion of the user/group associated with the given header.
+	 * @param header header of the displayed usergroup.
+	 * @param width css style width of the created element (e.g. "150px", "3em")
+	 * @param baseFileHandleUrl
+	 * @param baseProfileAttachmentUrl
+	 * @return
+	 */
+	public static String getUserGroupDisplaySuggestionHtml(UserGroupHeader header, String width, String baseFileHandleUrl, String baseProfileAttachmentUrl) {
+		StringBuilder result = new StringBuilder();
+		result.append("<div class=\"padding-left-5 userGroupSuggestion\" style=\"height:23px; width:" + width + ";\">");
+		result.append("<img class=\"margin-right-5 vertical-align-center tiny-thumbnail-image-container\" onerror=\"this.style.display=\'none\';\" src=\"");
+		if (header.getIsIndividual()) {
+			result.append(baseProfileAttachmentUrl);
+			result.append("?userId=" + header.getOwnerId() + "&waitForUrl=true\" />");
+		} else {
+			result.append(baseFileHandleUrl);
+			result.append("?teamId=" + header.getOwnerId() + "\" />");
+		}
+		result.append("<span class=\"search-item movedown-1 margin-right-5\">");
+		if (header.getIsIndividual()) {
+			result.append("<span class=\"font-italic\">" + header.getFirstName() + " " + header.getLastName() + "</span> ");
+		}
+		result.append("<span>" + header.getUserName() + "</span> ");
+		result.append("</span>");
+		if (!header.getIsIndividual()) {
+			result.append("(Team)");
+		}
+		result.append("</div>");
+		return result.toString();
 	}
 	
 	
@@ -351,7 +387,7 @@ public class DisplayUtils {
 	 * @param placeChanger
 	 * @return true if the user has been prompted
 	 */
-	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, SynapseView view) {
+	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, ShowsErrors view) {
 		//send exception to the javascript console
 		if (displayUtilsLogger != null && ex != null)
 			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
@@ -364,14 +400,14 @@ public class DisplayUtils {
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
 			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
 			return true;
 		} else if(ex instanceof ForbiddenException) {			
 			if(!isLoggedIn) {				
 				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 			} else {
-				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES);
+				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
 			}
 			return true;
 		} else if(ex instanceof BadRequestException) {
@@ -873,6 +909,16 @@ public class DisplayUtils {
 		return "#!" + getTeamSearchPlaceString(TeamSearch.class) + ":" + place.toToken();
 	}
 	
+	public static String getPeopleSearchHistoryToken(String searchTerm) {
+		PeopleSearch place = new PeopleSearch(searchTerm);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
+	public static String getPeopleSearchHistoryToken(String searchTerm, Integer start) {
+		PeopleSearch place = new PeopleSearch(searchTerm, start);
+		return "#!" + getPeopleSearchPlaceString(PeopleSearch.class) + ":" + place.toToken();
+	}
+	
 	public static String getTrashHistoryToken(String token, Integer start) {
 		Trash place = new Trash(token, start);
 		return "#!" + getTrashPlaceString(Trash.class) + ":" + place.toToken();
@@ -984,6 +1030,10 @@ public class DisplayUtils {
 	}
 
 	private static String getTeamSearchPlaceString(Class<TeamSearch> place) {
+		return getPlaceString(place.getName());		
+	}
+	
+	private static String getPeopleSearchPlaceString(Class<PeopleSearch> place) {
 		return getPlaceString(place.getName());		
 	}
 	
@@ -1934,67 +1984,6 @@ public class DisplayUtils {
 		container.add(paren);
 	}
 
-	public static void showSharingDialog(final AccessControlListEditor accessControlListEditor, boolean canChangePermission, final Callback callback) {
-		final Dialog window = new Dialog();
-		// configure layout
-		int windowHeight = canChangePermission ? 552 : 282;
-		window.setSize(560, windowHeight);
-		window.setPlain(true);
-		window.setModal(true);
-		window.setHeading(DisplayConstants.TITLE_SHARING_PANEL);
-		window.setLayout(new FitLayout());
-		window.add(accessControlListEditor.asWidget(), new FitData(4));			    
-	    
-		// configure buttons
-		if (canChangePermission) {
-			window.okText = "Save";
-			window.cancelText = "Cancel";
-			window.setButtons(Dialog.OKCANCEL);
-		} else {
-			window.cancelText = "Close";
-			window.setButtons(Dialog.CANCEL);
-		}
-		window.setButtonAlign(HorizontalAlignment.RIGHT);
-	    window.setHideOnButtonClick(false);
-		window.setResizable(true);
-		
-		if (canChangePermission) {
-			// "Apply" button
-			// TODO: Disable the "Apply" button if ACLEditor has no unsaved changes
-			Button applyButton = window.getButtonById(Dialog.OK);
-			applyButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-				@Override
-				public void componentSelected(ButtonEvent ce) {
-					// confirm close action if there are unsaved changes
-					if (accessControlListEditor.hasUnsavedChanges()) {
-						accessControlListEditor.pushChangesToSynapse(false, new AsyncCallback<EntityWrapper>() {
-							@Override
-							public void onSuccess(EntityWrapper result) {
-								callback.invoke();
-							}
-							@Override
-							public void onFailure(Throwable caught) {
-								//failure notification is handled by the acl editor view.
-							}
-						});
-					}
-					window.hide();
-				}
-		    });
-		}
-		
-		// "Close" button				
-		Button closeButton = window.getButtonById(Dialog.CANCEL);
-	    closeButton.addSelectionListener(new SelectionListener<ButtonEvent>() {
-			@Override
-			public void componentSelected(ButtonEvent ce) {
-				window.hide();
-			}
-	    });
-		
-		window.show();
-	}
-
 	public static LayoutContainer createRowContainer() {
 		LayoutContainer row;
 		row = new LayoutContainer();
@@ -2054,35 +2043,36 @@ public class DisplayUtils {
 	public static FlowPanel getMediaObject(String heading, String description, ClickHandler clickHandler, String pictureUri, boolean defaultPictureSinglePerson, int headingLevel) {
 		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("media");
-		String linkStyle = "";
-		if (clickHandler != null)
-			linkStyle = "link";
-		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
-		if (clickHandler != null)
-			headingHtml.addClickHandler(clickHandler);
-		
-		if (pictureUri != null) {
-			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
-			profilePicture.addStyleName("pull-left media-object imageButton");
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		} else {
-			//display default picture
-			String iconClass = defaultPictureSinglePerson ? "user" : "users";
-			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 imageButton userProfileImage lightGreyText margin-0-imp-before"));
-			profilePicture.addStyleName("pull-left media-object displayInline ");
-			if (clickHandler != null)
-				profilePicture.addClickHandler(clickHandler);
-			panel.add(profilePicture);
-		}
-		FlowPanel mediaBodyPanel = new FlowPanel();
-		mediaBodyPanel.addStyleName("media-body");
-		mediaBodyPanel.add(headingHtml);
-		if (description != null)
-			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
-		panel.add(mediaBodyPanel);
-		return panel;
+ 		String linkStyle = "";
+ 		if (clickHandler != null)
+ 			linkStyle = "link";
+ 		HTML headingHtml = new HTML("<h"+headingLevel+" class=\"media-heading "+linkStyle+"\">" + SafeHtmlUtils.htmlEscape(heading) + "</h"+headingLevel+">");
+ 		if (clickHandler != null)
+ 			headingHtml.addClickHandler(clickHandler);
+ 
+ 		if (pictureUri != null) {
+ 			FitImage profilePicture = new FitImage(pictureUri, 64, 64);
+ 			profilePicture.addStyleName("pull-left media-object imageButton");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		} else {
+ 			//display default picture
+ 			String iconClass = defaultPictureSinglePerson ? "user" : "users";
+ 			String clickableButtonCssClass = clickHandler != null ? "imageButton" : "";
+ 			HTML profilePicture = new HTML(DisplayUtils.getFontelloIcon(iconClass + " font-size-58 padding-2 " + clickableButtonCssClass + " userProfileImage lightGreyText margin-0-imp-before"));
+ 			profilePicture.addStyleName("pull-left media-object displayInline ");
+ 			if (clickHandler != null)
+ 				profilePicture.addClickHandler(clickHandler);
+ 			panel.add(profilePicture);
+ 		}
+ 		FlowPanel mediaBodyPanel = new FlowPanel();
+ 		mediaBodyPanel.addStyleName("media-body");
+ 		mediaBodyPanel.add(headingHtml);
+ 		if (description != null)
+ 			mediaBodyPanel.add(new HTML(SafeHtmlUtils.htmlEscape(description)));
+ 		panel.add(mediaBodyPanel);
+ 		return panel;
 	}
 	
 	public static SimpleComboBox<String> createSimpleComboBox(List<String> values, String defaultValue){
@@ -2143,7 +2133,7 @@ public class DisplayUtils {
 	}
 	
 	public static String getPreviewSuffix(Boolean isPreview) {
-		return isPreview ? WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
+		return isPreview ? org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_PREVIEW_SUFFIX : "";
 	}
 	
 	public static void hide(UIObject uiObject) {

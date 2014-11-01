@@ -35,14 +35,14 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		view.setPresenter(this);
 	}	
 	
-	public Widget asWidget(EntityBundle bundle, boolean isAdministrator, boolean canEdit) {		
+	public Widget asWidget(EntityBundle bundle) {		
 		view.setPresenter(this);
 		this.entityBundle = bundle; 		
 		
 		// Get EntityType
 		EntityType entityType = entityTypeProvider.getEntityTypeForEntity(bundle.getEntity());
 		
-		view.createTitlebar(bundle, entityType, authenticationController, isAdministrator, canEdit);
+		view.createTitlebar(bundle, entityType, authenticationController);
 		return view.asWidget();
 	}
 	

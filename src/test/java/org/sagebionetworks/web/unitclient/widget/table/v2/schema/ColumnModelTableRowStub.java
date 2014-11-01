@@ -145,5 +145,10 @@ public class ColumnModelTableRowStub implements ColumnModelTableRow {
 	public void setEnumValues(List<String> enumValues) {
 		this.enumValues = enumValues;
 	}
+	@Override
+	public void setSelectVisible(boolean visible) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

@@ -6,30 +6,34 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.markdown.constants.WidgetConstants;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.EventHandlerUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetView {
-	
 	private static final int FIELD_WIDTH = 500;
 	private SageImageBundle sageImageBundle;
 	
@@ -43,6 +47,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	private FlowPanel currentWizardContent;
 	private Callback okButtonCallback;
 	private WizardProgressWidget progressWidget;
+	private HandlerRegistration messageHandler;
 	
 	@Inject
 	public JoinTeamWidgetViewImpl(SageImageBundle sageImageBundle, MarkdownWidget wikiPage, WizardProgressWidget progressWidget, Dialog joinWizard) {
@@ -195,7 +200,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		this.presenter = presenter;
 	}
 	
-			@Override
+	@Override
 	public void showJoinWizard() {
 		FlowPanel body = new FlowPanel();
 		body.add(progressWidget.asWidget());
@@ -213,6 +218,7 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 		}, false);
 		
 		joinWizard.show();
+		enablePrimaryButton();
 	}
 			
 	public void showChallengeInfoPage(UserProfile profile, WikiPageKey challengeInfoWikiPageKey, Callback presenterCallback) {
@@ -224,16 +230,75 @@ public class JoinTeamWidgetViewImpl extends FlowPanel implements JoinTeamWidgetV
 	}
 		
 	@Override
-	public void showAccessRequirement(
-			String arText,
-			final Callback touAcceptanceCallback) {
-		joinWizard.getPrimaryButton().setText(DisplayConstants.ACCEPT);
-		currentWizardContent.clear();
-        currentWizardContent.add(new HTML(arText));
-        okButtonCallback = touAcceptanceCallback;
+	public void showTermsOfUseAccessRequirement(String arText, Callback touAcceptanceCallback) {
+		showAccessRequirement(arText, touAcceptanceCallback, DisplayConstants.ACCEPT);
 	}
 	
-			@Override
+	@Override
+	public void showACTAccessRequirement(String arText, Callback callback) {
+		showAccessRequirement(arText, callback, DisplayConstants.BUTTON_CONTINUE);
+	}
+	
+	private void showAccessRequirement(String arText, Callback callback, String primaryButtonText) {
+		joinWizard.getPrimaryButton().setText(primaryButtonText);
+		currentWizardContent.clear();
+        currentWizardContent.add(new HTML(arText));
+        okButtonCallback = callback;
+	}
+	
+	@Override
+	public void showPostMessageContentAccessRequirement(String url, Callback touAcceptanceCallback) {
+		//add the iframe, and wait for the message event to re-enable the continue button
+		joinWizard.getPrimaryButton().setEnabled(false);
+		joinWizard.getPrimaryButton().setText(DisplayConstants.BUTTON_CONTINUE);
+		currentWizardContent.clear();
+		Frame frame = new Frame(url);
+		frame.setHeight("800px");
+		frame.getElement().setAttribute("seamless", "true");
+		currentWizardContent.add(frame);
+		okButtonCallback = touAcceptanceCallback;
+	}
+	
+	/**
+	 * Called when message is received from iframe (via postMessage)
+	 */
+	public void enablePrimaryButton() {
+		joinWizard.getPrimaryButton().setEnabled(true);
+	}
+
+	@Override
+	protected void onAttach() {
+		//register to listen for the "message" events
+		if (messageHandler == null) {
+			messageHandler = EventHandlerUtils.addEventListener("message", EventHandlerUtils.getWnd(), new JavaScriptCallback() {
+				
+				@Override
+				public void invoke(JavaScriptObject event) {
+					if (_isSuccessMessage(event)) {
+						enablePrimaryButton();
+					}
+				}
+			});
+		}
+		super.onAttach();
+	}
+	
+	private static native boolean _isSuccessMessage(JavaScriptObject event) /*-{
+		console.log("event received: "+event);
+		console.log("event.data received: "+event.data);
+		return (event !== undefined && event.data !== undefined && 'success' === event.data.toLowerCase());
+    }-*/;
+	
+	@Override
+	protected void onDetach() {
+		if (messageHandler != null) {
+			messageHandler.removeHandler();
+			messageHandler = null;
+		}
+		super.onDetach();
+	}
+	
+	@Override
 	public void updateWizardProgress(int currentPage, int totalPages) {
 		progressWidget.configure(currentPage, totalPages);
 	}

@@ -16,7 +16,7 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
- 		<synapse.version>2014-09-12-1396-aab5200</synapse.version>
+ 		<synapse.version>64.0</synapse.version>
 		<gwtVersion>2.5.1</gwtVersion>
 		<org.springframework.version>4.0.2.RELEASE</org.springframework.version>
 		<guiceVersion>3.0-rc2</guiceVersion>
@@ -25,7 +25,7 @@
 		<org.json.version>20090211</org.json.version>
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.0-beta8</log4j.version>
-		<gwtboostrap3.version>0.8.1-gwt-2.5.1</gwtboostrap3.version>
+		<gwtboostrap3.version>0.8.3-gwt-2.5.1</gwtboostrap3.version>
 	</properties>
 
 	<repositories>
@@ -324,7 +324,7 @@
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>markdown</artifactId>
-			<version>2014-06-02-e29550a-12</version>
+			<version>2014-10-24-84cc532-13</version>
 		</dependency>
 		
 		
