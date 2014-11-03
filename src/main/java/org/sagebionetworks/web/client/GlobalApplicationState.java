@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
 import com.google.gwt.activity.shared.ActivityMapper;
@@ -85,7 +86,7 @@ public interface GlobalApplicationState {
 	/**
 	 * As app loads, initialize Synapse properties in the GlobalApplicationState so that they can be used client-side.
 	 */
-	void initSynapseProperties();
+	void initSynapseProperties(Callback c);
 	
 	String getSynapseProperty(String key);
 }

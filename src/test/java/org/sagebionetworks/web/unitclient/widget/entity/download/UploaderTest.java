@@ -357,6 +357,8 @@ public class UploaderTest {
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("ok.net").when(synapseClient).getHost(anyString(), any(AsyncCallback.class));
+		
 		uploader.queryForUploadDestination();
 		assertEquals(UploadType.SFTP, uploader.getCurrentUploadType());
 		verify(view).showUploadingToExternalStorage(anyString(), anyString());
@@ -470,18 +472,6 @@ public class UploaderTest {
 	public void testUploadFiles() {
 		uploader.uploadFiles();
 		verify(view).triggerUpload();
-	}
-	
-	@Test
-	public void testGetSftpDomain() {
-		assertEquals("mydomain.com", uploader.getSftpDomain("sfTp://mydomain.com/foo/bar"));
-		assertEquals("mydomain.com", uploader.getSftpDomain("sFtp://mydomain.com"));
-		assertNull(uploader.getSftpDomain(null));
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testInvalidSftpUrl() {
-		uploader.getSftpDomain("http://notsftp.com/bar");
 	}
 	
 	@Test

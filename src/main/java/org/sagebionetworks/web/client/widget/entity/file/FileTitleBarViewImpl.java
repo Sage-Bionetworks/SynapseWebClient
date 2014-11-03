@@ -205,6 +205,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				authorizedDirectDownloadImage.setVisible(true);
 				authorizedDirectDownloadLink.setText(entity.getName());
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadImage.setVisible(true);
@@ -218,6 +220,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			licensedDownloadLink.setVisible(true);
 			downloadButtonContainer.setVisible(true);
 		}
+	}
+	@Override
+	public void setLoginInstructions(String instructions) {
+		loginModalWidget.setInstructionMessage(instructions);
 	}
 	
 	@Override
