@@ -29,7 +29,6 @@ public class LoginModalWidget implements LoginModalView.Presenter, IsWidget {
 	@Override
 	public void onPrimary() {
 		view.submitForm(action, method, encodingType);
-		view.hideModal();
 	}
 
 	
