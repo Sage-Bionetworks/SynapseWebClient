@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
-import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.EntityType;
@@ -30,7 +29,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -207,9 +205,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				authorizedDirectDownloadImage.setVisible(true);
 				authorizedDirectDownloadLink.setText(entity.getName());
 				loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-				String encodedSftpUrl = FileTitleBar.getEncodedSftpUrl(sftpProxy, directDownloadUrl);
-				String sftpDomain = FileTitleBar.getSftpDomain(encodedSftpUrl); 
-				loginModalWidget.setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SafeHtmlUtils.htmlEscape(sftpDomain));
+				String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+				presenter.queryForSftpLoginInstructions(url);
 			} else {
 				directDownloadLink.setVisible(true);
 				directDownloadImage.setVisible(true);
@@ -223,6 +220,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 			licensedDownloadLink.setVisible(true);
 			downloadButtonContainer.setVisible(true);
 		}
+	}
+	@Override
+	public void setLoginInstructions(String instructions) {
+		loginModalWidget.setInstructionMessage(instructions);
 	}
 	
 	@Override

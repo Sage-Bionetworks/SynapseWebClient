@@ -250,7 +250,6 @@ public class WebConstants {
 	public static final String LIMIT_ONE = "' limit 1";
 	
 	public static final String SFTP_PREFIX = "sftp://";
-	public static final String SFTP_PREFIX_ENCODED = "sftp%3a%2f%2f";
 	
 	public static final String USER_ID_PARAM = "userId";
 	public static final String EMAIL_PARAM = "email";

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeProvider;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.shared.EntityType;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.http.client.URL;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -98,45 +100,20 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
 
-	public static String getEncodedSftpUrl(String sftpProxy, String proxiedSftpLink) {
-		//input params should not be null, and the proxied sftp link should be longer than the sftp proxy url!
-		if (proxiedSftpLink == null || sftpProxy == null) {
-			return null;
-		}
-		if (proxiedSftpLink.length() <= sftpProxy.length())
-			throw new IllegalArgumentException("Not a valid proxied sftp link: proxiedSftpLink=" + proxiedSftpLink + " sftpProxy="+sftpProxy);
-		
-		//where is the encoded sftp prefix?
-		int sftpPrefixIndex = proxiedSftpLink.toLowerCase().indexOf(WebConstants.SFTP_PREFIX_ENCODED);
-		if (sftpPrefixIndex == -1) {
-			throw new IllegalArgumentException("Proxied sftp link does not contain an encoded sftp url: proxiedSftpLink=" + proxiedSftpLink);
-		}
-		return proxiedSftpLink.substring(sftpPrefixIndex);
-	}
 	
-	public static String getSftpDomain(String encodedSftpUrl) {
-		if (encodedSftpUrl == null)
-			return null;
-		if (!encodedSftpUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX_ENCODED)) {
-			throw new IllegalArgumentException("Not an encoded sftp url: " + encodedSftpUrl);
-		}
-		String domain = encodedSftpUrl.substring(WebConstants.SFTP_PREFIX_ENCODED.length());
-		//if a port is specified, then find the (encoded) colon
-		int colonIndex = domain.indexOf("%3A");
-		if (colonIndex != -1) {
-			domain = domain.substring(0, colonIndex);
-		} else {
-			//no port, find the (encoded) slash
-			int slashIndex = domain.indexOf("%2F");
-			if (slashIndex != -1) {
-				domain = domain.substring(0, slashIndex);
+	public void queryForSftpLoginInstructions(String url) {
+		synapseClient.getHost(url, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String host) {
+				//update the download login dialog message
+				view.setLoginInstructions(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SafeHtmlUtils.htmlEscape(host));
 			}
-			
-		}
-		return domain;
-
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
-	
 	
 	/*
 	 * Private Methods

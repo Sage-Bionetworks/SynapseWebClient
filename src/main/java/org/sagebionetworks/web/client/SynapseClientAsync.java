@@ -386,4 +386,6 @@ public interface SynapseClientAsync {
 
 	void getMyProjects(int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
 	void getUserProjects(String userId, int limit, int offset, AsyncCallback<ProjectPagedResults> projectHeaders);
+	
+	void getHost(String urlString, AsyncCallback<String> callback);
 }

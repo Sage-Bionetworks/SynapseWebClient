@@ -487,4 +487,6 @@ public interface SynapseClient extends RemoteService {
 	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
 	ProjectPagedResults getMyProjects(int limit, int offset) throws RestServiceException;
 	ProjectPagedResults getUserProjects(String userId, int limit, int offset) throws RestServiceException;
+	
+	String getHost(String urlString) throws RestServiceException;
 }
