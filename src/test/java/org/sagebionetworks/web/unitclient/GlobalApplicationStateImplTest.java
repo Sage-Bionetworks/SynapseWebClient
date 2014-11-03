@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -104,10 +105,13 @@ public class GlobalApplicationStateImplTest {
 		String value = "v1";
 		testProps.put(key, value);
 		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
-		globalApplicationState.initSynapseProperties();
+		Callback mockCallback = mock(Callback.class);
+		globalApplicationState.initSynapseProperties(mockCallback);
+		
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
+		verify(mockCallback).invoke();
 	}
 	
 }

@@ -28,7 +28,7 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void triggerUpload();
 	
 	void showUploadingToSynapseStorage(String banner);
-	void showUploadingToExternalStorage(String url, String banner);
+	void showUploadingToExternalStorage(String host, String banner);
 	
 	/**
 	 * SFTP requires username and password, so prompt for it in the upload form.

@@ -200,7 +200,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						if (UploadType.SFTP == d.getUploadType()){
 							currentUploadType = UploadType.SFTP;
 							currentExternalUploadUrl = d.getUrl();
-							view.showUploadingToExternalStorage(getSftpDomain(currentExternalUploadUrl), d.getBanner());
+							getSftpHost(currentExternalUploadUrl, d.getBanner());
 							disableMultipleFileUploads();
 						} else {
 							onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported external upload type: " + d.getUploadType()));
@@ -219,18 +219,17 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public String getSftpDomain(String url) {
-		if (url == null)
-			return null;
-		if (!url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
-			throw new IllegalArgumentException("Not a sftp url: " + url);
-		}
-		String domain = url.substring(WebConstants.SFTP_PREFIX.length());
-		int slashIndex = domain.indexOf("/");
-		if (slashIndex != -1) {
-			domain = domain.substring(0, slashIndex);
-		}
-		return domain;
+	public void getSftpHost(String url, final String banner) {
+		synapseClient.getHost(url, new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String host) {
+				view.showUploadingToExternalStorage(host, banner);		
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	/**
