@@ -85,4 +85,6 @@ public interface LoginModalView extends IsWidget {
 	 * @param action
 	 */
 	public void submitForm(String actionUrl, String method, String encodingType);
+	
+	void clearForm();
 }

@@ -121,5 +121,10 @@ public class LoginModalViewImpl implements LoginModalView {
 		formPanel.submit();
 	}
 	
+	@Override
+	public void clearForm() {
+		usernameField.setValue("");
+		passwordField.setValue("");
+	}
 	
 }
