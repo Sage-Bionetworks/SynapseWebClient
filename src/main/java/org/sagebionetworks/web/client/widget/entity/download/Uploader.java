@@ -219,16 +219,24 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	public String getSftpDomain(String url) {
+	public static String getSftpDomain(String url) {
 		if (url == null)
 			return null;
 		if (!url.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 			throw new IllegalArgumentException("Not a sftp url: " + url);
 		}
 		String domain = url.substring(WebConstants.SFTP_PREFIX.length());
-		int slashIndex = domain.indexOf("/");
-		if (slashIndex != -1) {
-			domain = domain.substring(0, slashIndex);
+		//if a port is specified, then find the colon
+		int colonIndex = domain.indexOf(":");
+		if (colonIndex != -1) {
+			domain = domain.substring(0, colonIndex);
+		} else {
+			//no port, find the slash
+			int slashIndex = domain.indexOf("/");
+			if (slashIndex != -1) {
+				domain = domain.substring(0, slashIndex);
+			}
+			
 		}
 		return domain;
 	}

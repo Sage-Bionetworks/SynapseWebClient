@@ -476,6 +476,7 @@ public class UploaderTest {
 	public void testGetSftpDomain() {
 		assertEquals("mydomain.com", uploader.getSftpDomain("sfTp://mydomain.com/foo/bar"));
 		assertEquals("mydomain.com", uploader.getSftpDomain("sFtp://mydomain.com"));
+		assertEquals("mydomain.com", uploader.getSftpDomain("sftp://mydomain.com:22/foo/bar"));
 		assertNull(uploader.getSftpDomain(null));
 	}
 	

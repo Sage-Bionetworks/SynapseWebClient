@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -68,4 +70,36 @@ public class FileTitleBarTest {
 		Assert.assertTrue(FileTitleBar.isDataPossiblyWithin(fileEntity));
 	}
 
+	@Test
+	public void testGetSftpDomain() {
+		assertEquals("tcgaftps.nci.nih.gov", FileTitleBar.getSftpDomain("sftp%3A%2F%2Ftcgaftps.nci.nih.gov%3A22%2Ftcgapancantestdir%2Fsynapse%2Fjays-project-settings-test%2F58965f00-6714-4f8e-9f15-6da302259e13%2Ftesting-only.txt"));
+		assertEquals("tcgaftps.nci.nih.gov", FileTitleBar.getSftpDomain("sftp%3A%2F%2Ftcgaftps.nci.nih.gov%2Ftcgapancantestdir%2Fsynapse%2Fjays-project-settings-test%2F58965f00-6714-4f8e-9f15-6da302259e13%2Ftesting-only.txt"));
+		assertEquals("tcgaftps.nci.nih.gov", FileTitleBar.getSftpDomain("sftp%3A%2F%2Ftcgaftps.nci.nih.gov"));
+		
+		assertNull(FileTitleBar.getSftpDomain(null));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidSftpUrl() {
+		FileTitleBar.getSftpDomain("http://notsftp.com/bar");
+	}
+	
+	@Test
+	public void testGetEncodedSftpUrl() {
+		String sftpProxy = "https://sftp.synapse.org/sftp";
+		String encodedSftpUrl = "sftp%3A%2F%2Ftcgaftps.nci.nih.gov%3A22%2Ftcgapancantestdir%2Fsynapse%2Fjays-project-settings-test%2F58965f00-6714-4f8e-9f15-6da302259e13%2Ftesting-only.txt";
+		String proxiedSftpLink = "https://sftp.synapse.org/sftp?url=" + encodedSftpUrl;
+		assertEquals(encodedSftpUrl, FileTitleBar.getEncodedSftpUrl(sftpProxy, proxiedSftpLink));
+		assertNull(FileTitleBar.getEncodedSftpUrl(null, proxiedSftpLink));
+		assertNull(FileTitleBar.getEncodedSftpUrl(sftpProxy, null));
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidEncodedSftpUrl() {
+		String sftpProxy = "https://sftp.synapse.org/sftp";
+		String encodedSftpUrl = "invalidUrl";
+		String proxiedSftpLink = "https://sftp.synapse.org/sftp?url=" + encodedSftpUrl;
+		FileTitleBar.getEncodedSftpUrl(sftpProxy, proxiedSftpLink);
+	}
+	
 }
