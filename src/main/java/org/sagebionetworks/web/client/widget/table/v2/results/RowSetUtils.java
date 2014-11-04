@@ -105,13 +105,13 @@ public class RowSetUtils {
 			String header = headers.get(i);
 			// aggregate rows can have null headers so skip them.
 			if (header != null) {
-				String value = toUpdate.getValues().get(i);
-				if (original == null) {
-					// Create
-					map.put(header, value);
-				} else if (!value.equals(original.getValues().get(i))) {
-					// update
-					map.put(header, value);
+				String updateValue =  toUpdate.getValues().get(i);
+				if(original == null){
+					map.put(header, trimWithEmptyAsNull(updateValue));
+				}else{
+					if(isValueChanged(original.getValues().get(i), updateValue)){
+						map.put(header, trimWithEmptyAsNull(updateValue));
+					}
 				}
 			}
 		}
@@ -127,6 +127,42 @@ public class RowSetUtils {
 			return pr;
 		}
 	}
+	/**
+	 * Compare two cell values and decide if there is a change.
+	 * This method will treat empty string and null as equal.
+	 * Also non-null strings are trimmed before compared.
+	 * @param original
+	 * @param changed
+	 * @return
+	 */
+	public static boolean isValueChanged(String inOriginal, String inChanged){
+		String tOriginal = trimWithEmptyAsNull(inOriginal);
+		String tChanged = trimWithEmptyAsNull(inChanged);
+		if(tOriginal == null){
+			if(tChanged == null){
+				return false;
+			}
+			return true;
+		}else{
+			return !tOriginal.equals(tChanged);
+		}
+	}
+	/**
+	 * @return Returns null if the passed value is null.  Returns null if the trimmed string is empty else the trimmed string.  
+	 */
+	public static String trimWithEmptyAsNull(String toUpdate){
+		if(toUpdate == null){
+			return null;
+		}else{
+			String trim = toUpdate.trim();
+			if(trim.isEmpty()){
+				return null;
+			}else{
+				return trim;
+			}
+		}
+	}
+	
 
 	/**
 	 * Build up a map of rowIds to rows. Any row without a RowID will no be

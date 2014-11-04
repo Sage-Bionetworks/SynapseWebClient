@@ -10,16 +10,15 @@
 		<param-value>/WEB-INF/portal-context.xml</param-value>
 	</context-param>
 
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
+	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html 
 	<listener>
 		<listener-class>org.apache.logging.log4j.core.web.Log4jServletContextListener</listener-class>
 	</listener>
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
+	
 	<filter>
 		<filter-name>log4jServletFilter</filter-name>
 		<filter-class>org.apache.logging.log4j.core.web.Log4jServletFilter</filter-class>
 	</filter>
-	<!-- This is required for logging: see http://logging.apache.org/log4j/2.x/manual/webapp.html -->
 	<filter-mapping>
 		<filter-name>log4jServletFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -28,6 +27,7 @@
 		<dispatcher>INCLUDE</dispatcher>
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
+	-->
 
 
 	<!-- This listener will load other application context file in addition 
