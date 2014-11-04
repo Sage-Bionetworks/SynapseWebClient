@@ -3,8 +3,10 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +16,7 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
@@ -336,5 +339,20 @@ public class RowSetUtilsTest {
 	@Test
 	public void testTrimWithEmptyAsNull_Trim(){
 		assertEquals("a", RowSetUtils.trimWithEmptyAsNull(" a\n "));
+	}
+	/**
+	 * This is currently throwing an exception.
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testPartialRowWithNulls() throws JSONObjectAdapterException{
+		PartialRow pr = new PartialRow();
+		pr.setRowId(123L);
+		Map<String, String> values = new HashMap<String, String>();
+		values.put("a", null);
+		values.put("b", "");
+		pr.setValues(values);
+		String json = EntityFactory.createJSONStringForEntity(pr);
+		PartialRow clone = EntityFactory.createEntityFromJSONString(json, PartialRow.class);
 	}
 }
