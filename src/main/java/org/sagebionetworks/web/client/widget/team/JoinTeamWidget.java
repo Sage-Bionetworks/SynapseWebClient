@@ -58,6 +58,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	private int currentAccessRequirement;
 	
 	public static final String[] EXTRA_INFO_URL_WHITELIST = { 
+		"https://www.projectdatasphere.org/projectdatasphere/",
 		"https://mpmdev.ondemand.sas.com/projectdatasphere/"
 	};
 
