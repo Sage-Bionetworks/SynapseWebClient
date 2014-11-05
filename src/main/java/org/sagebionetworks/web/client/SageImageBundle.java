@@ -83,7 +83,7 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/spotlight/Dream85_Banner.jpg")
 	ImageResource dream85Banner();
 	
-	@Source("images/spotlight/Olfaction_Prediction_banner.png")
+	@Source("images/spotlight/Olfaction_Prediction_banner.jpg")
 	ImageResource dreamOP();
 	
 	@Source("images/spotlight/Project_datasphere_banner.jpg")
