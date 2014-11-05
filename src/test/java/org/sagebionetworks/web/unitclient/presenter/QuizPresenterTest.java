@@ -161,6 +161,8 @@ public class QuizPresenterTest {
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		ArgumentCaptor<Quiz> arg = ArgumentCaptor.forClass(Quiz.class);
 		verify(mockView).showQuiz(arg.capture());
+		verify(mockView).showLoading();
+		verify(mockView).hideLoading();
 		//mock quiz has 5 questions
 		assertEquals(5, arg.getValue().getQuestions().size());
 	}
@@ -170,6 +172,8 @@ public class QuizPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
 		presenter.getQuiz();
 		verify(mockSynapseClient).getCertificationQuiz(any(AsyncCallback.class));
+		verify(mockView).showLoading();
+		verify(mockView).hideLoading();
 		verify(mockView).showErrorMessage(anyString());
 	}
 	

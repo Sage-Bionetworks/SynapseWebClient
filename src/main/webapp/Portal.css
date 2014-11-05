@@ -691,6 +691,10 @@ a.shortBtn {
 	margin-right: -15px;
 }
 
+.margin-150 {
+	margin: 150px;
+}
+
 .tab-background {
 	background-color: #f9f9f9;
 	border-left: 1px solid #ddd;
