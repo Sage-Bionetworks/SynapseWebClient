@@ -8,6 +8,10 @@
 	text-align: center;
 } */
 
+.overflow-y-scroll-imp {
+	overflow-y: scroll !important;
+}
+
 .sf-j-menu {
 	float: right !important;
 	margin-bottom: 1em;
