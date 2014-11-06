@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -7,13 +8,13 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 
-import com.extjs.gxt.ui.client.data.ModelData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -42,21 +43,22 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	}
 	
 	@Override
-	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
+	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
-		TocItem mainPage = (TocItem) root.getChild(0);
-		if (mainPage.getChildCount() == 0)
+		//TocItem mainPage = (TocItem) root.getChild(0);
+		
+		if (tree.getItemCount() == 0)
 			return;
 		//only show the tree if the root has children
-		if (mainPage.getChildCount() > 0) {
+		if (tree.getItemCount() > 0) {
 			//traverse the tree, and create anchors
 			final UnorderedListPanel ul = new UnorderedListPanel();
 			ul.addStyleName("notopmargin nav bs-sidenav");
-			addTreeItemsRecursive(ul, root.getChildren());
+			addTreeItemsRecursive(ul, getTreeRootChildren(tree));
 			showHideButton = DisplayUtils.createButton("");
 			ulContainer = new FlowPanel();
 			ulContainer.setVisible(true);
@@ -81,6 +83,14 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			hideSubpages();
 		}
 		clearWidths();
+	}
+	
+	private List<SubPageTreeItem> getTreeRootChildren(Tree tree) {
+		List<SubPageTreeItem> result =  new ArrayList<SubPageTreeItem>();
+		for (int i = 0; i < tree.getItemCount(); i++) {
+			result.add((SubPageTreeItem) tree.getItem(i));
+		}
+		return result;
 	}
 	
 	/**
@@ -142,9 +152,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			DisplayUtils.show(ulContainer);
 	}
 	
-	private void addTreeItemsRecursive(UnorderedListPanel ul, List<ModelData> children) {
-		for (ModelData modelData : children) {
-			TocItem treeItem = (TocItem)modelData;
+	private void addTreeItemsRecursive(UnorderedListPanel ul, List<SubPageTreeItem> children) {
+		for (SubPageTreeItem treeItem : children) {
 			String styleName = treeItem.isCurrentPage() ? "active" : "";
 			ul.add(getListItem(treeItem), styleName);
 			if (treeItem.getChildCount() > 0){
@@ -157,7 +166,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		}
 	}
 	
-	private Widget getListItem(final TocItem treeItem) {
+	private Widget getListItem(final SubPageTreeItem treeItem) {
 		Anchor l = new Anchor(treeItem.getText());
 		l.addStyleName("link");
 		l.addClickHandler(new ClickHandler() {

@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +26,11 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -131,7 +131,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 			public void onSuccess(String results) {
 				try {
 					PaginatedResults<JSONEntity> wikiHeaders = nodeModelCreator.createPaginatedResults(results, V2WikiHeader.class);
-					Map<String, TocItem> wikiId2TreeItem = new HashMap<String, TocItem>();
+					Map<String, SubPageTreeItem> wikiId2TreeItem = new HashMap<String, SubPageTreeItem>();
 					
 					//now grab all of the headers associated with this level
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
@@ -148,25 +148,25 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							title = header.getTitle();
 						}
 						
-						TocItem item = new TocItem(title, targetPlace, isCurrentPage);
+						SubPageTreeItem item = new SubPageTreeItem(title, targetPlace, isCurrentPage);
 						wikiId2TreeItem.put(header.getId(), item);
 					}
 					//now set up the relationships
-					TocItem root = new TocItem();
+					Tree tree = new Tree();
 					
 					for (JSONEntity headerEntity : wikiHeaders.getResults()) {
 						V2WikiHeader header = (V2WikiHeader) headerEntity;
 						if (header.getParentId() != null){
 							//add this as a child							
-							TocItem parent = wikiId2TreeItem.get(header.getParentId());
-							TocItem child = wikiId2TreeItem.get(header.getId());
-							parent.add(child);
+							SubPageTreeItem parent = wikiId2TreeItem.get(header.getParentId());
+							SubPageTreeItem child = wikiId2TreeItem.get(header.getId());
+							parent.addItem(child);
 						} else {
-							root.add(wikiId2TreeItem.get(header.getId()));
+							tree.addItem(wikiId2TreeItem.get(header.getId()));
 						}
 					}
 					
-					view.configure(root, wikiSubpagesContainer, wikiPageContainer);
+					view.configure(tree, wikiSubpagesContainer, wikiPageContainer);
 				} catch (JSONObjectAdapterException e) {
 					onFailure(new UnknownErrorException(DisplayConstants.ERROR_INCOMPATIBLE_CLIENT_VERSION));
 				}
@@ -186,51 +186,27 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 	}
 }
 
-class TocItem extends BaseTreeModel implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	private static int ID = 0;
+class SubPageTreeItem extends TreeItem {
 	private String text;
 	private Place targetPlace;
 	private boolean isCurrentPage;
 	
-	public TocItem() {
-		set("id", ID++);
-	}
-	
-	public TocItem(String text, Place targetPlace, boolean isCurrentPage) {
+	public SubPageTreeItem(String text, Place targetPlace, boolean isCurrentPage) {
 		super();
-		set("id", ID++);
 		this.text = text;
 		this.targetPlace = targetPlace;
 		this.isCurrentPage = isCurrentPage;
 	}
 	
-	public Integer getId() {
-		return (Integer) get("id");
-	}
-	
-	public TocItem(String text, Synapse targetPlace, boolean isCurrentPage, BaseTreeModel[] children) {
-		this(text, targetPlace, isCurrentPage);
-		for(int i = 0; i < children.length; i++) {
-			add(children[i]);
+	public List<SubPageTreeItem> getChildren() {
+		List<SubPageTreeItem> children = new ArrayList<SubPageTreeItem>();
+		for (int i = 0; i < super.getChildCount(); i++) {
+			children.add((SubPageTreeItem) super.getChild(i));
 		}
+		return children;
 	}
 	
-	public Place getTargetPlace() {
-		return targetPlace;
-	}
-	
-	public String getText() {
-		return text;
-	}
-	
-	public boolean isCurrentPage() {
-		return isCurrentPage;
-	}
-	
-	@Override
-	public String toString() {
-		return "<span> " + getText() + "</span>";
-	}
+	public String getText()				{	return text;			}
+	public Place getTargetPlace()		{	return targetPlace;		}
+	public boolean isCurrentPage()	{	return isCurrentPage;	}
 }

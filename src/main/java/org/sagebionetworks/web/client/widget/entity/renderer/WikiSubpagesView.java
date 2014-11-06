@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Tree;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
 
@@ -18,7 +19,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(TocItem root, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
+	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer);
 	void hideSubpages();
 	void showSubpages();
 	/**
