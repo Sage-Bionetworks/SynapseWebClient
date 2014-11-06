@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.view;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -240,12 +241,12 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		certifiedUserImage.setWidth("25px");
 		certifiedUserImage.setPixelSize(25, 32);
 		certifiedUserImage.addStyleName("imageButton margin-top-10 vertical-align-top moveup-8 margin-right-10");
-//		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
+		final Tooltip tooltip = DisplayUtils.addTooltip(certifiedUserImage.asWidget(), DisplayConstants.CERTIFIED_USER);
 		certifiedUserImage.addClickHandler(new ClickHandler() {
 	@Override
 			public void onClick(ClickEvent event) {
 				clear();
-//				tooltip.hide();
+				tooltip.hide();
 				presenter.certificationBadgeClicked();
 			}
 		});
