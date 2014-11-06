@@ -146,7 +146,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// should not make it to the pre-flight check
-		verify(mockPreflightController, never()).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
 	
 	@Test
@@ -156,12 +156,12 @@ public class EntityActionControllerImplTest {
 		/*
 		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
 		 */
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// Must not make it to the actual delete since preflight failed.
 		verify(mockSynapseClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
 	}
@@ -171,14 +171,14 @@ public class EntityActionControllerImplTest {
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// confirm pre-flight
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
@@ -189,13 +189,13 @@ public class EntityActionControllerImplTest {
 		// confirm the delete
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// confirm pre-flight
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-		verify(mockPreflightController).preflightDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + entityDispalyType + WAS_SUCCESSFULLY_DELETED);

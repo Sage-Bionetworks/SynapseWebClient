@@ -9,26 +9,42 @@ import org.sagebionetworks.web.client.utils.Callback;
  *
  */
 public class PreflightControllerImpl implements PreflightController {
+	
+	CertifiedUserController certifiedUserController;
+	AccessRestrictionController accessRestrictionController;
 
 	@Override
-	public void preflightAddContentToEntity(String destinationEntityId,
+	public void checkUploadToEntity(final EntityBundle uploadTo, final Callback callback) {
+		// Access Restrictions then certified user.
+		accessRestrictionController.checkUploadToEntity(uploadTo, new Callback() {
+			@Override
+			public void invoke() {
+				// Access Restrictions
+				certifiedUserController.checkUploadToEntity(uploadTo, callback);
+			}
+		});
+	}
+
+	@Override
+	public void checkDownloadFromEntity(EntityBundle uploadTo, Callback callback) {
+		// Only access restrictions.
+		accessRestrictionController.checkDownloadFromEntity(uploadTo, callback);
+	}
+
+	@Override
+	public void checkDeleteEntity(EntityBundle toDelete, Callback callback) {
+		certifiedUserController.checkDeleteEntity(toDelete, callback);
+	}
+
+	@Override
+	public void checkCreateEntity(EntityBundle parentBundle, String entityClassName,
 			Callback callback) {
-		// TODO Add a real check
-		callback.invoke();
+		certifiedUserController.checkCreateEntity(parentBundle, entityClassName, callback);;
 	}
 
 	@Override
-	public void preflightSubmitToEvaluation(String evaluationId,
-			String entityIdToSubmit, Callback callback) {
-		// TODO Add a real check
-		callback.invoke();
-
-	}
-
-	@Override
-	public void preflightDeleteEntity(EntityBundle toDelete, Callback callback) {
-		// TODO Add a real check
-		callback.invoke();
+	public void checkUpdateEntity(EntityBundle toUpdate, Callback callback) {
+		certifiedUserController.checkUpdateEntity(toUpdate, callback);
 	}
 
 }

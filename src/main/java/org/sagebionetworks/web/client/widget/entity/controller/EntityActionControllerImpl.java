@@ -143,7 +143,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	public void postConfirmedDeleteEntity() {
 		// The user has confirmed the delete, the next step is the preflight check.
-		preflightController.preflightDeleteEntity(this.entityBundle, new Callback() {
+		preflightController.checkDeleteEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
 				postCheckDeleteEntity();
