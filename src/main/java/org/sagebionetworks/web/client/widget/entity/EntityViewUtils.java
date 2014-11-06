@@ -67,11 +67,10 @@ public class EntityViewUtils {
 		//form the html
 		HTMLPanel htmlPanel = new HTMLPanel(shb.toSafeHtml());
 		htmlPanel.addStyleName("inline-block");
-		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		
 		FlowPanel lc = new FlowPanel();
 		lc.addStyleName("inline-block");
-		
+		DisplayUtils.addTooltip(htmlPanel, tooltip, Placement.BOTTOM);
 		lc.add(htmlPanel);
 		
 		//show the info link if there are any restrictions, or if we are supposed to show the flag link (to allow people to flag or  admin to "change" the data access level).
@@ -101,9 +100,9 @@ public class EntityViewUtils {
 						GovernanceDialogHelper.showLoggedInFlagDialog(jiraFlagLink, iconsImageBundle);
 					}
 				}
-			});		
-			lc.add(flagLink);
+			});
 			DisplayUtils.addTooltip(flagLink, DisplayConstants.FLAG_TOOL_TIP, Placement.BOTTOM);
+			lc.add(flagLink);
 		}
 			
 	    return lc;
