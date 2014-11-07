@@ -552,7 +552,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		filesTabContainer.add(createBottomPadding());
 
 		// Tables Tab
-		tablesTabContainer.add(createTableListWidget(bundle.getEntity().getId(), bundle.getPermissions().getCanCertifiedUserEdit()));
+		tablesTabContainer.add(createTableListWidget(bundle));
 		tablesTabContainer.add(createBottomPadding());
 		
 		// Admin Tab: evaluations
@@ -887,9 +887,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 		return container;
 	}
 
-	private Widget createTableListWidget(String parentId, boolean canEdit) {		
+	private Widget createTableListWidget(EntityBundle bundle) {		
 		final TableListWidget listWidget = ginInjector.getTableListWidget();		
-		listWidget.configure(parentId, canEdit);
+		listWidget.configure(bundle);
 		return listWidget.asWidget();		
 	}
 	
