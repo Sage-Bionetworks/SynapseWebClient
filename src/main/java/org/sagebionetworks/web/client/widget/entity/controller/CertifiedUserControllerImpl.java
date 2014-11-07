@@ -5,10 +5,18 @@ import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 
+import com.google.inject.Inject;
+
 public class CertifiedUserControllerImpl implements CertifiedUserController {
 	
 	QuizInfoDialog quizInfoDialog;
 	
+	@Inject
+	public CertifiedUserControllerImpl(QuizInfoDialog quizInfoDialog) {
+		super();
+		this.quizInfoDialog = quizInfoDialog;
+	}
+
 	@Override
 	public void checkUploadToEntity(EntityBundle toUpdate, Callback callback) {
 		// Only certified users can upload data

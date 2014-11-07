@@ -17,4 +17,11 @@ public interface DownloadController {
 	 * @param callback
 	 */
 	public void checkDownloadFromEntity(EntityBundle uploadTo, Callback callback);
+	
+	/**
+	 * Does the user have an unmet download restriction on this entity?
+	 * @param uploadTo
+	 * @return
+	 */
+	public boolean hasUnmetDownloadRestriction(EntityBundle uploadTo);
 }

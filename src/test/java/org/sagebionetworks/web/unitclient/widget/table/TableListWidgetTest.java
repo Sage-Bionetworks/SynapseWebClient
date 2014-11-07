@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
 import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
 import org.sagebionetworks.repo.model.entity.query.EntityQuery;
@@ -18,6 +20,8 @@ import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
@@ -29,21 +33,29 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class TableListWidgetTest {
 
+	private PreflightController mockPreflightController;
 	private TableListWidgetView mockView;
 	private SynapseClientAsync mockSynapseClient;
 	private PaginationWidget mockpaginationWidget;
 	private CreateTableModalWidget mockcreateTableModalWidget;
 	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
+	private EntityBundle parentBundle;
 	
 	@Before
 	public void before(){
+		UserEntityPermissions permissions = new UserEntityPermissions();
+		permissions.setCanEdit(true);
+		Project project = new Project();
+		project.setId("syn123");
+		parentBundle = new EntityBundle(project, null, permissions, null, null, null, null, null);
 		mockView = Mockito.mock(TableListWidgetView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockpaginationWidget = Mockito.mock(PaginationWidget.class);
 		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
-		widget = new TableListWidget(mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget);
+		mockPreflightController = Mockito.mock(PreflightController.class);
+		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget);
 	}
 	
 	@Test
@@ -66,57 +78,49 @@ public class TableListWidgetTest {
 	
 	@Test
 	public void testConfigureUnderPageSize(){
-		String parentId = "syn123";
-		boolean canEdit = true;
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE-1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentId, canEdit);
+		widget.configure(parentBundle);
 		verify(mockView).showPaginationVisible(false);
 	}
 	
 	@Test
 	public void testConfigureOverPageSize(){
-		String parentId = "syn123";
-		boolean canEdit = true;
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentId, canEdit);
+		widget.configure(parentBundle);
 		verify(mockView).showPaginationVisible(true);
 	}
 	
 	@Test
 	public void testConfigureCanEdit(){
-		String parentId = "syn123";
-		boolean canEdit = true;
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentId, canEdit);
+		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
 	}
 	
 	@Test
 	public void testConfigureCannotEdit(){
-		String parentId = "syn123";
-		boolean canEdit = false;
+		parentBundle.getPermissions().setCanEdit(false);
 		EntityQueryResults results = new EntityQueryResults();
 		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
 		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentId, canEdit);
+		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
 	}
 	
 	@Test
 	public void testConfigureFailure(){
-		String parentId = "syn123";
-		boolean canEdit = false;
+		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentId, canEdit);
+		widget.configure(parentBundle);
 		verify(mockView).showErrorMessage(error);
 	}
 }

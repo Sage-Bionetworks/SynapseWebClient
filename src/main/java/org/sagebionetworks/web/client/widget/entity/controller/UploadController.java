@@ -11,5 +11,5 @@ public interface UploadController {
 	 * @param entityClassName The full class name of the entity to be created.
 	 * @param callback
 	 */
-	public void checkUploadToEntity(EntityBundle uploadTo, Callback callback);
+	public void checkUploadToEntity(EntityBundle bundle, Callback callback);
 }
