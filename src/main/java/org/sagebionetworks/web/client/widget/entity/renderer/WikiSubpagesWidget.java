@@ -165,7 +165,10 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, WidgetRen
 							SubPageTreeItem parent = wikiId2TreeItem.get(header.getParentId());
 							SubPageTreeItem child = wikiId2TreeItem.get(header.getId());
 							parent.addItem(child);
+							parent.setState(true);
 						} else {
+							String styleName = wikiId2TreeItem.get(header.getId()).isCurrentPage() ? "active" : "";
+							
 							tree.addItem(wikiId2TreeItem.get(header.getId()));
 						}
 					}
@@ -200,17 +203,20 @@ class SubPageTreeItem extends TreeItem {
 		this.text = text;
 		this.targetPlace = targetPlace;
 		this.isCurrentPage = isCurrentPage;
+		if (isCurrentPage) {
+			setWidget(new Label(text));	// TODO: Something special = ^ )
+		} else {
+			Anchor l = new Anchor(text);
+			l.addStyleName("link");
+//			l.addClickHandler(new ClickHandler() {
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
+//				}
+//			});
+			setWidget(l);
+		}
 		
-		Anchor l = new Anchor(text);
-		l.addStyleName("link");
-//		l.addClickHandler(new ClickHandler() {
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
-//			}
-//		});
-		
-		setWidget(l);
 		//setState(true);
 	}
 	
