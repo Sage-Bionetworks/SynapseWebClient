@@ -1374,18 +1374,14 @@ public class DisplayUtils {
 	 */
 	public static final String[] CORE_ATTR_INVALID_ELEMENTS = {"base", "head", "html", "meta",
 															   "param", "script", "style", "title"};
-	/**
-	 * A counter variable for assigning unqiue id's to tool-tippified elements
-	 */
-	private static int tooltipCount= 0;
-	private static int popoverCount= 0;
 	
 	public static Tooltip addTooltip(Widget widget, String tooltipText){
 		return addTooltip(widget, tooltipText, Placement.AUTO);
 	}
 	
 	/**
-	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration
+	 * Adds a twitter bootstrap tooltip to the given widget using the standard Synapse configuration.
+	 * NOTE: Add the widget to the parent container only after adding the tooltip (the Tooltip is reconfigured on attach event).
 	 *
 	 * CAUTION - If not used with a non-block level element like
 	 * an anchor, img, or span the results will probably not be
@@ -1399,15 +1395,15 @@ public class DisplayUtils {
 	 */
 	public static Tooltip addTooltip(Widget widget, String tooltipText, Placement pos){
 		Tooltip t = new Tooltip();
-		t.setWidget(widget);
 		t.setPlacement(pos);
 		t.setText(tooltipText);
 		t.setIsHtml(true);
 		t.setIsAnimated(false);
 		t.setTrigger(Trigger.HOVER);
+		t.setWidget(widget);
 		return t;
 	}
-
+	
 	/**
 	* Adds a popover to a target widget
 	*/

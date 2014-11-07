@@ -80,20 +80,20 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/Sloan_logo.jpg")
 	ImageResource sloanLogo();
 
-	@Source("images/spotlight/Dream9_AD.png")
-	ImageResource dream9AD();
-	
 	@Source("images/spotlight/Dream85_Banner.jpg")
 	ImageResource dream85Banner();
 	
-	@Source("images/spotlight/Dream9_AML.png")
-	ImageResource dream9AML();
+	@Source("images/spotlight/Olfaction_Prediction_banner.jpg")
+	ImageResource dreamOP();
 	
-	@Source("images/spotlight/Dream9_BROAD.jpg")
-	ImageResource dream9Broad();
+	@Source("images/spotlight/Project_datasphere_banner.jpg")
+	ImageResource dreamPDS();
 	
-	@Source("images/spotlight/Dream85_SM.jpg")
-	ImageResource dream85SM();
+	@Source("images/spotlight/SMC-Het_banner.jpg")
+	ImageResource dreamSMCHet();
+	
+	@Source("images/spotlight/SMC-RNA_banner.png")
+	ImageResource dreamSMCRNA();
 	
 	@Source("images/spotlight/TcgaPancancer.jpg")
 	ImageResource tcgaPancancer();

@@ -8,6 +8,10 @@
 	text-align: center;
 } */
 
+.overflow-y-scroll-imp {
+	overflow-y: scroll !important;
+}
+
 .sf-j-menu {
 	float: right !important;
 	margin-bottom: 1em;
@@ -687,6 +691,10 @@ a.shortBtn {
 	margin-right: -15px;
 }
 
+.margin-150 {
+	margin: 150px;
+}
+
 .tab-background {
 	background-color: #f9f9f9;
 	border-left: 1px solid #ddd;
@@ -783,7 +791,7 @@ a.shortBtn {
 
 .input-xs, select.input-xs {
   height: 20px !important;
-  padding: 4px 8px !important;
+  padding: 0px 8px !important;
   font-size: 11px !important;
   border-radius: 3px !important;
 }
