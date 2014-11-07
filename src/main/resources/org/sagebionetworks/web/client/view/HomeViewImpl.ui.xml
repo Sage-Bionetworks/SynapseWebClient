@@ -78,6 +78,10 @@
 								<a class="link howToUseLink" href="mailto:synapseInfo@sagebase.org" target="_blank">Contact Us</a><br/>
 								Other questions about Synapse?
 							</li>
+							<li>
+								<a class="link howToUseLink" href="#!Help:Collaboratorium" target="_blank">Interactive Workshop</a><br/>
+								A hands-on guide for using Synapse
+							</li>
 						</ul>
 					</div>
 				</g:HTMLPanel>
