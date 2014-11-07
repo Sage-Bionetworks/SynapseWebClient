@@ -26,12 +26,7 @@ public class PreflightControllerImpl implements PreflightController {
 	@Override
 	public void checkUploadToEntity(final EntityBundle uploadTo, final Callback callback) {
 		// Access Restrictions then certified user.
-		accessRestrictionController.checkUploadToEntity(uploadTo, new Callback() {
-			@Override
-			public void invoke() {
-				certifiedUserController.checkUploadToEntity(uploadTo, callback);
-			}
-		});
+		certifiedUserController.checkUploadToEntity(uploadTo, callback);
 	}
 
 	@Override
@@ -62,6 +57,18 @@ public class PreflightControllerImpl implements PreflightController {
 	public boolean hasUnmetDownloadRestriction(EntityBundle uploadTo) {
 		// Only access restrictions.
 		return accessRestrictionController.hasUnmetDownloadRestriction(uploadTo);
+	}
+
+	@Override
+	public void checkCreateEntityAndUpload(final EntityBundle parentEntity,
+			String entityClassName, final Callback callback) {
+		// Test create first
+		checkCreateEntity(parentEntity, entityClassName, new Callback() {
+			@Override
+			public void invoke() {
+				checkUploadToEntity(parentEntity, callback);
+			}
+		});
 	}
 
 }

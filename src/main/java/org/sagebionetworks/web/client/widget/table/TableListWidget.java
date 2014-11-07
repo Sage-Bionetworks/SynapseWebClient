@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.entity.query.EntityType;
 import org.sagebionetworks.repo.model.entity.query.Operator;
 import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -20,7 +21,6 @@ import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
-import org.sagebionetworks.web.shared.EntityBundleTransport;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -138,7 +138,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 
 	@Override
 	public void onUploadTable() {
-		preflightController.checkUploadToEntity(parentBundle, new Callback() {
+		// This operation creates an entity and uploads data to the entity so both checks must pass.
+		preflightController.checkCreateEntityAndUpload(parentBundle, TableEntity.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
 				postCheckUploadTable();
@@ -170,8 +171,22 @@ public class TableListWidget implements TableListWidgetView.Presenter, PageChang
 
 	@Override
 	public void onAddTable() {
+		preflightController.checkCreateEntity(parentBundle, TableEntity.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateTable();
+			}
+		});
+
+	}
+	
+	/**
+	 * Called after all pre-flight checks are performed on a table.
+	 */
+	private void postCheckCreateTable(){
 		this.createTableModalWidget.showCreateModal();
 	}
+	
 
 	@Override
 	public void tableCreated() {

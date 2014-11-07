@@ -51,17 +51,8 @@ public class CertifiedUserControllerImpl implements CertifiedUserController {
 
 	@Override
 	public void checkUpdateEntity(EntityBundle toUpdate, Callback callback) {
-		// Anyone can create a project
-		if(toUpdate.getEntity() instanceof Project){
-			callback.invoke();
-		}else{
-			// Only certified users can update non-projects
-			if(toUpdate.getPermissions().getIsCertifiedUser()){
-				callback.invoke();
-			}else{
-				quizInfoDialog.show(true, null);
-			}
-		}
+		// Anyone can update an entity
+		callback.invoke();
 	}
 
 }

@@ -2,8 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,12 +21,14 @@ import org.sagebionetworks.repo.model.entity.query.Sort;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.model.EntityBundle;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -122,5 +124,41 @@ public class TableListWidgetTest {
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockView).showErrorMessage(error);
+	}
+	
+	@Test
+	public void testUploadTableCSVPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntityAndUpload(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onUploadTable();
+		// Failure should not proceed to upload
+		verify(mockUploadTableModalWidget, never()).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testUploadTableCSVPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntityAndUpload(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onUploadTable();
+		// proceed to upload
+		verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testAddTableCSVPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddTable();
+		// Failure should not proceed to create
+		verify(mockcreateTableModalWidget, never()).showCreateModal();
+	}
+	
+	@Test
+	public void testCreateTableCSVPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddTable();
+		// proceed to create
+		verify(mockcreateTableModalWidget).showCreateModal();
 	}
 }
