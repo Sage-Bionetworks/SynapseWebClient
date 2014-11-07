@@ -49,7 +49,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
 		//this widget shows nothing if it doesn't have any pages!
-		//TocItem mainPage = (TocItem) root.getChild(0);
 		
 		if (tree.getItemCount() == 0)
 			return;
