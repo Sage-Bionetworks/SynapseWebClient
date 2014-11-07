@@ -273,7 +273,7 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onEditResults() {
-		preflightController.checkUpdateEntity(this.entityBundle, new Callback() {
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
 				postCheckEditResults();

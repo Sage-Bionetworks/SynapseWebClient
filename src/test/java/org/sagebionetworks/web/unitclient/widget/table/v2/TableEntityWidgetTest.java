@@ -328,7 +328,7 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testEditTablePreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		boolean canEdit = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		widget.onEditResults();
