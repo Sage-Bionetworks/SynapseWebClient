@@ -26,9 +26,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -196,6 +200,18 @@ class SubPageTreeItem extends TreeItem {
 		this.text = text;
 		this.targetPlace = targetPlace;
 		this.isCurrentPage = isCurrentPage;
+		
+		Anchor l = new Anchor(text);
+		l.addStyleName("link");
+//		l.addClickHandler(new ClickHandler() {
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				globalAppState.getPlaceChanger().goTo(treeItem.getTargetPlace());
+//			}
+//		});
+		
+		setWidget(l);
+		//setState(true);
 	}
 	
 	public List<SubPageTreeItem> getChildren() {
@@ -208,5 +224,5 @@ class SubPageTreeItem extends TreeItem {
 	
 	public String getText()				{	return text;			}
 	public Place getTargetPlace()		{	return targetPlace;		}
-	public boolean isCurrentPage()	{	return isCurrentPage;	}
+	public boolean isCurrentPage()		{	return isCurrentPage;	}
 }

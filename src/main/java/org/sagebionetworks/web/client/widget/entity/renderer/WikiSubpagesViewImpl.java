@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Tree;
+import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -55,25 +56,29 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		//only show the tree if the root has children
 		if (tree.getItemCount() > 0) {
 			//traverse the tree, and create anchors
-			final UnorderedListPanel ul = new UnorderedListPanel();
-			ul.addStyleName("notopmargin nav bs-sidenav");
-			addTreeItemsRecursive(ul, getTreeRootChildren(tree));
-			showHideButton = DisplayUtils.createButton("");
+//			final UnorderedListPanel ul = new UnorderedListPanel();
+//			ul.addStyleName("notopmargin nav bs-sidenav");
+//			addTreeItemsRecursive(ul, getTreeRootChildren(tree));
+//			showHideButton = DisplayUtils.createButton("");
 			ulContainer = new FlowPanel();
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
-			ulContainer.add(ul);
+//			ulContainer.add(ul);
+//			
+//			showHideButton.addClickHandler(new ClickHandler() {
+//				@Override
+//				public void onClick(ClickEvent event) {
+//					if (isShowingSubpages)
+//						hideSubpages();
+//					else
+//						showSubpages();
+//				}
+//			});
+			for (SubPageTreeItem item : getTreeRootChildren(tree)) {
+				recurseOpenItem(item);
+			}
 			
-			showHideButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					if (isShowingSubpages)
-						hideSubpages();
-					else
-						showSubpages();
-				}
-			});
-			
+			ulContainer.add(tree);
 			add(ulContainer);
 			add(showHideButton);
 			
@@ -82,6 +87,13 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			hideSubpages();
 		}
 		clearWidths();
+	}
+	
+	private void recurseOpenItem(SubPageTreeItem item) {
+		item.setState(true);
+		for (int i = 0; i < item.getChildCount(); i++) {
+			recurseOpenItem((SubPageTreeItem) item.getChild(i));
+		}
 	}
 	
 	private List<SubPageTreeItem> getTreeRootChildren(Tree tree) {
