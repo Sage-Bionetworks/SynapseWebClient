@@ -92,7 +92,7 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("images/spotlight/SMC-Het_banner.jpg")
 	ImageResource dreamSMCHet();
 	
-	@Source("images/spotlight/SMC-RNA_banner.png")
+	@Source("images/spotlight/SMC-RNA_banner.jpg")
 	ImageResource dreamSMCRNA();
 	
 	@Source("images/spotlight/TcgaPancancer.jpg")
