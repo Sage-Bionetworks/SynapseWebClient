@@ -1,9 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +18,7 @@ import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
 
@@ -178,4 +184,178 @@ public class RowSetUtilsTest {
 		assertEquals("b", pr.getValues().get(headers.get(1)));
 	}
 	
+	/**
+	 * If the original value contains empty strings and the update also contains empty strings
+	 * there should be no update.
+	 * 
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testOriginalEmptyStringAndChangeEmptyString() throws JSONObjectAdapterException{
+		RowSet original = new RowSet();
+		rowOne.setRowId(123L);
+		rowOne.setValues(Arrays.asList("", ""));
+		original.setRows(Arrays.asList(rowOne));
+		// Clone the data.
+		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
+		RowSet update = new RowSet();
+		update.setHeaders(headers);
+		update.setRows(updates);
+		// set the value of the one row to also be an empty string.
+		updates.get(0).setValues(Arrays.asList("", ""));
+		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		assertTrue(prs.getRows().isEmpty());
+	}
+	
+	/**
+	 * If the original value contains nulls and the update also contains empty strings
+	 * there should be no update.
+	 * 
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testOriginalNullAndChangeEmptyString() throws JSONObjectAdapterException{
+		RowSet original = new RowSet();
+		rowOne.setRowId(123L);
+		rowOne.setValues(Arrays.asList((String)null,(String)null));
+		original.setRows(Arrays.asList(rowOne));
+		// Clone the data.
+		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
+		RowSet update = new RowSet();
+		update.setHeaders(headers);
+		update.setRows(updates);
+		updates.get(0).setValues(Arrays.asList("", ""));
+		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		assertTrue(prs.getRows().isEmpty());
+	}
+	
+	/**
+	 * If the original value contains nulls and the update also contains empty strings
+	 * there should be no update.
+	 * 
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testOriginalEmptyStringAndChangeNulls() throws JSONObjectAdapterException{
+		RowSet original = new RowSet();
+		rowOne.setRowId(123L);
+		rowOne.setValues(Arrays.asList("",""));
+		original.setRows(Arrays.asList(rowOne));
+		// Clone the data.
+		List<Row> updates = TableModelTestUtils.cloneObject(original.getRows(), Row.class);
+		RowSet update = new RowSet();
+		update.setHeaders(headers);
+		update.setRows(updates);
+		updates.get(0).setValues(Arrays.asList((String)null,(String)null));
+		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		assertTrue(prs.getRows().isEmpty());
+	}
+	
+	/**
+	 * Adding a row with null or empty values should both be treated as null values.
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testAddRowWithNullAndEmptyStrings() throws JSONObjectAdapterException{
+		RowSet original = new RowSet();
+		original.setTableId("syn999");
+		Row emptyRow = new Row();
+		emptyRow.setValues(Arrays.asList("",null));
+		List<Row> updateRows = Arrays.asList(emptyRow);
+		RowSet update = new RowSet();
+		update.setHeaders(headers);
+		update.setRows(updateRows);
+		PartialRowSet prs = RowSetUtils.buildDelta(original, update);
+		assertNotNull(prs);
+		assertNotNull(prs.getRows());
+		PartialRow pr = prs.getRows().get(0);
+		assertEquals(null, pr.getValues().get(headers.get(0)));
+		assertEquals(null, pr.getValues().get(headers.get(1)));
+	}
+	
+	@Test
+	public void testIsValueChangedNullNull(){
+		assertFalse(RowSetUtils.isValueChanged(null, null));
+	}
+	
+	@Test
+	public void testIsValueChangedEmptyNull(){
+		assertFalse(RowSetUtils.isValueChanged(" ", null));
+	}
+	
+	@Test
+	public void testIsValueChangedNullEmpty(){
+		assertFalse(RowSetUtils.isValueChanged(null, "\t"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealNull(){
+		assertTrue(RowSetUtils.isValueChanged("a", null));
+	}
+	
+	@Test
+	public void testIsValueChangedNullReal(){
+		assertTrue(RowSetUtils.isValueChanged(null, "a"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealEmpty(){
+		assertTrue(RowSetUtils.isValueChanged("a", ""));
+	}
+	
+	@Test
+	public void testIsValueChangedEmptyReal(){
+		assertTrue(RowSetUtils.isValueChanged("", "a"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealRealDifferent(){
+		assertTrue(RowSetUtils.isValueChanged("b", "a"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealRealSame(){
+		assertFalse(RowSetUtils.isValueChanged("a", "a"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealSpaceRealSame(){
+		assertFalse(RowSetUtils.isValueChanged(" a ", "a"));
+	}
+	
+	@Test
+	public void testIsValueChangedRealRealSpaceSame(){
+		assertFalse(RowSetUtils.isValueChanged(" a ", " a\t"));
+	}
+	
+	@Test
+	public void testTrimWithEmptyAsNull_Null(){
+		assertEquals(null, RowSetUtils.trimWithEmptyAsNull(null));
+	}
+	
+	@Test
+	public void testTrimWithEmptyAsNullOkay(){
+		assertEquals("a", RowSetUtils.trimWithEmptyAsNull("a"));
+	}
+	
+	@Test
+	public void testTrimWithEmptyAsNull_Trim(){
+		assertEquals("a", RowSetUtils.trimWithEmptyAsNull(" a\n "));
+	}
+	/**
+	 * This is currently throwing an exception.
+	 * @throws JSONObjectAdapterException
+	 */
+	@Test
+	public void testPartialRowWithNulls() throws JSONObjectAdapterException{
+		PartialRow pr = new PartialRow();
+		pr.setRowId(123L);
+		Map<String, String> values = new HashMap<String, String>();
+		values.put("a", null);
+		values.put("b", "");
+		pr.setValues(values);
+		String json = EntityFactory.createJSONStringForEntity(pr);
+		PartialRow clone = EntityFactory.createEntityFromJSONString(json, PartialRow.class);
+		assertNotNull(clone);
+	}
 }

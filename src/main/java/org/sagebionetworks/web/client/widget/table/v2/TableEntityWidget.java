@@ -42,7 +42,7 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SELECT_FROM = "SELECT * FROM ";
 	public static final String NO_COLUMNS_EDITABLE = "This table does not have any columns.  Select the 'Show Schema' to add columns to the this table.";
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
-	public static final long DEFAULT_LIMIT = 10L;
+	public static final long DEFAULT_LIMIT = 25;
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
