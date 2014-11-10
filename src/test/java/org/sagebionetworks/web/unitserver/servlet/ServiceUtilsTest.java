@@ -116,33 +116,6 @@ public class ServiceUtilsTest {
 
 	}
 	
-
-	@Test
-	public void testExtractQueryDetails() throws Exception {
-		assertEquals(new QueryDetails(null, null, null, null), ServiceUtils.extractQueryDetails("SELECT * FROM syn123"));
-		assertEquals(new QueryDetails(null, null, "foo", SortDirection.DESC), ServiceUtils.extractQueryDetails("SELECT * FROM syn123 ORDER BY foo DESC"));	
-		assertEquals(new QueryDetails(6L, 5L, null, null), ServiceUtils.extractQueryDetails("SELECT * FROM syn123 LIMIT 5 OFFSET 6"));
-		assertEquals(new QueryDetails(6L, 5L, "foo", SortDirection.DESC), ServiceUtils.extractQueryDetails("SELECT * FROM syn123 ORDER BY foo DESC LIMIT 5 OFFSET 6"));
-	}
-
-	@Test
-	public void testModifyQuery() throws Exception {
-		String query = "SELECT * FROM syn123";
-		assertEquals("SELECT * FROM syn123", ServiceUtils.modifyQuery(query, new QueryDetails(null, null, null, null)));
-		assertEquals("SELECT * FROM syn123 ORDER BY foo ASC", ServiceUtils.modifyQuery(query, new QueryDetails(null, null, "foo", SortDirection.ASC)));
-		assertEquals("SELECT * FROM syn123 LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery(query, new QueryDetails(6L, 5L, null, null)));
-		assertEquals("SELECT * FROM syn123 ORDER BY foo ASC LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery(query, new QueryDetails(6L, 5L, "foo", SortDirection.ASC)));
-		
-		assertEquals("SELECT * FROM syn123 LIMIT 5 OFFSET 6", ServiceUtils.modifyQuery("SELECT * FROM syn123 LIMIT 5", new QueryDetails(6L, null, null, null)));
-	}
-	
-	@Test
-	public void testExtractQueryDetailsAndModifyQueryRoundTrip() throws Exception {
-		String query = "SELECT * FROM syn123";
-		QueryDetails queryDetails = new QueryDetails(6L, 5L, "foo", SortDirection.ASC);
-		assertEquals(queryDetails, ServiceUtils.extractQueryDetails(ServiceUtils.modifyQuery(query, queryDetails)));
-	}
-	
 	/*
 	 * Private Methods
 	 */
