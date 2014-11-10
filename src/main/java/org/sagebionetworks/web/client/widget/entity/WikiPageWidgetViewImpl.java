@@ -5,16 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.BootstrapAlertType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
@@ -33,7 +34,6 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.extjs.gxt.ui.client.widget.Dialog;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,8 +49,6 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -66,7 +64,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private MarkdownEditorWidget markdownEditorWidget;
 	private IconsImageBundle iconsImageBundle;
 	private SageImageBundle sageImageBundle;
-//	private Button editButton, addPageButton; 
 	private FlowPanel commandBar;
 	private SimplePanel commandBarWrapper;
 	private Boolean canEdit;
@@ -406,27 +403,22 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				//inform presenter that edit was clicked
 				presenter.editClicked();
 				//create the editor textarea, and configure the editor widget
-				final TextArea mdField = new TextArea();
-				mdField.setValue(presenter.getWikiPage().getMarkdown());
-				mdField.addStyleName("markdownEditor");
-				
-				LayoutContainer form = new LayoutContainer();
 				final TextBox titleField = new TextBox();
 				if (!isRootWiki) {
 					titleField.setValue(presenter.getWikiPage().getTitle());
 					titleField.addStyleName("font-size-32 margin-bottom-10");
 					titleField.setHeight("45px");					
-					form.add(titleField);
+					add(titleField);
 				}
 				//also add commands at the bottom
-				markdownEditorWidget.configure(wikiKey, mdField, form, false, true, new WidgetDescriptorUpdatedHandler() {
+				markdownEditorWidget.configure(wikiKey, presenter.getWikiPage().getMarkdown(), true, new WidgetDescriptorUpdatedHandler() {
 					@Override
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.addFileHandles(event.getNewFileHandleIds());
 					}
-				}, getCloseHandler(titleField, mdField), getManagementHandler());
-				form.addStyleName("margin-bottom-40 margin-top-10");
-				add(form);
+				}, getCloseHandler(titleField, markdownEditorWidget), getManagementHandler());
+				
+				add(markdownEditorWidget.asWidget());
 			}
 		});
 
@@ -521,11 +513,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		};
 	}
 	
-	private CloseHandler getCloseHandler(final TextBox titleField, final TextArea mdField) {
+	private CloseHandler getCloseHandler(final TextBox titleField, final MarkdownEditorWidget editorWidget) {
 		return new CloseHandler() {
 			@Override
 			public void saveClicked() {
-				presenter.saveClicked(titleField.getValue(), mdField.getValue());
+				presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
 			}
 			
 			@Override

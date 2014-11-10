@@ -14,9 +14,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -69,25 +67,24 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	 * @param saveHandler if no save handler is specified, then a Save button is not shown.  If it is specified, then Save is shown and saveClicked is called when that button is clicked.
 	 */
 	public void configure(final WikiPageKey wikiKey,
-			final TextArea markdownTextArea, 
-			final LayoutContainer formPanel,
-			final boolean showFieldLabel, 
+			final String markdown, 
 			final boolean isWikiEditor,
 			final WidgetDescriptorUpdatedHandler callback,
 			final CloseHandler saveHandler,
 			final ManagementHandler managementHandler) {
-		
+		//clear view state
+		view.clear();
 		if (formattingGuideWikiPageKey == null) {
 			//get the page name to wiki key map
 			getFormattingGuideWikiKey(new CallbackP<WikiPageKey>() {
 				@Override
 				public void invoke(WikiPageKey key) {
 					formattingGuideWikiPageKey = key;
-					view.configure(wikiKey, formattingGuideWikiPageKey, markdownTextArea, formPanel, showFieldLabel, isWikiEditor, callback, saveHandler, managementHandler);
+					view.configure(wikiKey, formattingGuideWikiPageKey, markdown, isWikiEditor, callback, saveHandler, managementHandler);
 				}
 			});
 		} else {
-			view.configure(wikiKey, formattingGuideWikiPageKey, markdownTextArea, formPanel, showFieldLabel, isWikiEditor, callback, saveHandler, managementHandler);
+			view.configure(wikiKey, formattingGuideWikiPageKey, markdown, isWikiEditor, callback, saveHandler, managementHandler);
 		}
 	}
 	
@@ -137,5 +134,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public String getMarkdown() {
+		return view.getMarkdown();
 	}
 }

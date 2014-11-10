@@ -1,0 +1,131 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	<bh:Div>
+	    <bh:Div ui:field="mdCommands" styleName="view margin-right-3-buttons margin-top-2-buttons margin-bottom-2-buttons">
+	        <b:Tooltip placement="BOTTOM" text="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
+	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
+	        </b:Tooltip>
+	        <b:Button dataTarget="#formattingGuideModal" dataToggle="MODAL" icon="QUESTION_CIRCLE" size="EXTRA_SMALL">Formatting Guide</b:Button>
+	        <b:ButtonGroup>
+				<b:Tooltip placement="BOTTOM" text="Insert Synapse Widget">
+					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
+				</b:Tooltip>
+			  <b:DropDownMenu>
+			    <b:AnchorListItem ui:field="attachmentLink">Attachment</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="buttonLink">Button Link</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="entityListLink">Entity List</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="imageLink">Image</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="joinTeamLink">Join Team Button</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="linkLink">Link</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="provenanceGraphLink">Provenance Graph</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="queryLink">Query Table</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="referenceLink">Reference</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="submitToEvaluationLink">Submit to Evaluation</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="tableLink">Table</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="tableOfContentsLink">Table of Contents</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="userTeamLink">User/Team</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="videoLink">Video</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT">YouTube Video</b:AnchorListItem>
+			  </b:DropDownMenu>
+			</b:ButtonGroup>
+	        <b:ButtonGroup>
+	        	<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL" icon="PLUS_SQUARE_O">@ Insert</b:Button>
+				  <b:DropDownMenu>
+				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="supertableLink">Synapse API SuperTable</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="wikifilesPreviewLink">Wiki Files Preview</b:AnchorListItem>
+				    <b:AnchorListItem ui:field="tutorialWizardLink">Tutorial Wizard</b:AnchorListItem>
+				  </b:DropDownMenu>
+			</b:ButtonGroup>
+			
+	        <b:Tooltip placement="BOTTOM" text="Bold">
+	        	<b:Button ui:field="boldButton" icon="BOLD" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Italic">
+	        	<b:Button ui:field="italicButton" icon="ITALIC" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Strike-through">
+	        	<b:Button ui:field="strikeButton" icon="STRIKETHROUGH" size="EXTRA_SMALL" height="22px" />
+	        </b:Tooltip>
+	        
+	        <b:Tooltip placement="BOTTOM" text="Optionally specify the language for syntax highlighting.">
+	        	<b:Button ui:field="codeBlockButton" size="EXTRA_SMALL">Code Block</b:Button>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="LaTeX math equation.">
+	        	<b:Button ui:field="mathButton" size="EXTRA_SMALL">TeX</b:Button>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Subscript">
+	        	<b:Button ui:field="subscriptButton" icon="SUBSCRIPT" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Superscript">
+	        	<b:Button ui:field="superscriptButton" icon="SUPERSCRIPT" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        
+	        <b:ButtonGroup>
+				<b:Tooltip placement="BOTTOM" text="Headings">
+					<b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL">Heading</b:Button>
+				</b:Tooltip>
+			  <b:DropDownMenu>
+			    <b:AnchorListItem ui:field="heading1Link">Heading 1</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading2Link">Heading 2</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading3Link">Heading 3</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading4Link">Heading 4</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading5Link">Heading 5</b:AnchorListItem>
+			    <b:AnchorListItem ui:field="heading6Link">Heading 6</b:AnchorListItem>
+			  </b:DropDownMenu>
+			</b:ButtonGroup>
+	        <b:Tooltip placement="BOTTOM" text="Insert Attachment">
+	        	<b:Button ui:field="attachmentButton" icon="PAPERCLIP" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Insert Image">
+	        	<b:Button ui:field="imageButton" icon="CAMERA" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Insert Video">
+	        	<b:Button ui:field="videoButton" icon="VIDEO_CAMERA" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	        <b:Tooltip placement="BOTTOM" text="Insert Link">
+	        	<b:Button ui:field="linkButton" icon="LINK" size="EXTRA_SMALL" height="22px"/>
+	        </b:Tooltip>
+	    </bh:Div>
+	    <bh:Div>
+	        <b:TextArea ui:field="markdownTextArea"/>
+	    </bh:Div>
+		<b:Row>
+			<b:Column size="SM_6">
+			    <bh:Div styleName="margin-right-3-buttons margin-top-5">
+				    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." >Save</b:Button>
+					<b:Button ui:field="attachmentsButton" >Attachments</b:Button>    
+					<b:Button ui:field="previewButton"  >Preview</b:Button>    
+			    </bh:Div>
+			</b:Column>
+			<b:Column size="SM_6">
+			    <bh:Div styleName="margin-right-3-buttons margin-top-5">
+				    <b:Button ui:field="deleteButton" pull="RIGHT" type="DANGER" >Delete Page</b:Button>
+				    <b:Button ui:field="cancelButton" pull="RIGHT">Cancel</b:Button>
+				</bh:Div>
+			</b:Column>
+		</b:Row>
+	    <b:Modal b:id="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		  <b:ModalBody>
+		    <g:FlowPanel ui:field="formattingGuideContainer" />
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
+		
+	    <b:Modal ui:field="previewModal" size="LARGE" title="Preview" closable="true" fade="true" dataBackdrop="STATIC" dataKeyboard="true">
+		  <b:ModalBody>
+		    <g:FlowPanel ui:field="previewHtmlContainer" styleName="entity-description-preview-wrapper" />
+		  </b:ModalBody>
+		  <b:ModalFooter>
+		    <b:Button ui:field="previewOkButton" type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
+		  </b:ModalFooter>
+		</b:Modal>
+	</bh:Div>
+</ui:UiBinder>

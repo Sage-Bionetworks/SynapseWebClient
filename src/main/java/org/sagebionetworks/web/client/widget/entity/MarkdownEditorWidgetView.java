@@ -7,17 +7,13 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHa
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.TextArea;
 
 public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 
 	void configure(final WikiPageKey wikiKey, 
 			WikiPageKey formattingGuideWikiPageKey,
-			final TextArea markdownTextArea, 
-			LayoutContainer formPanel,
-			boolean showFieldLabel, 
+			String markdown, 
 			final boolean isWikiEditor,
 			final WidgetDescriptorUpdatedHandler callback,
 			final CloseHandler saveHandler,
@@ -32,6 +28,8 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
+	
+	String getMarkdown();
 	
 	/**
 	 * Presenter interface
