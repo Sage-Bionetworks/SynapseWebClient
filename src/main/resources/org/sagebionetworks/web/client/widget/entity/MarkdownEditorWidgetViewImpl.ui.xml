@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-	    <bh:Div ui:field="mdCommands" styleName="view margin-right-3-buttons margin-top-2-buttons margin-bottom-2-buttons">
+	    <bh:Div ui:field="mdCommands" styleName="view md-command-bar">
 	        <b:Tooltip placement="BOTTOM" text="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
 	        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" />
 	        </b:Tooltip>
@@ -33,7 +33,9 @@
 			  </b:DropDownMenu>
 			</b:ButtonGroup>
 	        <b:ButtonGroup>
-	        	<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL" icon="PLUS_SQUARE_O">@ Insert</b:Button>
+	            <b:Tooltip placement="BOTTOM" text="WARNING! These are unreleased widgets, whose syntax may change in the future.">
+					<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL">@ Insert</b:Button>
+				</b:Tooltip>
 				  <b:DropDownMenu>
 				    <b:AnchorListItem ui:field="bookmarkLink">Bookmark</b:AnchorListItem>
 				    <b:AnchorListItem ui:field="externalWebsiteLink">External Website</b:AnchorListItem>

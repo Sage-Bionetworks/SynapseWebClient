@@ -33,16 +33,15 @@
 	padding: 3px 7px 3px 7px;
 }
 
-.margin-right-3-buttons>button {
-	margin-right:3px;
+.margin-right-3-buttons >button {
+	margin-right: 3px;
 }
 
-.margin-top-2-buttons>button {
-	margin-top:2px;
+.md-command-bar>button {
+	margin: 2px 3px 2px 0px;
 }
-
-.margin-bottom-2-buttons>button {
-	margin-bottom:2px;
+.md-command-bar>div {
+	margin: 2px 3px 2px 0px;
 }
 
 .header-username-picture-container {
