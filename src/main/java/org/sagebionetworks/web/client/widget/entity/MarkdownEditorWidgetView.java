@@ -2,27 +2,17 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 
-	void configure(final WikiPageKey wikiKey, 
-			WikiPageKey formattingGuideWikiPageKey,
-			String markdown, 
-			final boolean isWikiEditor,
-			final WidgetDescriptorUpdatedHandler callback,
-			final CloseHandler saveHandler,
-			final ManagementHandler managementHandler);
+	void configure(WikiPageKey formattingGuideWikiPageKey,
+			String markdown);
 	
-	void deleteMarkdown(String md);
-	void insertMarkdown(String md);
-	
-	void showPreviewHTML(String result, boolean isWiki) throws JSONObjectAdapterException;
+	void showPreviewHTML(String result, WikiPageKey wikiKey, boolean isWiki, WidgetRegistrar widgetRegistrar) throws JSONObjectAdapterException;
 	/**
 	 * Set the presenter.
 	 * @param presenter
@@ -30,11 +20,29 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 	void setPresenter(Presenter presenter);
 	
 	String getMarkdown();
+	void setMarkdown(String markdown);
+	int getCursorPos();
+	void setCursorPos(int pos);
+	void setMarkdownFocus();
+	int getSelectionLength();
+	void setSelectionRange(int pos, int length);
+	
+	void setEditButtonEnabled(boolean enabled);
+	void setSaving(boolean isSaving);
+	
+	void setDeleteVisible(boolean visible);
+	
+	public void setAttachmentsButtonVisible(boolean visible);
+	public void setNewAttachmentsUI(boolean visible);
+	void setSaveVisible(boolean visible);
+	void setCancelVisible(boolean visible);
+	void setAlphaCommandsVisible(boolean visible);
 	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void showPreview(String descriptionMarkdown, final boolean isWiki);
+		void handleCommand(MarkdownEditorAction action);
+		void markdownEditorClicked();
 	}
 }
