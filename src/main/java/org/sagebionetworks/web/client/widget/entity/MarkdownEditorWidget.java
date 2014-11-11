@@ -117,7 +117,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		
 		//clear view state
 		view.clear();
-		view.setNewAttachmentsUI(isWikiEditor);
+		view.setAttachmentCommandsVisible(isWikiEditor);
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
 	
 		if (formattingGuideWikiPageKey == null) {
@@ -414,5 +414,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			widgetDescriptorEditor.addWidgetDescriptorUpdatedHandler(handler);
 			widgetDescriptorEditor.editExisting(wikiKey, contentTypeKey, widgetDescriptor, isWikiEditor);
 		}
+	}
+
+	/**
+	 * For testing purposes only
+	 * @return
+	 */
+	public WidgetSelectionState getWidgetSelectionState() {
+		return widgetSelectionState;
 	}
 }

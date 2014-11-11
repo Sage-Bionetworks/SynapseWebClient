@@ -301,7 +301,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	}
 	
 	@Override
-	public void setNewAttachmentsUI(boolean visible) {
+	public void setAttachmentCommandsVisible(boolean visible) {
 		attachmentLink.setVisible(visible);
 		attachmentButton.setVisible(visible);
 	}
