@@ -20,10 +20,9 @@ import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.CloseHandler;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget.ManagementHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.dialog.NameAndDescriptionEditorDialog;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -84,9 +83,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	private FlowPanel wikiPagePanel;
 	private boolean isEmbeddedInOwnerPage;
 	private boolean isAttachmentsWidgetConfigured;
-	public interface Callback{
-		public void pageUpdated();
-	}
 	
 	public interface OwnerObjectNameCallback{
 		public void ownerObjectNameInitialized();
@@ -416,7 +412,36 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.addFileHandles(event.getNewFileHandleIds());
 					}
-				}, getCloseHandler(titleField, markdownEditorWidget), getManagementHandler());
+				});
+				
+				//register to handle these events
+				markdownEditorWidget.setActionHandler(MarkdownEditorAction.SAVE, new Callback() {
+					@Override
+					public void invoke() {
+						saveClicked(titleField, markdownEditorWidget);
+					}
+				});
+				
+				markdownEditorWidget.setActionHandler(MarkdownEditorAction.CANCEL, new Callback() {
+					@Override
+					public void invoke() {
+						cancelClicked();
+					}
+				});
+				
+				markdownEditorWidget.setActionHandler(MarkdownEditorAction.ATTACHMENTS, new Callback() {
+					@Override
+					public void invoke() {
+						attachmentsClicked();
+					}
+				});
+				
+				markdownEditorWidget.setActionHandler(MarkdownEditorAction.DELETE, new Callback() {
+					@Override
+					public void invoke() {
+						deleteClicked();
+					}
+				});
 				
 				add(markdownEditorWidget.asWidget());
 			}
@@ -458,73 +483,62 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		return buttonText;
 	}
 	
-	private ManagementHandler getManagementHandler() {
-		return new ManagementHandler() {
-			@Override
-			public void attachmentsClicked() {
-				if (!isAttachmentsWidgetConfigured) {
-					isAttachmentsWidgetConfigured = true;
-					wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
-						@Override
-						public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
-							//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
-							//delete previews, and image references
-							presenter.removeFileHandles(fileHandleIds);
-							Map<String, String> descriptor = new HashMap<String, String>();
-							descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-							try {
-								String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
-								markdownEditorWidget.deleteMarkdown(imageMD);
-								//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
-								String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-								markdownEditorWidget.deleteMarkdown(previewMD);
-							} catch (JSONObjectAdapterException e) {
-							}
-						}
-						
-						@Override
-						public void attachmentClicked(String fileName) {
-							//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
-							Map<String, String> descriptor = new HashMap<String, String>();
-							descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
-							try {
-								String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
-								markdownEditorWidget.insertMarkdown(previewMD);
-							} catch (JSONObjectAdapterException e) {
-							}						
-						}
-					});
-				}
-				showDialog(wikiAttachments);
-			}
-			@Override
-			public void deleteClicked() {
-				//delete wiki
-				DisplayUtils.showConfirmDialog(
-						DisplayConstants.LABEL_DELETE + " Page",
-						DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
-						new org.sagebionetworks.web.client.utils.Callback() {
-							@Override
-							public void invoke() {
-								presenter.deleteButtonClicked();
-							}
-						});
-			}
-		};
+	public void deleteClicked() {
+		//delete wiki
+		DisplayUtils.showConfirmDialog(
+				DisplayConstants.LABEL_DELETE + " Page",
+				DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?",
+				new org.sagebionetworks.web.client.utils.Callback() {
+					@Override
+					public void invoke() {
+						presenter.deleteButtonClicked();
+					}
+				});
 	}
 	
-	private CloseHandler getCloseHandler(final TextBox titleField, final MarkdownEditorWidget editorWidget) {
-		return new CloseHandler() {
-			@Override
-			public void saveClicked() {
-				presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
-			}
-			
-			@Override
-			public void cancelClicked() {
-				presenter.cancelClicked();
-			}
-		};
+	public void attachmentsClicked() {
+		if (!isAttachmentsWidgetConfigured) {
+			isAttachmentsWidgetConfigured = true;
+			wikiAttachments.configure(wikiKey, presenter.getWikiPage(), new WikiAttachments.Callback() {
+				@Override
+				public void attachmentsToDelete(String fileName, List<String> fileHandleIds) {
+					//when an attachment is deleted from the wiki attachments dialog, let's delete references from the markdown editor
+					//delete previews, and image references
+					presenter.removeFileHandles(fileHandleIds);
+					Map<String, String> descriptor = new HashMap<String, String>();
+					descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+					try {
+						String imageMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.IMAGE_CONTENT_TYPE, descriptor , widgetRegistrar);
+						markdownEditorWidget.deleteMarkdown(imageMD);
+						//works because AttachmentPreviewWidget looks for the same parameter ImageWidget
+						String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+						markdownEditorWidget.deleteMarkdown(previewMD);
+					} catch (JSONObjectAdapterException e) {
+					}
+				}
+				
+				@Override
+				public void attachmentClicked(String fileName) {
+					//when an attachment is clicked in the wiki attachments dialog, let's add a reference in the markdown editor
+					Map<String, String> descriptor = new HashMap<String, String>();
+					descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, fileName);
+					try {
+						String previewMD = WidgetRegistrarImpl.getWidgetMarkdown(WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE, descriptor , widgetRegistrar);
+						markdownEditorWidget.insertMarkdown(previewMD);
+					} catch (JSONObjectAdapterException e) {
+					}						
+				}
+			});
+		}
+		showDialog(wikiAttachments);
+	}
+	
+	public void saveClicked(TextBox titleField, MarkdownEditorWidget editorWidget) {
+		presenter.saveClicked(titleField.getValue(), editorWidget.getMarkdown());
+	}
+	
+	public void cancelClicked() {
+		presenter.cancelClicked();
 	}
 	
 	public void showErrorMessage(String message) {

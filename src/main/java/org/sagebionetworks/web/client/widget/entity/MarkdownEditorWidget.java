@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedHandler;
 import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresenter;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
@@ -24,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Lightweight widget used to resolve markdown
+ * Widget used to edit markdown
  * 
  * @author Jay
  *
@@ -41,20 +42,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private WidgetSelectionState widgetSelectionState;
 	WidgetDescriptorUpdatedHandler widgetDescriptorUpdatedHandler;
-	ManagementHandler managementHandler;
 	private boolean isWikiEditor;
-	CloseHandler closeHandler;
-	
-	public interface CloseHandler{
-		public void saveClicked();
-		public void cancelClicked();
-	}
-	
-	public interface ManagementHandler{
-		public void attachmentsClicked();
-		public void deleteClicked();
-	}
-	
+	private Callback attachmentsHandler, saveHandler, cancelHandler, deleteHandler; 
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -75,6 +64,32 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setPresenter(this);
 	}
 	
+	public void setActionHandler(MarkdownEditorAction action, Callback callback) {
+		if (callback != null) {
+			switch (action) {
+			case SAVE:
+				saveHandler = callback;
+				view.setSaveVisible(true);
+				break;
+			case CANCEL:
+				cancelHandler = callback;
+				view.setCancelVisible(true);
+				break;
+			case DELETE:
+				deleteHandler = callback;
+				view.setDeleteVisible(true);
+				break;
+			case ATTACHMENTS:
+				attachmentsHandler = callback;
+				view.setAttachmentsButtonVisible(true);
+				break;
+			default:
+				throw new IllegalArgumentException(
+						"Markdown editor does not support callback for the action: " + action);
+			}
+		}
+	}
+	
 	/**
 	 * 
 	 * @param ownerId
@@ -87,25 +102,21 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void configure(final WikiPageKey wikiKey,
 			final String markdown, 
 			final boolean isWikiEditor,
-			final WidgetDescriptorUpdatedHandler callback,
-			final CloseHandler closeHandler,
-			final ManagementHandler managementHandler) {
+			final WidgetDescriptorUpdatedHandler callback) {
 		this.isWikiEditor = isWikiEditor;
 		this.wikiKey = wikiKey;
 		this.widgetDescriptorUpdatedHandler = callback;
-		this.managementHandler = managementHandler;
-		this.closeHandler = closeHandler;
+		attachmentsHandler = null;
+		cancelHandler = null;
+		saveHandler = null;
+		deleteHandler = null;
+		view.setSaveVisible(false);
+		view.setCancelVisible(false);
+		view.setAttachmentsButtonVisible(false);
+		view.setDeleteVisible(false);
 		
 		//clear view state
 		view.clear();
-		boolean canManage = managementHandler != null;
-		view.setDeleteVisible(canManage);
-		view.setAttachmentsButtonVisible(canManage);
-		
-		boolean canSave = closeHandler != null;
-		view.setSaveVisible(canSave);
-		view.setCancelVisible(canSave);
-		
 		view.setNewAttachmentsUI(isWikiEditor);
 		view.setAlphaCommandsVisible(DisplayUtils.isInTestWebsite(cookies));
 	
@@ -312,19 +323,19 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case SAVE:
 			view.setSaving(true);
-			closeHandler.saveClicked();
+			saveHandler.invoke();
 			break;
 		case ATTACHMENTS:
-			managementHandler.attachmentsClicked();
+			attachmentsHandler.invoke();
 			break;
 		case PREVIEW:
 			showPreview();
 			break;
 		case CANCEL:
-			closeHandler.cancelClicked();
+			cancelHandler.invoke();
 			break;
 		case DELETE:
-			managementHandler.deleteClicked();
+			deleteHandler.invoke();
 			break;
 
 		default:

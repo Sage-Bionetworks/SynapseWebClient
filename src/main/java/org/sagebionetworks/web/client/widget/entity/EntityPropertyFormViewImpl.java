@@ -164,7 +164,7 @@ public class EntityPropertyFormViewImpl extends FormPanel implements EntityPrope
 					public void onUpdate(WidgetDescriptorUpdatedEvent event) {
 						presenter.refreshEntityAttachments();
 					}
-				}, null, null);
+				});
 				propPanel.add(markdownEditorWidget.asWidget());
 			}
 		}

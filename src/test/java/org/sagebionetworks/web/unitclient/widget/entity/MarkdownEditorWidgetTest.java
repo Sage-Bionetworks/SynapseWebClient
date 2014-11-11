@@ -44,6 +44,7 @@ public class MarkdownEditorWidgetTest {
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
 	ResourceLoader mockResourceLoader;
 	GWTWrapper mockGwt;
+	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -56,7 +57,9 @@ public class MarkdownEditorWidgetTest {
 		mockCookies = mock(CookieProvider.class);
 		mockGwt = mock(GWTWrapper.class);
 		mockView = mock(MarkdownEditorWidgetView.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt);
+		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
+		
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar);
 	}
 	
 	@Test
