@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -31,6 +32,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private static final String HIDE_SUBPAGES_MD_STYLE="col-xs-12";
 	
 	private Button showHideButton;
+	private Button editOrderButton;
 	private FlowPanel ulContainer;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
@@ -62,12 +64,20 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 //			ul.addStyleName("notopmargin nav bs-sidenav");
 //			addTreeItemsRecursive(ul, getTreeRootChildren(tree));
 			showHideButton = DisplayUtils.createButton("");
+			editOrderButton = DisplayUtils.createButton("");
 			ulContainer = new FlowPanel();
 			ulContainer.addStyleName("notopmargin nav bs-sidenav");
 			ulContainer.setVisible(true);
 			ulContainer.add(new HTML("<h4 class=\"margin-left-15\">Pages</h4>"));
 //			ulContainer.add(ul);
-//			
+			
+			editOrderButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					
+				}
+			});
+			
 			showHideButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
@@ -79,6 +89,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			});
 			
 			ulContainer.add(tree);
+			
+			add(editOrderButton);
 			add(ulContainer);
 			add(showHideButton);
 			
@@ -147,6 +159,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (wikiSubpagesContainer != null) {
 			wikiSubpagesContainer.removeStyleName(HIDE_SUBPAGES_STYLE);
 			wikiSubpagesContainer.addStyleName(SHOW_SUBPAGES_STYLE);
+		}
+		
+		if (editOrderButton != null) {
+			editOrderButton.setText("Edit Order");
+			editOrderButton.addStyleName("btn btn-default btn-xs right");
 		}
 			
 		if (wikiPageContainer != null) {

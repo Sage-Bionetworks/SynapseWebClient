@@ -135,7 +135,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		} else {
 			if(isInherited) {
 				// Notify user of inherited sharing settings.
-				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);		
+				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);
 				add(readOnly);
 				
 				// 'Create ACL' button
