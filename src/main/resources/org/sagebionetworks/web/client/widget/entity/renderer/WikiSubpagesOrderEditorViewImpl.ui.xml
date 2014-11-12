@@ -1,0 +1,14 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+
+	<g:FlowPanel>
+		<g:SimplePanel ui:field="treePanel" />
+		<b:VerticalButtonGroup>
+		    <b:Button ui:field="upButton">UP</b:Button>
+		    <b:Button ui:field="downButton">DOWN</b:Button>
+		</b:VerticalButtonGroup>
+		<g:SimplePanel ui:field="instructionPanel" />
+	</g:FlowPanel>
+</ui:UiBinder>

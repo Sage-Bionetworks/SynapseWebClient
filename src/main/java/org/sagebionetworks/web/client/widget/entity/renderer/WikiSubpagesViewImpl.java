@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl.EntityTreeImageBundle;
 
@@ -25,6 +26,7 @@ import com.google.inject.Inject;
 public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
 
 	private Presenter presenter;
+	WikiSubpagesOrderEditorModalWidget orderEditorModal;
 	private GlobalApplicationState globalAppState;
 	private static final String SHOW_SUBPAGES_STYLE="col-xs-12 col-md-3 well";
 	private static final String SHOW_SUBPAGES_MD_STYLE="col-xs-12 col-md-9";
@@ -39,8 +41,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	boolean isShowingSubpages;
 	
 	@Inject
-	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState) {
+	public WikiSubpagesViewImpl(GlobalApplicationState globalAppState, WikiSubpagesOrderEditorModalWidget orderEditorModal) {
 		this.globalAppState = globalAppState;
+		this.orderEditorModal = orderEditorModal;
 	}
 	@Override
 	public void clear() {
@@ -50,6 +53,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	@Override
 	public void configure(Tree tree, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		clear();
+		orderEditorModal.configure(tree);
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
 		this.wikiPageContainer = wikiPageContainer;
@@ -74,7 +78,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 			editOrderButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					
+					orderEditorModal.show(new Callback() {
+						@Override
+						public void invoke() {
+							Window.alert("WikiSubpagesViewImpl supposed to do something here??");
+						}
+					});
 				}
 			});
 			
