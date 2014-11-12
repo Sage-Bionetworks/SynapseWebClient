@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -540,5 +540,40 @@ public class MarkdownEditorWidgetTest {
 		setupSurroundText();
 		presenter.handleCommand(MarkdownEditorAction.H6);
 		assertEquals("######this", getNewMarkdown());
+	}
+	
+	//insert markdown commands
+	@Test
+	public void testHandleCommandJoinTeam(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_JOIN_TEAM);
+		assertTrue(getNewMarkdown().contains(WidgetConstants.JOIN_TEAM_CONTENT_TYPE));
+	}
+	
+	@Test
+	public void testHandleCommandSubmitToEvaluation(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_SUBMIT_TO_EVALUATION);
+		assertTrue(getNewMarkdown().contains(WidgetConstants.SUBMIT_TO_EVALUATION_CONTENT_TYPE));
+	}
+	
+	@Test
+	public void testHandleCommandToC(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_TOC);
+		assertTrue(getNewMarkdown().contains(WidgetConstants.TOC_CONTENT_TYPE));
+	}
+	@Test
+	public void testHandleCommandWikiFilesPreview(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_WIKI_FILES_PREVIEW);
+		assertTrue(getNewMarkdown().contains(WidgetConstants.WIKI_FILES_PREVIEW_CONTENT_TYPE));
+	}
+
+	@Test
+	public void testHandleCommandTutorialWizard(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.INSERT_TUTORIAL_WIZARD);
+		assertTrue(getNewMarkdown().contains(WidgetConstants.TUTORIAL_WIZARD_CONTENT_TYPE));
 	}
 }
