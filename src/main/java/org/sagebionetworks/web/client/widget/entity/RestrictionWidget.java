@@ -50,6 +50,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private HashSet<Long> shownAccessRequirements;
 	private Iterator<AccessRequirement> allArsIterator, unmetArsIterator;
 	private AccessRequirement currentAR;
+	private String jiraFlagLink;
 	
 	@Inject
 	public RestrictionWidget(
@@ -206,10 +207,17 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	@Override
 	public Widget asWidget() {
 		if (!includeRestrictionWidget()) return null;
+		configureUI();
+		
+		return asWidget();
+	}
+	
+	private void configureUI() {
+		view.clear();
 		final boolean isAnonymous = isAnonymous();
 		boolean hasAdministrativeAccess = false;
 		
-		String jiraFlagLink = null;
+		jiraFlagLink = null;
 		if (!isAnonymous) {
 			hasAdministrativeAccess = hasAdministrativeAccess();
 			jiraFlagLink = getJiraFlagUrl();
@@ -225,8 +233,44 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				 imposeRestrictionsCallback,
 				 loginCallback,
 				 jiraFlagLink);
-
-		return view.asWidget(jiraFlagLink, isAnonymous, hasAdministrativeAccess, loginCallback, restrictionLevel, aboutLinkClickHandler, showFlagLink, showChangeLink);
+		
+		switch (restrictionLevel) {
+			case OPEN:
+				view.showNoRestrictionsUI();
+				break;
+			case RESTRICTED:
+			case CONTROLLED:
+				view.showControlledUseUI();
+				break;
+			default:
+				throw new IllegalArgumentException(restrictionLevel.toString());
+		}
+		
+		if(showFlagLink) {
+			view.showFlagUI();
+		}
+		
+		//show the info link if there are any restrictions, or if we are supposed to show the flag link (to allow people to flag or  admin to "change" the data access level).
+		boolean isChangeLink = restrictionLevel==RESTRICTION_LEVEL.OPEN && hasAdministrativeAccess;
+		boolean isRestricted = restrictionLevel!=RESTRICTION_LEVEL.OPEN;
+		if ((isChangeLink && showChangeLink) || isRestricted) {
+			if (isChangeLink)
+				view.showChangeLink(aboutLinkClickHandler);
+			else
+				view.showShowLink(aboutLinkClickHandler);
+		}
+		
+		if (showFlagLink) {
+			if (isAnonymous)
+				view.showAnonymousFlagUI();
+			else
+				view.showFlagUI();
+		}
+	}
+	
+	@Override
+	public void flagData() {
+		view.open(jiraFlagLink);
 	}
 	
 	private ClickHandler getAboutLinkClickHandler(
@@ -333,6 +377,11 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 				});
 			}
 		};
+	}
+	
+	@Override
+	public void anonymousFlagModalOkClicked() {
+		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(ClientProperties.DEFAULT_PLACE_TOKEN));
 	}
 	
 	public Callback getLoginCallback() {

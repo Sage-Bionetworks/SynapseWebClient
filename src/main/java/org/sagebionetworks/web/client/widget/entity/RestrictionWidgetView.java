@@ -20,15 +20,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	
 	public void open(String url);
 	
-	public Widget asWidget(String jiraFlagLink,
-			boolean isAnonymous, 
-			boolean hasAdministrativeAccess,
-			Callback loginCallback, 
-			RESTRICTION_LEVEL restrictionLevel,
-			ClickHandler aboutLinkClickHandler,
-			boolean showFlagLink, 
-			boolean showChangeLink);
-	
 	public void showAccessRequirement(
 			 RESTRICTION_LEVEL restrictionLevel, 
 			 APPROVAL_TYPE approvalType,
@@ -49,11 +40,22 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	 */
 	public void showVerifyDataSensitiveDialog(Callback imposeRestrictionsCallback);
 	
+	void showControlledUseUI();
+	void showNoRestrictionsUI();
+	void showFlagUI();
+	void showAnonymousFlagUI();
+	void showChangeLink(ClickHandler changeLinkClickHandler);
+	void showShowLink(ClickHandler showLinkClickHandler);
+	
+	void showFlagModal();
+	void showAnonymousFlagModal();
+		
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
+		void flagData();
+		void anonymousFlagModalOkClicked();
 	}
 
 }
