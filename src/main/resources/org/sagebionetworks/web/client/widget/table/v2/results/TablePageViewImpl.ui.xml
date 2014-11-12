@@ -13,10 +13,6 @@
 				<t:TBody ui:field="body"></t:TBody>
 			</t:Table>
 		</g:ScrollPanel>
-		<b:Row>
-			<b:Column size="XS_4" offset="XS_5">
-				<g:SimplePanel ui:field="paginationPanel"/>
-			</b:Column>
-		</b:Row>
+		<g:SimplePanel ui:field="paginationPanel" />
 	</bh:Div>
 </ui:UiBinder>

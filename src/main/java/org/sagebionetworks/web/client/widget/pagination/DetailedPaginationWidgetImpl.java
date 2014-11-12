@@ -30,8 +30,9 @@ public class DetailedPaginationWidgetImpl implements DetailedPaginationWidget, D
 		this.listener = listener;
 		if(count == null || limit == null || offset == null || count < 1 || limit < 1){
 			view.setPagerVisible(false);
+			view.setMessage("");
 		}else{
-			view.setPagerVisible(true);
+
 			view.removeAllButtons();
 			this.limit = limit;
 			this.offset = offset;
@@ -40,6 +41,8 @@ public class DetailedPaginationWidgetImpl implements DetailedPaginationWidget, D
 			if(remainder > 0){
 				totalNumberOfPages++;
 			}
+			// show the pager if we have more than on page.
+			view.setPagerVisible(totalNumberOfPages > 1);
 			int currentPageNumber = ((int)(offset/limit)) + 1;
 			// previous
 			long offsetIfClicked;
@@ -77,6 +80,7 @@ public class DetailedPaginationWidgetImpl implements DetailedPaginationWidget, D
 				offsetIfClicked = offset + limit;
 				view.addButton(offsetIfClicked, NEXT, false);
 			}
+			setMessage(limit, offset, count);
 		}
 	}
 
@@ -98,4 +102,9 @@ public class DetailedPaginationWidgetImpl implements DetailedPaginationWidget, D
 		this.maxPageButtons = max;
 	}
 
+	private void setMessage(long limit, long offset, long count){
+		long start = offset+1L;
+		long end = Math.min(limit+offset, count);
+		view.setMessage(start+" - "+end+" of "+count);
+	}
 }

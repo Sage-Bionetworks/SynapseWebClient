@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.pagination;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Pagination;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,6 +23,9 @@ public class DetailedPaginationViewImpl implements DetailedPaginationView {
 	
 	@UiField
 	Pagination pageContainer;
+	@UiField
+	Text message;
+	
 	Presenter presenter;
 	Widget widget;
 	
@@ -63,5 +67,10 @@ public class DetailedPaginationViewImpl implements DetailedPaginationView {
 	@Override
 	public void removeAllButtons() {
 		pageContainer.clear();		
+	}
+
+	@Override
+	public void setMessage(String message) {
+		this.message.setText(message);
 	}
 }

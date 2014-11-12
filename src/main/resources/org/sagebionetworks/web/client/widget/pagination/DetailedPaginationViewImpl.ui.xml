@@ -6,7 +6,14 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
-		<b:Pagination ui:field="pageContainer">
-		</b:Pagination>
+		<b:Row>
+			<b:Column size="XS_2" >
+				<bh:Text ui:field="message"></bh:Text>
+			</b:Column>
+			<b:Column size="XS_8" offset="XS_2">
+				<b:Pagination ui:field="pageContainer" styleName="pagination margin-top-0">
+				</b:Pagination>
+			</b:Column>
+		</b:Row>
 	</bh:Div>
 </ui:UiBinder>

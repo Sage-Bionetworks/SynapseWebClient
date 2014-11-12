@@ -1,7 +1,12 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
 import com.google.gwt.user.client.ui.IsWidget;
-
+/**
+ * Contract between the view and widget.
+ * 
+ * @author jhill
+ *
+ */
 public interface DetailedPaginationView extends IsWidget {
 	
 	/**
@@ -38,4 +43,10 @@ public interface DetailedPaginationView extends IsWidget {
 	 * Remove all of the buttons
 	 */
 	void removeAllButtons();
+
+	/**
+	 * Set the message next to the paginations.
+	 * @param string
+	 */
+	void setMessage(String string);
 }
