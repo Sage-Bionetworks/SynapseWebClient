@@ -264,5 +264,6 @@ public interface PortalGinInjector extends Ginjector {
 
 	public BasicPaginationWidget createBasicPaginationWidget();
 
+
 	public KeyboardNavigationHandler createKeyboardNavigationHandler();
 }
