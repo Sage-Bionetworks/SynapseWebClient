@@ -1,8 +1,8 @@
 .colored { color:#3a5bdc;}
-.link { color:#3a5bdc !important;}
+.link { color:#3a5bdc;}
 .link, .link:visited, .link:hover {  color:#3a5bdc; }
 a {color:#3a5bdc;text-decoration:none;}
-a:visited{color:#3a5bdc;text-decoration:none;}
+a:visited{color:#3a5bdc; text-decoration:none;}
 a:hover{color:#3a5bdc; text-decoration:underline;}
 a:focus{color:#3a5bdc; text-decoration:underline;}
 
