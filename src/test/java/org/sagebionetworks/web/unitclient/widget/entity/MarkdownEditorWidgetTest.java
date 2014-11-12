@@ -332,7 +332,9 @@ public class MarkdownEditorWidgetTest {
 		when(mockWidgetRegistrar.getWidgetContentType(widgetDefinition)).thenReturn(contentType);
 		when(mockWidgetRegistrar.getWidgetDescriptor(widgetDefinition)).thenReturn(mockWidgetDescriptor);
 		
-		presenter.editExistingWidget();
+		//call editExistingWidget via handleCommand
+		presenter.handleCommand(MarkdownEditorAction.EDIT_WIDGET);
+		
 		//it should have selected the existing widget definition
 		verify(mockView).setSelectionRange(startWidgetIndex, widgetDefinition.length());
 		
@@ -347,6 +349,196 @@ public class MarkdownEditorWidgetTest {
 		verify(mockDescriptorUpdatedHandler).onUpdate(event);
 		verify(mockView).setMarkdown(before + after);
 		verify(mockView).setCursorPos(startWidgetIndex);
-		
+	}
+	
+	@Test
+	public void testHandleCommandInsertAttachment(){
+		String contentType = WidgetConstants.ATTACHMENT_PREVIEW_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_ATTACHMENT);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
+	public void testHandleCommandInsertButtonLink(){
+		String contentType = WidgetConstants.BUTTON_LINK_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_BUTTON_LINK);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
+	public void testHandleCommandInsertEntityList(){
+		String contentType = WidgetConstants.ENTITYLIST_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_ENTITY_LIST);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
+	public void testHandleCommandInsertImage(){
+		String contentType = WidgetConstants.IMAGE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_IMAGE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
+	public void testHandleCommandInsertLink(){
+		String contentType = WidgetConstants.LINK_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_LINK);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertProvGraph(){
+		String contentType = WidgetConstants.PROVENANCE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_PROV_GRAPH);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertQueryTable(){
+		String contentType = WidgetConstants.QUERY_TABLE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_QUERY_TABLE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertReference(){
+		String contentType = WidgetConstants.REFERENCE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_REFERENCE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertTable(){
+		String contentType = WidgetConstants.TABBED_TABLE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_TABLE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertUserTeam(){
+		String contentType = WidgetConstants.USER_TEAM_BADGE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_USER_TEAM_BADGE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertVideo(){
+		String contentType = WidgetConstants.VIDEO_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_VIDEO);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	@Test
+	public void testHandleCommandInsertYouTube(){
+		String contentType = WidgetConstants.YOUTUBE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_YOU_TUBE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertBookmark(){
+		String contentType = WidgetConstants.BOOKMARK_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_BOOKMARK);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertExternalWebsite(){
+		String contentType = WidgetConstants.SHINYSITE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	@Test
+	public void testHandleCommandInsertAPISuperTable(){
+		String contentType = WidgetConstants.API_TABLE_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_API_SUPERTABLE);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType), eq(isWikiEditor));
+	}
+	
+	private String surroundTextMarkdown = "this";
+	
+	private String getNewMarkdown() {
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).setMarkdown(captor.capture());
+		return captor.getValue();
+	}
+	
+	private void setupSurroundText() {
+		when(mockView.getSelectionLength()).thenReturn(surroundTextMarkdown.length());
+		when(mockView.getMarkdown()).thenReturn(surroundTextMarkdown);
+		when(mockView.getCursorPos()).thenReturn(0);
+	}
+	
+	@Test
+	public void testHandleCommandBold(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.BOLD);
+		assertEquals("**this**", getNewMarkdown());
+	}
+	
+	@Test
+	public void testHandleCommandItalic(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.ITALIC);
+		assertEquals("_this_", getNewMarkdown());
+	}
+	
+	@Test
+	public void testHandleCommandStrikeThrough(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.STRIKETHROUGH);
+		assertEquals("--this--", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandCodeBlock(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.CODE_BLOCK);
+		assertEquals("\n```\nthis\n```\n", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandMath(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.MATH);
+		assertEquals("$$\\(this\\)$$", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandSubscript(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.SUBSCRIPT);
+		assertEquals("~this~", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandSuperscript(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.SUPERSCRIPT);
+		assertEquals("^this^", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH1(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H1);
+		assertEquals("#this", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH2(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H2);
+		assertEquals("##this", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH3(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H3);
+		assertEquals("###this", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH4(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H4);
+		assertEquals("####this", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH5(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H5);
+		assertEquals("#####this", getNewMarkdown());
+	}
+	@Test
+	public void testHandleCommandH6(){
+		setupSurroundText();
+		presenter.handleCommand(MarkdownEditorAction.H6);
+		assertEquals("######this", getNewMarkdown());
 	}
 }
