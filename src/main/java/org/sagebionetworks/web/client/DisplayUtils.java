@@ -1584,7 +1584,7 @@ public class DisplayUtils {
 	    return output.toString();
 	  }
 	
-	public static void updateTextArea(TextArea textArea, String newValue) {
+	public static void updateTextArea(org.gwtbootstrap3.client.ui.TextArea textArea, String newValue) {
 		textArea.setValue(newValue);
 		DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textArea);
 	}
