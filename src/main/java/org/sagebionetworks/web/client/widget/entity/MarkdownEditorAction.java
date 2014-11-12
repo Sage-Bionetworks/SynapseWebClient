@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 
 /**
- * The enumeration of possible actions of an entity action menu.
+ * The enumeration of possible actions from the Markdown Editor
  * 
- * @author John
+ * @author Jay
  *
  */
 public enum MarkdownEditorAction {
